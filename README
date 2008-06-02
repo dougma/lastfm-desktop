@@ -1,0 +1,19 @@
+Check Out From Here?
+====================
+Yes, really. Check out everything below here.
+
+Build Instructions
+==================
+Use the generate..sh script and open the resulting IDE project file. 
+This will build the Moose suite, ie scrobbler, tuner and resolver.
+
+Folder Structure
+================
+dist/
+  - tools for building distributible packages
+tools/
+  - scripts that may aid development
+trash/
+  - candidates for permenant removal
+res/
+  - pre built libraries and other resources, organised by platform

@@ -1,0 +1,7 @@
+win32: SRC_DIR = $$system( cd )
+else:  SRC_DIR = $$system( pwd )
+
+BIN_DIR = $$SRC_DIR/../bin
+BUILD_DIR = $$SRC_DIR/../build
+UI_DIR = $$BUILD_DIR
+DESTDIR = $$BIN_DIR
