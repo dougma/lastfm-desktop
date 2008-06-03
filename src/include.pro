@@ -135,12 +135,10 @@ CONFIG( extension ) {
 }
 
 CONFIG( unicorn ) {
-    INCLUDEPATH += $$SRC_DIR/lib/unicorn
     LIBS += -lunicorn
 }
 
 CONFIG( moose ) {
-    INCLUDEPATH += $$SRC_DIR/lib/moose
     LIBS += -lmoose
 }
 
