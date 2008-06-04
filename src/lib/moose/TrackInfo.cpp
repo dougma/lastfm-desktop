@@ -259,8 +259,10 @@ TrackInfo::durationString() const
 
 
 TrackInfo::ScrobblableStatus
-TrackInfo::scrobblableStatus( TrackInfo& track ) const
+TrackInfo::scrobblableStatus() const
 {
+    TrackInfo& track = *this; //FIXME
+
     // Check duration
     if ( track.duration() < kScrobbleMinLength )
     {
@@ -368,11 +370,11 @@ TrackInfo::isDirExcluded( const QString& path ) const
 
 
 int
-TrackInfo::scrobbleTime( TrackInfo& track ) const
+TrackInfo::scrobbleTime() const
 {
     // If we don't have a length or it's less than the minimum, return the
     // threshold
-    if ( track.duration() <= 0 || track.duration() < kScrobbleMinLength )
+    if ( duration() <= 0 || duration() < kScrobbleMinLength )
         return kScrobbleTimeMax;
 
     float scrobPoint = qBound( kScrobblePointMin,
@@ -380,6 +382,6 @@ TrackInfo::scrobbleTime( TrackInfo& track ) const
                                kScrobblePointMax );
     scrobPoint /= 100.0f;
 
-    return qMin( kScrobbleTimeMax, int( track.duration() * scrobPoint ) );
+    return qMin( kScrobbleTimeMax, int( duration() * scrobPoint ) );
 }
 

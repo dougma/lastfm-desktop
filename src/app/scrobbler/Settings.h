@@ -3,7 +3,6 @@
 #define AUDIOSCROBBLER_SETTINGS_H
 
 #include "lib/moose/Settings.h"
-#include "lib/moose/TrackInfo.h" //kScrobblePoint
 
 int main( int, char** );
 class Settings;

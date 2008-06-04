@@ -77,6 +77,7 @@ extern "C"
 
 /* Initialize the algorithm. */
 
+    //TODO no need to export these
 #ifdef WIN32
 _declspec(dllexport)
 #endif

@@ -21,7 +21,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "UnicornDllExportMacro.h"
+#include "common/DllExportMacro.h"
 
 #include <string>
 #include <fstream>
@@ -80,7 +80,7 @@
 /*************************************************************************/ /**
     Simple logging class
 ******************************************************************************/
-class UNICORN_DLLEXPORT Logger
+class DLLEXPORT Logger
 {
 public:
 

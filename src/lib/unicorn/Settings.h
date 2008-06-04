@@ -3,7 +3,7 @@
 #ifndef UNICORN_SETTINGS_H
 #define UNICORN_SETTINGS_H
 
-#include "UnicornDllExportMacro.h"
+#include "common/DllExportMacro.h"
 #include <QSettings>
 #include <QString>
 
@@ -25,7 +25,7 @@ namespace Unicorn
 
     /** Settings that may be of use to the entire Last.fm suite 
       */
-    class UNICORN_DLLEXPORT Settings
+    class DLLEXPORT Settings
     {
     public:
         Settings();
@@ -69,6 +69,7 @@ namespace Unicorn
         /** @returns one of our pre-defined 2-letter language codes */
         QString appLanguage() const;
     };
+
 
     //TODO make most of this private, friend to Settings dialog
     class MutableSettings : private Settings

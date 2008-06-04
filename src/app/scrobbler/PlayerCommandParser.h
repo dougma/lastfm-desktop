@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,75 +17,46 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYERCOMMANDPARSER_H
-#define PLAYERCOMMANDPARSER_H
+#ifndef PLAYER_COMMAND_PARSER_H
+#define PLAYER_COMMAND_PARSER_H
 
 #include "PlayerCommands.h"
+#include "lib/moose/TrackInfo.h"
 
-#include <map>
 
-/*************************************************************************/ /**
-    Takes plain text messages from the plugin and parses them into a
-    CPlayerCommand for easy digestion by the player connection objects.    
-******************************************************************************/
-class CPlayerCommandParser
+class PlayerCommandParser
 {
 public:
+    struct Exception : QString
+    {
+        Exception( QString s ) : QString( s )
+        {}
+    };
 
-    /*********************************************************************/ /**
-        Ctor
-    **************************************************************************/
-    CPlayerCommandParser();
+    PlayerCommandParser( QString line ) throw( Exception )
 
-    /*********************************************************************/ /**
-        Parses a string received from a plugin.
+    enum Command
+    {
+        Start,
+        Stop,
+        Pause,
+        Resume,
+        BootStrap
+    };
 
-        @param[in] sCmd String to parse.
-        @param[out] cmdOut CPlayerCommand struct to store results in.
-    **************************************************************************/
-    void
-    Parse(
-        const std::string& sCmd,
-        CPlayerCommand&    cmdOut);
-
+    Command command() const { return m_command; }
+    TrackInfo track() const { return m_track; }
+    QString username() const { return m_username; }
 
 private:
+    Command extractCommand( QString& line );
+    QMap<QChar, QString> extractArgs( const QString& line );
+    QString requiredArgs( Command );
+    TrackInfo extractTrack( const QMap<QChar, QString>& args );
 
-    /*********************************************************************/ /**
-        Read the first word of the string and return the corresponding
-        command enum.
-    **************************************************************************/
-    EPlayerCommand
-    ParseCommand(
-        std::string& sCmd);
-
-    /*********************************************************************/ /**
-        Parse arguments off submission string and put them into argsMap.
-    **************************************************************************/
-    void
-    ParseArgs(
-        std::string&                 sArgs,
-        std::map<char, std::string>& argsMap);
-   
-    /*********************************************************************/ /**
-        Check that all the parameters are present.
-    **************************************************************************/
-    void
-    Validate(
-        EPlayerCommand cmd,
-        const std::map<char, std::string>& argsMap);
-    
-    /*********************************************************************/ /**
-        Fill TrackInfo.
-    **************************************************************************/
-    void
-    ParseTrack(
-        std::map<char, std::string>& argsMap,
-        TrackInfo& track);
-    
-    
-    std::map<std::string, EPlayerCommand>   mCmdMap;
-
+    Command m_command;
+    TrackInfo m_track;
+    QString m_username;
 };
 
 #endif // PLAYERCOMMANDPARSER_H

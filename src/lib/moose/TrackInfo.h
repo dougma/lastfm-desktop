@@ -1,14 +1,12 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -19,18 +17,16 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TRACKINFO_H
-#define TRACKINFO_H
+#ifndef TRACK_INFO_H
+#define TRACK_INFO_H
 
-#ifdef QT_XML_LIB
-#include <QDomElement>
-#endif
+#include "common/DllExportMacro.h"
+#include <QString>
 
-#include <QStringList>
-#include <QUrl>
+//TODO shared data pointer
 
 
-class TrackInfo
+class DLLEXPORT TrackInfo
 {
     // undefined because really what consititutes the same track varies depending
     // on usage. Some Qt templates require this operator though so maybe you'll
@@ -38,197 +34,130 @@ class TrackInfo
     // cause bugs --mxcl
     bool operator==( const TrackInfo& ) const;
 
-    public:
-        enum Source
-        {
-            //DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OF THIS ENUM!
-            // you will cause broken settings and b0rked scrobbler cache submissions
+public:
+    enum Source
+    {
+        // DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OR VALUES OF THIS ENUM!
+        // you will cause broken settings and b0rked scrobbler cache submissions
 
-            Unknown = -1,
-            Radio,
-            Player,
-            MediaDevice
-        };
+        Unknown = -1,
+        Radio,
+        Player,
+        MediaDevice
+    };
 
-        enum RatingFlag
-        {
-            //DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OF THIS ENUM!
-            // you will cause broken settings and b0rked scrobbler cache submissions
+    enum RatingFlag
+    {
+        // DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OR VALUES OF THIS ENUM!
+        // you will cause broken settings and b0rked scrobbler cache submissions
 
-            Skipped = 1,
-            Loved = 2,
-            Banned = 4,
-            Scrobbled = 8
-        };
+        Skipped = 1,
+        Loved = 2,
+        Banned = 4,
+        Scrobbled = 8
+    };
 
-        enum ScrobblableStatus
-        {
-            OkToScrobble,
-            NoTimeStamp,
-            TooShort,
-            ArtistNameMissing,
-            TrackNameMissing,
-            ExcludedDir,
-            ArtistInvalid,
-            FromTheFuture,
-            FromTheDistantPast
-        };
+    enum ScrobblableStatus
+    {
+        OkToScrobble,
+        NoTimeStamp,
+        TooShort,
+        ArtistNameMissing,
+        TrackNameMissing,
+        ExcludedDir,
+        ArtistInvalid,
+        FromTheFuture,
+        FromTheDistantPast
+    };
 
-        TrackInfo();
+    TrackInfo();
 
-        #ifdef QT_XML_LIB
-        TrackInfo( const QDomElement& element );
-        QDomElement toDomElement( class QDomDocument& document ) const;
-        #endif
+    const QString artist() const { return m_artist; }
+    const QString album() const { return m_album; }
+    const QString track() const { return m_track; }
+    const int trackNumber() const { return m_trackNumber; }
+    const int playCount() const { return m_playCount; }
+    const int duration() const { return m_duration; }
+    QString durationString() const;
+    const QString mbId() const { return m_mbId; }
+    const QString path() const;
+    time_t timeStamp() const { return m_timeStamp; }
+    const Source source() const { return m_source; }
+    /** scrobbler submission source string code */
+    QString sourceString() const;
+    QString playerId() const { return m_playerId; }
 
-        void timeStampMe();
+    bool isSkipped() const { return m_ratingFlags & TrackInfo::Skipped; }
+    bool isLoved() const { return m_ratingFlags & TrackInfo::Loved; }
+    bool isBanned() const { return m_ratingFlags & TrackInfo::Banned; }
+    bool isScrobbled() const { return m_ratingFlags & TrackInfo::Scrobbled; }
 
-        /** compares artist, trackname and album only */
-        bool sameAs( const TrackInfo& ) const;
+    QString toString() const;
 
-        bool isEmpty() const { return ( m_artist.isEmpty() && m_track.isEmpty() ); }
+    /** only one rating is possible, we have to figure out which from various flags applied */
+    QString ratingCharacter() const;
+    QString fpId() const { return m_fpId; }
+    
+    /** Checks whether the passed-in path is in a directory that the user has
+      * excluded from scrobbling. */
+    bool isDirExcluded( const QString& path ) const;
 
-        const QString artist() const { return m_artist; }
-        void setArtist( QString artist ) { m_artist = artist.trimmed(); }
+    /** Works out if passed-in track can be scrobbled and returns the 
+      * status. */
+    ScrobblableStatus scrobblableStatus() const;
 
-        const QString album() const { return m_album; }
-        void setAlbum( QString album ) { m_album = album.trimmed(); }
+    /** Returns the second at which passed-in track reached the scrobble 
+      * point. */
+    int scrobbleTime() const;
 
-        const QString track() const { return m_track; }
-        void setTrack( QString track ) { m_track = track.trimmed(); }
+protected:
+    QString m_artist;
+    QString m_album;
+    QString m_track;
+    int     m_trackNumber;
+    int     m_playCount;
+    int     m_duration;
+    short   m_ratingFlags;
+    time_t  m_timeStamp;
+    Source  m_source;
+    QString m_playerId;
+    QString m_mbId;
+    QString m_fpId; /// fingerprint id
 
-        const int trackNr() const { return m_trackNr; } //RENAME
-        void setTrackNr( int nr ) { m_trackNr = nr; }
-
-        const int playCount() const { return m_playCount; }
-        void setPlayCount( int playCount ) { m_playCount = playCount; }
-
-        const int duration() const { return m_duration; }
-        QString durationString() const;
-        void setDuration( int duration ) { m_duration = duration; }
-        void setDuration( QString duration ) { m_duration = duration.toInt(); } //REMOVE
-
-        const QString mbId() const { return m_mbId; }
-        void setMbId( QString mbId ) { m_mbId = mbId; }
-
-        const QString path() const;
-        void setPath( QString path );
-
-        // A radio track can have more than one path (i.e. URL)
-        const QString nextPath() const;
-        void setPaths( QStringList paths );
-        bool hasMorePaths() { return m_nextPath < m_paths.size(); }
-
-        time_t timeStamp() const { return m_timeStamp; }
-        void setTimeStamp( time_t timestamp ) { m_timeStamp = timestamp; }
-
-        const QString fileName() const { return m_fileName; }
-        void setFileName( QString fileName ) { m_fileName = fileName; }
-
-        const QString uniqueID() const { return m_uniqueID; }
-        void setUniqueID( QString uniqueID ) { m_uniqueID = uniqueID; }
-
-        const Source source() const { return m_source; }
-        void setSource( Source s ) { m_source = s; }
-        /** scrobbler submission source string code */
-        QString sourceString() const;
-
-        /** last.fm authorisation key */
-        const QString authCode() const { return m_authCode; } //RENAME
-        void setAuthCode( QString code ) { m_authCode = code; }
-
-        void setRatingFlag( RatingFlag flag ) { m_ratingFlags |= flag; }
-        bool isSkipped() const { return m_ratingFlags & TrackInfo::Skipped; }
-        bool isLoved() const { return m_ratingFlags & TrackInfo::Loved; }
-        bool isBanned() const { return m_ratingFlags & TrackInfo::Banned; }
-        bool isScrobbled() const { return m_ratingFlags & TrackInfo::Scrobbled; }
-        //TODO remove, only used by Scrobbler::scrobble() HACK
-        bool isSkippedLovedOrBanned() const { return isSkipped() || isLoved() || isBanned(); }
-        void merge( const TrackInfo& that );
-
-        QString toString() const;
-
-        /** only one rating is possible, we have to figure out which from various flags applied */
-        QString ratingCharacter() const;
-
-        static TrackInfo fromMimeData( const class QMimeData* mimedata );
-
-        QString playerId() const { return m_playerId; }
-        void setPlayerId( QString id ) { m_playerId = id; }
-
-        bool isPowerPlay() const { return !m_powerPlayLabel.isEmpty(); }
-        QString powerPlayLabel() const { return m_powerPlayLabel; }
-        void setPowerPlayLabel( QString label ) { m_powerPlayLabel = label; }
-
-        QString fpId() const { return m_fpId; }
-        void setFpId( QString id ) { m_fpId = id; }
-        
-        // vendor id/ product id, for portable media device scrobbles
-        QString mediaDeviceId() const { return m_mediaDeviceId; }
-        void setMediaDeviceId( QString s ) { m_mediaDeviceId = s; }
+public:
+    //TODO remove?
+    // Limits for user-configurable scrobble point (%)
+    static const int kScrobblePointMin = 50;
+    static const int kScrobblePointMax = 100;
+    // Shortest track length allowed to scrobble (s)
+    static const int kScrobbleMinLength = 31;
+    // Upper limit for scrobble time (s)
+    static const int kScrobbleTimeMax = 240;
+    // Percentage of track length at which to scrobble
+    //TODO should be a float, percentages are meaningless in the middle of code
+    static const int kDefaultScrobblePoint = 50;
+};
 
 
-        /** Checks whether the passed-in path is in a directory that the user has
-          * excluded from scrobbling. */
-        bool isDirExcluded( const QString& path ) const;
+class MutableTrackInfo : public TrackInfo
+{
+public:
+    MutableTrackInfo();
 
-        /** Works out if passed-in track can be scrobbled and returns the 
-          * status. */
-        ScrobblableStatus scrobblableStatus( TrackInfo& track ) const;
-
-        /** Returns the second at which passed-in track reached the scrobble 
-          * point. */
-        int scrobbleTime( TrackInfo& track ) const;
-
-    private:
-        QString m_artist;
-        QString m_album;
-        QString m_track;
-        int     m_trackNr; //RENAME
-
-        int     m_playCount;
-        int     m_duration;
-        QString m_fileName; //RENAME m_path?
-        QString m_mbId;
-        time_t  m_timeStamp;
-        Source  m_source;
-        QString m_authCode;
-        QString m_uniqueID; //TYPO
-        QString m_playerId;
-        QString m_powerPlayLabel;
-        
-        // used by the scrobbler when scrobbling portable devices
-        QString m_mediaDeviceId;
-
-        QStringList m_paths; //WTF
-        mutable int m_nextPath; //WTF
-
-        short m_ratingFlags;
-
-        /** this cannot be used by any component but the scrobbler, if you rely
-          * on it, you will get bugs! */
-        //FIXME make reliable?
-        QString m_username;
-
-        QString m_fpId; /// fingerprint id
-
-
-   public:
-    //CONSTANTS TODO remove?
-        // Limits for user-configurable scrobble point (%)
-        static const int kScrobblePointMin = 50;
-        static const int kScrobblePointMax = 100;
-        // Shortest track length allowed to scrobble (s)
-        static const int kScrobbleMinLength = 31;
-        // Upper limit for scrobble time (s)
-        static const int kScrobbleTimeMax = 240;
-        // Percentage of track length at which to scrobble
-        //TODO should be a float, percentages are meaningless in the middle of code
-        static const int kDefaultScrobblePoint = 50;
-
-    public:
-        QString username() const { return m_username; }
-        void setUsername( const QString& s ) { m_username = s; }
+    void setArtist( QString artist ) { m_artist = artist.trimmed(); }
+    void setAlbum( QString album ) { m_album = album.trimmed(); }
+    void setTrack( QString track ) { m_track = track.trimmed(); }
+    void setTrackNr( int nr ) { m_trackNr = nr; }
+    void setPlayCount( int playCount ) { m_playCount = playCount; }
+    void setDuration( int duration ) { m_duration = duration; }
+    void setMbId( QString mbId ) { m_mbId = mbId; }
+    void setPath( QString path );
+    void setTimeStamp( time_t timestamp ) { m_timeStamp = timestamp; }
+    void timeStampMe();
+    void setSource( Source s ) { m_source = s; }
+    void setRatingFlag( RatingFlag flag ) { m_ratingFlags |= flag; }
+    void setPlayerId( QString id ) { m_playerId = id; }
+    void setFpId( QString id ) { m_fpId = id; }
 };
 
 

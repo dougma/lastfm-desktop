@@ -1,7 +1,7 @@
 
 #include "TrackInfo.h"
-
 #include "lib/unicorn/Settings.h"
+#include "common/DllExportMacro.h"
 
 #ifndef MOOSE_SETTINGS_H
 #define MOOSE_SETTINGS_H
@@ -13,7 +13,7 @@ namespace Moose
     // Moose, then use same for main setOrgName etc.
     typedef Unicorn::Settings QSettings;
 
-    class Settings : public Unicorn::QSettings
+    class DLLEXPORT Settings : public Unicorn::QSettings
     {
     public:
         /** The AudioScrobbler executable location */

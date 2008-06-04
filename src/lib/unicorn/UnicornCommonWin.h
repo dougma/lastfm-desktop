@@ -21,7 +21,7 @@
 #ifndef UNICORNCOMMONWIN_H
 #define UNICORNCOMMONWIN_H
 
-#include "UnicornDllExportMacro.h"
+#include "common/DllExportMacro.h"
 
 #include <QString>
 #include <QUrl>
@@ -36,19 +36,19 @@ namespace UnicornUtils
         Returns the path to the system's Program Files directory inclusive
         of trailing slash.
     **************************************************************************/
-    UNICORN_DLLEXPORT std::string
+    DLLEXPORT std::string
     programFilesPath();
 	
     /*********************************************************************/ /**
         Returns true if we're running on a limited user account.
     **************************************************************************/
-    UNICORN_DLLEXPORT bool
+    DLLEXPORT bool
     isLimitedUser();
 
     /*********************************************************************/ /**
         Returns the name of the default player. "" if not found.
     **************************************************************************/
-    UNICORN_DLLEXPORT QString
+    DLLEXPORT QString
     findDefaultPlayer();
     
     /********************************************************************** /**
@@ -61,7 +61,7 @@ namespace UnicornUtils
     * Returns.......: S_OK on success, error code on failure
     * Description...: Creates a Shell link object (shortcut)
     **************************************************************************/
-    UNICORN_DLLEXPORT HRESULT
+    DLLEXPORT HRESULT
     createShortcut( /*in*/ LPCTSTR lpszFileName, 
                     /*in*/ LPCTSTR lpszDesc, 
                     /*in*/ LPCTSTR lpszShortcutPath );
@@ -70,13 +70,13 @@ namespace UnicornUtils
     /********************************************************************** /**
     * ie c:\ProgramData\Last.fm\Client
     **************************************************************************/
-    UNICORN_DLLEXPORT QString
+    DLLEXPORT QString
     globalAppDataPath();
 
-    UNICORN_DLLEXPORT bool
+    DLLEXPORT bool
     setPreferredAppForUrlScheme( const QUrl& url, const QString& app );
 
-    UNICORN_DLLEXPORT QString
+    DLLEXPORT QString
     preferredAppForUrlScheme( const QUrl& url );
 }
 

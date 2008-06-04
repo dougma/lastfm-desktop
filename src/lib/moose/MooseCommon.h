@@ -23,7 +23,7 @@
 
 /** @author <erik@last.fm> */
 
-#include "MooseDllExportMacro.h"
+#include "common/DllExportMacro.h"
 
 #include "TrackInfo.h"
 
@@ -80,7 +80,7 @@ namespace MooseUtils
     /**
      * Returns path to named file in the app's bin/data directory.
      */
-    MOOSE_DLLEXPORT QString
+    DLLEXPORT QString
     dataPath( QString file = "" );
 
     /**
@@ -89,7 +89,7 @@ namespace MooseUtils
      *      ~/Library/Application Support/Last.fm/ on OS X.
      *      ~/.local/share/Last.fm/ on Unix.
      */
-    MOOSE_DLLEXPORT QString
+    DLLEXPORT QString
     savePath( QString file = "" );
 
     /**
@@ -98,25 +98,25 @@ namespace MooseUtils
      *      ~/Library/Logs/ on OS X.
      *      ~/.local/share/Last.fm/ on Unix.
      */
-    MOOSE_DLLEXPORT QString
+    DLLEXPORT QString
     logPath( QString file );
 
     /**
      * Returns path to directory for storing cached images etc.
      */
-    MOOSE_DLLEXPORT QString
+    DLLEXPORT QString
     cachePath();
 
     /**
      * Returns path to named service plugin.
      */
-    MOOSE_DLLEXPORT QString
+    DLLEXPORT QString
     servicePath( QString name );
 
     /**
      * Helper function to load up a named service plugin.
      */
-    MOOSE_DLLEXPORT QObject*
+    DLLEXPORT QObject*
     loadService( QString name );
     
     // Not exported because implementation is in header.
@@ -131,21 +131,21 @@ namespace MooseUtils
      * Helper function to load a named icon from disk.
      */
   #ifdef QT_GUI_LIB
-    MOOSE_DLLEXPORT QIcon
+    DLLEXPORT QIcon
     icon( const char *name );
   #endif
 
     /**
      * @returns true if the client is already running
      */
-    MOOSE_DLLEXPORT bool
+    DLLEXPORT bool
     isAlreadyRunning();
 
     /**
      * Sends the command to the running client instance, or starts the client 
      * then sends it, NOTE we don't currently support spaces in @p command
      */
-    MOOSE_DLLEXPORT bool
+    DLLEXPORT bool
     sendToInstance( const QString& command,
                     MooseEnums::StartNewInstanceBehaviour = MooseEnums::DontStartNewInstance );
 
@@ -156,11 +156,11 @@ namespace MooseUtils
      * This is still needed on Windows to remove the autolaunch entry that was added by
      * versions prior to 1.5.
      */
-    MOOSE_DLLEXPORT void
+    DLLEXPORT void
     disableHelperApp();
   #endif
 
-    MOOSE_DLLEXPORT QStringList
+    DLLEXPORT QStringList
     extensionPaths();
 
   #ifdef Q_OS_MAC

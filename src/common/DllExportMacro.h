@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005 - 2008 Last.fm Ltd.                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,21 +17,21 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MOOSEDLLEXPORTMACRO_H
-#define MOOSEDLLEXPORTMACRO_H
+#ifndef DLL_EXPORT_MACRO_H
+#define DLL_EXPORT_MACRO_H
 
 // When we compile the header in a DLL as part of the DLL, we need
 // dllexport for the functions to be exported. When including the header
 // as part of the client modules, we need dllimport. X_DLLEXPORT_PRO
 // should only be defined in the DLL .pro.
 #if defined(_WIN32) || defined(WIN32)
-    #ifdef MOOSE_DLLEXPORT_PRO
-        #define MOOSE_DLLEXPORT __declspec(dllexport)
+    #ifdef QMAKE_DLLEXPORT
+        #define DLLEXPORT __declspec(dllexport)
     #else
-        #define MOOSE_DLLEXPORT __declspec(dllimport)
+        #define DLLEXPORT __declspec(dllimport)
     #endif
 #else
-    #define MOOSE_DLLEXPORT
+    #define DLLEXPORT
 #endif
 
-#endif // MOOSEDLLEXPORTMACRO_H
+#endif

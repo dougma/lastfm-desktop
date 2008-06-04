@@ -1,6 +1,3 @@
-#prevent build clashes
-BUILD_DIR = $$BUILD_DIR/$$TARGET
-
 CONFIG( breakpad ) {
     linux*:QMAKE_CXXFLAGS_RELEASE = -Os -freorder-blocks -fno-reorder-functions -fomit-frame-pointer -gstabs+
     mac*:QMAKE_CXXFLAGS_RELEASE = -Os -g -fomit-frame-pointer
@@ -144,3 +141,6 @@ CONFIG( moose ) {
 
 #TODO remove?
 DEPENDPATH += $$SRC_DIR/lib/unicorn $$SRC_DIR/lib/fingerprint
+
+
+win32:contains( TEMPLATE, lib ) DEFINES += QMAKE_DLLEXPORT
