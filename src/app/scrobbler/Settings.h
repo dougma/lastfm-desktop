@@ -40,7 +40,7 @@ public:
 
 namespace The
 {
-    Settings& settings()
+    inline Settings& settings()
     {
         return *Settings::instance;
     }

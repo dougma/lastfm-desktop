@@ -17,33 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_CONNECTION_H
-#define PLAYER_CONNECTION_H
+#ifndef PLAYBACK_STATE_H
+#define PLAYBACK_STATE_H
 
-#include <QObject>
-#include <QString>
-
-
-class PlayerConnection : public QObject
+namespace PlaybackState
 {
-    Q_OBJECT
+    // All states can turn into other states
+    // This is KEY there is no implied order
+    // Do not add a state if it may have some implied dependence or order
+    // instead make an Event
+    //NOTE some state transitions may cause multiple events to be emitted
+    // eg stopped -> paused will cause a PlaybackStarted, then PlaybackPaused to
+    // be emitted
+    enum Enum
+    {
+        Stopped,
+        TuningIn,
+        Playing,
+        Paused,
 
-public:
-    PlayerConnection( QTcpSocket* );
-
-signals:
-    void trackStarted( const TrackInfo& );
-    void playbackStopped();
-    void playbackPaused();
-    void playbackResumed();
-    void bootstapComplete( const QString& username );
-
-private:
-    void parseLine();
-
-private:
-    class QTcpSocket const* const socket;
-    QString playerId;
-};
+        TypeMax // leave here pls, kthxbai
+    };
+}
 
 #endif

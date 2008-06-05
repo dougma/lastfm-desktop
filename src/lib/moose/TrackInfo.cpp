@@ -30,16 +30,16 @@
 
 
 TrackInfo::TrackInfo() :
-        m_trackNr( 0 ),
+        m_trackNumber( 0 ),
         m_playCount( 0 ),
         m_duration( 0 ),
         m_timeStamp( 0 ),
         m_source( Unknown ),
-        m_nextPath( 0 ),
         m_ratingFlags( 0 )
 {}
 
 
+#if 0
 TrackInfo::TrackInfo( const QDomElement& e )
 {
     setArtist( e.namedItem( "artist" ).toElement().text() );
@@ -137,6 +137,7 @@ TrackInfo::merge( const TrackInfo& that )
     if ( m_fpId.isEmpty() ) setFpId( that.fpId() );
     if ( m_mediaDeviceId.isEmpty() ) setMediaDeviceId( that.mediaDeviceId() );
 }
+#endif
 
 
 QString
@@ -145,7 +146,7 @@ TrackInfo::toString() const
     if ( m_artist.isEmpty() )
     {
         if ( m_track.isEmpty() )
-            return QFileInfo( m_fileName ).fileName();
+            return QFileInfo( m_path ).fileName();
         else
             return m_track;
     }
@@ -169,70 +170,14 @@ TrackInfo::ratingCharacter() const
 }
 
 
-bool
-TrackInfo::sameAs( const TrackInfo& that ) const
-{
-    // This isn't an ideal check, but it's the best we can do until we introduce
-    // unique IDs for tracks. Since the artist/track info of a track can change
-    // after we receive metadata, just comparing on metadata isn't reliable. So
-    // we use the paths instead if we have them. And if not, fall back on metadata.
-
-    if ( !this->path().isEmpty() && !that.path().isEmpty() )
-        return this->path() == that.path();
-
-    if ( this->artist() != that.artist() )
-        return false;
-
-    if ( this->track() != that.track() )
-        return false;
-
-    return true;
-}
-
-
 void
-TrackInfo::timeStampMe()
+MutableTrackInfo::timeStampMe()
 {
     setTimeStamp( QDateTime::currentDateTime().toTime_t() );
 }
 
 
-const QString
-TrackInfo::path() const
-{
-    return m_paths.isEmpty() ? "" : m_paths.at( 0 );
-}
-
-
-void
-TrackInfo::setPath( QString path )
-{
-    m_paths.clear();
-    m_paths.append( path );
-}
-
-
-const QString
-TrackInfo::nextPath() const
-{
-    if ( m_nextPath < m_paths.size() )
-    {
-        return m_paths.at( m_nextPath++ );
-    }
-    else
-    {
-        return "";
-    }
-}
-
-
-void
-TrackInfo::setPaths( QStringList paths )
-{
-    m_paths = paths;
-}
-
-
+#if 0
 QString
 TrackInfo::sourceString() const
 {
@@ -244,6 +189,7 @@ TrackInfo::sourceString() const
         default: return "U";
     }
 }
+#endif
 
 
 QString
@@ -261,7 +207,7 @@ TrackInfo::durationString() const
 TrackInfo::ScrobblableStatus
 TrackInfo::scrobblableStatus() const
 {
-    TrackInfo& track = *this; //FIXME
+    const TrackInfo& track = *this; //FIXME
 
     // Check duration
     if ( track.duration() < kScrobbleMinLength )

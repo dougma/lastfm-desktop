@@ -30,9 +30,6 @@ CONFIG(debug, debug|release) {
     linux* {
         QMAKE_CXXFLAGS_DEBUG = -ggdb
     }
-    
-    OBJECTS_DIR = $$BUILD_DIR/debug
-    MOC_DIR = $$BUILD_DIR/debug
 
 	#if debug is specified first, remove the release stuff! --mxcl
 	CONFIG -= release
@@ -42,11 +39,15 @@ CONFIG(debug, debug|release) {
     CONFIG -= app_bundle
 }
 else {
-    OBJECTS_DIR = $$BUILD_DIR/release
-    MOC_DIR = $$BUILD_DIR/release
     CONFIG += warn_off
 }
 
+contains( TEMPLATE, vclib ):tinkywinky = no
+contains( TEMPLATE, vcapp ):tinkywinky = no
+
+!contains( tinkywinky, no ) {
+    # breaks visual studio build system
+    # NOTE always build release builds with nmake template!
 win32 {
 
 	# Build pdb and map files also for release builds
@@ -110,6 +111,7 @@ win32 {
         }
     }
 }
+}
 
 #TODO REMOVE
 linux* {
@@ -143,4 +145,12 @@ CONFIG( moose ) {
 DEPENDPATH += $$SRC_DIR/lib/unicorn $$SRC_DIR/lib/fingerprint
 
 
-win32:contains( TEMPLATE, lib ) DEFINES += QMAKE_DLLEXPORT
+win32 {
+    #FIXME DRY :(
+	contains( TEMPLATE, vclib ) {
+		DEFINES += QMAKE_DLLEXPORT
+	}
+	contains( TEMPLATE, lib ) {
+		DEFINES += QMAKE_DLLEXPORT
+	}
+}

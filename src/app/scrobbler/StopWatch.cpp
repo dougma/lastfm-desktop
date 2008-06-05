@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,156 +18,51 @@
  ***************************************************************************/
 
 #include "StopWatch.h"
-#include "lib/unicorn/Logger.h"
+#include <QDebug>
 
-/******************************************************************************
-    CStopWatch
-******************************************************************************/
-StopWatch::StopWatch() :
-    QThread(),
-    mState( STOPPED ),
-    mnTotalMs( 0 ),
-    mnTimer( 0 ),
-    mnTimeout( 0 ),
-    mbTimedOut( false )
+
+StopWatch::StopWatch()
 {
+    m_thread = new StopWatchThread;
 }
 
-/******************************************************************************
-    CStopWatch copy
-******************************************************************************/
-StopWatch::StopWatch(
-    const StopWatch& that) :
-    QThread()
+
+StopWatch::~StopWatch()
 {
-    clone(that);
+    m_thread->deleteLater();
 }
 
-/******************************************************************************
-    operator=
-******************************************************************************/
-StopWatch&
-StopWatch::operator=(
-    const StopWatch& that)
+
+void
+StopWatch::start( int const i )
 {
-    // Check for self-assignment
-    if (&that != this)
+    Q_ASSERT( !m_thread->isRunning() );
+    
+    m_thread->m_timeout = i;
+    m_thread->start();
+}
+
+
+void
+StopWatchThread::run()
+{
+    QDateTime lastTime = QDateTime::currentDateTime();
+    int timeSoFar = 0;
+    bool timedout = false;
+
+    while( !m_done )
     {
-        clone(that);
-    }
+        msleep( 250 );
 
-    return *this;
-}
+        QDateTime const now = QDateTime::currentDateTime();
 
-/******************************************************************************
-    Clone
-******************************************************************************/
-void
-StopWatch::clone(
-    const StopWatch& that)
-{
-    QMutexLocker grab(&mMutex);
-    mnTotalMs   = that.mnTotalMs;
-    mnTimer     = that.mnTimer;
-    mnTimeout   = that.mnTimeout;
-    mState      = that.mState;
-}
+        if (m_paused) 
+        {
+            lastTime = now;
+            continue;
+        }
 
-/******************************************************************************
-    Start
-******************************************************************************/
-void
-StopWatch::start()
-{
-    mMutex.lock();
-    EStopWatchState state = mState;
-    mMutex.unlock();
-
-    if (state == RUNNING)
-    {
-        return;
-    }
-
-    mMutex.lock();
-    mState = RUNNING;
-    mMutex.unlock();
-
-    QThread::start();
-}
-
-/******************************************************************************
-    Stop
-******************************************************************************/
-void
-StopWatch::stop()
-{
-    mMutex.lock();
-    mState = STOPPED;
-    mMutex.unlock();
-
-    // We need to make sure the timer thread has finished since it might call
-    // Notify after we've called Stop. Since it's going back to
-    // PlayerConnection::onScrobbleTimeout to submit a track, we need to ensure
-    // that the track it submits is the same one that it was timing.
-    wait();
-}
-
-/******************************************************************************
-    Reset
-******************************************************************************/
-void
-StopWatch::reset()
-{
-    mMutex.lock();
-    mnTimer = 0;
-    mnTotalMs = 0;
-    mbTimedOut = false;
-    mMutex.unlock();
-
-    emit valueChanged(mnTimer);
-    emit timerReset();
-}
-
-/******************************************************************************
-    setTimeout
-******************************************************************************/
-void
-StopWatch::setTimeout(
-    int nTimeout)
-{
-    mMutex.lock();
-    int curTime = mnTimer;
-    mMutex.unlock();
-
-    Q_ASSERT( nTimeout > curTime );
-
-    mnTimeout = nTimeout;
-
-    emit timeoutChanged(mnTimeout);
-}
-
-
-/******************************************************************************
-    ThreadMain
-******************************************************************************/
-void
-StopWatch::run()
-{
-    bool bStopped = false;
-    mLastTime = QDateTime::currentDateTime();
-
-    do
-    {
-        int nSleepInterval = 250;
-        msleep(nSleepInterval);
-
-        mMutex.lock();
-
-        // Poll for stop every nSleepInterval
-        bStopped = mState == STOPPED;
-
-        QDateTime currentTime = QDateTime::currentDateTime();
-        int msSpentSleeping = mLastTime.time().msecsTo( currentTime.time() );
+        int msSpentSleeping = lastTime.time().msecsTo( now.time() );
 
         // HACK: This is for when we pass midnight, QTime only works with days
         // so the msSpentSleeping will be a huge negative number. Force it
@@ -179,26 +72,30 @@ StopWatch::run()
 
         if ( msSpentSleeping >= 1000 )
         {
-            mLastTime = currentTime;
+            lastTime = now;
+            timeSoFar += msSpentSleeping;
 
-            mnTotalMs += msSpentSleeping;
-            mnTimer = mnTotalMs / (int)1000;
+            int s = timeSoFar / 1000;
+            emit tick( s );
 
-            //LOGL( 3, "msSpent: " << msSpentSleeping );
-            //LOGL( 3, "ms: " << mnTotalMs );
-            //LOGL( 3, "s: " << mnTimer );
-
-            // Poll for timeout every second
-            if (!mbTimedOut && mnTimer >= mnTimeout)
+            if (s >= m_timeout)
             {
-                emit timeoutReached();
-                mbTimedOut = true;
+                emit timeout();
+                timedout = true;
             }
-
-            emit valueChanged(mnTimer);
         }
+    }
+}
 
-        mMutex.unlock();
 
-    } while( !bStopped );
+void
+StopWatchThread::deleteLater()
+{
+    if (isRunning())
+    {
+        m_done = true;
+        connect( this, SIGNAL(finished()), SLOT(deleteLater()) );
+    }
+    else
+        QObject::deleteLater();
 }

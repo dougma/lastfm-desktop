@@ -33,13 +33,12 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
-    Settings settings( VERSION, QCoreApplication::applicationFilePath() );
-    Settings::instance = &settings;
-
+    //FIXME prolly bad to have a custom instantiation that may use the::settings
+    // before it exists init.
     App app( argc, argv );
 
-    MainWindow window;
-    window.show();
+    Settings settings( VERSION, app.applicationFilePath() );
+    Settings::instance = &settings;
 
     try
     {
@@ -52,7 +51,11 @@ int main( int argc, char** argv )
         manager.connect( &listener, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
 
         app.connect( &listener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
-        app.connect( &manager, SIGNAL(event( int, QVariant )), SLOT(onPlayerManagerEvent( int, QVariant )) );
+
+        app.setPlayerManager( &manager );
+
+        MainWindow window;
+        window.show();
 
         return app.exec();
     }

@@ -18,65 +18,69 @@
  ***************************************************************************/
 
 #include "PlayerListener.h"
-#include "PlayerConnection.h"
+#include "PlayerCommandParser.h"
+#include "lib/unicorn/Logger.h"
+#include <QTcpSocket>
 
 
 PlayerListener::PlayerListener( QObject* parent )
-              : QTcpSocket( parent )
+              : QTcpServer( parent )
 {
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );
 
+    //TODO stepping
     if (!listen( QHostAddress::LocalHost, 33367 ))
-        throw ListenFailure();
+        throw SocketFailure();
 }
 
 
 void
 PlayerListener::onNewConnection()
 {
-    while (hasPendingConnection())
+    Q_DEBUG_BLOCK;
+
+    while (hasPendingConnections())
     {
-        PlayerConnection* c = new PlayerConnection( nextPendingConnection() );
-        m_connections.push( c );
+        QTcpSocket* socket = nextPendingConnection();
 
-        connect( c, SIGNAL(trackStarted( TrackInfo )), SIGNAL(trackStarted( TrackInfo )) );
-        connect( c, SIGNAL(playbackEnded()), SLOT(onPlaybackEnded()) );
-        connect( c, SIGNAL(playbackPaused()), SLOT(onPlaybackPaused()) );
-        connect( c, SIGNAL(playbackResumed()), SLOT(onPlaybackResumed()) );
-        connect( c, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+        socket->waitForReadyRead(); //FIXME, blocks
+
+        while (socket->canReadLine())
+        {
+            try
+            {
+                PlayerCommandParser parser( socket->readLine() );
+
+                switch (parser.command())
+                {
+                    case PlayerCommandParser::Start:
+                        emit trackStarted( parser.track() );
+                        break;
+                    case PlayerCommandParser::Stop:
+                        emit playbackEnded( parser.playerId() );
+                        break;
+                    case PlayerCommandParser::Pause:
+                        emit playbackPaused( parser.playerId() );
+                        break;
+                    case PlayerCommandParser::Resume:
+                        emit playbackResumed( parser.playerId() );
+                        break;
+                    case PlayerCommandParser::Bootstrap:
+                        emit bootstrapCompleted( parser.playerId(), parser.username() );
+                        break;
+                }
+
+                socket->write( "OK\n" );
+            }
+            catch (PlayerCommandParser::Exception& e)
+            {
+                LOGL( 2, e );
+                QString s = "ERROR: " + e + "\n";
+                socket->write( s.toUtf8() );
+            }
+        }
+
+        socket->waitForBytesWritten(); //FIXME, blocks
+        delete socket;
     }
-}
-
-
-static inline QString id( QObject*o )
-{
-    return static_cast<PlayerConnection*>(o)->playerId();
-}
-
-
-void
-PlayerListener::onPlaybackEnded()
-{
-    emit playbackStopped( id(sender()) );
-}
-
-
-void
-PlayerListener::onPlaybackPaused()
-{
-    emit playbackPaused( id(sender()) );
-}
-
-
-void
-PlayerListener::onPlaybackResumed()
-{
-    emit playbackResumed( id(sender()) );
-}
-
-
-void
-PlayerListener::onBootstrapComplete( const QString& username )
-{
-    emit bootstrapComplete( id(sender()), username );
 }

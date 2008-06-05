@@ -17,24 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackEvent.h"
+#include "PlaybackState.h"
 #include "StopWatch.h"
+#include "lib/moose/TrackInfo.h"
 #include <QMutableVectorIterator>
 #include <QStack>
+#include <QVariant>
 
 
 struct Player
 {
+    Player()
+    {}
+
     Player( QString _id ) : id( _id )
     {}
 
-    Player( const Player that ) : id( that.id )
-    {}
-
-    QString const id;
+    QString id;
     TrackInfo track;
-    PlaybackState::Enum state;
     StopWatch watch;
+    PlaybackState::Enum state;
 };
 
 
@@ -45,8 +47,8 @@ class PlayerManager : public QObject
 public:
     PlayerManager();
 
-    PlaybackState state() const { return m_state; }
-    TrackInfo track() const { return m_tracks.top(); }
+    PlaybackState::Enum state() const { return m_state; }
+    TrackInfo track() const { return m_players.top()->track; }
 
     /** will ban or love the current track */
     void ban();
@@ -59,27 +61,31 @@ public slots:
     void onPlaybackResumed( const QString& playerId );
 
 signals:
+    /** the scrobble point tick, connect it to some gui representation */
+    void tick( int );
     /** the int is a PlaybackEvent, @data is documented with the enum */
-    void event( int, const QVariant& data );
+    void event( int, const QVariant& data = QVariant() );
 
 private:
-    class UniquePlayerStack : public QStack<Player>
+    void handleStateChange( PlaybackState::Enum, const TrackInfo& t = TrackInfo() );
+
+    class UniquePlayerStack : public QStack<Player*>
     {
-        bool find( const QString& id, QMutableVectorIterator& i )
+        bool find( const QString& id, QMutableVectorIterator<Player*>& i )
         {
             while (i.hasNext())
-                if (i.next().id == id)
+                if (i.next()->id == id)
                     return true;
             return false;
         }
 
     public:
-        Player& operator[]( const QString& id )
+        Player* operator[]( const QString& id )
         {
-            QMutableVectorIterator<Player> i( m_tracks );
+            QMutableVectorIterator<Player*> i( *this );
             if (!find( id, i ))
             {
-                push( Player( id ) );
+                push( new Player( id ) );
                 return top();
             }
 
@@ -88,12 +94,19 @@ private:
 
         void remove( const QString& id )
         {
-            QMutableVectorIterator<Player> i( m_tracks );
+            QMutableVectorIterator<Player*> i( *this );
             find( id, i );
+            delete i.value();
             i.remove();
         }
     };
 
     UniquePlayerStack m_players;
-    PlaybackState m_state;
+    PlaybackState::Enum m_state;
 };
+
+
+namespace The
+{
+    PlayerManager& playerManager(); //defined in App.cpp
+}

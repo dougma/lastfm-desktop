@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef PLAYBACK_EVENT_H
+#define PLAYBACK_EVENT_H
+
 /** Usage: connect to qApp->event( int, QVariant ), react to events in your slot
   * Note: if you depend on one object's events being handled before another, you
   * should accept the events at a higher level and control both objects from 
@@ -83,23 +86,4 @@ namespace PlaybackEvent
     };
 }
 
-
-namespace PlaybackState
-{
-    // All states can turn into other states
-    // This is KEY there is no implied order
-    // Do not add a state if it may have some implied dependence or order
-    // instead make an Event
-    //NOTE some state transitions may cause multiple events to be emitted
-    // eg stopped -> paused will cause a PlaybackStarted, then PlaybackPaused to
-    // be emitted
-    enum Enum
-    {
-        Stopped,
-        TuningIn,
-        Playing,
-        Paused,
-
-        TypeMax // leave here pls, kthxbai
-    };
-}
+#endif

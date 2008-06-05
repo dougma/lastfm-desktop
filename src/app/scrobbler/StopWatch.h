@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2008 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,143 +17,66 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef STOPWATCH_H
-#define STOPWATCH_H
+#ifndef STOP_WATCH_H
+#define STOP_WATCH_H
 
 #include <QThread>
 #include <QMutex>
 #include <QDateTime>
 
-class CPlayerConnection;
+//TODO arbiturary start times
+//TODO hideously inefficient, though of course not bad, but at the least we 
+// should stop waking every 250ms when the player is paused
 
-/*************************************************************************/ /**
-    A timer class that counts seconds. It spawns its own thread which just
-    sits there and counts. On timeout it notifies whoever's registered with it.
-    
-    It's probably not very accurate since it just uses sleep intervals to
-    count time, but it's accurate enough for our purposes.
-******************************************************************************/
-class StopWatch : public QThread
+
+class StopWatchThread : public QThread
 {
     Q_OBJECT
+    Q_DISABLE_COPY( StopWatchThread )
+    ~StopWatchThread() {} // use deleteLater()
+
+    bool m_done;
 
 public:
+    StopWatchThread() : m_done( false ), m_timeout( 0 ), m_paused( false )
+    {}
 
-    /*********************************************************************/ /**
-        Ctors
-    **************************************************************************/
-    StopWatch();
-    StopWatch(
-        const StopWatch& that);
-    StopWatch& operator=(
-        const StopWatch& that);
+    virtual void run();
+    void deleteLater();
 
-    /*********************************************************************/ /**
-        Start counting. Will spawn thread.
-    **************************************************************************/
-    void
-    start();
-
-    /*********************************************************************/ /**
-        Stop timer.
-    **************************************************************************/
-    void
-    stop();
-
-    /*********************************************************************/ /**
-        Reset timer to zero.
-    **************************************************************************/
-    void
-    reset();
-
-    /*********************************************************************/ /**
-        Set the timeout.
-
-        @param[in] nTimeout Timeout in seconds
-    **************************************************************************/
-    void
-    setTimeout(
-        int nTimeout);
-
-    /*********************************************************************/ /**
-        Returns current time.
-    **************************************************************************/
-    int
-    getTime() { return mnTimer; }
-
-    /*********************************************************************/ /**
-        Returns the timeout.
-    **************************************************************************/
-    int
-    getTimeOut() { return mnTimeout; }
-
-    /*********************************************************************/ /**
-        A comment on this method would be utterly reundant.
-    **************************************************************************/
-    bool
-    isRunning() { return mState == RUNNING; }
+    int m_timeout;
+    bool m_paused;
 
 signals:
-
-    /*********************************************************************/ /**
-        Emitted when timer value changes.
-    **************************************************************************/
-    void
-    valueChanged(
-        int elapsed);
-
-    /*********************************************************************/ /**
-        Emitted when timer is reset.
-    **************************************************************************/
-    void
-    timerReset();
-
-    /*********************************************************************/ /**
-        Emitted when timeout is changed.
-    **************************************************************************/
-    void
-    timeoutChanged(
-        int timeOut);
-
-    /*********************************************************************/ /**
-        Emitted when timeout is reached.
-    **************************************************************************/
-    void
-    timeoutReached();
-
-
-private:
-
-    /*********************************************************************/ /**
-        Used by copy ctor and operator=
-    **************************************************************************/
-    void
-    clone(
-        const StopWatch& that);
-
-    enum EStopWatchState
-    {
-        STOPPED,
-        RUNNING
-    };
-
-    /*********************************************************************/ /**
-        QThread run method.
-    **************************************************************************/
-    virtual void
-    run();
-
-    EStopWatchState mState;
-
-    QDateTime mLastTime;
-
-    int mnTotalMs;
-    int mnTimer;
-    int mnTimeout;
-
-    bool mbTimedOut;
-
-    QMutex mMutex;
+    void tick( int );
+    void timeout();
 };
 
-#endif // STOPWATCH_H
+
+/** Emits timeout() after seconds specified to start. 
+  * Emits tick every second.
+  * Continues to measure time after that point until object death.
+  */
+class StopWatch : public QObject
+{
+    Q_OBJECT
+    Q_DISABLE_COPY( StopWatch )
+
+public:
+    StopWatch();
+    ~StopWatch();
+
+    /** you can only call this once per object, it asserts otherwise */
+    void start( int timeout );
+
+    void pause()  { m_thread->m_paused = true; }
+    void resume() { m_thread->m_paused = false; }
+
+    /** connect to this */
+    QObject* o() const { return m_thread; }
+
+private:
+    StopWatchThread* m_thread;
+};
+
+#endif

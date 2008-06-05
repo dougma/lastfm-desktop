@@ -80,7 +80,7 @@ public:
     const int duration() const { return m_duration; }
     QString durationString() const;
     const QString mbId() const { return m_mbId; }
-    const QString path() const;
+    const QString path() const { return m_path; }
     time_t timeStamp() const { return m_timeStamp; }
     const Source source() const { return m_source; }
     /** scrobbler submission source string code */
@@ -123,6 +123,7 @@ protected:
     QString m_playerId;
     QString m_mbId;
     QString m_fpId; /// fingerprint id
+    QString m_path;
 
 public:
     //TODO remove?
@@ -139,19 +140,20 @@ public:
 };
 
 
-class MutableTrackInfo : public TrackInfo
+class DLLEXPORT MutableTrackInfo : public TrackInfo
 {
 public:
-    MutableTrackInfo();
+    MutableTrackInfo()
+    {}
 
     void setArtist( QString artist ) { m_artist = artist.trimmed(); }
     void setAlbum( QString album ) { m_album = album.trimmed(); }
     void setTrack( QString track ) { m_track = track.trimmed(); }
-    void setTrackNr( int nr ) { m_trackNr = nr; }
+    void setTrackNr( int n ) { m_trackNumber = n; }
     void setPlayCount( int playCount ) { m_playCount = playCount; }
     void setDuration( int duration ) { m_duration = duration; }
     void setMbId( QString mbId ) { m_mbId = mbId; }
-    void setPath( QString path );
+    void setPath( QString path ) { m_path = path; }
     void setTimeStamp( time_t timestamp ) { m_timeStamp = timestamp; }
     void timeStampMe();
     void setSource( Source s ) { m_source = s; }

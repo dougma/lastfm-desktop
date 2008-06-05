@@ -20,7 +20,6 @@
 #ifndef PLAYER_COMMAND_PARSER_H
 #define PLAYER_COMMAND_PARSER_H
 
-#include "PlayerCommands.h"
 #include "lib/moose/TrackInfo.h"
 
 
@@ -33,7 +32,7 @@ public:
         {}
     };
 
-    PlayerCommandParser( QString line ) throw( Exception )
+    PlayerCommandParser( QString line ) throw( Exception );
 
     enum Command
     {
@@ -41,10 +40,11 @@ public:
         Stop,
         Pause,
         Resume,
-        BootStrap
+        Bootstrap
     };
 
     Command command() const { return m_command; }
+    QString playerId() const { return m_playerId; }
     TrackInfo track() const { return m_track; }
     QString username() const { return m_username; }
 
@@ -55,6 +55,7 @@ private:
     TrackInfo extractTrack( const QMap<QChar, QString>& args );
 
     Command m_command;
+    QString m_playerId;
     TrackInfo m_track;
     QString m_username;
 };

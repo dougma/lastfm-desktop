@@ -41,22 +41,14 @@ public:
     PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
 
 signals:
-    void trackChanged( const TrackInfo& );
+    void trackStarted( const TrackInfo& );
     void playbackEnded( const QString& playerId );
     void playbackPaused( const QString& playerId );
     void playbackResumed( const QString& playerId );
-    void bootstrapComplete( const QString& playerId, const QString& username );
+    void bootstrapCompleted( const QString& playerId, const QString& username );
 
 private slots:
     void onNewConnection();
-
-    void onPlaybackEnded();
-    void onPlaybackPaused();
-    void onPlaybackResumed();
-    void onBootstrapComplete( const QString& username );
-
-private:
-    QStack<PlayerConnection*> m_connections;
 };
 
 #endif

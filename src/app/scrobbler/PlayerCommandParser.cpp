@@ -18,34 +18,43 @@
  ***************************************************************************/
 
 #include "PlayerCommandParser.h"
+#include "lib/unicorn/Logger.h"
+#include <QStringList>
+#include <QUrl>
 
 
 PlayerCommandParser::PlayerCommandParser( QString line )
 {
-    line = line.trimmed();
-    if (line.isEmpty()) throw Exception( "Command string seems to be empty" )
-
-    m_command = parseCommand( line ); //removes the command string from line
+    Q_DEBUG_BLOCK;
 
     line = line.trimmed();
+    if (line.isEmpty()) throw Exception( "Command string seems to be empty" );
 
-    QMap<QString, QString> const args = parseArgs( line );
+    qDebug() << line;
+
+    m_command = extractCommand( line ); //removes the command string from line
+
+    line = line.trimmed();
+
+    QMap<QChar, QString> const args = extractArgs( line );
     QString const required = requiredArgs( m_command );
 
-    for (int i = 0; i < required.length())
+    for (int i = 0; i < required.length(); ++i)
     {
         QChar const c = required[i];
         if (!args.contains( c ))
-            throw Exception( "Mandoatory argument unspecified: " + c )
+            throw Exception( "Mandatory argument unspecified: " + QString(c) );
     }
+
+    m_playerId = args['c'];
 
     switch (m_command)
     {
         case Start:
-            m_track = parseTrack( args );
+            m_track = extractTrack( args );
             break;
-        case BootStrap:
-            m_username = args['u'] );
+        case Bootstrap:
+            m_username = args['u'];
             break;
         default:
             break;
@@ -53,14 +62,13 @@ PlayerCommandParser::PlayerCommandParser( QString line )
 }
 
 
-Command
+PlayerCommandParser::Command
 PlayerCommandParser::extractCommand( QString& line )
 {
     int const n = line.indexOf( ' ' );
     if (n == -1) throw Exception( "Unable to parse" );
 
-    QString const command = line.left( n );
-    command = command.toUpper();
+    QString const command = line.left( n ).toUpper();
 
     // Trim off command from passed in string
     line = line.mid( n + 1 );
@@ -69,7 +77,7 @@ PlayerCommandParser::extractCommand( QString& line )
     if (command == "STOP") return Stop;
     if (command == "PAUSE") return Pause;
     if (command == "RESUME") return Resume;
-    if (command == "BOOTSTRAP") return BootStrap;
+    if (command == "BOOTSTRAP") return Bootstrap;
 
     throw Exception( "Invalid command" );
 }
@@ -90,7 +98,7 @@ PlayerCommandParser::extractArgs( const QString& line )
         QChar id = parts[0][0];
 
         if (map.contains( id ))
-            throw Execption( "Field identifier occurred twice in request: " + id );
+            throw Exception( "Field identifier occurred twice in request: " + QString(id) );
 
         map[id] = parts[1].trimmed();
     }
@@ -102,7 +110,7 @@ PlayerCommandParser::extractArgs( const QString& line )
 QString
 PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
 {
-    switch (cmd)
+    switch (c)
     {   
         case Start: 
             return "catblp";
@@ -110,7 +118,7 @@ PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
         case Pause:
         case Resume:
             return "c";
-        case BootStrap:
+        case Bootstrap:
             return "cu";
     }
 }
