@@ -23,7 +23,7 @@
 #include <QTcpSocket>
 
 
-PlayerListener::PlayerListener( QObject* parent )
+PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketFailure )
               : QTcpServer( parent )
 {
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );

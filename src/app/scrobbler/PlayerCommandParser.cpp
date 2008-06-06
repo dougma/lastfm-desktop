@@ -23,7 +23,7 @@
 #include <QUrl>
 
 
-PlayerCommandParser::PlayerCommandParser( QString line )
+PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandParser::Exception )
 {
     Q_DEBUG_BLOCK;
 

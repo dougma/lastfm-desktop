@@ -1,4 +1,4 @@
-TEMPLATE = vcapp
+TEMPLATE = app
 TARGET = AudioScrobbler
 CONFIG += unicorn moose
 QT += xml network

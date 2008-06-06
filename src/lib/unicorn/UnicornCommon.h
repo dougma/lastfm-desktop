@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,33 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORNCOMMON_H
-#define UNICORNCOMMON_H
+#ifndef UNICORN_COMMON_H
+#define UNICORN_COMMON_H
 
 #include "common/DllExportMacro.h"
-
 
 #include <QString>
 #include <QLocale>
 #include <QUrl>
 
+//TODO remove
 #include <string>
 #include <vector>
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
     #include "UnicornCommonWin.h"
 #endif
-
-
-// Some nice macros for writing getters and setters automatically
-#define PROP_GET( Type, lower ) \
-    private: Type m_##lower; \
-    public: Type lower() const { return m_##lower; } \
-    private:
-#define PROP_GET_SET( Type, lower, Upper ) \
-    PROP_GET( Type, lower ) \
-    public: void set##Upper( Type lower ) { m_##lower = lower; } \
-    private:
+#ifdef Q_OS_MAC
+    #include "UnicornCommonMac.h"
+#endif
 
 
 namespace UnicornEnums
@@ -195,40 +186,4 @@ namespace UnicornUtils
     msleep( int );
 }
 
-
-#ifdef Q_OS_MAC
-namespace UnicornUtils
-{
-    /**
-     * Returns the path to the user's Application Support directory.
-     */
-    QString
-    applicationSupportFolderPath();
-
-    QLocale::Language
-    osxLanguageCode();
-    
-    QByteArray 
-    CFStringToUtf8( CFStringRef );
-
-    inline QString
-    CFStringToQString( CFStringRef s )
-    {
-        return QString::fromUtf8( CFStringToUtf8( s ) );
-    }
-    
-    bool
-    isGrowlInstalled();
-
-    bool
-    iTunesIsOpen();
-
-    bool
-    setPreferredAppForUrlScheme( const QUrl& url, const QString& app );
-
-    QString
-    preferredAppForUrlScheme( const QUrl& url );
-}
 #endif
-
-#endif // UNICORNCOMMON_H
