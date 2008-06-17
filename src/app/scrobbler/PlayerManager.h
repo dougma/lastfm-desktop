@@ -24,6 +24,8 @@
 #include <QStack>
 #include <QVariant>
 
+//TODO don't duplicate the Player.state in m_state 
+
 
 struct Player
 {
@@ -43,6 +45,8 @@ struct Player
 class PlayerManager : public QObject
 {
     Q_OBJECT
+
+    friend class Observed;
 
 public:
     PlayerManager();
@@ -109,4 +113,36 @@ private:
 namespace The
 {
     PlayerManager& playerManager(); //defined in App.cpp
+}
+
+
+class Observed
+{
+    static Player& top() { return *The::playerManager().m_players.top(); }
+
+public:
+    static uint scrobblePoint()
+    {
+        return top().track.scrobblePoint();
+    }
+
+    static uint elapsedScrobbleTime()
+    {
+        //FIXME will crash
+        return top().watch.elapsed();
+    }
+
+    static uint duration()
+    {
+        return top().track.duration();
+    }
+};
+
+
+namespace The
+{
+    inline Observed observed()
+    {
+        return Observed();
+    }
 }

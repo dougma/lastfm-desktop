@@ -38,17 +38,19 @@ class StopWatchThread : public QThread
     bool m_done;
 
 public:
-    StopWatchThread() : m_done( false ), m_timeout( 0 ), m_paused( false )
+    StopWatchThread() : m_done( false ), m_paused( false ), m_timeout( 0 ), m_elapsed( 0 )
     {}
 
     virtual void run();
     void deleteLater();
 
-    int m_timeout;
     bool m_paused;
+    /** all in units of milliseconds */
+    uint m_timeout;
+    uint m_elapsed;
 
 signals:
-    void tick( int );
+    void tick( int ); // int is the usual signal/slot parameter, uint breaks
     void timeout();
 };
 
@@ -66,14 +68,17 @@ public:
     StopWatch();
     ~StopWatch();
 
-    /** you can only call this once per object, it asserts otherwise */
-    void start( int timeout );
+    /** kills the old stop watch, you won't get any signals for that one now */
+    void start( uint timeout_in_seconds );
 
     void pause()  { m_thread->m_paused = true; }
     void resume() { m_thread->m_paused = false; }
 
-    /** connect to this */
-    QObject* o() const { return m_thread; }
+    uint elapsed() { return m_thread->m_elapsed / 1000; }
+
+signals:
+    void tick( int );
+    void timeout();
 
 private:
     StopWatchThread* m_thread;

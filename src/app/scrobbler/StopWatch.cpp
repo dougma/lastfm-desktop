@@ -21,24 +21,30 @@
 #include <QDebug>
 
 
-StopWatch::StopWatch()
-{
-    m_thread = new StopWatchThread;
-}
+StopWatch::StopWatch() : m_thread( 0 )
+{}
 
 
 StopWatch::~StopWatch()
 {
-    m_thread->deleteLater();
+    if (m_thread) m_thread->deleteLater();
 }
 
 
 void
-StopWatch::start( int const i )
+StopWatch::start( uint const i )
 {
-    Q_ASSERT( !m_thread->isRunning() );
-    
-    m_thread->m_timeout = i;
+    if (m_thread)
+    {
+        disconnect( m_thread, 0, this, 0 );
+        m_thread->deleteLater();
+    }
+
+    m_thread = new StopWatchThread;
+    connect( m_thread, SIGNAL(tick( int )), SIGNAL(tick( int )) );
+    connect( m_thread, SIGNAL(timeout()), SIGNAL(timeout()) );
+
+    m_thread->m_timeout = i * 1000;
     m_thread->start();
 }
 
@@ -47,7 +53,6 @@ void
 StopWatchThread::run()
 {
     QDateTime lastTime = QDateTime::currentDateTime();
-    int timeSoFar = 0;
     bool timedout = false;
 
     while( !m_done )
@@ -73,12 +78,11 @@ StopWatchThread::run()
         if ( msSpentSleeping >= 1000 )
         {
             lastTime = now;
-            timeSoFar += msSpentSleeping;
+            m_elapsed += msSpentSleeping;
 
-            int s = timeSoFar / 1000;
-            emit tick( s );
+            emit tick( m_elapsed / 1000 );
 
-            if (s >= m_timeout)
+            if (m_elapsed >= m_timeout)
             {
                 emit timeout();
                 timedout = true;

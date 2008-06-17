@@ -108,7 +108,8 @@ public:
 
     /** Returns the second at which passed-in track reached the scrobble 
       * point. */
-    int scrobbleTime() const;
+    int scrobbleTime() const; //FIXME remove
+    int scrobblePoint() const { return scrobbleTime(); }
 
 protected:
     QString m_artist;

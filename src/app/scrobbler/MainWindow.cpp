@@ -22,12 +22,20 @@
 #include "PlayerManager.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/moose/TrackInfo.h"
+#include <QPainter>
+#include <QResizeEvent>
 #include <QTime>
+#include <QTimer>
 #include <QVariant>
+#include <cmath>
 
 
 MainWindow::MainWindow()
+          : m_progressDisplayTick( 0 )
 {
+    m_progressDisplayTimer = new QTimer( this );
+    connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
+
     ui.setupUi( this );
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
@@ -43,6 +51,7 @@ MainWindow::onAppEvent( int e, const QVariant& v )
         case PlaybackEvent::PlaybackStarted:
         case PlaybackEvent::TrackChanged:
             ui.track->setText( v.value<TrackInfo>().toString() );
+            ui.source->setText( "00:00" );
             break;
 
         case PlaybackEvent::PlaybackEnded:
@@ -50,6 +59,31 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             ui.track->clear();
             ui.source->clear();
             break;
+    }
+
+    // progress display timer
+    switch (e)
+    {
+        case PlaybackEvent::PlaybackStarted:
+        case PlaybackEvent::PlaybackUnstalled:
+        case PlaybackEvent::PlaybackUnpaused:
+            determineProgressDisplayGranularity( The::observed().scrobblePoint() );
+            m_progressDisplayTimer->start();
+            break;
+        
+        case PlaybackEvent::PlaybackStalled:
+        case PlaybackEvent::PlaybackPaused:
+        case PlaybackEvent::PlaybackEnded:
+            m_progressDisplayTimer->stop();
+            break;
+    }
+    switch (e)
+    {
+        case PlaybackEvent::PlaybackStarted:
+        case PlaybackEvent::TrackChanged:
+        case PlaybackEvent::PlaybackEnded:
+            m_progressDisplayTick = 0;
+            update();
     }
 }
 
@@ -60,4 +94,66 @@ MainWindow::onPlaybackTick( int s )
     QTime t( 0, 0 );
     t = t.addSecs( s );
     ui.source->setText( t.toString( "mm:ss" ) );
+}
+
+
+void
+MainWindow::resizeEvent( QResizeEvent* e )
+{
+    if (The::playerManager().state() == PlaybackState::Stopped)
+        return;
+
+    // this is as exact as we can get it in milliseconds
+    uint exactElapsedScrobbleTime = m_progressDisplayTick * m_progressDisplayTimer->interval();
+
+    determineProgressDisplayGranularity( The::observed().scrobblePoint() );
+    
+    if (e->oldSize().width() == 0)
+    {
+        m_progressDisplayTick = 0;
+    }
+    else
+    {
+        double f = exactElapsedScrobbleTime;
+        f /= The::observed().scrobblePoint() * 1000;
+        f *= e->size().width();
+        m_progressDisplayTick = ceil( f );
+    }
+
+    update();
+}
+
+
+void
+MainWindow::determineProgressDisplayGranularity( uint g )
+{
+    if (g == 0)
+    {
+        //TODO #error better handling with gui stuff but non intrusive
+    }
+    else
+        m_progressDisplayTimer->setInterval( 1000 * g / width() );
+}
+
+
+void
+MainWindow::onProgressDisplayTick()
+{
+    m_progressDisplayTick++;
+    update();
+}
+
+
+void
+MainWindow::paintEvent( QPaintEvent* e )
+{
+    QMainWindow::paintEvent( e );
+
+    if (!m_progressDisplayTick)
+        return;
+
+    QPainter p( this );
+    p.setPen( Qt::gray );
+    p.setBrush( Qt::lightGray );
+    p.drawRect( QRect( QPoint(), QPoint( m_progressDisplayTick, height() ) ) );
 }

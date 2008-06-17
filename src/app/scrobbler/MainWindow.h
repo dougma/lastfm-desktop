@@ -29,7 +29,21 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 
+protected:
+    void resizeEvent( QResizeEvent* );
+    void paintEvent( QPaintEvent* );
+
 private slots:
     void onAppEvent( int, const QVariant& );
     void onPlaybackTick( int );
+    void onProgressDisplayTick();
+
+private:
+    /** progress is updated every granularity, so if showing the progress todo
+      * scrobble point, pass the scrobble point in seconds, and the granularity
+      * will be based on the width of the mainwindow and the scrobble point */
+    void determineProgressDisplayGranularity( uint g );
+
+    class QTimer* m_progressDisplayTimer;
+    uint m_progressDisplayTick;
 };

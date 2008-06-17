@@ -49,7 +49,7 @@ PlayerListener::onNewConnection()
         {
             try
             {
-                PlayerCommandParser parser( socket->readLine() );
+                PlayerCommandParser parser( QString::fromUtf8( socket->readLine() ) );
 
                 switch (parser.command())
                 {

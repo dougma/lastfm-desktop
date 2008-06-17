@@ -53,7 +53,7 @@ PlayerManager::onTrackStarted( const TrackInfo& t )
         //TODO this isn't neat, we don't have to do it everytime as the previous 
         // top() is prolly the same as the new top()
         disconnect( 0, 0, this, SIGNAL(tick( int )) );
-        connect( p.watch.o(), SIGNAL(tick( int )), SIGNAL(tick( int )) );
+        connect( &p.watch, SIGNAL(tick( int )), SIGNAL(tick( int )) );
         handleStateChange( p.state, p.track );
     }
 }
@@ -105,6 +105,8 @@ void
 PlayerManager::handleStateChange( PlaybackState::Enum newState, const TrackInfo& t )
 {
     using namespace PlaybackState;
+
+    qDebug() << m_players.count();
 
     PlaybackState::Enum oldState = m_state;
     m_state = newState;

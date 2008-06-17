@@ -59,7 +59,7 @@ int main( int argc, char** argv )
 
         return app.exec();
     }
-    catch (PlayerListener::SocketFailure& e)
+    catch (PlayerListener::SocketFailure&)
     {
         //TODO
         //FIXME can't have it so that there is no radio option if listener socket fails!
