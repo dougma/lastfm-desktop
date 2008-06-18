@@ -20,12 +20,12 @@
 #include "UnicornCommon.h"
 
 #include "logger.h"
-#include "md5.h"
 
+#include <QCoreApplication>
+#include <QCryptographicHash>
+#include <QDir>
 #include <QMap>
 #include <QUrl>
-#include <QCoreApplication>
-#include <QDir>
 
 #ifdef WIN32
     #include <windows.h>
@@ -39,26 +39,10 @@ namespace UnicornUtils
 
 
 QString
-md5Digest( const char *token )
+md5( const QByteArray& src )
 {
-    md5_state_t md5state;
-    unsigned char md5pword[16];
-
-    md5_init( &md5state );
-    md5_append( &md5state, (unsigned const char *)token, (int)strlen( token ) );
-    md5_finish( &md5state, md5pword );
-
-    char tmp[33];
-    strncpy( tmp, "\0", sizeof(tmp) );
-    for ( int j = 0; j < 16; j++ )
-    {
-        char a[3];
-        sprintf( a, "%02x", md5pword[j] );
-        tmp[2*j] = a[0];
-        tmp[2*j+1] = a[1];
-    }
-
-    return QString::fromAscii( tmp );
+    QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
+    return QString::fromLatin1( digest.toHex() );
 }
 
 

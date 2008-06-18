@@ -62,11 +62,8 @@ namespace UnicornEnums
  */
 namespace UnicornUtils
 {
-    /**
-     * Md5 hash token.
-     */
     DLLEXPORT QString
-    md5Digest( const char* token );
+    md5( const QByteArray& );
 
     /**
      * Translate a QHttpState into a human-readable string.
