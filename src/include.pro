@@ -137,6 +137,14 @@ CONFIG( unicorn ) {
     LIBS += -lunicorn
 }
 
+CONFIG( unicorn ):horn = yes
+contains( TARGET, unicorn ):horn = yes
+contains( horn, yes ) {
+    QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
+    message( "QtOverrides active! Check lib/unicorn/QtOverrides for documentation." )
+}
+
+
 CONFIG( moose ) {
     LIBS += -lmoose
 }
@@ -154,3 +162,6 @@ win32 {
 		DEFINES += QMAKE_DLLEXPORT
 	}
 }
+
+
+contains( TEMPLATE, app ):contains( QT, gui ):RESOURCES += $$SRC_DIR/common/qrc/common.qrc

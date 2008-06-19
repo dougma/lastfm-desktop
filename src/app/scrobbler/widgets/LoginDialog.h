@@ -17,36 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
+#include "ui_LoginWidget.h"
+#include <QDialog>
 
 
-class MainWindow : public QMainWindow
+class LoginDialog : public QDialog
 {
     Q_OBJECT
 
-    Ui::MainWindow ui;
-
 public:
-    MainWindow();
+    LoginDialog();
 
-    QMap<QString, QAction*> actions() const;
-
-protected:
-    void resizeEvent( QResizeEvent* );
-    void paintEvent( QPaintEvent* );
+    // is already an md5 hash
+    QString password() const { return m_password; }
+    QString username() const { return m_username; }
 
 private slots:
-    void onAppEvent( int, const QVariant& );
-    void onPlaybackTick( int );
-    void onProgressDisplayTick();
+    void verify();
+    void onVerifyResult( class Request* );
 
 private:
-    /** progress is updated every granularity, so if showing the progress todo
-      * scrobble point, pass the scrobble point in seconds, and the granularity
-      * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
+    Ui::LoginWidget ui;
 
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
+    bool m_bootstrap;
+    QString m_username;
+    QString m_password;
 };

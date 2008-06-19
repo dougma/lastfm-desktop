@@ -54,6 +54,7 @@ PlayerManager::onTrackStarted( const TrackInfo& t )
         // top() is prolly the same as the new top()
         disconnect( 0, 0, this, SIGNAL(tick( int )) );
         connect( &p.watch, SIGNAL(tick( int )), SIGNAL(tick( int )) );
+        connect( &p.watch, SIGNAL(timeout()), SIGNAL(onStopWatchTimedOut()) );
         handleStateChange( p.state, p.track );
     }
 }
@@ -160,4 +161,11 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const TrackInfo&
         }
         break;
     }
+}
+
+
+void
+PlayerManager::onStopWatchTimedOut()
+{
+    emit event( PlaybackEvent::ScrobblePointReached );
 }

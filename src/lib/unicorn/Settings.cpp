@@ -18,5 +18,5 @@ Unicorn::Settings::appLanguage() const
   #else
     QLocale::Language qtLang = QLocale::system().language();
   #endif
-    return UnicornUtils::qtLanguageToLfmLangCode( qtLang );
+    return Unicorn::qtLanguageToLfmLangCode( qtLang );
 }

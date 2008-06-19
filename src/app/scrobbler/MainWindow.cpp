@@ -157,3 +157,13 @@ MainWindow::paintEvent( QPaintEvent* e )
     p.setBrush( Qt::lightGray );
     p.drawRect( QRect( QPoint(), QPoint( m_progressDisplayTick, height() ) ) );
 }
+
+
+QMap<QString, QAction*>
+MainWindow::actions() const
+{
+    QMap<QString, QAction*> map;
+    foreach (QAction* a, QMainWindow::actions())
+        map[a->objectName()] = a;
+    return map;
+}

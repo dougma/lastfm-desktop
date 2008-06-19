@@ -18,13 +18,36 @@
  ***************************************************************************/
 
 #include "App.h"
+#include "PlaybackEvent.h"
 #include "PlayerManager.h"
+#include "ScrobbleShepherd.h"
+#include "Settings.h"
+#include "widgets/SettingsDialog/SettingsDialog.h"
 
 
 App::App( int argc, char** argv ) 
    : QApplication( argc, argv ),
      m_playerManager( 0 )
 {
+    if (The::user().isEmpty())
+    {
+        LoginDialog d;
+        if (d.exec() == QDialog::Accepted)
+        {
+            The::settings().setUsername( d.username() );
+            The::settings().setPassword( d.password() );
+
+            //TODO bootstrapping
+        }
+        else
+        {
+            quit();
+            return;
+        }
+    }
+
+    m_scrobbler = new ScrobblerManager( this );
+
     connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
@@ -47,12 +70,34 @@ App::state() const
 
 
 void
-App::onAppEvent( int, const QVariant& )
-{}
+App::onAppEvent( int e, const QVariant& )
+{
+    switch (e)
+    {
+        case PlaybackEvent::ScrobblePointReached:
+            m_scrobbler->scrobble( The::playerManager().track() );
+            break;
+
+        case PlaybackEvent::PlaybackStarted:
+        case PlaybackEvent::TrackChanged:
+            m_scrobbler->nowPlaying( The::playerManager().track() );
+            break;
+    }
+}
 
 
 void 
 App::onBootstrapCompleted( const QString& playerId, const QString& username )
+{}
+
+
+void
+App::love()
+{}
+
+
+void
+App::ban()
 {}
 
 

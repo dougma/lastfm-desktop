@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2008 by                                          *
- *      Last.fm Ltd. <client@last.fm>                                      *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,10 +22,11 @@
 
 /** @author <erik@last.fm> */
 
-#include <QString>
-#include <CoreFoundation/CoreFoundation.h>
 #include <QLocale>
+#include <QString>
 #include <QUrl>
+#include <CoreFoundation/CoreFoundation.h>
+
 
 namespace UnicornUtils
 {

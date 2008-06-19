@@ -21,6 +21,7 @@
 #define TRACK_INFO_H
 
 #include "common/DllExportMacro.h"
+#include <QDomElement>
 #include <QString>
 
 //TODO shared data pointer
@@ -72,17 +73,48 @@ public:
 
     TrackInfo();
 
-    const QString artist() const { return m_artist; }
-    const QString album() const { return m_album; }
-    const QString track() const { return m_track; }
-    const int trackNumber() const { return m_trackNumber; }
-    const int playCount() const { return m_playCount; }
-    const int duration() const { return m_duration; }
+    /** not a great isEmpty check, but most services will complain if these two
+      * are empty */
+    bool isEmpty() const { return m_artist.isEmpty() && m_title.isEmpty(); }
+
+    //TODO remove
+    bool sameAs( const TrackInfo& that ) const
+    {
+        // This isn't an ideal check, but it's the best we can do until we introduce
+        // unique IDs for tracks. Since the artist/track info of a track can change
+        // after we receive metadata, just comparing on metadata isn't reliable. So
+        // we use the paths instead if we have them. And if not, fall back on metadata.
+
+        if ( !this->path().isEmpty() && !that.path().isEmpty() )
+            return this->path() == that.path();
+
+        if ( this->artist() != that.artist() )
+            return false;
+
+        if ( this->track() != that.track() )
+            return false;
+
+        return true;
+    }
+
+    //TODO remove
+    void merge( const TrackInfo& that );
+    //TODO remove
+    QDomElement toDomElement( class QDomDocument& ) const;
+    //TODO remove
+    TrackInfo( const QDomElement& );
+
+    QString artist() const { return m_artist; }
+    QString album() const { return m_album; }
+    QString track() const { return m_title; }
+    int trackNumber() const { return m_trackNumber; }
+    int playCount() const { return m_playCount; }
+    int duration() const { return m_duration; }
     QString durationString() const;
-    const QString mbId() const { return m_mbId; }
-    const QString path() const { return m_path; }
+    QString mbId() const { return m_mbId; }
+    QString path() const { return m_path; }
     time_t timeStamp() const { return m_timeStamp; }
-    const Source source() const { return m_source; }
+    Source source() const { return m_source; }
     /** scrobbler submission source string code */
     QString sourceString() const;
     QString playerId() const { return m_playerId; }
@@ -114,7 +146,7 @@ public:
 protected:
     QString m_artist;
     QString m_album;
-    QString m_track;
+    QString m_title;
     int     m_trackNumber;
     int     m_playCount;
     int     m_duration;
@@ -149,7 +181,7 @@ public:
 
     void setArtist( QString artist ) { m_artist = artist.trimmed(); }
     void setAlbum( QString album ) { m_album = album.trimmed(); }
-    void setTrack( QString track ) { m_track = track.trimmed(); }
+    void setTrack( QString track ) { m_title = track.trimmed(); }
     void setTrackNr( int n ) { m_trackNumber = n; }
     void setPlayCount( int playCount ) { m_playCount = playCount; }
     void setDuration( int duration ) { m_duration = duration; }

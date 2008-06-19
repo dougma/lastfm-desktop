@@ -1,0 +1,9 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/SettingsDialog">
+     <file>account.png</file>
+     <file>radio.png</file>
+     <file>scrobbling.png</file>
+     <file>connection.png</file>
+     <file>ipod.png</file>
+ </qresource>
+ </RCC> 

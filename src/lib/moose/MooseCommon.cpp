@@ -57,7 +57,7 @@ savePath( QString file )
     QString path;
 
     #ifdef WIN32
-        path = UnicornUtils::appDataPath();
+        path = Unicorn::applicationDataPath();
         if ( path.isEmpty() )
             path = QApplication::applicationDirPath();
         else

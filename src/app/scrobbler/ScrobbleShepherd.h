@@ -29,19 +29,17 @@
   * Songs that have passed the scrobble point should be submitted to Last.fm
   * when they _end_, using submit(), you can announce just started tracks using,
   * announce() - this is the NowPlaying notification.
-  *
-  * You may want to strip down TrackInfo (see libUnicorn) to something more
-  * manageable. CachedHttp can be replaced with QHttp with no consequences.
-  *
+  * 
   * Determining the scrobble point and what constitutes a legal scrobble is up
   * to you!
   *
   * http://www.audioscrobbler.net/development/protocol/
   */
 
+#include <QHttp>
 #include <QList>
+#include <QVariant>
 
-#include "lib/unicorn/CachedHttp.h"
 #include "lib/moose/TrackInfo.h"
 
 class ScrobbleCache;
@@ -161,6 +159,9 @@ public:
                 : Scrobbler::ErrorNotInitialized;
     }
 
+    //FIXME!
+    QString username() const { return "mxcl"; }
+
 public slots:
     void scrobble( TrackInfo );
     void nowPlaying( const TrackInfo& );
@@ -183,7 +184,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////>
-class ScrobblerHttp : public CachedHttp
+class ScrobblerHttp : public QHttp
 {
     Q_OBJECT
 
@@ -321,11 +322,5 @@ private:
     bool operator==( const ScrobbleCache& ); //undefined
 };
 ///////////////////////////////////////////////////////////////////////////////>
-
-
-namespace The
-{
-    ScrobblerManager& scrobbler(); //defined in container.cpp
-}
 
 #endif /* SCROBBLER_H */

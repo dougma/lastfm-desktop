@@ -17,36 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
+#include "Request.h"
 
 
-class MainWindow : public QMainWindow
+enum UserAuthCode
 {
-    Q_OBJECT
+    AUTH_OK = 0,
+    AUTH_OK_LOWER,
+    AUTH_BADUSER,
+    AUTH_BADPASS,
+    AUTH_ERROR
+};
 
-    Ui::MainWindow ui;
+
+/** @author <max@last.fm>
+  * @short Verify with server that a supplied user/pass combo is valid. Password
+  *        should be MD5 hashed. */
+class DLLEXPORT VerifyUserRequest : public Request
+{
+    PROP_GET_SET( QString, username, Username );
+
+    PROP_GET( bool, bootstrapAllowed );
+    PROP_GET( UserAuthCode, userAuthCode );
+
+    QString m_password;
+    QString m_md5;
+    QString m_lowered_md5;
 
 public:
-    MainWindow();
+    VerifyUserRequest();
 
-    QMap<QString, QAction*> actions() const;
+    virtual void start();
+    virtual void success( QByteArray data );
 
-protected:
-    void resizeEvent( QResizeEvent* );
-    void paintEvent( QPaintEvent* );
+    void setPassword( const QString& );
 
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onPlaybackTick( int );
-    void onProgressDisplayTick();
-
-private:
-    /** progress is updated every granularity, so if showing the progress todo
-      * scrobble point, pass the scrobble point in seconds, and the granularity
-      * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
-
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
+    /** user after the request returns, if you use before, result is undefined */
+    QString password() const;
 };

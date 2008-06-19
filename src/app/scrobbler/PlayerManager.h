@@ -65,10 +65,13 @@ public slots:
     void onPlaybackResumed( const QString& playerId );
 
 signals:
-    /** the scrobble point tick, connect it to some gui representation */
-    void tick( int );
+    /** the scrobble point tick */
+    void tick( int seconds_since_observation_started );
     /** the int is a PlaybackEvent, @data is documented with the enum */
     void event( int, const QVariant& data = QVariant() );
+
+private slots:
+    void onStopWatchTimedOut();
 
 private:
     void handleStateChange( PlaybackState::Enum, const TrackInfo& t = TrackInfo() );

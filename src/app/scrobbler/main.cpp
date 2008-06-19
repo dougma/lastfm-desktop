@@ -57,6 +57,12 @@ int main( int argc, char** argv )
         MainWindow window;
         window.show();
 
+        QMap<QString, QAction*> actions = window.actions();
+
+        //TODO setMainWindow and do connects there silly
+        app.connect( actions["love"], SIGNAL(triggered()), SLOT(love()) );
+        app.connect( actions["ban"], SIGNAL(triggered()), SLOT(ban()) );
+
         return app.exec();
     }
     catch (PlayerListener::SocketFailure&)

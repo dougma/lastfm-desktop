@@ -36,6 +36,9 @@ public:
 public slots:
     void onBootstrapCompleted( const QString& playerId, const QString& username );
 
+    void love();
+    void ban();
+
 private slots:
     void onAppEvent( int, const QVariant& );
 
@@ -43,5 +46,6 @@ signals:
     void event( int, const QVariant& );
 
 private:
-    PlayerManager* m_playerManager;
+    class PlayerManager* m_playerManager;
+    class ScrobblerManager* m_scrobbler;
 };

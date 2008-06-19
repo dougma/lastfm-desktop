@@ -135,7 +135,7 @@ findDefaultPlayer()
     QString exeCmd = progIdKey.value("Default").toString();
 
     vector<string> separated;
-    UnicornUtils::parseQuotedStrings( exeCmd.toStdString(), separated );
+    Unicorn::parseQuotedStrings( exeCmd.toStdString(), separated );
 
     QString path = separated.size() > 0 ? QString::fromStdString(separated.at(0)) : "";
     QFileInfo file(path);

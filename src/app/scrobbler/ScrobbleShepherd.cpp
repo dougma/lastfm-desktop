@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,9 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "container.h"
-#include "Scrobbler-1.2.h"
-#include "logger.h"
+#include "ScrobbleShepherd.h"
+
+#include "lib/unicorn/Logger.h"
+#include "lib/unicorn/UnicornCommon.h"
+#include "lib/moose/MooseCommon.h"
 
 #include <QApplication>
 #include <QDateTime>
@@ -30,6 +30,7 @@
 #include <QDomElement>
 #include <QFile>
 #include <QTimer>
+#include <QUrl>
 
 
 /** used to determine save location for scrobble caches 
@@ -102,18 +103,10 @@ ScrobblerManager::scrobble( TrackInfo track )
     Q_DEBUG_BLOCK << track.toString();
     Q_ASSERT( !track.isEmpty() );
 
-    ScrobbleCache cache( track.username() );
+    ScrobbleCache cache( username() );
     cache.append( track );
 
-    //HACK skip hack, see Container::skip()
-    //NOTE this won't break scrobbling if the listener ever includes the rating
-    // in its trackinfo object but it will delay that scrobble until a track
-    // with no rating is submitted
-    // we don't scrobble as the Player* classes may also submit this track
-    // and we need to wait and see if they do and not scrobble both
-    // just this one
-    if ( !track.isSkippedLovedOrBanned() )
-        scrobble( cache );
+    scrobble( cache );
 }
 
 
@@ -151,13 +144,13 @@ ScrobblerManager::nowPlaying( const TrackInfo& track )
 {
     Q_DEBUG_BLOCK << track.toString();
 
-    Scrobbler* scrobbler = scrobblerForUser( track.username() );
+    Scrobbler* scrobbler = scrobblerForUser( username() );
 
     if (scrobbler && scrobbler->canAnnounce())
         //TODO cache the now playing if the scrobbler is not yet ready
         scrobbler->announce( track );
     else
-        qDebug() << "No scrobbler found for user:" << track.username();
+        qDebug() << "No scrobbler found for user:" << username();
 }
 
 
@@ -282,7 +275,7 @@ ScrobbleCache //static private
 ScrobbleCache::fromFile( const QString& filename )
 {
     ScrobbleCache cache;
-    cache.m_path = MooseUtils::savePath( filename );
+    cache.m_path = Moose::savePath( filename );
     cache.read();
 
     //NOTE we don't set username, that's up to the caller
@@ -308,7 +301,7 @@ ScrobbleCache::pathsForCacheBackups()
 {
     QStringList paths;
 
-    QDir d = MooseUtils::savePath( "" );
+    QDir d = Moose::savePath( "" );
     foreach (QString path, d.entryList( QStringList("*_submissions.*.backup.xml"), QDir::Files ))
         paths += d.filePath( path );
 
@@ -719,7 +712,7 @@ Scrobbler::errorDescription( Scrobbler::Error error )
 
 ///////////////////////////////////////////////////////////////////////////////>
 ScrobblerHttp::ScrobblerHttp( QObject* parent )
-            : CachedHttp( parent ),
+            : QHttp( parent ),
               m_id( 0 )
 {
     m_retry_timer = new QTimer( this );
@@ -783,7 +776,7 @@ void
 ScrobblerHandshakeRequest::request()
 {
     QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
-    QString auth_token = UnicornUtils::md5Digest( (m_init.password + timestamp).toUtf8() );
+    QString auth_token = Unicorn::md5( (m_init.password + timestamp).toUtf8() );
 
     QString query_string = QString() +
                             "?hs=true" +
@@ -811,7 +804,7 @@ ScrobblerPostRequest::request()
 
     qDebug() << "POST:" << m_data;
 
-    m_id = CachedHttp::request( header, m_data );
+    m_id = QHttp::request( header, m_data );
 }
 
 

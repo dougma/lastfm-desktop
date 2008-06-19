@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2008 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,36 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
+#ifndef QT_OVERRIDES_SYSTEM_TRAY_ICON_H
+#define QT_OVERRIDES_SYSTEM_TRAY_ICON_H
+
+#include <qsystemtrayicon.h>
+
+#ifdef Q_OS_MAC
 
 
-class MainWindow : public QMainWindow
+namespace Moose
 {
-    Q_OBJECT
+    /** @author Max Howell <max@last.fm>
+      */
+    class QSystemTrayIcon : public ::QSystemTrayIcon
+    {
+    public:
+        QSystemTrayIcon( QObject* parent ) : ::QSystemTrayIcon( parent )
+        {}
 
-    Ui::MainWindow ui;
+        void showMessage( const QString& title,
+                          const QString& text,
+                          MessageIcon icon = Information,
+                          int millisecondsTimeoutHint = 10000 );
+    };
+}
 
-public:
-    MainWindow();
 
-    QMap<QString, QAction*> actions() const;
+#define QSystemTrayIcon Moose::QSystemTrayIcon
 
-protected:
-    void resizeEvent( QResizeEvent* );
-    void paintEvent( QPaintEvent* );
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onPlaybackTick( int );
-    void onProgressDisplayTick();
-
-private:
-    /** progress is updated every granularity, so if showing the progress todo
-      * scrobble point, pass the scrobble point in seconds, and the granularity
-      * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
-
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
-};
+#endif
+#endif

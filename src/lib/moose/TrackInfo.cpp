@@ -39,42 +39,38 @@ TrackInfo::TrackInfo() :
 {}
 
 
-#if 0
 TrackInfo::TrackInfo( const QDomElement& e )
 {
-    setArtist( e.namedItem( "artist" ).toElement().text() );
-    setAlbum( e.namedItem( "album" ).toElement().text() );
-    setTrack( e.namedItem( "track" ).toElement().text() );
-    setTrackNr( 0 );
-    setDuration( e.namedItem( "duration" ).toElement().text() );
-    setPlayCount( e.namedItem( "playcount" ).toElement().text().toInt() );
-    setFileName( e.namedItem( "filename" ).toElement().text() );
-    setUniqueID( e.namedItem( "uniqueID" ).toElement().text() );
-    setSource( (Source)e.namedItem( "source" ).toElement().text().toInt() );
-    setAuthCode( e.namedItem( "authorisationKey" ).toElement().text() );
+    m_artist = e.namedItem( "artist" ).toElement().text();
+    m_album =  e.namedItem( "album" ).toElement().text();
+    m_title = e.namedItem( "track" ).toElement().text();
+    m_trackNumber = 0;
+    m_duration = e.namedItem( "duration" ).toElement().text().toInt();
+    m_playCount = e.namedItem( "playcount" ).toElement().text().toInt();
+    m_path = e.namedItem( "filename" ).toElement().text();
     m_ratingFlags = e.namedItem( "userActionFlags" ).toElement().text().toUInt();
-    m_mediaDeviceId = e.namedItem( "mediaDeviceId" ).toElement().text();
 
     // this is necessary because the default return for toInt() is 0, and that
     // corresponds to Radio not Unknown :( oops.
     QString const source = e.namedItem( "source" ).toElement().text();
     if (source.isEmpty())
-        setSource( Unknown );
+        m_source = Unknown;
     else
-        setSource( (Source)source.toInt() );
+        m_source = (Source)source.toInt();
 
     // support 1.1.3 stringed timestamps, and 1.3.0 Unix Timestamps
     QString const timestring = e.namedItem( "timestamp" ).toElement().text();
     QDateTime const timestamp = QDateTime::fromString( timestring, "yyyy-MM-dd hh:mm:ss" );
     if (timestamp.isValid())
-        setTimeStamp( timestamp.toTime_t() );
+        m_timeStamp = timestamp.toTime_t();
     else
-        setTimeStamp( timestring.toUInt() );
-
+        m_timeStamp = timestring.toUInt();
+#if 0
     setPath( e.namedItem( "path" ).toElement().text() );
     setFpId( e.namedItem( "fpId" ).toElement().text() );
     setMbId( e.namedItem( "mbId" ).toElement().text() );
     setPlayerId( e.namedItem( "playerId" ).toElement().text() );
+#endif
 }
 
 
@@ -92,20 +88,17 @@ TrackInfo::toDomElement( QDomDocument& document ) const
 
     makeElement( "artist", m_artist );
     makeElement( "album", m_album );
-    makeElement( "track", m_track );
+    makeElement( "track", m_title );
     makeElement( "duration", QString::number( m_duration ) );
     makeElement( "timestamp", QString::number( m_timeStamp ) );
     makeElement( "playcount", QString::number( m_playCount ) );
-    makeElement( "filename", m_fileName );
-    makeElement( "uniqueID", m_uniqueID );
+    makeElement( "filename", m_path );
     makeElement( "source", QString::number( m_source ) );
-    makeElement( "authorisationKey", m_authCode );
     makeElement( "userActionFlags", QString::number(m_ratingFlags) );
     makeElement( "path", path() );
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
     makeElement( "playerId", playerId() );
-    makeElement( "mediaDeviceId", m_mediaDeviceId );
 
     return item;
 }
@@ -116,28 +109,10 @@ TrackInfo::merge( const TrackInfo& that )
 {
     m_ratingFlags |= that.m_ratingFlags;
 
-    if ( m_artist.isEmpty() ) setArtist( that.artist() );
-    if ( m_track.isEmpty() ) setTrack( that.track() );
-    if ( m_trackNr == 0 ) setTrackNr( that.trackNr() );
-    // can't do this, we don't know
-    //if ( m_playCount == 0 ) setPlayCount( that.playCount() );
-    if ( m_duration == 0 ) setDuration( that.duration() );
-    if ( m_fileName.isEmpty() ) setFileName( that.fileName() );
-    if ( m_mbId.isEmpty() ) setMbId( that.mbId() );
-    if ( m_timeStamp == 0 ) setTimeStamp( that.timeStamp() );
-    if ( m_source == Unknown ) setSource( that.source() );
-    if ( m_authCode.isEmpty() ) setAuthCode( that.authCode() );
-    if ( m_uniqueID.isEmpty() ) setUniqueID( that.uniqueID() );
-    if ( m_playerId.isEmpty() ) setPlayerId( that.playerId() );
-    if ( m_powerPlayLabel.isEmpty() ) setPowerPlayLabel( that.powerPlayLabel() );
-    if ( m_paths.isEmpty() ) setPaths( that.m_paths );
-    // can't do this
-    //if ( m_nextPath.isEmpty() )
-    if ( m_username.isEmpty() ) setUsername( that.username() );
-    if ( m_fpId.isEmpty() ) setFpId( that.fpId() );
-    if ( m_mediaDeviceId.isEmpty() ) setMediaDeviceId( that.mediaDeviceId() );
+    if ( m_artist.isEmpty() ) m_artist = that.artist();
+    if ( m_title.isEmpty() ) m_title = that.track();
+    if ( m_trackNumber == 0 ) m_trackNumber = that.trackNumber();
 }
-#endif
 
 
 QString
@@ -145,16 +120,16 @@ TrackInfo::toString() const
 {
     if ( m_artist.isEmpty() )
     {
-        if ( m_track.isEmpty() )
+        if ( m_title.isEmpty() )
             return QFileInfo( m_path ).fileName();
         else
-            return m_track;
+            return m_title;
     }
 
-    if ( m_track.isEmpty() )
+    if ( m_title.isEmpty() )
         return m_artist;
 
-    return m_artist + ' ' + QChar(8211) /*en dash*/ + ' ' + m_track;
+    return m_artist + ' ' + QChar(8211) /*en dash*/ + ' ' + m_title;
 }
 
 
@@ -177,19 +152,17 @@ MutableTrackInfo::timeStampMe()
 }
 
 
-#if 0
 QString
 TrackInfo::sourceString() const
 {
     switch (m_source)
     {
-        case Radio: return "L" + authCode();
-        case Player: return "P" + playerId();
-        case MediaDevice: return "P" + mediaDeviceId();
+        case Radio: return "L" /*+ authCode()*/;
+        case Player: return "P" /*+ playerId()*/;
+        case MediaDevice: return "P" /*+ mediaDeviceId()*/;
         default: return "U";
     }
 }
-#endif
 
 
 QString

@@ -34,7 +34,7 @@
 
 using namespace std;
 
-namespace UnicornUtils
+namespace Unicorn
 {
 
 
@@ -347,7 +347,7 @@ sortCaseInsensitively( QStringList input )
 
 
 QString
-appDataPath()
+applicationDataPath()
 {
     QString path;
 
@@ -387,51 +387,47 @@ appDataPath()
 
 
 QString
-getOSVersion()
+verbosePlatformString()
 {
-    QString version;
-
     #ifdef Q_WS_WIN
     switch (QSysInfo::WindowsVersion)
     {
-        case QSysInfo::WV_32s:        version = "Windows 3.1 with Win32s"; break;
-        case QSysInfo::WV_95:         version = "Windows 95"; break;
-        case QSysInfo::WV_98:         version = "Windows 98"; break;
-        case QSysInfo::WV_Me:         version = "Windows Me"; break;
-        case QSysInfo::WV_DOS_based:  version = "MS-DOS-based Windows"; break;
+        case QSysInfo::WV_32s:        return "Windows 3.1 with Win32s";
+        case QSysInfo::WV_95:         return "Windows 95";
+        case QSysInfo::WV_98:         return "Windows 98";
+        case QSysInfo::WV_Me:         return "Windows Me";
+        case QSysInfo::WV_DOS_based:  return "MS-DOS-based Windows";
 
-        case QSysInfo::WV_NT:         version = "Windows NT"; break;
-        case QSysInfo::WV_2000:       version = "Windows 2000"; break;
-        case QSysInfo::WV_XP:         version = "Windows XP"; break;
-        case QSysInfo::WV_2003:       version = "Windows Server 2003"; break;
-        case QSysInfo::WV_VISTA:      version = "Windows Vista"; break;
-        case QSysInfo::WV_NT_based:   version = "NT-based Windows"; break;
+        case QSysInfo::WV_NT:         return "Windows NT";
+        case QSysInfo::WV_2000:       return "Windows 2000";
+        case QSysInfo::WV_XP:         return "Windows XP";
+        case QSysInfo::WV_2003:       return "Windows Server 2003";
+        case QSysInfo::WV_VISTA:      return "Windows Vista";
+        case QSysInfo::WV_NT_based:   return "NT-based Windows";
 
-        case QSysInfo::WV_CE:         version = "Windows CE"; break;
-        case QSysInfo::WV_CENET:      version = "Windows CE.NET"; break;
-        case QSysInfo::WV_CE_based:   version = "CE-based Windows"; break;
+        case QSysInfo::WV_CE:         return "Windows CE";
+        case QSysInfo::WV_CENET:      return "Windows CE.NET";
+        case QSysInfo::WV_CE_based:   return "CE-based Windows";
 
-        default:                      version = "Qt doesn't know"; break;
+        default:                      return "Unknown";
     }
     #elif defined Q_WS_MAC
     switch (QSysInfo::MacintoshVersion)
     {
-        case QSysInfo::MV_Unknown:    version = "Unknown Mac"; break;
-        case QSysInfo::MV_9:          version = "Mac OS 9"; break;
-        case QSysInfo::MV_10_0:       version = "Mac OS X 10.0"; break;
-        case QSysInfo::MV_10_1:       version = "Mac OS X 10.1"; break;
-        case QSysInfo::MV_10_2:       version = "Mac OS X 10.2"; break;
-        case QSysInfo::MV_10_3:       version = "Mac OS X 10.3"; break;
-        case QSysInfo::MV_10_4:       version = "Mac OS X 10.4"; break;
-        case QSysInfo::MV_10_5:       version = "Mac OS X 10.5"; break;
+        case QSysInfo::MV_Unknown:    return "Unknown Mac";
+        case QSysInfo::MV_9:          return "Mac OS 9";
+        case QSysInfo::MV_10_0:       return "Mac OS X 10.0";
+        case QSysInfo::MV_10_1:       return "Mac OS X 10.1";
+        case QSysInfo::MV_10_2:       return "Mac OS X 10.2";
+        case QSysInfo::MV_10_3:       return "Mac OS X 10.3";
+        case QSysInfo::MV_10_4:       return "Mac OS X 10.4";
+        case QSysInfo::MV_10_5:       return "Mac OS X 10.5";
         
-        default:                      version = "Qt doesn't know"; break;
+        default:                      return "Unknown";
     }
     #else
-    version = "Unix/Linux";
-    #endif // Q_WS_WIN
-
-    return version;
+    return "Unix";
+    #endif
 }
 
 

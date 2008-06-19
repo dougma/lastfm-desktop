@@ -17,36 +17,32 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
+#ifndef QT_OVERRIDES_HTTP_H
+#define QT_OVERRIDES_HTTP_H
 
+#include <QtNetwork/QHttp>
 
-class MainWindow : public QMainWindow
+//TODO add user agent adjustment
+
+namespace Moose
 {
-    Q_OBJECT
+    /** @author Max Howell <max@last.fm>
+      */
+    class QHttp : public ::QHttp
+    {
+        QString m_host;
+    
+    public:
+        QHttp( const QString& host, quint16 port, QObject* parent ) :
+                ::QHttp( host, port, parent ),
+                  m_host( host )
+        {}
+        
+        QString host() const { return m_host; }
+    };
+}
 
-    Ui::MainWindow ui;
 
-public:
-    MainWindow();
+#define QHttp Moose::QHttp
 
-    QMap<QString, QAction*> actions() const;
-
-protected:
-    void resizeEvent( QResizeEvent* );
-    void paintEvent( QPaintEvent* );
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onPlaybackTick( int );
-    void onProgressDisplayTick();
-
-private:
-    /** progress is updated every granularity, so if showing the progress todo
-      * scrobble point, pass the scrobble point in seconds, and the granularity
-      * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
-
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
-};
+#endif

@@ -60,7 +60,7 @@ namespace UnicornEnums
  *
  * @author <erik@last.fm>
  */
-namespace UnicornUtils
+namespace Unicorn
 {
     DLLEXPORT QString
     md5( const QByteArray& );
@@ -174,10 +174,10 @@ namespace UnicornUtils
      * path fails.
      */
     DLLEXPORT QString
-    appDataPath();
+    applicationDataPath();
 
     DLLEXPORT QString
-    getOSVersion();
+    verbosePlatformString();
 
     DLLEXPORT void
     msleep( int );
