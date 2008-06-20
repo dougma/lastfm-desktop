@@ -54,7 +54,7 @@ PlayerManager::onTrackStarted( const TrackInfo& t )
         // top() is prolly the same as the new top()
         disconnect( 0, 0, this, SIGNAL(tick( int )) );
         connect( &p.watch, SIGNAL(tick( int )), SIGNAL(tick( int )) );
-        connect( &p.watch, SIGNAL(timeout()), SIGNAL(onStopWatchTimedOut()) );
+        connect( &p.watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
         handleStateChange( p.state, p.track );
     }
 }

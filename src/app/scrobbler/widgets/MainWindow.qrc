@@ -1,0 +1,8 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/MainWindow">
+     <file>love.png</file>
+     <file>ban.png</file>
+     <file>share.png</file>
+     <file>tag.png</file>
+ </qresource>
+ </RCC> 

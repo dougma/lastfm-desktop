@@ -22,6 +22,7 @@
 #include "PlayerManager.h"
 #include "ScrobbleShepherd.h"
 #include "Settings.h"
+#include "version.h"
 #include "widgets/LoginDialog.h"
 
 
@@ -50,7 +51,13 @@ App::App( int argc, char** argv )
         }
     }
 
+    Scrobbler::Init init;
+    init.client_version = VERSION;
+    init.password = The::settings().password();
+    init.username = The::settings().username();
+
     m_scrobbler = new ScrobblerManager( this );
+    m_scrobbler->handshake( init );
 
     connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }

@@ -159,9 +159,6 @@ public:
                 : Scrobbler::ErrorNotInitialized;
     }
 
-    //FIXME!
-    QString username() const { return "mxcl"; }
-
 public slots:
     void scrobble( TrackInfo );
     void nowPlaying( const TrackInfo& );

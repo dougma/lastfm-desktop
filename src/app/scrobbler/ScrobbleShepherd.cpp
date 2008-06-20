@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "ScrobbleShepherd.h"
+#include "Settings.h"
 
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"
@@ -103,7 +104,7 @@ ScrobblerManager::scrobble( TrackInfo track )
     Q_DEBUG_BLOCK << track.toString();
     Q_ASSERT( !track.isEmpty() );
 
-    ScrobbleCache cache( username() );
+    ScrobbleCache cache( The::settings().username() );
     cache.append( track );
 
     scrobble( cache );
@@ -144,13 +145,13 @@ ScrobblerManager::nowPlaying( const TrackInfo& track )
 {
     Q_DEBUG_BLOCK << track.toString();
 
-    Scrobbler* scrobbler = scrobblerForUser( username() );
+    Scrobbler* scrobbler = scrobblerForUser( The::settings().username() );
 
     if (scrobbler && scrobbler->canAnnounce())
         //TODO cache the now playing if the scrobbler is not yet ready
         scrobbler->announce( track );
     else
-        qDebug() << "No scrobbler found for user:" << username();
+        qDebug() << "No scrobbler found for user:" << The::settings().username();
 }
 
 
