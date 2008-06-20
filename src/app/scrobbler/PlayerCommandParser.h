@@ -20,6 +20,9 @@
 #ifndef PLAYER_COMMAND_PARSER_H
 #define PLAYER_COMMAND_PARSER_H
 
+// ms admits its lousy compiler doesn't care about throw declarations
+#pragma warning( disable : 4290 )
+
 #include "lib/moose/TrackInfo.h"
 
 

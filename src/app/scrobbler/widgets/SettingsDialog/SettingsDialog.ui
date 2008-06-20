@@ -231,7 +231,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="language" >
+            <widget class="QComboBox" name="languages" >
              <property name="minimumSize" >
               <size>
                <width>100</width>
@@ -991,6 +991,22 @@
     <hint type="destinationlabel" >
      <x>361</x>
      <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>manualProxyButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>manualProxyBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>56</x>
+     <y>129</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>31</x>
+     <y>186</y>
     </hint>
    </hints>
   </connection>

@@ -31,9 +31,22 @@ LoginDialog::LoginDialog()
     ui.setupUi( this );
     ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
     ui.spinner->movie()->setParent( this );
+    ui.spinner->hide();
+
+    ok()->setDisabled( true );
 
     connect( ui.buttonBox, SIGNAL(accepted()), SLOT(verify()) );
     connect( ui.buttonBox, SIGNAL(rejected()), SLOT(reject()) );
+    connect( ui.username, SIGNAL(textEdited( QString )), SLOT(onEdited()) );
+    connect( ui.password, SIGNAL(textEdited( QString )), SLOT(onEdited()) );
+}
+
+
+void
+LoginDialog::onEdited()
+{
+    if (!ui.spinner->isVisible())
+        ok()->setDisabled( ui.username->text().isEmpty() || ui.password->text().isEmpty() );
 }
 
 
@@ -41,7 +54,7 @@ void
 LoginDialog::verify()
 {
     setWindowTitle( tr("Verifying Login Credentials...") );
-    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
+    ok()->setEnabled( false );
     ui.spinner->show();
     ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
 
@@ -59,7 +72,7 @@ void
 LoginDialog::onVerifyResult( Request* request )
 {
     ui.retranslateUi( this ); //resets Window title;
-    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( true );
+    ok()->setEnabled( true );
     ui.spinner->hide();
     ui.spinner->movie()->stop();
 

@@ -11,3 +11,6 @@ UI_DIR = $$BUILD_DIR
 DESTDIR = $$BIN_DIR
 INCLUDEPATH += $$SRC_DIR
 LIBS += -L$$BIN_DIR
+
+# TODO really we should fix these warnings properly
+win32:DEFINES += _CRT_SECURE_NO_WARNINGS

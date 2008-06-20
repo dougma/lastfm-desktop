@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_LoginWidget.h"
+#include "ui_LoginDialog.h"
 #include <QDialog>
 
 
@@ -33,11 +33,14 @@ public:
     QString username() const { return m_username; }
 
 private slots:
+    void onEdited();
     void verify();
     void onVerifyResult( class Request* );
 
 private:
-    Ui::LoginWidget ui;
+    QPushButton* ok() const { return ui.buttonBox->button( QDialogButtonBox::Ok ); }
+
+    Ui::LoginDialog ui;
 
     bool m_bootstrap;
     QString m_username;

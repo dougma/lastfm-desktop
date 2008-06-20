@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>LoginWidget</class>
- <widget class="QWidget" name="LoginWidget" >
+ <class>LoginDialog</class>
+ <widget class="QDialog" name="LoginDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>

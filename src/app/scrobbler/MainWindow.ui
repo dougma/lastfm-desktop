@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>AudioScrobbler</string>
+   <string>Name TBA</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QHBoxLayout" >
@@ -76,9 +76,6 @@
   <action name="quit" >
    <property name="text" >
     <string>E&amp;xit</string>
-   </property>
-   <property name="shortcut" >
-    <string>Esc</string>
    </property>
   </action>
  </widget>

@@ -114,12 +114,13 @@ PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
     {   
         case Start: 
             return "catblp";
+        case Bootstrap:
+            return "cu";
+        default:
         case Stop:
         case Pause:
         case Resume:
             return "c";
-        case Bootstrap:
-            return "cu";
     }
 }
 

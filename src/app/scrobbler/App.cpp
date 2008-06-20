@@ -29,7 +29,7 @@ App::App( int argc, char** argv )
    : QApplication( argc, argv ),
      m_playerManager( 0 )
 {
-    if (The::settings().username().isEmpty())
+    if (true)//The::settings().username().isEmpty())
     {
         LoginDialog d;
         if (d.exec() == QDialog::Accepted)

@@ -193,7 +193,7 @@ createShortcut( LPCTSTR lpszFileName,
         MultiByteToWideChar(CP_ACP, 0, 
                        lpszShortcutPath, -1, wszTemp, MAX_PATH);
     #else
-        wcsncpy(wszTemp, lpszShortcutPath, MAX_PATH);
+        wcsncpy( wszTemp, lpszShortcutPath, MAX_PATH );
     #endif
 
         // Write the shortcut to disk
@@ -218,7 +218,7 @@ globalAppDataPath()
 
 
 bool
-setPreferredAppForUrlScheme( const QUrl& url, const QString& app )
+setPreferredAppForUrlScheme( const QUrl&, const QString& )
 {
     return false;
 }
