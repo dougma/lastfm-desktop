@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>331</width>
-    <height>133</height>
+    <height>114</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -62,7 +62,6 @@
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
   <widget class="QToolBar" name="toolbar" >
    <property name="windowTitle" >
     <string/>

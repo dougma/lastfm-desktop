@@ -22,19 +22,33 @@
 
 #include "MooseDllExportMacro.h"
 #include <QDomElement>
+#include <QExplicitlySharedDataPointer>
 #include <QString>
 
 //TODO shared data pointer
 
+struct TrackInfoData : QSharedData
+{
+    TrackInfoData();
+
+    QString artist;
+    QString album;
+    QString title;
+    int     trackNumber;
+    int     playCount;
+    int     duration;
+    short   ratingFlags;
+    time_t  timeStamp;
+    int     source;
+    QString playerId;
+    QString mbId;
+    QString fpId; /// fingerprint id
+    QString path;
+};
+
 
 class MOOSE_DLLEXPORT TrackInfo
 {
-    // undefined because really what consititutes the same track varies depending
-    // on usage. Some Qt templates require this operator though so maybe you'll
-    // want to add it at some point in the future, my suggestion is don't, it'll
-    // cause bugs --mxcl
-    bool operator==( const TrackInfo& ) const;
-
 public:
     enum Source
     {
@@ -72,100 +86,69 @@ public:
     };
 
     TrackInfo();
+    TrackInfo( const QDomElement& );
+
+    /** this track and that track point to the same object, so they are the same
+      * in fact. This doesn't do a deep data comparison. So even if all the 
+      * fields are the same it will return false if they aren't in fact spawned
+      * from the same initial TrackInfo object */
+    bool operator==( const TrackInfo& that ) const
+    {
+        return this->d == that.d;
+    }
 
     /** not a great isEmpty check, but most services will complain if these two
       * are empty */
-    bool isEmpty() const { return m_artist.isEmpty() && m_title.isEmpty(); }
+    bool isEmpty() const { return d->artist.isEmpty() && d->title.isEmpty(); }
 
-    //TODO remove
-    bool sameAs( const TrackInfo& that ) const
-    {
-        // This isn't an ideal check, but it's the best we can do until we introduce
-        // unique IDs for tracks. Since the artist/track info of a track can change
-        // after we receive metadata, just comparing on metadata isn't reliable. So
-        // we use the paths instead if we have them. And if not, fall back on metadata.
-
-        if ( !this->path().isEmpty() && !that.path().isEmpty() )
-            return this->path() == that.path();
-
-        if ( this->artist() != that.artist() )
-            return false;
-
-        if ( this->track() != that.track() )
-            return false;
-
-        return true;
-    }
-
-    //TODO remove
-    void merge( const TrackInfo& that );
-    //TODO remove
+    /** the standard representation of this object as an XML node */
     QDomElement toDomElement( class QDomDocument& ) const;
-    //TODO remove
-    TrackInfo( const QDomElement& );
 
-    QString artist() const { return m_artist; }
-    QString album() const { return m_album; }
-    QString track() const { return m_title; }
-    int trackNumber() const { return m_trackNumber; }
-    int playCount() const { return m_playCount; }
-    int duration() const { return m_duration; }
+    QString artist() const { return d->artist; }
+    QString album() const { return d->album; }
+    QString track() const { return d->title; }
+    int trackNumber() const { return d->trackNumber; }
+    int playCount() const { return d->playCount; }
+    int duration() const { return d->duration; }
     QString durationString() const;
-    QString mbId() const { return m_mbId; }
-    QString path() const { return m_path; }
-    time_t timeStamp() const { return m_timeStamp; }
-    Source source() const { return m_source; }
+    QString mbId() const { return d->mbId; }
+    QString path() const { return d->path; }
+    time_t timeStamp() const { return d->timeStamp; }
+    Source source() const { return (Source)d->source; }
     /** scrobbler submission source string code */
     QString sourceString() const;
-    QString playerId() const { return m_playerId; }
+    QString playerId() const { return d->playerId; }
+    QString fpId() const { return d->fpId; }
 
-    bool isSkipped() const { return m_ratingFlags & TrackInfo::Skipped; }
-    bool isLoved() const { return m_ratingFlags & TrackInfo::Loved; }
-    bool isBanned() const { return m_ratingFlags & TrackInfo::Banned; }
-    bool isScrobbled() const { return m_ratingFlags & TrackInfo::Scrobbled; }
+    bool isSkipped() const { return d->ratingFlags & TrackInfo::Skipped; }
+    bool isLoved() const { return d->ratingFlags & TrackInfo::Loved; }
+    bool isBanned() const { return d->ratingFlags & TrackInfo::Banned; }
+    bool isScrobbled() const { return d->ratingFlags & TrackInfo::Scrobbled; }
 
     QString toString() const;
 
     /** only one rating is possible, we have to figure out which from various flags applied */
     QString ratingCharacter() const;
-    QString fpId() const { return m_fpId; }
     
-    /** Checks whether the passed-in path is in a directory that the user has
-      * excluded from scrobbling. */
-    bool isDirExcluded( const QString& path ) const;
-
     /** Works out if passed-in track can be scrobbled and returns the 
       * status. */
     ScrobblableStatus scrobblableStatus() const;
 
     /** Returns the second at which passed-in track reached the scrobble 
       * point. */
-    int scrobbleTime() const; //FIXME remove
-    int scrobblePoint() const { return scrobbleTime(); }
+    int scrobblePoint() const;
 
 protected:
-    QString m_artist;
-    QString m_album;
-    QString m_title;
-    int     m_trackNumber;
-    int     m_playCount;
-    int     m_duration;
-    short   m_ratingFlags;
-    time_t  m_timeStamp;
-    Source  m_source;
-    QString m_playerId;
-    QString m_mbId;
-    QString m_fpId; /// fingerprint id
-    QString m_path;
+    friend class MutableTrackInfo; //FIXME wtf? but compiler error otherwise
+    QExplicitlySharedDataPointer<TrackInfoData> d;
 
 public:
-    //TODO remove?
-    // Limits for user-configurable scrobble point (%)
+    // Limits for user-configurable scrobble point in percent
     static const int kScrobblePointMin = 50;
     static const int kScrobblePointMax = 100;
-    // Shortest track length allowed to scrobble (s)
+    // Shortest track length allowed to scrobble in seconds
     static const int kScrobbleMinLength = 31;
-    // Upper limit for scrobble time (s)
+    // Upper limit for scrobble time in seconds
     static const int kScrobbleTimeMax = 240;
     // Percentage of track length at which to scrobble
     //TODO should be a float, percentages are meaningless in the middle of code
@@ -179,21 +162,37 @@ public:
     MutableTrackInfo()
     {}
 
-    void setArtist( QString artist ) { m_artist = artist.trimmed(); }
-    void setAlbum( QString album ) { m_album = album.trimmed(); }
-    void setTrack( QString track ) { m_title = track.trimmed(); }
-    void setTrackNr( int n ) { m_trackNumber = n; }
-    void setPlayCount( int playCount ) { m_playCount = playCount; }
-    void setDuration( int duration ) { m_duration = duration; }
-    void setMbId( QString mbId ) { m_mbId = mbId; }
-    void setPath( QString path ) { m_path = path; }
-    void setTimeStamp( time_t timestamp ) { m_timeStamp = timestamp; }
+    MutableTrackInfo( const TrackInfo& that )
+    {
+        this->d = that.d;
+    }
+
+    void setArtist( QString artist ) { d->artist = artist.trimmed(); }
+    void setAlbum( QString album ) { d->album = album.trimmed(); }
+    void setTrack( QString track ) { d->title = track.trimmed(); }
+    void setTrackNumber( int n ) { d->trackNumber = n; }
+    void setPlayCount( int playCount ) { d->playCount = playCount; }
+    void setDuration( int duration ) { d->duration = duration; }
+    void setMbId( QString mbId ) { d->mbId = mbId; }
+    void setPath( QString path ) { d->path = path; }
+    void setTimeStamp( time_t timestamp ) { d->timeStamp = timestamp; }
     void timeStampMe();
-    void setSource( Source s ) { m_source = s; }
-    void setRatingFlag( RatingFlag flag ) { m_ratingFlags |= flag; }
-    void setPlayerId( QString id ) { m_playerId = id; }
-    void setFpId( QString id ) { m_fpId = id; }
+    void setSource( Source s ) { d->source = s; }
+    void setRatingFlag( RatingFlag flag ) { d->ratingFlags |= flag; }
+    void setPlayerId( QString id ) { d->playerId = id; }
+    void setFpId( QString id ) { d->fpId = id; }
 };
+
+
+inline 
+TrackInfoData::TrackInfoData() 
+             : trackNumber( 0 ),
+               playCount( 0 ),
+               duration( 0 ),
+               timeStamp( 0 ),
+               source( TrackInfo::Unknown ),
+               ratingFlags( 0 )
+{}
 
 
 #include <QDebug>

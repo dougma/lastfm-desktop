@@ -232,9 +232,6 @@ public:
 
 };
 
-#ifdef WIN32
-    #define __PRETTY_FUNCTION__ __FUNCTION__
-#endif
 
 #ifdef QT_CORE_LIB
 
@@ -251,103 +248,6 @@ operator<<(std::ostream& os, const QString& qs)
     os << qs.toAscii().data();
     return os;
 }
-
-#ifndef QT_NO_DEBUG
-
-/**
- * @author <max@last.fm> - mxcl
- * indents blocks, mostly used to mark function start and end automatically
- */
-
-#include <QTime>
-#include <QVariant>
-
-class QDebugBlock
-{
-    mutable QString m_title; //because operator= requires a const parameter for some reason :(
-    QTime m_time;
-
-    static int &indents() { static int indent = 0; return indent; }
-
-public:
-    QDebugBlock( QString title ) : m_title( title )
-    {
-        // use data() to prevent quotes being output by QDebugStream
-        debug() << "BEGIN:" << title.toLatin1().data();
-        indents()++;
-
-        m_time.start();
-    }
-
-    QDebugBlock( const QDebugBlock& that )
-    {
-        *this = that;
-    }
-
-    QDebugBlock &operator=( const QDebugBlock& block )
-    {
-        m_title = block.m_title;
-        m_time = block.m_time;
-
-        block.m_title = "";
-
-        return *this;
-    }
-
-    ~QDebugBlock()
-    {
-        if (!m_title.isEmpty())
-        {
-            indents()--;
-
-            // use data() to prevent quotes being output by QDebugStream
-            debug() << "END:  " << m_title.toLatin1().data() << "[elapsed:" << m_time.elapsed() << "ms]";
-        }
-    }
-
-    static QDebug debug()
-    {
-        QDebug d( QtDebugMsg );
-        int i = indents() * 2;
-        while (i--)
-            d.space();
-
-        return d;
-    }
-
-
-    /**
-     * so you can do: Q_DEBUG_BLOCK << somestring;
-     */
-    QDebugBlock &operator<<( const QVariant& v )
-    {
-        QString const s = v.toString();
-        if (!s.isEmpty())
-            debug() << s;
-
-        return *this;
-    }
-};
-
-#define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
-
-#define qDebug() QDebugBlock::debug()
-
-
-#else // QT_NO_DEBUG
-
-    #include <QDateTime>
-
-    #define Q_DEBUG_BLOCK qDebug()
-    class QDebugBlock { public: QDebugBlock( QString ) {} };
-
-    // If we don't do this, we won't get function names/line numbers from qDebug statements
-    #define qDebug() qDebug() << QDateTime::currentDateTime().toUTC().toString( "yyMMdd hh:mm:ss" ) \
-                              << '-' << QString( "%1" ).arg( (int)QThread::currentThreadId(), 8, 16, QChar( '0' ) ) \
-                              << '-' << __PRETTY_FUNCTION__ << '(' << __LINE__<< ") - L3\n  "
-
-    #define qWarning() qDebug()
-#endif
 
 #endif //QT_CORE_LIB
 

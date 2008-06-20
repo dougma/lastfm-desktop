@@ -40,8 +40,6 @@ MainWindow::MainWindow()
 
     ui.setupUi( this );
 
-    delete ui.statusbar;
-
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
 

@@ -29,42 +29,36 @@
 #include <QMimeData>
 
 
-TrackInfo::TrackInfo() :
-        m_trackNumber( 0 ),
-        m_playCount( 0 ),
-        m_duration( 0 ),
-        m_timeStamp( 0 ),
-        m_source( Unknown ),
-        m_ratingFlags( 0 )
+TrackInfo::TrackInfo()
 {}
 
 
 TrackInfo::TrackInfo( const QDomElement& e )
 {
-    m_artist = e.namedItem( "artist" ).toElement().text();
-    m_album =  e.namedItem( "album" ).toElement().text();
-    m_title = e.namedItem( "track" ).toElement().text();
-    m_trackNumber = 0;
-    m_duration = e.namedItem( "duration" ).toElement().text().toInt();
-    m_playCount = e.namedItem( "playcount" ).toElement().text().toInt();
-    m_path = e.namedItem( "filename" ).toElement().text();
-    m_ratingFlags = e.namedItem( "userActionFlags" ).toElement().text().toUInt();
+    d->artist = e.namedItem( "artist" ).toElement().text();
+    d->album =  e.namedItem( "album" ).toElement().text();
+    d->title = e.namedItem( "track" ).toElement().text();
+    d->trackNumber = 0;
+    d->duration = e.namedItem( "duration" ).toElement().text().toInt();
+    d->playCount = e.namedItem( "playcount" ).toElement().text().toInt();
+    d->path = e.namedItem( "filename" ).toElement().text();
+    d->ratingFlags = e.namedItem( "userActionFlags" ).toElement().text().toUInt();
 
     // this is necessary because the default return for toInt() is 0, and that
     // corresponds to Radio not Unknown :( oops.
     QString const source = e.namedItem( "source" ).toElement().text();
     if (source.isEmpty())
-        m_source = Unknown;
+        d->source = Unknown;
     else
-        m_source = (Source)source.toInt();
+        d->source = (Source)source.toInt();
 
     // support 1.1.3 stringed timestamps, and 1.3.0 Unix Timestamps
     QString const timestring = e.namedItem( "timestamp" ).toElement().text();
     QDateTime const timestamp = QDateTime::fromString( timestring, "yyyy-MM-dd hh:mm:ss" );
     if (timestamp.isValid())
-        m_timeStamp = timestamp.toTime_t();
+        d->timeStamp = timestamp.toTime_t();
     else
-        m_timeStamp = timestring.toUInt();
+        d->timeStamp = timestring.toUInt();
 #if 0
     setPath( e.namedItem( "path" ).toElement().text() );
     setFpId( e.namedItem( "fpId" ).toElement().text() );
@@ -86,15 +80,15 @@ TrackInfo::toDomElement( QDomDocument& document ) const
         item.appendChild( e ); \
     }
 
-    makeElement( "artist", m_artist );
-    makeElement( "album", m_album );
-    makeElement( "track", m_title );
-    makeElement( "duration", QString::number( m_duration ) );
-    makeElement( "timestamp", QString::number( m_timeStamp ) );
-    makeElement( "playcount", QString::number( m_playCount ) );
-    makeElement( "filename", m_path );
-    makeElement( "source", QString::number( m_source ) );
-    makeElement( "userActionFlags", QString::number(m_ratingFlags) );
+    makeElement( "artist", d->artist );
+    makeElement( "album", d->album );
+    makeElement( "track", d->title );
+    makeElement( "duration", QString::number( d->duration ) );
+    makeElement( "timestamp", QString::number( d->timeStamp ) );
+    makeElement( "playcount", QString::number( d->playCount ) );
+    makeElement( "filename", d->path );
+    makeElement( "source", QString::number( d->source ) );
+    makeElement( "userActionFlags", QString::number(d->ratingFlags) );
     makeElement( "path", path() );
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
@@ -104,32 +98,21 @@ TrackInfo::toDomElement( QDomDocument& document ) const
 }
 
 
-void
-TrackInfo::merge( const TrackInfo& that )
-{
-    m_ratingFlags |= that.m_ratingFlags;
-
-    if ( m_artist.isEmpty() ) m_artist = that.artist();
-    if ( m_title.isEmpty() ) m_title = that.track();
-    if ( m_trackNumber == 0 ) m_trackNumber = that.trackNumber();
-}
-
-
 QString
 TrackInfo::toString() const
 {
-    if ( m_artist.isEmpty() )
+    if ( d->artist.isEmpty() )
     {
-        if ( m_title.isEmpty() )
-            return QFileInfo( m_path ).fileName();
+        if ( d->title.isEmpty() )
+            return QFileInfo( d->path ).fileName();
         else
-            return m_title;
+            return d->title;
     }
 
-    if ( m_title.isEmpty() )
-        return m_artist;
+    if ( d->title.isEmpty() )
+        return d->artist;
 
-    return m_artist + ' ' + QChar(8211) /*en dash*/ + ' ' + m_title;
+    return d->artist + ' ' + QChar(8211) /*en dash*/ + ' ' + d->title;
 }
 
 
@@ -155,7 +138,7 @@ MutableTrackInfo::timeStampMe()
 QString
 TrackInfo::sourceString() const
 {
-    switch (m_source)
+    switch (d->source)
     {
         case Radio: return "L" /*+ authCode()*/;
         case Player: return "P" /*+ playerId()*/;
@@ -168,8 +151,8 @@ TrackInfo::sourceString() const
 QString
 TrackInfo::durationString() const
 {
-    QTime t = QTime().addSecs( m_duration );
-    if (m_duration < 60*60)
+    QTime t = QTime().addSecs( d->duration );
+    if (d->duration < 60*60)
         return t.toString( "m:ss" );
     else
         return t.toString( "hh:mm:ss" );
@@ -229,18 +212,11 @@ TrackInfo::scrobblableStatus() const
         return TrackNameMissing;
     }
 
-    // Check if dir excluded
-    if ( isDirExcluded( track.path() ) )
-    {
-        LOG( 3, "Track is in excluded directory `" << track.path() << "', " << "will not submit.\n" );
-        return ExcludedDir;
-    }
-
     QStringList invalidList;
     invalidList << "unknown artist"
-        << "unknown"
-        << "[unknown]"
-        << "[unknown artist]";
+                << "unknown"
+                << "[unknown]"
+                << "[unknown artist]";
 
     // Check if artist name is an invalid one like "unknown"
     foreach( QString invalid, invalidList )
@@ -257,39 +233,8 @@ TrackInfo::scrobblableStatus() const
 }
 
 
-bool
-TrackInfo::isDirExcluded( const QString& path ) const
-{
-    QString pathToTest = QDir( path ).absolutePath();
-#ifdef WIN32
-    pathToTest = pathToTest.toLower();
-#endif
-
-    if (pathToTest.isEmpty())
-        return false;
-
-    foreach ( QString bannedPath, Moose::Settings().excludedDirs() )
-    {
-        bannedPath = QDir( bannedPath ).absolutePath();
-#ifdef WIN32
-        bannedPath = bannedPath.toLower();
-#endif
-
-        // Try and match start of given path with banned dir
-        if ( pathToTest.startsWith( bannedPath ) )
-        {
-            // Found, this path is from a banned dir
-            return true;
-        }
-    }
-
-    // The path wasn't found in exclusions list
-    return false;
-}
-
-
 int
-TrackInfo::scrobbleTime() const
+TrackInfo::scrobblePoint() const
 {
     // If we don't have a length or it's less than the minimum, return the
     // threshold
