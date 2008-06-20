@@ -20,14 +20,14 @@
 #ifndef TRACK_INFO_H
 #define TRACK_INFO_H
 
-#include "common/DllExportMacro.h"
+#include "MooseDllExportMacro.h"
 #include <QDomElement>
 #include <QString>
 
 //TODO shared data pointer
 
 
-class DLLEXPORT TrackInfo
+class MOOSE_DLLEXPORT TrackInfo
 {
     // undefined because really what consititutes the same track varies depending
     // on usage. Some Qt templates require this operator though so maybe you'll
@@ -173,7 +173,7 @@ public:
 };
 
 
-class DLLEXPORT MutableTrackInfo : public TrackInfo
+class MOOSE_DLLEXPORT MutableTrackInfo : public TrackInfo
 {
 public:
     MutableTrackInfo()

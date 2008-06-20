@@ -17,23 +17,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommon.h"
-#include "Settings.h"
-#include <QLocale>
+#include "ui_SettingsDialog.h"
+#include <QDialog>
 
 
-QString
-Unicorn::Settings::appLanguage() const
+class SettingsDialog : public QDialog
 {
-    QString code = QSettings().value( "AppLanguage" ).toString();
-    if ( !code.isEmpty() )
-        return code;
+    Q_OBJECT
 
-    // If none found, use system locale
-  #ifdef Q_WS_MAC
-    QLocale::Language qtLang = UnicornUtils::osxLanguageCode();
-  #else
-    QLocale::Language qtLang = QLocale::system().language();
-  #endif
-    return Unicorn::qtLanguageToLfmLangCode( qtLang );
-}
+public:
+    SettingsDialog();
+
+private slots:
+    void enableOk() { ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( true ); }
+
+private:
+    Ui::SettingsDialog ui;
+};

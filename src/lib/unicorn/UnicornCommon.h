@@ -20,7 +20,7 @@
 #ifndef UNICORN_COMMON_H
 #define UNICORN_COMMON_H
 
-#include "common/DllExportMacro.h"
+#include "UnicornDllExportMacro.h"
 
 #include <QString>
 #include <QLocale>
@@ -62,33 +62,33 @@ namespace UnicornEnums
  */
 namespace Unicorn
 {
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     md5( const QByteArray& );
 
     /**
      * Translate a QHttpState into a human-readable string.
      * TODO: move to Http class?
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     QHttpStateToString( int state );
 
     /**
      * Translate a Qt language code into the language code used on the Last.fm site.
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     qtLanguageToLfmLangCode( QLocale::Language qtLang );
 
     /**
      * Translate a Last.fm site language code into the equivalent ISO 639
      * language code as used in HTTP headers.
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     lfmLangCodeToIso639( const QString& code );
 
     /**
      * Translate a Last.fm site language code into the equivalent hostname.
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     localizedHostName( const QString& code );
 
     /**
@@ -102,7 +102,7 @@ namespace Unicorn
      *   // WHY std::string!!
      *   // Because it's a legacy function from the MFC days.
      */
-    DLLEXPORT void
+    UNICORN_DLLEXPORT void
     parseQuotedStrings( const std::string& sCompound,
                         std::vector<std::string>& separated );
 
@@ -111,7 +111,7 @@ namespace Unicorn
      *
      *   @param[in] str String to trim.
      */
-    DLLEXPORT void
+    UNICORN_DLLEXPORT void
     trim( std::string& str );
 
     /**
@@ -119,10 +119,10 @@ namespace Unicorn
      *
      *   @param[in] str String to strip.
      */
-    DLLEXPORT void
+    UNICORN_DLLEXPORT void
     stripBBCode( std::string& str );
 
-    DLLEXPORT void
+    UNICORN_DLLEXPORT void
     stripBBCode( QString& str );
 
     /**
@@ -135,10 +135,10 @@ namespace Unicorn
      *
      *   @param[in] str String to encode.
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     urlEncodeItem( QString item );
 
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     urlDecodeItem( QString item );
 
     /**
@@ -161,7 +161,7 @@ namespace Unicorn
     /**
      * QStringList::sort() sorts with uppercase first
      */
-    DLLEXPORT QStringList
+    UNICORN_DLLEXPORT QStringList
     sortCaseInsensitively( QStringList input );
 
     /**
@@ -173,13 +173,13 @@ namespace Unicorn
      * May return an empty string on Windows if the system call to get the
      * path fails.
      */
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     applicationDataPath();
 
-    DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     verbosePlatformString();
 
-    DLLEXPORT void
+    UNICORN_DLLEXPORT void
     msleep( int );
 }
 

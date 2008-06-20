@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "PlaybackEvent.h"
 #include "PlayerManager.h"
+#include "widgets/SettingsDialog/SettingsDialog.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/moose/TrackInfo.h"
 #include <QPainter>
@@ -40,6 +41,9 @@ MainWindow::MainWindow()
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
+
+    connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
+    connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
 }
 
 
@@ -166,4 +170,11 @@ MainWindow::actions() const
     foreach (QAction* a, QMainWindow::actions())
         map[a->objectName()] = a;
     return map;
+}
+
+
+void
+MainWindow::showSettingsDialog()
+{
+    SettingsDialog().exec();
 }

@@ -3,7 +3,7 @@
 #ifndef UNICORN_SETTINGS_H
 #define UNICORN_SETTINGS_H
 
-#include "common/DllExportMacro.h"
+#include "UnicornDllExportMacro.h"
 #include <QSettings>
 #include <QString>
 
@@ -25,40 +25,14 @@ namespace Unicorn
 
     /** Settings that may be of use to the entire Last.fm suite 
       */
-    class DLLEXPORT Settings
+    class UNICORN_DLLEXPORT Settings
     {
     public:
-        Settings();
+        Settings()
+        {}
 
         QString username() const { return QSettings().value( "Username" ).toString(); }
         QString password() const { return QSettings().value( "Password" ).toString(); }
-
-    #if 0
-        //TODO there is only one widget that can set the password
-        // enforce that by moving this function there
-    
-        void setPassword( QString password )
-        {
-            if ( !password.isEmpty() && password != "********" )
-            {
-                password = UnicornUtils::md5Digest( password.toUtf8() );
-                MyQSettings( this ).setValue( "Password", password );
-            }
-        }
-
-        //TODO these should only be handled by same above metioned widget
-        bool rememberPass() const
-        { 
-            // Written as int for backwards compatibility with the MFC Audioscrobbler
-            return (bool)MyQSettings( this ).value( "RememberPass", true ).toInt();
-        }
-
-        void setRememberPass( bool remember )
-        {
-            MyQSettings( this ).setValue( "RememberPass", int(remember) );
-            emit userChanged( username() );
-        }
-    #endif
 
         bool isUseProxy() const { return QSettings().value( "ProxyEnabled" ).toInt() == 1; }
         QString proxyHost() const { return QSettings().value( "ProxyHost" ).toString(); }
@@ -71,9 +45,12 @@ namespace Unicorn
     };
 
 
-    //TODO make most of this private, friend to Settings dialog
+    //TODO make most of this private, friend to Settings dialog, or move there
     class MutableSettings : private Settings
     {
+        void setPassword(); // undefined, as basically, you're not
+        void setUsername(); // allowed to do this, App.cpp can though
+
     public:
         MutableSettings()
         {}

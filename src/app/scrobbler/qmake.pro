@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = AudioScrobbler
 CONFIG += unicorn moose 
-QT += xml network override
+QT += xml network
 
 include( $$SRC_DIR/include.pro )
 

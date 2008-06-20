@@ -139,10 +139,7 @@ CONFIG( unicorn ) {
 
 CONFIG( unicorn ):horn = yes
 contains( TARGET, unicorn ):horn = yes
-contains( horn, yes ) {
-    QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
-    message( "QtOverrides active! Check lib/unicorn/QtOverrides for documentation." )
-}
+contains( horn, yes ):QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
 
 
 CONFIG( moose ) {
@@ -163,5 +160,3 @@ win32 {
 	}
 }
 
-
-contains( TEMPLATE, app ):contains( QT, gui ):RESOURCES += $$SRC_DIR/common/qrc/common.qrc

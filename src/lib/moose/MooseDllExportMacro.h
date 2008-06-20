@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 - 2008 Last.fm Ltd.                                    *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,21 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef DLL_EXPORT_MACRO_H
-#define DLL_EXPORT_MACRO_H
+#ifndef MOOSE_DLL_EXPORT_MACRO_H
+#define MOOSE_DLL_EXPORT_MACRO_H
 
-// When we compile the header in a DLL as part of the DLL, we need
-// dllexport for the functions to be exported. When including the header
-// as part of the client modules, we need dllimport. X_DLLEXPORT_PRO
-// should only be defined in the DLL .pro.
+/** Exports symbols when compiled as part of libunicorn, imports when included
+  * from some external target. */
 #if defined(_WIN32) || defined(WIN32)
-    #ifdef QMAKE_DLLEXPORT
-        #define DLLEXPORT __declspec(dllexport)
+    #ifdef _MOOSE_DLLEXPORT
+        #define MOOSE_DLLEXPORT __declspec(dllexport)
     #else
-        #define DLLEXPORT __declspec(dllimport)
+        #define MOOSE_DLLEXPORT __declspec(dllimport)
     #endif
 #else
-    #define DLLEXPORT
+    #define MOOSE_DLLEXPORT
 #endif
 
 #endif

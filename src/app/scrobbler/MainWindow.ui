@@ -39,8 +39,48 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="logOut" />
+    <addaction name="separator" />
+    <addaction name="quit" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="settings" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuTools" />
+   <addaction name="menuHelp" />
   </widget>
   <widget class="QStatusBar" name="statusbar" />
+  <action name="settings" >
+   <property name="text" >
+    <string>&amp;Settings...</string>
+   </property>
+  </action>
+  <action name="logOut" >
+   <property name="text" >
+    <string>Log &amp;Out</string>
+   </property>
+  </action>
+  <action name="quit" >
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Esc</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

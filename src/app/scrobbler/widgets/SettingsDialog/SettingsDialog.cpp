@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2008 Last.fm Ltd.                                           *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,33 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef QT_OVERRIDES_SYSTEM_TRAY_ICON_H
-#define QT_OVERRIDES_SYSTEM_TRAY_ICON_H
-
-#include <qsystemtrayicon.h>
-
-#ifdef Q_OS_MAC
+#include "SettingsDialog.h"
 
 
-namespace Moose
+SettingsDialog::SettingsDialog()
+              : QDialog( qApp->activeWindow() /*FIXME*/ )
 {
-    /** @author Max Howell <max@last.fm>
-      */
-    class QSystemTrayIcon : public ::QSystemTrayIcon
-    {
-    public:
-        QSystemTrayIcon( QObject* parent ) : ::QSystemTrayIcon( parent )
-        {}
+    ui.setupUi( this );
+    // this couldn't be done in designer easily :(
+    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
+    ui.buttonBox->setContentsMargins( 0, 0, style()->pixelMetric( QStyle::PM_LayoutRightMargin ), 0 );
 
-        void showMessage( const QString& title,
-                          const QString& text,
-                          MessageIcon icon = Information,
-                          int millisecondsTimeoutHint = 10000 );
-    };
+    // make OK button enable if something changes
+    //NOTE we don't store initial value, so as a result if user changes the thing back, we do nothing..
+    foreach (QLineEdit* o, ui.pageStack->findChildren<QLineEdit*>())
+        connect( o, SIGNAL(textEdited( QString )), SLOT(enableOk()) );
+    foreach (QComboBox* o, ui.pageStack->findChildren<QComboBox*>())
+        connect( o, SIGNAL(currentIndexChanged( int )), SLOT(enableOk()) );
+    foreach (QGroupBox* o, ui.pageStack->findChildren<QGroupBox*>())
+        connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
+    foreach (QRadioButton* o, ui.pageStack->findChildren<QRadioButton*>())
+        connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
 }
-
-
-#define QSystemTrayIcon Moose::QSystemTrayIcon
-
-#endif
-#endif

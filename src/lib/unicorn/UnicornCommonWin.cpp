@@ -42,7 +42,7 @@
 
 using namespace std;
 
-namespace UnicornUtils
+namespace Unicorn
 {
 
 

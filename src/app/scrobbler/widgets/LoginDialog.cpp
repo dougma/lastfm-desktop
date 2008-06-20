@@ -18,12 +18,19 @@
  ***************************************************************************/
 
 #include "LoginDialog.h"
+#include "lib/unicorn/LastMessageBox.h"
+#include "lib/unicorn/Logger.h"
+#include "lib/unicorn/ws/VerifyUserRequest.h"
+#include <QMovie>
+#include <QPushButton>
 
 
 LoginDialog::LoginDialog()
            : m_bootstrap( false )
 {
     ui.setupUi( this );
+    ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
+    ui.spinner->movie()->setParent( this );
 
     connect( ui.buttonBox, SIGNAL(accepted()), SLOT(verify()) );
     connect( ui.buttonBox, SIGNAL(rejected()), SLOT(reject()) );
@@ -33,7 +40,10 @@ LoginDialog::LoginDialog()
 void
 LoginDialog::verify()
 {
+    setWindowTitle( tr("Verifying Login Credentials...") );
+    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
     ui.spinner->show();
+    ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
 
     VerifyUserRequest *verify = new VerifyUserRequest;
     verify->setUsername( ui.username->text() );
@@ -46,9 +56,12 @@ LoginDialog::verify()
 
 
 void
-LoginDialog::onVerifyResult( Request* r )
+LoginDialog::onVerifyResult( Request* request )
 {
+    ui.retranslateUi( this ); //resets Window title;
+    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( true );
     ui.spinner->hide();
+    ui.spinner->movie()->stop();
 
     VerifyUserRequest* verify = static_cast<VerifyUserRequest*>(request);
 
@@ -56,9 +69,9 @@ LoginDialog::onVerifyResult( Request* r )
     // since the ws refactor, so we need to check for it here.
     UserAuthCode result = verify->failed() ? AUTH_ERROR : verify->userAuthCode();
 
-    LOGL( 4, "Verify result: " << result );
+    LOGL( 4, "Verify result: " << (int)result );
 
-    m_bootstrap = (verify->bootStrapCode() == BOOTSTRAP_ALLOWED);
+    m_bootstrap = verify->bootstrapAllowed();
 
     switch (result)
     {

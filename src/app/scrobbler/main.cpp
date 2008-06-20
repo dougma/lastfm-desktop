@@ -33,15 +33,15 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
-    //FIXME prolly bad to have a custom instantiation that may use the::settings
-    // before it exists init.
-    App app( argc, argv );
-
-    Settings settings( VERSION, app.applicationFilePath() );
-    Settings::instance = &settings;
-
     try
     {
+        //FIXME prolly bad to have a custom instantiation that may use the::settings
+        // before it exists init.
+        App app( argc, argv );
+
+        Settings settings( VERSION, app.applicationFilePath() );
+        Settings::instance = &settings;
+
         PlayerListener listener;
         PlayerManager manager;
 
@@ -69,5 +69,9 @@ int main( int argc, char** argv )
     {
         //TODO
         //FIXME can't have it so that there is no radio option if listener socket fails!
-    }   
+    }
+    catch (int)
+    {
+        // user wouldn't log in
+    }
 }

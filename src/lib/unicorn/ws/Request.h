@@ -20,9 +20,8 @@
 #ifndef WEB_SERVICE_REQUEST_H
 #define WEB_SERVICE_REQUEST_H
 
-#include "common/DllExportMacro.h"
-
-#include "UnicornCommon.h"
+#include "../UnicornDllExportMacro.h"
+#include "../UnicornCommon.h"
 
 #include <QHttp>
 #include <QHttpHeader>
@@ -184,7 +183,7 @@ enum WebRequestResultCode
   * signal and process the data there.
   */
 
-class DLLEXPORT Request : public QObject
+class UNICORN_DLLEXPORT Request : public QObject
 {
     Q_OBJECT
 
@@ -327,6 +326,7 @@ private:
 
 private slots:
     void onHeaderReceivedPrivate( const class QHttpResponseHeader& header );
+    void onRequestFinished( int, bool error );
     void onFailurePrivate( int error_code, const QString &error_string );
     void onSuccessPrivate( QByteArray data );
 };

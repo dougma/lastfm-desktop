@@ -22,7 +22,7 @@
 
 #include "TrackInfo.h"
 #include "lib/unicorn/Settings.h"
-#include "common/DllExportMacro.h"
+#include "MooseDllExportMacro.h"
 #include <QStringList>
 
 
@@ -30,9 +30,9 @@ namespace Moose
 {
     //TODO use constant for organisation and application name and stick them in 
     // Moose, then use same for main setOrgName etc.
-    typedef Unicorn::Settings QSettings;
+    typedef Unicorn::QSettings QSettings;
 
-    class DLLEXPORT Settings : public Unicorn::QSettings
+    class MOOSE_DLLEXPORT Settings : public Unicorn::Settings
     {
     public:
         /** The AudioScrobbler executable location */

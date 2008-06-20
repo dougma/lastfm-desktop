@@ -20,12 +20,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Logger.h"
 #include "Request.h"
 #include "XmlRpc.h"
-#include "UnicornCommon.h"
-#include "Settings.h"
-
+#include "../Logger.h"
+#include "../Settings.h"
+#include "../UnicornCommon.h"
 #include <QApplication>
 #include <QHttpRequestHeader>
 
@@ -52,8 +51,7 @@ Request::Request( RequestType type, const char *name )
 
     m_http = new QHttp( host, 80, this );
 
-    connect( m_http, SIGNAL(dataAvailable( QByteArray )), SLOT(onSuccessPrivate( QByteArray )) );
-    connect( m_http, SIGNAL(errorOccured( int, QString )), SLOT(onFailurePrivate( int, QString )) );        
+    connect( m_http, SIGNAL(requestFinished( int, bool )), SLOT(onRequestFinished( int, bool )) );
     connect( m_http, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHeaderReceivedPrivate( QHttpResponseHeader )) );
 
 //////
@@ -120,6 +118,16 @@ Request::onHeaderReceivedPrivate( const QHttpResponseHeader& header )
 
         }
     }
+}
+
+
+void
+Request::onRequestFinished( int, bool error )
+{
+    if (error) 
+        onFailurePrivate( m_http->error(), m_http->errorString() );
+    else
+        onSuccessPrivate( m_http->readAll() );
 }
 
 
@@ -251,7 +259,7 @@ Request::request( const XmlRpc &xmlrpc )
 
     QString const xml = xmlrpc.toString();
 
-    m_http->request( header, xml.toUtf8(), 0 /*to QIoDevice */,  xmlrpc.useCache() );
+    m_http->request( header, xml.toUtf8(), xmlrpc.useCache() );
 
     qDebug() << objectName() << "initiated:" << ( m_http->host() + header.path() );
 /*    LOG( 3, objectName() << " request xmlrpc:\n" <<

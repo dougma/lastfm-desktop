@@ -23,13 +23,13 @@
 
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/LastMessageBox.h"
 
 #include <QApplication>
 #include <QDir>
 #include <QHostAddress>
 #include <QLibrary>
 #include <QMap>
-#include <QMessageBox>
 #include <QPluginLoader>
 #include <QProcess>
 #include <QTcpSocket>
@@ -139,7 +139,7 @@ servicePath( QString name )
 static void
 loadServiceError( QString name )
 {
-    QMessageBox::critical( 0,
+    LastMessageBox::critical(
         QCoreApplication::translate( "Container", "Error" ),
         QCoreApplication::translate( "Container", "Couldn't load service: %1. The application won't be able to start." ).arg( name ) );
 

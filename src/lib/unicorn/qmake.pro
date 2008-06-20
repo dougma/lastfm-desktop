@@ -1,14 +1,18 @@
 TARGET = unicorn
 TEMPLATE = lib
-QT += override
 
 #fixme make libwebservice
 QT += network xml
 
+#fixme make UnicornGui
+QT += gui
+
 include( $$SRC_DIR/include.pro )
 
 SOURCES += $$system( find . -name \*.cpp )
-HEADERS += $$system( find . -name \*.h ) qmake.pro
+HEADERS += $$system( find . -name \*.h ) \
+           qmake.pro \
+           QtOverride/QHttp QtOverride/QSystemTrayIcon QtOverride/QMessageBox
 
 !win32 {
     SOURCES -= ./UnicornCommonWin.cpp
@@ -19,4 +23,4 @@ HEADERS += $$system( find . -name \*.h ) qmake.pro
     HEADERS -= ./UnicornCommonMac.h ./AppleScript.h
 }
 
-INCLUDEPATH += .
+DEFINES += _UNICORN_DLLEXPORT

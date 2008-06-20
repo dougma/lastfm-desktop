@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,23 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommon.h"
-#include "Settings.h"
-#include <QLocale>
+#ifndef UNICORN_DLL_EXPORT_MACRO_H
+#define UNICORN_DLL_EXPORT_MACRO_H
 
+/** Exports symbols when compiled as part of libunicorn, imports when included
+  * from some external target. */
+#if defined(_WIN32) || defined(WIN32)
+    #ifdef _UNICORN_DLLEXPORT
+        #define UNICORN_DLLEXPORT __declspec(dllexport)
+    #else
+        #define UNICORN_DLLEXPORT __declspec(dllimport)
+    #endif
+#else
+    #define UNICORN_DLLEXPORT
+#endif
 
-QString
-Unicorn::Settings::appLanguage() const
-{
-    QString code = QSettings().value( "AppLanguage" ).toString();
-    if ( !code.isEmpty() )
-        return code;
-
-    // If none found, use system locale
-  #ifdef Q_WS_MAC
-    QLocale::Language qtLang = UnicornUtils::osxLanguageCode();
-  #else
-    QLocale::Language qtLang = QLocale::system().language();
-  #endif
-    return Unicorn::qtLanguageToLfmLangCode( qtLang );
-}
+#endif

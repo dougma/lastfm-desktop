@@ -33,7 +33,7 @@ enum UserAuthCode
 /** @author <max@last.fm>
   * @short Verify with server that a supplied user/pass combo is valid. Password
   *        should be MD5 hashed. */
-class DLLEXPORT VerifyUserRequest : public Request
+class UNICORN_DLLEXPORT VerifyUserRequest : public Request
 {
     PROP_GET_SET( QString, username, Username );
 

@@ -22,27 +22,26 @@
 #include "PlayerManager.h"
 #include "ScrobbleShepherd.h"
 #include "Settings.h"
-#include "widgets/SettingsDialog/SettingsDialog.h"
+#include "widgets/LoginDialog.h"
 
 
 App::App( int argc, char** argv ) 
    : QApplication( argc, argv ),
      m_playerManager( 0 )
 {
-    if (The::user().isEmpty())
+    if (The::settings().username().isEmpty())
     {
         LoginDialog d;
         if (d.exec() == QDialog::Accepted)
         {
-            The::settings().setUsername( d.username() );
-            The::settings().setPassword( d.password() );
+            Unicorn::QSettings().setValue( "Username", d.username() );
+            Unicorn::QSettings().setValue( "Password", d.password() );
 
             //TODO bootstrapping
         }
         else
         {
-            quit();
-            return;
+            throw 0; //FIXME using exceptions for flow control? eww!
         }
     }
 

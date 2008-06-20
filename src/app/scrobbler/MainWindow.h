@@ -41,6 +41,8 @@ private slots:
     void onPlaybackTick( int );
     void onProgressDisplayTick();
 
+    void showSettingsDialog();
+
 private:
     /** progress is updated every granularity, so if showing the progress todo
       * scrobble point, pass the scrobble point in seconds, and the granularity
