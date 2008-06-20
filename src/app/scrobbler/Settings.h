@@ -35,9 +35,20 @@ class Settings : public Moose::Settings
     friend int main( int, char** );
     friend Settings& The::settings();
 
+protected:
+    Settings( const Settings& )
+    {
+        // we appear odd, but it enforces encapsulation, since the compiler
+        // requires an instance of Settings to use this ctor, and only main()
+        // can create one, well you could cast something else, but we may 
+        // actually require something from the Settings instance at some point
+        // and then your code will crash :P
+    }
+
 public:
     QByteArray containerGeometry() const { return QSettings().value( "MainWindowGeometry" ).toByteArray(); }
     Qt::WindowState containerWindowState() const { return (Qt::WindowState) QSettings().value( "MainWindowState" ).toInt(); }
+    bool logOutOnExit() const { return QSettings().value( "LogOutOnExit", false ).toBool(); }
 
 private:
     bool m_weWereJustUpgraded;
@@ -47,8 +58,10 @@ private:
 class MutableSettings : private Settings
 {
 public:
-    MutableSettings();
+    MutableSettings( const Settings& that ) : Settings( that )
+    {}
 
+    void setLogOutOnExit( bool b ) { QSettings().setValue( "LogOutOnExit", b ); }
     void setControlPort( int v ) { QSettings().setValue( "ControlPort", v ); }
     void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
     void setContainerWindowState( int state ) { QSettings().setValue( "MainWindowState", state ); }

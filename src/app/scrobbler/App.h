@@ -27,6 +27,7 @@ class App : public QApplication
 
 public:
     App( int, char** );
+    ~App();
 
     PlaybackState::Enum state() const;
 

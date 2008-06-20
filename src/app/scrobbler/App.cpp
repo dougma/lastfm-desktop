@@ -29,11 +29,16 @@ App::App( int argc, char** argv )
    : QApplication( argc, argv ),
      m_playerManager( 0 )
 {
-    if (true)//The::settings().username().isEmpty())
+    if (The::settings().username().isEmpty() || The::settings().logOutOnExit())
     {
         LoginDialog d;
         if (d.exec() == QDialog::Accepted)
         {
+            // we shouldn't store this really, if LogOutOnExit is enabled
+            // but we delete the setting on exit, and it means other apps can
+            // log in while the client is loaded, and prevents us having to 
+            // store these datas for the use case where LogOutOnExit is disabled
+            // during the session
             Unicorn::QSettings().setValue( "Username", d.username() );
             Unicorn::QSettings().setValue( "Password", d.password() );
 
@@ -65,6 +70,18 @@ PlaybackState::Enum
 App::state() const
 {
     return m_playerManager->state();
+}
+
+
+App::~App()
+{
+    // we do this here, rather than in the SettingsDialog in case the user
+    // changes their mind
+    if (The::settings().logOutOnExit())
+    {
+        Unicorn::QSettings().remove( "Username" );
+        Unicorn::QSettings().remove( "Password" );
+    }
 }
 
 

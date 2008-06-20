@@ -9,3 +9,6 @@ SOURCES += $$system( find . -name \*.cpp )
 HEADERS += $$system( find . -name \*.h ) qmake.pro
 FORMS += $$system( find -name \*.ui )
 RESOURCES += $$system( find -name \*.qrc )
+RESOURCES += $$SRC_DIR/common/qrc/common.qrc
+
+INCLUDEPATH += .

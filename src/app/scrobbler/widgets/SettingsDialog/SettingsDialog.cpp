@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "SettingsDialog.h"
+#include "Settings.h"
 #include "lib/unicorn/UnicornCommon.h"
 
 // Visual Studio sucks, thus we do this
@@ -51,14 +52,32 @@ SettingsDialog::SettingsDialog()
     ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), Unicorn::qtLanguageToLfmLangCode( QLocale::Russian ) );
     ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), Unicorn::qtLanguageToLfmLangCode( QLocale::Chinese ) );
 
+    //setup widgets
+    ui.logOutOnExit->setChecked( The::settings().logOutOnExit() );
+
     // make OK button enable if something changes
     //NOTE we don't store initial value, so as a result if user changes the thing back, we do nothing..
     foreach (QLineEdit* o, ui.pageStack->findChildren<QLineEdit*>())
         connect( o, SIGNAL(textEdited( QString )), SLOT(enableOk()) );
+    foreach (QCheckBox* o, ui.pageStack->findChildren<QCheckBox*>())
+        connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
     foreach (QComboBox* o, ui.pageStack->findChildren<QComboBox*>())
         connect( o, SIGNAL(currentIndexChanged( int )), SLOT(enableOk()) );
     foreach (QGroupBox* o, ui.pageStack->findChildren<QGroupBox*>())
         connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
     foreach (QRadioButton* o, ui.pageStack->findChildren<QRadioButton*>())
         connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
+}
+
+
+void //virtual
+SettingsDialog::accept()
+{
+    MutableSettings s( The::settings() );
+
+    // note, don't delete the username/password from the settings yet, do that
+    // at exit, in case the user changes his/her mind
+    s.setLogOutOnExit( ui.logOutOnExit->isChecked() );
+
+    QDialog::accept();
 }

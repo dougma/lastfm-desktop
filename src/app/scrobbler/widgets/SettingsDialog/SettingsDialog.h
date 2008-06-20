@@ -28,6 +28,8 @@ class SettingsDialog : public QDialog
 public:
     SettingsDialog();
 
+    virtual void accept();
+
 private slots:
     void enableOk() { ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( true ); }
 

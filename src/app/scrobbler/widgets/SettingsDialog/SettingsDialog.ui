@@ -201,6 +201,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="logOutOnExit" >
+            <property name="text" >
+             <string>Log out on exit</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

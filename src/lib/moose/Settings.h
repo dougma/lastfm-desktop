@@ -48,7 +48,7 @@ namespace Moose
 
         // used by Moose::sendToInstance
         // needed by Twiddly
-        int  controlPort() const { return QSettings().value( "ControlPort", 32213 ).toInt(); }
+        int controlPort() const { return QSettings().value( "ControlPort", 32213 ).toInt(); }
 
         // used by TrackInfo
         // needed by Twiddly as it uses TrackInfo::isScrobblable()
