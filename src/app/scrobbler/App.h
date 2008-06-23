@@ -48,5 +48,5 @@ signals:
 
 private:
     class PlayerManager* m_playerManager;
-    class ScrobblerManager* m_scrobbler;
+    class Scrobbler* m_scrobbler;
 };

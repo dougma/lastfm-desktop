@@ -21,18 +21,7 @@
 #define SCROBBLE_SHEPHERD_H
 
 /** @author Max Howell <max@last.fm>
-  * @brief You should be able to drop this file into another project and submit scrobbles to Last.fm
-  *
-  * Instantiate a ScrobbleManager class. Pass it username and password
-  * information.
-  *
-  * Songs that have passed the scrobble point should be submitted to Last.fm
-  * when they _end_, using submit(), you can announce just started tracks using,
-  * announce() - this is the NowPlaying notification.
-  * 
-  * Determining the scrobble point and what constitutes a legal scrobble is up
-  * to you!
-  *
+  * ARSP is the Audioscrobbler Realtime Scrobbling Protocol
   * http://www.audioscrobbler.net/development/protocol/
   */
 
@@ -42,43 +31,8 @@
 
 #include "lib/moose/TrackInfo.h"
 
-class ScrobbleCache;
-class ScrobblerHandshakeRequest;
-class ScrobblerNowPlayingRequest;
-class ScrobblerHttpPostRequest;
 
-
-namespace Scrobbler
-{
-    enum Status
-    {
-        Connecting,
-        Handshaken,
-        Scrobbling,
-        TracksScrobbled,
-        TracksNotScrobbled,
-        StatusMax
-    };
-
-    enum Error
-    {
-        /** the following will show via the status signal, the scrobbler will
-          * not submit this session (np too), however caching will continue */
-        ErrorBadSession = StatusMax,
-        ErrorBannedClient,
-        ErrorBadAuthorisation,
-        ErrorBadTime,
-        ThreeHardFailures,
-
-        /** while the handshake is occuring */
-        ErrorNotInitialized,
-
-        NoError
-    };
-}
-
-
-class ScrobblerManager : public QObject
+class Scrobbler : public QObject
 {
     Q_OBJECT
 
@@ -93,8 +47,8 @@ class ScrobblerManager : public QObject
 
 public:
     /** password should be already a 32 character md5 hash */
-    ScrobblerManager( const QString& username, const QString& password );
-    ~ScrobblerManager();
+    Scrobbler( const QString& username, const QString& password );
+    ~Scrobbler();
 
     /** will ask Last.fm to update the now playing information for username() */
     void nowPlaying( const TrackInfo& );
@@ -103,6 +57,32 @@ public:
 
     QString session() const { return m_session; }
     QString username() const { return m_username; }
+
+    enum Status
+    {
+        Connecting,
+        Handshaken,
+        Scrobbling,
+        TracksScrobbled,
+        TracksNotScrobbled,
+        StatusMax
+    };
+
+    enum Error
+    {
+        /** the following will show via the status signal, the scrobbler will
+        * not submit this session (np too), however caching will continue */
+        ErrorBadSession = StatusMax,
+        ErrorBannedClient,
+        ErrorBadAuthorisation,
+        ErrorBadTime,
+        ThreeHardFailures,
+
+        /** while the handshake is occuring */
+        ErrorNotInitialized,
+
+        NoError
+    };
 
 signals:
     /** the controller should show status in an appropriate manner */
@@ -167,11 +147,11 @@ class ScrobblerHttpPostRequest : public ScrobblerHttp
 protected:
     QByteArray m_data;
 
-    ScrobblerManager* manager() const { return (ScrobblerManager*)parent(); }
+    Scrobbler* manager() const { return (Scrobbler*)parent(); }
     QString session() const { return manager()->session(); }
 
 public:
-    ScrobblerHttpPostRequest( ScrobblerManager* parent ) : ScrobblerHttp( parent )
+    ScrobblerHttpPostRequest( Scrobbler* parent ) : ScrobblerHttp( parent )
     {}
 
     /** if you reimplement call the base version after setting m_data */
@@ -186,7 +166,7 @@ class NowPlaying : public ScrobblerHttpPostRequest
     QTimer* m_timer;
 
 public:
-    NowPlaying( ScrobblerManager* );
+    NowPlaying( Scrobbler* );
 
     void request( const TrackInfo& );
 };
@@ -197,7 +177,7 @@ class ScrobblerSubmitter : public ScrobblerHttpPostRequest
     QList<TrackInfo> m_batch;
 
 public:
-    ScrobblerSubmitter( ScrobblerManager* parent ) : ScrobblerHttpPostRequest( parent )
+    ScrobblerSubmitter( Scrobbler* parent ) : ScrobblerHttpPostRequest( parent )
     {}
 
     virtual void request();

@@ -82,7 +82,7 @@ StopWatchThread::run()
 
             emit tick( m_elapsed / 1000 );
 
-            if (m_elapsed >= m_timeout)
+            if (!timedout && m_elapsed >= m_timeout)
             {
                 emit timeout();
                 timedout = true;

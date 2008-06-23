@@ -38,18 +38,19 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////>
-ScrobblerManager::ScrobblerManager( const QString& username, const QString& password )
+Scrobbler::Scrobbler( const QString& username, const QString& password )
         : m_username( username ),
           m_password( password ),
           m_handshake( 0 ), 
           m_np( 0 ), 
-          m_submitter( 0 )
+          m_submitter( 0 ),
+          m_hard_failures( 0 )
 {
     handshake();
 }
 
 
-ScrobblerManager::~ScrobblerManager()
+Scrobbler::~Scrobbler()
 {
     delete m_handshake;
     delete m_np;
@@ -58,39 +59,41 @@ ScrobblerManager::~ScrobblerManager()
 
 
 void
-ScrobblerManager::handshake()
+Scrobbler::handshake()
 {
     m_session = "";
+    m_hard_failures = 0;
 
     delete m_handshake;
     delete m_np;
     delete m_submitter;
     
     m_handshake = new ScrobblerHandshake( m_username, m_password );
-    connect( m_handshake, SIGNAL(done()), SLOT(onHandshakeReturn()) );
+    connect( m_handshake, SIGNAL(done( QString )), SLOT(onHandshakeReturn( QString )) );
+    connect( m_handshake, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHandshakeHeaderReceived( QHttpResponseHeader )) );
     m_np = new NowPlaying( this );
-    connect( m_handshake, SIGNAL(done()), SLOT(onNowPlayingReturn()) );
+    connect( m_np, SIGNAL(done( QString )), SLOT(onNowPlayingReturn( QString )) );
     m_submitter = new ScrobblerSubmitter( this );
-    connect( m_handshake, SIGNAL(done()), SLOT(onSubmissionReturn()) );
+    connect( m_submitter, SIGNAL(done( QString )), SLOT(onSubmissionReturn( QString )) );
 }
 
 
 void
-ScrobblerManager::submit()
+Scrobbler::submit()
 {
     m_submitter->request();
 }
 
 
 void
-ScrobblerManager::nowPlaying( const TrackInfo& track )
+Scrobbler::nowPlaying( const TrackInfo& track )
 {
     m_np->request( track );
 }
 
 
 void
-ScrobblerManager::onError( Scrobbler::Error code )
+Scrobbler::onError( Scrobbler::Error code )
 {
     Q_DEBUG_BLOCK << code; //TODO error text
 
@@ -99,7 +102,7 @@ ScrobblerManager::onError( Scrobbler::Error code )
         case Scrobbler::ErrorBannedClient:
         case Scrobbler::ErrorBadAuthorisation:
         case Scrobbler::ErrorBadTime:
-            //TEST that np and submit don't fuck everything up
+            //TEST that np and submit don't fuck everything up, ie you may need to abort
             break;
 
         default:
@@ -116,9 +119,9 @@ ScrobblerManager::onError( Scrobbler::Error code )
 
 
 void
-ScrobblerManager::onHandshakeReturn( const QString& result ) //TODO trim before passing here
+Scrobbler::onHandshakeReturn( const QString& result ) //TODO trim before passing here
 {
-    Q_DEBUG_BLOCK << result;
+    Q_DEBUG_BLOCK << result.trimmed();
     QStringList const results = result.split( '\n' );
     QString const code = results.value( 0 );
 
@@ -151,9 +154,9 @@ ScrobblerManager::onHandshakeReturn( const QString& result ) //TODO trim before 
 
 
 void
-ScrobblerManager::onNowPlayingReturn( const QString& result )
+Scrobbler::onNowPlayingReturn( const QString& result )
 {
-    Q_DEBUG_BLOCK << result;
+    Q_DEBUG_BLOCK << result.trimmed();
     QString const code = result.split( '\n' ).value( 0 );
 
     if (code == "OK")
@@ -176,9 +179,9 @@ ScrobblerManager::onNowPlayingReturn( const QString& result )
 
 
 void
-ScrobblerManager::onSubmissionReturn( const QString& result )
+Scrobbler::onSubmissionReturn( const QString& result )
 {
-    Q_DEBUG_BLOCK << result;
+    Q_DEBUG_BLOCK << result.trimmed();
     QString const code = result.split( '\n' ).value( 0 );
 
     if (code == "OK")
@@ -197,7 +200,7 @@ ScrobblerManager::onSubmissionReturn( const QString& result )
     {
         onError( Scrobbler::ErrorBadSession );
     }
-    else if (++m_hard_failures == 3)
+    else if (++m_hard_failures >= 3)
     {
         onError( Scrobbler::ThreeHardFailures );
     }
@@ -308,7 +311,7 @@ ScrobbleCache::append( const QList<TrackInfo>& tracks )
 int
 ScrobbleCache::remove( const QList<TrackInfo>& toremove )
 {
-    qDebug() << m_tracks.count() << "toremove count:" << toremove.count();
+    qDebug() << m_tracks.count() << "track." << toremove.count() << "to remove";
 
     QMutableListIterator<TrackInfo> i( m_tracks );
     while (i.hasNext()) {
@@ -425,7 +428,7 @@ ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& 
                      m_password( password )
 {
     setHost( "post.audioscrobbler.com" );
-    connect( this, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHeaderReceived( QHttpResponseHeader )) );
+    request();
 }
 
 
@@ -446,12 +449,12 @@ ScrobblerHandshake::request()
 
     m_id = get( '/' + query_string );
 
-    qDebug() << "GET:" << query_string;
+    qDebug() << "HTTP GET" << host() + '/' + query_string;
 }
 
 
 void
-ScrobblerManager::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
+Scrobbler::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
 {
     if (header.statusCode() != 200)
     {
@@ -474,13 +477,13 @@ ScrobblerHttpPostRequest::request()
     header.setValue( "Host", host() ); //Qt makes me LOL today
     header.setContentType( "application/x-www-form-urlencoded" );
 
-    qDebug() << "POST:" << m_data;
+    qDebug() << "HTTP POST" << host() + '/' + m_path << m_data;
 
     m_id = QHttp::request( header, m_data );
 }
 
 
-NowPlaying::NowPlaying( ScrobblerManager* parent )
+NowPlaying::NowPlaying( Scrobbler* parent )
           : ScrobblerHttpPostRequest( parent )
 {
     m_timer = new QTimer( this );
@@ -524,6 +527,9 @@ ScrobblerSubmitter::request()
     ScrobbleCache cache( manager()->username() );
     QList<TrackInfo> tracks = cache.tracks();
 
+    if (tracks.isEmpty())
+        return;
+
     // we need to put the tracks in chronological order or the Scrobbling Service
     // rejects the ones that are later than previously submitted tracks
     // this is only relevent if the cache is greater than 50 in size as then
@@ -531,6 +537,7 @@ ScrobblerSubmitter::request()
     //TODO sort in the persistent cache
     qSort( tracks.begin(), tracks.end(), TrackInfo::lessThan );
     tracks = tracks.mid( 0, 50 );
+    m_batch = tracks;
 
     Q_ASSERT( session().size() );
     Q_ASSERT( tracks.size() <= 50 );

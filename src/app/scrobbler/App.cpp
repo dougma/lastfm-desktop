@@ -51,7 +51,7 @@ App::App( int argc, char** argv )
         }
     }
 
-    m_scrobbler = new ScrobblerManager( The::settings().username(), The::settings().password() );
+    m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
 
     connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }

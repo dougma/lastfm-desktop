@@ -40,6 +40,9 @@ PlayerManager::love()
 void
 PlayerManager::onTrackStarted( const TrackInfo& t )
 {
+    if (m_players.count())
+        disconnect( &m_players.top()->watch, 0, this, 0 );
+
     QString const id = t.playerId();
     Player& p = *m_players[id];
     p.track = t;
@@ -52,7 +55,6 @@ PlayerManager::onTrackStarted( const TrackInfo& t )
     {
         //TODO this isn't neat, we don't have to do it everytime as the previous 
         // top() is prolly the same as the new top()
-        disconnect( 0, 0, this, SIGNAL(tick( int )) );
         connect( &p.watch, SIGNAL(tick( int )), SIGNAL(tick( int )) );
         connect( &p.watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
         handleStateChange( p.state, p.track );
