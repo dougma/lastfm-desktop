@@ -20,7 +20,7 @@
 #include "MainWindow.h"
 #include "PlaybackEvent.h"
 #include "PlayerManager.h"
-#include "widgets/SettingsDialog/SettingsDialog.h"
+#include "widgets/SettingsDialog.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/moose/TrackInfo.h"
 #include <QLinearGradient>
