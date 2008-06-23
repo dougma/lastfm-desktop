@@ -45,32 +45,11 @@
 class ScrobbleCache;
 class ScrobblerHandshakeRequest;
 class ScrobblerNowPlayingRequest;
-class ScrobblerPostRequest;
+class ScrobblerHttpPostRequest;
 
 
-///////////////////////////////////////////////////////////////////////////////>
-class Scrobbler : public QObject
+namespace Scrobbler
 {
-    Q_OBJECT
-
-    void hardFailure();
-
-private slots:
-    void onHandshakeReturn( const QString& );
-    void onNowPlayingReturn( const QString& );
-    void onSubmissionReturn( const QString& );
-    void onHandshakeHeaderReceived( const QHttpResponseHeader& );
-
-public:
-    struct Init
-    {
-        QString username;
-        QString password;
-        QString client_version;
-    };
-
-    explicit Scrobbler( const Init& );
-
     enum Status
     {
         Connecting,
@@ -83,113 +62,74 @@ public:
 
     enum Error
     {
+        /** the following will show via the status signal, the scrobbler will
+          * not submit this session (np too), however caching will continue */
         ErrorBadSession = StatusMax,
         ErrorBannedClient,
         ErrorBadAuthorisation,
         ErrorBadTime,
+        ThreeHardFailures,
+
+        /** while the handshake is occuring */
         ErrorNotInitialized,
+
         NoError
     };
-
-    bool canSubmit() const { return m_session_id.length() && m_submitted_tracks.isEmpty(); }
-    bool canAnnounce() const { return m_session_id.length(); }
-
-    QString username() const { return m_init.username; }
-    Init init() const { return m_init; }
-
-    /** @returns the number of tracks being scrobbled, 0 if empty cache or 
-      * scrobbler is busy or scrobbler not handshaken yet, to test for that
-      * you can examine the result of canSubmit() */
-    int submit( const ScrobbleCache& );
-
-    /** Will update the now-playing status at the Last.fm website */
-    void announce( const TrackInfo& );
-
-    /** resets the running count of the number of scrobbled tracks */
-    void resetScrobbleCount() { m_scrobbled = 0; }
-    uint scrobbled() const { return m_scrobbled; }
-
-    Error lastError() const { return m_lastError; }
-    static QString errorDescription( Scrobbler::Error error );
-
-signals:
-    void handshaken( Scrobbler* );
-    void scrobbled( const QList<TrackInfo>& );
-    void invalidated( int = NoError );
-
-private:
-    ScrobblerHandshakeRequest* m_handshake;
-    ScrobblerNowPlayingRequest* m_now_playing;
-    ScrobblerPostRequest* m_submission;
-
-    Init m_init;
-    QString m_session_id;
-    uint m_hard_failures;
-    uint m_scrobbled;
-    Error m_lastError;
-
-    class QTimer* m_timer;
-
-    QList<TrackInfo> m_submitted_tracks;
-};
-///////////////////////////////////////////////////////////////////////////////>
+}
 
 
-///////////////////////////////////////////////////////////////////////////////>
 class ScrobblerManager : public QObject
 {
     Q_OBJECT
 
-    /** one scrobbler per user */
-    QList<Scrobbler*> m_scrobblers;
+    QString const m_username;
+    QString const m_password;
+    QString m_session;
+
+    class ScrobblerHandshake* m_handshake;
+    class NowPlaying* m_np;
+    class ScrobblerSubmitter* m_submitter;
+    uint m_hard_failures;
 
 public:
-    ScrobblerManager( QObject* parent = 0 );
+    /** password should be already a 32 character md5 hash */
+    ScrobblerManager( const QString& username, const QString& password );
     ~ScrobblerManager();
 
-    void handshake( const Scrobbler::Init& );
-
-    bool canScrobble( const QString& username ) const { return scrobblerForUser( username ); }
-
-    Scrobbler::Error
-    lastError( const QString& username ) const
-    {
-        return scrobblerForUser( username )
-                ? scrobblerForUser( username )->lastError()
-                : Scrobbler::ErrorNotInitialized;
-    }
-
-public slots:
-    void scrobble( TrackInfo );
+    /** will ask Last.fm to update the now playing information for username() */
     void nowPlaying( const TrackInfo& );
-    void scrobble( const class ScrobbleCache& );
+    /** will submit the ScrobbleCache for this user */
+    void submit();
+
+    QString session() const { return m_session; }
+    QString username() const { return m_username; }
 
 signals:
     /** the controller should show status in an appropriate manner */
     void status( int code, QVariant data = QVariant() );
 
-private slots:
-    /** a scrobbler is now invalid, delete it and handshake a new one */
-    void onInvalidated( int errorcode );
-    void onHandshaken( Scrobbler* );
-    void onScrobbled( const QList<TrackInfo>& );
-
 private:
-    Scrobbler* scrobblerForUser( const QString& username ) const;
+    void handshake();
+    void onError( Scrobbler::Error );
+
+private slots:
+    void onHandshakeReturn( const QString& );
+    void onNowPlayingReturn( const QString& );
+    void onSubmissionReturn( const QString& );
+
+    void onHandshakeHeaderReceived( const QHttpResponseHeader& );
 };
-///////////////////////////////////////////////////////////////////////////////>
 
 
-///////////////////////////////////////////////////////////////////////////////>
 class ScrobblerHttp : public QHttp
 {
     Q_OBJECT
 
 protected:
-    ScrobblerHttp( QObject* parent );
+    ScrobblerHttp( QObject* parent = 0 );
 
     int m_id;
-    QTimer *m_retry_timer;
+    class QTimer *m_retry_timer;
 
 private slots:
     void onRequestFinished( int id, bool error );
@@ -202,88 +142,82 @@ protected slots:
 
 public:
     void resetRetryTimer();
-    int retry();
+    void retry();
 
     int id() const { return m_id; }
 };
-///////////////////////////////////////////////////////////////////////////////>
 
 
-///////////////////////////////////////////////////////////////////////////////>
-class ScrobblerHandshakeRequest : public ScrobblerHttp
+class ScrobblerHandshake : public ScrobblerHttp
 {
-    Scrobbler::Init m_init;
-
-    virtual void request();
+    QString const m_username;
+    QString const m_password;
 
 public:
-    ScrobblerHandshakeRequest( QObject* parent ) : ScrobblerHttp( parent )
-    {}
+    ScrobblerHandshake( const QString& username, const QString& password );
 
-    virtual void request( const Scrobbler::Init& init)
-    {
-        m_init = init;
-        request();
-    }
+    virtual void request();
 };
-///////////////////////////////////////////////////////////////////////////////>
 
 
-///////////////////////////////////////////////////////////////////////////////>
-class ScrobblerPostRequest : public ScrobblerHttp
+class ScrobblerHttpPostRequest : public ScrobblerHttp
 {
-    QString m_host;
     QString m_path;
-    QByteArray m_data;
 
 protected:
-    virtual void request();
+    QByteArray m_data;
+
+    ScrobblerManager* manager() const { return (ScrobblerManager*)parent(); }
+    QString session() const { return manager()->session(); }
 
 public:
-    ScrobblerPostRequest( QObject* parent ) : ScrobblerHttp( parent )
+    ScrobblerHttpPostRequest( ScrobblerManager* parent ) : ScrobblerHttp( parent )
     {}
 
-    void setUrl( const QUrl& url );
-    void request( const QByteArray& data );
+    /** if you reimplement call the base version after setting m_data */
+    virtual void request();
+
+    void setUrl( const QUrl& );
 };
-///////////////////////////////////////////////////////////////////////////////>
 
 
-///////////////////////////////////////////////////////////////////////////////>
-/** class exists to allow us to delay 5 seconds before we announce new tracks
-  * because if a user skips many tracks in quick succession, eg searching for a
-  * good track in iTunes shuffle, it breaks facebook and teh intertubes */
-class ScrobblerNowPlayingRequest : public ScrobblerPostRequest
+class NowPlaying : public ScrobblerHttpPostRequest
 {
     QTimer* m_timer;
 
-    virtual void request();
+public:
+    NowPlaying( ScrobblerManager* );
+
+    void request( const TrackInfo& );
+};
+
+
+class ScrobblerSubmitter : public ScrobblerHttpPostRequest
+{
+    QList<TrackInfo> m_batch;
 
 public:
-    ScrobblerNowPlayingRequest( QObject* );
-};
-///////////////////////////////////////////////////////////////////////////////>
-
-
-///////////////////////////////////////////////////////////////////////////////>
-class ScrobbleCache
-{
-protected:
-    QString m_path;
-    QString m_username;
-    QList<TrackInfo> m_tracks;
-
-    ScrobbleCache() //used by mediaDeviceCache()
+    ScrobblerSubmitter( ScrobblerManager* parent ) : ScrobblerHttpPostRequest( parent )
     {}
 
-    /** forces only one of each track for a specific timestamp */
-    void merge( const TrackInfo& );
+    virtual void request();
+    QList<TrackInfo> batch() const { return m_batch; }
+
+    void clearBatch() { m_batch.clear(); }
+};
+
+
+/** absolutely not thread-safe */
+class ScrobbleCache
+{
+    QString m_path;
+    QString m_username;
+    QList<TrackInfo>& m_tracks;
+
+    ScrobbleCache(); //used by tracksForPath()
 
     void read();  /// reads from m_path into m_tracks
     void write(); /// writes m_tracks to m_path
-
-    /// m_username needs to be set by the caller
-    static ScrobbleCache fromFile( const QString& );
 
 public:
     explicit ScrobbleCache( const QString& username );
@@ -300,12 +234,6 @@ public:
     QString path() const { return m_path; }
     QString username() const { return m_username; }
 
-    /** makes a timestamped backup of current cache */
-    void backup();
-
-    /** returns all backup file paths for all users */
-    static QStringList pathsForCacheBackups();
-
     /** a track list from an XML file in the ScrobbleCache format at path */
     static QList<TrackInfo> tracksForPath( const QString& path )
     {
@@ -318,6 +246,5 @@ public:
 private:
     bool operator==( const ScrobbleCache& ); //undefined
 };
-///////////////////////////////////////////////////////////////////////////////>
 
 #endif /* SCROBBLER_H */

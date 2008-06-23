@@ -30,11 +30,15 @@
 
 
 TrackInfo::TrackInfo()
-{}
+{
+    d = new TrackInfoData;
+}
 
 
 TrackInfo::TrackInfo( const QDomElement& e )
 {
+    d = new TrackInfoData;
+
     d->artist = e.namedItem( "artist" ).toElement().text();
     d->album =  e.namedItem( "album" ).toElement().text();
     d->title = e.namedItem( "track" ).toElement().text();

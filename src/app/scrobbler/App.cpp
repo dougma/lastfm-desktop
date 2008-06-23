@@ -51,13 +51,7 @@ App::App( int argc, char** argv )
         }
     }
 
-    Scrobbler::Init init;
-    init.client_version = VERSION;
-    init.password = The::settings().password();
-    init.username = The::settings().username();
-
-    m_scrobbler = new ScrobblerManager( this );
-    m_scrobbler->handshake( init );
+    m_scrobbler = new ScrobblerManager( The::settings().username(), The::settings().password() );
 
     connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
@@ -98,8 +92,13 @@ App::onAppEvent( int e, const QVariant& )
     switch (e)
     {
         case PlaybackEvent::ScrobblePointReached:
-            m_scrobbler->scrobble( The::playerManager().track() );
+        {
+            //TODO cache the track, but in a way that the scrobbler won't submit it yet
+            ScrobbleCache cache( The::settings().username() );
+            cache.append( The::playerManager().track() );
+            m_scrobbler->submit();
             break;
+        }
 
         case PlaybackEvent::PlaybackStarted:
         case PlaybackEvent::TrackChanged:

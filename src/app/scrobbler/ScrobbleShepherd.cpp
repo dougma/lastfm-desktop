@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ScrobbleShepherd.h"
-#include "Settings.h"
+#include "version.h"
 
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"
@@ -33,162 +33,81 @@
 #include <QTimer>
 #include <QUrl>
 
-
-/** used to determine save location for scrobble caches 
-  * NOTE you'll need to define this somewhere */
-QString savePath( QString );
-
-/** returns the 32 character HEX representation of the supplied data
-  * NOTE you'll need to define this somewhere */
-QString MD5Digest( const char* );
-
-
-/** used to sort tracks into chronological order pre scrobbling submission */
-static bool trackInfoLessThan( const TrackInfo &t1, const TrackInfo &t2)
-{
-    return t1.timeStamp() < t2.timeStamp();
-}
+// NOTE use your own! Ask russ@last.fm for a code.
+#define THREE_LETTER_SCROBBLE_CODE "ass"
 
 
 ///////////////////////////////////////////////////////////////////////////////>
-ScrobblerManager::ScrobblerManager( QObject* parent )
-        : QObject( parent )
-{}
+ScrobblerManager::ScrobblerManager( const QString& username, const QString& password )
+        : m_username( username ),
+          m_password( password ),
+          m_handshake( 0 ), 
+          m_np( 0 ), 
+          m_submitter( 0 )
+{
+    handshake();
+}
 
 
 ScrobblerManager::~ScrobblerManager()
 {
-    QDateTime a_while_ago = QDateTime::currentDateTime().addDays( -7 );
-
-    foreach (QString const path, ScrobbleCache::pathsForCacheBackups())
-        if (QFileInfo( path ).created() < a_while_ago)
-        {
-            qDebug() << "Deleting expired backup:" << path;
-            QFile::remove( path );
-        }
-
-//////
-    qDeleteAll( m_scrobblers );
+    delete m_handshake;
+    delete m_np;
+    delete m_submitter;
 }
 
 
 void
-ScrobblerManager::handshake( const Scrobbler::Init& init )
+ScrobblerManager::handshake()
 {
-    Q_DEBUG_BLOCK << init.username;
+    m_session = "";
 
-    Scrobbler* scrobbler = scrobblerForUser( init.username );
-
-    if (!scrobbler)
-    {
-        scrobbler = new Scrobbler( init );
-
-        connect( scrobbler, SIGNAL(handshaken( Scrobbler* )), SLOT(onHandshaken( Scrobbler* )) );
-        connect( scrobbler, SIGNAL(scrobbled( QList<TrackInfo> )), SLOT(onScrobbled( QList<TrackInfo> )) );
-        connect( scrobbler, SIGNAL(invalidated( int )), SLOT(onInvalidated( int )) );
-
-        m_scrobblers += scrobbler;
-
-        emit status( Scrobbler::Connecting );
-    }
-    else
-        emit status( Scrobbler::Handshaken, init.username );
-
-    //TODO push the scrobbler to handshake again if exists already
+    delete m_handshake;
+    delete m_np;
+    delete m_submitter;
+    
+    m_handshake = new ScrobblerHandshake( m_username, m_password );
+    connect( m_handshake, SIGNAL(done()), SLOT(onHandshakeReturn()) );
+    m_np = new NowPlaying( this );
+    connect( m_handshake, SIGNAL(done()), SLOT(onNowPlayingReturn()) );
+    m_submitter = new ScrobblerSubmitter( this );
+    connect( m_handshake, SIGNAL(done()), SLOT(onSubmissionReturn()) );
 }
 
 
-void //public
-ScrobblerManager::scrobble( TrackInfo track )
+void
+ScrobblerManager::submit()
 {
-    Q_DEBUG_BLOCK << track.toString();
-    Q_ASSERT( !track.isEmpty() );
-
-    ScrobbleCache cache( The::settings().username() );
-    cache.append( track );
-
-    scrobble( cache );
-}
-
-
-void //private
-ScrobblerManager::scrobble( const ScrobbleCache& cache )
-{
-    Q_DEBUG_BLOCK << cache.username();
-    Q_ASSERT( cache.username().length() );
-
-    if (cache.tracks().isEmpty())
-        qDebug() << "No tracks to scrobble";
-
-    else if (qApp->closingDown())
-        // if we are shutting down, save the submit for next time
-        // we choose this method as otherwise we have to hang the app waiting for a 
-        // timeout and this isn't safe --mxcl
-        qDebug() << "Not actually submitting as we are shutting down";
-
-    else if (Scrobbler* scrobbler = scrobblerForUser( cache.username() ))
-    {
-        int const N = scrobbler->submit( cache );
-
-        if (N)
-            emit status( Scrobbler::Scrobbling, N );
-        else
-            qDebug() << "Scrobbler not ready, will submit at earliest opportunity";
-    }
-    else
-        qDebug() << "No scrobbler available for:" << cache.username();
+    m_submitter->request();
 }
 
 
 void
 ScrobblerManager::nowPlaying( const TrackInfo& track )
 {
-    Q_DEBUG_BLOCK << track.toString();
-
-    Scrobbler* scrobbler = scrobblerForUser( The::settings().username() );
-
-    if (scrobbler && scrobbler->canAnnounce())
-        //TODO cache the now playing if the scrobbler is not yet ready
-        scrobbler->announce( track );
-    else
-        qDebug() << "No scrobbler found for user:" << The::settings().username();
-}
-
-
-Scrobbler*
-ScrobblerManager::scrobblerForUser( const QString& username ) const
-{
-    foreach (Scrobbler* s, m_scrobblers)
-        if (s->username() == username)
-            return s;
-
-    return 0;
+    m_np->request( track );
 }
 
 
 void
-ScrobblerManager::onInvalidated( int code )
+ScrobblerManager::onError( Scrobbler::Error code )
 {
-    Q_DEBUG_BLOCK << code;
-
-    Scrobbler* scrobbler = (Scrobbler*)sender();
-    scrobbler->deleteLater();
-    int const N = m_scrobblers.removeAll( scrobbler );
-
-    Q_ASSERT( N == 1 );
+    Q_DEBUG_BLOCK << code; //TODO error text
 
     switch (code)
     {
         case Scrobbler::ErrorBannedClient:
         case Scrobbler::ErrorBadAuthorisation:
         case Scrobbler::ErrorBadTime:
-            // up to the Container to decide what to do
+            //TEST that np and submit don't fuck everything up
             break;
 
-        case Scrobbler::ErrorBadSession:
         default:
-            QString const username = scrobbler->username();
-            handshake( scrobbler->init() ); // creates a new scrobbler
+            Q_ASSERT( false );
+
+        case Scrobbler::ThreeHardFailures:
+        case Scrobbler::ErrorBadSession:
+            handshake();
             break;
     }
 
@@ -197,59 +116,111 @@ ScrobblerManager::onInvalidated( int code )
 
 
 void
-ScrobblerManager::onScrobbled( const QList<TrackInfo>& tracks )
+ScrobblerManager::onHandshakeReturn( const QString& result ) //TODO trim before passing here
 {
-    Q_DEBUG_BLOCK << tracks.count() << "tracks were successfully scrobbled";
-    Q_ASSERT( sender() );
+    Q_DEBUG_BLOCK << result;
+    QStringList const results = result.split( '\n' );
+    QString const code = results.value( 0 );
 
-//////
-    Scrobbler* scrobbler = static_cast<Scrobbler*>(sender());
-    ScrobbleCache cache( scrobbler->username() );
+    if (code == "OK" && results.count() >= 4)
+    {
+        m_session = results[1];
+        m_np->setUrl( results[2] );
+        m_submitter->setUrl( results[3] );
 
-    if (tracks.count() > 2)
-        //do a backup because nobody writes perfect code, least of all me!
-        cache.backup();
+        emit status( Scrobbler::Handshaken, m_username );
 
-    int remaining = cache.remove( tracks );
-
-    if (remaining)
-        scrobble( cache );
-    else {
-        // only show status on final submission batch, and only if something
-        // was scrobbled (not skipped or banned)
-        if (scrobbler->scrobbled() > 0)
-            emit status( Scrobbler::TracksScrobbled, scrobbler->scrobbled() );
-
-        scrobbler->resetScrobbleCount();
+        m_np->ScrobblerHttpPostRequest::request();
+        m_submitter->request();
     }
+    else if (code == "BANNED")
+    {
+        onError( Scrobbler::ErrorBannedClient );
+    }
+    else if (code == "BADAUTH")
+    {
+        onError( Scrobbler::ErrorBadAuthorisation );
+    }
+    else if (code == "BADTIME")
+    {
+        onError( Scrobbler::ErrorBadTime );
+    }
+    else
+        m_handshake->retry(); //TODO increasing time up to 2 hours
 }
 
 
 void
-ScrobblerManager::onHandshaken( Scrobbler* scrobbler )
+ScrobblerManager::onNowPlayingReturn( const QString& result )
 {
-    QString const username = scrobbler->username();
+    Q_DEBUG_BLOCK << result;
+    QString const code = result.split( '\n' ).value( 0 );
 
-    Q_DEBUG_BLOCK << username;
-    Q_ASSERT( username.length() );
+    if (code == "OK")
+    {
+        // yay
+    }
+    else if (code == "BADSESSION")
+    {
+        onError( Scrobbler::ErrorBadSession );
+    }
 
-    ScrobbleCache cache( username );
-    scrobble( cache );
+    // we don't hard fail for what would be the else case here, because:
+    //  1) if just np is failing and subs are still ok, then we should submit!
+    //  2) np is minimal load relative to subs, so who cares
+    //  3) if everything is broken, subs will cause hard failure too, so everything is still fine
 
-    emit status( Scrobbler::Handshaken, username );
+    // TODO retry if server replies with busy, at least
+    // TODO you need a lot more error handling for the scrobblerHttp returns "" case
 }
-///////////////////////////////////////////////////////////////////////////////>
+
+
+void
+ScrobblerManager::onSubmissionReturn( const QString& result )
+{
+    Q_DEBUG_BLOCK << result;
+    QString const code = result.split( '\n' ).value( 0 );
+
+    if (code == "OK")
+    {
+        ScrobbleCache( m_username ).remove( m_submitter->batch() );
+        m_submitter->clearBatch();
+
+        //TODO emit status of submissions
+        m_hard_failures = 0;
+        m_submitter->resetRetryTimer();
+
+        // try to submit another batch;
+        m_submitter->request();
+    }
+    else if (code == "BADSESSION")
+    {
+        onError( Scrobbler::ErrorBadSession );
+    }
+    else if (++m_hard_failures == 3)
+    {
+        onError( Scrobbler::ThreeHardFailures );
+    }
+    else
+        m_submitter->retry();
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////>
-ScrobbleCache::ScrobbleCache( const QString& username )
+//FIXME! Doesn't suit multi user feel of this class as it is currently
+static QList<TrackInfo> g_tracks;
+
+
+ScrobbleCache::ScrobbleCache() : m_tracks( g_tracks )
+{}
+
+
+ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
 {
     Q_ASSERT( username.length() );
 
     m_path = MooseUtils::savePath( username + "_submissions.xml" );
     m_username = username;
-
-    read();
 }
 
 
@@ -269,44 +240,6 @@ ScrobbleCache::read()
     for (QDomNode n = xml.documentElement().firstChild(); !n.isNull(); n = n.nextSibling())
         if (n.nodeName() == "item")
             m_tracks += TrackInfo( n.toElement() );
-}
-
-
-ScrobbleCache //static private
-ScrobbleCache::fromFile( const QString& filename )
-{
-    ScrobbleCache cache;
-    cache.m_path = Moose::savePath( filename );
-    cache.read();
-
-    //NOTE we don't set username, that's up to the caller
-
-    return cache;
-}
-
-
-void
-ScrobbleCache::backup()
-{
-    QString timestamp = QDateTime::currentDateTime().toString( "yyyyMMddhhmm" );
-        QString filename = QFileInfo( m_path ).baseName() + '.' + timestamp + ".backup.xml";
-    ScrobbleCache backup = ScrobbleCache::fromFile( filename );
-
-    // append in case we made a backup this minute already
-    backup.append( tracks() );
-}
-
-
-QStringList //static
-ScrobbleCache::pathsForCacheBackups()
-{
-    QStringList paths;
-
-    QDir d = Moose::savePath( "" );
-    foreach (QString path, d.entryList( QStringList("*_submissions.*.backup.xml"), QDir::Files ))
-        paths += d.filePath( path );
-
-    return paths;
 }
 
 
@@ -353,50 +286,23 @@ void
 ScrobbleCache::append( const QList<TrackInfo>& tracks )
 {
     foreach (const TrackInfo& track, tracks)
-        merge( track );
+    {
+        // we can't scrobble empties
+        if (track.isEmpty()) {
+            LOGL( 3, "Will not cache an empty track" );
+            continue;
+        }
+
+        if (QDateTime::fromTime_t(track.timeStamp()) < QDateTime::fromString( "2003-01-01", Qt::ISODate ))
+        {
+            LOGL( 3, "Won't scrobble track from before the date Audioscrobbler project was founded!" );
+            continue;
+        }
+
+        m_tracks += track;
+    }
     write();
 }
-
-
-//HACK
-void
-ScrobbleCache::merge( const TrackInfo& track )
-{
-    // we can't scrobble empties
-    if (track.isEmpty()) {
-        LOGL( 3, "Will not cache an empty track" );
-        return;
-    }
-
-    if (QDateTime::fromTime_t(track.timeStamp()) < QDateTime::fromString( "2003-01-01", Qt::ISODate ))
-    {
-        LOGL( 3, "Won't scrobble track from before the date Audioscrobbler project was founded!" );
-        return;
-    }
-
-    QMutableListIterator<TrackInfo> i( m_tracks );
-    while (i.hasNext())
-    {
-        TrackInfo& cachedtrack = i.next();
-
-        //HACK we can have multiple tracks at the same time for iPod scrobbling
-        // and they don't have rating characters
-        if (track.source() == TrackInfo::MediaDevice)
-            continue;
-        //HACK
-
-        if (track.sameAs( cachedtrack ) && track.timeStamp() == cachedtrack.timeStamp())
-        {
-            // This will make sure no information gets lost
-            cachedtrack.merge( track );
-            return;
-        }
-    }
-
-    m_tracks += track;
-
-}
-//HACK
 
 
 int
@@ -408,7 +314,7 @@ ScrobbleCache::remove( const QList<TrackInfo>& toremove )
     while (i.hasNext()) {
         TrackInfo t = i.next();
         for (int x = 0; x < toremove.count(); ++x)
-            if (toremove[x].timeStamp() == t.timeStamp() && toremove[x].sameAs( t ))
+            if (toremove[x] == t)
             {
                 qDebug() << "Removing" << t.toString();
                 i.remove();
@@ -423,264 +329,8 @@ ScrobbleCache::remove( const QList<TrackInfo>& toremove )
     // function and the behaviour is documented so it's alright imo --mxcl
     return m_tracks.count();
 }
-///////////////////////////////////////////////////////////////////////////////>
 
-
-///////////////////////////////////////////////////////////////////////////////>
-Scrobbler::Scrobbler( const Scrobbler::Init& init )
-{
-    m_lastError = Scrobbler::ErrorNotInitialized;
-    m_hard_failures = m_scrobbled = 0;
-    m_init = init;
-
-    m_handshake = new ScrobblerHandshakeRequest( this );
-    m_now_playing = new ScrobblerNowPlayingRequest( this );
-    m_submission = new ScrobblerPostRequest( this );
-
-    // the QueuedConnection is required as Http causes a crash if you spawn a new
-    // event loop in a slot connected to any of its dataAvailable type functions
-    connect( m_handshake, SIGNAL(done( QString )), SLOT(onHandshakeReturn( QString )), Qt::QueuedConnection );
-    connect( m_now_playing, SIGNAL(done( QString )), SLOT(onNowPlayingReturn( QString )), Qt::QueuedConnection );
-    connect( m_submission, SIGNAL(done( QString )), SLOT(onSubmissionReturn( QString )), Qt::QueuedConnection );
-
-    connect( m_handshake, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHandshakeHeaderReceived( QHttpResponseHeader )) );
-
-    connect( this, SIGNAL(invalidated( int )), m_handshake, SLOT(abort()) );
-    connect( this, SIGNAL(invalidated( int )), m_now_playing, SLOT(abort()) );
-    connect( this, SIGNAL(invalidated( int )), m_submission, SLOT(abort()) );
-
-//////
-    qDebug() << "Initiating Scrobbler handshake for:" << m_init.username;
-
-    m_handshake->setHost( "post.audioscrobbler.com" );
-    m_handshake->request( init );
-}
-
-
-void
-Scrobbler::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
-{
-    if (header.statusCode() != 200)
-        hardFailure();
-}
-
-
-void
-Scrobbler::hardFailure()
-{
-    Q_ASSERT( sender() );
-
-    ScrobblerHttp* http = (ScrobblerHttp*)sender();
-    qDebug() << "Scrobbler HTTP error:" << http->id();
-    http->abort();
-
-    m_lastError = Scrobbler::ErrorNotInitialized;
-    if (http != m_handshake && ++m_hard_failures >= 3)
-    {
-        qDebug() << "Three hard failures. Invalidating this Scrobbler.";
-
-        // ScrobblerManager will delete us and salvage submissions (if any)
-        emit invalidated();
-    }
-    else {
-        int const interval = http->retry();
-
-        qDebug() << "Scrobbler hard failure. Retrying in" << interval / 1000 << "seconds.";
-    }
-}
-
-
-void
-Scrobbler::onHandshakeReturn( const QString& result )
-{
-    Q_DEBUG_BLOCK << result.trimmed();
-
-    QStringList const results = result.split( '\n' );
-    QString const code = results.value( 0 );
-
-//////
-    if (code == "OK" && results.count() >= 4)
-    {
-        m_lastError = Scrobbler::NoError;
-        m_session_id = results[1];
-        m_now_playing->setUrl( results[2] );
-        m_submission->setUrl( results[3] );
-
-        // reset hard failure state
-        m_hard_failures = 0;
-        m_handshake->resetRetryTimer();
-
-        emit handshaken( this );
-
-        // save memory *shrug*
-        delete m_handshake;
-        m_handshake = 0;
-    }
-    else if (code == "BANNED")
-    {
-        m_lastError = Scrobbler::ErrorBannedClient;
-        emit invalidated( Scrobbler::ErrorBannedClient );
-    }
-    else if (code == "BADAUTH")
-    {
-        m_lastError = Scrobbler::ErrorBadAuthorisation;
-        emit invalidated( Scrobbler::ErrorBadAuthorisation );
-    }
-    else if (code == "BADTIME")
-    {
-        m_lastError = Scrobbler::ErrorBadTime;
-        emit invalidated( Scrobbler::ErrorBadTime );
-    }
-    else
-        hardFailure();
-}
-
-
-/** @returns number of tracks submitted */
-int
-Scrobbler::submit( const ScrobbleCache& cache )
-{
-    if ( !canSubmit() )
-        return 0;
-
-    QList<TrackInfo> tracks = cache.tracks();
-
-    // we need to put the tracks in chronological order or the Scrobbling Service
-    // rejects the ones that are later than previously submitted tracks
-    // this is only relevent if the cache is greater than 50 in size as then
-    // submissions are done in batches, but better safe than sorry
-    qSort( tracks.begin(), tracks.end(), trackInfoLessThan );
-    tracks = tracks.mid( 0, 50 );
-
-//////
-    Q_DEBUG_BLOCK << (tracks.count() == 1 ? tracks[0].toString() : QString("%1 tracks").arg( tracks.count() ) );
-    Q_ASSERT( m_submitted_tracks.isEmpty() );
-    Q_ASSERT( m_session_id.size() );
-    Q_ASSERT( tracks.size() <= 50 );
-
-//////
-    QString data = "s=" + m_session_id;
-    bool portable = false;
-    int n = 0;
-
-    foreach (TrackInfo const i, tracks)
-    {
-        QString const N = QString::number( n++ );
-        #define e( x ) QUrl::toPercentEncoding( x )
-        data += "&a[" + N + "]=" + e(i.artist()) +
-                "&t[" + N + "]=" + e(i.track()) +
-                "&i[" + N + "]=" + QString::number( i.timeStamp() ) +
-                "&o[" + N + "]=" + i.sourceString() +
-                "&r[" + N + "]=" + i.ratingCharacter() +
-                "&l[" + N + "]=" + e(QString::number( i.duration() )) +
-                "&b[" + N + "]=" + e(i.album()) +
-                "&n[" + N + "]=" + //position in album if known, and we don't generally
-                "&m[" + N + "]=" + i.mbId();
-        #undef e
-
-        if (i.source() == TrackInfo::MediaDevice)
-            portable = true;
-    }
-
-    if (portable)
-        data += "&portable=1";
-
-//////
-    m_submission->request( data.toUtf8() );
-    m_submitted_tracks = tracks;
-
-    return tracks.count();
-}
-
-
-void
-Scrobbler::onSubmissionReturn( const QString& result )
-{
-    Q_DEBUG_BLOCK << "[id:" << ((ScrobblerHttp*)sender())->id() << "]" << result.trimmed();
-    Q_ASSERT( m_submitted_tracks.count() );
-
-//////
-    QString const code = result.split( '\n' ).value( 0 );
-
-    if (code == "OK")
-    {
-        m_lastError = Scrobbler::NoError;
-
-        foreach (const TrackInfo& track, m_submitted_tracks)
-            if (track.isLoved() || track.isScrobbled())
-                m_scrobbled++; //displayed to user after a complete cache is submitted
-
-        m_hard_failures = 0;
-        m_submission->resetRetryTimer();
-
-        // we must clear so that if more submissions are required they can proceed
-        // as canSubmit() returns false if there are submitted tracks in the queue
-        QList<TrackInfo> cp = m_submitted_tracks;
-        m_submitted_tracks.clear();
-        emit scrobbled( cp );
-    }
-    else {
-        if (code == "BADSESSION")
-        {
-            m_lastError = Scrobbler::ErrorBadSession;
-            emit invalidated( Scrobbler::ErrorBadSession );
-        }
-        else
-            hardFailure();
-    }
-}
-
-
-void
-Scrobbler::announce( const TrackInfo& track )
-{
-    Q_DEBUG_BLOCK << track.toString();
-    Q_ASSERT( m_session_id.size() );
-
-    if (track.isEmpty()) {
-        LOGL( 3, "Empty track, not announcing to now playing" );
-        return;
-    }
-
-//////
-    #define e( x ) QUrl::toPercentEncoding( x )
-    QString data =  "s=" + e(m_session_id)
-                 + "&a=" + e(track.artist())
-                 + "&t=" + e(track.track())
-                 + "&b=" + e(track.album())
-                 + "&l=" + e(QString::number( track.duration() ))
-                 + "&n=" //track number
-                 + "&m=" + e(track.mbId());
-    #undef e
-
-    m_now_playing->ScrobblerPostRequest::request( data.toUtf8() );
-}
-
-
-void
-Scrobbler::onNowPlayingReturn( const QString& result )
-{
-    qDebug() << "onNowPlayingReturn: [id:" << ((ScrobblerHttp*)sender())->id() << "]" << result.trimmed();
-
-//////
-    QString const code = result.split( '\n' ).value( 0 );
-
-    if (code == "OK")
-    {
-        m_lastError = Scrobbler::NoError;
-        m_hard_failures = 0;
-        m_now_playing->resetRetryTimer();
-    }
-    else if (code == "BADSESSION")
-    {
-        m_lastError = Scrobbler::ErrorBadSession;
-        emit invalidated( Scrobbler::ErrorBadSession );
-    }
-    else
-        hardFailure();
-}
-
-
+#if 0
 QString
 Scrobbler::errorDescription( Scrobbler::Error error )
 {
@@ -705,7 +355,7 @@ Scrobbler::errorDescription( Scrobbler::Error error )
             return "OK";
     }
 }
-
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////>
@@ -743,48 +393,54 @@ ScrobblerHttp::onRequestFinished( int id, bool error )
 
 
 void
-ScrobblerPostRequest::setUrl( const QUrl& url )
+ScrobblerHttpPostRequest::setUrl( const QUrl& url )
 {
     m_path = url.path();
-    m_host = url.host();
-    setHost( m_host, url.port() );
+    setHost( url.host(), url.port() );
 }
 
 
-int
+void 
 ScrobblerHttp::retry()
 {
     int const i = m_retry_timer->interval();
     if (i < 120 * 60 * 1000)
         m_retry_timer->setInterval( i * 2 );
 
-    m_retry_timer->start();
+    qDebug() << "Retry in " << m_retry_timer->interval() / 1000 << " seconds";
 
-    return m_retry_timer->interval();
+    m_retry_timer->start();
 }
 
 
 void
 ScrobblerHttp::resetRetryTimer()
 {
-    m_retry_timer->setInterval( 15 * 1000 );
+    m_retry_timer->setInterval( 60 * 1000 );
 }
-///////////////////////////////////////////////////////////////////////////////>
 
 
-///////////////////////////////////////////////////////////////////////////////>
+ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& password )
+                   : m_username( username ),
+                     m_password( password )
+{
+    setHost( "post.audioscrobbler.com" );
+    connect( this, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHeaderReceived( QHttpResponseHeader )) );
+}
+
+
 void
-ScrobblerHandshakeRequest::request()
+ScrobblerHandshake::request()
 {
     QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
-    QString auth_token = Unicorn::md5( (m_init.password + timestamp).toUtf8() );
+    QString auth_token = Unicorn::md5( (m_password + timestamp).toUtf8() );
 
     QString query_string = QString() +
                             "?hs=true" +
                             "&p=1.2" + //protocol version
-                            "&c=ass" + //AudioScrobbler Service
-                            "&v=" + m_init.client_version +
-                            "&u=" + QString(QUrl::toPercentEncoding( m_init.username )) +
+                            "&c=" + THREE_LETTER_SCROBBLE_CODE
+                            "&v=" + VERSION +
+                            "&u=" + QString(QUrl::toPercentEncoding( m_username )) +
                             "&t=" + timestamp +
                             "&a=" + auth_token;
 
@@ -792,15 +448,30 @@ ScrobblerHandshakeRequest::request()
 
     qDebug() << "GET:" << query_string;
 }
+
+
+void
+ScrobblerManager::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
+{
+    if (header.statusCode() != 200)
+    {
+        abort(); //TEST
+        m_handshake->retry();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////>
 
 
 ///////////////////////////////////////////////////////////////////////////////>
 void
-ScrobblerPostRequest::request()
+ScrobblerHttpPostRequest::request()
 {
+    if (m_data.isEmpty() || manager()->session().isEmpty())
+        return;
+
     QHttpRequestHeader header( "POST", m_path );
-    header.setValue( "Host", m_host );
+    header.setValue( "Host", host() ); //Qt makes me LOL today
     header.setContentType( "application/x-www-form-urlencoded" );
 
     qDebug() << "POST:" << m_data;
@@ -809,20 +480,8 @@ ScrobblerPostRequest::request()
 }
 
 
-void
-ScrobblerPostRequest::request( const QByteArray& data )
-{
-    Q_DEBUG_BLOCK << "[id:" << m_id << ']' << data;
-
-    m_data = data;
-    request();
-}
-///////////////////////////////////////////////////////////////////////////////>
-
-
-///////////////////////////////////////////////////////////////////////////////>
-ScrobblerNowPlayingRequest::ScrobblerNowPlayingRequest( QObject* parent )
-        : ScrobblerPostRequest( parent )
+NowPlaying::NowPlaying( ScrobblerManager* parent )
+          : ScrobblerHttpPostRequest( parent )
 {
     m_timer = new QTimer( this );
     m_timer->setInterval( 5000 );
@@ -832,11 +491,78 @@ ScrobblerNowPlayingRequest::ScrobblerNowPlayingRequest( QObject* parent )
 
 
 void
-ScrobblerNowPlayingRequest::request()
+NowPlaying::request( const TrackInfo& track )
 {
-    if (sender())
-        ScrobblerPostRequest::request();
-    else
-        m_timer->start();
+    Q_ASSERT( session().size() );
+
+    if (track.isEmpty()) {
+        LOGL( 3, "Won't perform np request for an empty track" );
+        return;
+    }
+
+    #define e( x ) QUrl::toPercentEncoding( x )
+    QString data =  "s=" + e(session())
+                 + "&a=" + e(track.artist())
+                 + "&t=" + e(track.track())
+                 + "&b=" + e(track.album())
+                 + "&l=" + QString::number( track.duration() )
+                 + "&n=" + QString::number( track.trackNumber() )
+                 + "&m=" + e(track.mbId());
+    #undef e
+
+    m_data = data.toUtf8();
+    m_timer->start();
 }
-///////////////////////////////////////////////////////////////////////////////>
+
+
+void
+ScrobblerSubmitter::request()
+{
+    //TODO if (!canSubmit()) return;
+    if (m_batch.size()) return;
+
+    ScrobbleCache cache( manager()->username() );
+    QList<TrackInfo> tracks = cache.tracks();
+
+    // we need to put the tracks in chronological order or the Scrobbling Service
+    // rejects the ones that are later than previously submitted tracks
+    // this is only relevent if the cache is greater than 50 in size as then
+    // submissions are done in batches, but better safe than sorry
+    //TODO sort in the persistent cache
+    qSort( tracks.begin(), tracks.end(), TrackInfo::lessThan );
+    tracks = tracks.mid( 0, 50 );
+
+    Q_ASSERT( session().size() );
+    Q_ASSERT( tracks.size() <= 50 );
+
+    //////
+    QString data = "s=" + session();
+    bool portable = false;
+    int n = 0;
+
+    foreach (TrackInfo const i, tracks)
+    {
+        QString const N = QString::number( n++ );
+        #define e( x ) QUrl::toPercentEncoding( x )
+        data += "&a[" + N + "]=" + e(i.artist()) +
+                "&t[" + N + "]=" + e(i.track()) +
+                "&i[" + N + "]=" + QString::number( i.timeStamp() ) +
+                "&o[" + N + "]=" + i.sourceString() +
+                "&r[" + N + "]=" + i.ratingCharacter() +
+                "&l[" + N + "]=" + e(QString::number( i.duration() )) +
+                "&b[" + N + "]=" + e(i.album()) +
+                "&n[" + N + "]=" + //position in album if known, and we don't generally
+                "&m[" + N + "]=" + i.mbId();
+        #undef e
+
+        if (i.source() == TrackInfo::MediaDevice)
+            portable = true;
+    }
+
+    if (portable)
+        data += "&portable=1";
+
+    m_data = data.toUtf8();
+    ScrobblerHttpPostRequest::request();
+};
+

@@ -106,7 +106,7 @@ public:
 
     QString artist() const { return d->artist; }
     QString album() const { return d->album; }
-    QString track() const { return d->title; }
+    QString track() const { return d->title; } //TODO rename title
     int trackNumber() const { return d->trackNumber; }
     int playCount() const { return d->playCount; }
     int duration() const { return d->duration; }
@@ -137,6 +137,12 @@ public:
     /** Returns the second at which passed-in track reached the scrobble 
       * point. */
     int scrobblePoint() const;
+
+    /** used to sort tracks into chronological order, used by scrobbling */
+    static bool lessThan( const TrackInfo &t1, const TrackInfo &t2)
+    {
+        return t1.timeStamp() < t2.timeStamp();
+    }
 
 protected:
     friend class MutableTrackInfo; //FIXME wtf? but compiler error otherwise
