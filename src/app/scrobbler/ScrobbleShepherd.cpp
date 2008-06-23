@@ -477,7 +477,7 @@ ScrobblerHttpPostRequest::request()
     header.setValue( "Host", host() ); //Qt makes me LOL today
     header.setContentType( "application/x-www-form-urlencoded" );
 
-    qDebug() << "HTTP POST" << host() + '/' + m_path << m_data;
+    qDebug() << "HTTP POST" << host() + m_path << m_data;
 
     m_id = QHttp::request( header, m_data );
 }
