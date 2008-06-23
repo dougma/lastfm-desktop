@@ -17,50 +17,47 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
-
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
 #include "lib/moose/TrackInfo.h"
+#include <QList>
+#include <QString>
 
 
-class PlayerCommandParser
+/** absolutely not thread-safe */
+class ScrobbleCache
 {
+    QString m_path;
+    QString m_username;
+    QList<TrackInfo>& m_tracks;
+
+    ScrobbleCache(); //used by tracksForPath()
+
+    void read();  /// reads from m_path into m_tracks
+    void write(); /// writes m_tracks to m_path
+
 public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    explicit ScrobbleCache( const QString& username );
 
-    PlayerCommandParser( QString line ) throw( Exception );
+    /** note this is unique for TrackInfo::sameAs() and equal timestamps 
+    * obviously playcounts will not be increased for the same timestamp */
+    void append( const TrackInfo& );
+    void append( const QList<TrackInfo>& );
 
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
+    /** returns the number of tracks left in the queue */
+    int remove( const QList<TrackInfo>& );
 
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
+    QList<TrackInfo> tracks() const { return m_tracks; }
+    QString path() const { return m_path; }
     QString username() const { return m_username; }
 
+    /** a track list from an XML file in the ScrobbleCache format at path */
+    static QList<TrackInfo> tracksForPath( const QString& path )
+    {
+        ScrobbleCache cache;
+        cache.m_path = path;
+        cache.read();
+        return cache.m_tracks;
+    }
+
 private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
-
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
+    bool operator==( const ScrobbleCache& ); //undefined
 };
-
-#endif // PLAYERCOMMANDPARSER_H

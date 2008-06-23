@@ -17,50 +17,17 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
-
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
-#include "lib/moose/TrackInfo.h"
+#include "ScrobblerHttp.h"
+#include <QString>
 
 
-class PlayerCommandParser
+class ScrobblerHandshake : public ScrobblerHttp
 {
+    QString const m_username;
+    QString const m_password;
+
 public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    ScrobblerHandshake( const QString& username, const QString& password );
 
-    PlayerCommandParser( QString line ) throw( Exception );
-
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
-
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
-    QString username() const { return m_username; }
-
-private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
-
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
+    virtual void request();
 };
-
-#endif // PLAYERCOMMANDPARSER_H

@@ -17,50 +17,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
-
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
-#include "lib/moose/TrackInfo.h"
+#include "ScrobblerHandshake.h"
+#include "version.h"
+#include "lib/unicorn/UnicornCommon.h"
+#include <QDateTime>
+#include <QDebug>
 
 
-class PlayerCommandParser
+ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& password )
+                  : m_username( username ),
+                    m_password( password )
 {
-public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    setHost( "post.audioscrobbler.com" );
+    request();
+}
 
-    PlayerCommandParser( QString line ) throw( Exception );
 
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
+void
+ScrobblerHandshake::request()
+{
+    QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
+    QString auth_token = Unicorn::md5( (m_password + timestamp).toUtf8() );
 
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
-    QString username() const { return m_username; }
+    QString query_string = QString() +
+        "?hs=true" +
+        "&p=1.2" + //protocol version
+        "&c=" + THREE_LETTER_SCROBBLE_CODE
+        "&v=" + VERSION +
+        "&u=" + QString(QUrl::toPercentEncoding( m_username )) +
+        "&t=" + timestamp +
+        "&a=" + auth_token;
 
-private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
+    m_id = get( '/' + query_string );
 
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
-};
-
-#endif // PLAYERCOMMANDPARSER_H
+    qDebug() << "HTTP GET" << host() + '/' + query_string;
+}

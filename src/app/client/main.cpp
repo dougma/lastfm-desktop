@@ -19,9 +19,9 @@
 
 #include "App.h"
 #include "Settings.h"
-#include "MainWindow.h"
 #include "PlayerManager.h"
 #include "PlayerListener.h"
+#include "widgets/MainWindow.h"
 #include "version.h"
 
 
@@ -29,7 +29,7 @@ int main( int argc, char** argv )
 {
     // used by some Qt stuff, eg QSettings
     // must be before Settings object is created
-    QCoreApplication::setApplicationName( "AudioScrobbler" );
+    QCoreApplication::setApplicationName( PRODUCT_NAME );
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 

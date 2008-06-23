@@ -17,50 +17,22 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
-
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
+#include "ScrobblerHttp.h"
 #include "lib/moose/TrackInfo.h"
+#include <QList>
 
 
-class PlayerCommandParser
+class ScrobblerSubmission : public ScrobblerPostHttp
 {
+    QList<TrackInfo> m_batch;
+
 public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    ScrobblerSubmission( Scrobbler* parent ) : ScrobblerPostHttp( parent )
+    {}
 
-    PlayerCommandParser( QString line ) throw( Exception );
+    /** submits the ScrobbleCache for the current user */
+    virtual void request();
 
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
-
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
-    QString username() const { return m_username; }
-
-private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
-
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
+    QList<TrackInfo> batch() const { return m_batch; }
+    void clearBatch() { m_batch.clear(); }
 };
-
-#endif // PLAYERCOMMANDPARSER_H

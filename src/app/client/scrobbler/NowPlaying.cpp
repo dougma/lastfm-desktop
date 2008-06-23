@@ -17,50 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
-
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
+#include "NowPlaying.h"
+#include "Scrobbler.h"
 #include "lib/moose/TrackInfo.h"
+#include <QDebug>
+#include <QTimer>
 
 
-class PlayerCommandParser
+NowPlaying::NowPlaying( Scrobbler* parent )
+          : ScrobblerPostHttp( parent )
 {
-public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    m_timer = new QTimer( this );
+    m_timer->setInterval( 5000 );
+    m_timer->setSingleShot( true );
+    connect( m_timer, SIGNAL(timeout()), SLOT(request()) );
+}
 
-    PlayerCommandParser( QString line ) throw( Exception );
 
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
+void
+NowPlaying::request( const TrackInfo& track )
+{
+    if (track.isEmpty()) {
+        qDebug() << "Won't perform np request for an empty track";
+        return;
+    }
 
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
-    QString username() const { return m_username; }
+    #define e( x ) QUrl::toPercentEncoding( x )
+    QString data =  "s=" + e(manager()->session())
+                 + "&a=" + e(track.artist())
+                 + "&t=" + e(track.track())
+                 + "&b=" + e(track.album())
+                 + "&l=" + QString::number( track.duration() )
+                 + "&n=" + QString::number( track.trackNumber() )
+                 + "&m=" + e(track.mbId());
+    #undef e
 
-private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
-
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
-};
-
-#endif // PLAYERCOMMANDPARSER_H
+    m_data = data.toUtf8();
+    m_timer->start();
+}

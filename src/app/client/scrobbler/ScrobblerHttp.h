@@ -17,50 +17,57 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_COMMAND_PARSER_H
-#define PLAYER_COMMAND_PARSER_H
+#ifndef SCROBBLER_HTTP_H
+#define SCROBBLER_HTTP_H
 
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-
-#include "lib/moose/TrackInfo.h"
+#include <QHttp>
+#include <QUrl>
 
 
-class PlayerCommandParser
+/** facade pattern for QHttp for Scrobbler usage */
+class ScrobblerHttp : public QHttp
 {
+    Q_OBJECT
+
+protected:
+    ScrobblerHttp( QObject* parent = 0 );
+
+    int m_id;
+    class QTimer *m_retry_timer;
+
+private slots:
+    void onRequestFinished( int id, bool error );
+
+signals:
+    void done( const QString& data );
+
+protected slots:
+    virtual void request() = 0;
+
 public:
-    struct Exception : QString
-    {
-        Exception( QString s ) : QString( s )
-        {}
-    };
+    void resetRetryTimer();
+    void retry();
 
-    PlayerCommandParser( QString line ) throw( Exception );
-
-    enum Command
-    {
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Bootstrap
-    };
-
-    Command command() const { return m_command; }
-    QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
-    QString username() const { return m_username; }
-
-private:
-    Command extractCommand( QString& line );
-    QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
-
-    Command m_command;
-    QString m_playerId;
-    TrackInfo m_track;
-    QString m_username;
+    int id() const { return m_id; }
 };
 
-#endif // PLAYERCOMMANDPARSER_H
+
+class ScrobblerPostHttp : public ScrobblerHttp
+{
+    QString m_path;
+
+protected:
+    QByteArray m_data;
+    class Scrobbler* manager() const { return (Scrobbler*)parent(); }
+
+public:
+    ScrobblerPostHttp( Scrobbler* parent ) : ScrobblerHttp( (QObject*)parent )
+    {}
+
+    /** if you reimplement call the base version after setting m_data */
+    virtual void request();
+
+    void setUrl( const QUrl& );
+};
+
+#endif

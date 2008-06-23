@@ -2,12 +2,13 @@ win32: SRC_DIR = $$system( cd )
 else:  SRC_DIR = $$system( pwd )
 
 ROOT_DIR = $$SRC_DIR/..
-BIN_DIR = $$ROOT_DIR/bin
+BIN_DIR = $$ROOT_DIR/_bin
 
-BUILD_DIR = build
+BUILD_DIR = _build
 OBJECTS_DIR = $$BUILD_DIR
 MOC_DIR = $$BUILD_DIR
 UI_DIR = $$BUILD_DIR
+RCC_DIR = $$BUILD_DIR
 DESTDIR = $$BIN_DIR
 INCLUDEPATH += $$SRC_DIR
 LIBS += -L$$BIN_DIR
