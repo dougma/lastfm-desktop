@@ -26,7 +26,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    SettingsDialog();
+    SettingsDialog( QWidget* parent );
 
     virtual void accept();
 

@@ -22,9 +22,16 @@
 #include "Settings.h"
 
 
-PlayerManager::PlayerManager()
-             : m_state( PlaybackState::Stopped )
-{}
+PlayerManager::PlayerManager( PlayerListener* listener )
+             : QObject( (QObject*)listener ),
+               m_state( PlaybackState::Stopped )
+{
+    QObject* o = (QObject*)listener;
+    connect( o, SIGNAL(trackStarted( TrackInfo )), SLOT(onTrackStarted( TrackInfo )) );
+    connect( o, SIGNAL(playbackEnded( QString )), SLOT(onPlaybackEnded( QString )) );
+    connect( o, SIGNAL(playbackPaused( QString )), SLOT(onPlaybackPaused( QString )) );
+    connect( o, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
+}
 
 
 void

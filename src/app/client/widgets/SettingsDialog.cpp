@@ -27,8 +27,8 @@ static const unsigned char kRussian[]  = { 0xD0, 0xA0, 0xD1, 0x83, 0xD1, 0x81, 0
 static const unsigned char kJapanese[] = { 0xE6, 0x97, 0xA5, 0xE6, 0x9C, 0xAC, 0xE8, 0xAA, 0x9E, 0x0 };
 
 
-SettingsDialog::SettingsDialog()
-              : QDialog( qApp->activeWindow() /*FIXME*/ )
+SettingsDialog::SettingsDialog( QWidget* parent )
+              : QDialog( parent )
 {
     ui.setupUi( this );
     // this couldn't be done in designer easily :(

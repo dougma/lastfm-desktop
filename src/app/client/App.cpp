@@ -19,18 +19,28 @@
 
 #include "App.h"
 #include "PlaybackEvent.h"
+#include "PlayerListener.h"
 #include "PlayerManager.h"
-#include "scrobbler/Scrobbler.h"
-#include "scrobbler/ScrobbleCache.h"
 #include "Settings.h"
 #include "version.h"
+#include "scrobbler/Scrobbler.h"
+#include "scrobbler/ScrobbleCache.h"
+#include "widgets/DiagnosticsDialog.h"
 #include "widgets/LoginDialog.h"
+#include "widgets/MainWindow.h"
 
 
 App::App( int argc, char** argv ) 
-   : QApplication( argc, argv ),
-     m_playerManager( 0 )
+   : QApplication( argc, argv )
 {
+    Settings::instance = new Settings( VERSION, applicationFilePath() );
+
+    m_playerListener = new PlayerListener( this );
+    connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
+
+    m_playerManager = new PlayerManager( m_playerListener );
+    connect( m_playerManager, SIGNAL(event( int, QVariant )), SIGNAL(event( int, QVariant )) );
+
     if (The::settings().username().isEmpty() || The::settings().logOutOnExit())
     {
         LoginDialog d;
@@ -54,24 +64,9 @@ App::App( int argc, char** argv )
 
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
 
+    DiagnosticsDialog::observe( m_scrobbler );
+
     connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-}
-
-
-void
-App::setPlayerManager( class PlayerManager* p )
-{
-    Q_ASSERT( m_playerManager == 0 );
-
-    m_playerManager = p; 
-    connect( p, SIGNAL(event( int, QVariant )), SIGNAL(event( int, QVariant )) );
-}
-
-
-PlaybackState::Enum
-App::state() const
-{
-    return m_playerManager->state();
 }
 
 
@@ -84,6 +79,26 @@ App::~App()
         Unicorn::QSettings().remove( "Username" );
         Unicorn::QSettings().remove( "Password" );
     }
+
+    delete Settings::instance;
+}
+
+
+void
+App::setMainWindow( MainWindow* window )
+{
+    QMap<QString, QAction*> actions = window->actions();
+
+    //TODO setMainWindow and do connects there silly
+    connect( actions["love"], SIGNAL(triggered()), SLOT(love()) );
+    connect( actions["ban"], SIGNAL(triggered()), SLOT(ban()) );
+}
+
+
+PlaybackState::Enum
+App::state() const
+{
+    return m_playerManager->state();
 }
 
 
@@ -97,7 +112,7 @@ App::onAppEvent( int e, const QVariant& )
             //TODO cache the track, but in a way that the scrobbler won't submit it yet
             ScrobbleCache cache( The::settings().username() );
             cache.append( The::playerManager().track() );
-            m_scrobbler->submit();
+            //m_scrobbler->submit();
             break;
         }
 

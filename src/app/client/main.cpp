@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "Settings.h"
-#include "PlayerManager.h"
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
@@ -27,41 +25,18 @@
 
 int main( int argc, char** argv )
 {
-    // used by some Qt stuff, eg QSettings
-    // must be before Settings object is created
+    // must be set before the Settings object is created
     QCoreApplication::setApplicationName( PRODUCT_NAME );
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
     try
     {
-        //FIXME prolly bad to have a custom instantiation that may use the::settings
-        // before it exists init.
         App app( argc, argv );
-
-        Settings settings( VERSION, app.applicationFilePath() );
-        Settings::instance = &settings;
-
-        PlayerListener listener;
-        PlayerManager manager;
-
-        manager.connect( &listener, SIGNAL(trackStarted( TrackInfo )), SLOT(onTrackStarted( TrackInfo )) );
-        manager.connect( &listener, SIGNAL(playbackEnded( QString )), SLOT(onPlaybackEnded( QString )) );
-        manager.connect( &listener, SIGNAL(playbackPaused( QString )), SLOT(onPlaybackPaused( QString )) );
-        manager.connect( &listener, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
-
-        app.connect( &listener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
-
-        app.setPlayerManager( &manager );
-
+        
         MainWindow window;
+        app.setMainWindow( &window );
         window.show();
-
-        QMap<QString, QAction*> actions = window.actions();
-
-        //TODO setMainWindow and do connects there silly
-        app.connect( actions["love"], SIGNAL(triggered()), SLOT(love()) );
-        app.connect( actions["ban"], SIGNAL(triggered()), SLOT(ban()) );
 
         return app.exec();
     }

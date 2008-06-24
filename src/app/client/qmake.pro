@@ -5,10 +5,10 @@ QT += xml network
 
 include( $$SRC_DIR/include.pro )
 
-SOURCES += $$system( find . -name \*.cpp )
-HEADERS += $$system( find . -name \*.h ) qmake.pro
-FORMS += $$system( find -name \*.ui )
-RESOURCES += $$system( find -name \*.qrc )
+SOURCES += $$system( sh $$TOOLS_DIR/findsources cpp )
+HEADERS += $$system( sh $$TOOLS_DIR/findsources h ) qmake.pro
+FORMS += $$system( sh $$TOOLS_DIR/findsources ui )
+RESOURCES += $$system( sh $$TOOLS_DIR/findsources qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
 INCLUDEPATH += .

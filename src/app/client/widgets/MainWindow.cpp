@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "PlaybackEvent.h"
 #include "PlayerManager.h"
+#include "widgets/DiagnosticsDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/moose/TrackInfo.h"
@@ -44,6 +45,7 @@ MainWindow::MainWindow()
     connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
 
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
+    connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
 }
 
@@ -198,5 +200,12 @@ MainWindow::actions() const
 void
 MainWindow::showSettingsDialog()
 {
-    SettingsDialog().exec();
+    SettingsDialog( this ).exec();
+}
+
+
+void
+MainWindow::showDiagnosticsDialog()
+{
+    DiagnosticsDialog( this ).exec();
 }

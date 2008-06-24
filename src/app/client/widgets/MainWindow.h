@@ -41,7 +41,9 @@ private slots:
     void onPlaybackTick( int );
     void onProgressDisplayTick();
 
+public slots:
     void showSettingsDialog();
+    void showDiagnosticsDialog();
 
 private:
     /** progress is updated every granularity, so if showing the progress todo

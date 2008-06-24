@@ -13,6 +13,8 @@ DESTDIR = $$BIN_DIR
 INCLUDEPATH += $$SRC_DIR
 LIBS += -L$$BIN_DIR
 
+TOOLS_DIR = $$ROOT_DIR/tools
+
 # TODO really we should fix these warnings properly
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS
 

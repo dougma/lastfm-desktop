@@ -61,7 +61,6 @@ public:
         Handshaken,
         Scrobbling,
         TracksScrobbled,
-        TracksNotScrobbled,
         StatusMax
     };
 
@@ -73,15 +72,10 @@ public:
         ErrorBannedClient,
         ErrorBadAuthorisation,
         ErrorBadTime,
-        ThreeHardFailures,
-
-        /** while the handshake is occuring */
-        ErrorNotInitialized,
+        ErrorThreeHardFailures,
 
         NoError
     };
-
-    static QString errorDescription( Scrobbler::Error );
 
 signals:
     /** the controller should show status in an appropriate manner */

@@ -49,7 +49,7 @@ class PlayerManager : public QObject
     friend class Observed;
 
 public:
-    PlayerManager();
+    PlayerManager( class PlayerListener* parent );
 
     PlaybackState::Enum state() const { return m_state; }
     TrackInfo track() const { return m_players.top()->track; }

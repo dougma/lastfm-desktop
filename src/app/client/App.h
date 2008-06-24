@@ -31,8 +31,10 @@ public:
 
     PlaybackState::Enum state() const;
 
-    void setPlayerManager( class PlayerManager* p );
-    PlayerManager& playerManager() { return *m_playerManager; }
+    void setMainWindow( class MainWindow* );
+
+    //TODO remove
+    class PlayerManager& playerManager() { return *m_playerManager; }
 
 public slots:
     void onBootstrapCompleted( const QString& playerId, const QString& username );
@@ -47,6 +49,8 @@ signals:
     void event( int, const QVariant& );
 
 private:
+    class PlayerListener* m_playerListener;
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;
+    class DrWatson* m_watson;
 };

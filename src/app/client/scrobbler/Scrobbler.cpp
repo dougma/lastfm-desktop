@@ -94,7 +94,7 @@ Scrobbler::onError( Scrobbler::Error code )
         default:
             Q_ASSERT( false ); //what aren't you handling?
 
-        case Scrobbler::ThreeHardFailures:
+        case Scrobbler::ErrorThreeHardFailures:
         case Scrobbler::ErrorBadSession:
             handshake();
             break;
@@ -189,7 +189,7 @@ Scrobbler::onSubmissionReturn( const QString& result )
     }
     else if (++m_hard_failures >= 3)
     {
-        onError( Scrobbler::ThreeHardFailures );
+        onError( Scrobbler::ErrorThreeHardFailures );
     }
     else
         m_submitter->retry();
@@ -204,23 +204,4 @@ Scrobbler::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
         m_handshake->abort(); //TEST
         m_handshake->retry();
     }
-}
-
-
-QString //static
-Scrobbler::errorDescription( Scrobbler::Error error )
-{
-    switch (error)
-    {
-        case ErrorBadSession: return tr( "Bad session" );
-        case ErrorBannedClient: return tr( "Client too old" );
-        case ErrorBadAuthorisation: return tr( "Wrong username / password" );
-        case ErrorBadTime: return tr( "Wrong timezone" );
-        case ThreeHardFailures: return tr( "Could not reach server" );
-        case ErrorNotInitialized: return tr( "Contacting Last.fm" );
-        case NoError: return "OK";
-    }
-
-    // Visual studio is ghae
-    return "Unknown";
 }

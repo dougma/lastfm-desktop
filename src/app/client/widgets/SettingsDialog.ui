@@ -131,7 +131,7 @@
        <string>General</string>
       </property>
       <property name="icon" >
-       <iconset resource="QtResource.qrc" >:/SettingsDialog/account.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/account.png</iconset>
       </property>
      </item>
      <item>
@@ -139,7 +139,7 @@
        <string>Radio</string>
       </property>
       <property name="icon" >
-       <iconset resource="QtResource.qrc" >:/SettingsDialog/radio.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/radio.png</iconset>
       </property>
      </item>
      <item>
@@ -147,7 +147,7 @@
        <string>Scrobbling</string>
       </property>
       <property name="icon" >
-       <iconset resource="QtResource.qrc" >:/SettingsDialog/scrobbling.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/scrobbling.png</iconset>
       </property>
      </item>
      <item>
@@ -155,7 +155,7 @@
        <string>Connection</string>
       </property>
       <property name="icon" >
-       <iconset resource="QtResource.qrc" >:/SettingsDialog/connection.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/connection.png</iconset>
       </property>
      </item>
      <item>
@@ -163,7 +163,7 @@
        <string>iPod</string>
       </property>
       <property name="icon" >
-       <iconset resource="QtResource.qrc" >:/SettingsDialog/ipod.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/ipod.png</iconset>
       </property>
      </item>
     </widget>
@@ -950,7 +950,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="QtResource.qrc" />
+  <include location="SettingsDialog.qrc" />
  </resources>
  <connections>
   <connection>

@@ -22,7 +22,6 @@
 
 #include "lib/moose/Settings.h"
 
-int main( int, char** );
 class Settings;
 namespace The { Settings& settings(); }
 
@@ -32,7 +31,7 @@ class Settings : public Moose::Settings
     Settings( const QString& version, const QString& path );
 
     static Settings* instance;
-    friend int main( int, char** );
+    friend class App;
     friend Settings& The::settings();
 
 protected:

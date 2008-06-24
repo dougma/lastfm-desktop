@@ -1,0 +1,2 @@
+#!/bin/sh
+find . -path _build -prune -o -name \*.$1 -print | sed -e 's|\./||g'
