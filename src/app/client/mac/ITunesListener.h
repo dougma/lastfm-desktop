@@ -17,41 +17,49 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_LISTENER_H
-#define PLAYER_LISTENER_H
+#include <QtGlobal> //Q_WS_MAC
 
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 ) 
+#ifndef ITUNES_SCRIPT_H && defined Q_WS_MAC
+#define ITUNES_SCRIPT_H
 
-#include <QTcpServer>
-class TrackInfo;
+#include <QThread>
+#include <CoreFoundation/CoreFoundation.h>
 
-
-/** @author Erik Jaelevik, <erik@last.fm>
-  * @contributor Christian Muehlhaeuser <chris@last.fm>
-  * @rewrite Max Howell <max@last.fm> -- to Qt4
+/** @author Christian Muehlhaeuser <chris@last.fm>
+  * @contributor Erik Jaelevik <erik@last.fm>
+  * @rewrite Max Howell <max@last.fm>
   */
-class PlayerListener : public QTcpServer
+class ITunesListener : public QThread
 {
     Q_OBJECT
 
 public:
-    class SocketFailure
-    {};
+    ITunesListener( uint port, QObject* parent );
 
-    PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
+    enum State { Unknown = -1, Playing, Paused, Stopped };
 
-    uint port() const { return 33367; }
+    virtual void run();
     
-signals:
-    void trackStarted( const TrackInfo& );
-    void playbackEnded( const QString& playerId );
-    void playbackPaused( const QString& playerId );
-    void playbackResumed( const QString& playerId );
-    void bootstrapCompleted( const QString& playerId, const QString& username );
+private:
+    /** to communicate with the player listener */
+    uint const m_port;
 
-private slots:
-    void onNewConnection();
+    static bool iTunesIsPlaying();
+    /** @returns true if the currently playing track is music, ie. not a podcast */
+    static bool isMusic();
+    /** iTunes notification center callback */
+    static void callback( CFNotificationCenterRef, 
+                          void*, 
+                          CFStringRef, 
+                          const void*, 
+                          CFDictionaryRef );
+
+    void callback( CFDictionaryRef );
+    void transmit( const QString& data );
+    void setupCurrentTrack();
+
+    State m_state;
+    QString m_previousPid;
 };
 
 #endif

@@ -21,6 +21,10 @@
 #undef QHttp
 #include "../Settings.h"
 #include <QHttpRequestHeader>
+#ifdef Q_WS_MAC
+#include "../UnicornCommonMac.h"
+#include <SystemConfiguration/SystemConfiguration.h> 
+#endif
 
 
 Unicorn::QHttp::QHttp( QObject* parent )
@@ -68,7 +72,7 @@ Unicorn::QHttp::post( const QString& path, const QByteArray& data )
 
 
 int 
-Unicorn::QHttp::request( QHttpRequestHeader& header, const QByteArray& data, bool /*FIXME*/ )
+Unicorn::QHttp::request( QHttpRequestHeader header, const QByteArray& data )
 {
     header.setValue( "Host", m_host );
     header.setValue( "Connection", "Keep-Alive" );
@@ -127,7 +131,7 @@ Unicorn::QHttp::applyAutoDetectedProxy()
         result = (hostStr != NULL) && (CFGetTypeID(hostStr) == CFStringGetTypeID());
     }
     if (result)
-        host = UnicornUtils::CFStringToQString( hostStr );
+        host = Unicorn::CFStringToQString( hostStr );
 
     // get the port
     int portInt;

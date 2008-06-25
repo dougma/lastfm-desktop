@@ -112,7 +112,6 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
 
     #ifdef Q_OS_MAC
     layout()->setMargin( 7 );
-    delete ui.line;
     ui.cachedTracksList->setAttribute( Qt::WA_MacShowFocusRect, false );
     ui.vboxLayout1->setSpacing( 18 );
     #endif

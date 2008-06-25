@@ -28,7 +28,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 
-namespace UnicornUtils
+namespace Unicorn
 {
     /**
      * Returns the path to the user's Application Support directory.

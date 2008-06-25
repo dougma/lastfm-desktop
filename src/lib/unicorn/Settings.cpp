@@ -25,15 +25,14 @@
 QString
 Unicorn::Settings::appLanguage() const
 {
-    QString code = QSettings().value( "AppLanguage" ).toString();
-    if ( !code.isEmpty() )
+    QString const code = Unicorn::QSettings().value( "AppLanguage" ).toString();
+    if (code.size())
         return code;
 
     // If none found, use system locale
-  #ifdef Q_WS_MAC
-    QLocale::Language qtLang = UnicornUtils::osxLanguageCode();
-  #else
-    QLocale::Language qtLang = QLocale::system().language();
-  #endif
-    return Unicorn::qtLanguageToLfmLangCode( qtLang );
+#ifdef Q_WS_MAC
+    return Unicorn::qtLanguageToLfmLangCode( Unicorn::osxLanguageCode() );
+#else
+    return Unicorn::qtLanguageToLfmLangCode( QLocale::system().language() );
+#endif
 }

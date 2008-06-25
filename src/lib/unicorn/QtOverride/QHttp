@@ -45,7 +45,7 @@ namespace Unicorn
         
         int get( const QString& path );
         int post( const QString& path, const QByteArray& data );
-        int request( QHttpRequestHeader&, const QByteArray& data = QByteArray(), bool useCache = false );
+        int request( QHttpRequestHeader, const QByteArray& data = QByteArray() );
         
         /** all unimplemented */
         int get( const QString & path, QIODevice * to );

@@ -1,8 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Max Howell, Last.fm Ltd <max@last.fm>                              *
- *      Jono Cole, Last.fm Ltd <jono@last.fm>                              *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,6 +23,7 @@
 #include "../Settings.h"
 #include "../UnicornCommon.h"
 #include <QApplication>
+#include <QDebug>
 #include <QHttpRequestHeader>
 
 QString Request::m_baseHost;
@@ -136,7 +134,7 @@ Request::onFailurePrivate( int error_code, const QString &error_string )
 {
     m_timeout_timer.stop();
 
-    QDebugBlock block( QString(__PRETTY_FUNCTION__) + " - " + objectName() );
+//    QDebugBlock block( QString(__PRETTY_FUNCTION__) + " - " + objectName() );
 
     LOG( 1, objectName() << "\n" <<
         "  Http response: " << m_http->lastResponse().statusCode() << "\n" <<
@@ -259,7 +257,8 @@ Request::request( const XmlRpc &xmlrpc )
 
     QString const xml = xmlrpc.toString();
 
-    m_http->request( header, xml.toUtf8(), xmlrpc.useCache() );
+    m_http->request( header, xml.toUtf8() );
+//FIXME    m_http->request( header, xml.toUtf8(), xmlrpc.useCache() );
 
     qDebug() << objectName() << "initiated:" << ( m_http->host() + header.path() );
 /*    LOG( 3, objectName() << " request xmlrpc:\n" <<

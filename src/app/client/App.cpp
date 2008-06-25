@@ -23,6 +23,7 @@
 #include "PlayerManager.h"
 #include "Settings.h"
 #include "version.h"
+#include "mac/ITunesListener.h"
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
 #include "widgets/DiagnosticsDialog.h"
@@ -34,12 +35,6 @@ App::App( int argc, char** argv )
    : QApplication( argc, argv )
 {
     Settings::instance = new Settings( VERSION, applicationFilePath() );
-
-    m_playerListener = new PlayerListener( this );
-    connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
-
-    m_playerManager = new PlayerManager( m_playerListener );
-    connect( m_playerManager, SIGNAL(event( int, QVariant )), SIGNAL(event( int, QVariant )) );
 
     if (The::settings().username().isEmpty() || The::settings().logOutOnExit())
     {
@@ -62,6 +57,16 @@ App::App( int argc, char** argv )
         }
     }
 
+    m_playerListener = new PlayerListener( this );
+    connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
+    
+    m_playerManager = new PlayerManager( m_playerListener );
+    connect( m_playerManager, SIGNAL(event( int, QVariant )), SIGNAL(event( int, QVariant )) );
+    
+#ifdef Q_WS_MAC
+    new ITunesListener( m_playerListener->port(), this );
+#endif
+    
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
 
     DiagnosticsDialog::observe( m_scrobbler );

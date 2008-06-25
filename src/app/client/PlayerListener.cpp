@@ -29,7 +29,7 @@ PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketF
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );
 
     //TODO stepping
-    if (!listen( QHostAddress::LocalHost, 33367 ))
+    if (!listen( QHostAddress::LocalHost, port() ))
         throw SocketFailure();
 }
 

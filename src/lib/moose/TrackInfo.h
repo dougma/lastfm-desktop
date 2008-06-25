@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,11 +21,11 @@
 #define TRACK_INFO_H
 
 #include "MooseDllExportMacro.h"
+#include <QDateTime>
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>
 #include <QString>
 
-//TODO shared data pointer
 
 struct TrackInfoData : QSharedData
 {
@@ -34,16 +34,16 @@ struct TrackInfoData : QSharedData
     QString artist;
     QString album;
     QString title;
-    int     trackNumber;
-    int     playCount;
-    int     duration;
-    short   ratingFlags;
-    time_t  timeStamp;
-    int     source;
+    int trackNumber;
+    int playCount;
+    int duration;
+    short source;
+    short ratingFlags;
     QString playerId;
-    QString mbId;
+    QString mbId; /// musicbrainz id
     QString fpId; /// fingerprint id
     QString path;
+    QDateTime time; /// the time the track was started at
 };
 
 
@@ -113,7 +113,7 @@ public:
     QString durationString() const;
     QString mbId() const { return d->mbId; }
     QString path() const { return d->path; }
-    time_t timeStamp() const { return d->timeStamp; }
+    QDateTime timeStamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
     /** scrobbler submission source string code */
     QString sourceString() const;
@@ -181,12 +181,12 @@ public:
     void setDuration( int duration ) { d->duration = duration; }
     void setMbId( QString mbId ) { d->mbId = mbId; }
     void setPath( QString path ) { d->path = path; }
-    void setTimeStamp( time_t timestamp ) { d->timeStamp = timestamp; }
-    void timeStampMe();
     void setSource( Source s ) { d->source = s; }
     void setRatingFlag( RatingFlag flag ) { d->ratingFlags |= flag; }
     void setPlayerId( QString id ) { d->playerId = id; }
     void setFpId( QString id ) { d->fpId = id; }
+    
+    void setTimeStampNow() { d->time = QDateTime::currentDateTime(); }
 };
 
 
@@ -195,7 +195,6 @@ TrackInfoData::TrackInfoData()
              : trackNumber( 0 ),
                playCount( 0 ),
                duration( 0 ),
-               timeStamp( 0 ),
                source( TrackInfo::Unknown ),
                ratingFlags( 0 )
 {}

@@ -58,7 +58,7 @@ ScrobblerSubmission::request()
         #define e( x ) QUrl::toPercentEncoding( x )
         data += "&a[" + N + "]=" + e(i.artist()) +
                 "&t[" + N + "]=" + e(i.track()) +
-                "&i[" + N + "]=" + QString::number( i.timeStamp() ) +
+                "&i[" + N + "]=" + QString::number( i.timeStamp().toTime_t() ) +
                 "&o[" + N + "]=" + i.sourceString() +
                 "&r[" + N + "]=" + i.ratingCharacter() +
                 "&l[" + N + "]=" + e(QString::number( i.duration() )) +

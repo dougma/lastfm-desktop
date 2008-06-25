@@ -21,6 +21,8 @@
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
+#include "lib/moose/MooseCommon.h"
+#include <QDir>
 
 
 int main( int argc, char** argv )
@@ -30,6 +32,10 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
+    QDir().mkpath( Moose::cachePath() );
+    QDir().mkpath( Moose::savePath() );
+    QDir().mkpath( Moose::logPath() );
+    
     try
     {
         App app( argc, argv );

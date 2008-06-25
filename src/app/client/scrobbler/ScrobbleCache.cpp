@@ -108,12 +108,6 @@ ScrobbleCache::append( const QList<TrackInfo>& tracks )
             continue;
         }
 
-        if (QDateTime::fromTime_t(track.timeStamp()) < QDateTime::fromString( "2003-01-01", Qt::ISODate ))
-        {
-            qDebug() << "Won't scrobble track from before the date Audioscrobbler project was founded!";
-            continue;
-        }
-
         m_tracks += track;
     }
     write();

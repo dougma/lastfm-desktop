@@ -30,7 +30,7 @@
 
 
 QString
-UnicornUtils::applicationSupportFolderPath()
+Unicorn::applicationSupportFolderPath()
 {
     std::string outString;
 
@@ -73,7 +73,7 @@ UnicornUtils::applicationSupportFolderPath()
 
 
 QLocale::Language
-UnicornUtils::osxLanguageCode()
+Unicorn::osxLanguageCode()
 {
     CFArrayRef languages;
     languages = (CFArrayRef)CFPreferencesCopyValue( CFSTR( "AppleLanguages" ),
@@ -86,7 +86,7 @@ UnicornUtils::osxLanguageCode()
     if ( languages != NULL )
     {
         CFStringRef uxstylelangs = CFStringCreateByCombiningStrings( kCFAllocatorDefault, languages, CFSTR( ":" ) );
-        langCode = UnicornUtils::CFStringToQString( uxstylelangs ).split( ':' ).value( 0 );
+        langCode = Unicorn::CFStringToQString( uxstylelangs ).split( ':' ).value( 0 );
     }
 
     return QLocale( langCode ).language();
@@ -94,7 +94,7 @@ UnicornUtils::osxLanguageCode()
 
 
 QByteArray
-UnicornUtils::CFStringToUtf8( CFStringRef s )
+Unicorn::CFStringToUtf8( CFStringRef s )
 {
     QByteArray result;
 
@@ -240,21 +240,21 @@ isProcessRunning( const QString& processName )
 
 
 bool
-UnicornUtils::isGrowlInstalled()
+Unicorn::isGrowlInstalled()
 {
     return isProcessRunning( "GrowlHelperApp" );
 }
 
 
 bool
-UnicornUtils::iTunesIsOpen()
+Unicorn::iTunesIsOpen()
 {
     return isProcessRunning( "iTunes" );
 }
 
 
 bool
-UnicornUtils::setPreferredAppForUrlScheme( const QUrl& url, const QString& app )
+Unicorn::setPreferredAppForUrlScheme( const QUrl& url, const QString& app )
 {
     QString scheme = url.scheme();
     CFStringRef urlStr = CFStringCreateWithCharacters( NULL, reinterpret_cast<const UniChar *>( scheme.unicode() ), scheme.length() );
@@ -278,7 +278,7 @@ UnicornUtils::setPreferredAppForUrlScheme( const QUrl& url, const QString& app )
 
 
 QString
-UnicornUtils::preferredAppForUrlScheme( const QUrl& url )
+Unicorn::preferredAppForUrlScheme( const QUrl& url )
 {
     QString app;
     QString scheme = url.scheme() + "://";

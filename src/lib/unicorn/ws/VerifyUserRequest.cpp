@@ -21,6 +21,7 @@
 #include "VerifyUserRequest.h"
 #include "../UnicornCommon.h"
 #include "../Logger.h"
+#include <QDateTime>
 
 
 VerifyUserRequest::VerifyUserRequest()

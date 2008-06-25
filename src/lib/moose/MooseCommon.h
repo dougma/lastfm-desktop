@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2008 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,55 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MOOSECOMMON_H
-#define MOOSECOMMON_H
-
-/** @author <erik@last.fm> */
+#ifndef MOOSE_COMMON_H
+#define MOOSE_COMMON_H
 
 #include "MooseDllExportMacro.h"
-
 #include "TrackInfo.h"
-
 #include <QString>
 #include <QObject>
 
-#ifdef QT_GUI_LIB
-    #include <QIcon>
-#endif
-
 #ifdef WIN32
-    #define EXTENSION_PREFIX "ext_"
-    #define SERVICE_PREFIX "srv_"
-    #define DEBUG_SUFFIX "d"
-    #define LIB_EXTENSION ".dll"
+#define EXTENSION_PREFIX "ext_"
+#define SERVICE_PREFIX "srv_"
+#define LIB_EXTENSION ".dll"
 
 #elif defined Q_WS_X11
-    #define EXTENSION_PREFIX "libext_"
-    #define SERVICE_PREFIX "libsrv_"
-    #define DEBUG_SUFFIX "_debug"
-    #define LIB_EXTENSION ".so"
+#define EXTENSION_PREFIX "libext_"
+#define SERVICE_PREFIX "libsrv_"
+#define LIB_EXTENSION ".so"
 
 #elif defined Q_WS_MAC
-    #define EXTENSION_PREFIX "libext_"
-    #define SERVICE_PREFIX "libsrv_"
-    #define DEBUG_SUFFIX "_debug"
-    #define LIB_EXTENSION ".dylib"
+#define EXTENSION_PREFIX "libext_"
+#define SERVICE_PREFIX "libsrv_"
+#define LIB_EXTENSION ".dylib"
 #endif
 
 
 namespace MooseEnums
 {
-    enum UserIconColour
-    {
-        eNone = -1,
-        eRed = 0,
-        eBlue,
-        eGreen,
-        eOrange,
-        eBlack,
-        eColorMax
-    };
-    
     enum StartNewInstanceBehaviour
     {
         StartNewInstance,
@@ -75,20 +52,13 @@ namespace MooseEnums
 }
 
 
-namespace MooseUtils
+namespace Moose
 {
-    /**
-     * Returns path to named file in the app's bin/data directory.
-     */
-    MOOSE_DLLEXPORT QString
-    dataPath( QString file = "" );
-
-    /**
-     * Returns path to named file in the app's user-writable save directory.
-     * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
-     *      ~/Library/Application Support/Last.fm/ on OS X.
-     *      ~/.local/share/Last.fm/ on Unix.
-     */
+    /** @returns path to named file in the app's user-writable save directory.
+      * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
+      *      ~/Library/Application Support/Last.fm/ on OS X.
+      *      ~/.local/share/Last.fm/ on Unix.
+      */
     MOOSE_DLLEXPORT QString
     savePath( QString file = "" );
 
@@ -99,7 +69,7 @@ namespace MooseUtils
      *      ~/.local/share/Last.fm/ on Unix.
      */
     MOOSE_DLLEXPORT QString
-    logPath( QString file );
+    logPath( QString file = "" );
 
     /**
      * Returns path to directory for storing cached images etc.
@@ -126,14 +96,6 @@ namespace MooseUtils
     {
         return static_cast<T*>(loadService( name ));
     }
-
-    /**
-     * Helper function to load a named icon from disk.
-     */
-  #ifdef QT_GUI_LIB
-    MOOSE_DLLEXPORT QIcon
-    icon( const char *name );
-  #endif
 
     /**
      * @returns true if the client is already running
@@ -188,9 +150,8 @@ namespace MooseConstants
 
 namespace Moose
 {
-    using namespace MooseUtils;
     using namespace MooseEnums;
 }
 
 
-#endif // MOOSECOMMON_H
+#endif

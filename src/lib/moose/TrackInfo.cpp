@@ -1,14 +1,12 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -21,12 +19,8 @@
 
 #include "TrackInfo.h"
 #include "Settings.h"
-
 #include "lib/unicorn/Logger.h"
-
 #include <QDir>
-#include <QDomElement>
-#include <QMimeData>
 
 
 TrackInfo::TrackInfo()
@@ -57,13 +51,15 @@ TrackInfo::TrackInfo( const QDomElement& e )
         d->source = (Source)source.toInt();
 
     // support 1.1.3 stringed timestamps, and 1.3.0 Unix Timestamps
-    QString const timestring = e.namedItem( "timestamp" ).toElement().text();
-    QDateTime const timestamp = QDateTime::fromString( timestring, "yyyy-MM-dd hh:mm:ss" );
-    if (timestamp.isValid())
-        d->timeStamp = timestamp.toTime_t();
+    QString const t130 = e.namedItem( "timestamp" ).toElement().text();
+    QDateTime const t113 = QDateTime::fromString( t130, "yyyy-MM-dd hh:mm:ss" );
+    if (t113.isValid())
+        d->time = t113;
     else
-        d->timeStamp = timestring.toUInt();
+        d->time = QDateTime::fromTime_t( t130.toUInt() );
+
 #if 0
+    //old code, most likely unused
     setPath( e.namedItem( "path" ).toElement().text() );
     setFpId( e.namedItem( "fpId" ).toElement().text() );
     setMbId( e.namedItem( "mbId" ).toElement().text() );
@@ -88,7 +84,7 @@ TrackInfo::toDomElement( QDomDocument& document ) const
     makeElement( "album", d->album );
     makeElement( "track", d->title );
     makeElement( "duration", QString::number( d->duration ) );
-    makeElement( "timestamp", QString::number( d->timeStamp ) );
+    makeElement( "timestamp", QString::number( d->time.toTime_t() ) );
     makeElement( "playcount", QString::number( d->playCount ) );
     makeElement( "filename", d->path );
     makeElement( "source", QString::number( d->source ) );
@@ -132,13 +128,6 @@ TrackInfo::ratingCharacter() const
 }
 
 
-void
-MutableTrackInfo::timeStampMe()
-{
-    setTimeStamp( QDateTime::currentDateTime().toTime_t() );
-}
-
-
 QString
 TrackInfo::sourceString() const
 {
@@ -167,52 +156,48 @@ TrackInfo::durationString() const
 TrackInfo::ScrobblableStatus
 TrackInfo::scrobblableStatus() const
 {
-    const TrackInfo& track = *this; //FIXME
-
-    // Check duration
-    if ( track.duration() < kScrobbleMinLength )
+    if ( duration() < kScrobbleMinLength )
     {
-        LOG( 3, "Track length is " << track.duration() << " s which is too short, will not submit.\n" );
+        LOGL( 3, "Duration is too short (" << duration() << "s), will not submit.\n" );
         return TooShort;
     }
 
     // Radio tracks above preview length always scrobble
-    if ( track.source() == TrackInfo::Radio )
+    if ( source() == TrackInfo::Radio )
     {
         return OkToScrobble;
     }
 
-    // Check timestamp
-    if ( track.timeStamp() == 0 )
+    if ( !timeStamp().isValid() )
     {
-        LOG( 3, "Track has no timestamp, will not submit.\n" );
+        LOGL( 3, "Invalid timestamp, will not submit" );
         return NoTimeStamp;
     }
 
     // actual spam prevention is something like 12 hours, but we are only
     // trying to weed out obviously bad data, server side criteria for
     // "the future" may change, so we should let the server decide, not us
-    if ( track.timeStamp() > QDateTime::currentDateTime().addMonths( 1 ).toTime_t() )
+    if ( timeStamp() > QDateTime::currentDateTime().addMonths( 1 ) )
     {
         LOGL( 3, "Track is more than a month in the future, will not submit" );
         return FromTheFuture;
     }
 
-    if ( track.timeStamp() < QDateTime::fromString( "2003-01-01", Qt::ISODate ).toTime_t() )
+    if ( timeStamp() < QDateTime::fromString( "2003-01-01", Qt::ISODate ) )
     {
         LOGL( 3, "Track was played before the Audioscrobbler project was founded! Will not submit" );
         return FromTheDistantPast;
     }
 
     // Check if any required fields are empty
-    if ( track.artist().isEmpty() )
+    if ( artist().isEmpty() )
     {
-        LOG( 3, "Artist was missing, will not submit.\n" );
+        LOGL( 3, "Artist was missing, will not submit" );
         return ArtistNameMissing;
     }
-    if ( track.track().isEmpty() )
+    if ( track().isEmpty() )
     {
-        LOG( 3, "Artist, track or duration was missing, will not submit.\n" );
+        LOGL( 3, "Artist, track or duration was missing, will not submit" );
         return TrackNameMissing;
     }
 
@@ -225,9 +210,9 @@ TrackInfo::scrobblableStatus() const
     // Check if artist name is an invalid one like "unknown"
     foreach( QString invalid, invalidList )
     {
-        if ( track.artist().toLower() == invalid )
+        if ( artist().toLower() == invalid )
         {
-            LOG( 3, "Artist '" << track.artist() << "' is an invalid artist name, will not submit.\n" );
+            LOG( 3, "Artist '" << artist() << "' is an invalid artist name, will not submit.\n" );
             return ArtistInvalid;
         }
     }

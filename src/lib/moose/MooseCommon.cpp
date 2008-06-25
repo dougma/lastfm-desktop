@@ -40,7 +40,7 @@
 #endif
 
 
-namespace MooseUtils
+namespace Moose
 {
 
 
@@ -58,12 +58,12 @@ savePath( QString file )
 
     #ifdef WIN32
         path = Unicorn::applicationDataPath();
-        if ( path.isEmpty() )
+        if (path.isEmpty())
             path = QApplication::applicationDirPath();
         else
             path += "/Last.fm/Client";
     #else
-        path = UnicornUtils::appDataPath() + "/Last.fm";
+        path = Unicorn::applicationDataPath() + "/Last.fm";
     #endif
 
     QDir d( path );
@@ -79,9 +79,9 @@ logPath( QString file )
     #ifndef Q_WS_MAC
         return savePath( file );
     #else
-        return QDir( QDir::homePath() + "/Library/Logs" ).filePath( file );
+        QDir const d = QDir::home().filePath( "/Library/Logs/Last.fm" );
+        return d.filePath( file );
     #endif
-
 }
 
 
@@ -89,7 +89,7 @@ QString
 cachePath()
 {
     #ifdef Q_WS_MAC
-        QString appSupportFolder = UnicornUtils::applicationSupportFolderPath();
+        QString appSupportFolder = Unicorn::applicationSupportFolderPath();
         QDir cacheDir( appSupportFolder + "/Last.fm/Cache" );
 
         if (!cacheDir.exists())
@@ -115,18 +115,10 @@ servicePath( QString name )
         dirPath = qApp->applicationDirPath() + "/services";
     #endif
 
-    #ifndef QT_NO_DEBUG
-        dirPath += "/debug";
-    #endif
-
     if ( name.isEmpty() )
     {
         return dirPath;
     }
-
-    #ifndef QT_NO_DEBUG
-        name += DEBUG_SUFFIX;
-    #endif
 
     QDir servicesDir( dirPath );
     QString fileName = SERVICE_PREFIX + name + LIB_EXTENSION;
@@ -163,13 +155,6 @@ loadService( QString name )
     }
 
     return plugin;
-}
-
-
-QIcon
-icon( const char *name )
-{
-    return QIcon( MooseUtils::dataPath( QString("icons/") + name + ".png" ) );
 }
 
 

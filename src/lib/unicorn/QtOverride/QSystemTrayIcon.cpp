@@ -20,10 +20,9 @@
 #include "./QSystemTrayIcon"
 #undef QSystemTrayIcon
 
-#include "UnicornCommonMac.h"
-#include "libUnicorn/AppleScript.h"
-#include "libUnicorn/logger.h"
-#include "MooseCommon.h"
+#include "../UnicornCommonMac.h"
+#include "../AppleScript.h"
+#include "../Logger.h"
 
 #include <QBoxLayout>
 #include <QDesktopWidget>
@@ -51,7 +50,7 @@ Moose::QSystemTrayIcon::showMessage( const QString& title,
                                      MessageIcon icon,
                                      int ms )
 {
-    if (!UnicornUtils::isGrowlInstalled())
+    if (!Unicorn::isGrowlInstalled())
     {
         static QPointer<GrowlClone> w;
         delete w;
@@ -68,7 +67,7 @@ GrowlClone::GrowlClone( const QString& title, const QString& description )
     QLabel* ldescription = new QLabel( description );
     QLabel* logo = new QLabel;
 
-    logo->setPixmap( Moose::dataPath( "app_55.png" ) );
+    logo->setPixmap( QPixmap(":/AudioscrobblerLogo.png") );
     logo->setFixedSize( 55, 55 );
 
     ltitle->setFixedWidth( 200 );

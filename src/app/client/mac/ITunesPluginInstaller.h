@@ -17,41 +17,42 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_LISTENER_H
-#define PLAYER_LISTENER_H
+#ifndef ITUNES_PLUGIN_INSTALLER_H
+#define ITUNES_PLUGIN_INSTALLER_H
 
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 ) 
-
-#include <QTcpServer>
-class TrackInfo;
+#include <QCoreApplication> //Q_DECLARE_TR_FUNCTIONS
+#include <QString>
 
 
-/** @author Erik Jaelevik, <erik@last.fm>
-  * @contributor Christian Muehlhaeuser <chris@last.fm>
-  * @rewrite Max Howell <max@last.fm> -- to Qt4
+/** @author Christian Muehlhaeuser <chris@last.fm>
+  * @contributor Max Howell <max@last.fm>
   */
-class PlayerListener : public QTcpServer
+class ITunesPluginInstaller
 {
-    Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS( ITunesPluginInstaller )
 
 public:
-    class SocketFailure
-    {};
-
-    PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
-
-    uint port() const { return 33367; }
+    ITunesPluginInstaller();
     
-signals:
-    void trackStarted( const TrackInfo& );
-    void playbackEnded( const QString& playerId );
-    void playbackPaused( const QString& playerId );
-    void playbackResumed( const QString& playerId );
-    void bootstrapCompleted( const QString& playerId, const QString& username );
+    void install();
+    void uninstall();
 
-private slots:
-    void onNewConnection();
+    // NOTE this is only valid after calling install()
+    bool needsTwiddlyBootstrap() const { return m_needsTwiddlyBootstrap; }
+
+private:
+    bool isPluginInstalled();
+    QString pListVersion( const QString& file );
+
+    bool removeInstalledPlugin();
+    bool installPlugin();
+
+    // Legacy code: removes old LastFmHelper for updates
+    void disableLegacyHelperApp();
+
+    QString const k_shippedPluginDir;
+    QString const k_iTunesPluginDir;
+    bool m_needsTwiddlyBootstrap;
 };
 
 #endif

@@ -369,7 +369,7 @@ applicationDataPath()
         }
 
     #elif defined(Q_WS_MAC)
-        path = UnicornUtils::applicationSupportFolderPath();
+        path = Unicorn::applicationSupportFolderPath();
 
     #elif defined(Q_WS_X11)
         path = QDir::home().filePath( ".local/share" );

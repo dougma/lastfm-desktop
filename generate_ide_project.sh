@@ -2,8 +2,6 @@
 
 windows()
 {
-    # we step into src because qmake is b0rked
-    cd src
     qmake -recursive -tp vc pigmyshrew.pro
 
     AFTER='
@@ -22,13 +20,18 @@ EndProject
 '
 
     echo "$AFTER" >> pigmyshrew.sln
-
-    rmdir _build
 }
 
 osx() 
 {
-    echo unimplemented
+    qmake -recursive -spec macx-xcode pigmyshrew.pro
+    # qmake 4.4 sucks
+    for x in `find . -type d -name \*.xcodeproj`
+    do 
+        pushd $x
+        mv project.pbxproj.qmake project.pbxproj
+        popd &> /dev/null
+    done
 }
 
 linux()
@@ -36,9 +39,13 @@ linux()
     echo unimplemented
 }
 
+# we step into src because qmake is b0rked
+cd src
 
 case `uname` in
     Darwin) osx;;
     Linux) linux;;
     *) windows;;
 esac
+
+rmdir _build
