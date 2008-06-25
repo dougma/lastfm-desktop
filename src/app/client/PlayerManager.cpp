@@ -176,5 +176,6 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const TrackInfo&
 void
 PlayerManager::onStopWatchTimedOut()
 {
+    MutableTrackInfo( track() ).setRatingFlag( TrackInfo::Scrobbled );
     emit event( PlaybackEvent::ScrobblePointReached );
 }

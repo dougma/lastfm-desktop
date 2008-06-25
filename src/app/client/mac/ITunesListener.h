@@ -18,8 +18,11 @@
  ***************************************************************************/
 
 #include <QtGlobal> //Q_WS_MAC
+#ifndef Q_WS_MAC
+#define ITUNES_SCRIPT_H
+#endif
 
-#ifndef ITUNES_SCRIPT_H && defined Q_WS_MAC
+#ifndef ITUNES_SCRIPT_H
 #define ITUNES_SCRIPT_H
 
 #include <QThread>

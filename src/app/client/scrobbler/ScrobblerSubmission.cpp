@@ -54,6 +54,12 @@ ScrobblerSubmission::request()
 
     foreach (TrackInfo const i, tracks)
     {
+        if (i.dateTime() < QDateTime::fromString( "2003-01-01", Qt::ISODate ))
+        {
+            qDebug() << "Won't scrobble track from before the date Audioscrobbler project was founded!";
+            continue;
+        }
+
         QString const N = QString::number( n++ );
         #define e( x ) QUrl::toPercentEncoding( x )
         data += "&a[" + N + "]=" + e(i.artist()) +

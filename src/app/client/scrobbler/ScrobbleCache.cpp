@@ -39,6 +39,9 @@ ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
 
     m_path = Moose::savePath( username + "_submissions.xml" );
     m_username = username;
+
+    //HACK due to bad design with this m_tracks global instance thing
+    if (m_tracks.isEmpty()) read();
 }
 
 
@@ -102,13 +105,10 @@ ScrobbleCache::append( const QList<TrackInfo>& tracks )
 {
     foreach (const TrackInfo& track, tracks)
     {
-        // we can't scrobble empties
-        if (track.isEmpty()) {
+        if (track.isEmpty()) 
             qDebug() << "Will not cache an empty track";
-            continue;
-        }
-
-        m_tracks += track;
+        else
+            m_tracks += track;
     }
     write();
 }

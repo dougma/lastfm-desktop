@@ -61,7 +61,7 @@ App::App( int argc, char** argv )
     connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
     
     m_playerManager = new PlayerManager( m_playerListener );
-    connect( m_playerManager, SIGNAL(event( int, QVariant )), SIGNAL(event( int, QVariant )) );
+    connect( m_playerManager, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     
 #ifdef Q_WS_MAC
     new ITunesListener( m_playerListener->port(), this );
@@ -70,8 +70,6 @@ App::App( int argc, char** argv )
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
 
     DiagnosticsDialog::observe( m_scrobbler );
-
-    connect( this, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
 
@@ -108,7 +106,7 @@ App::state() const
 
 
 void
-App::onAppEvent( int e, const QVariant& )
+App::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
@@ -117,7 +115,7 @@ App::onAppEvent( int e, const QVariant& )
             //TODO cache the track, but in a way that the scrobbler won't submit it yet
             ScrobbleCache cache( The::settings().username() );
             cache.append( The::playerManager().track() );
-            //m_scrobbler->submit();
+            m_scrobbler->submit();
             break;
         }
 
@@ -126,6 +124,8 @@ App::onAppEvent( int e, const QVariant& )
             m_scrobbler->nowPlaying( The::playerManager().track() );
             break;
     }
+
+    emit event( e, d );
 }
 
 

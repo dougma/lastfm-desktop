@@ -45,8 +45,6 @@ DrWatson::DrWatson()
 void
 DrWatson::onScrobblerStatusChanged( int const new_status )
 {
-    Q_DEBUG_BLOCK << new_status;
-
     int const old_status = scrobbler_status;
 
     if (new_status == Scrobbler::Connecting)
@@ -140,7 +138,7 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
         Qt::QueuedConnection );
 
 #endif
-    connect( qApp, SIGNAL( event( int, QVariant ) ), SLOT( onAppEvent( int, QVariant ) ) );
+    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.copyToClipboardButton, SIGNAL( clicked() ), SLOT( onCopyToClipboard() ) );
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
 
@@ -259,7 +257,7 @@ DiagnosticsDialog::onOutputBufferSizeChanged(int bufferSize)
 void
 DiagnosticsDialog::onAppEvent( int event, const QVariant& /* data */ )
 {
-    switch ( event )
+    switch (event)
     {
         case PlaybackEvent::ScrobblePointReached:
             populateScrobbleCacheView();
@@ -290,25 +288,22 @@ DiagnosticsDialog::radioHandshakeReturn( Request* req )
 void 
 DiagnosticsDialog::populateScrobbleCacheView()
 {
-    QString const username = The::settings().username();
-    ScrobbleCache scrobbleCache( username );
+    Q_DEBUG_BLOCK;
+
+    ScrobbleCache cache( The::settings().username() );
+
+    qDebug() << cache.tracks().count();
 
     QList<QTreeWidgetItem *> items;
-    const QList<TrackInfo>& cachedTracks = scrobbleCache.tracks();
-    for( QList<TrackInfo>::const_iterator i = cachedTracks.begin(); i != cachedTracks.end(); i++ )
-    {
-        if ( i->isScrobbled() )
-            items.append( new QTreeWidgetItem( (QTreeWidget*)0,
-                          QStringList() << i->artist() << i->track() << i->album() ) );
-    }
+    foreach (TrackInfo t, cache.tracks())
+        if ( t.isScrobbled() )
+            items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.track() << t.album() ) );
 
     ui.cachedTracksList->clear();
     ui.cachedTracksList->insertTopLevelItems( 0, items );
-
-    if (scrobbleCache.tracks().isEmpty())
-        ui.cachedTracksLabel->setText( tr( "The cache is empty" ) );
-    else
-        ui.cachedTracksLabel->setText( tr( "%n cached tracks", "", items.count() ) );
+    ui.cachedTracksLabel->setText( cache.tracks().isEmpty()
+            ? tr( "The cache is empty" )
+            : tr( "%n cached tracks", "", items.count() ) );
 }
 
 

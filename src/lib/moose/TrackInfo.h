@@ -114,6 +114,7 @@ public:
     QString mbId() const { return d->mbId; }
     QString path() const { return d->path; }
     QDateTime timeStamp() const { return d->time; }
+    QDateTime dateTime() const { return d->time; }
     Source source() const { return (Source)d->source; }
     /** scrobbler submission source string code */
     QString sourceString() const;
