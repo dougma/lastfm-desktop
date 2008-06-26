@@ -21,6 +21,9 @@
 #define DIAGNOSTICS_DIALOG_H
 
 #include "ui_DiagnosticsDialog.h"
+
+#include "MailLogsDialog.h"
+
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
@@ -72,6 +75,9 @@ public:
 private:
     void populateScrobbleCacheView();
 	void scrobbleIpod( bool isManual = false );
+	QString diagnosticInformation();
+
+    MailLogsDialog m_mailLogsDialog;
 
     class QTimer* m_logTimer;
     std::ifstream m_logFile;
@@ -92,6 +98,7 @@ private slots:
 
 	void onScrobbleIpodClicked();
 	void onLogPoll();
+	void onMailLogsClicked();
 
     void onRefresh();
 };

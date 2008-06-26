@@ -141,6 +141,7 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.copyToClipboardButton, SIGNAL( clicked() ), SLOT( onCopyToClipboard() ) );
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
+    connect( ui.mailButton, SIGNAL( clicked() ), SLOT( onMailLogsClicked() ) );
 
     //FIXME still needed for eg. cache view may not reflect truth
     connect( ui.refreshButton, SIGNAL( clicked() ), SLOT( onRefresh() ) );
@@ -313,17 +314,15 @@ DiagnosticsDialog::onRefresh()
     populateScrobbleCacheView();
 }
 
-
-void
-DiagnosticsDialog::onCopyToClipboard()
+QString
+DiagnosticsDialog::diagnosticInformation()
 {
-    QClipboard *clipboard = QApplication::clipboard();
-    QString clipboardText;
+    QString informationText;
 
     //TODO should read "Last successful submission" - that's what it actually shows at least
-    clipboardText.append( tr( "Last successful connection: " ) + ui.lastConnectionStatusLabel->text() + "\n\n" );
-    clipboardText.append( tr( "Submission Server: " ) + ui.scrobblingStatus->text() + "\n" );
-    clipboardText.append( ui.cachedTracksLabel->text() + ":\n\n" );
+    informationText.append( tr( "Last successful connection: " ) + ui.lastConnectionStatusLabel->text() + "\n\n" );
+    informationText.append( tr( "Submission Server: " ) + ui.scrobblingStatus->text() + "\n" );
+    informationText.append( ui.cachedTracksLabel->text() + ":\n\n" );
 
     // Iterate through cached tracks list and add to clipboard contents
     for(int row = 0; row < ui.cachedTracksList->topLevelItemCount(); row++)
@@ -331,19 +330,27 @@ DiagnosticsDialog::onCopyToClipboard()
         QTreeWidgetItem *rowData = ui.cachedTracksList->topLevelItem( row );
         for(int col = 0; col < rowData->columnCount(); col++)
         {
-            clipboardText.append( rowData->data( col, Qt::DisplayRole ).toString() );
-            clipboardText.append( "\t:\t" );
+            informationText.append( rowData->data( col, Qt::DisplayRole ).toString() );
+            informationText.append( "\t:\t" );
         }
         //remove trailing seperators
-        clipboardText.chop(3);
-        clipboardText.append( "\n" );
+        informationText.chop(3);
+        informationText.append( "\n" );
     }
 
     #ifndef HIDE_RADIO
-    clipboardText.append("\n" + tr( "Radio Server: " ) + ui.radioServerStatusLabel->text() + "\n" );
+    informationText.append( tr( "Radio Server: " ) + ui.radioServerStatusLabel->text() + "\n" );
     #endif
+    
+    return informationText;
+}
 
-    clipboard->setText( clipboardText );
+void
+DiagnosticsDialog::onCopyToClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+
+    clipboard->setText( diagnosticInformation() );
 }
 
 
@@ -418,8 +425,9 @@ DiagnosticsDialog::onLogPoll()
 void 
 DiagnosticsDialog::onScrobbleIpodClicked()
 {
+#ifndef Q_WS_X11
     //TODO: make DRY - this is replicated in WizardTwiddlyBootstrapPage.cpp
-    #ifdef Q_OS_MAC
+    #ifdef Q_WS_MAC
         #define TWIDDLY_EXECUTABLE_NAME "/../../Resources/iPodScrobbler"
     #else
         #define TWIDDLY_EXECUTABLE_NAME "/../iPodScrobbler.exe"
@@ -452,4 +460,13 @@ DiagnosticsDialog::onScrobbleIpodClicked()
     }
 
     QProcess::startDetached( The::settings().path() + TWIDDLY_EXECUTABLE_NAME, args );
+#endif
 }
+
+void 
+DiagnosticsDialog::onMailLogsClicked()
+{
+    m_mailLogsDialog.setDiagnosticsDialogInfo( diagnosticInformation() );
+    m_mailLogsDialog.exec();
+}
+

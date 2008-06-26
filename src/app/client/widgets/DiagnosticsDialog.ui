@@ -560,6 +560,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="mailButton" >
+       <property name="text" >
+        <string>Mail Logs</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
