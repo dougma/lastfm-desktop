@@ -24,62 +24,52 @@
 
 
 void
-ScrobblerSubmission::request()
+ScrobblerSubmission::setTracks( const QList<TrackInfo>& tracks )
 {
-    //TODO if (!canSubmit()) return;
-    if (m_batch.size()) return;
+    m_tracks = tracks;
+    // submit in chronological order
+    qSort( m_tracks.begin(), m_tracks.end(), TrackInfo::lessThan );
+}
 
-    ScrobbleCache cache( manager()->username() );
-    QList<TrackInfo> tracks = cache.tracks();
 
-    if (tracks.isEmpty())
+void
+ScrobblerSubmission::submitNextBatch()
+{
+    Q_ASSERT( !hasPendingRequests() );
+
+    m_batch.clear(); //yep first
+
+    if (m_tracks.isEmpty())
         return;
 
-    // we need to put the tracks in chronological order or the Scrobbling Service
-    // rejects the ones that are later than previously submitted tracks
-    // this is only relevent if the cache is greater than 50 in size as then
-    // submissions are done in batches, but better safe than sorry
-    //TODO sort in the persistent cache
-    qSort( tracks.begin(), tracks.end(), TrackInfo::lessThan );
-    tracks = tracks.mid( 0, 50 );
-    m_batch = tracks;
-
-    Q_ASSERT( manager()->session().size() );
-    Q_ASSERT( tracks.size() <= 50 );
-
-    //////
-    QString data = "s=" + manager()->session();
     bool portable = false;
-    int n = 0;
+    m_data = "s=" + session();
 
-    foreach (TrackInfo const i, tracks)
+    for (int i = 0; i < 50 && !m_tracks.isEmpty(); ++i)
     {
-        if (i.dateTime() < QDateTime::fromString( "2003-01-01", Qt::ISODate ))
-        {
-            qDebug() << "Won't scrobble track from before the date Audioscrobbler project was founded!";
-            continue;
-        }
+        TrackInfo t = m_tracks.takeFirst();
 
-        QString const N = QString::number( n++ );
+        QByteArray const N = QByteArray::number( i );
         #define e( x ) QUrl::toPercentEncoding( x )
-        data += "&a[" + N + "]=" + e(i.artist()) +
-                "&t[" + N + "]=" + e(i.track()) +
-                "&i[" + N + "]=" + QString::number( i.timeStamp().toTime_t() ) +
-                "&o[" + N + "]=" + i.sourceString() +
-                "&r[" + N + "]=" + i.ratingCharacter() +
-                "&l[" + N + "]=" + e(QString::number( i.duration() )) +
-                "&b[" + N + "]=" + e(i.album()) +
-                "&n[" + N + "]=" + //position in album if known, and we don't generally
-                "&m[" + N + "]=" + i.mbId();
+        m_data += "&a[" + N + "]=" + e(t.artist()) +
+                  "&t[" + N + "]=" + e(t.track()) +
+                  "&i[" + N + "]=" + QByteArray::number( t.timeStamp().toTime_t() ) +
+                  "&o[" + N + "]=" + t.sourceString() +
+                  "&r[" + N + "]=" + t.ratingCharacter() +
+                  "&l[" + N + "]=" + QByteArray::number( t.duration() ) +
+                  "&b[" + N + "]=" + e(t.album()) +
+                  "&n[" + N + "]=" + QByteArray::number( t.trackNumber() ) +
+                  "&m[" + N + "]=" + e(t.mbId());
         #undef e
 
-        if (i.source() == TrackInfo::MediaDevice)
+        if (t.source() == TrackInfo::MediaDevice)
             portable = true;
+
+        m_batch += t;
     }
 
     if (portable)
-        data += "&portable=1";
+        m_data += "&portable=1";
 
-    m_data = data.toUtf8();
-    ScrobblerPostHttp::request();
+    request();
 };

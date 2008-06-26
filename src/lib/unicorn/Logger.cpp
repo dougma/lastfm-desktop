@@ -18,7 +18,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#define ASSERT_ON_QT_WARNINGS_IN_DEBUG_BUILD
+//#define ASSERT_ON_QT_WARNINGS_IN_DEBUG_BUILD
 
 #include "logger.h"
 

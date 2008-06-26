@@ -20,6 +20,8 @@
 #ifndef SCROBBLER_H
 #define SCROBBLER_H
 
+#include <QByteArray>
+#include <QList>
 #include <QString>
 #include <QVariant>
 
@@ -35,11 +37,11 @@ class Scrobbler : public QObject
 
     QString const m_username;
     QString const m_password;
-    QString m_session;
 
     class ScrobblerHandshake* m_handshake;
     class NowPlaying* m_np;
     class ScrobblerSubmission* m_submitter;
+    class ScrobbleCache* m_cache;
     uint m_hard_failures;
 
 public:
@@ -49,10 +51,11 @@ public:
 
     /** will ask Last.fm to update the now playing information for username() */
     void nowPlaying( const class TrackInfo& );
+    /** will cache the track, but we won't submit it until you call submit() */
+    void cache( const TrackInfo& );
     /** will submit the ScrobbleCache for this user */
     void submit();
 
-    QString session() const { return m_session; }
     QString username() const { return m_username; }
 
     enum Status
@@ -86,10 +89,10 @@ private:
     void onError( Scrobbler::Error );
 
 private slots:
-    void onHandshakeReturn( const QString& );
-    void onNowPlayingReturn( const QString& );
-    void onSubmissionReturn( const QString& );
-
+    void onHandshakeReturn( const QByteArray& );
+    void onNowPlayingReturn( const QByteArray& );
+    void onSubmissionReturn( const QByteArray& );
+    void onSubmissionStarted( int );
     void onHandshakeHeaderReceived( const class QHttpResponseHeader& );
 };
 

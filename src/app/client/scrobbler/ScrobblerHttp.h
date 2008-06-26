@@ -24,50 +24,56 @@
 #include <QUrl>
 
 
-/** facade pattern for QHttp for Scrobbler usage */
+/** facade pattern base class for QHttp for Scrobbler usage */
 class ScrobblerHttp : public QHttp
 {
     Q_OBJECT
 
+public:
+    void retry();
+    int requestId() const { return m_id; }
+
 protected:
     ScrobblerHttp( QObject* parent = 0 );
 
+protected slots:
+    virtual void request() = 0;
+
+signals:
+    void done( const QByteArray& data );
+
+protected:
     int m_id;
     class QTimer *m_retry_timer;
 
 private slots:
     void onRequestFinished( int id, bool error );
 
-signals:
-    void done( const QString& data );
-
-protected slots:
-    virtual void request() = 0;
-
-public:
+private:
     void resetRetryTimer();
-    void retry();
-
-    int id() const { return m_id; }
 };
 
 
 class ScrobblerPostHttp : public ScrobblerHttp
 {
     QString m_path;
+    QByteArray m_session;
 
 protected:
     QByteArray m_data;
-    class Scrobbler* manager() const { return (Scrobbler*)parent(); }
 
 public:
-    ScrobblerPostHttp( Scrobbler* parent ) : ScrobblerHttp( (QObject*)parent )
+    ScrobblerPostHttp()
     {}
 
     /** if you reimplement call the base version after setting m_data */
     virtual void request();
 
+    void setSession( const QByteArray& id ) { m_session = id; }
     void setUrl( const QUrl& );
+
+    QByteArray postData() const { return m_data; }
+    QByteArray session() const { return m_session; }
 };
 
 #endif

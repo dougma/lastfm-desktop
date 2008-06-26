@@ -32,12 +32,15 @@ Scrobbler::Scrobbler( const QString& username, const QString& password )
           m_submitter( 0 ),
           m_hard_failures( 0 )
 {
+    m_cache = new ScrobbleCache( username );
+
     handshake();
 }
 
 
 Scrobbler::~Scrobbler()
 {
+    delete m_cache;
     delete m_handshake;
     delete m_np;
     delete m_submitter;
@@ -47,34 +50,47 @@ Scrobbler::~Scrobbler()
 void
 Scrobbler::handshake()
 {
-    m_session = "";
     m_hard_failures = 0;
+
+    QByteArray np_data;
+    if (m_np) np_data = m_np->postData();
 
     delete m_handshake;
     delete m_np;
     delete m_submitter;
     
     m_handshake = new ScrobblerHandshake( m_username, m_password );
-    connect( m_handshake, SIGNAL(done( QString )), SLOT(onHandshakeReturn( QString )) );
+    connect( m_handshake, SIGNAL(done( QByteArray )), SLOT(onHandshakeReturn( QByteArray )) );
     connect( m_handshake, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHandshakeHeaderReceived( QHttpResponseHeader )) );
-    m_np = new NowPlaying( this );
-    connect( m_np, SIGNAL(done( QString )), SLOT(onNowPlayingReturn( QString )) );
-    m_submitter = new ScrobblerSubmission( this );
-    connect( m_submitter, SIGNAL(done( QString )), SLOT(onSubmissionReturn( QString )) );
-}
+    m_np = new NowPlaying( np_data );
+    connect( m_np, SIGNAL(done( QByteArray )), SLOT(onNowPlayingReturn( QByteArray )) );
+    m_submitter = new ScrobblerSubmission;
+    connect( m_submitter, SIGNAL(done( QByteArray )), SLOT(onSubmissionReturn( QByteArray )) );
+    connect( m_submitter, SIGNAL(requestStarted( int )), SLOT(onSubmissionStarted( int )) );
 
-
-void
-Scrobbler::submit()
-{
-    m_submitter->request();
+#error scrobble cached tracks after handshake
 }
 
 
 void
 Scrobbler::nowPlaying( const TrackInfo& track )
 {
-    m_np->request( track );
+    m_np->submit( track );
+}
+
+
+void
+Scrobbler::cache( const TrackInfo& track )
+{
+    m_cache->add( track );
+}
+
+
+void
+Scrobbler::submit()
+{
+    m_submitter->setTracks( m_cache->tracks() );
+    m_submitter->submitNextBatch();
 }
 
 
@@ -88,11 +104,11 @@ Scrobbler::onError( Scrobbler::Error code )
         case Scrobbler::ErrorBannedClient:
         case Scrobbler::ErrorBadAuthorisation:
         case Scrobbler::ErrorBadTime:
-            //TEST that np and submit don't fuck everything up, ie you may need to abort
+            // np and submitter are in invalid state and won't send any requests
             break;
 
         default:
-            Q_ASSERT( false ); //what aren't you handling?
+            Q_ASSERT( false ); // you (yes you!) have missed an enum value out
 
         case Scrobbler::ErrorThreeHardFailures:
         case Scrobbler::ErrorBadSession:
@@ -104,23 +120,25 @@ Scrobbler::onError( Scrobbler::Error code )
 }
 
 
+#define SPLIT( x ) QList<QByteArray> const results = x.split( '\n' ); QByteArray const code =  results.value( 0 ); Q_DEBUG_BLOCK << x.trimmed();
+
+
 void
-Scrobbler::onHandshakeReturn( const QString& result ) //TODO trim before passing here
+Scrobbler::onHandshakeReturn( const QByteArray& result ) //TODO trim before passing here
 {
-    Q_DEBUG_BLOCK << result.trimmed();
-    QStringList const results = result.split( '\n' );
-    QString const code = results.value( 0 );
+    SPLIT( result )
 
     if (code == "OK" && results.count() >= 4)
     {
-        m_session = results[1];
-        m_np->setUrl( results[2] );
-        m_submitter->setUrl( results[3] );
+        m_np->setSession( results[1] );
+        m_np->setUrl( QString::fromUtf8( results[2] ) );
+        m_submitter->setSession( results[1] );
+        m_submitter->setUrl( QString::fromUtf8( results[3] ) );
 
         emit status( Scrobbler::Handshaken, m_username );
 
         // submit any queued work
-        m_np->ScrobblerPostHttp::request();
+        m_np->request();
         m_submitter->request();
     }
     else if (code == "BANNED")
@@ -141,24 +159,28 @@ Scrobbler::onHandshakeReturn( const QString& result ) //TODO trim before passing
 
 
 void
-Scrobbler::onNowPlayingReturn( const QString& result )
+Scrobbler::onNowPlayingReturn( const QByteArray& result )
 {
-    Q_DEBUG_BLOCK << result.trimmed();
-    QString const code = result.split( '\n' ).value( 0 );
+    SPLIT( result )
 
     if (code == "OK")
     {
-        // yay
+        m_np->reset();
     }
     else if (code == "BADSESSION")
     {
-        onError( Scrobbler::ErrorBadSession );
+        if (!m_submitter->hasPendingRequests())
+        {
+            // if scrobbling is happening then there is no way I'm causing
+            // duplicate scrobbles! We'll fail next time we try to contact 
+            // Last.fm instead
+            onError( Scrobbler::ErrorBadSession );
+        }
     }
-
-    // we don't hard fail for what would be the else case here, because:
-    //  1) if just np is failing and subs are still ok, then we should submit!
-    //  2) np is minimal load relative to subs, so who cares
-    //  3) if everything is broken, subs will cause hard failure too, so everything is still fine
+    // yep, no else. The protocol says hard fail, I say, don't:
+    //  1) if only np is down, then hard failing will just mean a lot of work for the handshake php script with no good reason
+    //  2) if both are down, subs will hard fail too, so just rely on that
+    //  3) if np is up and subs is down, successful np requests will reset the failure count and possibly prevent timely scrobbles
 
     // TODO retry if server replies with busy, at least
     // TODO you need a lot more error handling for the scrobblerHttp returns "" case
@@ -166,22 +188,20 @@ Scrobbler::onNowPlayingReturn( const QString& result )
 
 
 void
-Scrobbler::onSubmissionReturn( const QString& result )
+Scrobbler::onSubmissionReturn( const QByteArray& result )
 {
-    Q_DEBUG_BLOCK << result.trimmed();
-    QString const code = result.split( '\n' ).value( 0 );
+    SPLIT( result )
 
     if (code == "OK")
     {
-        ScrobbleCache( m_username ).remove( m_submitter->batch() );
-        m_submitter->clearBatch();
-
-        //TODO emit status of submissions
         m_hard_failures = 0;
-        m_submitter->resetRetryTimer();
+        m_cache->remove( m_submitter->batch() );
+        m_submitter->submitNextBatch();
 
-        // try to submit another batch;
-        m_submitter->request();
+        if (m_submitter->batch().isEmpty())
+        {
+            emit status( Scrobbler::TracksScrobbled );
+        }
     }
     else if (code == "BADSESSION")
     {
@@ -204,4 +224,12 @@ Scrobbler::onHandshakeHeaderReceived( const QHttpResponseHeader& header )
         m_handshake->abort(); //TEST
         m_handshake->retry();
     }
+}
+
+
+void
+Scrobbler::onSubmissionStarted( int id )
+{
+    if (id == m_submitter->requestId())
+        emit status( Scrobbling );
 }

@@ -45,6 +45,8 @@ DrWatson::DrWatson()
 void
 DrWatson::onScrobblerStatusChanged( int const new_status )
 {
+    Q_DEBUG_BLOCK << new_status;
+
     int const old_status = scrobbler_status;
 
     if (new_status == Scrobbler::Connecting)
@@ -62,6 +64,10 @@ DrWatson::onScrobblerStatusChanged( int const new_status )
 
     switch (new_status)
     {
+        case Scrobbler::TracksScrobbled:
+            scrobbler_status = Scrobbler::Handshaken;
+            break;
+
         case Scrobbler::Handshaken:
             scrobbler_handshake_time = QDateTime::currentDateTime();
             // FALL THROUGH
@@ -289,11 +295,7 @@ DiagnosticsDialog::radioHandshakeReturn( Request* req )
 void 
 DiagnosticsDialog::populateScrobbleCacheView()
 {
-    Q_DEBUG_BLOCK;
-
     ScrobbleCache cache( The::settings().username() );
-
-    qDebug() << cache.tracks().count();
 
     QList<QTreeWidgetItem *> items;
     foreach (TrackInfo t, cache.tracks())

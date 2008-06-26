@@ -17,20 +17,16 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScrobblerHttp.h"
-#include "lib/moose/TrackInfo.h"
-#include <QList>
+#include "ui_TrackListViewItem.h"
 
 
-class ScrobblerSubmission : public ScrobblerPostHttp
+class TrackListViewItem : public QWidget
 {
-    QList<TrackInfo> m_tracks;
-    QList<TrackInfo> m_batch;
-
 public:
-    void setTracks( const QList<TrackInfo>& );
-    /** submits a batch of 50 to the scrobbling service */
-    void submitNextBatch();
-    /** the current batch, depending on */
-    QList<TrackInfo> batch() const { return m_batch; }
+    TrackListViewItem()
+    {
+        ui.setupUi( this );
+    }
+
+    Ui::TrackListViewItem ui;
 };

@@ -25,15 +25,25 @@
 #include "version.h"
 #include "mac/ITunesListener.h"
 #include "scrobbler/Scrobbler.h"
-#include "scrobbler/ScrobbleCache.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/LoginDialog.h"
 #include "widgets/MainWindow.h"
+#include "lib/unicorn/LastMessageBox.h"
 
 
 App::App( int argc, char** argv ) 
    : QApplication( argc, argv )
 {
+#ifdef Q_WS_MAC
+    if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
+    {
+        LastMessageBox::critical( 
+                QObject::tr( "Unsupported OS X Version" ),
+                QObject::tr( "We are sorry, but Last.fm requires OS X Tiger or above." ) );
+        throw 1; //FIXME using exceptions for flow control? eww!
+    }
+#endif
+
     Settings::instance = new Settings( VERSION, applicationFilePath() );
 
     if (The::settings().username().isEmpty() || The::settings().logOutOnExit())
@@ -110,18 +120,19 @@ App::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
-        case PlaybackEvent::ScrobblePointReached:
-        {
-            //TODO cache the track, but in a way that the scrobbler won't submit it yet
-            ScrobbleCache cache( The::settings().username() );
-            cache.append( The::playerManager().track() );
-            m_scrobbler->submit();
-            break;
-        }
-
-        case PlaybackEvent::PlaybackStarted:
         case PlaybackEvent::TrackChanged:
+            m_scrobbler->submit();
+            // FALL THROUGH
+        case PlaybackEvent::PlaybackStarted:
             m_scrobbler->nowPlaying( The::playerManager().track() );
+            break;
+
+        case PlaybackEvent::ScrobblePointReached:
+            m_scrobbler->cache( The::playerManager().track() );
+            break;
+
+        case PlaybackEvent::PlaybackEnded:
+            m_scrobbler->submit();
             break;
     }
 

@@ -22,6 +22,8 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/moose/MooseCommon.h"
+#include "lib/unicorn/Logger.h"
+#include "lib/unicorn/UnicornCommon.h"
 #include <QDir>
 
 
@@ -36,6 +38,12 @@ int main( int argc, char** argv )
     QDir().mkpath( Moose::savePath() );
     QDir().mkpath( Moose::logPath() );
     
+    Logger& logger = Logger::GetLogger();
+    logger.Init( Moose::logPath( "Last.fm.log" ), false );
+    logger.SetLevel( Logger::Debug );
+    LOGL( 3, "Application: " << PRODUCT_NAME << " " << VERSION );
+    LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );
+
     try
     {
         App app( argc, argv );

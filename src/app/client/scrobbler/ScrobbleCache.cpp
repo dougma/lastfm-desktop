@@ -29,10 +29,6 @@
 static QList<TrackInfo> g_tracks;
 
 
-ScrobbleCache::ScrobbleCache() : m_tracks( g_tracks )
-{}
-
-
 ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
 {
     Q_ASSERT( username.length() );
@@ -94,14 +90,14 @@ ScrobbleCache::write()
 
 
 void
-ScrobbleCache::append( const TrackInfo& track )
+ScrobbleCache::add( const TrackInfo& track )
 {
-    append( QList<TrackInfo>() << track );
+    add( QList<TrackInfo>() << track );
 }
 
 
 void
-ScrobbleCache::append( const QList<TrackInfo>& tracks )
+ScrobbleCache::add( const QList<TrackInfo>& tracks )
 {
     foreach (const TrackInfo& track, tracks)
     {

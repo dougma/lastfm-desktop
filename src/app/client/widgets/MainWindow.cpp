@@ -22,6 +22,7 @@
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/SettingsDialog.h"
+#include "widgets/TrackListView.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/moose/TrackInfo.h"
 #include <QLinearGradient>
@@ -40,6 +41,7 @@ MainWindow::MainWindow()
     connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
 
     ui.setupUi( this );
+    setCentralWidget( m_trackListView = new TrackListView );
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
@@ -55,17 +57,13 @@ MainWindow::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
-        case PlaybackEvent::PlaybackStarted:
-        case PlaybackEvent::TrackChanged:
-            ui.track->setText( v.value<TrackInfo>().toString() );
-            ui.source->setText( "00:00" );
-            break;
+    case PlaybackEvent::PlaybackStarted:
+    case PlaybackEvent::TrackChanged:
+        m_trackListView->add( v.value<TrackInfo>() );
+        break;
 
-        case PlaybackEvent::PlaybackEnded:
-            qDebug() << "ENDED";
-            ui.track->clear();
-            ui.source->clear();
-            break;
+    case PlaybackEvent::PlaybackEnded:
+        break;
     }
 
     // progress display timer
@@ -100,7 +98,7 @@ MainWindow::onPlaybackTick( int s )
 {
     QTime t( 0, 0 );
     t = t.addSecs( s );
-    ui.source->setText( t.toString( "mm:ss" ) );
+//    ui.source->setText( t.toString( "mm:ss" ) );
 }
 
 

@@ -25,6 +25,9 @@ class NowPlaying : public ScrobblerPostHttp
     QTimer* m_timer;
 
 public:
-    NowPlaying( Scrobbler* );
-    void request( const class TrackInfo& );
+    NowPlaying( const QByteArray& );
+    void submit( const class TrackInfo& );
+    void reset();
+
+    using ScrobblerPostHttp::request;
 };

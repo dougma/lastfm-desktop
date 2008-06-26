@@ -25,7 +25,7 @@
 
 ScrobblerHttp::ScrobblerHttp( QObject* parent )
              : QHttp( parent ),
-               m_id( 0 )
+               m_id( -1 )
 {
     m_retry_timer = new QTimer( this );
     m_retry_timer->setSingleShot( true );
@@ -44,11 +44,20 @@ ScrobblerHttp::onRequestFinished( int id, bool error )
 
     if (id == m_id)
     {
-        if (error)
-            qDebug() << this;
+        QByteArray const data = readAll();
 
-        m_id = 0;
-        emit done( error ? QString() : QString( readAll() ) );
+        if (error)
+        {
+            qDebug() << "ERROR!" << this;
+            emit done( QByteArray() );
+        }
+        else if (data.startsWith( "OK\n" ))
+        {
+            resetRetryTimer();
+            emit done( data );
+        }
+
+        m_id = -1;
     }
 }
 
@@ -84,7 +93,7 @@ ScrobblerHttp::resetRetryTimer()
 void
 ScrobblerPostHttp::request()
 {
-    if (m_data.isEmpty() || manager()->session().isEmpty())
+    if (m_data.isEmpty() || session().isEmpty())
         return;
 
     QHttpRequestHeader header( "POST", m_path );

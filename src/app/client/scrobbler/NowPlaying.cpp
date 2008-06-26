@@ -24,9 +24,13 @@
 #include <QTimer>
 
 
-NowPlaying::NowPlaying( Scrobbler* parent )
-          : ScrobblerPostHttp( parent )
+NowPlaying::NowPlaying( const QByteArray& data )
 {
+    // will be submitted after the handshake, if there is some data that is
+    m_data = data;
+
+    // we wait 5 seconds to prevent the server paniking when people skip a lot
+    // tracks in succession
     m_timer = new QTimer( this );
     m_timer->setInterval( 5000 );
     m_timer->setSingleShot( true );
@@ -35,23 +39,28 @@ NowPlaying::NowPlaying( Scrobbler* parent )
 
 
 void
-NowPlaying::request( const TrackInfo& track )
+NowPlaying::reset()
 {
-    if (track.isEmpty()) {
-        qDebug() << "Won't perform np request for an empty track";
+    m_timer->stop();
+    m_data.clear();
+}
+
+
+void
+NowPlaying::submit( const TrackInfo& track )
+{
+    if (track.isEmpty())
         return;
-    }
 
     #define e( x ) QUrl::toPercentEncoding( x )
-    QString data =  "s=" + e(manager()->session())
-                 + "&a=" + e(track.artist())
-                 + "&t=" + e(track.track())
-                 + "&b=" + e(track.album())
-                 + "&l=" + QString::number( track.duration() )
-                 + "&n=" + QString::number( track.trackNumber() )
-                 + "&m=" + e(track.mbId());
+    m_data =  "s=" + session()
+           + "&a=" + e(track.artist())
+           + "&t=" + e(track.track())
+           + "&b=" + e(track.album())
+           + "&l=" + QByteArray::number( track.duration() )
+           + "&n=" + QByteArray::number( track.trackNumber() )
+           + "&m=" + e(track.mbId());
     #undef e
 
-    m_data = data.toUtf8();
     m_timer->start();
 }

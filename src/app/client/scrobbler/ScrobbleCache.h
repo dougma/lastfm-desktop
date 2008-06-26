@@ -27,20 +27,22 @@ class ScrobbleCache
 {
     QString m_path;
     QString m_username;
-    QList<TrackInfo>& m_tracks;
+    QList<TrackInfo> m_tracks;
 
-    ScrobbleCache(); //used by tracksForPath()
+    int m_subs_end;
 
     void read();  /// reads from m_path into m_tracks
     void write(); /// writes m_tracks to m_path
+
+    friend class ScrobblerSubmission;
 
 public:
     explicit ScrobbleCache( const QString& username );
 
     /** note this is unique for TrackInfo::sameAs() and equal timestamps 
     * obviously playcounts will not be increased for the same timestamp */
-    void append( const TrackInfo& );
-    void append( const QList<TrackInfo>& );
+    void add( const TrackInfo& );
+    void add( const QList<TrackInfo>& );
 
     /** returns the number of tracks left in the queue */
     int remove( const QList<TrackInfo>& );
@@ -48,15 +50,6 @@ public:
     QList<TrackInfo> tracks() const { return m_tracks; }
     QString path() const { return m_path; }
     QString username() const { return m_username; }
-
-    /** a track list from an XML file in the ScrobbleCache format at path */
-    static QList<TrackInfo> tracksForPath( const QString& path )
-    {
-        ScrobbleCache cache;
-        cache.m_path = path;
-        cache.read();
-        return cache.m_tracks;
-    }
 
 private:
     bool operator==( const ScrobbleCache& ); //undefined

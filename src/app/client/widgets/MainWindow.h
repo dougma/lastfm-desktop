@@ -53,4 +53,6 @@ private:
 
     class QTimer* m_progressDisplayTimer;
     uint m_progressDisplayTick;
+
+    class TrackListView* m_trackListView;
 };
