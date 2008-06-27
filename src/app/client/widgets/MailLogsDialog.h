@@ -24,9 +24,8 @@
 
 
 /** @author <petgru@openfestis.org>
-  * @brief Makes it possible for a user to easily mail all necessary 
-    debug information to us. */
-
+  * @brief Makes it possible for a user to easily mail all necessary debug information to us.
+  */
 class MailLogsDialog : public QDialog
 {
     Q_OBJECT
@@ -50,7 +49,6 @@ private:
 
 private slots:
     void onCreateMailClicked();
-
 };
 
 #endif //MAIL_LOGS_DIALOG_H

@@ -30,6 +30,7 @@
 #include <QTextCodec>
 #include <QTextDecoder>
 
+
 MailLogsDialog::MailLogsDialog( QWidget *parent )
         : QDialog( parent )
 {
@@ -39,10 +40,10 @@ MailLogsDialog::MailLogsDialog( QWidget *parent )
 
 }
 
+
 MailLogsDialog::~MailLogsDialog()
-{
-    
-}
+{}
+
 
 void
 MailLogsDialog::onCreateMailClicked()
@@ -53,7 +54,7 @@ MailLogsDialog::onCreateMailClicked()
 
     #ifdef Q_WS_MAC
         url += "&attach=" + Moose::logPath( "Last.fm Twiddly.log" );
-    #elif Q_WS_WIN32
+    #elif defined WIN32
         url += "&attach=" + Moose::logPath( "Twiddly.log" );
     #endif
 
@@ -109,6 +110,7 @@ MailLogsDialog::onCreateMailClicked()
     QDialog::accept();
 }
 
+
 QString
 MailLogsDialog::runCommand( QString cmd )
 {
@@ -120,6 +122,7 @@ MailLogsDialog::runCommand( QString cmd )
 
     return QString( process.readAll() );
 }
+
 
 #ifdef Q_WS_X11
 QString
@@ -142,5 +145,3 @@ MailLogsDialog::getSystemInformationUnix()
     return information;
 }
 #endif
-
-

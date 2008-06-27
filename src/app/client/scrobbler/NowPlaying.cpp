@@ -53,13 +53,12 @@ NowPlaying::submit( const TrackInfo& track )
         return;
 
     #define e( x ) QUrl::toPercentEncoding( x )
-    m_data =  "s=" + session()
-           + "&a=" + e(track.artist())
-           + "&t=" + e(track.track())
-           + "&b=" + e(track.album())
-           + "&l=" + QByteArray::number( track.duration() )
-           + "&n=" + QByteArray::number( track.trackNumber() )
-           + "&m=" + e(track.mbId());
+    m_data = "&a=" + e(track.artist()) +
+             "&t=" + e(track.track()) +
+             "&b=" + e(track.album()) +
+             "&l=" + QByteArray::number( track.duration() ) +
+             "&n=" + QByteArray::number( track.trackNumber() ) +
+             "&m=" + e(track.mbId());
     #undef e
 
     m_timer->start();

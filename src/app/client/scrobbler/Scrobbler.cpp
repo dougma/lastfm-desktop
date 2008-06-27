@@ -35,6 +35,7 @@ Scrobbler::Scrobbler( const QString& username, const QString& password )
     m_cache = new ScrobbleCache( username );
 
     handshake();
+    submit(); // will submit what's there once the handshake completes
 }
 
 
@@ -67,8 +68,6 @@ Scrobbler::handshake()
     m_submitter = new ScrobblerSubmission;
     connect( m_submitter, SIGNAL(done( QByteArray )), SLOT(onSubmissionReturn( QByteArray )) );
     connect( m_submitter, SIGNAL(requestStarted( int )), SLOT(onSubmissionStarted( int )) );
-
-#error scrobble cached tracks after handshake
 }
 
 

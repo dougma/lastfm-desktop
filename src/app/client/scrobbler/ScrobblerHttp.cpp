@@ -93,7 +93,7 @@ ScrobblerHttp::resetRetryTimer()
 void
 ScrobblerPostHttp::request()
 {
-    if (m_data.isEmpty() || session().isEmpty())
+    if (m_data.isEmpty() || m_session.isEmpty())
         return;
 
     QHttpRequestHeader header( "POST", m_path );
@@ -102,5 +102,5 @@ ScrobblerPostHttp::request()
 
     qDebug() << "HTTP POST" << host() + m_path << m_data;
 
-    m_id = QHttp::request( header, m_data );
+    m_id = QHttp::request( header, "s=" + m_session + m_data );
 }

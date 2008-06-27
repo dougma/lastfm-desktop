@@ -73,7 +73,6 @@ public:
     void setUrl( const QUrl& );
 
     QByteArray postData() const { return m_data; }
-    QByteArray session() const { return m_session; }
 };
 
 #endif

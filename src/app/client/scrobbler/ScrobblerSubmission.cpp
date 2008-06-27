@@ -38,13 +38,12 @@ ScrobblerSubmission::submitNextBatch()
     Q_ASSERT( !hasPendingRequests() );
 
     m_batch.clear(); //yep first
+    m_data.clear();
 
     if (m_tracks.isEmpty())
         return;
 
     bool portable = false;
-    m_data = "s=" + session();
-
     for (int i = 0; i < 50 && !m_tracks.isEmpty(); ++i)
     {
         TrackInfo t = m_tracks.takeFirst();
