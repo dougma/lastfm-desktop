@@ -19,16 +19,22 @@
 
 #include "MailLogsDialog.h"
 
-#include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/UnicornCommon.h"
 #include "Settings.h"
+
+#include "lib/moose/MooseCommon.h"
+
+#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/LastMessageBox.h"
 
 #include <QDesktopServices>
 #include <QProcess>
 #include <QUrl>
+#include <QClipboard>
 
-#include <QTextCodec>
-#include <QTextDecoder>
+#ifdef WIN32
+#include <windows.h>
+#include <stdio.h>
+#endif
 
 
 MailLogsDialog::MailLogsDialog( QWidget *parent )
@@ -61,6 +67,7 @@ MailLogsDialog::onCreateMailClicked()
     url += "&attach=" + Moose::logPath( "Last.fm.log" );
     
     body += "-------------- User supplied information --------------\n";
+
     body += ui.moreInfoTextEdit->toPlainText();
     body += "\n\n\n";
     
@@ -95,19 +102,32 @@ MailLogsDialog::onCreateMailClicked()
     body += "------------------ System information -----------------\n";
     body += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
     
-#ifdef Q_WS_X11
-    body += getSystemInformationUnix();
-#endif
+    body += getSystemInformation();
 
     body += "\n\n\n";
 
     url += "&body=" + body;
 
-    QDesktopServices::openUrl ( QUrl( url ) );
-    
-    ui.moreInfoTextEdit->clear();
-    
-    QDialog::accept();
+    qDebug() << "url: " << url;
+
+    if ( QDesktopServices::openUrl ( QUrl( url ) ) )
+    {
+        ui.moreInfoTextEdit->clear();
+        
+        QDialog::accept();
+    }
+    else
+    {
+        LastMessageBox::warning( tr( "Can't open mail client" ), 
+                                 tr( "Failed to open your mail client. I stored the information "
+                                     "in the clipboard instead so you can paste it in your mail "
+                                     "client manualy. Please send it to client@last.fm" ) );
+        QApplication::clipboard()->setText( body );
+
+        ui.moreInfoTextEdit->clear();
+        
+        QDialog::accept();
+    }
 }
 
 
@@ -123,13 +143,12 @@ MailLogsDialog::runCommand( QString cmd )
     return QString( process.readAll() );
 }
 
-
-#ifdef Q_WS_X11
 QString
-MailLogsDialog::getSystemInformationUnix()
+MailLogsDialog::getSystemInformation()
 {
     QString information;
-    
+
+#ifdef Q_WS_X11
     information += "CPU: \n";
     information += runCommand( "cat /proc/cpuinfo" );
     information += "\n";
@@ -141,7 +160,58 @@ MailLogsDialog::getSystemInformationUnix()
     information += "Diskspace: \n";
     information += runCommand( "df -h" );
     information += "\n";
+
+#elif WIN32
+    // CPU
+    SYSTEM_INFO siSysInfo;
+    GetSystemInfo(&siSysInfo); 
+
+    information += "CPU: \n";  
+    information += "Number of processors: " + QString::number( siSysInfo.dwNumberOfProcessors ) + "\n";
+    information += "Page size: " + QString::number( siSysInfo.dwPageSize ) + "\n";
+    information += "Processor type: " + QString::number( siSysInfo.dwProcessorType ) + "\n";
+    information += "Active processor mask: " + QString::number( siSysInfo.dwActiveProcessorMask ) + "\n";
+    information += "\n";
+
+    // Memory
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof (statex);
+    GlobalMemoryStatusEx (&statex);
+
+    information += "Memory used: " + QString::number( statex.dwMemoryLoad ) + "%\n";
+    information += "Total memory: " + QString::number( statex.ullTotalPhys/(1024*1024) ) + "MB\n";
+    information += "Free memory: " + QString::number( statex.ullAvailPhys/(1024*1024) ) + "MB\n";
+    information += "Total virtual memory: " + QString::number( statex.ullTotalVirtual/(1024*1024) ) + "MB\n";
+    information += "Free virtual memory: " + QString::number( statex.ullAvailVirtual/(1024*1024) ) + "MB\n";
+
+    // Disk space
+    __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
+    DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
+
+    GetDiskFreeSpaceEx( NULL,
+                        (PULARGE_INTEGER)&lpFreeBytesAvailable,
+                        (PULARGE_INTEGER)&lpTotalNumberOfBytes,
+                        (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
+                        ); 
+
+    information += "Drive C:\\ \n";
+    information += "   Total diskspace: " + QString::number( lpTotalNumberOfBytes/(1024*1024) )+ "MB\n";
+    information += "   Free diskspace: " + QString::number( lpFreeBytesAvailable/(1024*1024) )  + "MB\n";
+
+#elif Q_WS_MAC
+    information += "CPU: \n";
+    information += runCommand( "hostinfo" );
+    information += "\n";
     
+    information += "Memory: \n";
+    information += runCommand( "top -l 1 | egrep 'MemRegions:|PhysMem:'" );
+    information += "\n";
+    
+    information += "Diskspace: \n";
+    information += runCommand( "df -h" );
+    information += "\n";
+
+#endif
+
     return information;
 }
-#endif

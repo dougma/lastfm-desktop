@@ -36,9 +36,7 @@ public:
     
     QString runCommand( QString );
     
-    #ifdef Q_WS_X11
-    QString getSystemInformationUnix();
-    #endif
+    QString getSystemInformation();
     
     void setDiagnosticsDialogInfo( QString info ) { m_diagnosticsDialogInfo = info; }
 

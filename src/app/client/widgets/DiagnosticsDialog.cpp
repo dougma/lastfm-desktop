@@ -350,9 +350,7 @@ DiagnosticsDialog::diagnosticInformation()
 void
 DiagnosticsDialog::onCopyToClipboard()
 {
-    QClipboard *clipboard = QApplication::clipboard();
-
-    clipboard->setText( diagnosticInformation() );
+    QApplication::clipboard()->setText( diagnosticInformation() );
 }
 
 
