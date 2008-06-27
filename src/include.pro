@@ -139,7 +139,10 @@ CONFIG( unicorn ) {
 
 CONFIG( unicorn ):horn = yes
 contains( TARGET, unicorn ):horn = yes
-contains( horn, yes ):QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
+contains( horn, yes ) {
+    win32:QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
+    macx*:QMAKE_CXX = $$QMAKE_CXX -I$$SRC_DIR/lib/unicorn/QtOverride
+}
 
 
 CONFIG( moose ) {
