@@ -46,10 +46,8 @@ MailLogsDialog::MailLogsDialog( QWidget *parent )
     connect( ui.mailButton, SIGNAL( clicked() ), SLOT( onCreateMailClicked() ) );
 }
 
-
 MailLogsDialog::~MailLogsDialog()
 {}
-
 
 void
 MailLogsDialog::onCreateMailClicked()
@@ -57,6 +55,25 @@ MailLogsDialog::onCreateMailClicked()
     QString url, body;
     url += "mailto:client@last.fm";
     url += "?subject=Client logs from user " + The::settings().username();
+    url += "&attach=" + Moose::logPath( "Last.fm.log" );
+    
+    // -------------------- Log files ------------------------------
+    
+    QString twiddlyLog;
+    #ifdef Q_WS_MAC
+        twiddlyLog = Moose::logPath( "Last.fm Twiddly.log" );
+    #elif defined WIN32
+        twiddlyLog = Moose::logPath( "Twiddly.log" );
+    #endif
+
+    QString logFiles = Moose::logPath( "Last.fm.log" ); 
+    if ( QFile::exists( twiddlyLog ) )
+    {
+        url += "&attach=" + twiddlyLog;
+        logFiles += " " + tr("and") + " " + twiddlyLog;
+    }
+
+    body += "\n" + tr("PLEASE attach %1 if not already attached").arg(logFiles) + "\n\n";
 
     body += "-------------- User supplied information --------------\n";
 
@@ -81,44 +98,16 @@ MailLogsDialog::onCreateMailClicked()
         body += "Excluded dirs:\n";
         foreach( QString dir, The::settings().excludedDirs() )
         {
-            body += "    " + dir;
+            body += "    " + dir + "\n";
         }
     }
-    
-    body += "\n";
-    
-    body += m_diagnosticsDialogInfo;
-    
-    body += "\n\n";
+
+    body += "\n" +m_diagnosticsDialogInfo + "\n\n";
 
     body += "------------------ System information -----------------\n";
-    body += getSystemInformation();
-
-    body += "\n\n\n";
-
-    QFile clientLog( Moose::logPath( "Last.fm.log" ) );
-    if ( clientLog.open( QIODevice::ReadOnly ) )
-    {
-        body += "---------------------- Client Log ---------------------\n";
-        body += QString( clientLog.readAll() );
-    }
-
-    QString twiddlyLogFile;
-    #ifdef Q_WS_MAC
-        twiddlyLogFile = Moose::logPath( "Last.fm Twiddly.log" );
-    #elif defined WIN32
-        twiddlyLogFile = Moose::logPath( "Twiddly.log" );
-    #endif
-
-    QFile twiddlyLog( twiddlyLogFile );
-    if ( twiddlyLog.open( QIODevice::ReadOnly ) )
-    {
-        body += "---------------------- Twiddly Log ---------------------\n";
-        body += QString( twiddlyLog.readAll() );
-    }
+    body += getSystemInformation() + "\n\n\n";
 
     url += "&body=" + body;
-
     ui.moreInfoTextEdit->clear();
 
     if ( QDesktopServices::openUrl ( QUrl( url ) ) )
@@ -134,7 +123,6 @@ MailLogsDialog::onCreateMailClicked()
         QDialog::accept();
     }
 }
-
 
 QString
 MailLogsDialog::runCommand( QString cmd )
@@ -218,3 +206,4 @@ MailLogsDialog::getSystemInformation()
 
     return information;
 }
+
