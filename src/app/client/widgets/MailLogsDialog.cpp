@@ -100,15 +100,11 @@ MailLogsDialog::onCreateMailClicked()
     body += "\n\n";
 
     body += "------------------ System information -----------------\n";
-    body += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
-    
     body += getSystemInformation();
 
     body += "\n\n\n";
 
     url += "&body=" + body;
-
-    qDebug() << "url: " << url;
 
     if ( QDesktopServices::openUrl ( QUrl( url ) ) )
     {
@@ -147,6 +143,8 @@ QString
 MailLogsDialog::getSystemInformation()
 {
     QString information;
+    
+    information += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
 
 #ifdef Q_WS_X11
     information += "CPU: \n";
@@ -161,7 +159,7 @@ MailLogsDialog::getSystemInformation()
     information += runCommand( "df -h" );
     information += "\n";
 
-#elif WIN32
+#elif defined WIN32
     // CPU
     SYSTEM_INFO siSysInfo;
     GetSystemInfo(&siSysInfo); 
@@ -198,13 +196,9 @@ MailLogsDialog::getSystemInformation()
     information += "   Total diskspace: " + QString::number( lpTotalNumberOfBytes/(1024*1024) )+ "MB\n";
     information += "   Free diskspace: " + QString::number( lpFreeBytesAvailable/(1024*1024) )  + "MB\n";
 
-#elif Q_WS_MAC
-    information += "CPU: \n";
+#elif defined Q_WS_MAC
+    information += "CPU and Memory: \n";
     information += runCommand( "hostinfo" );
-    information += "\n";
-    
-    information += "Memory: \n";
-    information += runCommand( "top -l 1 | egrep 'MemRegions:|PhysMem:'" );
     information += "\n";
     
     information += "Diskspace: \n";

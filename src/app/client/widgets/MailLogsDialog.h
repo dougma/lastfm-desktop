@@ -34,7 +34,7 @@ public:
     MailLogsDialog( QWidget *parent = 0 );
     ~MailLogsDialog();
     
-    QString runCommand( QString );
+    QString runCommand( QString cmd );
     
     QString getSystemInformation();
     
