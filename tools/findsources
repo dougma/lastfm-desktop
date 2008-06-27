@@ -1,2 +1,2 @@
 #!/bin/sh
-find . -path _build -prune -o -name \*.$1 -print | sed -e 's|\./||g' | grep -v tests
+find . -name \*.$1 -print | sed -e 's|\./||g' | grep -v tests | grep -v _build
