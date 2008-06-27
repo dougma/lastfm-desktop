@@ -133,10 +133,6 @@ CONFIG( extension ) {
     TARGET = $$TARGET.extension
 }
 
-CONFIG( unicorn ) {
-    LIBS += -lunicorn
-}
-
 CONFIG( unicorn ):horn = yes
 contains( TARGET, unicorn ):horn = yes
 contains( horn, yes ) {
@@ -145,21 +141,12 @@ contains( horn, yes ) {
 }
 
 
+CONFIG( unicorn ) {
+    LIBS += -lunicorn
+}
 CONFIG( moose ) {
     LIBS += -lmoose
 }
-
-#TODO remove?
-DEPENDPATH += $$SRC_DIR/lib/unicorn $$SRC_DIR/lib/fingerprint
-
-
-win32 {
-    #FIXME DRY :(
-	contains( TEMPLATE, vclib ) {
-		DEFINES += QMAKE_DLLEXPORT
-	}
-	contains( TEMPLATE, lib ) {
-		DEFINES += QMAKE_DLLEXPORT
-	}
+CONFIG( radio ) {
+    LIBS += -lradio
 }
-

@@ -1,7 +1,8 @@
 TEMPLATE = app
 TARGET = AudioScrobbler
-CONFIG += unicorn moose 
-QT += xml network
+CONFIG += unicorn moose radio
+QT += xml network phonon
+INCLUDEPATH += .
 
 include( $$SRC_DIR/include.pro )
 
@@ -11,11 +12,4 @@ FORMS += $$system( sh $$TOOLS_DIR/findsources ui )
 RESOURCES += $$system( sh $$TOOLS_DIR/findsources qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
-# how else to add it to the project?
-win32:HEADERS += qmake.pro
-
 !macx:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
-
-INCLUDEPATH += .
-
-LIBS += -lradio

@@ -10,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		include.pro = include.pro
 		.qmake.cache = .qmake.cache
 		pigmyshrew.pro = pigmyshrew.pro
+		app\client\appclient.pro = app\client\appclient.pro
 		lib\radio\libradio.pro = lib\radio\libradio.pro
 		lib\moose\libmoose.pro = lib\moose\libmoose.pro
 		lib\unicorn\libunicorn.pro = lib\unicorn\libunicorn.pro
