@@ -17,22 +17,52 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommon.h"
-#include "Settings.h"
-#include <QLocale>
+#include "common/DllExportMacro.h"
+#include <QList>
+#include <QThread>
+#include <QUrl>
 
 
-QString
-Unicorn::Settings::language() const
+class RADIO_DLLEXPORT Radio : public QThread
 {
-    QString const code = Unicorn::QSettings().value( "AppLanguage" ).toString();
-    if (code.size())
-        return code;
+    Q_OBJECT
 
-    // If none found, use system locale
-#ifdef Q_WS_MAC
-    return Unicorn::qtLanguageToLfmLangCode( Unicorn::osxLanguageCode() );
-#else
-    return Unicorn::qtLanguageToLfmLangCode( QLocale::system().language() );
-#endif
-}
+    virtual void run();
+
+    QString const m_username;
+    QString const m_password;
+    QString m_session;
+    QString m_host;
+    QString m_base_path;
+    QString m_station_url;
+
+public:
+    struct Track
+    {
+        Track() : duration( 0 )
+        {}
+
+        QString authcode;
+        QString title;
+        QString artist;
+        QString album;
+        uint duration;
+        QString sponsor;
+        QString location;
+    };
+
+private:
+    QByteArray get( QString path );
+
+    void handshake();
+    void adjust();
+    QList<Track> fetchPlaylist();
+
+public:
+    Radio( const QString& username, const QString& password );
+
+    /** eg lastfm://user/mxcl/ */
+    void setStationUrl( const QString& station );
+
+    bool m_done;
+};

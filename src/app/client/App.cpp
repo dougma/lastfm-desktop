@@ -28,6 +28,7 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/LoginDialog.h"
 #include "widgets/MainWindow.h"
+#include "lib/radio/Radio.h"
 #include "lib/unicorn/LastMessageBox.h"
 
 
@@ -78,6 +79,7 @@ App::App( int argc, char** argv )
 #endif
     
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
+    m_radio = new Radio( The::settings().username(), The::settings().password() );
 
     DiagnosticsDialog::observe( m_scrobbler );
 }

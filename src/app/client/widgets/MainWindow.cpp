@@ -27,6 +27,7 @@
 #include "lib/moose/TrackInfo.h"
 #include <QLinearGradient>
 #include <QPainter>
+#include <QPointer>
 #include <QResizeEvent>
 #include <QTime>
 #include <QTimer>
@@ -205,5 +206,12 @@ MainWindow::showSettingsDialog()
 void
 MainWindow::showDiagnosticsDialog()
 {
-    DiagnosticsDialog( this ).exec();
+    static QPointer<DiagnosticsDialog> d;
+
+    if (!d)
+    {
+        d = new DiagnosticsDialog( this );
+        d->setAttribute( Qt::WA_DeleteOnClose );
+        d->show();
+    }
 }

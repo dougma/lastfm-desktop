@@ -70,8 +70,6 @@ public:
 
     Ui::DiagnosticsDialog ui;
 
-    void show();
-
 private:
     void populateScrobbleCacheView();
 	void scrobbleIpod( bool isManual = false );

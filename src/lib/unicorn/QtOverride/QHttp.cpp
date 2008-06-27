@@ -35,8 +35,8 @@ Unicorn::QHttp::QHttp( QObject* parent )
 
 
 Unicorn::QHttp::QHttp( const QString &hostname, quint16 port /* = 0 */, QObject *parent /* = 0 */ )
-             : ::QHttp( hostname, port, parent ),
-               m_host( hostname )
+              : ::QHttp( hostname, port, parent ),
+                m_host( hostname )
 {
     init();
 }

@@ -41,7 +41,7 @@ namespace Unicorn
         QString proxyPassword() const { return QSettings().value( "ProxyPassword" ).toString(); }
 
         /** @returns one of our pre-defined 2-letter language codes */
-        QString appLanguage() const;
+        QString language() const;
     };
 
 
@@ -60,7 +60,7 @@ namespace Unicorn
         void setProxyPort( int v ) { QSettings().setValue( "ProxyPort", v ); }
         void setProxyUser( QString v ) { QSettings().setValue( "ProxyUser", v ); }
         void setProxyPassword( QString v ) { QSettings().setValue( "ProxyPassword", v ); }
-        void setAppLanguage( QString langCode ) { QSettings().setValue( "AppLanguage", langCode ); }
+        void setLanguage( QString langCode ) { QSettings().setValue( "AppLanguage", langCode ); }
     };
 }
 

@@ -17,3 +17,5 @@ win32:HEADERS += qmake.pro
 !macx:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
 
 INCLUDEPATH += .
+
+LIBS += -lradio

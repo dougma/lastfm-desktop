@@ -22,9 +22,6 @@ HEADERS += $$system( sh $$TOOLS_DIR/findsources h ) \
     HEADERS -= UnicornCommonMac.h AppleScript.h
 }
 
-#no other way to get it into the vcproj :(
-win32:HEADERS += qmake.pro
-
 macx*:LIBS += -framework SystemConfiguration -framework CoreServices
 
 DEFINES += _UNICORN_DLLEXPORT
