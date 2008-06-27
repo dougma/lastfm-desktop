@@ -30,6 +30,7 @@
 #include <QProcess>
 #include <QUrl>
 #include <QClipboard>
+#include <QFile>
 
 #ifdef WIN32
 #include <windows.h>
@@ -43,7 +44,6 @@ MailLogsDialog::MailLogsDialog( QWidget *parent )
     ui.setupUi( this );
 
     connect( ui.mailButton, SIGNAL( clicked() ), SLOT( onCreateMailClicked() ) );
-
 }
 
 
@@ -58,14 +58,6 @@ MailLogsDialog::onCreateMailClicked()
     url += "mailto:client@last.fm";
     url += "?subject=Client logs from user " + The::settings().username();
 
-    #ifdef Q_WS_MAC
-        url += "&attach=" + Moose::logPath( "Last.fm Twiddly.log" );
-    #elif defined WIN32
-        url += "&attach=" + Moose::logPath( "Twiddly.log" );
-    #endif
-
-    url += "&attach=" + Moose::logPath( "Last.fm.log" );
-    
     body += "-------------- User supplied information --------------\n";
 
     body += ui.moreInfoTextEdit->toPlainText();
@@ -104,14 +96,33 @@ MailLogsDialog::onCreateMailClicked()
 
     body += "\n\n\n";
 
+    QFile clientLog( Moose::logPath( "Last.fm.log" ) );
+    if ( clientLog.open( QIODevice::ReadOnly ) )
+    {
+        body += "---------------------- Client Log ---------------------\n";
+        body += QString( clientLog.readAll() );
+    }
+
+    QString twiddlyLogFile;
+    #ifdef Q_WS_MAC
+        twiddlyLogFile = Moose::logPath( "Last.fm Twiddly.log" );
+    #elif defined WIN32
+        twiddlyLogFile = Moose::logPath( "Twiddly.log" );
+    #endif
+
+    QFile twiddlyLog( twiddlyLogFile );
+    if ( twiddlyLog.open( QIODevice::ReadOnly ) )
+    {
+        body += "---------------------- Twiddly Log ---------------------\n";
+        body += QString( twiddlyLog.readAll() );
+    }
+
     url += "&body=" + body;
 
+    ui.moreInfoTextEdit->clear();
+
     if ( QDesktopServices::openUrl ( QUrl( url ) ) )
-    {
-        ui.moreInfoTextEdit->clear();
-        
         QDialog::accept();
-    }
     else
     {
         LastMessageBox::warning( tr( "Can't open mail client" ), 
@@ -119,8 +130,6 @@ MailLogsDialog::onCreateMailClicked()
                                      "in the clipboard instead so you can paste it in your mail "
                                      "client manualy. Please send it to client@last.fm" ) );
         QApplication::clipboard()->setText( body );
-
-        ui.moreInfoTextEdit->clear();
         
         QDialog::accept();
     }
