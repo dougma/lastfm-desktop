@@ -4,7 +4,7 @@ CONFIG += unicorn moose radio
 QT += xml network phonon
 INCLUDEPATH += .
 
-include( $$SRC_DIR/include.pro )
+include( $$SRC_DIR/common/include.pro )
 
 SOURCES += $$system( sh $$TOOLS_DIR/findsources cpp )
 HEADERS += $$system( sh $$TOOLS_DIR/findsources h )

@@ -4,7 +4,7 @@ CONFIG += unicorn
 QT += xml network
 qt -= gui
 
-include( $$SRC_DIR/include.pro )
+include( $$SRC_DIR/common/include.pro )
 
 SOURCES = $$system( ls *.cpp )
 HEADERS = $$system( ls *.h )

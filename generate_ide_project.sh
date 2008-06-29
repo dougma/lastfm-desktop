@@ -1,8 +1,10 @@
 #!/bin/bash
 
+BASE='Last.fm'
+
 windows()
 {
-    qmake -recursive -tp vc pigmyshrew.pro
+    qmake -recursive -tp vc $BASE.pro
 
     AFTER='
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{780C13D3-8172-4EE0-8FD5-26ED6489851C}"
@@ -23,17 +25,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{3FDD67
 EndProject
 '
 
-    echo "$AFTER" >> pigmyshrew.sln
+    echo "$AFTER" >> Last.sln
 }
 
 osx() 
 {
-    qmake -recursive -spec macx-xcode pigmyshrew.pro
+    qmake -recursive -spec macx-xcode $BASE.pro
     # qmake 4.4 sucks
     for x in `find . -type d -name \*.xcodeproj`
     do 
-        pushd $x
-        mv project.pbxproj.qmake project.pbxproj
+        pushd $x &> /dev/null
+        [[ -f $x ]] && mv project.pbxproj.* project.pbxproj
         popd &> /dev/null
     done
 }
