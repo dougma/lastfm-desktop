@@ -35,7 +35,7 @@ osx()
     for x in `find . -type d -name \*.xcodeproj`
     do 
         pushd $x &> /dev/null
-        [[ -f $x ]] && mv project.pbxproj.* project.pbxproj
+        test -f project.pbxproj.* && mv project.pbxproj.* project.pbxproj
         popd &> /dev/null
     done
 }
