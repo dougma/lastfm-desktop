@@ -134,7 +134,7 @@ PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
     track.setAlbum( args['b'] );
     track.setMbId( args['m'] );
     track.setDuration( args['l'].toInt() );
-    track.setPath( QUrl::fromPercentEncoding( args['p'].toLatin1() ) );
+    track.setPath( QUrl::fromPercentEncoding( args['p'].toUtf8() ) );
     track.setSource( TrackInfo::Player );
     
     //TODO should be done earlier, NOTE don't get the plugin to send a stamp time
