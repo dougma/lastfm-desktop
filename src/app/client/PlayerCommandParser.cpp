@@ -83,12 +83,37 @@ PlayerCommandParser::extractCommand( QString& line )
 }
 
 
+namespace mxcl
+{
+    /** replaces '&&' and splits on remaining single '&' */
+    QStringList static
+    split( QString line )
+    {
+        QStringList parts;
+        int start = 0, i = 0;
+        int end = 0;
+        while ((end = line.indexOf( '&', i )) != -1)
+        {
+            i = end + 1;
+            if (line[i] == '&') {
+                line.remove( end, 1 ); //convert && to &
+                continue;
+            }
+            parts += line.mid( start, end - start );
+            start = i;
+        }
+        return parts << line.mid( start );
+    }
+}
+
+
 QMap<QChar, QString>
 PlayerCommandParser::extractArgs( const QString& line )
 {
     QMap<QChar, QString> map;
 
-    foreach (QString pair, line.split( '&', QString::SkipEmptyParts ))
+    // split by single & only, doubles are in fact &
+    foreach (QString pair, mxcl::split( line ))
     {
         QStringList parts = pair.split( '=' );
 
