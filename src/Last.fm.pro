@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
+CONFIG += ordered
 
 SUBDIRS = lib/unicorn/libunicorn.pro \
           lib/radio/libradio.pro \ 
