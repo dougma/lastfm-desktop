@@ -1,46 +1,3 @@
-CONFIG( breakpad ) {
-    linux*:QMAKE_CXXFLAGS_RELEASE = -Os -freorder-blocks -fno-reorder-functions -fomit-frame-pointer -gstabs+
-    mac*:QMAKE_CXXFLAGS_RELEASE = -Os -g -fomit-frame-pointer
-    win32 {
-        QMAKE_CXXFLAGS_RELEASE = -Zi -Oy -Ox -GL -MD -DNDEBUG
-        QMAKE_LFLAGS_RELEASE = /ltcg
-    }
-
-	QMAKE_CFLAGS_RELEASE = $$QMAKE_CXXFLAGS_RELEASE
-
-	unix {
-		# optimise mpg decoding
-		QMAKE_CFLAGS_RELEASE += -O3
-		QMAKE_CFLAGS_RELEASE -= -Os
-	}
-	
-	INCLUDEPATH += $$SRC_DIR/src/breakpad $$SRC_DIR/src/breakpad/external/src
-}
-else {
-    DEFINES += NBREAKPAD
-}
-
-CONFIG(debug, debug|release) {
-    mac* {
-		#speeds up debug builds by only compiling x86
-		CONFIG += x86
-		CONFIG -= ppc
-	}
-
-    linux* {
-        QMAKE_CXXFLAGS_DEBUG = -ggdb
-    }
-
-	#if debug is specified first, remove the release stuff! --mxcl
-	CONFIG -= release
-
-	VERSION_UPDATE_PATTERN = *.*.*.*
-
-    CONFIG -= app_bundle
-}
-else {
-    CONFIG += warn_off
-}
 
 contains( TEMPLATE, vclib ):tinkywinky = no
 contains( TEMPLATE, vcapp ):tinkywinky = no
@@ -111,42 +68,4 @@ win32 {
         }
     }
 }
-}
-
-#TODO REMOVE
-linux* {
-    DEFINES += LINUX
-}
-
-#TODO REMOVE
-mac {
-	DEFINES += MACOSX
-}
-
-CONFIG( service ) {
-    CONFIG += plugin
-    TARGET = $$TARGET.service
-}
-
-CONFIG( extension ) {
-    CONFIG += plugin
-    TARGET = $$TARGET.extension
-}
-
-CONFIG( unicorn ):horn = yes
-contains( TARGET, unicorn ):horn = yes
-contains( horn, yes ) {
-    win32:QMAKE_INCDIR_QT = $$SRC_DIR/lib/unicorn/QtOverride $$QMAKE_INCDIR_QT
-    unix:QMAKE_CXX = $$QMAKE_CXX -I$$SRC_DIR/lib/unicorn/QtOverride
-}
-
-
-CONFIG( unicorn ) {
-    LIBS += -lunicorn
-}
-CONFIG( moose ) {
-    LIBS += -lmoose
-}
-CONFIG( radio ) {
-    LIBS += -lradio
 }

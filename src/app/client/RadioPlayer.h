@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -14,17 +14,11 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef PHONON_PLAYBACK_H
-#define PHONON_PLAYBACK_H
 
 #include <QObject>
-#include <QBuffer>
-#include <QUrl>
-#include <phonon/phononnamespace.h>
-
+ 
 namespace Phonon
 {
     class MediaObject;
@@ -33,41 +27,24 @@ namespace Phonon
 }
 
 
-/** @author Adam Renberg <adam@last.fm>
-  * @author Max Howell <max@last.fm>
-  */
-
-class PhononPlayback : public QObject
+class RadioPlayer : public QObject
 {
     Q_OBJECT
-
-signals:
-    void event( int, const QVariant& );
-
+    
 public:
-    PhononPlayback();
-
+    RadioPlayer( const QString& username, const QString& username );
+    
 public slots:
-    // adds track to the queue being played. 
-    void enqueueTrack( const class QUrl& );
-
-    void startPlayback();
-    void pausePlayback();
-    void stopPlayback();
+    void play( const QString& lastfm_url );
     void skip();
+    void stop();
 
-public:
-    // resets internals to a state similar to a newly created instance
-    void reset();
-
-protected slots:
-    void privateOnStateChanged( Phonon::State newState, Phonon::State oldState );
-    void privateOnCurrentSourceChanged( const Phonon::MediaSource& source );
+private slots:
+    void onTracksReady();
+    void onAboutToFinishPlaylist();
 
 private:
+    class Radio* m_radio;
     Phonon::MediaObject *m_mediaObject;
     Phonon::AudioOutput *m_audioOutput;
 };
-
-#endif
-

@@ -33,8 +33,22 @@ Radio::Radio( const QString& username, const QString& password )
        m_password( password ),
        m_done( false )
 {
-    m_station_url = "lastfm://user/mxcl";
     start();
+}
+
+
+void
+Radio::tuneIn( const QString& url )
+{
+    m_station_url = url;
+    
+}
+
+
+void
+Radio::fetchNextPlaylist()
+{
+    m_waitCondition.wakeAll();
 }
 
 
@@ -58,8 +72,12 @@ Radio::run()
                 {
                     qDebug() << t.artist << t.title << t.location;
                 }
+                
+                m_tracks = tracks;
+                emit tracksReady();
 
-                return;
+                m_waitCondition.wait( &mutex );
+                qDebug() << "woke up!";
             }
         }
         catch (int)

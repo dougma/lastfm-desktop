@@ -22,6 +22,7 @@
 #include "ScrobbleCache.h"
 #include "ScrobblerHandshake.h"
 #include "ScrobblerSubmission.h"
+#include <QDebug>
 
 
 Scrobbler::Scrobbler( const QString& username, const QString& password )

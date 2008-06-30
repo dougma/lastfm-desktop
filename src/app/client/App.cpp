@@ -21,6 +21,7 @@
 #include "PlaybackEvent.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
+#include "RadioPlayer.h"
 #include "Settings.h"
 #include "version.h"
 #include "mac/ITunesListener.h"
@@ -28,7 +29,6 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/LoginDialog.h"
 #include "widgets/MainWindow.h"
-#include "lib/radio/Radio.h"
 #include "lib/unicorn/LastMessageBox.h"
 
 
@@ -79,7 +79,9 @@ App::App( int argc, char** argv )
 #endif
     
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
-    m_radio = new Radio( The::settings().username(), The::settings().password() );
+    m_radio = new RadioPlayer( The::settings().username(), The::settings().password() );
+
+    m_radio->play( "lastfm://user/mxcl/" );
 
     DiagnosticsDialog::observe( m_scrobbler );
 }
@@ -102,11 +104,9 @@ App::~App()
 void
 App::setMainWindow( MainWindow* window )
 {
-    QMap<QString, QAction*> actions = window->actions();
-
-    //TODO setMainWindow and do connects there silly
-    connect( actions["love"], SIGNAL(triggered()), SLOT(love()) );
-    connect( actions["ban"], SIGNAL(triggered()), SLOT(ban()) );
+    connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
+    connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
+    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
 }
 
 

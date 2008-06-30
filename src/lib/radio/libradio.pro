@@ -4,7 +4,7 @@ CONFIG += unicorn
 QT += xml network
 QT -= gui
 
-include( $$SRC_DIR/include.pro )
+include( $$SRC_DIR/common/qmake/include.pro )
 
 SOURCES += $$system( ls *.cpp )
 HEADERS += $$system( ls *.h )

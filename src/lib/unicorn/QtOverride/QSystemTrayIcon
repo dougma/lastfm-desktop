@@ -20,7 +20,7 @@
 #ifndef QT_OVERRIDES_SYSTEM_TRAY_ICON_H
 #define QT_OVERRIDES_SYSTEM_TRAY_ICON_H
 
-#include <qsystemtrayicon.h>
+#include <QtGui/QSystemTrayIcon>
 
 #ifdef Q_OS_MAC
 

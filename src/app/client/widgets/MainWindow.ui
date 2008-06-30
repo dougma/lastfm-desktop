@@ -93,6 +93,8 @@
    <addaction name="separator" />
    <addaction name="share" />
    <addaction name="tag" />
+   <addaction name="separator" />
+   <addaction name="skip" />
   </widget>
   <action name="settings" >
    <property name="text" >
@@ -144,6 +146,14 @@
   <action name="diagnostics" >
    <property name="text" >
     <string>Diagnostics</string>
+   </property>
+  </action>
+  <action name="skip" >
+   <property name="icon">
+	<iconset resource="MainWindow.qrc" >:/MainWindow/skip.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Skip</string>
    </property>
   </action>
  </widget>

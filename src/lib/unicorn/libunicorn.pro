@@ -3,11 +3,10 @@ TEMPLATE = lib
 
 #fixme make libwebservice
 QT += network xml
-
 #fixme make UnicornGui
 QT += gui
 
-include( $$SRC_DIR/common/include.pro )
+include( $$SRC_DIR/common/qmake/include.pro )
 
 SOURCES += $$system( sh $$TOOLS_DIR/findsources cpp )
 HEADERS += $$system( sh $$TOOLS_DIR/findsources h ) \

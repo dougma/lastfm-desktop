@@ -17,51 +17,66 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "App.h"
-#include "PlayerListener.h"
-#include "widgets/MainWindow.h"
-#include "version.h"
-#include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornCommon.h"
-#include <QDir>
+#include "RadioPlayer.h"
+#include "lib/radio/Radio.h"
+#include <phonon/mediaobject.h>
+#include <phonon/audiooutput.h>
+#include <phonon/mediasource.h>
+#include <phonon/backendcapabilities.h>
+
+#include <QDebug>
+
+QString password, username;
 
 
-int main( int argc, char** argv )
+RadioPlayer::RadioPlayer( const QString& _username, const QString& _password )
 {
-    // must be set before the Settings object is created
-    QCoreApplication::setApplicationName( PRODUCT_NAME );
-    QCoreApplication::setOrganizationName( "Last.fm" );
-    QCoreApplication::setOrganizationDomain( "last.fm" );
+    username = _username; password = _password;
 
-    QDir().mkpath( Moose::cachePath() );
-    QDir().mkpath( Moose::savePath() );
-    QDir().mkpath( Moose::logPath() );
+    m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+    m_mediaObject = new Phonon::MediaObject( this );
     
-    Logger& logger = Logger::GetLogger();
-    logger.Init( Moose::logPath( "Last.fm.log" ), false );
-    logger.SetLevel( Logger::Debug );
-    LOGL( 3, "Application: " << PRODUCT_NAME << " " << VERSION );
-    LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );
+    Phonon::createPath( m_mediaObject, m_audioOutput );
+}
 
-    try
-    {
-        App app( argc, argv );
-        
-        MainWindow window;
-        app.setMainWindow( &window );
-        window.show();
 
-        return app.exec();
-    }
-    catch (PlayerListener::SocketFailure& e)
-    {
-        //TODO
-        //FIXME can't have it so that there is no radio option if listener socket fails!
-        qDebug() << "Socket failure:" << e.what();
-    }
-    catch (int)
-    {
-        // user wouldn't log in
-    }
+void
+RadioPlayer::play( const QString& url )
+{
+    m_radio = new Radio( username, password );
+    connect( m_radio, SIGNAL(tracksReady()), SLOT(onTracksReady()) );
+    m_radio->tuneIn( url );
+}
+
+
+void
+RadioPlayer::skip()
+{
+    m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
+    m_mediaObject->play();
+}
+
+
+void
+RadioPlayer::stop()
+{
+    m_mediaObject->stop();
+}
+
+
+void
+RadioPlayer::onTracksReady()
+{
+    QList<QUrl> urls;
+    foreach (const Radio::Track& t, m_radio->m_tracks)
+        urls += t.location;
+    m_mediaObject->enqueue( urls );
+    m_mediaObject->play();
+}
+
+
+void
+RadioPlayer::onAboutToFinishPlaylist()
+{
+    m_radio->fetchNextPlaylist();
 }

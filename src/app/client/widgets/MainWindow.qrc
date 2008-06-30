@@ -4,5 +4,7 @@
      <file>MainWindow/ban.png</file>
      <file>MainWindow/share.png</file>
      <file>MainWindow/tag.png</file>
+     <file>MainWindow/skip.png</file>
+     <file>MainWindow/stop.png</file>
  </qresource>
  </RCC> 

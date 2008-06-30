@@ -21,6 +21,7 @@
 #include <QList>
 #include <QThread>
 #include <QUrl>
+#include <QWaitCondition>
 
 
 class RADIO_DLLEXPORT Radio : public QThread
@@ -35,6 +36,8 @@ class RADIO_DLLEXPORT Radio : public QThread
     QString m_host;
     QString m_base_path;
     QString m_station_url;
+    
+    QWaitCondition m_waitCondition;
 
 public:
     struct Track
@@ -50,7 +53,7 @@ public:
         QString sponsor;
         QString location;
     };
-
+    
 private:
     QByteArray get( QString path );
 
@@ -62,7 +65,13 @@ public:
     Radio( const QString& username, const QString& password );
 
     /** eg lastfm://user/mxcl/ */
-    void setStationUrl( const QString& station );
+    void tuneIn( const QString& station );
+    void fetchNextPlaylist();
 
     bool m_done;
+    
+    QList<Track> m_tracks;
+    
+signals:
+    void tracksReady();
 };

@@ -227,7 +227,7 @@ ITunesPluginInstaller::disableLegacyHelperApp()
     for ( int i = CFArrayGetCount( prefCFArrayRef ) - 1; i >= 0 ; i-- )
     {
         CFDictionaryRef dict = (CFDictionaryRef)CFArrayGetValueAtIndex( prefCFArrayRef, i );
-        QString path = UnicornUtils::CFStringToQString( (CFStringRef) CFDictionaryGetValue( dict, CFSTR( "Path" ) ) );
+        QString path = Unicorn::CFStringToQString( (CFStringRef) CFDictionaryGetValue( dict, CFSTR( "Path" ) ) );
 
         if ( path.toLower().contains( "lastfmhelper" ) )
         {

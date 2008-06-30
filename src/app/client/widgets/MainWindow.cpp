@@ -38,6 +38,8 @@
 MainWindow::MainWindow()
           : m_progressDisplayTick( 0 )
 {
+    setUnifiedTitleAndToolBarOnMac( true );
+    
     m_progressDisplayTimer = new QTimer( this );
     connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
 
@@ -183,16 +185,6 @@ MainWindow::paintEvent( QPaintEvent* e )
     p.setPen( k_trackBarProgressTop );
     p.setBrush( g );
     p.drawRect( QRect( QPoint(), QPoint( m_progressDisplayTick, height() ) ) );
-}
-
-
-QMap<QString, QAction*>
-MainWindow::actions() const
-{
-    QMap<QString, QAction*> map;
-    foreach (QAction* a, QMainWindow::actions())
-        map[a->objectName()] = a;
-    return map;
 }
 
 

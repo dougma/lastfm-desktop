@@ -2,19 +2,17 @@ win32: SRC_DIR = $$system( cd )
 else:  SRC_DIR = $$system( pwd )
 
 ROOT_DIR = $$SRC_DIR/..
-
 BUILD_DIR = _build
+TOOLS_DIR = $$ROOT_DIR/tools
+
 OBJECTS_DIR = $$BUILD_DIR
 MOC_DIR = $$BUILD_DIR
 UI_DIR = $$BUILD_DIR
 RCC_DIR = $$BUILD_DIR
 DESTDIR = $$ROOT_DIR/_bin
 INCLUDEPATH += $$SRC_DIR
-LIBS += -L$$DESTDIR
 
-TOOLS_DIR = $$ROOT_DIR/tools
+LIBS += -L$$DESTDIR
 
 # TODO really we should fix these warnings properly
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS
-
-release:DEFINES += NDEBUG

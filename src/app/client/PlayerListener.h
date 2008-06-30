@@ -36,8 +36,13 @@ class PlayerListener : public QTcpServer
     Q_OBJECT
 
 public:
-    class SocketFailure
-    {};
+    struct SocketFailure : private QString
+    {
+        SocketFailure( const QString& what ) : QString( what )
+        {}
+        
+        QString what() const { return *this; }
+    };
 
     PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
 

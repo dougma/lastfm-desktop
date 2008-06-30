@@ -25,12 +25,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    Ui::MainWindow ui;
-
 public:
     MainWindow();
 
-    QMap<QString, QAction*> actions() const;
+    Ui::MainWindow ui;
 
 protected:
     void resizeEvent( QResizeEvent* );

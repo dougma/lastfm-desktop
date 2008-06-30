@@ -52,6 +52,6 @@ private:
     class PlayerListener* m_playerListener;
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;
-    class Radio* m_radio;
+    class RadioPlayer* m_radio;
     class DrWatson* m_watson;
 };
