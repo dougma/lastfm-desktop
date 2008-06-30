@@ -19,8 +19,9 @@
  ***************************************************************************/
 
 #include <QtTest/QtTest>
+#include <QMainWindow>
 
-#include "Settings.h"
+#include "app/client/Settings.h"
 
 class TestSettings : public QObject
 {
@@ -32,16 +33,84 @@ class TestSettings : public QObject
             qApp->setOrganizationName( "Last.fm.test" );
             qApp->setOrganizationDomain( "Last.fm.test" );
             qApp->setApplicationName( "Last.fm.test" );
+            
+            The::settings();
+            
+            QSettings().clear();
         }
         
-        void testBlaa();
+        void testLogOutOnExit();
+        void testControlPort();
+        void testScrobblePoint();
+        void testContainerWindowState();
+        void testContainerGeometry();
 };
 
 
 void
-TestSettings::testBlaa()
+TestSettings::testLogOutOnExit()
 {
-    QCOMPARE( 1, 1 );
+    MutableSettings mSettings( The::settings() );
+    mSettings.setLogOutOnExit( true );
+    QCOMPARE( The::settings().logOutOnExit(), true );
+    
+    mSettings.setLogOutOnExit( false );
+    QCOMPARE( The::settings().logOutOnExit(), false );
+}
+
+void
+TestSettings::testControlPort()
+{
+    MutableSettings mSettings( The::settings() );
+    mSettings.setControlPort( 10 );
+    QCOMPARE( The::settings().controlPort(), 10 );
+    
+    mSettings.setControlPort( 8090 );
+    QCOMPARE( The::settings().controlPort(), 8090 );
+}
+
+void
+TestSettings::testScrobblePoint()
+{
+    MutableSettings mSettings( The::settings() );
+    mSettings.setScrobblePoint( 51 );
+    QCOMPARE( The::settings().scrobblePoint(), 51 );
+    
+    mSettings.setScrobblePoint( 85 );
+    QCOMPARE( The::settings().scrobblePoint(), 85 );
+}
+
+void
+TestSettings::testContainerWindowState()
+{
+    /*QMainWindow mw;
+    mw.setWindowState( Qt::WindowMinimized | Qt::WindowActive );
+    
+    MutableSettings mSettings( The::settings() );
+    mSettings.setContainerWindowState( mw.windowState() );
+    
+    QCOMPARE( The::settings().containerWindowState(), mw.windowState() );*/
+}
+
+void
+TestSettings::testContainerGeometry()
+{
+    QMainWindow mw;
+    mw.resize( 457, 678 );
+    QByteArray state = mw.saveState();
+    
+    MutableSettings mSettings( The::settings() );
+    mSettings.setContainerGeometry( state );
+    
+    QCOMPARE( The::settings().containerGeometry(), mw.saveState() );
+    
+    mw.resize( 680, 440 );
+    
+    state = mw.saveState();
+    
+    mSettings.setContainerGeometry( state );
+    
+    QCOMPARE( The::settings().containerGeometry(), mw.saveState() );
 }
 
 QTEST_MAIN(TestSettings)
