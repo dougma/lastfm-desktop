@@ -20,7 +20,7 @@
 
 //#define ASSERT_ON_QT_WARNINGS_IN_DEBUG_BUILD
 
-#include "logger.h"
+#include "Logger.h"
 
 #ifndef WIN32
     #include <sys/stat.h>

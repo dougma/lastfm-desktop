@@ -19,7 +19,7 @@
 
 #include "UnicornCommon.h"
 
-#include "logger.h"
+#include "Logger.h"
 
 #include <QCoreApplication>
 #include <QCryptographicHash>

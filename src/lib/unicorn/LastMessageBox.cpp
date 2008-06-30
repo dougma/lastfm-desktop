@@ -23,7 +23,7 @@
 #include <QDialogButtonBox>
 
 #include "LastMessageBox.h"
-#include "logger.h"
+#include "Logger.h"
 
 // for DRY reasons
 #define PARENT parent ? parent : mainWindow()
