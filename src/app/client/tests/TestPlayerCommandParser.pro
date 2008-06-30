@@ -1,14 +1,15 @@
-CONFIG += qtestlib
+CONFIG += qtestlib unicorn moose
 QT += testlib xml
 TEMPLATE = app
-TARGET = 
+TARGET =
 INCLUDEPATH += ../
 
-include( $$SRC_DIR/include.pro )
+include( $$SRC_DIR/common/qmake/include.pro )
 
-DESTDIR = $$BIN_DIR/tests
+DESTDIR = $$DESTDIR/tests
 
 libs += -lunicorn$$EXT -lmoose$$EXT
 
 # Input
-SOURCES +=  TestPlayerCommandParser.cpp
+SOURCES +=  TestPlayerCommandParser.cpp \
+            ../PlayerCommandParser.cpp

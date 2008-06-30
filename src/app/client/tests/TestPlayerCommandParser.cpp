@@ -20,7 +20,7 @@
 
 #include <QtTest/QtTest>
 
-#include "Settings.h"
+#include "PlayerCommandParser.h"
 
 class TestPlayerCommandParser : public QObject
 {
@@ -32,14 +32,156 @@ class TestPlayerCommandParser : public QObject
             
         }
         
-        void testBlaa();
+        void testStart();
+        void testStop();
+        void testResume();
+        void testPause();
+        void testBootstrap();
+        void testEmptyLine();
+        void testMissingArgument();
+        void testInvalidCommand();
+        void testDuplicatedArgument();
+        void testUnicode();
 };
 
 
 void
-TestSettings::testBlaa()
+TestPlayerCommandParser::testStart()
 {
-    QCOMPARE( 1, 1 );
+    PlayerCommandParser pcp ( "START c=testapp"
+                                   "&a=Test Artist"
+                                   "&t=Test Title"
+                                   "&b=Test Album"
+                                   "&l=100"
+                                   "&p=/home/tester/test.mp3" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Start );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+    QCOMPARE( pcp.track().artist(), QString( "Test Artist" ) );
+    QCOMPARE( pcp.track().track(), QString( "Test Title" ) );
+    QCOMPARE( pcp.track().album(), QString( "Test Album" ) );
+    QCOMPARE( pcp.track().duration(), 100 );
+    QCOMPARE( pcp.track().path(), QString( "/home/tester/test.mp3" ) );
+}
+
+void
+TestPlayerCommandParser::testStop()
+{
+    PlayerCommandParser pcp ( "STOP c=testapp" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Stop );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+}
+
+void
+TestPlayerCommandParser::testResume()
+{
+    PlayerCommandParser pcp ( "RESUME c=testapp" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Resume );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+}
+
+void
+TestPlayerCommandParser::testPause()
+{
+    PlayerCommandParser pcp ( "PAUSE c=testapp" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Pause );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+}
+
+void
+TestPlayerCommandParser::testBootstrap()
+{
+    PlayerCommandParser pcp ( "BOOTSTRAP c=testapp&u=TestUser" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Bootstrap );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+    QCOMPARE( pcp.username(), QString( "TestUser" ) );
+}
+
+void
+TestPlayerCommandParser::testEmptyLine()
+{
+    // The PlayerCommandParser should throw an exception on empty lines
+    try
+    {
+        PlayerCommandParser pcp ( "" );
+        
+        QFAIL( "PlayerCommandParser did not throw an exception on an empty line." );
+    }
+    catch ( PlayerCommandParser::Exception e )
+    {
+        QCOMPARE( 1, 1 ); // Success
+    }
+}
+
+void
+TestPlayerCommandParser::testMissingArgument()
+{
+    // The PlayerCommandParser should throw an exception when arguments are missing
+    try
+    {
+        PlayerCommandParser pcp ( "START c=testap" );
+        
+        QFAIL( "PlayerCommandParser did not throw an exception when arguments are missing." );
+    }
+    catch ( PlayerCommandParser::Exception e )
+    {
+        QCOMPARE( 1, 1 ); // Success
+    }
+}
+
+void
+TestPlayerCommandParser::testInvalidCommand()
+{
+    // The PlayerCommandParser should throw an exception when passed a invalid command
+    try
+    {
+        PlayerCommandParser pcp ( "SUPERSTART c=testap" );
+        
+        QFAIL( "PlayerCommandParser did not throw an exception when passed a invalid command." );
+    }
+    catch ( PlayerCommandParser::Exception e )
+    {
+        QCOMPARE( 1, 1 ); // Success
+    }
+}
+
+void
+TestPlayerCommandParser::testDuplicatedArgument()
+{
+    // The PlayerCommandParser should throw an exception when arguments are duplicated
+    try
+    {
+        PlayerCommandParser pcp ( "START c=testap&c=testapp2" );
+        
+        QFAIL( "PlayerCommandParser did not throw an exception when arguments are duplicated." );
+    }
+    catch ( PlayerCommandParser::Exception e )
+    {
+        QCOMPARE( 1, 1 ); // Success
+    }
+}
+
+void
+TestPlayerCommandParser::testUnicode()
+{
+    PlayerCommandParser pcp ( "START c=testapp"
+                                   "&a=佐橋俊彦"
+                                   "&t=対峙"
+                                   "&b=TV Animation ジパング original Soundtrack"
+                                   "&l=123"
+                                   "&p=/home/tester/15 対峙.mp3" );
+
+    QCOMPARE( pcp.command(), PlayerCommandParser::Start );
+    QCOMPARE( pcp.playerId(), QString( "testapp" ) );
+    QCOMPARE( pcp.track().artist(), QString( "佐橋俊彦" ) );
+    QCOMPARE( pcp.track().track(), QString( "対峙" ) );
+    QCOMPARE( pcp.track().album(), QString( "TV Animation ジパング original Soundtrack" ) );
+    QCOMPARE( pcp.track().duration(), 123 );
+    QCOMPARE( pcp.track().path(), QString( "/home/tester/15 対峙.mp3" ) );
 }
 
 QTEST_MAIN(TestPlayerCommandParser)
