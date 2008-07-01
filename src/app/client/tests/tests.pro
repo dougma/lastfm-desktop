@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS =   TestSettings.pro \
-            TestPlayerCommandParser.pro
+            TestPlayerCommandParser.pro \
+            TestStopWatch.pro

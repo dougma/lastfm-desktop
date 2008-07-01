@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
+ *   Copyright (C) 2005 - 2008 by                                          *
  *      Last.fm Ltd <client@last.fm>                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
