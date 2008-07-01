@@ -33,7 +33,7 @@
 <xsl:template match="TestFunction">
     <testcase classname="{$classname}" name="{@name}" time="0.0">
         <!-- handle fail -->
-        <xsl:if test="Incident/@type = 'fail'">
+        <xsl:if test="Incident/@type = 'fail' or Incident/@type = 'xpass'">
                         <!-- will be used to generate "nice" error message -->
                         <xsl:variable name="file" select="Incident/@file" />
                         <xsl:variable name="line" select="Incident/@line" />
@@ -43,7 +43,14 @@
 
                         <!-- display a reasonable error message -->
             <xsl:element name="failure">
-                <xsl:attribute name="type">Standard</xsl:attribute>
+                <xsl:if test="Incident/@type='fail'">
+                        <xsl:attribute name="type">Standard</xsl:attribute>
+                </xsl:if>
+                <xsl:if test="Incident/@type='xpass'">
+                        <xsl:attribute name="type">Unexpected Pass</xsl:attribute>
+                </xsl:if>
+                
+                
                 <xsl:attribute name="message">
                                         <xsl:value-of select="concat($file,':',$line,' :: ',$description)" />
                 </xsl:attribute>
@@ -61,14 +68,14 @@
 <xsl:template name="display-system-out">
         <system-out>
                 <xsl:for-each select="/TestCase/TestFunction/Incident[@type='fail'] | /TestCase/TestFunction/Message[@type='skip']">
-                        <xsl:choose>
+                        <!--><xsl:choose>
                                 <xsl:when test="@type='fail'">
                                         <xsl:value-of select="Description"/>
                                 </xsl:when>
                                 <xsl:when test="@type='skip'">
                                         <xsl:value-of select="Description"/>
                                 </xsl:when>
-                        </xsl:choose>
+                        </xsl:choose>-->
                 </xsl:for-each>
         </system-out>
 </xsl:template>
