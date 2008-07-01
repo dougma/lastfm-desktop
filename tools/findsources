@@ -1,2 +1,0 @@
-#!/bin/sh
-find . -name \*.$1 -print | sed -e 's|\./||g' | grep -v tests | grep -v _build
