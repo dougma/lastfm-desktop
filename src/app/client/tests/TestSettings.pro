@@ -1,5 +1,5 @@
 CONFIG += qtestlib unicorn moose
-QT += testlib xml gui
+QT += testlib xml gui network
 TEMPLATE = app
 TARGET = 
 INCLUDEPATH += ../

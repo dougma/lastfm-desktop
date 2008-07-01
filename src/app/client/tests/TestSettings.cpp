@@ -58,35 +58,41 @@ TestSettings::testLogOutOnExit()
     QCOMPARE( The::settings().logOutOnExit(), false );
 }
 
+// the following three methods cannot be tested properly, as 
+// the setting is done in client/Settings, and the getting is
+// done in moose/Settings, and they point to different Settings-
+// paths. it is not desirable to do testing on the same path as
+// the release build, but currently you cannot change the path
+// of moose/Settings or unicorn/Settings
+
 void
 TestSettings::testControlPort()
 {
-    MutableSettings mSettings( The::settings() );
+    QWARN( "Cannot test controlPort() in Settings" );
+    /*MutableSettings mSettings( The::settings() );
     mSettings.setControlPort( 10 );
-    QEXPECT_FAIL( "", "We Cannot make moose use test-settings-path, so we cannot test it's settings", Continue );
     QCOMPARE( The::settings().controlPort(), 10 );
     
     mSettings.setControlPort( 8090 );
-    QEXPECT_FAIL( "", "We Cannot make moose use test-settings-path, so we cannot test it's settings", Continue );
-    QCOMPARE( The::settings().controlPort(), 8090 );
+    QCOMPARE( The::settings().controlPort(), 8090 );*/
 }
 
 void
 TestSettings::testScrobblePoint()
 {
-    MutableSettings mSettings( The::settings() );
+    QWARN( "Cannot test scrobblePoint() in Settings" );
+    /*MutableSettings mSettings( The::settings() );
     mSettings.setScrobblePoint( 51 );
-    QEXPECT_FAIL( "", "We Cannot make moose use test-settings-path, so we cannot test it's settings", Continue );
     QCOMPARE( The::settings().scrobblePoint(), 51 );
     
     mSettings.setScrobblePoint( 85 );
-    QEXPECT_FAIL( "", "We Cannot make moose use test-settings-path, so we cannot test it's settings", Continue );
-    QCOMPARE( The::settings().scrobblePoint(), 85 );
+    QCOMPARE( The::settings().scrobblePoint(), 85 );*/
 }
 
 void
 TestSettings::testContainerWindowState()
 {
+    QWARN( "Cannot test containerWindowState() in Settings" );
     /*QMainWindow mw;
     mw.setWindowState( Qt::WindowMinimized | Qt::WindowActive );
     
@@ -105,7 +111,6 @@ TestSettings::testContainerGeometry()
     
     MutableSettings mSettings( The::settings() );
     mSettings.setContainerGeometry( state );
-    
     QCOMPARE( The::settings().containerGeometry(), mw.saveState() );
     
     mw.resize( 680, 440 );
