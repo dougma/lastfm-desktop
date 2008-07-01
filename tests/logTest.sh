@@ -1,8 +1,9 @@
 #!/bin/bash
-
+# author <pete@last.fm>
 # meant to be run from the /tests dir
 
 RUNDIR=`pwd`
+mkdir $RUNDIR/output
 
 TOTERRORS=0
 
