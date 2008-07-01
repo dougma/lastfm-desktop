@@ -28,10 +28,6 @@
 
 namespace Moose
 {
-    //TODO use constant for organisation and application name and stick them in 
-    // Moose, then use same for main setOrgName etc.
-    typedef Unicorn::QSettings QSettings;
-
     class MOOSE_DLLEXPORT Settings : public Unicorn::Settings
     {
     public:
