@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "MooseCommon.h"
-#include "Settings.h"
+#include "MooseSettings.h"
 
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"

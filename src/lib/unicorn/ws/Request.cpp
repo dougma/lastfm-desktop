@@ -20,7 +20,7 @@
 #include "Request.h"
 #include "XmlRpc.h"
 #include "../Logger.h"
-#include "../Settings.h"
+#include "../UnicornSettings.h"
 #include "../UnicornCommon.h"
 #include <QApplication>
 #include <QDebug>

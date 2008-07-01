@@ -17,44 +17,22 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MOOSE_SETTINGS_H
-#define MOOSE_SETTINGS_H
-
-#include "TrackInfo.h"
-#include "lib/unicorn/Settings.h"
-#include "lib/DllExportMacro.h"
-#include <QStringList>
+#include "UnicornCommon.h"
+#include "UnicornSettings.h"
+#include <QLocale>
 
 
-namespace Moose
+QString
+Unicorn::Settings::language() const
 {
-    class MOOSE_DLLEXPORT Settings : public Unicorn::Settings
-    {
-    public:
-        /** The AudioScrobbler executable location */
-        QString path() const { return QSettings().value( "Path" ).toString(); }
-        /** The AudioScrobbler version number */
-        QString version() const { return QSettings().value( "Version", "unknown" ).toString(); }
+    QString const code = Unicorn::QSettings().value( "AppLanguage" ).toString();
+    if (code.size())
+        return code;
 
-        // used by TrackInfo
-        //TODO shouldn't be necessary
-        /** is percentage */
-        //TODO percentage is confusing in implementations, use float
-        int scrobblePoint() const { return QSettings().value( "ScrobblePoint", TrackInfo::kDefaultScrobblePoint ).toInt(); }
-
-        // used by Moose::sendToInstance
-        // needed by Twiddly
-        int controlPort() const { return QSettings().value( "ControlPort", 32213 ).toInt(); }
-
-        // used by TrackInfo
-        // needed by Twiddly as it uses TrackInfo::isScrobblable()
-        QStringList excludedDirs() const
-        {
-            QStringList paths = QSettings( ).value( "ExclusionDirs" ).toStringList();
-            paths.removeAll( "" );
-            return paths;
-        }
-    };
-}
-
+    // If none found, use system locale
+#ifdef Q_WS_MAC
+    return Unicorn::qtLanguageToLfmLangCode( Unicorn::osxLanguageCode() );
+#else
+    return Unicorn::qtLanguageToLfmLangCode( QLocale::system().language() );
 #endif
+}

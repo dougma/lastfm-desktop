@@ -20,7 +20,7 @@
 #ifndef AUDIOSCROBBLER_SETTINGS_H
 #define AUDIOSCROBBLER_SETTINGS_H
 
-#include "lib/moose/Settings.h"
+#include "lib/moose/MooseSettings.h"
 
 class Settings;
 namespace The { Settings& settings(); }

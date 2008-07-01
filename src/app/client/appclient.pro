@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = AudioScrobbler
+TARGET = client
 CONFIG += unicorn moose radio
 QT += xml network phonon
 INCLUDEPATH += .

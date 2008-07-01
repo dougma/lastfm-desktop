@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "TrackInfo.h"
-#include "Settings.h"
+#include "MooseSettings.h"
 #include "lib/unicorn/Logger.h"
 #include <QDir>
 

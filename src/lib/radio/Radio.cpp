@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "Radio.h"
-#include "lib/unicorn/Settings.h"
+#include "lib/unicorn/UnicornSettings.h"
 #include <QBuffer>
 #include <QDebug>
 #include <QtNetwork/QHttp> //TODO use our override
