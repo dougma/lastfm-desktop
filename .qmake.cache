@@ -1,7 +1,9 @@
-win32: SRC_DIR = $$system( cd )
-else:  SRC_DIR = $$system( pwd )
+win32: ROOT_DIR = $$system( cd )
+else:  ROOT_DIR = $$system( pwd )
 
-ROOT_DIR = $$SRC_DIR/..
+# TODO remove! confusing!
+SRC_DIR = $$ROOT_DIR
+
 BUILD_DIR = _build
 TOOLS_DIR = $$ROOT_DIR/tools
 
@@ -10,7 +12,7 @@ MOC_DIR = $$BUILD_DIR
 UI_DIR = $$BUILD_DIR
 RCC_DIR = $$BUILD_DIR
 DESTDIR = $$ROOT_DIR/_bin
-INCLUDEPATH += $$SRC_DIR
+INCLUDEPATH += $$ROOT_DIR
 
 LIBS += -L$$DESTDIR
 
