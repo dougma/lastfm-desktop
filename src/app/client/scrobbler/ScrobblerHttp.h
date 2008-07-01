@@ -38,7 +38,7 @@ protected:
 
 protected slots:
     virtual void request() = 0;
-
+    int get( QString );
 signals:
     void done( const QByteArray& data );
 
