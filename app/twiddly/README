@@ -1,0 +1,9 @@
+Twiddly is coupled to the iPod handling component of the iTunes plugin and the
+Last.fm Client software.
+
+It is launched when an iPod has finished syncing with iTunes and compares the
+iTunesPlaysDatabase with the iTunes Library Database, and thus determines what
+has been played by an iPod.
+
+It is a separate process for the purpose of writing simpler code, and the
+use-case where the client is not running.
