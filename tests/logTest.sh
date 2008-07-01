@@ -18,6 +18,16 @@ do
     
     $i  -xml > "$OUTPUTFILE"
     
+    # check for program errors
+    RETURNCODE=$?
+    if [[ RETURNCODE -gt 0 ]];
+    then
+        echo "Bailing out - bad return code: $RETURNCODE"
+        echo "$i"
+        exit
+    fi
+    
+    # count number of test failures
     NUMERRORS=`grep -c \"fail\" $OUTPUTFILE`
     XPASS=`grep -c \"xpass\" $OUTPUTFILE`
     let NUMERRORS=$NUMERRORS+$XPASS
@@ -28,6 +38,7 @@ do
         echo "$NUMERRORS errors where encountered in $i"
     fi
     
+    # transform outputted xml into junit-xml
     xsltproc $RUNDIR/QtTest_to_JUnit.xslt $OUTPUTFILE > "$OUTPUTFILE.junit.xml"
 done
 
