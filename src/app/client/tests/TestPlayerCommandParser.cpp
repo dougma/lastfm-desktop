@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
+ *   Copyright (C) 2005 - 2008 by                                          *
  *      Last.fm Ltd <client@last.fm>                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -184,6 +184,6 @@ TestPlayerCommandParser::testUnicode()
     QCOMPARE( pcp.track().path(), QString( "/home/tester/15 対峙.mp3" ) );
 }
 
-QTEST_MAIN(TestPlayerCommandParser)
+QTEST_APPLESS_MAIN(TestPlayerCommandParser)
 #include "TestPlayerCommandParser.moc"
 
