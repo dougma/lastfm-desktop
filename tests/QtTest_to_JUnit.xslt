@@ -31,6 +31,7 @@
 </xsl:template>
 
 <xsl:template match="TestFunction">
+            <!-- TODO: set time-parameter properly -->
     <testcase classname="{$classname}" name="{@name}" time="0.0">
         <!-- handle fail -->
         <xsl:if test="Incident/@type = 'fail' or Incident/@type = 'xpass'">
@@ -62,6 +63,8 @@
         <xsl:if test="Incident/@type = 'skip'">
 
         </xsl:if>
+        
+                <!-- TODO: handle warnings -->
     </testcase>
 </xsl:template>
 
