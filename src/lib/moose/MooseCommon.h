@@ -20,7 +20,7 @@
 #ifndef MOOSE_COMMON_H
 #define MOOSE_COMMON_H
 
-#include "MooseDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include "TrackInfo.h"
 #include <QString>
 #include <QObject>

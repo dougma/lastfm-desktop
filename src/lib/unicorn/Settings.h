@@ -3,7 +3,7 @@
 #ifndef UNICORN_SETTINGS_H
 #define UNICORN_SETTINGS_H
 
-#include "UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QSettings>
 #include <QString>
 

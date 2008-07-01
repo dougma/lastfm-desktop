@@ -20,7 +20,7 @@
 #ifndef TRACK_INFO_H
 #define TRACK_INFO_H
 
-#include "MooseDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QDateTime>
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>

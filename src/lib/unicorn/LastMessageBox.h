@@ -20,7 +20,7 @@
 #ifndef LAST_MESSAGE_BOX_H
 #define LAST_MESSAGE_BOX_H
 
-#include "UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QtGui/QMessageBox>
 
 

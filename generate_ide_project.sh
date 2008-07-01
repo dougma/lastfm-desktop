@@ -11,11 +11,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		include.pro = include.pro
 		.qmake.cache = .qmake.cache
-		pigmyshrew.pro = pigmyshrew.pro
+		Last.fm.pro = Last.fm.pro
 		app\client\appclient.pro = app\client\appclient.pro
 		lib\radio\libradio.pro = lib\radio\libradio.pro
 		lib\moose\libmoose.pro = lib\moose\libmoose.pro
 		lib\unicorn\libunicorn.pro = lib\unicorn\libunicorn.pro
+		lib\fingerprint\libfingerprint.pro = lib\fingerprint\libfingerprint.pro
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{3FDD67B7-DF67-4F22-8545-755D722794BC}"

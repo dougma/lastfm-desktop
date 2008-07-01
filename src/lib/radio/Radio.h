@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "common/DllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QList>
 #include <QThread>
 #include <QUrl>

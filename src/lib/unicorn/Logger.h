@@ -21,7 +21,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 
 #include <string>
 #include <fstream>

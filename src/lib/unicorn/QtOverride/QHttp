@@ -20,7 +20,7 @@
 #ifndef QT_OVERRIDES_HTTP_H
 #define QT_OVERRIDES_HTTP_H
 
-#include "../UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QtNetwork/QHttp>
 
 //TODO add user agent adjustment

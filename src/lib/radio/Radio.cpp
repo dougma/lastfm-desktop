@@ -26,6 +26,7 @@
 
 //TODO discovery mode
 //TODO skips left
+//TODO multiple locations for the same track
 
 
 Radio::Radio( const QString& username, const QString& password )
@@ -76,7 +77,10 @@ Radio::run()
                 m_tracks = tracks;
                 emit tracksReady();
 
+                QMutex mutex;
+                mutex.lock();
                 m_waitCondition.wait( &mutex );
+                mutex.unlock();
                 qDebug() << "woke up!";
             }
         }

@@ -20,7 +20,7 @@
 #ifndef UNICORN_COMMON_H
 #define UNICORN_COMMON_H
 
-#include "UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 
 #include <QString>
 #include <QLocale>

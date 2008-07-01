@@ -21,7 +21,7 @@
 #ifndef UNICORNCOMMONWIN_H
 #define UNICORNCOMMONWIN_H
 
-#include "UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 
 #include <QString>
 #include <QUrl>

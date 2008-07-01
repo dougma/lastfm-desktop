@@ -22,7 +22,7 @@
 
 #include "TrackInfo.h"
 #include "lib/unicorn/Settings.h"
-#include "MooseDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QStringList>
 
 

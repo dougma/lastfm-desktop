@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,7 +20,7 @@
 #ifndef WEB_SERVICE_REQUEST_H
 #define WEB_SERVICE_REQUEST_H
 
-#include "../UnicornDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include "../UnicornCommon.h"
 
 #include <QHttp>

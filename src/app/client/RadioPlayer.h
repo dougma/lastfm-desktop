@@ -32,7 +32,7 @@ class RadioPlayer : public QObject
     Q_OBJECT
     
 public:
-    RadioPlayer( const QString& username, const QString& username );
+    RadioPlayer( const QString& username, const QString& password );
     
 public slots:
     void play( const QString& lastfm_url );

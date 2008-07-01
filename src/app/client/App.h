@@ -44,6 +44,7 @@ public slots:
 
 private slots:
     void onAppEvent( int, const QVariant& );
+    void onStartRadio();
 
 signals:
     void event( int, const QVariant& );

@@ -81,8 +81,6 @@ App::App( int argc, char** argv )
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
     m_radio = new RadioPlayer( The::settings().username(), The::settings().password() );
 
-    m_radio->play( "lastfm://user/mxcl/" );
-
     DiagnosticsDialog::observe( m_scrobbler );
 }
 
@@ -107,6 +105,18 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
+
+    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl" );
+    edit->setWindowTitle( "Start Radio Station" );
+    edit->show();
+    connect( edit, SIGNAL(returnPressed()), SLOT(onStartRadio()) );
+}
+
+
+void
+App::onStartRadio()
+{
+    m_radio->play( static_cast<QLineEdit*>(sender())->text() );
 }
 
 

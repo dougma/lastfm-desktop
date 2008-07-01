@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MOOSE_DLL_EXPORT_MACRO_H
-#define MOOSE_DLL_EXPORT_MACRO_H
+#ifndef DLL_EXPORT_MACRO_H
+#define DLL_EXPORT_MACRO_H
 
 /** Exports symbols when compiled as part of libunicorn, imports when included
   * from some external target. */
@@ -28,8 +28,30 @@
     #else
         #define MOOSE_DLLEXPORT __declspec(dllimport)
     #endif
+
+    #ifdef _UNICORN_DLLEXPORT
+        #define UNICORN_DLLEXPORT __declspec(dllexport)
+    #else
+        #define UNICORN_DLLEXPORT __declspec(dllimport)
+    #endif
+
+    #ifdef _RADIO_DLLEXPORT
+        #define RADIO_DLLEXPORT __declspec(dllexport)
+    #else
+        #define RADIO_DLLEXPORT __declspec(dllimport)
+    #endif
+
+    #ifdef _FINGERPRINT_DLLEXPORT
+        #define FINGERPRINT_DLLEXPORT __declspec(dllexport)
+    #else
+        #define FINGERPRINT_DLLEXPORT __declspec(dllimport)
+    #endif
+
 #else
     #define MOOSE_DLLEXPORT
+    #define UNICORN_DLLEXPORT
+    #define RADIO_DLLEXPORT
+    #define FINGERPRINT_DLLEXPORT
 #endif
 
 #endif
