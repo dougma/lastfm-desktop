@@ -23,3 +23,7 @@ CONFIG( moose ) {
 CONFIG( radio ) {
     LIBS += -lradio
 }
+
+CONFIG( qtestlib ) {
+    DESTDIR = $$DESTDIR/tests
+}
