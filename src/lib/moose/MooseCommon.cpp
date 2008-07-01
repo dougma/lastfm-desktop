@@ -25,7 +25,7 @@
 #include "lib/unicorn/UnicornCommon.h"
 #include "lib/unicorn/LastMessageBox.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QHostAddress>
 #include <QLibrary>
@@ -47,7 +47,7 @@ namespace Moose
 QString
 dataPath( QString file )
 {
-    return QApplication::applicationDirPath() + "/data/" + file;
+    return QCoreApplication::applicationDirPath() + "/data/" + file;
 }
 
 
@@ -59,7 +59,7 @@ savePath( QString file )
     #ifdef WIN32
         path = Unicorn::applicationDataPath();
         if (path.isEmpty())
-            path = QApplication::applicationDirPath();
+            path = QCoreApplication::applicationDirPath();
         else
             path += "/Last.fm/Client";
     #else
