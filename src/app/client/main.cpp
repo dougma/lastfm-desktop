@@ -24,11 +24,17 @@
 #include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"
+#include "lib/breakpad/BreakPad.h"
 #include <QDir>
 
 
 int main( int argc, char** argv )
 {
+#ifdef _BREAKPAD
+    BreakPad breakpad;
+    breakpad.setProductName( PRODUCT_NAME );
+#endif
+
     // must be set before the Settings object is created
     QCoreApplication::setApplicationName( PRODUCT_NAME );
     QCoreApplication::setOrganizationName( "Last.fm" );

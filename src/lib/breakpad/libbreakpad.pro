@@ -2,13 +2,11 @@ TEMPLATE = lib
 TARGET = breakpad
 CONFIG -= gui
 
-include( ../../definitions.pro.inc )
+include( $$SRC_DIR/common/qmake/include.pro )
 
 INCLUDEPATH += . external/src
 SOURCES = BreakPad.cpp
 HEADERS = BreakPad.h
-LIBS -= libLastFmTools
-
 
 !win32 {
 	SOURCES += $$SYSTEM( ls external/src/client/*.cc )

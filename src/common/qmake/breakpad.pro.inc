@@ -18,8 +18,8 @@ CONFIG( breakpad ) {
 		QMAKE_CFLAGS_RELEASE -= -Os
 	}
 	
-	INCLUDEPATH += $$SRC_DIR/src/breakpad $$SRC_DIR/src/breakpad/external/src
+	INCLUDEPATH += $$SRC_DIR/lib/breakpad $$SRC_DIR/lib/breakpad/external/src
 }
 else {
-    DEFINES += NBREAKPAD
+    DEFINES += _BREAKPAD
 }

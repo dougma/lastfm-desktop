@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd <client@last.fm>                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,9 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef NBREAKPAD
+#ifdef _BREAKPAD
 
-#include "BreakpadDllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QString>
 
 #ifdef __APPLE__
@@ -48,7 +47,7 @@ public:
     void setProductName( const char* s ) { m_product_name = s; };
     const char* productName() const { return m_product_name; }
 };
+
 #endif
 
-
-#undef char
+#undef char //what's this about?

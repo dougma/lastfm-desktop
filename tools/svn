@@ -12,5 +12,6 @@ case $1 in
     ci | commit) $svn /command:commit /path:"$path";;
     log) $svn /command:log /path:"$path";;
     props) $svn /command:properties /path:"$path";;
+    browse) $svn /command:repobrowser /path:"$path";;
     *)           /usr/bin/svn $@;;
 esac
