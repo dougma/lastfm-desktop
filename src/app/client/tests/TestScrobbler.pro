@@ -1,8 +1,7 @@
 CONFIG += qtestlib moose unicorn
 QT += testlib xml network
 TEMPLATE = app
-TARGET =
-INCLUDEPATH += ../ ../scrobbler
+INCLUDEPATH += ../ ../scrobbler .
 
 include( $$SRC_DIR/common/qmake/include.pro )
 

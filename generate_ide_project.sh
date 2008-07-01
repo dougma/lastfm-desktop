@@ -1,10 +1,8 @@
 #!/bin/bash
 
-BASE='Last.fm'
-
 windows()
 {
-    qmake -recursive -tp vc $BASE.pro
+    qmake -recursive -tp vc Last.fm.pro
 
     AFTER='
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{780C13D3-8172-4EE0-8FD5-26ED6489851C}"
@@ -31,7 +29,7 @@ EndProject
 
 osx() 
 {
-    qmake -recursive -spec macx-xcode $BASE.pro
+    qmake -recursive -spec macx-xcode Last.fm.pro
     # qmake 4.4 sucks
     for x in `find . -type d -name \*.xcodeproj`
     do 

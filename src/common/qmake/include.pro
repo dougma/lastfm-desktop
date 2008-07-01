@@ -1,7 +1,7 @@
 
 include( breakpad.pro.inc )
 include( debug.pro.inc )
-win32:include( manifest.pro.inc )
+#win32:include( manifest.pro.inc )
 include( QtOverride.pro.inc )
 
 CONFIG( service ) {
@@ -17,9 +17,11 @@ CONFIG( extension ) {
 CONFIG( unicorn ) {
     LIBS += -lunicorn
 }
+
 CONFIG( moose ) {
     LIBS += -lmoose
 }
+
 CONFIG( radio ) {
     LIBS += -lradio
 }
