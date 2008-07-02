@@ -3,7 +3,7 @@
 BINDIR="../_bin"
 
 case `uname` in
-    Darwin)
+    Darwin) ;;
     Linux) export LD_LIBRARY_PATH=$BINDIR:$LD_LIBRARY_PATH;;
     *) export PATH=$BINDIR:$PATH;;
 esac
