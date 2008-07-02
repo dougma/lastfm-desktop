@@ -55,4 +55,6 @@ private:
     class Scrobbler* m_scrobbler;
     class RadioPlayer* m_radio;
     class DrWatson* m_watson;
+
+    class QSystemTrayIcon* m_trayIcon;
 };

@@ -204,7 +204,7 @@ TrackInfoData::TrackInfoData()
 #include <QDebug>
 inline QDebug operator<<( QDebug& d, const TrackInfo& t )
 {
-    return d << t.toString();
+    return d << t.toString().replace( QChar(8211), '-' );
 }
 
 

@@ -16,5 +16,4 @@ INCLUDEPATH += $$ROOT_DIR
 
 LIBS += -L$$DESTDIR
 
-# TODO really we should fix these warnings properly
-win32:DEFINES += _CRT_SECURE_NO_WARNINGS
+win32:DEFINES += _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN

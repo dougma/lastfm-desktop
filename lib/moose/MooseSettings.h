@@ -50,7 +50,7 @@ namespace Moose
         // needed by Twiddly as it uses TrackInfo::isScrobblable()
         QStringList excludedDirs() const
         {
-            QStringList paths = QSettings( ).value( "ExclusionDirs" ).toStringList();
+            QStringList paths = QSettings().value( "ExclusionDirs" ).toStringList();
             paths.removeAll( "" );
             return paths;
         }

@@ -30,6 +30,7 @@
 #include "widgets/LoginDialog.h"
 #include "widgets/MainWindow.h"
 #include "lib/unicorn/LastMessageBox.h"
+#include <QSystemTrayIcon>
 
 
 App::App( int argc, char** argv ) 
@@ -82,6 +83,8 @@ App::App( int argc, char** argv )
     m_radio = new RadioPlayer( The::settings().username(), The::settings().password() );
 
     DiagnosticsDialog::observe( m_scrobbler );
+
+    setQuitOnLastWindowClosed( false );
 }
 
 
@@ -106,10 +109,21 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
 
-    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl" );
+    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl/loved" );
     edit->setWindowTitle( "Start Radio Station" );
     edit->show();
     connect( edit, SIGNAL(returnPressed()), SLOT(onStartRadio()) );
+
+    m_trayIcon = new QSystemTrayIcon( window );
+    m_trayIcon->setIcon( QPixmap(":/as.png") );
+    m_trayIcon->show();
+    QMenu* menu = new QMenu;
+    menu->addAction( window->ui.quit );
+    m_trayIcon->setContextMenu( menu );
+    connect( m_trayIcon, 
+             SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
+             window, 
+             SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 }
 
 
@@ -136,8 +150,16 @@ App::onAppEvent( int e, const QVariant& d )
             m_scrobbler->submit();
             // FALL THROUGH
         case PlaybackEvent::PlaybackStarted:
-            m_scrobbler->nowPlaying( The::playerManager().track() );
+        {
+            TrackInfo t = d.value<TrackInfo>();
+            m_scrobbler->nowPlaying( t );
+
+            // no tooltips on mac
+        #ifndef Q_WS_MAC
+            m_trayIcon->setToolTip( t.toString() );
+        #endif
             break;
+        }            
 
         case PlaybackEvent::ScrobblePointReached:
             m_scrobbler->cache( The::playerManager().track() );

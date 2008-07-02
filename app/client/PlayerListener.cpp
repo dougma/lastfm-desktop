@@ -30,7 +30,7 @@ PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketF
 
     //TODO stepping
     if (!listen( QHostAddress::LocalHost, port() ))
-        ;//throw SocketFailure( errorString() );
+        throw SocketFailure( errorString() );
 }
 
 

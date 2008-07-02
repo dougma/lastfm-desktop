@@ -19,6 +19,7 @@
 
 #include "ui_MainWindow.h"
 #include <QMap>
+#include <QSystemTrayIcon> // due to a poor design decision in Qt
 
 
 class MainWindow : public QMainWindow
@@ -31,26 +32,13 @@ public:
     Ui::MainWindow ui;
 
 protected:
-    void resizeEvent( QResizeEvent* );
-    void paintEvent( QPaintEvent* );
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onPlaybackTick( int );
-    void onProgressDisplayTick();
+    void closeEvent( QCloseEvent* );
 
 public slots:
     void showSettingsDialog();
     void showDiagnosticsDialog();
+    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 
 private:
-    /** progress is updated every granularity, so if showing the progress todo
-      * scrobble point, pass the scrobble point in seconds, and the granularity
-      * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
-
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
-
     class TrackListView* m_trackListView;
 };

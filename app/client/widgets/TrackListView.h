@@ -17,13 +17,61 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QListWidget>
+#include <QWidget>
 
 
 class TrackListView : public QWidget
 {
+    Q_OBJECT
+
 public:
     TrackListView();
 
     void add( const class TrackInfo& );
+
+private slots:
+    void onAppEvent( int, const QVariant& );
+
+private:
+    struct Ui
+    {
+        class QBoxLayout* layout;
+        class ScrobbleProgressWidget* progress;
+    };
+
+    Ui ui;
+};
+
+
+class ScrobbleProgressWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ScrobbleProgressWidget();
+
+    struct Ui
+    {
+        class QLabel* time;
+        class QLabel* timeToScrobblePoint;
+    };
+
+    Ui ui;
+
+    /** progress is updated every granularity, so if showing the progress todo
+    * scrobble point, pass the scrobble point in seconds, and the granularity
+    * will be based on the width of the mainwindow and the scrobble point */
+    void determineProgressDisplayGranularity( uint g );
+
+    void resizeEvent( QResizeEvent* );
+    void paintEvent( QPaintEvent* );
+
+    class QTimer* m_progressDisplayTimer;
+    uint m_progressDisplayTick;
+
+public slots:
+    void onPlaybackTick( int );
+
+private slots:
+    void onProgressDisplayTick();
 };

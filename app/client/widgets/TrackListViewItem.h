@@ -23,9 +23,10 @@
 class TrackListViewItem : public QWidget
 {
 public:
-    TrackListViewItem()
+    TrackListViewItem( QWidget* parent ) : QWidget( parent )
     {
         ui.setupUi( this );
+        ui.year->setEnabled( false );
     }
 
     Ui::TrackListViewItem ui;

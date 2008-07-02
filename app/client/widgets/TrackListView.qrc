@@ -1,0 +1,8 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>TrackListView/love.png</file>
+     <file>TrackListView/ban.png</file>
+     <file>TrackListView/share.png</file>
+     <file>TrackListView/add.png</file>
+ </qresource>
+ </RCC> 

@@ -18,173 +18,29 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "PlaybackEvent.h"
-#include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/TrackListView.h"
-#include "lib/unicorn/Logger.h"
-#include "lib/moose/TrackInfo.h"
-#include <QLinearGradient>
-#include <QPainter>
+#include <QCloseEvent>
 #include <QPointer>
-#include <QResizeEvent>
-#include <QTime>
-#include <QTimer>
-#include <QVariant>
-#include <cmath>
+
+#ifdef WIN32
+#include "windows.h"
+#endif
 
 
 MainWindow::MainWindow()
-          : m_progressDisplayTick( 0 )
 {
-    setUnifiedTitleAndToolBarOnMac( true );
-    
-    m_progressDisplayTimer = new QTimer( this );
-    connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
-
     ui.setupUi( this );
+
+    setUnifiedTitleAndToolBarOnMac( true );
     setCentralWidget( m_trackListView = new TrackListView );
 
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-    connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
+    delete ui.toolbar;
 
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
-}
-
-
-void
-MainWindow::onAppEvent( int e, const QVariant& v )
-{
-    switch (e)
-    {
-    case PlaybackEvent::PlaybackStarted:
-    case PlaybackEvent::TrackChanged:
-        m_trackListView->add( v.value<TrackInfo>() );
-        break;
-
-    case PlaybackEvent::PlaybackEnded:
-        break;
-    }
-
-    // progress display timer
-    switch (e)
-    {
-        case PlaybackEvent::PlaybackStarted:
-        case PlaybackEvent::PlaybackUnstalled:
-        case PlaybackEvent::PlaybackUnpaused:
-            determineProgressDisplayGranularity( The::observed().scrobblePoint() );
-            m_progressDisplayTimer->start();
-            break;
-        
-        case PlaybackEvent::PlaybackStalled:
-        case PlaybackEvent::PlaybackPaused:
-        case PlaybackEvent::PlaybackEnded:
-            m_progressDisplayTimer->stop();
-            break;
-    }
-    switch (e)
-    {
-        case PlaybackEvent::PlaybackStarted:
-        case PlaybackEvent::TrackChanged:
-        case PlaybackEvent::PlaybackEnded:
-            m_progressDisplayTick = 0;
-            update();
-    }
-}
-
-
-void
-MainWindow::onPlaybackTick( int s )
-{
-    QTime t( 0, 0 );
-    t = t.addSecs( s );
-//    ui.source->setText( t.toString( "mm:ss" ) );
-}
-
-
-void
-MainWindow::resizeEvent( QResizeEvent* e )
-{
-    if (The::playerManager().state() == PlaybackState::Stopped)
-        return;
-
-    // this is as exact as we can get it in milliseconds
-    uint exactElapsedScrobbleTime = m_progressDisplayTick * m_progressDisplayTimer->interval();
-
-    determineProgressDisplayGranularity( The::observed().scrobblePoint() );
-    
-    if (e->oldSize().width() == 0)
-    {
-        m_progressDisplayTick = 0;
-    }
-    else
-    {
-        double f = exactElapsedScrobbleTime;
-        f /= The::observed().scrobblePoint() * 1000;
-        f *= e->size().width();
-        m_progressDisplayTick = ceil( f );
-    }
-
-    update();
-}
-
-
-void
-MainWindow::determineProgressDisplayGranularity( uint g )
-{
-    if (g == 0)
-    {
-        //TODO #error better handling with gui stuff but non intrusive
-    }
-    else
-        m_progressDisplayTimer->setInterval( 1000 * g / width() );
-}
-
-
-void
-MainWindow::onProgressDisplayTick()
-{
-    m_progressDisplayTick++;
-    update();
-}
-
-
-void
-MainWindow::paintEvent( QPaintEvent* e )
-{
-    QMainWindow::paintEvent( e );
-
-    if (!m_progressDisplayTick)
-        return;
-
-    // Track bar blue bg colour
-    const QColor k_trackBarBkgrBlueTop( 0xeb, 0xf0, 0xf2, 0xff );
-    const QColor k_trackBarBkgrBlueMiddle( 0xe5, 0xe9, 0xec, 0xff );
-    const QColor k_trackBarBkgrBlueBottom( 0xdc, 0xe2, 0xe5, 0xff );
-
-    // Track bar progress bar colour
-    const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
-    const QColor k_trackBarProgressMiddle( 0xd0, 0xd9, 0xe2, 0xff );
-    const QColor k_trackBarProgressBottom( 0xca, 0xd4, 0xdc, 0xff );
-
-    // Track bar scrobbled colour
-    const QColor k_trackBarScrobbledTop( 0xba, 0xc7, 0xd7, 0xff );
-    const QColor k_trackBarScrobbledMiddle( 0xb8, 0xc4, 0xd5, 0xff );
-    const QColor k_trackBarScrobbledBottom( 0xb5, 0xc1, 0xd2, 0xff );
-
-    QLinearGradient g( 0, 0, 0, 20 );
-    g.setColorAt( 0, k_trackBarProgressTop );
-    g.setColorAt( 0.5, k_trackBarProgressMiddle );
-    g.setColorAt( 0.51, k_trackBarProgressBottom );
-    g.setColorAt( 1, k_trackBarProgressBottom );
-
-    QPainter p( this );
-    p.setPen( k_trackBarProgressTop );
-    p.setBrush( g );
-    p.drawRect( QRect( QPoint(), QPoint( m_progressDisplayTick, height() ) ) );
 }
 
 
@@ -205,5 +61,101 @@ MainWindow::showDiagnosticsDialog()
         d = new DiagnosticsDialog( this );
         d->setAttribute( Qt::WA_DeleteOnClose );
         d->show();
+    }
+    else
+        d->activateWindow();
+}
+
+
+void
+MainWindow::closeEvent( QCloseEvent* event )
+{
+#ifdef WIN32
+    //TEST this works on XP as it sure doesn't on Vista
+
+    hide();
+
+    event->ignore();
+
+    // Do animation and fail gracefully if not possible to find systray
+    RECT rectFrame;    // animate from
+    RECT rectSysTray;  // animate to
+
+    ::GetWindowRect( (HWND)winId(), &rectFrame );
+
+    // Get taskbar window
+    HWND taskbarWnd = ::FindWindow( L"Shell_TrayWnd", NULL );
+    if ( taskbarWnd == NULL )
+        return;
+
+    // Use taskbar window to get position of tray window
+    HWND trayWnd = ::FindWindowEx( taskbarWnd, NULL, L"TrayNotifyWnd", NULL );
+    if ( trayWnd == NULL )
+        return;
+
+    ::GetWindowRect( trayWnd, &rectSysTray );
+    ::DrawAnimatedRects( (HWND)winId(), IDANI_CAPTION, &rectFrame, &rectSysTray );
+
+    // Make it release memory as when minimised
+    HANDLE h = ::GetCurrentProcess();
+    SetProcessWorkingSetSize( h, -1 ,-1 );
+#else
+    QMainWindow::closeEvent( event );
+#endif
+}
+
+
+void
+MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason reason )
+{
+    switch (reason)
+    {
+        case QSystemTrayIcon::Unknown:
+        case QSystemTrayIcon::Context:
+        case QSystemTrayIcon::MiddleClick:
+            break;
+
+        case QSystemTrayIcon::DoubleClick:
+          #ifdef WIN32
+            show();
+            activateWindow();
+            raise();
+          #endif
+            break;
+
+        case QSystemTrayIcon::Trigger:
+          #ifdef Q_WS_X11
+            if (!isVisible()) 
+            {
+                show();
+
+                //NOTE don't raise, as this won't work with focus stealing prevention
+                //raise();
+
+                QX11Info const i;
+                Atom const _NET_ACTIVE_WINDOW = XInternAtom( i.display(), "_NET_ACTIVE_WINDOW", False);
+
+                // this sends the correct demand for window activation to the Window 
+                // manager. Thus forcing window activation.
+                ///@see http://standards.freedesktop.org/wm-spec/wm-spec-1.3.html#id2506353
+                XEvent e;
+                e.xclient.type = ClientMessage;
+                e.xclient.message_type = _NET_ACTIVE_WINDOW;
+                e.xclient.display = i.display();
+                e.xclient.window = winId();
+                e.xclient.format = 32;
+                e.xclient.data.l[0] = 1; // we are a normal application
+                e.xclient.data.l[1] = i.appUserTime();
+                e.xclient.data.l[2] = qApp->activeWindow() ? qApp->activeWindow()->winId() : 0;
+                e.xclient.data.l[3] = 0l;
+                e.xclient.data.l[4] = 0l;
+
+                // we send to the root window per fdo NET spec
+                XSendEvent( i.display(), i.appRootWindow(), false, SubstructureRedirectMask | SubstructureNotifyMask, &e );
+            }
+            else
+                hide();
+          #endif
+            break;
     }
 }
