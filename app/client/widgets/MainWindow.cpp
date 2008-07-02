@@ -24,6 +24,12 @@
 #include <QCloseEvent>
 #include <QPointer>
 
+#ifdef Q_WS_X11
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#endif
+
 #ifdef WIN32
 #include "windows.h"
 #endif
