@@ -1,20 +1,15 @@
 TARGET = iPodScrobbler
-QT -= gui
-QT += xml sql
-
-include( ../../definitions.pro.inc )
-
+CONFIG += unicorn moose
 CONFIG -= app_bundle
+QT = core xml sql
+
+include( $$ROOT_DIR/common/qmake/include.pro )
 
 SOURCES += main.cpp \
            PlayCountsDatabase.cpp \
            IPod.cpp
            
 mac*:SOURCES += ITunesLibrary_mac.cpp
-
-INCLUDEPATH += .. ../libUnicorn
-
-LIBS += -L../../bin -lLastFmTools$$EXT -lMoose$$EXT
 
 win32 {
     SOURCES += ITunesLibrary_win.cpp \
@@ -34,8 +29,4 @@ win32 {
     CONFIG(debug, debug|release) {
         QMAKE_POST_LINK += && copy $$ROOT_DIR\bin\iPodScrobblerd.exe $$ROOT_DIR\bin\iPodScrobbler.exe
     }
-}
-
-breakpad {
-    LIBS += -lbreakpad$$EXT
 }

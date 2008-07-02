@@ -12,4 +12,4 @@ FORMS     += $$findSources( ui )
 RESOURCES += $$findSources( qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
-!macx:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
+!macx*:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp

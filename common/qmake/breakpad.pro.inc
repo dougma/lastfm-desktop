@@ -19,7 +19,5 @@ CONFIG( breakpad ) {
 	}
 	
 	INCLUDEPATH += $$SRC_DIR/lib/breakpad $$SRC_DIR/lib/breakpad/external/src
-}
-else {
     DEFINES += _BREAKPAD
 }
