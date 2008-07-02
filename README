@@ -11,7 +11,7 @@ Build Requirements
 ==================
 Windows
 -------
-cygwin, with tar, perl, ssh, svn, etc.
+cygwin -- tar, perl, ssh, svn, gzip, etc.
 
 Folder Structure
 ================

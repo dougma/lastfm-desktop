@@ -8,8 +8,8 @@ QT += gui
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
-SOURCES += $$system( sh $$TOOLS_DIR/findsources cpp )
-HEADERS += $$system( sh $$TOOLS_DIR/findsources h ) \
+SOURCES += $$findSources( cpp )
+HEADERS += $$findSources( h ) \
            QtOverride/QHttp QtOverride/QSystemTrayIcon QtOverride/QMessageBox
 
 !win32 {

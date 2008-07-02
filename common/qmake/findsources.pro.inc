@@ -1,3 +1,3 @@
 defineReplace( findSources ) {
-	return $$system( find . -name \*$$1 | sed -e 's|\./||g' | grep -v tests | grep -v _build )
+    return( $$system( perl $$ROOT_DIR/common/qmake/findSources.pl $$1 ) )
 }
