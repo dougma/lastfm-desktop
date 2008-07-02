@@ -1,15 +1,15 @@
 TEMPLATE = app
 TARGET = client
 CONFIG += unicorn moose radio
-QT += xml network phonon
+QT = core gui xml network phonon
 INCLUDEPATH += .
 
-include( $$SRC_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/common/qmake/include.pro )
 
-SOURCES += $$system( sh $$TOOLS_DIR/findsources cpp )
-HEADERS += $$system( sh $$TOOLS_DIR/findsources h )
-FORMS += $$system( sh $$TOOLS_DIR/findsources ui )
-RESOURCES += $$system( sh $$TOOLS_DIR/findsources qrc )
+SOURCES   += findSources( cpp )
+HEADERS   += findSources( h )
+FORMS     += findSources( ui )
+RESOURCES += findSources( qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
 !macx:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp

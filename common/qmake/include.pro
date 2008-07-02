@@ -1,4 +1,6 @@
 
+include( findsources.pro.inc )
+
 include( breakpad.pro.inc )
 include( debug.pro.inc )
 #win32:include( manifest.pro.inc )
