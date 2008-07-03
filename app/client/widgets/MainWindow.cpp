@@ -42,7 +42,7 @@ MainWindow::MainWindow()
     setUnifiedTitleAndToolBarOnMac( true );
     setCentralWidget( m_trackListView = new TrackListView );
 
-    delete ui.toolbar;
+    ui.toolbar->hide();
 
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
