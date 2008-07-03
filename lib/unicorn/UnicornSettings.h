@@ -73,6 +73,9 @@ namespace Unicorn
         // all Unicorn::Applications obey this
         bool logOutOnExit() const { return UserSettings().value( "LogOutOnExit", false ).toBool(); }
 
+        //TODO: make this a per user setting
+        QString sessionKey() const { return QSettings().value( "SessionKey", "" ).toString(); }
+
         /** @returns one of our pre-defined 2-letter language codes */
         QString language() const;
     };
@@ -104,7 +107,10 @@ namespace Unicorn
         void setProxyPassword( QString v ) { QSettings().setValue( "ProxyPassword", v ); }
         void setLanguage( QString langCode ) { QSettings().setValue( "AppLanguage", langCode ); }
         void setLogOutOnExit( bool b ) { UserSettings().setValue( "LogOutOnExit", b ); }
+        void setSessionKey( QString sessionKey ) { QSettings().setValue( "SessionKey", sessionKey ); }
     };
 }
+
+
 
 #endif

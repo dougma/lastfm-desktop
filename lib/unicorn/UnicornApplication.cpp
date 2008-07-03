@@ -21,6 +21,7 @@
 #include "LastMessageBox.h"
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
+#include "ws/WsRequestManager.h"
 
 
 Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
@@ -57,6 +58,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             throw StubbornUserException();
         }
     }
+
+    WsRequestManager::instance();
 }
 
 
