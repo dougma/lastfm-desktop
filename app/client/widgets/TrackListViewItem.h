@@ -27,6 +27,8 @@ public:
     {
         ui.setupUi( this );
         ui.year->setEnabled( false );
+        ui.year->setAttribute( Qt::WA_MacSmallSize );
+        ui.album->setAttribute( Qt::WA_MacSmallSize );
     }
 
     Ui::TrackListViewItem ui;

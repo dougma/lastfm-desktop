@@ -39,10 +39,9 @@ MainWindow::MainWindow()
 {
     ui.setupUi( this );
 
-    setUnifiedTitleAndToolBarOnMac( true );
     setCentralWidget( m_trackListView = new TrackListView );
-
-    ui.toolbar->hide();
+//    setUnifiedTitleAndToolBarOnMac( true );
+    delete ui.toolbar;
 
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );

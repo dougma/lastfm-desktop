@@ -78,22 +78,6 @@ DrWatson::onScrobblerStatusChanged( int const new_status )
 }
 
 
-static void smallFontise( QWidget* w )
-{
-    #ifdef WIN32
-    return; //small fonts look wrong on Windows
-    #endif
-
-    QFont f = w->font();
-    #if defined LINUX
-        f.setPointSize( f.pointSize() - 2 );
-    #else
-        f.setPointSize( 10 );
-    #endif
-    w->setFont( f );
-}
-
-
 DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
         : QDialog( parent )
 {
@@ -107,15 +91,12 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     ui.tabWidget->removeTab( 3 );
 #endif
 
-    // not possible to do this with designer, and varies by platform
-    smallFontise( ui.cachedTracksLabel );
-    smallFontise( ui.cachedTracksTitle );
-    smallFontise( ui.fingerprintedTracksTitle );
 
     #ifdef Q_OS_MAC
-    layout()->setMargin( 7 );
+    ui.cachedTracksLabel->setAttribute( Qt::WA_MacSmallSize );
+    ui.fingerprintedTracksTitle->setAttribute( Qt::WA_MacSmallSize );
+    ui.cachedTracksList->setAttribute( Qt::WA_MacSmallSize );
     ui.cachedTracksList->setAttribute( Qt::WA_MacShowFocusRect, false );
-    ui.vboxLayout1->setSpacing( 18 );
     #endif
 
     ui.httpBufferLabel->setMinimumWidth( ui.httpBufferProgress->fontMetrics().width( "100.0k" ) );
