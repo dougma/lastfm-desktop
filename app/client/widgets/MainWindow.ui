@@ -6,13 +6,21 @@
     <x>0</x>
     <y>0</y>
     <width>331</width>
-    <height>114</height>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Name TBA</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>84</y>
+     <width>331</width>
+     <height>41</height>
+    </rect>
+   </property>
    <layout class="QHBoxLayout" >
     <item>
      <widget class="QLabel" name="source" >
@@ -43,6 +51,8 @@
     <property name="title" >
      <string>&amp;File</string>
     </property>
+    <addaction name="actionTune_In" />
+    <addaction name="separator" />
     <addaction name="logOut" />
     <addaction name="separator" />
     <addaction name="quit" />
@@ -64,6 +74,14 @@
    <addaction name="menuHelp" />
   </widget>
   <widget class="QToolBar" name="toolbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>22</y>
+     <width>331</width>
+     <height>62</height>
+    </rect>
+   </property>
    <property name="windowTitle" >
     <string/>
    </property>
@@ -113,7 +131,8 @@
   </action>
   <action name="ban" >
    <property name="icon" >
-    <iconset resource="MainWindow.qrc" >:/MainWindow/ban.png</iconset>
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/ban.png</normaloff>:/MainWindow/ban.png</iconset>
    </property>
    <property name="text" >
     <string>Ban</string>
@@ -121,7 +140,8 @@
   </action>
   <action name="love" >
    <property name="icon" >
-    <iconset resource="MainWindow.qrc" >:/MainWindow/love.png</iconset>
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/love.png</normaloff>:/MainWindow/love.png</iconset>
    </property>
    <property name="text" >
     <string>Love</string>
@@ -129,7 +149,8 @@
   </action>
   <action name="share" >
    <property name="icon" >
-    <iconset resource="MainWindow.qrc" >:/MainWindow/share.png</iconset>
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/share.png</normaloff>:/MainWindow/share.png</iconset>
    </property>
    <property name="text" >
     <string>Share</string>
@@ -137,7 +158,8 @@
   </action>
   <action name="tag" >
    <property name="icon" >
-    <iconset resource="MainWindow.qrc" >:/MainWindow/tag.png</iconset>
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/tag.png</normaloff>:/MainWindow/tag.png</iconset>
    </property>
    <property name="text" >
     <string>Tag</string>
@@ -149,11 +171,17 @@
    </property>
   </action>
   <action name="skip" >
-   <property name="icon">
-	<iconset resource="MainWindow.qrc" >:/MainWindow/skip.png</iconset>
+   <property name="icon" >
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/skip.png</normaloff>:/MainWindow/skip.png</iconset>
    </property>
    <property name="text" >
     <string>Skip</string>
+   </property>
+  </action>
+  <action name="actionTune_In" >
+   <property name="text" >
+    <string>Tune In...</string>
    </property>
   </action>
  </widget>
