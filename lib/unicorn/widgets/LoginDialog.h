@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 #include "ui_LoginDialog.h"
+#include "lib/DllExportMacro.h"
 #include <QDialog>
 
 
-class LoginDialog : public QDialog
+class UNICORN_DLLEXPORT LoginDialog : public QDialog
 {
     Q_OBJECT
 

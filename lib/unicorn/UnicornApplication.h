@@ -17,12 +17,13 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/DllExportMacro.h"
 #include <QApplication>
 
 
 namespace Unicorn
 {
-    class Application : public QApplication
+    class UNICORN_DLLEXPORT Application : public QApplication
     {
         Q_OBJECT
         
