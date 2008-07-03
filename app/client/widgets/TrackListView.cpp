@@ -44,12 +44,13 @@ void
 TrackListView::add( const TrackInfo& t )
 {
     TrackListViewItem* i = new TrackListViewItem( this );
-    i->ui.artist->setText( t.artist() + " <b>" + t.track() + "</b>" );
+    i->ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
     i->ui.album->setText( t.album() );
     i->ui.year->setText( "2000" );
     i->show();
 
     ui.layout->insertWidget( 0, i );
+    ui.layout->insertWidget( 1, ui.progress );
 }
 
 

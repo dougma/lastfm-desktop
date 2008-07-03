@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -45,8 +45,6 @@ DrWatson::DrWatson()
 void
 DrWatson::onScrobblerStatusChanged( int const new_status )
 {
-    Q_DEBUG_BLOCK << new_status;
-
     int const old_status = scrobbler_status;
 
     if (new_status == Scrobbler::Connecting)

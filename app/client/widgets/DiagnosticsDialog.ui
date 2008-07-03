@@ -40,10 +40,21 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="scrobblingTab" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>480</width>
+        <height>422</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Scrobbling</string>
       </attribute>
       <layout class="QVBoxLayout" >
+       <property name="spacing" >
+        <number>6</number>
+       </property>
        <item>
         <layout class="QGridLayout" >
          <item row="0" column="1" >
@@ -109,19 +120,6 @@
           <number>9</number>
          </property>
          <item>
-          <widget class="QLabel" name="cachedTracksTitle" >
-           <property name="font" >
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text" >
-            <string>Cached Tracks</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QTreeWidget" name="cachedTracksList" >
            <property name="sizePolicy" >
             <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
@@ -185,6 +183,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="radioTab" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>480</width>
+        <height>422</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Radio</string>
       </attribute>
@@ -339,7 +345,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -350,6 +356,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="fingerprintingTab" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>480</width>
+        <height>422</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>Fingerprinting</string>
       </attribute>
@@ -359,6 +373,9 @@
        </property>
        <item>
         <layout class="QGridLayout" >
+         <property name="spacing" >
+          <number>6</number>
+         </property>
          <item row="0" column="0" >
           <widget class="QLabel" name="submissionServerLabel_2" >
            <property name="sizePolicy" >
@@ -427,6 +444,9 @@
          <property name="spacing" >
           <number>2</number>
          </property>
+         <property name="topMargin" >
+          <number>9</number>
+         </property>
          <item>
           <widget class="QLabel" name="fingerprintedTracksTitle" >
            <property name="font" >
@@ -485,6 +505,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="iPodTab" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>480</width>
+        <height>422</height>
+       </rect>
+      </property>
       <attribute name="title" >
        <string>iPod Scrobbling</string>
       </attribute>
@@ -574,11 +602,8 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Expanding</enum>
        </property>
       </spacer>
      </item>
