@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "PlaybackState.h"
-#include <QApplication>
+#include "lib/unicorn/UnicornApplication.h"
 
 
-class App : public QApplication
+class App : public Unicorn::Application
 {
     Q_OBJECT
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -27,47 +27,17 @@
 #include "mac/ITunesListener.h"
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "widgets/LoginDialog.h"
 #include "widgets/MainWindow.h"
-#include "lib/unicorn/LastMessageBox.h"
+#include <QLineEdit>
 #include <QSystemTrayIcon>
 
 
 App::App( int argc, char** argv ) 
-   : QApplication( argc, argv )
+   : Unicorn::Application( argc, argv )
 {
-#ifdef Q_WS_MAC
-    if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
-    {
-        LastMessageBox::critical( 
-                QObject::tr( "Unsupported OS X Version" ),
-                QObject::tr( "We are sorry, but Last.fm requires OS X Tiger or above." ) );
-        throw 1; //FIXME using exceptions for flow control? eww!
-    }
-#endif
-
+    //TODO bootstrapping
+    
     Settings::instance = new Settings( VERSION, applicationFilePath() );
-
-    if (The::settings().username().isEmpty() || The::settings().logOutOnExit())
-    {
-        LoginDialog d;
-        if (d.exec() == QDialog::Accepted)
-        {
-            // we shouldn't store this really, if LogOutOnExit is enabled
-            // but we delete the setting on exit, and it means other apps can
-            // log in while the client is loaded, and prevents us having to 
-            // store these datas for the use case where LogOutOnExit is disabled
-            // during the session
-            Unicorn::QSettings().setValue( "Username", d.username() );
-            Unicorn::QSettings().setValue( "Password", d.password() );
-
-            //TODO bootstrapping
-        }
-        else
-        {
-            throw 0; //FIXME using exceptions for flow control? eww!
-        }
-    }
 
     m_playerListener = new PlayerListener( this );
     connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
@@ -90,14 +60,6 @@ App::App( int argc, char** argv )
 
 App::~App()
 {
-    // we do this here, rather than in the SettingsDialog in case the user
-    // changes their mind
-    if (The::settings().logOutOnExit())
-    {
-        Unicorn::QSettings().remove( "Username" );
-        Unicorn::QSettings().remove( "Password" );
-    }
-
     delete Settings::instance;
 }
 

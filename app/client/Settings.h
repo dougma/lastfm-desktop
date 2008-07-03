@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -34,33 +34,21 @@ class Settings : public Moose::Settings
     friend class App;
     friend Settings& The::settings();
 
-protected:
-    Settings( const Settings& )
-    {
-        // we appear odd, but it enforces encapsulation, since the compiler
-        // requires an instance of Settings to use this ctor, and only main()
-        // can create one, well you could cast something else, but we may 
-        // actually require something from the Settings instance at some point
-        // and then your code will crash :P
-    }
-
 public:
     QByteArray containerGeometry() const { return QSettings().value( "MainWindowGeometry" ).toByteArray(); }
     Qt::WindowState containerWindowState() const { return (Qt::WindowState) QSettings().value( "MainWindowState" ).toInt(); }
-    bool logOutOnExit() const { return QSettings().value( "LogOutOnExit", false ).toBool(); }
 
 private:
     bool m_weWereJustUpgraded;
 };
 
 
-class MutableSettings : private Settings
+class MutableSettings : public Unicorn::MutableSettings
 {
 public:
-    MutableSettings( const Settings& that ) : Settings( that )
+    MutableSettings( const ::Settings& )
     {}
 
-    void setLogOutOnExit( bool b ) { QSettings().setValue( "LogOutOnExit", b ); }
     void setControlPort( int v ) { QSettings().setValue( "ControlPort", v ); }
     void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
     void setContainerWindowState( int state ) { QSettings().setValue( "MainWindowState", state ); }

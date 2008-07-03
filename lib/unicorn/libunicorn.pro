@@ -8,9 +8,10 @@ QT += gui
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
-SOURCES += $$findSources( cpp )
-HEADERS += $$findSources( h ) \
+SOURCES = $$findSources( cpp )
+HEADERS = $$findSources( h ) \
            QtOverride/QHttp QtOverride/QSystemTrayIcon QtOverride/QMessageBox
+FORMS   = $$findSources( ui )
 
 !win32 {
     SOURCES -= UnicornCommonWin.cpp

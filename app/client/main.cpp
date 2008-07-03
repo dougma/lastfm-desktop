@@ -62,12 +62,20 @@ int main( int argc, char** argv )
     }
     catch (PlayerListener::SocketFailure& e)
     {
-        //TODO
+        //TODO message to user
         //FIXME can't have it so that there is no radio option if listener socket fails!
         qDebug() << "Socket failure:" << e.what();
+        return 1;
     }
-    catch (int)
+    catch (Unicorn::Application::UnsupportedPlatformException&)
+    {
+        // a message box was displayed to the user by Unicorn::Application
+        qDebug() << "Unsupport platform"; 
+        return 2;
+    }
+    catch (Unicorn::Application::StubbornUserException&)
     {
         // user wouldn't log in
+        return 0;
     }
 }
