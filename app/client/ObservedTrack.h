@@ -17,44 +17,42 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
-#include "lib/unicorn/UnicornApplication.h"
+#ifndef OBSERVED_TRACK_H
+#define OBSERVED_TRACK_H
+
+#include "lib/moose/TrackInfo.h"
+#include "StopWatch.h" // sadly necessary dep
+#include <QPointer>
 
 
-class App : public Unicorn::Application
+class ObservedTrack : public TrackInfo
 {
-    Q_OBJECT
+    QPointer<StopWatch> m_watch;
+
+    friend class PlayerManager;
 
 public:
-    App( int, char** );
-    ~App();
+    ObservedTrack() // QMetaType needs this :(
+    {
+        // initialising m_watch to 0 is done by QPointer for us
+    }
 
-    PlaybackState::Enum state() const;
+    ObservedTrack( const TrackInfo& that )
+    {
+        static_cast<TrackInfo&>(*this) = that;
+    }
 
-    void setMainWindow( class MainWindow* );
+    /** If you copy the returned object use a QPointer, as it is liable to be
+      * deleted after the track is finished. This is by design, since you don't 
+      * want to reflect the information about a track that no longer exists */
+    StopWatch* watch() const { return m_watch; }
 
-    //TODO remove
-    class PlayerManager& playerManager() { return *m_playerManager; }
-
-public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
-
-    void love();
-    void ban();
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onTuneIn();
-
-signals:
-    void event( int, const QVariant& );
-
-private:
-    class PlayerListener* m_playerListener;
-    class PlayerManager* m_playerManager;
-    class Scrobbler* m_scrobbler;
-    class RadioPlayer* m_radio;
-    class DrWatson* m_watson;
-
-    class QSystemTrayIcon* m_trayIcon;
+    /** @returns the time in seconds when the track is considered scrobbled */
+    uint scrobblePoint() const;
 };
+
+
+#include <QMetaType>
+Q_DECLARE_METATYPE( ObservedTrack );
+
+#endif

@@ -70,12 +70,7 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
-
-    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl/loved" );
-    edit->setWindowTitle( "Start Radio Station" );
-    edit->show();
-    connect( edit, SIGNAL(returnPressed()), SLOT(onStartRadio()) );
-
+    connect( window->ui.tunein, SIGNAL(triggered()), SLOT(onTuneIn()) );
     m_trayIcon = new QSystemTrayIcon( window );
     m_trayIcon->setIcon( QPixmap(":/as.png") );
     m_trayIcon->show();
@@ -90,9 +85,18 @@ App::setMainWindow( MainWindow* window )
 
 
 void
-App::onStartRadio()
+App::onTuneIn()
 {
-    m_radio->play( static_cast<QLineEdit*>(sender())->text() );
+    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl/loved" );
+
+    QDialog d;
+    d.setWindowTitle( tr("Start Radio Station") );
+    (new QVBoxLayout( &d ))->addWidget( edit );
+    connect( edit, SIGNAL(returnPressed()), &d, SLOT(accept()) );
+    d.exec();
+
+    if (d.result() == QDialog::Accepted)
+        m_radio->play( edit->text() );
 }
 
 
@@ -124,7 +128,7 @@ App::onAppEvent( int e, const QVariant& d )
         }            
 
         case PlaybackEvent::ScrobblePointReached:
-            m_scrobbler->cache( The::playerManager().track() );
+            m_scrobbler->cache( d.value<TrackInfo>() );
             break;
 
         case PlaybackEvent::PlaybackEnded:

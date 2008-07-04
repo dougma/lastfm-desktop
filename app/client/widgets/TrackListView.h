@@ -27,7 +27,7 @@ class TrackListView : public QWidget
 public:
     TrackListView();
 
-    void add( const class TrackInfo& );
+    void add( const class ObservedTrack& );
 
 private slots:
     void onAppEvent( int, const QVariant& );
@@ -68,6 +68,9 @@ public:
 
     class QTimer* m_progressDisplayTimer;
     uint m_progressDisplayTick;
+
+    uint m_scrobblePoint;
+    uint scrobblePoint() const { return m_scrobblePoint; }
 
 public slots:
     void onPlaybackTick( int );

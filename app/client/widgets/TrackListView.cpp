@@ -18,10 +18,9 @@
  ***************************************************************************/
 
 #include "TrackListView.h"
+#include "ObservedTrack.h"
 #include "PlaybackEvent.h"
-#include "PlayerManager.h"
 #include "TrackListViewItem.h"
-#include "lib/moose/TrackInfo.h"
 #include <QLinearGradient>
 #include <QPainter>
 #include <QResizeEvent>
@@ -37,25 +36,38 @@ TrackListView::TrackListView()
 
     ui.layout = new QVBoxLayout( this );
     ui.layout->addWidget( ui.progress = new ScrobbleProgressWidget );
+    ui.layout->setContentsMargins( 0, 0, 0, 0 );
+
+    ui.progress->layout()->setContentsMargins( -1, -1, -1, -1 );
 }
 
 
 void 
-TrackListView::add( const TrackInfo& t )
+TrackListView::add( const ObservedTrack& t )
 {
-    TrackListViewItem* i = new TrackListViewItem( this );
-    i->ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
-    i->ui.album->setText( t.album() );
-    i->ui.year->setText( "2000" );
+    TrackListViewItem* i = new TrackListViewItem( t, this );
     i->show();
 
+    ui.progress->m_scrobblePoint = t.scrobblePoint();
+    connect( t.watch(), SIGNAL(tick( int )), ui.progress, SLOT(onPlaybackTick( int )) );
+
+    QLabel* time = new QLabel( t.dateTime().toString( "hh:mm:ss" ) );
+    time->setEnabled( false );
+    time->setAttribute( Qt::WA_MacSmallSize );
+    time->setPalette( QPalette( Qt::black, Qt::lightGray ) );
+    time->setAutoFillBackground( true );
+    time->setMargin( 2 );
+    time->setIndent( 1 );
+    
+    ui.layout->insertWidget( 0, ui.progress );
     ui.layout->insertWidget( 0, i );
-    ui.layout->insertWidget( 1, ui.progress );
+    ui.layout->insertWidget( 0, time );
 }
 
 
 ScrobbleProgressWidget::ScrobbleProgressWidget()
-                      : m_progressDisplayTick( 0 )
+                      : m_progressDisplayTick( 0 ),
+                        m_scrobblePoint( 0 )
 {
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.time = new QLabel );
@@ -68,7 +80,6 @@ ScrobbleProgressWidget::ScrobbleProgressWidget()
 
     m_progressDisplayTimer = new QTimer( this );
     connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
-    connect( &The::playerManager(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
 }
 
 
@@ -131,12 +142,10 @@ ScrobbleProgressWidget::onProgressDisplayTick()
 void
 ScrobbleProgressWidget::onPlaybackTick( int s )
 {
-    int const p = The::observed().scrobblePoint();
-
-    if (s < p)
+    if ((uint)s < scrobblePoint())
     {
         QTime t( 0, 0 );
-        t = t.addSecs( p );
+        t = t.addSecs( scrobblePoint() );
         t = t.addSecs( -s );
         ui.timeToScrobblePoint->setText( t.toString( "-mm:ss" ) );
     }
@@ -152,13 +161,13 @@ ScrobbleProgressWidget::onPlaybackTick( int s )
 void
 ScrobbleProgressWidget::resizeEvent( QResizeEvent* e )
 {
-    if (The::playerManager().state() == PlaybackState::Stopped)
+    if (!scrobblePoint())
         return;
 
     // this is as exact as we can get it in milliseconds
     uint exactElapsedScrobbleTime = m_progressDisplayTick * m_progressDisplayTimer->interval();
 
-    determineProgressDisplayGranularity( The::observed().scrobblePoint() );
+    determineProgressDisplayGranularity( scrobblePoint() );
 
     if (e->oldSize().width() == 0)
     {
@@ -167,7 +176,7 @@ ScrobbleProgressWidget::resizeEvent( QResizeEvent* e )
     else
     {
         double f = exactElapsedScrobbleTime;
-        f /= The::observed().scrobblePoint() * 1000;
+        f /= scrobblePoint() * 1000;
         f *= e->size().width();
         m_progressDisplayTick = ceil( f );
     }
@@ -183,7 +192,7 @@ TrackListView::onAppEvent( int e, const QVariant& v )
     {
     case PlaybackEvent::PlaybackStarted:
     case PlaybackEvent::TrackChanged:
-        add( v.value<TrackInfo>() );
+        add( v.value<ObservedTrack>() );
         break;
 
     case PlaybackEvent::PlaybackEnded:
@@ -196,7 +205,7 @@ TrackListView::onAppEvent( int e, const QVariant& v )
     case PlaybackEvent::PlaybackStarted:
     case PlaybackEvent::PlaybackUnstalled:
     case PlaybackEvent::PlaybackUnpaused:
-        ui.progress->determineProgressDisplayGranularity( The::observed().scrobblePoint() );
+        ui.progress->determineProgressDisplayGranularity(  v.value<ObservedTrack>().scrobblePoint() );
         ui.progress->m_progressDisplayTimer->start();
         break;
 

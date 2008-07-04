@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,18 +18,14 @@
  ***************************************************************************/
 
 #include "ui_TrackListViewItem.h"
+#include "lib/moose/TrackInfo.h"
 
 
 class TrackListViewItem : public QWidget
 {
 public:
-    TrackListViewItem( QWidget* parent ) : QWidget( parent )
-    {
-        ui.setupUi( this );
-        ui.year->setEnabled( false );
-        ui.year->setAttribute( Qt::WA_MacSmallSize );
-        ui.album->setAttribute( Qt::WA_MacSmallSize );
-    }
+    TrackListViewItem( const TrackInfo&, QWidget* parent );
 
     Ui::TrackListViewItem ui;
+    TrackInfo m_track;
 };

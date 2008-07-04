@@ -23,6 +23,7 @@
 #include "lib/DllExportMacro.h"
 #include <QSettings>
 #include <QString>
+#include "app/client/version.h" //FIXME for PRODUCT_NAME
 
 
 namespace Unicorn
@@ -36,7 +37,7 @@ namespace Unicorn
     class QSettings : public ::QSettings
     {
     public:
-        QSettings() : ::QSettings( "Last.fm", "AudioScrobbler" )
+        QSettings() : ::QSettings( "Last.fm", PRODUCT_NAME )
         {}
     };
     

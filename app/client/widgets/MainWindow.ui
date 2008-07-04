@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Name TBA</string>
+   <string>Last.fm</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
@@ -51,7 +51,7 @@
     <property name="title" >
      <string>&amp;File</string>
     </property>
-    <addaction name="actionTune_In" />
+    <addaction name="tunein" />
     <addaction name="separator" />
     <addaction name="logOut" />
     <addaction name="separator" />
@@ -179,7 +179,7 @@
     <string>Skip</string>
    </property>
   </action>
-  <action name="actionTune_In" >
+  <action name="tunein" >
    <property name="text" >
     <string>Tune In...</string>
    </property>

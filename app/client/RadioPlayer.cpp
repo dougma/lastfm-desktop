@@ -18,13 +18,13 @@
  ***************************************************************************/
 
 #include "RadioPlayer.h"
-#include "lib/radio/Radio.h"
+//#include "lib/radio/Radio.h"
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <phonon/mediasource.h>
 #include <phonon/backendcapabilities.h>
-
 #include <QDebug>
+#include <QDir>
 
 QString password, username;
 
@@ -36,6 +36,8 @@ RadioPlayer::RadioPlayer( const QString& _username, const QString& _password )
     m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
     m_mediaObject = new Phonon::MediaObject( this );
     
+    m_mediaObject->setTickInterval( 1000 );
+
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
@@ -43,8 +45,10 @@ RadioPlayer::RadioPlayer( const QString& _username, const QString& _password )
 void
 RadioPlayer::play( const QString& url )
 {
+    qRegisterMetaType<QList<Radio::Track> >( "QList<Radio::Track>" );
+
     m_radio = new Radio( username, password );
-    connect( m_radio, SIGNAL(tracksReady()), SLOT(onTracksReady()) );
+    connect( m_radio, SIGNAL(tracks( QList<Radio::Track> )), SLOT(onTracksReady( QList<Radio::Track> )) );
     m_radio->tuneIn( url );
 }
 
@@ -65,11 +69,21 @@ RadioPlayer::stop()
 
 
 void
-RadioPlayer::onTracksReady()
+RadioPlayer::onTracksReady( const QList<Radio::Track>& tracks )
 {
     QList<QUrl> urls;
-    foreach (const Radio::Track& t, m_radio->m_tracks)
+
+#ifdef WIN32
+    Q_UNUSED( tracks )
+    //Phonom/Qt4.4/Windows is broken for HTTP streaming - crashes
+    QDir d( "c:/Users/mxcl/Music" );
+    foreach (QString name, d.entryList( QStringList() << "*.mp3", QDir::Files ))
+        urls += QUrl::fromLocalFile( d.filePath( name ) );
+#else
+    foreach (const Radio::Track& t, tracks)
         urls += t.location;
+#endif
+
     m_mediaObject->enqueue( urls );
     m_mediaObject->play();
 }

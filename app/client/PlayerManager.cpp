@@ -47,23 +47,17 @@ PlayerManager::love()
 void
 PlayerManager::onTrackStarted( const TrackInfo& t )
 {
-    if (m_players.count())
-        disconnect( &m_players.top()->watch, 0, this, 0 );
-
     QString const id = t.playerId();
     Player& p = *m_players[id];
     p.track = t;
     p.state = PlaybackState::Playing;
-    //TODO take into account the point at which the track actually started as 
-    // reported by the PlayerSource
-    p.watch.start( t.duration() * The::settings().scrobblePoint() / 100);
+    StopWatch* watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
+    delete p.track.m_watch; //just in case
+    p.track.m_watch = watch;
 
     if (m_players.top()->id == id)
     {
-        //TODO this isn't neat, we don't have to do it everytime as the previous 
-        // top() is prolly the same as the new top()
-        connect( &p.watch, SIGNAL(tick( int )), SIGNAL(tick( int )) );
-        connect( &p.watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
+        connect( watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
         handleStateChange( p.state, p.track );
     }
 }
@@ -74,6 +68,8 @@ void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
     bool const isActive = m_players.top()->id == id;
+
+    QString id_ = m_players.top()->id;
 
     // do before anything so the state emission we are about to do is reflected
     // here as well as elsewhere
@@ -94,7 +90,7 @@ PlayerManager::onPlaybackEnded( const QString& id )
 void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
-    m_players[id]->watch.pause();
+    m_players[id]->track.m_watch->pause();
 
     if (m_players.top()->id == id)
         handleStateChange( PlaybackState::Paused );
@@ -104,7 +100,7 @@ PlayerManager::onPlaybackPaused( const QString& id )
 void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
-    m_players[id]->watch.resume();
+    m_players[id]->track.m_watch->resume();
 
     if (m_players.top()->id == id)
         handleStateChange( PlaybackState::Playing );

@@ -70,8 +70,6 @@ public:
 
     bool m_done;
     
-    QList<Track> m_tracks;
-    
 signals:
-    void tracksReady();
+    void tracks( const QList<Radio::Track>& );
 };

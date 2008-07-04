@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QObject>
+#include "lib/radio/Radio.h"
  
 namespace Phonon
 {
@@ -40,7 +41,7 @@ public slots:
     void stop();
 
 private slots:
-    void onTracksReady();
+    void onTracksReady( const QList<Radio::Track>& );
     void onAboutToFinishPlaylist();
 
 private:

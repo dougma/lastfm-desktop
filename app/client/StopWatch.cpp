@@ -21,31 +21,20 @@
 #include <QDebug>
 
 
-StopWatch::StopWatch() : m_thread( 0 )
-{}
+StopWatch::StopWatch( uint timeout ) : m_thread( 0 )
+{
+    m_thread = new StopWatchThread;
+    connect( m_thread, SIGNAL(tick( int )), SIGNAL(tick( int )) );
+    connect( m_thread, SIGNAL(timeout()), SIGNAL(timeout()) );
+
+    m_thread->m_timeout = timeout * 1000;
+    m_thread->start();
+}
 
 
 StopWatch::~StopWatch()
 {
     if (m_thread) m_thread->deleteLater();
-}
-
-
-void
-StopWatch::start( uint const i )
-{
-    if (m_thread)
-    {
-        disconnect( m_thread, 0, this, 0 );
-        m_thread->deleteLater();
-    }
-
-    m_thread = new StopWatchThread;
-    connect( m_thread, SIGNAL(tick( int )), SIGNAL(tick( int )) );
-    connect( m_thread, SIGNAL(timeout()), SIGNAL(timeout()) );
-
-    m_thread->m_timeout = i * 1000;
-    m_thread->start();
 }
 
 

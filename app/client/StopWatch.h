@@ -65,11 +65,8 @@ class StopWatch : public QObject
     Q_DISABLE_COPY( StopWatch )
 
 public:
-    StopWatch();
+    StopWatch( uint timeout_in_seconds );
     ~StopWatch();
-
-    /** kills the old stop watch, you won't get any signals for that one now */
-    void start( uint timeout_in_seconds );
 
     void pause()  { m_thread->m_paused = true; }
     void resume() { m_thread->m_paused = false; }

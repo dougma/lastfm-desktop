@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "PlaybackState.h"
+#include "ObservedTrack.h"
 #include "StopWatch.h"
-#include "lib/moose/TrackInfo.h"
 #include <QMutableVectorIterator>
 #include <QStack>
 #include <QVariant>
@@ -29,15 +29,11 @@
 
 struct Player
 {
-    Player()
+    Player( QString _id ) : id( _id ), track( TrackInfo() )
     {}
 
-    Player( QString _id ) : id( _id )
-    {}
-
-    QString id;
-    TrackInfo track;
-    StopWatch watch;
+    QString const id;
+    ObservedTrack track;
     PlaybackState::Enum state;
 };
 
@@ -65,8 +61,6 @@ public slots:
     void onPlaybackResumed( const QString& playerId );
 
 signals:
-    /** the scrobble point tick */
-    void tick( int seconds_since_observation_started );
     /** the int is a PlaybackEvent, @data is documented with the enum */
     void event( int, const QVariant& data = QVariant() );
 
@@ -111,41 +105,3 @@ private:
     UniquePlayerStack m_players;
     PlaybackState::Enum m_state;
 };
-
-
-namespace The
-{
-    PlayerManager& playerManager(); //defined in App.cpp
-}
-
-
-class Observed
-{
-    static Player& top() { return *The::playerManager().m_players.top(); }
-
-public:
-    static uint scrobblePoint()
-    {
-        return top().track.scrobblePoint();
-    }
-
-    static uint elapsedScrobbleTime()
-    {
-        //FIXME will crash
-        return top().watch.elapsed();
-    }
-
-    static uint duration()
-    {
-        return top().track.duration();
-    }
-};
-
-
-namespace The
-{
-    inline Observed observed()
-    {
-        return Observed();
-    }
-}

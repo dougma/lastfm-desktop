@@ -33,16 +33,14 @@ Radio::Radio( const QString& username, const QString& password )
      : m_username( username ),
        m_password( password ),
        m_done( false )
-{
-    start();
-}
+{}
 
 
 void
 Radio::tuneIn( const QString& url )
 {
     m_station_url = url;
-    
+    start();   
 }
 
 
@@ -74,8 +72,7 @@ Radio::run()
                     qDebug() << t.artist << t.title << t.location;
                 }
                 
-                m_tracks = tracks;
-                emit tracksReady();
+                emit this->tracks( tracks );
 
                 QMutex mutex;
                 mutex.lock();
