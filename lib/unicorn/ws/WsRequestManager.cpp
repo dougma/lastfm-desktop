@@ -29,7 +29,7 @@ void WsRequestManager::getSession()
 {
     Unicorn::Settings settings;
 
-    WsRequestParameters params = new WsRequestParameters( this );
+    WsRequestParameters params;
     QString authToken = md5( ( settings.username() + 
                                settings.password() ).toUtf8() );
 
@@ -99,7 +99,7 @@ void WsRequestManager::parseSessionAuth( WsReply* reply )
     Unicorn::Settings settings;
     Unicorn::MutableSettings mutableSettings;
 
-    QDomDocument& content = reply->domDocument();
+    QDomDocument content = reply->domDocument();
 
     QDomElement lfm = content.firstChildElement( "lfm" );
     if( lfm.isNull() )
