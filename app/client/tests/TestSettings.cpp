@@ -39,6 +39,11 @@ class TestSettings : public QObject
             QSettings().clear();
         }
         
+        void cleanupTestCase()
+        {
+            QSettings().clear();
+        }
+        
         void testLogOutOnExit();
         void testControlPort();
         void testScrobblePoint();
