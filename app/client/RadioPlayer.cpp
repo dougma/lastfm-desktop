@@ -72,17 +72,8 @@ void
 RadioPlayer::onTracksReady( const QList<Radio::Track>& tracks )
 {
     QList<QUrl> urls;
-
-#ifdef WIN32
-    Q_UNUSED( tracks )
-    //Phonom/Qt4.4/Windows is broken for HTTP streaming - crashes
-    QDir d( "c:/Users/mxcl/Music" );
-    foreach (QString name, d.entryList( QStringList() << "*.mp3", QDir::Files ))
-        urls += QUrl::fromLocalFile( d.filePath( name ) );
-#else
     foreach (const Radio::Track& t, tracks)
         urls += t.location;
-#endif
 
     m_mediaObject->enqueue( urls );
     m_mediaObject->play();

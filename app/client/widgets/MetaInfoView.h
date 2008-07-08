@@ -17,25 +17,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QtWebKit>
+#include <QWebView>
+
 
 class MetaInfoView : public QWebView
 {
     Q_OBJECT
-    
-    signals:
 
-    public:
-        MetaInfoView( QWidget* parent = 0 );
-        ~MetaInfoView();
+public:
+    MetaInfoView( QWidget* parent = 0 );
+    ~MetaInfoView();
 
-    public slots:
-        void onAppEvent( int, const QVariant& );
+public slots:
+    void onAppEvent( int, const QVariant& );
 
-    private slots:
-        void onLinkClicked( const QUrl& );
-
-    private:
-        
+private slots:
+    void onLinkClicked( const QUrl& );      
 };
-

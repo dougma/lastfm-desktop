@@ -17,14 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QDesktopServices>
-
 #include "MetaInfoView.h"
 #include "PlaybackEvent.h"
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
+#include <QDesktopServices>
 
-MetaInfoView::MetaInfoView( QWidget* parent ) :
-    QWebView( parent )
+
+MetaInfoView::MetaInfoView( QWidget* parent )
+            : QWebView( parent )
 {   
     load( QUrl( "http://www.google.com") );
     //page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
@@ -34,10 +34,10 @@ MetaInfoView::MetaInfoView( QWidget* parent ) :
              this, SLOT( onLinkClicked( const QUrl& ) ) );
 }
 
-MetaInfoView::~MetaInfoView()
-{
 
-}
+MetaInfoView::~MetaInfoView()
+{}
+
 
 void
 MetaInfoView::onAppEvent( int e, const QVariant& d )
@@ -47,12 +47,13 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
     {
         case PlaybackEvent::TrackChanged:
         case PlaybackEvent::PlaybackStarted:
-            TrackInfo t = d.value<TrackInfo>( );
+            Track t = d.value<Track>( );
             // FIXME: get the real page.
             load( QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) ) );
             break;
     }
 }
+
 
 void
 MetaInfoView::onLinkClicked( const QUrl& url )
@@ -60,4 +61,3 @@ MetaInfoView::onLinkClicked( const QUrl& url )
     qDebug() << "Url clicked: " << url;
     QDesktopServices::openUrl( url );
 }
-
