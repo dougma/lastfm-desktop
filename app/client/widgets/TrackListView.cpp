@@ -39,6 +39,8 @@ TrackListView::TrackListView()
     ui.layout->setContentsMargins( 0, 0, 0, 0 );
 
     ui.progress->layout()->setContentsMargins( -1, -1, -1, -1 );
+    
+    ui.layout->setAlignment( Qt::AlignTop );
 }
 
 
@@ -58,7 +60,8 @@ TrackListView::add( const ObservedTrack& t )
     time->setAutoFillBackground( true );
     time->setMargin( 2 );
     time->setIndent( 1 );
-    
+    time->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+
     ui.layout->insertWidget( 0, ui.progress );
     ui.layout->insertWidget( 0, i );
     ui.layout->insertWidget( 0, time );
@@ -77,6 +80,8 @@ ScrobbleProgressWidget::ScrobbleProgressWidget()
 
     ui.time->setDisabled( true ); //aesthetics
     ui.timeToScrobblePoint->setDisabled( true ); //aesthetics
+
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
     m_progressDisplayTimer = new QTimer( this );
     connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
@@ -124,7 +129,7 @@ ScrobbleProgressWidget::determineProgressDisplayGranularity( uint g )
 {
     if (g == 0)
     {
-        //TODO #error better handling with gui stuff but non intrusive
+        m_progressDisplayTimer->stop();
     }
     else
         m_progressDisplayTimer->setInterval( 1000 * g / width() );
@@ -205,9 +210,21 @@ TrackListView::onAppEvent( int e, const QVariant& v )
     case PlaybackEvent::PlaybackStarted:
     case PlaybackEvent::PlaybackUnstalled:
     case PlaybackEvent::PlaybackUnpaused:
-        ui.progress->determineProgressDisplayGranularity(  v.value<ObservedTrack>().scrobblePoint() );
-        ui.progress->m_progressDisplayTimer->start();
+    {
+        ObservedTrack t = v.value<ObservedTrack>();
+        if (t.isEmpty())
+        {
+            ui.progress->ui.timeToScrobblePoint->setText( ":(" );
+            ui.progress->ui.time->clear();
+            ui.progress->m_progressDisplayTimer->stop();
+            return;
+        }
+        else {
+            ui.progress->determineProgressDisplayGranularity( t.scrobblePoint() );
+            ui.progress->m_progressDisplayTimer->start();
+        }
         break;
+    }
 
     case PlaybackEvent::PlaybackStalled:
     case PlaybackEvent::PlaybackPaused:
@@ -215,6 +232,7 @@ TrackListView::onAppEvent( int e, const QVariant& v )
         ui.progress->m_progressDisplayTimer->stop();
         break;
     }
+    
     switch (e)
     {
     case PlaybackEvent::PlaybackStarted:

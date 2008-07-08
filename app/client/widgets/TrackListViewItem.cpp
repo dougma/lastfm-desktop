@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include "TrackListViewItem.h"
+#include "lib/unicorn/ws/WsRequestManager.h"
+#include "lib/unicorn/ws/WsReply.h"
 
 
 TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
@@ -29,7 +31,34 @@ TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent )
     ui.year->setAttribute( Qt::WA_MacSmallSize );
     ui.album->setAttribute( Qt::WA_MacSmallSize );
 
+    if (t.isEmpty())
+    {
+        //FIXME
+        ui.artist->setText( "Super mega error :(" );
+        return;
+    }
+
     ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
     ui.album->setText( t.album() );
     ui.year->setText( "2000" );
+    
+    
+#if 0
+    //TODO move into TrackInfo
+    WsReply* reply = WsRequestBuilder( "track.getTopTags" )
+                .add( "track", t.track() )
+                .add( "artist", t.artist() )
+                .get()
+                .synchronously();
+    
+    QDomNodeList nodes = reply->domDocument().documentElement().elementsByTagName( "tag" );
+
+    QStringList tags;
+    for (int x = 0; x < nodes.count(); ++x)
+    {
+        tags += nodes.at( x ).firstChildElement( "name" ).text();
+    }
+    
+    ui.tags->setText( tags.join( ", " ) );
+#endif
 }

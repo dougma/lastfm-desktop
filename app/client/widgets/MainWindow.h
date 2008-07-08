@@ -37,6 +37,8 @@ protected:
 public slots:
     void showSettingsDialog();
     void showDiagnosticsDialog();
+    void showAboutDialog();
+    
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 
 private:

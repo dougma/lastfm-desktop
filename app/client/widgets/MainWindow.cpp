@@ -21,6 +21,7 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/TrackListView.h"
+#include "version.h"
 #include <QCloseEvent>
 #include <QPointer>
 
@@ -59,16 +60,34 @@ MainWindow::showSettingsDialog()
 void
 MainWindow::showDiagnosticsDialog()
 {
-    static QPointer<DiagnosticsDialog> d;
+    #define NON_MODAL_MACRO( Type ) \
+        static QPointer<Type> d; \
+        if (!d) { \
+            d = new Type( this ); \
+            d->setAttribute( Qt::WA_DeleteOnClose ); \
+            d->show(); \
+        } else \
+            d->activateWindow();
+            
+    NON_MODAL_MACRO( DiagnosticsDialog )
+}
 
-    if (!d)
+
+void
+MainWindow::showAboutDialog()
+{
+    class AboutDialog : public QDialog
     {
-        d = new DiagnosticsDialog( this );
-        d->setAttribute( Qt::WA_DeleteOnClose );
-        d->show();
-    }
-    else
-        d->activateWindow();
+    public:
+        AboutDialog( QWidget* parent ) : QDialog( parent )
+        {
+            QVBoxLayout* v = new QVBoxLayout( this );
+            v->addWidget( new QLabel( "<b>" PRODUCT_NAME "</b> " VERSION ) );
+            v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
+        }
+    };
+    
+    AboutDialog( this ).exec();
 }
 
 

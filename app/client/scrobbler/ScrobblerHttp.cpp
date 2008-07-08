@@ -77,7 +77,7 @@ ScrobblerHttp::retry()
     if (i < 120 * 60 * 1000)
         m_retry_timer->setInterval( i * 2 );
 
-    qDebug() << "Retry in " << m_retry_timer->interval() / 1000 << " seconds";
+    qDebug() << "Will retry in" << m_retry_timer->interval() / 1000 << "seconds";
 
     m_retry_timer->start();
 }
@@ -86,14 +86,16 @@ ScrobblerHttp::retry()
 void
 ScrobblerHttp::resetRetryTimer()
 {
-    m_retry_timer->setInterval( 60 * 1000 );
+    m_retry_timer->setInterval( 30 * 1000 );
 }
+
 
 int
 ScrobblerHttp::get( QString url )
 {
     return QHttp::get( url );
 }
+
 
 void
 ScrobblerPostHttp::request()

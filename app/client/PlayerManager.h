@@ -68,7 +68,7 @@ private slots:
     void onStopWatchTimedOut();
 
 private:
-    void handleStateChange( PlaybackState::Enum, const Track& t = Track() );
+    void handleStateChange( PlaybackState::Enum, const ObservedTrack& t = ObservedTrack() );
 
     class UniquePlayerStack : public QStack<Player*>
     {

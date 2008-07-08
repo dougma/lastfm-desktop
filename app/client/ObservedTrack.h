@@ -34,19 +34,19 @@ class ObservedTrack : public Track
 public:
     ObservedTrack() // QMetaType needs this :(
     {
-        // initialising m_watch to 0 is done by QPointer for us
+        // QPointer automatically sets m_watch to 0 for us
     }
 
     ObservedTrack( const Track& that )
     {
-        static_cast<Track&>(*this) = that;
+        this->d = static_cast<const ObservedTrack&>(that).d;
     }
 
     /** If you copy the returned object use a QPointer, as it is liable to be
       * deleted after the track is finished. This is by design, since you don't 
       * want to reflect the information about a track that no longer exists */
     StopWatch* watch() const { return m_watch; }
-
+    
     /** @returns the time in seconds when the track is considered scrobbled */
     uint scrobblePoint() const;
 };

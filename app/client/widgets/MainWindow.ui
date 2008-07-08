@@ -62,6 +62,8 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="diagnostics" />
+    <addaction name="separator" />
+    <addaction name="actionAbout_Last_fm" />
    </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
@@ -116,7 +118,7 @@
   </widget>
   <action name="settings" >
    <property name="text" >
-    <string>&amp;Settings...</string>
+    <string>&amp;Settings</string>
    </property>
   </action>
   <action name="logOut" >
@@ -182,6 +184,11 @@
   <action name="tunein" >
    <property name="text" >
     <string>Tune In...</string>
+   </property>
+  </action>
+  <action name="actionAbout_Last_fm" >
+   <property name="text" >
+    <string>About</string>
    </property>
   </action>
  </widget>

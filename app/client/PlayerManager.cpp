@@ -46,14 +46,16 @@ PlayerManager::love()
 
 void
 PlayerManager::onTrackStarted( const Track& t )
-{
+{   
     QString const id = t.playerId();
     Player& p = *m_players[id];
     p.track = t;
     p.state = PlaybackState::Playing;
     StopWatch* watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
-    delete p.track.m_watch; //just in case
+    delete p.track.m_watch; //stuff is connected to it, break those connections
     p.track.m_watch = watch;
+
+    qDebug() << p.track.toString() << p.track.isEmpty();
 
     if (m_players.top()->id == id)
     {
@@ -108,14 +110,17 @@ PlayerManager::onPlaybackResumed( const QString& id )
 
 
 void
-PlayerManager::handleStateChange( PlaybackState::Enum newState, const Track& t )
+PlayerManager::handleStateChange( PlaybackState::Enum newState, const ObservedTrack& t )
 {
     using namespace PlaybackState;
 
-    qDebug() << m_players.count();
-
     PlaybackState::Enum oldState = m_state;
     m_state = newState;
+
+    if (newState == Playing && t.isEmpty())
+    {
+        qWarning() << "Empty TrackInfo object presented for Playback notification, this is wrong!";
+    }
 
     switch (oldState)
     {
