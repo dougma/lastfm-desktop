@@ -20,8 +20,8 @@
 #ifndef MOOSE_SETTINGS_H
 #define MOOSE_SETTINGS_H
 
-#include "TrackInfo.h"
 #include "lib/DllExportMacro.h"
+#include "lib/unicorn/Track.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include <QStringList>
 
@@ -36,18 +36,18 @@ namespace Moose
         /** The AudioScrobbler version number */
         QString version() const { return QSettings().value( "Version", "unknown" ).toString(); }
 
-        // used by TrackInfo
+        // used by Track
         //TODO shouldn't be necessary
         /** is percentage */
         //TODO percentage is confusing in implementations, use float
-        int scrobblePoint() const { return QSettings().value( "ScrobblePoint", TrackInfo::kDefaultScrobblePoint ).toInt(); }
+        int scrobblePoint() const { return QSettings().value( "ScrobblePoint", Track::kDefaultScrobblePoint ).toInt(); }
 
         // used by Moose::sendToInstance
         // needed by Twiddly
         int controlPort() const { return QSettings().value( "ControlPort", 32213 ).toInt(); }
 
-        // used by TrackInfo
-        // needed by Twiddly as it uses TrackInfo::isScrobblable()
+        // used by Track
+        // needed by Twiddly as it uses Track::isScrobblable()
         QStringList excludedDirs() const
         {
             QStringList paths = QSettings().value( "ExclusionDirs" ).toStringList();

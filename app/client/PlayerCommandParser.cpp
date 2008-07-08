@@ -150,17 +150,17 @@ PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
 }
 
 
-TrackInfo
+Track
 PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
 {
-    MutableTrackInfo track;
+    MutableTrack track;
     track.setArtist( args['a'] );
     track.setTrack( args['t'] );
     track.setAlbum( args['b'] );
     track.setMbId( args['m'] );
     track.setDuration( args['l'].toInt() );
     track.setPath( QUrl::fromPercentEncoding( args['p'].toUtf8() ) );
-    track.setSource( TrackInfo::Player );
+    track.setSource( Track::Player );
     track.setPlayerId( args['c'] );
 
     //TODO should be done earlier, NOTE don't get the plugin to send a stamp time

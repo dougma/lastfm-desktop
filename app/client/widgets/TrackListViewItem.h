@@ -18,14 +18,14 @@
  ***************************************************************************/
 
 #include "ui_TrackListViewItem.h"
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 
 
 class TrackListViewItem : public QWidget
 {
 public:
-    TrackListViewItem( const TrackInfo&, QWidget* parent );
+    TrackListViewItem( const Track&, QWidget* parent );
 
     Ui::TrackListViewItem ui;
-    TrackInfo m_track;
+    Track m_track;
 };

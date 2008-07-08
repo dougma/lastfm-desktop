@@ -24,11 +24,11 @@
 
 
 void
-ScrobblerSubmission::setTracks( const QList<TrackInfo>& tracks )
+ScrobblerSubmission::setTracks( const QList<Track>& tracks )
 {
     m_tracks = tracks;
     // submit in chronological order
-    qSort( m_tracks.begin(), m_tracks.end(), TrackInfo::lessThan );
+    qSort( m_tracks.begin(), m_tracks.end(), Track::lessThan );
 }
 
 
@@ -46,7 +46,7 @@ ScrobblerSubmission::submitNextBatch()
     bool portable = false;
     for (int i = 0; i < 50 && !m_tracks.isEmpty(); ++i)
     {
-        TrackInfo t = m_tracks.takeFirst();
+        Track t = m_tracks.takeFirst();
 
         QByteArray const N = QByteArray::number( i );
         #define e( x ) QUrl::toPercentEncoding( x )
@@ -61,7 +61,7 @@ ScrobblerSubmission::submitNextBatch()
                   "&m[" + N + "]=" + e(t.mbId());
         #undef e
 
-        if (t.source() == TrackInfo::MediaDevice)
+        if (t.source() == Track::MediaDevice)
             portable = true;
 
         m_batch += t;

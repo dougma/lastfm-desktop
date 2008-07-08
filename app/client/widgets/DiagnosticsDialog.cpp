@@ -24,7 +24,7 @@
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
 #include "lib/moose/MooseCommon.h"
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 
 #include <QProcess>
 #include <QClipboard>
@@ -112,14 +112,14 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     
     // Fingerprint collector
     ui.fpQueueSizeLabel->setText( "0" );
-    connect( The::app().m_fpCollector, SIGNAL( trackFingerprintingStarted( TrackInfo ) ),
-        this,                     SLOT( onTrackFingerprintingStarted( TrackInfo ) ),
+    connect( The::app().m_fpCollector, SIGNAL( trackFingerprintingStarted( Track ) ),
+        this,                     SLOT( onTrackFingerprintingStarted( Track ) ),
         Qt::QueuedConnection );
-    connect( The::app().m_fpCollector, SIGNAL( trackFingerprinted( TrackInfo ) ),
-        this,                     SLOT( onTrackFingerprinted( TrackInfo ) ),
+    connect( The::app().m_fpCollector, SIGNAL( trackFingerprinted( Track ) ),
+        this,                     SLOT( onTrackFingerprinted( Track ) ),
         Qt::QueuedConnection );
-    connect( The::app().m_fpCollector, SIGNAL( cantFingerprintTrack( TrackInfo, QString ) ),
-        this,                     SLOT( onCantFingerprintTrack( TrackInfo, QString ) ),
+    connect( The::app().m_fpCollector, SIGNAL( cantFingerprintTrack( Track, QString ) ),
+        this,                     SLOT( onCantFingerprintTrack( Track, QString ) ),
         Qt::QueuedConnection );
 
 #endif
@@ -277,7 +277,7 @@ DiagnosticsDialog::populateScrobbleCacheView()
     ScrobbleCache cache( The::settings().username() );
 
     QList<QTreeWidgetItem *> items;
-    foreach (TrackInfo t, cache.tracks())
+    foreach (Track t, cache.tracks())
         if ( t.isScrobbled() )
             items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.track() << t.album() ) );
 
@@ -334,7 +334,7 @@ DiagnosticsDialog::onCopyToClipboard()
 
 
 void
-DiagnosticsDialog::onTrackFingerprintingStarted( const TrackInfo& track )
+DiagnosticsDialog::onTrackFingerprintingStarted( const Track& track )
 {
 #if 0
     ui.fpCurrentTrackLabel->setText( track.toString() );
@@ -344,7 +344,7 @@ DiagnosticsDialog::onTrackFingerprintingStarted( const TrackInfo& track )
 
 
 void
-DiagnosticsDialog::onTrackFingerprinted( const TrackInfo& track  )
+DiagnosticsDialog::onTrackFingerprinted( const Track& track  )
 {
 #if 0
     ui.fpCurrentTrackLabel->setText( "" );
@@ -356,7 +356,7 @@ DiagnosticsDialog::onTrackFingerprinted( const TrackInfo& track  )
 
 
 void
-DiagnosticsDialog::onCantFingerprintTrack( const TrackInfo& /* track */, QString /* reason */ )
+DiagnosticsDialog::onCantFingerprintTrack( const Track& /* track */, QString /* reason */ )
 {
 #if 0
     ui.fpCurrentTrackLabel->setText( "" );

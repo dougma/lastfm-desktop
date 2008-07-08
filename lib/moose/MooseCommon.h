@@ -21,7 +21,6 @@
 #define MOOSE_COMMON_H
 
 #include "lib/DllExportMacro.h"
-#include "TrackInfo.h"
 #include <QString>
 #include <QObject>
 

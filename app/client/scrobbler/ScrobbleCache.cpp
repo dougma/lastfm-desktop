@@ -26,7 +26,7 @@
 
 
 //FIXME! Doesn't suit multi user feel of this class as it is currently
-static QList<TrackInfo> g_tracks;
+static QList<Track> g_tracks;
 
 
 ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
@@ -56,7 +56,7 @@ ScrobbleCache::read()
 
     for (QDomNode n = xml.documentElement().firstChild(); !n.isNull(); n = n.nextSibling())
         if (n.nodeName() == "item")
-            m_tracks += TrackInfo( n.toElement() );
+            m_tracks += Track( n.toElement() );
 }
 
 
@@ -73,7 +73,7 @@ ScrobbleCache::write()
         e.setAttribute( "product", PRODUCT_NAME );
         e.setAttribute( "version", "1.2" );
 
-        foreach (TrackInfo i, m_tracks)
+        foreach (Track i, m_tracks)
             e.appendChild( i.toDomElement( xml ) );
 
         xml.appendChild( e );
@@ -90,16 +90,16 @@ ScrobbleCache::write()
 
 
 void
-ScrobbleCache::add( const TrackInfo& track )
+ScrobbleCache::add( const Track& track )
 {
-    add( QList<TrackInfo>() << track );
+    add( QList<Track>() << track );
 }
 
 
 void
-ScrobbleCache::add( const QList<TrackInfo>& tracks )
+ScrobbleCache::add( const QList<Track>& tracks )
 {
-    foreach (const TrackInfo& track, tracks)
+    foreach (const Track& track, tracks)
     {
         if (track.isEmpty()) 
             qDebug() << "Will not cache an empty track";
@@ -111,11 +111,11 @@ ScrobbleCache::add( const QList<TrackInfo>& tracks )
 
 
 int
-ScrobbleCache::remove( const QList<TrackInfo>& toremove )
+ScrobbleCache::remove( const QList<Track>& toremove )
 {
-    QMutableListIterator<TrackInfo> i( m_tracks );
+    QMutableListIterator<Track> i( m_tracks );
     while (i.hasNext()) {
-        TrackInfo t = i.next();
+        Track t = i.next();
         for (int x = 0; x < toremove.count(); ++x)
             if (toremove[x] == t)
                 i.remove();

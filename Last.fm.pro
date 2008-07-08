@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
-CONFIG += ordered
 
-SUBDIRS += lib/unicorn/libunicorn.pro \
+SUBDIRS += app/client/appclient.pro \
+           lib/unicorn/libunicorn.pro \
            lib/moose/libmoose.pro \
-           lib/radio/libradio.pro \ 
-           app/client/appclient.pro
+           lib/radio/libradio.pro
+           

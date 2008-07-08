@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 #include <QList>
 #include <QString>
 
@@ -27,7 +27,7 @@ class ScrobbleCache
 {
     QString m_path;
     QString m_username;
-    QList<TrackInfo> m_tracks;
+    QList<Track> m_tracks;
 
     int m_subs_end;
 
@@ -39,15 +39,15 @@ class ScrobbleCache
 public:
     explicit ScrobbleCache( const QString& username );
 
-    /** note this is unique for TrackInfo::sameAs() and equal timestamps 
+    /** note this is unique for Track::sameAs() and equal timestamps 
     * obviously playcounts will not be increased for the same timestamp */
-    void add( const TrackInfo& );
-    void add( const QList<TrackInfo>& );
+    void add( const Track& );
+    void add( const QList<Track>& );
 
     /** returns the number of tracks left in the queue */
-    int remove( const QList<TrackInfo>& );
+    int remove( const QList<Track>& );
 
-    QList<TrackInfo> tracks() const { return m_tracks; }
+    QList<Track> tracks() const { return m_tracks; }
     QString path() const { return m_path; }
     QString username() const { return m_username; }
 

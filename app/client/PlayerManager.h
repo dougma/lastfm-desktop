@@ -29,7 +29,7 @@
 
 struct Player
 {
-    Player( QString _id ) : id( _id ), track( TrackInfo() )
+    Player( QString _id ) : id( _id ), track( Track() )
     {}
 
     QString const id;
@@ -48,14 +48,14 @@ public:
     PlayerManager( class PlayerListener* parent );
 
     PlaybackState::Enum state() const { return m_state; }
-    TrackInfo track() const { return m_players.top()->track; }
+    Track track() const { return m_players.top()->track; }
 
     /** will ban or love the current track */
     void ban();
     void love();
 
 public slots:
-    void onTrackStarted( const TrackInfo& );
+    void onTrackStarted( const Track& );
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );
     void onPlaybackResumed( const QString& playerId );
@@ -68,7 +68,7 @@ private slots:
     void onStopWatchTimedOut();
 
 private:
-    void handleStateChange( PlaybackState::Enum, const TrackInfo& t = TrackInfo() );
+    void handleStateChange( PlaybackState::Enum, const Track& t = Track() );
 
     class UniquePlayerStack : public QStack<Player*>
     {

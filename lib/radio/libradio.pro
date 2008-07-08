@@ -6,6 +6,6 @@ QT -= gui
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
-SOURCES += $$system( ls *.cpp )
-HEADERS += $$system( ls *.h )
+SOURCES += $$findSources( cpp )
+HEADERS += $$findSources( h )
 DEFINES += _RADIO_DLLEXPORT

@@ -26,7 +26,7 @@ class NowPlaying : public ScrobblerPostHttp
 
 public:
     NowPlaying( const QByteArray& );
-    void submit( const class TrackInfo& );
+    void submit( const class Track& );
     void reset();
 
     using ScrobblerPostHttp::request;

@@ -19,7 +19,7 @@
 
 #include "NowPlaying.h"
 #include "Scrobbler.h"
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 #include <QDebug>
 #include <QTimer>
 
@@ -47,7 +47,7 @@ NowPlaying::reset()
 
 
 void
-NowPlaying::submit( const TrackInfo& track )
+NowPlaying::submit( const Track& track )
 {
     if (track.isEmpty())
         return;

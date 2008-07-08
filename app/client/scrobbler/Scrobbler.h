@@ -50,9 +50,9 @@ public:
     ~Scrobbler();
 
     /** will ask Last.fm to update the now playing information for username() */
-    void nowPlaying( const class TrackInfo& );
+    void nowPlaying( const class Track& );
     /** will cache the track, but we won't submit it until you call submit() */
-    void cache( const TrackInfo& );
+    void cache( const Track& );
     /** will submit the ScrobbleCache for this user */
     void submit();
 

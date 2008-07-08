@@ -27,7 +27,7 @@ PlayerManager::PlayerManager( PlayerListener* listener )
                m_state( PlaybackState::Stopped )
 {
     QObject* o = (QObject*)listener;
-    connect( o, SIGNAL(trackStarted( TrackInfo )), SLOT(onTrackStarted( TrackInfo )) );
+    connect( o, SIGNAL(trackStarted( Track )), SLOT(onTrackStarted( Track )) );
     connect( o, SIGNAL(playbackEnded( QString )), SLOT(onPlaybackEnded( QString )) );
     connect( o, SIGNAL(playbackPaused( QString )), SLOT(onPlaybackPaused( QString )) );
     connect( o, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
@@ -45,7 +45,7 @@ PlayerManager::love()
 
 
 void
-PlayerManager::onTrackStarted( const TrackInfo& t )
+PlayerManager::onTrackStarted( const Track& t )
 {
     QString const id = t.playerId();
     Player& p = *m_players[id];
@@ -108,7 +108,7 @@ PlayerManager::onPlaybackResumed( const QString& id )
 
 
 void
-PlayerManager::handleStateChange( PlaybackState::Enum newState, const TrackInfo& t )
+PlayerManager::handleStateChange( PlaybackState::Enum newState, const Track& t )
 {
     using namespace PlaybackState;
 
@@ -172,6 +172,6 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const TrackInfo&
 void
 PlayerManager::onStopWatchTimedOut()
 {
-    MutableTrackInfo( track() ).setRatingFlag( TrackInfo::Scrobbled );
+    MutableTrack( track() ).setRatingFlag( Track::Scrobbled );
     emit event( PlaybackEvent::ScrobblePointReached );
 }

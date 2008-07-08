@@ -58,17 +58,17 @@ int main( int argc, char** argv )
         
         MainWindow window;
         app.setMainWindow( &window );
-        
+
         MetaInfoView infoView;
         app.setMetaInfoView( &infoView );
         
-        #ifdef Q_WS_X11 // HACK: Should not be needed. Qt bug?
+      #ifdef Q_WS_X11 // HACK: Should not be needed. But otherwise crashes. Qt bug?
         QTimer::singleShot( 0, &window, SLOT( show() ) );
         QTimer::singleShot( 0, &infoView, SLOT( show() ) );
-        #else
+      #else
         window.show();
         infoView.show();
-        #endif
+      #endif
 
         return app.exec();
     }

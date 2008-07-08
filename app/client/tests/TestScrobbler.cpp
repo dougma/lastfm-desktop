@@ -24,7 +24,7 @@
 
 #include "scrobbler/Scrobbler.h"
 
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 #include "lib/unicorn/UnicornCommon.h"
 
 QByteArray ok_handshake_response = "OK\n"
@@ -86,7 +86,7 @@ TestScrobbler::testNowPlaying()
     privateMock.setNextResponse( QByteArray( "OK" ) ); // Reset response to ok
     QApplication::processEvents(); // process successful handshake emits
     
-    MutableTrackInfo track;
+    MutableTrack track;
     track.setArtist( "Test Artist" );
     track.setTrack( "The Tester Song" );
     track.setAlbum( "The Most Tested Album Ever" );
@@ -116,7 +116,7 @@ TestScrobbler::testSubmitTrack()
     privateMock.setNextResponse( QByteArray( "OK" ) ); // Reset response to ok
     QApplication::processEvents(); // process successful handshake emits
     
-    MutableTrackInfo track;
+    MutableTrack track;
     track.setArtist( "Test Artist" );
     track.setTrack( "The Tester Song" );
     track.setAlbum( "The Most Tested Album Ever" );

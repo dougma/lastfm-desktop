@@ -21,9 +21,9 @@
 #include <QtTest/QtTest>
 #include <QMainWindow>
 
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 
-class TestTrackInfo : public QObject
+class TestTrack : public QObject
 {
     Q_OBJECT
 
@@ -60,10 +60,10 @@ class TestTrackInfo : public QObject
 };
 
 void
-TestTrackInfo::testArtist()
+TestTrack::testArtist()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QFETCH( QString, string );
     QFETCH( QString, result );
@@ -74,7 +74,7 @@ TestTrackInfo::testArtist()
 }
 
 void
-TestTrackInfo::testArtist_data()
+TestTrack::testArtist_data()
 {
     QTest::addColumn<QString>( "string" );
     QTest::addColumn<QString>( "result" );
@@ -85,10 +85,10 @@ TestTrackInfo::testArtist_data()
 }
 
 void
-TestTrackInfo::testAlbum()
+TestTrack::testAlbum()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QFETCH( QString, string );
     QFETCH( QString, result );
@@ -99,7 +99,7 @@ TestTrackInfo::testAlbum()
 }
 
 void
-TestTrackInfo::testAlbum_data()
+TestTrack::testAlbum_data()
 {
     QTest::addColumn<QString>( "string" );
     QTest::addColumn<QString>( "result" );
@@ -110,10 +110,10 @@ TestTrackInfo::testAlbum_data()
 }
 
 void
-TestTrackInfo::testTrack()
+TestTrack::testTrack()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QFETCH( QString, string );
     QFETCH( QString, result );
@@ -124,7 +124,7 @@ TestTrackInfo::testTrack()
 }
 
 void
-TestTrackInfo::testTrack_data()
+TestTrack::testTrack_data()
 {
     QTest::addColumn<QString>( "string" );
     QTest::addColumn<QString>( "result" );
@@ -135,10 +135,10 @@ TestTrackInfo::testTrack_data()
 }
 
 void
-TestTrackInfo::testTrackNumber()
+TestTrack::testTrackNumber()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     mutableTrack.setTrackNumber( -1 );
     QCOMPARE( track.trackNumber(), -1 );
@@ -154,10 +154,10 @@ TestTrackInfo::testTrackNumber()
 }
 
 void
-TestTrackInfo::testPlayCount()
+TestTrack::testPlayCount()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     mutableTrack.setPlayCount( -1 );
     QCOMPARE( track.playCount(), -1 );
@@ -173,10 +173,10 @@ TestTrackInfo::testPlayCount()
 }
 
 void
-TestTrackInfo::testDuration()
+TestTrack::testDuration()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     mutableTrack.setDuration( -1 );
     QCOMPARE( track.duration(), -1 );
@@ -192,10 +192,10 @@ TestTrackInfo::testDuration()
 }
 
 void
-TestTrackInfo::testMbId()
+TestTrack::testMbId()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     mutableTrack.setMbId( "kk83842736487236whatever" );
     QCOMPARE( track.mbId(), QString( "kk83842736487236whatever" ) );
@@ -208,10 +208,10 @@ TestTrackInfo::testMbId()
 }
 
 void
-TestTrackInfo::testPath()
+TestTrack::testPath()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     mutableTrack.setPath( "http://ws.last.fm/the/path/to/the/ws/that/we/caer/aboutsedr" );
     QCOMPARE( track.path(), QString( "http://ws.last.fm/the/path/to/the/ws/that/we/caer/aboutsedr" ) );
@@ -227,33 +227,33 @@ TestTrackInfo::testPath()
 }
 
 void
-TestTrackInfo::testSource()
+TestTrack::testSource()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
-    mutableTrack.setSource( TrackInfo::Radio );
-    QCOMPARE( track.source(), TrackInfo::Radio );
+    mutableTrack.setSource( Track::Radio );
+    QCOMPARE( track.source(), Track::Radio );
     QCOMPARE( track.sourceString(), QString( "L" ) );
     
-    mutableTrack.setSource( TrackInfo::Unknown );
-    QCOMPARE( track.source(), TrackInfo::Unknown );
+    mutableTrack.setSource( Track::Unknown );
+    QCOMPARE( track.source(), Track::Unknown );
     QCOMPARE( track.sourceString(), QString( "U" ) );
     
-    mutableTrack.setSource( TrackInfo::MediaDevice );
-    QCOMPARE( track.source(), TrackInfo::MediaDevice );
+    mutableTrack.setSource( Track::MediaDevice );
+    QCOMPARE( track.source(), Track::MediaDevice );
     QCOMPARE( track.sourceString(), QString( "P" ) );
     
-    mutableTrack.setSource( TrackInfo::Player );
-    QCOMPARE( track.source(), TrackInfo::Player );
+    mutableTrack.setSource( Track::Player );
+    QCOMPARE( track.source(), Track::Player );
     QCOMPARE( track.sourceString(), QString( "P" ) );
 }
 
 void
-TestTrackInfo::testRatingFlag()
+TestTrack::testRatingFlag()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QCOMPARE( track.ratingCharacter(), QString( "" ) );
     QVERIFY( !track.isSkipped() );
@@ -262,37 +262,37 @@ TestTrackInfo::testRatingFlag()
     QVERIFY( !track.isScrobbled() );
     
     // simple checking
-    mutableTrack.setRatingFlag( TrackInfo::Skipped );
+    mutableTrack.setRatingFlag( Track::Skipped );
     QCOMPARE( track.ratingCharacter(), QString( "S" ) );
     QVERIFY( track.isSkipped() );
     
-    mutableTrack.setRatingFlag( TrackInfo::Scrobbled );
+    mutableTrack.setRatingFlag( Track::Scrobbled );
     QCOMPARE( track.ratingCharacter(), QString( "" ) );
     QVERIFY( track.isScrobbled() );
     
-    mutableTrack.setRatingFlag( TrackInfo::Loved );
+    mutableTrack.setRatingFlag( Track::Loved );
     QCOMPARE( track.ratingCharacter(), QString( "L" ) );
     QVERIFY( track.isLoved() );
     
-    mutableTrack.setRatingFlag( TrackInfo::Banned );
+    mutableTrack.setRatingFlag( Track::Banned );
     QCOMPARE( track.ratingCharacter(), QString( "B" ) );
     QVERIFY( track.isBanned() );
     
     
-    TrackInfo track2;
-    MutableTrackInfo mutableTrack2( track2 );
+    Track track2;
+    MutableTrack mutableTrack2( track2 );
     
     // somewhat less simple checking
-    mutableTrack2.setRatingFlag( TrackInfo::Skipped );
+    mutableTrack2.setRatingFlag( Track::Skipped );
     QCOMPARE( track2.ratingCharacter(), QString( "S" ) );
     QVERIFY( track2.isSkipped() );
     
-    mutableTrack2.setRatingFlag( TrackInfo::Loved );
+    mutableTrack2.setRatingFlag( Track::Loved );
     QCOMPARE( track2.ratingCharacter(), QString( "L" ) );
     QVERIFY( track2.isLoved() );
     QVERIFY( track2.isSkipped() );
     
-    mutableTrack2.setRatingFlag( TrackInfo::Scrobbled );
+    mutableTrack2.setRatingFlag( Track::Scrobbled );
     QCOMPARE( track2.ratingCharacter(), QString( "L" ) );
     QVERIFY( track2.isScrobbled() );
     QVERIFY( track2.isSkipped() );
@@ -300,10 +300,10 @@ TestTrackInfo::testRatingFlag()
 }
 
 void
-TestTrackInfo::testPlayerId()
+TestTrack::testPlayerId()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QFETCH( QString, string );
     QFETCH( QString, result );
@@ -314,7 +314,7 @@ TestTrackInfo::testPlayerId()
 }
 
 void
-TestTrackInfo::testPlayerId_data()
+TestTrack::testPlayerId_data()
 {
     QTest::addColumn<QString>( "string" );
     QTest::addColumn<QString>( "result" );
@@ -325,10 +325,10 @@ TestTrackInfo::testPlayerId_data()
 }
 
 void
-TestTrackInfo::testFpId()
+TestTrack::testFpId()
 {
-    TrackInfo track;
-    MutableTrackInfo mutableTrack( track );
+    Track track;
+    MutableTrack mutableTrack( track );
     
     QFETCH( QString, string );
     QFETCH( QString, result );
@@ -339,7 +339,7 @@ TestTrackInfo::testFpId()
 }
 
 void
-TestTrackInfo::testFpId_data()
+TestTrack::testFpId_data()
 {
     QTest::addColumn<QString>( "string" );
     QTest::addColumn<QString>( "result" );
@@ -350,13 +350,13 @@ TestTrackInfo::testFpId_data()
 }
 
 void
-TestTrackInfo::testDomConstructor()
+TestTrack::testDomConstructor()
 {
     QEXPECT_FAIL( "", "A test for constructing a track-info from a dom-element has not yet been implemented", Continue );
     QVERIFY( false );
 }
 
 // Appless is faster, and there is no need for a QApplication in this test
-QTEST_APPLESS_MAIN(TestTrackInfo)
-#include "TestTrackInfo.moc"
+QTEST_APPLESS_MAIN(TestTrack)
+#include "TestTrack.moc"
 

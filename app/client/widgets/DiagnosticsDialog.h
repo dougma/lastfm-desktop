@@ -90,9 +90,9 @@ private slots:
 
     void onCopyToClipboard();
 
-    void onTrackFingerprintingStarted( const class TrackInfo& );
-    void onTrackFingerprinted( const TrackInfo& );
-    void onCantFingerprintTrack( const TrackInfo&, QString reason );
+    void onTrackFingerprintingStarted( const class Track& );
+    void onTrackFingerprinted( const Track& );
+    void onCantFingerprintTrack( const Track&, QString reason );
 
 	void onScrobbleIpodClicked();
 	void onLogPoll();

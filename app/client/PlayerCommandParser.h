@@ -23,7 +23,7 @@
 // ms admits its lousy compiler doesn't care about throw declarations
 #pragma warning( disable : 4290 )
 
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 
 
 class PlayerCommandParser
@@ -48,18 +48,18 @@ public:
 
     Command command() const { return m_command; }
     QString playerId() const { return m_playerId; }
-    TrackInfo track() const { return m_track; }
+    Track track() const { return m_track; }
     QString username() const { return m_username; }
 
 private:
     Command extractCommand( QString& line );
     QMap<QChar, QString> extractArgs( const QString& line );
     QString requiredArgs( Command );
-    TrackInfo extractTrack( const QMap<QChar, QString>& args );
+    Track extractTrack( const QMap<QChar, QString>& args );
 
     Command m_command;
     QString m_playerId;
-    TrackInfo m_track;
+    Track m_track;
     QString m_username;
 };
 

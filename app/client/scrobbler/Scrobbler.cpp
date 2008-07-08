@@ -73,14 +73,14 @@ Scrobbler::handshake()
 
 
 void
-Scrobbler::nowPlaying( const TrackInfo& track )
+Scrobbler::nowPlaying( const Track& track )
 {
     m_np->submit( track );
 }
 
 
 void
-Scrobbler::cache( const TrackInfo& track )
+Scrobbler::cache( const Track& track )
 {
     m_cache->add( track );
 }

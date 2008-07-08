@@ -125,7 +125,7 @@ App::onAppEvent( int e, const QVariant& d )
             // FALL THROUGH
         case PlaybackEvent::PlaybackStarted:
         {
-            TrackInfo t = d.value<TrackInfo>();
+            Track t = d.value<Track>();
             m_scrobbler->nowPlaying( t );
 
             // no tooltips on mac
@@ -136,7 +136,7 @@ App::onAppEvent( int e, const QVariant& d )
         }            
 
         case PlaybackEvent::ScrobblePointReached:
-            m_scrobbler->cache( d.value<TrackInfo>() );
+            m_scrobbler->cache( d.value<Track>() );
             break;
 
         case PlaybackEvent::PlaybackEnded:

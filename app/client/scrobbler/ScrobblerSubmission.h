@@ -18,19 +18,19 @@
  ***************************************************************************/
 
 #include "ScrobblerHttp.h"
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 #include <QList>
 
 
 class ScrobblerSubmission : public ScrobblerPostHttp
 {
-    QList<TrackInfo> m_tracks;
-    QList<TrackInfo> m_batch;
+    QList<Track> m_tracks;
+    QList<Track> m_batch;
 
 public:
-    void setTracks( const QList<TrackInfo>& );
+    void setTracks( const QList<Track>& );
     /** submits a batch of 50 to the scrobbling service */
     void submitNextBatch();
     /** the current batch, depending on */
-    QList<TrackInfo> batch() const { return m_batch; }
+    QList<Track> batch() const { return m_batch; }
 };

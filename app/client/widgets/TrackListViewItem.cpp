@@ -20,7 +20,7 @@
 #include "TrackListViewItem.h"
 
 
-TrackListViewItem::TrackListViewItem( const TrackInfo& t, QWidget* parent ) 
+TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
                  : QWidget( parent ),
                    m_track( t )
 {

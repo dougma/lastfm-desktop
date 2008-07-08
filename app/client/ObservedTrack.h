@@ -20,12 +20,12 @@
 #ifndef OBSERVED_TRACK_H
 #define OBSERVED_TRACK_H
 
-#include "lib/moose/TrackInfo.h"
+#include "lib/unicorn/Track.h"
 #include "StopWatch.h" // sadly necessary dep
 #include <QPointer>
 
 
-class ObservedTrack : public TrackInfo
+class ObservedTrack : public Track
 {
     QPointer<StopWatch> m_watch;
 
@@ -37,9 +37,9 @@ public:
         // initialising m_watch to 0 is done by QPointer for us
     }
 
-    ObservedTrack( const TrackInfo& that )
+    ObservedTrack( const Track& that )
     {
-        static_cast<TrackInfo&>(*this) = that;
+        static_cast<Track&>(*this) = that;
     }
 
     /** If you copy the returned object use a QPointer, as it is liable to be
