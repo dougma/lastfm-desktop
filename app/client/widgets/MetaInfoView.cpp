@@ -17,45 +17,44 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
-#include "lib/unicorn/UnicornApplication.h"
+#include "MetaInfoView.h"
+#include "PlaybackEvent.h"
 
-
-class App : public Unicorn::Application
+MetaInfoView::MetaInfoView( QWidget* parent ) :
+    QWebView( parent )
 {
-    Q_OBJECT
+    QWebPage* p1 = page();
+    load( QUrl( "http://www.google.com" ) ); 
+    QWebPage* p2 = page();
+    qDebug() << "WEBPAGES: " << p1 << " : " << p2;
+    
+    page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
+    
+    connect( page(), SIGNAL( linkClicked( const QUrl& ) ),
+             this, SLOT( onLinkClicked( const QUrl& ) ) );
+}
 
-public:
-    App( int, char** );
-    ~App();
+MetaInfoView::~MetaInfoView()
+{
 
-    PlaybackState::Enum state() const;
+}
 
-    void setMainWindow( class MainWindow* );
-    void setMetaInfoView( class MetaInfoView* );
+void
+MetaInfoView::onAppEvent( int e, const QVariant& d )
+{
+    qDebug() << "MetaInfoView::onAppEvent: " << e << " : " << d;
+    switch (e)
+    {
+        case PlaybackEvent::TrackChanged:
+            load( QUrl( "http://www.google.com" ) );
+            break;
+    }
+}
 
-    //TODO remove
-    class PlayerManager& playerManager() { return *m_playerManager; }
+void
+MetaInfoView::onLinkClicked( const QUrl& url )
+{
+    qDebug() << "URL CLICKED: " << url;
+    load( QUrl( "http://www.last.fm" ) );
+}
 
-public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
-
-    void love();
-    void ban();
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onTuneIn();
-
-signals:
-    void event( int, const QVariant& );
-
-private:
-    class PlayerListener* m_playerListener;
-    class PlayerManager* m_playerManager;
-    class Scrobbler* m_scrobbler;
-    class RadioPlayer* m_radio;
-    class DrWatson* m_watson;
-
-    class QSystemTrayIcon* m_trayIcon;
-};

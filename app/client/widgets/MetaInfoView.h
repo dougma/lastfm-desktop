@@ -17,45 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
-#include "lib/unicorn/UnicornApplication.h"
+#include <QtWebKit>
 
-
-class App : public Unicorn::Application
+class MetaInfoView : public QWebView
 {
     Q_OBJECT
+    
+    signals:
 
-public:
-    App( int, char** );
-    ~App();
+    public:
+        MetaInfoView( QWidget* parent = 0 );
+        ~MetaInfoView();
 
-    PlaybackState::Enum state() const;
+    public slots:
+        void onAppEvent( int, const QVariant& );
 
-    void setMainWindow( class MainWindow* );
-    void setMetaInfoView( class MetaInfoView* );
+    private slots:
+        void onLinkClicked( const QUrl& );
 
-    //TODO remove
-    class PlayerManager& playerManager() { return *m_playerManager; }
-
-public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
-
-    void love();
-    void ban();
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onTuneIn();
-
-signals:
-    void event( int, const QVariant& );
-
-private:
-    class PlayerListener* m_playerListener;
-    class PlayerManager* m_playerManager;
-    class Scrobbler* m_scrobbler;
-    class RadioPlayer* m_radio;
-    class DrWatson* m_watson;
-
-    class QSystemTrayIcon* m_trayIcon;
+    private:
+        
 };
+

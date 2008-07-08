@@ -28,6 +28,7 @@
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
+#include "widgets/MetaInfoView.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -81,6 +82,13 @@ App::setMainWindow( MainWindow* window )
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
+}
+
+void
+App::setMetaInfoView( MetaInfoView* infoView )
+{
+    connect( this, SIGNAL( event( int, const QVariant& ) ),
+             infoView, SLOT( onAppEvent( int, const QVariant& ) ) );
 }
 
 

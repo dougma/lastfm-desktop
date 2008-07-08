@@ -20,6 +20,7 @@
 #include "App.h"
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
+#include "widgets/MetaInfoView.h"
 #include "version.h"
 #include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/Logger.h"
@@ -57,10 +58,16 @@ int main( int argc, char** argv )
         
         MainWindow window;
         app.setMainWindow( &window );
+        
+        MetaInfoView infoView;
+        app.setMetaInfoView( &infoView );
+        
         #ifdef Q_WS_X11 // HACK: Should not be needed. Qt bug?
-        QTimer::singleShot( 100, &window, SLOT( show() ) );
+        QTimer::singleShot( 0, &window, SLOT( show() ) );
+        QTimer::singleShot( 0, &infoView, SLOT( show() ) );
         #else
-        window.show()
+        window.show();
+        infoView.show();
         #endif
 
         return app.exec();
