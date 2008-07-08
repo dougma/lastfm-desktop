@@ -26,6 +26,7 @@
 #include "lib/unicorn/UnicornCommon.h"
 #include "lib/breakpad/BreakPad.h"
 #include <QDir>
+#include <QTimer>
 
 
 int main( int argc, char** argv )
@@ -56,7 +57,11 @@ int main( int argc, char** argv )
         
         MainWindow window;
         app.setMainWindow( &window );
-        window.show();
+        #ifdef Q_WS_X11 // HACK: Should not be needed. Qt bug?
+        QTimer::singleShot( 100, &window, SLOT( show() ) );
+        #else
+        window.show()
+        #endif
 
         return app.exec();
     }
