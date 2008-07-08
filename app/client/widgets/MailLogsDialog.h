@@ -22,6 +22,9 @@
 
 #include "ui_MailLogsDialog.h"
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 
 /** @author <petgru@openfestis.org>
   * @brief Makes it possible for a user to easily mail all necessary debug information to us.
@@ -33,20 +36,12 @@ class MailLogsDialog : public QDialog
 public:
     MailLogsDialog( QWidget *parent = 0 );
     ~MailLogsDialog();
-    
-    QString runCommand( QString cmd );
-    
-    QString getSystemInformation();
-    
-    void setDiagnosticsDialogInfo( QString info ) { m_diagnosticsDialogInfo = info; }
 
     Ui::MailLogsDialog ui;
 
-private:
-    QString m_diagnosticsDialogInfo;
-
 private slots:
     void onCreateMailClicked();
+    void onError();
 };
 
 #endif //MAIL_LOGS_DIALOG_H

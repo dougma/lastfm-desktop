@@ -445,7 +445,6 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 void 
 DiagnosticsDialog::onMailLogsClicked()
 {
-    m_mailLogsDialog.setDiagnosticsDialogInfo( diagnosticInformation() );
     m_mailLogsDialog.exec();
 }
 
