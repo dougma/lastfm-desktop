@@ -19,7 +19,7 @@
 
 #include "ScrobbleCache.h"
 #include "version.h"
-#include "lib/moose/MooseCommon.h"
+#include "lib/unicorn/UnicornCommon.h"
 #include <QFile>
 #include <QDomElement>
 #include <QDomDocument>
@@ -33,7 +33,7 @@ ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
 {
     Q_ASSERT( username.length() );
 
-    m_path = Moose::savePath( username + "_submissions.xml" );
+    m_path = Unicorn::savePath( username + "_submissions.xml" );
     m_username = username;
 
     //HACK due to bad design with this m_tracks global instance thing

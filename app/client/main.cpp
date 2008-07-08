@@ -43,11 +43,11 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
     QDir().mkpath( Moose::cachePath() );
-    QDir().mkpath( Moose::savePath() );
-    QDir().mkpath( Moose::logPath() );
+    QDir().mkpath( Unicorn::savePath() );
+    QDir().mkpath( Unicorn::logPath() );
     
     Logger& logger = Logger::GetLogger();
-    logger.Init( Moose::logPath( "Last.fm.log" ), false );
+    logger.Init( Unicorn::logPath( "Last.fm.log" ), false );
     logger.SetLevel( Logger::Debug );
     LOGL( 3, "Application: " << PRODUCT_NAME << " " << VERSION );
     LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );

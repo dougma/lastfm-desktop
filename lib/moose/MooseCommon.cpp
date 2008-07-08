@@ -45,47 +45,6 @@ namespace Moose
 
 
 QString
-dataPath( QString file )
-{
-    return QCoreApplication::applicationDirPath() + "/data/" + file;
-}
-
-
-QString
-savePath( QString file )
-{
-    QString path;
-
-    #ifdef WIN32
-        path = Unicorn::applicationDataPath();
-        if (path.isEmpty())
-            path = QCoreApplication::applicationDirPath();
-        else
-            path += "/Last.fm/Client";
-    #else
-        path = Unicorn::applicationDataPath() + "/Last.fm";
-    #endif
-
-    QDir d( path );
-    d.mkpath( path );
-
-    return d.filePath( file );
-}
-
-
-QString
-logPath( QString file )
-{
-    #ifndef Q_WS_MAC
-        return savePath( file );
-    #else
-        QDir const d = QDir::home().filePath( "/Library/Logs/Last.fm" );
-        return d.filePath( file );
-    #endif
-}
-
-
-QString
 cachePath()
 {
     #ifdef Q_WS_MAC
@@ -99,7 +58,7 @@ cachePath()
 
         return cacheDir.path() + "/";
     #else
-        return savePath( "cache/" );
+        return Unicorn::savePath( "cache/" );
     #endif
 }
 
@@ -291,5 +250,34 @@ QString bundleDirPath()
     return QDir::cleanPath( QDir( qApp->applicationDirPath() ).absoluteFilePath( "../.." ) );
 }
 #endif
+
+QString
+sessionInformation()
+{
+    Moose::Settings settings;
+    QString clientinfo;
+
+    clientinfo += "User: " + settings.username() + "\n";
+    clientinfo += "Is using proxy: " + QString::number( settings.isUseProxy() ) + "\n";
+    if ( settings.isUseProxy() )
+    {
+        clientinfo += "Proxy Host: " + settings.proxyHost() + "\n";
+        clientinfo += "Proxy Port: " + QString::number( settings.proxyPort() ) + "\n";
+    }
+    clientinfo += "Path: " + settings.path() + "\n";
+    clientinfo += "Version: " + settings.version() + "\n";
+    clientinfo += "Scrobble Point: " + QString::number( settings.scrobblePoint() ) + "\n";
+    clientinfo += "Control Port: " + QString::number( settings.controlPort() ) + "\n";
+    if ( !settings.excludedDirs().isEmpty() )
+    {
+        clientinfo += "Excluded dirs:\n";
+        foreach( QString dir, settings.excludedDirs() )
+        {
+            clientinfo += "    " + dir + "\n";
+        }
+    }
+    
+    return clientinfo;
+}
 
 } // namespace MooseUtils

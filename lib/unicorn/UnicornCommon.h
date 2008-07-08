@@ -175,12 +175,42 @@ namespace Unicorn
      */
     UNICORN_DLLEXPORT QString
     applicationDataPath();
+    
+    /** @returns path to named file in the app's user-writable save directory.
+      * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
+      *      ~/Library/Application Support/Last.fm/ on OS X.
+      *      ~/.local/share/Last.fm/ on Unix.
+      */
+    MOOSE_DLLEXPORT QString
+    savePath( QString file = "" );
+    
+    /**
+     * Returns path to named file in the preferred (OS-dependant) logging directory.
+     * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
+     *      ~/Library/Logs/ on OS X.
+     *      ~/.local/share/Last.fm/ on Unix.
+     */
+    UNICORN_DLLEXPORT QString
+    logPath( QString file = "" );
 
     UNICORN_DLLEXPORT QString
     verbosePlatformString();
 
     UNICORN_DLLEXPORT void
     msleep( int );
+    
+    /**
+     * Returns information about the system.
+     * Operatingsystem, CPU, Memory, Diskspace.
+     */
+    UNICORN_DLLEXPORT QString
+    systemInformation();
+    
+    /**
+     * Runs a shell command, waits for the process to finish then return the output.
+     */
+    UNICORN_DLLEXPORT QString
+    runCommand(QString);
 }
 
 #endif

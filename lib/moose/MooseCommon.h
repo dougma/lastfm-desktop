@@ -53,23 +53,6 @@ namespace MooseEnums
 
 namespace Moose
 {
-    /** @returns path to named file in the app's user-writable save directory.
-      * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
-      *      ~/Library/Application Support/Last.fm/ on OS X.
-      *      ~/.local/share/Last.fm/ on Unix.
-      */
-    MOOSE_DLLEXPORT QString
-    savePath( QString file = "" );
-
-    /**
-     * Returns path to named file in the preferred (OS-dependant) logging directory.
-     * E.g. C:\Documents and Settings\user\Local Settings\Application Data\Last.fm\Client on Windows.
-     *      ~/Library/Logs/ on OS X.
-     *      ~/.local/share/Last.fm/ on Unix.
-     */
-    MOOSE_DLLEXPORT QString
-    logPath( QString file = "" );
-
     /**
      * Returns path to directory for storing cached images etc.
      */
@@ -128,6 +111,12 @@ namespace Moose
     /** eg. /Applications/Last.fm.app/ */
     QString bundleDirPath();
   #endif
+  
+    /**
+     * Returns information about the session.
+     * More or less the information you get from MoseUtils and MoseSettings
+     */
+    QString sessionInformation();
 
 } //namespace MooseUtils
 

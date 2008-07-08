@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QMap>
 #include <QUrl>
+#include <QProcess>
 
 #ifdef WIN32
     #include <windows.h>
@@ -387,6 +388,40 @@ applicationDataPath()
 
 
 QString
+savePath( QString file )
+{
+    QString path;
+
+    #ifdef WIN32
+        path = Unicorn::applicationDataPath();
+        if (path.isEmpty())
+            path = QCoreApplication::applicationDirPath();
+        else
+            path += "/Last.fm/";
+    #else
+        path = Unicorn::applicationDataPath() + "/Last.fm";
+    #endif
+
+    QDir d( path );
+    d.mkpath( path );
+
+    return d.filePath( file );
+}
+
+
+QString
+logPath( QString file )
+{
+    #ifndef Q_WS_MAC
+        return savePath( file );
+    #else
+        QDir const d = QDir::home().filePath( "/Library/Logs/Last.fm" );
+        return d.filePath( file );
+    #endif
+}
+
+
+QString
 verbosePlatformString()
 {
     #ifdef Q_WS_WIN
@@ -441,5 +476,87 @@ msleep( int ms )
   #endif
 }
 
+QString
+runCommand( QString cmd )
+{
+    QProcess process;
+
+    process.start( cmd );
+    process.closeWriteChannel();
+    process.waitForFinished();
+
+    return QString( process.readAll() );
+}
+
+QString 
+systemInformation()
+{
+    QString information;
+    
+    information += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
+
+#ifdef Q_WS_X11
+    information += "CPU: \n";
+    information += runCommand( "cat /proc/cpuinfo" );
+    information += "\n";
+    
+    information += "Memory: \n";
+    information += runCommand( "cat /proc/meminfo" );
+    information += "\n";
+    
+    information += "Diskspace: \n";
+    information += runCommand( "df -h" );
+    information += "\n";
+
+#elif defined WIN32
+    // CPU
+    SYSTEM_INFO siSysInfo;
+    GetSystemInfo(&siSysInfo); 
+
+    information += "CPU: \n";  
+    information += "Number of processors: " + QString::number( siSysInfo.dwNumberOfProcessors ) + "\n";
+    information += "Page size: " + QString::number( siSysInfo.dwPageSize ) + "\n";
+    information += "Processor type: " + QString::number( siSysInfo.dwProcessorType ) + "\n";
+    information += "Active processor mask: " + QString::number( siSysInfo.dwActiveProcessorMask ) + "\n";
+    information += "\n";
+
+    // Memory
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof (statex);
+    GlobalMemoryStatusEx (&statex);
+
+    information += "Memory used: " + QString::number( statex.dwMemoryLoad ) + "%\n";
+    information += "Total memory: " + QString::number( statex.ullTotalPhys/(1024*1024) ) + "MB\n";
+    information += "Free memory: " + QString::number( statex.ullAvailPhys/(1024*1024) ) + "MB\n";
+    information += "Total virtual memory: " + QString::number( statex.ullTotalVirtual/(1024*1024) ) + "MB\n";
+    information += "Free virtual memory: " + QString::number( statex.ullAvailVirtual/(1024*1024) ) + "MB\n";
+
+    // Disk space
+    __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
+    DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
+
+    GetDiskFreeSpaceEx( NULL,
+                        (PULARGE_INTEGER)&lpFreeBytesAvailable,
+                        (PULARGE_INTEGER)&lpTotalNumberOfBytes,
+                        (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
+                        ); 
+
+    information += "Drive C:\\ \n";
+    information += "   Total diskspace: " + QString::number( lpTotalNumberOfBytes/(1024*1024) )+ "MB\n";
+    information += "   Free diskspace: " + QString::number( lpFreeBytesAvailable/(1024*1024) )  + "MB\n";
+
+#elif defined Q_WS_MAC
+    information += "CPU and Memory: \n";
+    information += Unicorn::runCommand( "hostinfo" );
+    information += "\n";
+    
+    information += "Diskspace: \n";
+    information += Unicorn::runCommand( "df -h" );
+    information += "\n";
+
+#endif
+
+    return information;
+}
 
 } // namespace UnicornUtils
