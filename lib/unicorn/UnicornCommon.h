@@ -181,7 +181,7 @@ namespace Unicorn
       *      ~/Library/Application Support/Last.fm/ on OS X.
       *      ~/.local/share/Last.fm/ on Unix.
       */
-    MOOSE_DLLEXPORT QString
+    UNICORN_DLLEXPORT QString
     savePath( QString file = "" );
     
     /**

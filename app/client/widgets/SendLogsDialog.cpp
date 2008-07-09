@@ -34,6 +34,9 @@
 #include <QFile>
 #include <QNetworkRequest>
 #include <QTextDocument>
+#include <QDir>
+#include <QFileInfo>
+#include <QStringList>
 
 #ifdef WIN32
 #include <windows.h>
@@ -64,7 +67,17 @@ SendLogsDialog::onSendClicked()
     connect( request, SIGNAL( error() ), SLOT( onError() ) );
     ui.moreInfoTextEdit->clear();
     
-    request->addLog("client", Unicorn::logPath( "Last.fm.log" ) );
+    QDir logDir( Unicorn::logPath( ) );
+    QStringList logExt("*.log");
+        
+    // find logs
+    logDir.setFilter( QDir::Files | QDir::Readable );
+    logDir.setNameFilters( logExt );
+    QList<QFileInfo> logFiles = logDir.entryInfoList();
+    
+    foreach( QFileInfo log, logFiles )
+        request->addLog( log.completeBaseName(), log.absoluteFilePath() );
+
     request->addLogData( "clientinfo", Moose::sessionInformation() );
     request->addLogData( "sysinfo", Unicorn::systemInformation() );
     
