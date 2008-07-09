@@ -98,6 +98,7 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
     
     static bool b = true;
     static QLinearGradient g( 0, 0, 0, 20 );
+    const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
     if (b)
     {
         // Track bar blue bg colour
@@ -106,7 +107,6 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
         const QColor k_trackBarBkgrBlueBottom( 0xdc, 0xe2, 0xe5, 0xff );
 
         // Track bar progress bar colour
-        const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
         const QColor k_trackBarProgressMiddle( 0xd0, 0xd9, 0xe2, 0xff );
         const QColor k_trackBarProgressBottom( 0xca, 0xd4, 0xdc, 0xff );
 
