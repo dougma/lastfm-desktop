@@ -18,15 +18,16 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-
+#include "ObservedTrack.h"
 #include "PlaybackEvent.h"
 #include "Settings.h"
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
+#include "widgets/SendLogsDialog.h"
 #include "lib/unicorn/UnicornCommon.h"
-#include "lib/unicorn/Track.h"
-
+#include <QByteArray>
 #include <QClipboard>
+#include <QFile>
 #include <QTimer>
 #include <QProcess>
 
@@ -238,16 +239,16 @@ DiagnosticsDialog::onOutputBufferSizeChanged(int bufferSize)
 
 
 void
-DiagnosticsDialog::onAppEvent( int event, const QVariant& /* data */ )
+DiagnosticsDialog::onAppEvent( int event, const QVariant& )
 {
     switch (event)
     {
-        case PlaybackEvent::ScrobblePointReached:
-            populateScrobbleCacheView();
-            break;
+    case PlaybackEvent::ScrobblePointReached:
+        populateScrobbleCacheView();
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -439,9 +440,9 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 #endif
 }
 
+
 void 
 DiagnosticsDialog::onSendLogsClicked()
 {
-    m_sendLogsDialog.exec();
+    SendLogsDialog( this ).exec();
 }
-

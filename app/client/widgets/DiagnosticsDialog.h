@@ -22,8 +22,6 @@
 
 #include "ui_DiagnosticsDialog.h"
 
-#include "SendLogsDialog.h"
-
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
@@ -74,8 +72,6 @@ private:
     void populateScrobbleCacheView();
 	void scrobbleIpod( bool isManual = false );
 	QString diagnosticInformation();
-
-    SendLogsDialog m_sendLogsDialog;
 
     class QTimer* m_logTimer;
     std::ifstream m_logFile;

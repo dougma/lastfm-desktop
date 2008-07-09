@@ -95,27 +95,31 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
 
     if (!m_progressDisplayTick)
         return;
+    
+    static bool b = true;
+    static QLinearGradient g( 0, 0, 0, 20 );
+    if (b)
+    {
+        // Track bar blue bg colour
+        const QColor k_trackBarBkgrBlueTop( 0xeb, 0xf0, 0xf2, 0xff );
+        const QColor k_trackBarBkgrBlueMiddle( 0xe5, 0xe9, 0xec, 0xff );
+        const QColor k_trackBarBkgrBlueBottom( 0xdc, 0xe2, 0xe5, 0xff );
 
-    // Track bar blue bg colour
-    const QColor k_trackBarBkgrBlueTop( 0xeb, 0xf0, 0xf2, 0xff );
-    const QColor k_trackBarBkgrBlueMiddle( 0xe5, 0xe9, 0xec, 0xff );
-    const QColor k_trackBarBkgrBlueBottom( 0xdc, 0xe2, 0xe5, 0xff );
+        // Track bar progress bar colour
+        const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
+        const QColor k_trackBarProgressMiddle( 0xd0, 0xd9, 0xe2, 0xff );
+        const QColor k_trackBarProgressBottom( 0xca, 0xd4, 0xdc, 0xff );
 
-    // Track bar progress bar colour
-    const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
-    const QColor k_trackBarProgressMiddle( 0xd0, 0xd9, 0xe2, 0xff );
-    const QColor k_trackBarProgressBottom( 0xca, 0xd4, 0xdc, 0xff );
-
-    // Track bar scrobbled colour
-    const QColor k_trackBarScrobbledTop( 0xba, 0xc7, 0xd7, 0xff );
-    const QColor k_trackBarScrobbledMiddle( 0xb8, 0xc4, 0xd5, 0xff );
-    const QColor k_trackBarScrobbledBottom( 0xb5, 0xc1, 0xd2, 0xff );
-
-    QLinearGradient g( 0, 0, 0, 20 );
-    g.setColorAt( 0, k_trackBarProgressTop );
-    g.setColorAt( 0.5, k_trackBarProgressMiddle );
-    g.setColorAt( 0.51, k_trackBarProgressBottom );
-    g.setColorAt( 1, k_trackBarProgressBottom );
+        // Track bar scrobbled colour
+        const QColor k_trackBarScrobbledTop( 0xba, 0xc7, 0xd7, 0xff );
+        const QColor k_trackBarScrobbledMiddle( 0xb8, 0xc4, 0xd5, 0xff );
+        const QColor k_trackBarScrobbledBottom( 0xb5, 0xc1, 0xd2, 0xff );
+        
+        g.setColorAt( 0, k_trackBarProgressTop );
+        g.setColorAt( 0.5, k_trackBarProgressMiddle );
+        g.setColorAt( 0.51, k_trackBarProgressBottom );
+        g.setColorAt( 1, k_trackBarProgressBottom );
+    }
 
     QPainter p( this );
     p.setPen( k_trackBarProgressTop );

@@ -20,8 +20,10 @@
 #ifndef PLAYER_LISTENER_H
 #define PLAYER_LISTENER_H
 
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 ) 
+#ifdef WIN32 //prevent warning with gcc (lol)
+    // ms admits its lousy compiler doesn't care about throw declarations
+    #pragma warning( disable : 4290 ) 
+#endif
 
 #include <QTcpServer>
 class Track;

@@ -25,8 +25,10 @@
 #include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include "lib/DllExportMacro.h"
 
-class SendLogsRequest : public QObject
+
+class UNICORN_DLLEXPORT SendLogsRequest : public QObject
 {
     Q_OBJECT
 

@@ -114,9 +114,9 @@ namespace Moose
   
     /**
      * Returns information about the session.
-     * More or less the information you get from MoseUtils and MoseSettings
+     * More or less the information you get from MooseUtils and MoseSettings
      */
-    QString sessionInformation();
+    MOOSE_DLLEXPORT QString sessionInformation();
 
 } //namespace MooseUtils
 

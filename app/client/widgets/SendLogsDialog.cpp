@@ -18,45 +18,22 @@
  ***************************************************************************/
 
 #include "SendLogsDialog.h"
-
 #include "Settings.h"
-
 #include "lib/moose/MooseCommon.h"
-
 #include "lib/unicorn/UnicornCommon.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/ws/SendLogsRequest.h"
-
-#include <QDesktopServices>
-#include <QProcess>
-#include <QUrl>
-#include <QClipboard>
-#include <QFile>
-#include <QNetworkRequest>
-#include <QTextDocument>
 #include <QDir>
-#include <QFileInfo>
-#include <QStringList>
-
-#ifdef WIN32
-#include <windows.h>
-#include <stdio.h>
-#endif
-
 #include "version.h"
 
 
 SendLogsDialog::SendLogsDialog( QWidget *parent )
-        : QDialog( parent )
+              : QDialog( parent )
 {
     ui.setupUi( this );
 
     connect( ui.sendButton, SIGNAL( clicked() ), SLOT( onSendClicked() ) );
 }
-
-
-SendLogsDialog::~SendLogsDialog()
-{}
 
 
 void

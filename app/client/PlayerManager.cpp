@@ -49,17 +49,17 @@ PlayerManager::onTrackStarted( const Track& t )
 {   
     QString const id = t.playerId();
     Player& p = *m_players[id];
+    delete p.track.m_watch; //stuff is connected to it, break those connections
+
     p.track = t;
     p.state = PlaybackState::Playing;
-    StopWatch* watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
-    delete p.track.m_watch; //stuff is connected to it, break those connections
-    p.track.m_watch = watch;
+    p.track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
 
     qDebug() << p.track.toString() << p.track.isEmpty();
 
     if (m_players.top()->id == id)
     {
-        connect( watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
+        connect( p.track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
         handleStateChange( p.state, p.track );
     }
 }
