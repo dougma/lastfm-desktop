@@ -28,6 +28,7 @@
 
 #include <QClipboard>
 #include <QTimer>
+#include <QProcess>
 
 DrWatson DiagnosticsDialog::watson;
 
