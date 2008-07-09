@@ -75,6 +75,7 @@ SendLogsDialog::onSendClicked()
     request->send();
     
     ui.buttonBox->setEnabled( false );
+    ui.moreInfoTextEdit->setEnabled( false );
     ui.spinner->show();
     ui.spinner->movie()->start();
 }
@@ -90,6 +91,7 @@ SendLogsDialog::onSuccess()
     ui.spinner->hide();
     ui.moreInfoTextEdit->clear();
     ui.buttonBox->setEnabled( true );
+    ui.moreInfoTextEdit->setEnabled( true );
     QDialog::accept();
 }
 
@@ -102,5 +104,6 @@ SendLogsDialog::onError()
     ui.spinner->movie()->stop();
     ui.spinner->hide();
     ui.buttonBox->setEnabled( true );
+    ui.moreInfoTextEdit->setEnabled( true );
 }
 
