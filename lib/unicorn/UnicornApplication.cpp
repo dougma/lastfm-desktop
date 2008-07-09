@@ -21,7 +21,6 @@
 #include "LastMessageBox.h"
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
-#include "ws/WsRequestManager.h"
 
 
 Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
@@ -39,27 +38,24 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 
     Settings s;
 
-    if (s.username().isEmpty() || s.logOutOnExit())
+    if (s.username().isEmpty() || s.sessionKey().isEmpty() || s.logOutOnExit())
     {
         LoginDialog d;
         if (d.exec() == QDialog::Accepted)
         {
-            // we shouldn't store this really, if LogOutOnExit is enabled
-            // but we delete the setting on exit, and it means other apps can
-            // log in while the client is loaded, and prevents us having to 
-            // store these datas for the use case where LogOutOnExit is disabled
-            // during the session
-            Unicorn::QSettings s;
-            s.setValue( "Username", d.username() );
+            // if LogOutOnExit is enabled, really, we shouldn't store these,
+            // but it means other Unicorn apps can log in while the client is 
+            // loaded, and we delete the settings on exit if logOut is on
+            Unicorn::QSettings().setValue( "Username", d.username() );
+            Unicorn::UserQSettings s;
             s.setValue( "Password", d.password() );
+            s.setValue( "SessionKey", d.sessionKey() );
         }
         else
         {
             throw StubbornUserException();
         }
     }
-
-    WsRequestManager::instance();
 }
 
 
@@ -69,8 +65,9 @@ Unicorn::Application::~Application()
     // did it then the user would be unable to change their mind
     if (Unicorn::Settings().logOutOnExit())
     {
-        Unicorn::QSettings s;
-        s.remove( "Username" );
+        Unicorn::QSettings().remove( "Username" );
+        Unicorn::UserQSettings s;
         s.remove( "Password" );
+        s.remove( "SessionKey" );
     }
 }

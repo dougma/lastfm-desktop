@@ -1,14 +1,6 @@
 <ui version="4.0" >
  <class>LoginDialog</class>
  <widget class="QDialog" name="LoginDialog" >
-  <property name="geometry" >
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>332</width>
-    <height>110</height>
-   </rect>
-  </property>
   <property name="sizePolicy" >
    <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
     <horstretch>0</horstretch>
@@ -29,10 +21,7 @@
        <property name="rightMargin" >
         <number>9</number>
        </property>
-       <property name="horizontalSpacing" >
-        <number>6</number>
-       </property>
-       <property name="verticalSpacing" >
+       <property name="spacing" >
         <number>6</number>
        </property>
        <item row="0" column="0" >
@@ -99,7 +88,7 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>16</width>
          <height>48</height>
@@ -121,7 +110,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>20</height>
@@ -141,7 +130,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::Expanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>314</width>
        <height>16</height>
@@ -152,7 +141,7 @@
    <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QLabel" name="label" >
+      <widget class="QLabel" name="urls" >
        <property name="text" >
         <string>&lt;a href='http://last.fm/join/'>Sign up&lt;/a>&lt;br>&lt;a href='http://last.fm/settings/lostpassword/'>Forgot your password?&lt;/a></string>
        </property>
@@ -161,7 +150,7 @@
      <item>
       <widget class="QDialogButtonBox" name="buttonBox" >
        <property name="standardButtons" >
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
       </widget>
      </item>

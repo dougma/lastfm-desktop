@@ -1,17 +1,15 @@
 #include "WsRequestParameters.h"
 #include "../UnicornCommon.h"
 
+// HI! DON'T USE OURS! GET YOUR OWN!
 static const QString API_KEY = "c8c7b163b11f92ef2d33ba6cd3c2c3c3";
 static const QString API_SECRET = "73582dfc9e556d307aead069af110ab8";
 
+
 WsRequestParameters::WsRequestParameters( QObject* parent )
                     : QObject( parent )
-{
-}
+{}
 
-WsRequestParameters::~WsRequestParameters(void)
-{
-}
 
 WsRequestParameters::operator const QList< QPair< QString,QString > >()
 {
@@ -30,13 +28,17 @@ WsRequestParameters::operator const QList< QPair< QString,QString > >()
     return params;
 }
 
-WsRequestParameters& WsRequestParameters::add( const QString& key, const QString& value )
+
+WsRequestParameters&
+WsRequestParameters::add( const QString& key, const QString& value )
 {
     m_paramList.insert( key, value );
     return *this;
 }
 
-QString WsRequestParameters::methodSignature()
+
+QString 
+WsRequestParameters::methodSignature()
 {
     QString paramString;
 

@@ -1,57 +1,57 @@
+/***************************************************************************
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ ***************************************************************************/
+
 #ifndef WS_REQUEST_MANAGER_H
 #define WS_REQUEST_MANAGER_H
 
 #include "WsRequestParameters.h"
-#include <QNetworkAccessManager>
-#include <QMap>
 #include "lib/DllExportMacro.h"
 
-class UNICORN_DLLEXPORT WsRequestManager: QObject
+class WsReply;
+
+   
+class UNICORN_DLLEXPORT WsRequestBuilder
 {
-    Q_OBJECT
-
-public:
-    static WsRequestManager *instance()
-    { 
-        if(!s_instance) s_instance = new WsRequestManager(); 
-        return s_instance; 
-    }
-
-    class WsReply* getMethod( const QString methodName, WsRequestParameters& params )
+    enum RequestMethod
     {
-        return callMethod( methodName, params, GET );
-    }
-
-    class WsReply* syncGetMethod( const QString methodName, WsRequestParameters &params )
-    {
-        return syncCallMethod( methodName, params, GET );
-    }
-
-private:
-    WsRequestManager(void);
-    ~WsRequestManager(void);
-
-    enum WsRequestType
-    {
-        GET = 0,
+        GET,
         POST
     };
 
-    void getSession();
+    static class QNetworkAccessManager* nam;
 
-    static WsRequestManager* s_instance;
-    bool m_hasHandshaken;
-    QString m_baseHost;
-    QString m_apiRoot;
+    RequestMethod request_method;
+    WsRequestParameters params;
 
-    QNetworkAccessManager m_networkAccessManager;
-    class WsReply* callMethod( const QString methodName, WsRequestParameters& params, int RequestType = GET );
-    class WsReply* syncCallMethod( const QString methodName, WsRequestParameters &params, int RequestType = GET );
+    static QByteArray userAgent();
 
+public:
+    WsRequestBuilder( const QString& methodName );
+    
+    WsRequestBuilder& get() { request_method = GET; return *this; }
+    WsRequestBuilder& post() { request_method = POST; return *this; }
 
-private slots:
-    void parseSessionAuth( class WsReply* reply );
+    /** add a parameter to the request */
+    WsRequestBuilder& add( const QString& key, const QString& value ) { params.add( key, value ); return *this; }
 
+    WsReply* synchronously();
+    WsReply* asynchronously();
 };
 
-#endif //WS_REQUEST_MANAGER_H
+#endif

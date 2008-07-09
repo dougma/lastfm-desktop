@@ -32,6 +32,8 @@ LoginDialog::LoginDialog()
     ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
     ui.spinner->movie()->setParent( this );
     ui.spinner->hide();
+    
+    ui.urls->setAttribute( Qt::WA_MacSmallSize );
 
     ok()->setDisabled( true );
 
@@ -71,11 +73,6 @@ LoginDialog::verify()
 void
 LoginDialog::onVerifyResult( Request* request )
 {
-    ui.retranslateUi( this ); //resets Window title;
-    ok()->setEnabled( true );
-    ui.spinner->hide();
-    ui.spinner->movie()->stop();
-
     VerifyUserRequest* verify = static_cast<VerifyUserRequest*>(request);
 
     // If the request failed, the auth code doesn't get filled in properly
@@ -92,6 +89,7 @@ LoginDialog::onVerifyResult( Request* request )
         case AUTH_OK_LOWER:
             m_username = verify->username();
             m_password = verify->password();
+            authenticate2();
             accept();
             break;
 
@@ -113,4 +111,31 @@ LoginDialog::onVerifyResult( Request* request )
             //TODO much better handling thatn v1
             break;
     }
+    
+    // do last, otherwise it looks weird
+    ui.retranslateUi( this ); //resets Window title
+    ok()->setEnabled( true );
+    ui.spinner->hide();
+    ui.spinner->movie()->stop();
+}
+
+
+#include "lib/unicorn/ws/WsRequestManager.h"
+#include "lib/unicorn/ws/WsReply.h"
+void
+LoginDialog::authenticate2()
+{
+    WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
+            .add( "username", m_username )
+            .add( "authToken", Unicorn::md5( (m_username + m_password).toUtf8() ) )
+            .get()
+            .synchronously();
+
+    QDomDocument content = reply->domDocument();
+    QDomElement lfm = content.firstChildElement( "lfm" );
+    QDomElement session = lfm.firstChildElement( "session" );
+    QDomElement key = session.firstChildElement( "key" );
+    m_sessionKey = key.firstChild().nodeValue();
+    
+    qDebug() << m_sessionKey;   
 }

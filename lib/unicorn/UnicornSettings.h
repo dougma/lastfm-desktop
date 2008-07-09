@@ -44,10 +44,10 @@ namespace Unicorn
     
     /** Clearly no use until a username() has been assigned. But this is 
       * automatic if you use Unicorn::Application anyway. */
-    class UserSettings : public Unicorn::QSettings
+    class UserQSettings : public Unicorn::QSettings
     {
     public:
-        UserSettings();
+        UserQSettings();
     };
     
     
@@ -60,10 +60,8 @@ namespace Unicorn
         {}
 
         QString username() const { return QSettings().value( "Username" ).toString(); }
-        // perhaps should be a UserSetting, but well, only one person can be 
-        // logged in at a time and we forget passwords for security reasons
-        // inbetween user switching. So really this makes sense.
-        QString password() const { return QSettings().value( "Password" ).toString(); }
+        QString password() const { return UserQSettings().value( "Password" ).toString(); }
+        QString sessionKey() const { return UserQSettings().value( "SessionKey", "" ).toString(); }
 
         bool isUseProxy() const { return QSettings().value( "ProxyEnabled" ).toInt() == 1; }
         QString proxyHost() const { return QSettings().value( "ProxyHost" ).toString(); }
@@ -72,17 +70,14 @@ namespace Unicorn
         QString proxyPassword() const { return QSettings().value( "ProxyPassword" ).toString(); }
 
         // all Unicorn::Applications obey this
-        bool logOutOnExit() const { return UserSettings().value( "LogOutOnExit", false ).toBool(); }
-
-        //TODO: make this a per user setting
-        QString sessionKey() const { return QSettings().value( "SessionKey", "" ).toString(); }
+        bool logOutOnExit() const { return UserQSettings().value( "LogOutOnExit", false ).toBool(); }
 
         /** @returns one of our pre-defined 2-letter language codes */
         QString language() const;
     };
     
 
-    inline UserSettings::UserSettings()
+    inline UserQSettings::UserQSettings()
     {
         QString const username = Unicorn::Settings().username();
         beginGroup( username );
@@ -107,8 +102,7 @@ namespace Unicorn
         void setProxyUser( QString v ) { QSettings().setValue( "ProxyUser", v ); }
         void setProxyPassword( QString v ) { QSettings().setValue( "ProxyPassword", v ); }
         void setLanguage( QString langCode ) { QSettings().setValue( "AppLanguage", langCode ); }
-        void setLogOutOnExit( bool b ) { UserSettings().setValue( "LogOutOnExit", b ); }
-        void setSessionKey( QString sessionKey ) { QSettings().setValue( "SessionKey", sessionKey ); }
+        void setLogOutOnExit( bool b ) { UserQSettings().setValue( "LogOutOnExit", b ); }
     };
 }
 

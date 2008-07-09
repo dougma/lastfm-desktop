@@ -1,13 +1,14 @@
-#ifndef WS_RESPONSE_H
-#define WS_RESPONSE_H
+#ifndef WS_REPLY_H
+#define WS_REPLY_H
 
 #include <QNetworkReply>
 #include <QDomDocument>
+#include "lib/DllExportMacro.h"
 
-class WsReply: public QNetworkReply
+class UNICORN_DLLEXPORT WsReply : public QNetworkReply
 {
-    public:
-        QDomDocument domDocument();
+public:
+    QDomDocument domDocument(); //can't be const
 };
 
 #endif

@@ -43,7 +43,7 @@ QString
 md5( const QByteArray& src )
 {
     QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
-    return QString::fromLatin1( digest.toHex() );
+    return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' );
 }
 
 

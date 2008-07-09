@@ -1,131 +1,93 @@
+/***************************************************************************
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ ***************************************************************************/
+
 #include "WsRequestManager.h"
 #include "WsReply.h"
-#include "../UnicornCommon.h"
-#include "../UnicornSettings.h"
-#include <QXmlInputSource>
-#include <QXmlReader>
+#include <QCoreApplication>
+#include <QNetworkAccessManager>
 #include <QEventLoop>
-#include <QDebug>
 
-using namespace Unicorn;
+QNetworkAccessManager* WsRequestBuilder::nam = 0;
 
-//static
-    WsRequestManager* WsRequestManager::s_instance = 0;
 
-WsRequestManager::WsRequestManager( void )
-                 :m_hasHandshaken( false ),
-                  m_baseHost( "http://ws.audioscrobbler.com/" ),
-                  m_apiRoot( "2.0/" )
+WsRequestBuilder::WsRequestBuilder( const QString& method )
 {
-    Unicorn::Settings settings;
-
-    if( settings.sessionKey().isEmpty() )
-    {
-        getSession();
-    }
+    if (!nam) nam = new QNetworkAccessManager( qApp );
+    
+    params.add( "method", method );
 }
 
-void WsRequestManager::getSession()
+
+WsReply*
+WsRequestBuilder::asynchronously()
 {
-    Unicorn::Settings settings;
-
-    WsRequestParameters params;
-    QString authToken = md5( ( settings.username() + 
-                               settings.password() ).toUtf8() );
-
-    params.add( "username", settings.username() )
-          .add( "authToken", authToken );
-    
-    WsReply* reply = syncCallMethod( "auth.getMobileSession", params );
-    if( reply->error() != QNetworkReply::NoError )
-    {
-        //TODO: handle network error + early out
-    }
-    
-    parseSessionAuth( reply );
-}
-
-WsRequestManager::~WsRequestManager( void )
-{
-}
-
-WsReply* WsRequestManager::callMethod( const QString methodName, WsRequestParameters &params, int RequestType )
-{
-    params.add( "method", methodName );
-    
-    QUrl url( m_baseHost + m_apiRoot );
+    QUrl url( "http://ws.audioscrobbler.com/2.0/" );
     url.setQueryItems( params );
-    
+
     QNetworkRequest request( url );
-    
+    request.setRawHeader( "User-Agent", userAgent() );
     QNetworkReply* reply = 0;
-    
-    switch( RequestType )
+
+    switch (request_method)
     {
-        case GET:
-            reply = m_networkAccessManager.get( request );
+        case GET:  
+            reply = nam->get( request ); 
             break;
 
-        case POST:
-            reply = m_networkAccessManager.post( request, url.encodedQuery() );
+        case POST: 
+            reply = nam->post( request, url.encodedQuery() ); 
             break;
 
         default:
             Q_ASSERT( !"Unknown RequestType" );
             break;
     }
-        
-    WsReply* wsReply = static_cast< WsReply* >( reply );
-    return wsReply;
+
+    return static_cast<WsReply*>( reply );
 }
 
-WsReply* WsRequestManager::syncCallMethod( const QString methodName, WsRequestParameters &params, int RequestType )
+
+QByteArray //static
+WsRequestBuilder::userAgent()
 {
-    WsReply* reply = callMethod( methodName, params );
+    //FIXME since we aren't all the client
+    // NEVER CHANGE THE FOLLOWING STRING! you can append stuff, but that's it
+    QByteArray agent = "Last.fm Client";
+#ifdef WIN32
+    agent += " (Windows)";
+#elif defined (Q_WS_MAC)
+    agent += " (OS X)";
+#elif defined (Q_WS_X11)
+    agent += " (X11)";
+#endif
+    return agent;
+}
+
+
+WsReply*
+WsRequestBuilder::synchronously()
+{
+    WsReply* reply = asynchronously();
+
     QEventLoop eventLoop;
-
-    connect( reply, SIGNAL( finished() ),
-             &eventLoop, SLOT( quit() ) );
-    
-    connect( reply, SIGNAL( error( QNetworkReply::NetworkError ) ),
-             &eventLoop, SLOT( quit() ) );
-
+    QObject::connect( reply, SIGNAL(finished()), &eventLoop, SLOT(quit()) );
     eventLoop.exec();
-    return reply;
-}
-
-void WsRequestManager::parseSessionAuth( WsReply* reply )
-{
-    Unicorn::Settings settings;
-    Unicorn::MutableSettings mutableSettings;
-
-    QDomDocument content = reply->domDocument();
-
-    QDomElement lfm = content.firstChildElement( "lfm" );
-    if( lfm.isNull() )
-    {
-        //TODO: error handling and early out
-    }
-
-    QString status = lfm.attribute( "status", "" );
-    if( status != "ok" )
-    {
-        //TODO: error handling and early out
-    }
-
-    QDomElement session = lfm.firstChildElement( "session" );
-    if( session.isNull() )
-    {
-        //TODO: error handling and early out
-    }
-
-    QDomElement key = session.firstChildElement( "key" );
-    if( key.isNull() || !key.firstChild().isText() )
-    {
-        //TODO: error handling and early out
-    }
     
-    mutableSettings.setSessionKey( key.firstChild().nodeValue() );
-    qDebug() << "AuthRequest Response:\n"  << content.toString();
-    qDebug() << "Session Key: " << settings.sessionKey();
+    return reply;
 }

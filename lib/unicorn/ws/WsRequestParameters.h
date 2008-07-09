@@ -8,12 +8,13 @@
 #include <QObject>
 #include "lib/DllExportMacro.h"
 
+
 class UNICORN_DLLEXPORT WsRequestParameters: public QObject
 {
     Q_OBJECT
+
 public:
     WsRequestParameters( QObject* parent = 0 );
-    ~WsRequestParameters( void );
     
     WsRequestParameters& add( const QString& key, const QString& value );
     operator const QList< QPair< QString, QString > >();

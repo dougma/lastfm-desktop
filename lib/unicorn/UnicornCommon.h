@@ -62,6 +62,7 @@ namespace UnicornEnums
  */
 namespace Unicorn
 {
+    /** the 32 hex-character md5 hash */
     UNICORN_DLLEXPORT QString
     md5( const QByteArray& );
 
