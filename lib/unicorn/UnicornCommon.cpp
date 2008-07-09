@@ -533,7 +533,6 @@ systemInformation()
 
     // Disk space
     __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
-    DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
 
     GetDiskFreeSpaceEx( NULL,
                         (PULARGE_INTEGER)&lpFreeBytesAvailable,
