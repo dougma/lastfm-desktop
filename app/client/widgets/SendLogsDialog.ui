@@ -1,12 +1,12 @@
 <ui version="4.0" >
- <class>MailLogsDialog</class>
- <widget class="QDialog" name="MailLogsDialog" >
+ <class>SendLogsDialog</class>
+ <widget class="QDialog" name="SendLogsDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
-    <height>375</height>
+    <width>508</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -56,7 +56,7 @@
        <item>
         <widget class="QLabel" name="infoLabel2" >
          <property name="text" >
-          <string>Information about your platfrom.</string>
+          <string>Information about your computer and operatingsystem.</string>
          </property>
          <property name="wordWrap" >
           <bool>true</bool>
@@ -70,7 +70,10 @@
    <item>
     <widget class="QLabel" name="moreInfoHeader" >
      <property name="text" >
-      <string>More Info</string>
+      <string>Please describe the problem as thoroughly as possible. Please also link to any forum-threads where you might have discussed the problem. We will get back to you as soon as possible.</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -100,9 +103,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="mailButton" >
+      <widget class="QPushButton" name="sendButton" >
        <property name="text" >
-        <string>Create Mail</string>
+        <string>Send</string>
        </property>
       </widget>
      </item>
@@ -115,7 +118,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>MailLogsDialog</receiver>
+   <receiver>SendLogsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >

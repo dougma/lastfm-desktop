@@ -17,65 +17,31 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "MailLogsDialog.h"
+#ifndef MAIL_LOGS_DIALOG_H
+#define MAIL_LOGS_DIALOG_H
 
-#include "Settings.h"
+#include "ui_SendLogsDialog.h"
 
-#include "lib/moose/MooseCommon.h"
-
-#include "lib/unicorn/UnicornCommon.h"
-#include "lib/unicorn/LastMessageBox.h"
-#include "lib/unicorn/ws/SendLogsRequest.h"
-
-#include <QDesktopServices>
-#include <QProcess>
-#include <QUrl>
-#include <QClipboard>
-#include <QFile>
-#include <QNetworkRequest>
-#include <QTextDocument>
-
-#ifdef WIN32
-#include <windows.h>
-#include <stdio.h>
-#endif
-
-#include "version.h"
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 
-MailLogsDialog::MailLogsDialog( QWidget *parent )
-        : QDialog( parent )
+/** @author <petgru@openfestis.org>
+  * @brief Makes it possible for a user to easily mail all necessary debug information to us.
+  */
+class SendLogsDialog : public QDialog
 {
-    ui.setupUi( this );
+    Q_OBJECT
 
-    connect( ui.mailButton, SIGNAL( clicked() ), SLOT( onCreateMailClicked() ) );
-}
+public:
+    SendLogsDialog( QWidget *parent = 0 );
+    ~SendLogsDialog();
 
+    Ui::SendLogsDialog ui;
 
-MailLogsDialog::~MailLogsDialog()
-{}
+private slots:
+    void onSendClicked();
+    void onError();
+};
 
-
-void
-MailLogsDialog::onCreateMailClicked()
-{
-    SendLogsRequest* request = new SendLogsRequest( PRODUCT_NAME, VERSION, ui.moreInfoTextEdit->toPlainText() );
-    ui.moreInfoTextEdit->clear();
-    
-    request->addLog("client", Unicorn::logPath( "Last.fm.log" ) );
-    request->addLogData( "clientinfo", Moose::sessionInformation() );
-    request->addLogData( "sysinfo", Unicorn::systemInformation() );
-    
-    request->send();
-    
-    QDialog::accept();
-}
-
-
-void
-MailLogsDialog::onError()
-{
-    LastMessageBox::warning( tr( "Couldn't send logs" ), 
-                             tr( "Failed to send the logs. Please try again later." ) );
-}
-
+#endif //SEND_LOGS_DIALOG_H

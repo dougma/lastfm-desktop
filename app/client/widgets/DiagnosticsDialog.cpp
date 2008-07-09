@@ -23,15 +23,11 @@
 #include "Settings.h"
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
-#include "lib/moose/MooseCommon.h"
+#include "lib/unicorn/UnicornCommon.h"
 #include "lib/unicorn/Track.h"
 
-#include <QProcess>
 #include <QClipboard>
-
-#include <QByteArray>
 #include <QTimer>
-#include <QFile>
 
 DrWatson DiagnosticsDialog::watson;
 
@@ -126,7 +122,7 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.copyToClipboardButton, SIGNAL( clicked() ), SLOT( onCopyToClipboard() ) );
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
-    connect( ui.mailButton, SIGNAL( clicked() ), SLOT( onMailLogsClicked() ) );
+    connect( ui.sendLogsButton, SIGNAL( clicked() ), SLOT( onSendLogsClicked() ) );
 
     //FIXME still needed for eg. cache view may not reflect truth
     connect( ui.refreshButton, SIGNAL( clicked() ), SLOT( onRefresh() ) );
@@ -430,9 +426,9 @@ DiagnosticsDialog::onScrobbleIpodClicked()
             QString twiddlyLogName = "Twiddly.log";
         #endif
         
-        qDebug() << "Watching log file: " << Moose::logPath( twiddlyLogName );       
+        qDebug() << "Watching log file: " << Unicorn::logPath( twiddlyLogName );       
  
-        m_logFile.open(Moose::logPath( twiddlyLogName ).toStdString().c_str());
+        m_logFile.open(Unicorn::logPath( twiddlyLogName ).toStdString().c_str());
 
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
@@ -443,8 +439,8 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 }
 
 void 
-DiagnosticsDialog::onMailLogsClicked()
+DiagnosticsDialog::onSendLogsClicked()
 {
-    m_mailLogsDialog.exec();
+    m_sendLogsDialog.exec();
 }
 
