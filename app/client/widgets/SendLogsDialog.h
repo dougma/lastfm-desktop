@@ -41,6 +41,7 @@ public:
 
 private slots:
     void onSendClicked();
+    void onSuccess();
     void onError();
 };
 

@@ -60,6 +60,8 @@ void
 SendLogsDialog::onSendClicked()
 {
     SendLogsRequest* request = new SendLogsRequest( PRODUCT_NAME, VERSION, ui.moreInfoTextEdit->toPlainText() );
+    connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
+    connect( request, SIGNAL( error() ), SLOT( onError() ) );
     ui.moreInfoTextEdit->clear();
     
     request->addLog("client", Unicorn::logPath( "Last.fm.log" ) );
@@ -69,6 +71,15 @@ SendLogsDialog::onSendClicked()
     request->send();
     
     QDialog::accept();
+}
+
+
+void
+SendLogsDialog::onSuccess()
+{
+    LastMessageBox::information( tr( "Logs sent" ), 
+                                 tr( "Your logs have been sent to the Last.fm support team.\n"
+                                     "We will get back to you as soon as possible." ) );
 }
 
 

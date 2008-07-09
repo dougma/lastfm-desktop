@@ -25,13 +25,15 @@
 #include <QTextDocument>
 #include <QDebug>
 
+
 SendLogsRequest::SendLogsRequest( QString clientname, QString clientversion, QString usernotes )
 {
     m_clientname = clientname;
     m_clientversion = clientversion;
     m_usernotes = usernotes;
 }
-        
+
+
 void
 SendLogsRequest::addLog( QString name, QString filename )
 {
@@ -46,13 +48,15 @@ SendLogsRequest::addLog( QString name, QString filename )
     }
 }
 
+
 void
 SendLogsRequest::addLogData( QString name, QString data )
 {
     m_data.append( postData( name, qCompress( escapeString( data ).toLatin1() ) ) );
     m_logs.append( name );
 }
-        
+
+ 
 void
 SendLogsRequest::send()
 {
@@ -81,6 +85,7 @@ SendLogsRequest::send()
     m_data.append( postData( "logs", m_logs.join(",").toLatin1() ) );
     m_data.append( "--8e61d618ca16--" ); // close the post request
     
+    m_error = false;
     QNetworkReply *reply = m_networkAccessManager.post( request, m_data );
     
     connect( reply, SIGNAL( finished() ),
@@ -88,6 +93,7 @@ SendLogsRequest::send()
     connect( reply, SIGNAL( error( QNetworkReply::NetworkError ) ),
              this, SLOT( onError( QNetworkReply::NetworkError ) ) );
 }
+
 
 QString
 SendLogsRequest::escapeString( QString str )
@@ -106,6 +112,7 @@ SendLogsRequest::escapeString( QString str )
     return escaped_string;
 }
 
+
 QByteArray
 SendLogsRequest::postData( QString name, QByteArray data )
 {
@@ -123,16 +130,21 @@ SendLogsRequest::postData( QString name, QByteArray data )
     return postdata;
 }
 
+
 void
 SendLogsRequest::onFinished()
 {
+    if (!m_error)
+        emit success();
     delete this;
     qDebug() << "Sent SendLogsRequest successfully";
 }
 
+
 void
 SendLogsRequest::onError( QNetworkReply::NetworkError code )
 {
+    m_error = true;
     emit error();
 }
 

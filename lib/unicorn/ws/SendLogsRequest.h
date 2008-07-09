@@ -31,6 +31,7 @@ class SendLogsRequest : public QObject
     Q_OBJECT
 
     signals:
+        void success();
         void error();
 
     public:
@@ -49,6 +50,7 @@ class SendLogsRequest : public QObject
         QByteArray m_data;
         QStringList m_logs;
         QString m_clientname, m_clientversion, m_usernotes;
+        bool m_error;
     
     private slots:
         void onFinished();
