@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QWidget>
+#include "ObservedTrack.h" //FIXME move scrobblePoint
 
 
 class TrackListView : public QWidget
@@ -61,7 +62,7 @@ public:
     /** progress is updated every granularity, so if showing the progress todo
     * scrobble point, pass the scrobble point in seconds, and the granularity
     * will be based on the width of the mainwindow and the scrobble point */
-    void determineProgressDisplayGranularity( uint g );
+    void determineProgressDisplayGranularity( const class ScrobblePoint& );
 
     void resizeEvent( QResizeEvent* );
     void paintEvent( QPaintEvent* );
@@ -69,8 +70,8 @@ public:
     class QTimer* m_progressDisplayTimer;
     uint m_progressDisplayTick;
 
-    uint m_scrobblePoint;
-    uint scrobblePoint() const { return m_scrobblePoint; }
+    ScrobblePoint m_scrobblePoint;
+    ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }
 
 public slots:
     void onPlaybackTick( int );

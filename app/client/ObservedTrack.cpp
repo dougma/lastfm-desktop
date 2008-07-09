@@ -21,18 +21,18 @@
 #include "lib/moose/MooseSettings.h"
 
 
-uint
+ScrobblePoint
 ObservedTrack::scrobblePoint() const
 {
     // If we don't have a length or it's less than the minimum, return the
     // max. threshold
     if ( duration() <= 0 || duration() < int(kScrobbleMinLength) )
-        return kScrobbleTimeMax;
+        return ScrobblePoint( kScrobbleTimeMax );
 
-    float scrobPoint = qBound( int(kScrobblePointMin),
-                               Moose::Settings().scrobblePoint(),
-                               int(kScrobblePointMax) );
-    scrobPoint /= 100.0f;
+    float F = qBound( int(kScrobblePointMin),
+                      Moose::Settings().scrobblePoint(),
+                      int(kScrobblePointMax) );
+    F /= 100.0f;
 
-    return qMin( int(kScrobbleTimeMax), int( duration() * scrobPoint ) );
+    return ScrobblePoint( F * duration() );
 }

@@ -16,9 +16,9 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>84</y>
+     <y>82</y>
      <width>331</width>
-     <height>41</height>
+     <height>43</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" >
@@ -63,12 +63,14 @@
     </property>
     <addaction name="diagnostics" />
     <addaction name="separator" />
-    <addaction name="actionAbout_Last_fm" />
+    <addaction name="about" />
    </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
      <string>&amp;Tools</string>
     </property>
+    <addaction name="meta" />
+    <addaction name="separator" />
     <addaction name="settings" />
    </widget>
    <addaction name="menuFile" />
@@ -81,7 +83,7 @@
      <x>0</x>
      <y>22</y>
      <width>331</width>
-     <height>62</height>
+     <height>60</height>
     </rect>
    </property>
    <property name="windowTitle" >
@@ -186,9 +188,14 @@
     <string>Tune In...</string>
    </property>
   </action>
-  <action name="actionAbout_Last_fm" >
+  <action name="about" >
    <property name="text" >
     <string>About</string>
+   </property>
+  </action>
+  <action name="meta" >
+   <property name="text" >
+    <string>Meta Information</string>
    </property>
   </action>
  </widget>

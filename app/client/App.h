@@ -32,10 +32,6 @@ public:
     PlaybackState::Enum state() const;
 
     void setMainWindow( class MainWindow* );
-    void setMetaInfoView( class MetaInfoView* );
-
-    //TODO remove
-    class PlayerManager& playerManager() { return *m_playerManager; }
 
 public slots:
     void onBootstrapCompleted( const QString& playerId, const QString& username );

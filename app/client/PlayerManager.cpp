@@ -178,5 +178,5 @@ void
 PlayerManager::onStopWatchTimedOut()
 {
     MutableTrack( track() ).setRatingFlag( Track::Scrobbled );
-    emit event( PlaybackEvent::ScrobblePointReached );
+    emit event( PlaybackEvent::ScrobblePointReached, QVariant::fromValue( track() ) );
 }

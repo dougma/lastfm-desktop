@@ -129,14 +129,9 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
 
 
 void
-ScrobbleProgressWidget::determineProgressDisplayGranularity( uint g )
+ScrobbleProgressWidget::determineProgressDisplayGranularity( const ScrobblePoint& g )
 {
-    if (g == 0)
-    {
-        m_progressDisplayTimer->stop();
-    }
-    else
-        m_progressDisplayTimer->setInterval( 1000 * g / width() );
+    m_progressDisplayTimer->setInterval( 1000 * g / width() );
 }
 
 

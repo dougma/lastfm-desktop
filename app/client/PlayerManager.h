@@ -48,7 +48,7 @@ public:
     PlayerManager( class PlayerListener* parent );
 
     PlaybackState::Enum state() const { return m_state; }
-    Track track() const { return m_players.top()->track; }
+    ObservedTrack track() const { return m_players.top()->track; }
 
     /** will ban or love the current track */
     void ban();

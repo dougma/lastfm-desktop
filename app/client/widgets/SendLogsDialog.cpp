@@ -84,11 +84,12 @@ SendLogsDialog::onSendClicked()
 void
 SendLogsDialog::onSuccess()
 {
+    ui.spinner->movie()->stop();
+    ui.spinner->hide();
+
     LastMessageBox::information( tr( "Logs sent" ), 
                                  tr( "Your logs have been sent to the Last.fm support team.\n"
                                      "We will get back to you as soon as possible." ) );
-    ui.spinner->movie()->stop();
-    ui.spinner->hide();
     ui.moreInfoTextEdit->clear();
     ui.buttonBox->setEnabled( true );
     ui.moreInfoTextEdit->setEnabled( true );

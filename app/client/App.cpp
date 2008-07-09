@@ -28,7 +28,6 @@
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
-#include "widgets/MetaInfoView.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -84,13 +83,6 @@ App::setMainWindow( MainWindow* window )
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 }
 
-void
-App::setMetaInfoView( MetaInfoView* infoView )
-{
-    connect( this, SIGNAL( event( int, const QVariant& ) ),
-             infoView, SLOT( onAppEvent( int, const QVariant& ) ) );
-}
-
 
 void
 App::onTuneIn()
@@ -125,7 +117,7 @@ App::onAppEvent( int e, const QVariant& d )
             // FALL THROUGH
         case PlaybackEvent::PlaybackStarted:
         {
-            Track t = d.value<Track>();
+            Track t = d.value<ObservedTrack>();
             m_scrobbler->nowPlaying( t );
 
             // no tooltips on mac
@@ -136,7 +128,7 @@ App::onAppEvent( int e, const QVariant& d )
         }            
 
         case PlaybackEvent::ScrobblePointReached:
-            m_scrobbler->cache( d.value<Track>() );
+            m_scrobbler->cache( d.value<ObservedTrack>() );
             break;
 
         case PlaybackEvent::PlaybackEnded:
@@ -166,5 +158,4 @@ App::ban()
 namespace The
 {
     App& app() { return *(App*)qApp; }
-    PlayerManager& playerManager() { return The::app().playerManager(); }
 }

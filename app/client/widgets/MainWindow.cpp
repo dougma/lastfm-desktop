@@ -19,6 +19,7 @@
 
 #include "MainWindow.h"
 #include "widgets/DiagnosticsDialog.h"
+#include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/TrackListView.h"
 #include "version.h"
@@ -44,6 +45,9 @@ MainWindow::MainWindow()
 //    setUnifiedTitleAndToolBarOnMac( true );
     delete ui.toolbar;
 
+
+    connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
+    connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
@@ -65,6 +69,7 @@ MainWindow::showDiagnosticsDialog()
         if (!d) { \
             d = new Type( this ); \
             d->setAttribute( Qt::WA_DeleteOnClose ); \
+            d->setWindowFlags( Qt::Dialog ); \
             d->show(); \
         } else \
             d->activateWindow();
@@ -84,10 +89,18 @@ MainWindow::showAboutDialog()
             QVBoxLayout* v = new QVBoxLayout( this );
             v->addWidget( new QLabel( "<b>" PRODUCT_NAME "</b> " VERSION ) );
             v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
+            setWindowTitle( tr("About") );
         }
     };
     
     AboutDialog( this ).exec();
+}
+
+
+void
+MainWindow::showMetaInfoView()
+{
+    NON_MODAL_MACRO( MetaInfoView )
 }
 
 

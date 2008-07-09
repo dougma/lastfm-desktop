@@ -25,6 +25,22 @@
 #include <QPointer>
 
 
+//TODO to seperate file
+class ScrobblePoint
+{
+    uint i;
+
+public:
+    explicit ScrobblePoint( uint const j )
+    {
+        i = qBound( uint(Track::kScrobbleMinLength),
+                    j,
+                    uint(Track::kScrobbleTimeMax) );
+    }
+    operator uint() const { return i; }
+};
+
+
 class ObservedTrack : public Track
 {
     QPointer<StopWatch> m_watch;
@@ -47,8 +63,9 @@ public:
       * want to reflect the information about a track that no longer exists */
     StopWatch* watch() const { return m_watch; }
     
-    /** @returns the time in seconds when the track is considered scrobbled */
-    uint scrobblePoint() const;
+    /** @returns the time in seconds when the track is considered scrobbled 
+      * the value is guarenteed between 31 and 240 */
+    ScrobblePoint scrobblePoint() const;
 };
 
 

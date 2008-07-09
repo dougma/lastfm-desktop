@@ -38,6 +38,7 @@ public slots:
     void showSettingsDialog();
     void showDiagnosticsDialog();
     void showAboutDialog();
+    void showMetaInfoView();
     
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 
