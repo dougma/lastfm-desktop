@@ -31,9 +31,12 @@
       <attribute name="title" >
        <string>Scrobbling</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" >
+      <layout class="QVBoxLayout" >
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" >
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="label" >
            <property name="text" >
@@ -42,19 +45,32 @@
           </widget>
          </item>
          <item>
-          <widget class="StatusLight" native="1" name="subsLight" />
+          <widget class="StatusLight" native="1" name="subsLight" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Maximum" hsizetype="Maximum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer" >
+          <spacer>
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>20</width>
+             <height>2</height>
+            </size>
            </property>
           </spacer>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <layout class="QHBoxLayout" >
          <item>
           <widget class="QLabel" name="lastConnectionLabel" >
            <property name="text" >
@@ -306,6 +322,12 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
         </spacer>
        </item>
       </layout>
@@ -320,7 +342,10 @@
        </property>
        <item>
         <layout class="QGridLayout" >
-         <property name="spacing" >
+         <property name="horizontalSpacing" >
+          <number>6</number>
+         </property>
+         <property name="verticalSpacing" >
           <number>6</number>
          </property>
          <item row="0" column="0" >
@@ -500,16 +525,6 @@
    <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QPushButton" name="refreshButton" >
-       <property name="text" >
-        <string>Refresh</string>
-       </property>
-       <property name="shortcut" >
-        <string>F5</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="copyToClipboardButton" >
        <property name="text" >
         <string>Copy to Clipboard</string>
@@ -544,7 +559,7 @@
        <property name="sizeType" >
         <enum>QSizePolicy::Expanding</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" >
         <size>
          <width>0</width>
          <height>0</height>

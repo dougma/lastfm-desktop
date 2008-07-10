@@ -126,9 +126,6 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
     connect( ui.sendLogsButton, SIGNAL( clicked() ), SLOT( onSendLogsClicked() ) );
 
-    //FIXME still needed for eg. cache view may not reflect truth
-    connect( ui.refreshButton, SIGNAL( clicked() ), SLOT( onRefresh() ) );
-
     m_logTimer = new QTimer( this );
     connect( m_logTimer, SIGNAL(timeout()), SLOT(onLogPoll()) );
 
@@ -211,6 +208,28 @@ DiagnosticsDialog::onScrobblerStatusChanged( int v )
     ui.subsLight->setToolTip( s );
 
     populateScrobbleCacheView();
+
+    switch (v)
+    {
+        case Scrobbler::ErrorBadSession:
+            //TODO flashing
+        case Scrobbler::Connecting:
+            //NOTE we only get this on startup
+            ui.subsLight->setColor( Qt::yellow );
+            break;
+        case Scrobbler::Handshaken:
+        case Scrobbler::Scrobbling:
+        case Scrobbler::TracksScrobbled:
+            ui.subsLight->setColor( Qt::green );
+            break;
+        
+        case Scrobbler::ErrorBannedClient:
+        case Scrobbler::ErrorInvalidSessionKey:
+        case Scrobbler::ErrorBadTime:
+        case Scrobbler::ErrorThreeHardFailures:
+            ui.subsLight->setColor( Qt::red );
+            break;
+    }
 }
 
 

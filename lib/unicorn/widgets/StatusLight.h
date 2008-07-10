@@ -26,27 +26,21 @@
 #ifndef STATUS_LIGHT_H
 #define STATUS_LIGHT_H
 
+#include "lib/DllExportMacro.h"
+#include <QColor>
 #include <QWidget>
 
-class StatusLight : public QWidget
+
+class UNICORN_DLLEXPORT StatusLight : public QWidget
 {
-    Q_OBJECT
+    QColor m_color;
 
 public: 
-    StatusLight( QWidget *parent = 0 );
-    bool value() const { return m_value; }
-    QColor color() const { return m_color; }
-    
-public slots:
-	void setValue(bool);
-	void setColor(QColor);
-	void toggleValue();
+    StatusLight( QWidget* parent = 0 );
+    void setColor( QColor c ) { m_color = c; }
 
 protected:
-    bool m_value;
-    QColor m_color;
-    void paintEvent(QPaintEvent *event);
-
+    void paintEvent( QPaintEvent* event );
 };
 
 #endif

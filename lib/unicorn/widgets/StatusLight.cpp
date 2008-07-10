@@ -22,72 +22,42 @@
  ***************************************************************************/
   
 #include "StatusLight.h"
-#include <QColor>
-#include <QtGlobal>
-#include <QtGui>
-#include <QPolygon>
+#include <QDebug>
+#include <QFontMetrics>
+#include <QPainter>
+#include <QRadialGradient>
 
 
-StatusLight::StatusLight( QWidget *parent )
-    : QWidget( parent )
+StatusLight::StatusLight( QWidget* parent )
+           : QWidget( parent )
 {
-   m_value=false;
-   m_color=Qt::red;
-   setMinimumSize(QSize(50,50));
+    m_color = Qt::white;
+
+    int const M = fontMetrics().height();
+    setFixedSize( M, M );
+
+    qDebug() << M;
 }
 
 
-void StatusLight::paintEvent(QPaintEvent *)
+void StatusLight::paintEvent( QPaintEvent* )
 {
-	QPainter painter(this);
-	painter.setRenderHint(QPainter::Antialiasing, true);
-	painter.setWindow( -50,-50,100,100);
+	QPainter p( this );
+	p.setRenderHint( QPainter::Antialiasing, true );
+	p.setWindow( -50,-50, 100, 100 );
 	
-	painter.setPen(Qt::white);
-	painter.drawArc(-25,-25,50,50,0,5670);
-	painter.drawArc(-32,-33,66,66,0,5670);
-	painter.setPen(Qt::darkGray);
-	painter.drawArc(-34,-33,66,66,3400,3000);
+	p.setPen(Qt::white);
+	p.drawArc(-25,-25,50,50,0,5670);
+	p.drawArc(-32,-33,66,66,0,5670);
+	p.setPen(Qt::darkGray);
+	p.drawArc(-34,-33,66,66,3400,3000);
 	
-    if(m_value)
-    {
-      QRadialGradient radialGrad(QPointF(-8, -8), 20);
-      radialGrad.setColorAt(0, Qt::white);
-       
-      radialGrad.setColorAt(1, m_color);
-   	  QBrush brush(radialGrad);
-      painter.setBrush(brush);
-      painter.setPen(Qt::black);
-	  painter.drawEllipse(-25,-25,50,50);
-    }
-    else
-    {
-      QRadialGradient radialGrad(QPointF(-8, -8), 20);
-      radialGrad.setColorAt(0, Qt::white);
-      radialGrad.setColorAt(1, Qt::lightGray);
-   	  QBrush brush(radialGrad);
-      painter.setBrush(brush);
-	  painter.drawEllipse(-25,-25,50,50);
-    }	
-}
+    QRadialGradient radialGrad(QPointF(-8, -8), 20);
+    radialGrad.setColorAt(0, Qt::white);
+    radialGrad.setColorAt(1, m_color);
 
-void StatusLight::setColor(QColor newColor)
-{
-   m_color=newColor;
-   update();
-}
-
-
-void StatusLight::setValue(bool value)
-{
-   m_value=value;
-   update();
-}
-
-
-void StatusLight::toggleValue()
-{ 
-	m_value=!m_value;
-	update();
-	return; 
+    QBrush brush(radialGrad);
+    p.setBrush(brush);
+    p.setPen(Qt::black);
+    p.drawEllipse(-25,-25,50,50);
 }
