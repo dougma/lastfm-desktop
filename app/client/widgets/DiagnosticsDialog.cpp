@@ -208,7 +208,7 @@ DiagnosticsDialog::onScrobblerStatusChanged( int v )
         ui.lastConnectionStatusLabel->setText( d.toString( "d/M/yyyy h:mm" ) );
 
     QString const s = scrobblerStatusText( v );
-    ui.scrobblingStatus->setText( s );
+    ui.subsLight->setToolTip( s );
 
     populateScrobbleCacheView();
 }
@@ -300,7 +300,7 @@ DiagnosticsDialog::diagnosticInformation()
 
     //TODO should read "Last successful submission" - that's what it actually shows at least
     informationText.append( tr( "Last successful connection: " ) + ui.lastConnectionStatusLabel->text() + "\n\n" );
-    informationText.append( tr( "Submission Server: " ) + ui.scrobblingStatus->text() + "\n" );
+    informationText.append( tr( "Submission Server: " ) + ui.subsLight->toolTip() + "\n" );
     informationText.append( ui.cachedTracksLabel->text() + ":\n\n" );
 
     // Iterate through cached tracks list and add to clipboard contents
