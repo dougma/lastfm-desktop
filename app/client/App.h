@@ -19,7 +19,7 @@
 
 #include "PlaybackState.h"
 #include "lib/unicorn/UnicornApplication.h"
-
+#include "lib/unicorn/ws/WsError.h"
 
 class App : public Unicorn::Application
 {
@@ -38,6 +38,15 @@ public slots:
 
     void love();
     void ban();
+
+    /** all webservices connect to this and emit in the case of bad errors that
+      * need to be handled at a higher level */
+    void onWsError( Ws::Error );
+    
+    void onScrobblerStatusChanged( int );
+
+    /** currently also quits, needs fixing! */
+    void logout();
 
 private slots:
     void onAppEvent( int, const QVariant& );

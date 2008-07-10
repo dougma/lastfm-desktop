@@ -24,7 +24,8 @@
 
 
 Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
-                    : QApplication( argc, argv )
+                    : QApplication( argc, argv ),
+                      m_logoutAtQuit( false )
 {
 #ifdef Q_WS_MAC
     if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
@@ -48,7 +49,7 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             // loaded, and we delete the settings on exit if logOut is on
             Unicorn::QSettings().setValue( "Username", d.username() );
             Unicorn::UserQSettings s;
-            s.setValue( "Password", d.password() );
+            s.setValue( "Username", d.username() );
             s.setValue( "SessionKey", d.sessionKey() );
         }
         else
@@ -63,11 +64,11 @@ Unicorn::Application::~Application()
 {
     // we do this here, rather than when the setting is changed because if we 
     // did it then the user would be unable to change their mind
-    if (Unicorn::Settings().logOutOnExit())
+    if (Unicorn::Settings().logOutOnExit() || m_logoutAtQuit)
     {
-        Unicorn::QSettings().remove( "Username" );
         Unicorn::UserQSettings s;
         s.remove( "Password" );
         s.remove( "SessionKey" );
+        Unicorn::QSettings().remove( "Username" ); // do after the UserQSettings or it doesn't work!
     }
 }

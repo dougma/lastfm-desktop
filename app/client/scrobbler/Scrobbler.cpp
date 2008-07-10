@@ -102,9 +102,10 @@ Scrobbler::onError( Scrobbler::Error code )
     switch (code)
     {
         case Scrobbler::ErrorBannedClient:
-        case Scrobbler::ErrorBadAuthorisation:
+        case Scrobbler::ErrorInvalidSessionKey:
         case Scrobbler::ErrorBadTime:
             // np and submitter are in invalid state and won't send any requests
+            // the app has to tell the user and let them decide what to do
             break;
 
         default:
@@ -147,7 +148,7 @@ Scrobbler::onHandshakeReturn( const QByteArray& result ) //TODO trim before pass
     }
     else if (code == "BADAUTH")
     {
-        onError( Scrobbler::ErrorBadAuthorisation );
+        onError( Scrobbler::ErrorInvalidSessionKey );
     }
     else if (code == "BADTIME")
     {

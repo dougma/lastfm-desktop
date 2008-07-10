@@ -29,25 +29,20 @@ class UNICORN_DLLEXPORT LoginDialog : public QDialog
 public:
     LoginDialog();
 
-    // is already an md5 hash
-    QString password() const { return m_password; }
     QString username() const { return m_username; }
     QString sessionKey() const { return m_sessionKey; }
     
 private slots:
     void onEdited();
-    void verify();
-    void onVerifyResult( class Request* );
+    void authenticate();
+    void onAuthenticated( class WsReply* );
 
 private:
-    void authenticate2();
-    
     QPushButton* ok() const { return ui.buttonBox->button( QDialogButtonBox::Ok ); }
 
     Ui::LoginDialog ui;
 
     bool m_bootstrap;
     QString m_username;
-    QString m_password;
     QString m_sessionKey;
 };

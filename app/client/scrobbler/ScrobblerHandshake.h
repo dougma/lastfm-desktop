@@ -24,10 +24,10 @@
 class ScrobblerHandshake : public ScrobblerHttp
 {
     QString const m_username;
-    QString const m_password;
+    QString const m_session;
 
 public:
-    ScrobblerHandshake( const QString& username, const QString& password );
+    ScrobblerHandshake( const QString& username, const QString& session );
 
     virtual void request();
 };

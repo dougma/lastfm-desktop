@@ -34,6 +34,8 @@ class UNICORN_DLLEXPORT WsRequestBuilder
         POST
     };
 
+    /** DO NOT MAKE THIS ACCESSIBLE TO OTHER PARTS OF THE APPLICATION 
+      * Talk to max if you wanted to */
     static class QNetworkAccessManager* nam;
 
     RequestMethod request_method;
@@ -41,17 +43,20 @@ class UNICORN_DLLEXPORT WsRequestBuilder
 
     static QByteArray userAgent();
 
+    /** starts the request, connect to finished() to get the results */
+    WsReply* start();
+
 public:
     WsRequestBuilder( const QString& methodName );
     
-    WsRequestBuilder& get() { request_method = GET; return *this; }
-    WsRequestBuilder& post() { request_method = POST; return *this; }
+    WsReply* get() { request_method = GET; return start(); }
+    WsReply* post() { request_method = POST; return start(); }
 
     /** add a parameter to the request */
     WsRequestBuilder& add( const QString& key, const QString& value ) { params.add( key, value ); return *this; }
 
-    WsReply* synchronously();
-    WsReply* asynchronously();
+    
+    WsRequestBuilder& connect( QObject* receiver, const char* slot );
 };
 
 #endif

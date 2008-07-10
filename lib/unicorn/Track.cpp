@@ -219,3 +219,28 @@ Track::scrobblableStatus() const
     // All tests passed!
     return OkToScrobble;
 }
+
+
+#include "lib/unicorn/ws/WsRequestBuilder.h"
+#include "lib/unicorn/ws/WsReply.h"
+QStringList
+Track::topTags() const
+{
+    WsReply* reply = WsRequestBuilder( "track.getTopTags" )
+                        .add( "track", track() )
+                        .add( "artist", artist() )
+                        .get();
+    reply->finish();
+
+    QStringList tags;
+    try
+    {
+        foreach (EasyDomElement e, reply->lfm().children( "tag" ))
+            tags += e["name"].text();
+    }
+    catch (EasyDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }
+    return tags;
+}

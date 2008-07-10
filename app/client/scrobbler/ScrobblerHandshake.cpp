@@ -24,9 +24,9 @@
 #include <QDebug>
 
 
-ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& password )
+ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& session )
                   : m_username( username ),
-                    m_password( password )
+                    m_session( session )
 {
     setHost( "post.audioscrobbler.com" );
     request();
@@ -37,16 +37,18 @@ void
 ScrobblerHandshake::request()
 {
     QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
-    QString auth_token = Unicorn::md5( (m_password + timestamp).toUtf8() );
+    QString auth_token = Unicorn::md5( (API_SECRET + timestamp).toUtf8() );
 
     QString query_string = QString() +
         "?hs=true" +
-        "&p=1.2" + //protocol version
+        "&p=1.2.1" + //protocol version
         "&c=" + THREE_LETTER_SCROBBLE_CODE
         "&v=" + VERSION +
         "&u=" + QString(QUrl::toPercentEncoding( m_username )) +
         "&t=" + timestamp +
-        "&a=" + auth_token;
+        "&a=" + auth_token +
+        "&api_key=" API_KEY +
+        "&sk=" + m_session;
 
     m_id = get( '/' + query_string );
 

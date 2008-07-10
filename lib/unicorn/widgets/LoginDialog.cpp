@@ -20,7 +20,9 @@
 #include "LoginDialog.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/Logger.h"
-#include "lib/unicorn/ws/VerifyUserRequest.h"
+#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/ws/WsRequestBuilder.h"
+#include "lib/unicorn/ws/WsReply.h"
 #include <QMovie>
 #include <QPushButton>
 
@@ -37,7 +39,7 @@ LoginDialog::LoginDialog()
 
     ok()->setDisabled( true );
 
-    connect( ui.buttonBox, SIGNAL(accepted()), SLOT(verify()) );
+    connect( ui.buttonBox, SIGNAL(accepted()), SLOT(authenticate()) );
     connect( ui.buttonBox, SIGNAL(rejected()), SLOT(reject()) );
     connect( ui.username, SIGNAL(textEdited( QString )), SLOT(onEdited()) );
     connect( ui.password, SIGNAL(textEdited( QString )), SLOT(onEdited()) );
@@ -53,62 +55,69 @@ LoginDialog::onEdited()
 
 
 void
-LoginDialog::verify()
+LoginDialog::authenticate()
 {
     setWindowTitle( tr("Verifying Login Credentials...") );
     ok()->setEnabled( false );
     ui.spinner->show();
     ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
 
-    VerifyUserRequest *verify = new VerifyUserRequest;
-    verify->setUsername( ui.username->text() );
-    verify->setPassword( ui.password->text() );
-    
-    connect( verify, SIGNAL(result( Request* )), SLOT(onVerifyResult( Request* )), Qt::QueuedConnection );
+    m_username = ui.username->text();
 
-    verify->start();
+    using Unicorn::md5;
+    QString const password = ui.password->text();
+
+    WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
+            .add( "username", m_username )
+            .add( "authToken", md5( (m_username + md5( password.toUtf8() )).toUtf8() ) )
+            .get();
+
+    connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAuthenticated( WsReply* )) );
 }
 
 
 void
-LoginDialog::onVerifyResult( Request* request )
+LoginDialog::onAuthenticated( WsReply* reply )
 {
-    VerifyUserRequest* verify = static_cast<VerifyUserRequest*>(request);
-
-    // If the request failed, the auth code doesn't get filled in properly
-    // since the ws refactor, so we need to check for it here.
-    UserAuthCode result = verify->failed() ? AUTH_ERROR : verify->userAuthCode();
-
-    LOGL( 4, "Verify result: " << (int)result );
-
-    m_bootstrap = verify->bootstrapAllowed();
-
-    switch (result)
+    switch (reply->error())
     {
-        case AUTH_OK:
-        case AUTH_OK_LOWER:
-            m_username = verify->username();
-            m_password = verify->password();
-            authenticate2();
-            accept();
+        case Ws::NoError:
+        {
+            try
+            {
+                m_sessionKey = reply->lfm()["session"]["key"].nonEmptyText();
+                accept();
+                break;
+            }
+            catch (EasyDomElement::Exception& e)
+            {
+                qWarning() << e;
+            }
+
+            // FALL THROUGH!
+        }
+        
+        case Ws::AuthenticationFailed:
+            // COPYTODO
+            LastMessageBox::critical( 
+                    tr( "Login Failed" ), 
+                    tr( "Sorry, we don't recognise that username, or you typed the password wrongly." ) );
+            break;
+        
+        default:
+            // COPYTODO
+            LastMessageBox::critical(
+                    tr("Last.fm Unavailable"), 
+                    tr("There was a problem communicating with the Last.fm services. Please try again later.") );
             break;
 
-        case AUTH_BADUSER:
-            LastMessageBox::critical( 
-                    tr( "Login Failed" ), 
-                    tr( "<p>That username was not found."
-                        "<p>Please enter the username you used when you signed up at Last.fm." ) );
-            break;
-        
-        case AUTH_BADPASS:
-            LastMessageBox::critical( 
-                    tr( "Login Failed" ), 
-                    tr( "<p>The password you entered is not correct."
-                        "<p>Please enter the password you used when you signed up at Last.fm." ) );
-            break;
-        
-        case AUTH_ERROR:
-            //TODO much better handling thatn v1
+        case Ws::UrProxyIsFuckedLol:
+        case Ws::UrLocalNetworkIsFuckedLol:
+            // TODO proxy prompting?
+            // COPYTODO
+            LastMessageBox::critical(
+                    tr("Cannot connect to Last.fm"),
+                    tr("Last.fm cannot be reached. Please check your firewall settings.") );
             break;
     }
     
@@ -117,25 +126,4 @@ LoginDialog::onVerifyResult( Request* request )
     ok()->setEnabled( true );
     ui.spinner->hide();
     ui.spinner->movie()->stop();
-}
-
-
-#include "lib/unicorn/ws/WsRequestManager.h"
-#include "lib/unicorn/ws/WsReply.h"
-void
-LoginDialog::authenticate2()
-{
-    WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
-            .add( "username", m_username )
-            .add( "authToken", Unicorn::md5( (m_username + m_password).toUtf8() ) )
-            .get()
-            .synchronously();
-
-    QDomDocument content = reply->domDocument();
-    QDomElement lfm = content.firstChildElement( "lfm" );
-    QDomElement session = lfm.firstChildElement( "session" );
-    QDomElement key = session.firstChildElement( "key" );
-    m_sessionKey = key.firstChild().nodeValue();
-    
-    qDebug() << m_sessionKey;   
 }

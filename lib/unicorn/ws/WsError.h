@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,41 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Request.h"
+#ifndef WS_ERROR_H
+#define WS_ERROR_H
 
-
-enum UserAuthCode
+namespace Ws
 {
-    AUTH_OK = 0,
-    AUTH_OK_LOWER,
-    AUTH_BADUSER,
-    AUTH_BADPASS,
-    AUTH_ERROR
-};
+    enum Error
+    {
+        NoError = 1,
 
+        /** see http://last.fm/api/ */
+        InvalidService = 2,
+        InvalidMethod,
+        AuthenticationFailed,
+        InvalidFormat,
+        InvalidParameters,
+        InvalidResourceSpecified,
+        InvalidSessionKey,
+        InvalidApiKey,
+        ServiceOffline,
+        SubscribersOnly,
 
-/** @author <max@last.fm>
-  * @short Verify with server that a supplied user/pass combo is valid. Password
-  *        should be MD5 hashed. */
-class UNICORN_DLLEXPORT VerifyUserRequest : public Request
-{
-    PROP_GET_SET( QString, username, Username );
+        /** Last.fm sucks, or something weird happened. 
+          * Call networkError() for more details */
+        TryAgain = 100,
 
-    PROP_GET( bool, bootstrapAllowed );
-    PROP_GET( UserAuthCode, userAuthCode );
+        /** Last.fm fucked up, or something mangled the response on its way */
+        MalformedResponse,
 
-    QString m_password;
-    QString m_md5;
-    QString m_lowered_md5;
+        /** call networkError() for more details */
+        UrLocalNetworkIsFuckedLol,
+        UrProxyIsFuckedLol,
 
-public:
-    VerifyUserRequest();
+        /** you aborted the request, the lib never does, we promise! */
+        Aborted
+    };
+}
 
-    virtual void start();
-    virtual void success( QByteArray data );
-
-    void setPassword( const QString& );
-
-    /** user after the request returns, if you use before, result is undefined */
-    QString password() const;
-};
+#endif

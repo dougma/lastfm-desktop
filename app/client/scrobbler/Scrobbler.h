@@ -73,7 +73,7 @@ public:
         * not submit this session (np too), however caching will continue */
         ErrorBadSession = StatusMax,
         ErrorBannedClient,
-        ErrorBadAuthorisation,
+        ErrorInvalidSessionKey,
         ErrorBadTime,
         ErrorThreeHardFailures,
 

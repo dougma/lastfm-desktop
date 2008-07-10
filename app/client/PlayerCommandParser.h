@@ -20,11 +20,7 @@
 #ifndef PLAYER_COMMAND_PARSER_H
 #define PLAYER_COMMAND_PARSER_H
 
-#ifdef WIN32 //prevent warning with gcc (lol)
-// ms admits its lousy compiler doesn't care about throw declarations
-#pragma warning( disable : 4290 )
-#endif
-
+#include "lib/HideStupidWarnings.h"
 #include "lib/unicorn/Track.h"
 
 

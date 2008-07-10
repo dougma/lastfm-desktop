@@ -145,6 +145,9 @@ public:
         return t1.timeStamp() < t2.timeStamp();
     }
 
+    // TODO not asyncronous! return a WsReply object!
+    QStringList topTags() const;
+
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise
     QExplicitlySharedDataPointer<TrackData> d;

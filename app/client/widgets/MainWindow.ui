@@ -53,7 +53,7 @@
     </property>
     <addaction name="tunein" />
     <addaction name="separator" />
-    <addaction name="logOut" />
+    <addaction name="logout" />
     <addaction name="separator" />
     <addaction name="quit" />
    </widget>
@@ -123,7 +123,7 @@
     <string>&amp;Settings</string>
    </property>
   </action>
-  <action name="logOut" >
+  <action name="logout" >
    <property name="text" >
     <string>Log &amp;Out</string>
    </property>

@@ -28,6 +28,7 @@
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
+#include "lib/unicorn/LastMessageBox.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -49,8 +50,8 @@ App::App( int argc, char** argv )
     new ITunesListener( m_playerListener->port(), this );
 #endif
     
-    m_scrobbler = new Scrobbler( The::settings().username(), The::settings().password() );
-    m_radio = new RadioPlayer( The::settings().username(), The::settings().password() );
+    m_scrobbler = new Scrobbler( The::settings().username(), The::settings().sessionKey() );
+    m_radio = new RadioPlayer( The::settings().username(), The::settings().sessionKey() );
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -71,6 +72,7 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
     connect( window->ui.tunein, SIGNAL(triggered()), SLOT(onTuneIn()) );
+    connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
     m_trayIcon = new QSystemTrayIcon( window );
     m_trayIcon->setIcon( QPixmap(":/as.png") );
     m_trayIcon->show();
@@ -140,6 +142,48 @@ App::onAppEvent( int e, const QVariant& d )
 }
 
 
+void
+App::onWsError( Ws::Error e )
+{
+    switch (e)
+    {
+        case Ws::InvalidSessionKey:
+            logout();
+            break;
+    }
+}
+
+
+void 
+App::onScrobblerStatusChanged( int e )
+{
+    // the scrobbler will not function for this session, the user will need to
+    // restart in order to scrobble - after fixing the relevent issue!
+
+    switch (e)
+    {
+        case Scrobbler::ErrorBannedClient:
+            LastMessageBox::critical( tr( "Old Version" ), 
+                                      tr( "This software is too old to scrobble. Please upgrade." ) );
+            break;
+
+        case Scrobbler::ErrorInvalidSessionKey:
+            logout();
+            break;
+
+        case Scrobbler::ErrorBadTime:
+            LastMessageBox::critical( tr( "Error" ),
+                tr( "<p>Last.fm cannot authorise any scrobbling! :("
+                    "<p>It appears your computer disagrees with us about what the time is."
+                    "<p>If you are sure the time is right, check the date is correct and check your "
+                       "timezone is not set to something miles away, like Mars." 
+                    "<p>We're sorry about this restriction, but we impose it to help prevent "
+                       "scrobble spamming." ) );
+            break;
+    }
+}
+
+
 void 
 App::onBootstrapCompleted( const QString& playerId, const QString& username )
 {}
@@ -153,6 +197,14 @@ App::love()
 void
 App::ban()
 {}
+
+
+void
+App::logout()
+{
+    logoutAtQuit();
+    quit(); //TODO warn the user at least first! and restart as well
+}
 
 
 namespace The

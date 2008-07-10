@@ -60,7 +60,6 @@ namespace Unicorn
         {}
 
         QString username() const { return QSettings().value( "Username" ).toString(); }
-        QString password() const { return UserQSettings().value( "Password" ).toString(); }
         QString sessionKey() const { return UserQSettings().value( "SessionKey", "" ).toString(); }
 
         bool isUseProxy() const { return QSettings().value( "ProxyEnabled" ).toInt() == 1; }
@@ -89,7 +88,7 @@ namespace Unicorn
 
     class UNICORN_DLLEXPORT MutableSettings : private Settings
     {
-        void setPassword(); // undefined, as basically, you're not allowed
+        void setSessionKey(); // undefined, as basically, you're not allowed
         void setUsername(); // to do this, Unicorn::Application can though
 
     public:

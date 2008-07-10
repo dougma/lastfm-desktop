@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "WsRequestManager.h"
+#include "WsRequestBuilder.h"
 #include "WsReply.h"
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -35,7 +35,7 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 
 
 WsReply*
-WsRequestBuilder::asynchronously()
+WsRequestBuilder::start()
 {
     QUrl url( "http://ws.audioscrobbler.com/2.0/" );
     url.setQueryItems( params );
@@ -59,7 +59,7 @@ WsRequestBuilder::asynchronously()
             break;
     }
 
-    return static_cast<WsReply*>( reply );
+    return new WsReply( reply );
 }
 
 
@@ -77,17 +77,4 @@ WsRequestBuilder::userAgent()
     agent += " (X11)";
 #endif
     return agent;
-}
-
-
-WsReply*
-WsRequestBuilder::synchronously()
-{
-    WsReply* reply = asynchronously();
-
-    QEventLoop eventLoop;
-    QObject::connect( reply, SIGNAL(finished()), &eventLoop, SLOT(quit()) );
-    eventLoop.exec();
-    
-    return reply;
 }

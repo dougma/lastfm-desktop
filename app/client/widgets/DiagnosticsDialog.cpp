@@ -50,11 +50,11 @@ DrWatson::onScrobblerStatusChanged( int const new_status )
         {
             case Scrobbler::ErrorBadSession:
             case Scrobbler::ErrorBannedClient:
-            case Scrobbler::ErrorBadAuthorisation:
+            case Scrobbler::ErrorInvalidSessionKey:
             case Scrobbler::ErrorBadTime:
             case Scrobbler::ErrorThreeHardFailures:
-                // the state is better represented to the user by the error
-                // condition until we successfully rehandshake
+                // the state that is already set better represents the actual
+                // state then "Connecting..." does
                 return;
         }
 
@@ -183,7 +183,7 @@ static QString scrobblerStatusText( int const i )
     {
         case Scrobbler::ErrorBadSession: return tr( "Your session expired, it is being renewed." );
         case Scrobbler::ErrorBannedClient: return tr( "Your client too old, you must upgrade." );
-        case Scrobbler::ErrorBadAuthorisation: return tr( "Your username or password is incorrect" );
+        case Scrobbler::ErrorInvalidSessionKey: return tr( "Your username or password is incorrect" );
         case Scrobbler::ErrorBadTime: return tr( "Your timezone or date are incorrect" );
         case Scrobbler::ErrorThreeHardFailures: return tr( "The submissions server is down" );
 
