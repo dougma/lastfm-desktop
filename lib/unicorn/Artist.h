@@ -17,32 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackListViewItem.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#ifndef UNICORN_ARTIST_H
+#define UNICORN_ARTIST_H
+
+#include "lib/DllExportMacro.h"
+#include <QString>
 
 
-TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
-                 : QWidget( parent ),
-                   m_track( t )
+class UNICORN_DLLEXPORT Artist
 {
-    ui.setupUi( this );
-    ui.year->setEnabled( false );
-    ui.year->setAttribute( Qt::WA_MacSmallSize );
-    ui.album->setAttribute( Qt::WA_MacSmallSize );
+    QString m_name;
 
-    if (t.isEmpty())
-    {
-        //FIXME
-        ui.artist->setText( "Super mega error :(" );
-        return;
-    }
+public:
+    Artist()
+    {}
 
-    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
-    ui.album->setText( t.album() );
-    ui.year->setText( "2000" );
-    
-    QStringList const tags = t.topTags().mid( 0, 3 );
-    ui.tags->setText( tags.join( ", " ) );
-    ui.cover->setPixmap( t.album().image() );
-}
+    explicit Artist( const QString& name ) : m_name( name )
+    {}
+
+    operator QString() const { return m_name; }
+};
+
+#endif

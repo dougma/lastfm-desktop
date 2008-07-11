@@ -20,9 +20,15 @@
 #include "UnicornException.h"
 #include <QDomElement>
 #include <QList>
+#include <QStringList>
 
 /** @author <max@last.fm>
   * @brief facade pattern for QDomElement, throwing exceptions in situations that we must handle
+  *
+  * QDomElement dome;
+  * EasyDomElement( dome )["album"]["image size=small"].text();
+  * foreach (EasyDomElement e, EasyDomElement( dome )["album"].children( "image" ))
+  *     qDebug() << e.text();
   */
 class EasyDomElement
 {
@@ -48,8 +54,23 @@ public:
 
     EasyDomElement operator[]( const QString& name )
     {
+        QStringList parts = name.split( ' ' );
+        if (parts.size() >= 2)
+        {
+            QString tagName = parts[0];
+            parts = parts[1].split( '=' );
+            QString attributeName = parts.value( 0 );
+            QString attributeValue = parts.value( 1 );
+
+            foreach (EasyDomElement e, children( tagName ))
+                if (e.e.attribute( attributeName ) == attributeValue)
+                    return e;
+        }
         return EasyDomElement( e.firstChildElement( name ) );
     }
+
+    /** select a specific element, querying by attribute 
+    EasyDomElement operator()( const QString& name )
 
     /** use in all cases where empty would be an error */
     QString nonEmptyText() const 

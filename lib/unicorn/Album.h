@@ -17,32 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackListViewItem.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#ifndef UNICORN_ALBUM_H
+#define UNICORN_ALBUM_H
+
+#include "Artist.h"
+#include "Mbid.h"
+#include "lib/DllExportMacro.h"
+#include <QPixmap>
+#include <QString>
+class WsReply;
 
 
-TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
-                 : QWidget( parent ),
-                   m_track( t )
+class UNICORN_DLLEXPORT Album
 {
-    ui.setupUi( this );
-    ui.year->setEnabled( false );
-    ui.year->setAttribute( Qt::WA_MacSmallSize );
-    ui.album->setAttribute( Qt::WA_MacSmallSize );
+    Mbid m_mbid;
+    Artist m_artist;
+    QString m_title;
 
-    if (t.isEmpty())
-    {
-        //FIXME
-        ui.artist->setText( "Super mega error :(" );
-        return;
-    }
+public:
+    explicit Album( Mbid mbid ) : m_mbid( mbid )
+    {}
 
-    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
-    ui.album->setText( t.album() );
-    ui.year->setText( "2000" );
-    
-    QStringList const tags = t.topTags().mid( 0, 3 );
-    ui.tags->setText( tags.join( ", " ) );
-    ui.cover->setPixmap( t.album().image() );
-}
+    Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
+    {}
+
+    operator QString() const { return m_title; }
+    QString title() const { return m_title; }
+    Artist artist() const { return m_artist; }
+    Mbid mbid() const { return m_mbid; }
+
+    /** Album.getInfo WebService */
+    WsReply* getInfo() const;
+
+    /** downloads image FIXME not synchronously! */
+    QPixmap image();
+};
+
+#endif

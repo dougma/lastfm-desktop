@@ -20,6 +20,8 @@
 #ifndef UNICORN_TRACK_H
 #define UNICORN_TRACK_H
 
+#include "Album.h"
+#include "Artist.h"
 #include "lib/DllExportMacro.h"
 #include <QDateTime>
 #include <QDomElement>
@@ -104,8 +106,8 @@ public:
     /** the standard representation of this object as an XML node */
     QDomElement toDomElement( class QDomDocument& ) const;
 
-    QString artist() const { return d->artist; }
-    QString album() const { return d->album; }
+    Artist artist() const { return Artist( d->artist ); }
+    Album album() const { return Album( artist(), d->album ); }
     QString track() const { return d->title; } //TODO rename title
     int trackNumber() const { return d->trackNumber; }
     int playCount() const { return d->playCount; }

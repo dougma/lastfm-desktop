@@ -14,8 +14,8 @@ sub show_subs
     {
         switch ($_)
         {
-            case '.svn'   { next; }
-            case '_build' { next; }
+            case '.svn'   { $File::Find::prune = 1; }
+            case '_build' { $File::Find::prune = 1; }
             case 'tests'  { $File::Find::prune = 1; }
         }
     }

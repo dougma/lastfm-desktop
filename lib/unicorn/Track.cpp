@@ -190,7 +190,7 @@ Track::scrobblableStatus() const
     }
 
     // Check if any required fields are empty
-    if ( artist().isEmpty() )
+    if ( d->artist.isEmpty() )
     {
         LOGL( 3, "Artist was missing, will not submit" );
         return ArtistNameMissing;
@@ -209,9 +209,9 @@ Track::scrobblableStatus() const
 
     foreach( QString invalid, invalidList )
     {
-        if ( artist().toLower() == invalid )
+        if ( d->artist.toLower() == invalid )
         {
-            LOG( 3, "Artist '" << artist() << "' is an invalid artist name, will not submit.\n" );
+            LOG( 3, "Artist '" << d->artist << "' is an invalid artist name, will not submit.\n" );
             return ArtistInvalid;
         }
     }
@@ -228,7 +228,7 @@ Track::topTags() const
 {
     WsReply* reply = WsRequestBuilder( "track.getTopTags" )
                         .add( "track", track() )
-                        .add( "artist", artist() )
+                        .add( "artist", d->artist )
                         .get();
     reply->finish();
 

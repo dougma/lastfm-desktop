@@ -37,6 +37,7 @@ TrackListView::TrackListView()
     ui.layout = new QVBoxLayout( this );
     ui.layout->addWidget( ui.progress = new ScrobbleProgressWidget );
     ui.layout->setContentsMargins( 0, 0, 0, 0 );
+    ui.layout->setSpacing( 0 );
 
     ui.progress->layout()->setContentsMargins( -1, -1, -1, -1 );
     

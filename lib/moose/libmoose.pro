@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = moose
 CONFIG += unicorn
-QT = core xml network
+QT = core gui xml network
 
 include( $$SRC_DIR/common/qmake/include.pro )
 

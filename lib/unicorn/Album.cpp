@@ -17,32 +17,48 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackListViewItem.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#include "Album.h"
+#include "Artist.h"
+#include "ws/WsRequestBuilder.h"
+#include "ws/WsReply.h"
+#include <QEventLoop>
 
 
-TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
-                 : QWidget( parent ),
-                   m_track( t )
+WsReply*
+Album::getInfo() const
 {
-    ui.setupUi( this );
-    ui.year->setEnabled( false );
-    ui.year->setAttribute( Qt::WA_MacSmallSize );
-    ui.album->setAttribute( Qt::WA_MacSmallSize );
+    return WsRequestBuilder( "Album.getInfo" )
+            .add( "artist", m_artist )
+            .add( "album", m_title )
+            .get();
+}
 
-    if (t.isEmpty())
+
+QPixmap
+Album::image()
+{
+    WsReply* reply = getInfo();
+    reply->finish();
+
+    try
     {
-        //FIXME
-        ui.artist->setText( "Super mega error :(" );
-        return;
+        QUrl url = reply->lfm()["album"]["image size=small"].text();
+
+        QNetworkAccessManager manager;
+        QNetworkReply* get = manager.get( QNetworkRequest( url ) );
+        QEventLoop loop;
+        QObject::connect( get, SIGNAL(finished()), &loop, SLOT(quit()) );
+        loop.exec();
+        QByteArray bytes = get->readAll();
+        delete get;
+        QPixmap p;
+        p.loadFromData( bytes );
+        return p;
+    }
+    catch (EasyDomElement::Exception& e)
+    {
+        qWarning() << e;
     }
 
-    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
-    ui.album->setText( t.album() );
-    ui.year->setText( "2000" );
-    
-    QStringList const tags = t.topTags().mid( 0, 3 );
-    ui.tags->setText( tags.join( ", " ) );
-    ui.cover->setPixmap( t.album().image() );
+    return QPixmap();
 }
