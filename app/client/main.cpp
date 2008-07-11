@@ -22,6 +22,7 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/moose/MooseCommon.h"
+#include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornCommon.h"
 #include "lib/breakpad/BreakPad.h"
@@ -41,12 +42,10 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
-    QDir().mkpath( Moose::cachePath() );
-    QDir().mkpath( Unicorn::savePath() );
-    QDir().mkpath( Unicorn::logPath() );
+    UnicornDir::mkpaths();
     
     Logger& logger = Logger::GetLogger();
-    logger.Init( Unicorn::logPath( "Last.fm.log" ), false );
+    logger.Init( UnicornDir::logs().filePath( PRODUCT_NAME ".log" ), false );
     logger.SetLevel( Logger::Debug );
     LOGL( 3, "Application: " << PRODUCT_NAME << " " << VERSION );
     LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );

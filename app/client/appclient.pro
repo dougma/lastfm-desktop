@@ -13,3 +13,6 @@ RESOURCES += $$findSources( qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
 !macx*:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
+
+# included directly into App.cpp
+SOURCES -= legacy/disableHelperApp.cpp

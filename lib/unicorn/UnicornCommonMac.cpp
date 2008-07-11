@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,58 +17,12 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommonMac.h"
-
+#include "UnicornCommon.h"
 #include "AppleScript.h"
-
 #include <QDebug>
 #include <QDir>
 #include <Carbon/Carbon.h>
-
 #include <sys/sysctl.h>
-
-
-QString
-Unicorn::applicationSupportFolderPath()
-{
-    std::string outString;
-
-    OSErr err;
-
-    short vRefNum = 0;
-    StrFileName fileName;
-    fileName[0] = 0;
-    long dirId;
-    err = ::FindFolder( kOnAppropriateDisk, kApplicationSupportFolderType,
-                        kDontCreateFolder, &vRefNum, &dirId );
-    if ( err != noErr )
-        return "";
-
-    // Now we have a vRefNum and a dirID - but *not* an Unix-Path as string.
-    // Lets make one based from this:
-
-    // create a FSSpec...
-    FSSpec fsspec;
-    err = ::FSMakeFSSpec( vRefNum, dirId, NULL, &fsspec );
-    if ( err != noErr )
-        return "";
-
-    // ...and build an FSRef based on thes FSSpec.
-    FSRef fsref;
-    err = ::FSpMakeFSRef( &fsspec, &fsref );
-    if ( err != noErr )
-        return "";
-
-    // ...then extract the Unix Path as a C-String from the FSRef
-    unsigned char path[512];
-    err = ::FSRefMakePath( &fsref, path, 512 );
-    if ( err != noErr )
-        return "";
-
-    // ...and copy this into the result.
-    outString = (const char*)path;
-    return QDir::homePath() + QString::fromStdString( outString );
-}
 
 
 QLocale::Language

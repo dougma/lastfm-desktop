@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -34,37 +33,10 @@
 #include <QProcess>
 #include <QTcpSocket>
 
-#ifdef WIN32
-    #include <windows.h>
-    #include <shlobj.h>
-#endif
 
-
-namespace Moose
-{
-
-
+#if 0
 QString
-cachePath()
-{
-    #ifdef Q_WS_MAC
-        QString appSupportFolder = Unicorn::applicationSupportFolderPath();
-        QDir cacheDir( appSupportFolder + "/Last.fm/Cache" );
-
-        if (!cacheDir.exists())
-        {
-            cacheDir.mkpath( appSupportFolder + "/Last.fm/Cache" );
-        }
-
-        return cacheDir.path() + "/";
-    #else
-        return Unicorn::savePath( "cache/" );
-    #endif
-}
-
-
-QString
-servicePath( QString name )
+Moose::servicePath( QString name )
 {
     QString dirPath;
     #ifdef WIN32
@@ -99,7 +71,7 @@ loadServiceError( QString name )
 
 
 QObject*
-loadService( QString name )
+Moose::loadService( QString name )
 {
     QString path = servicePath( name );
 
@@ -115,10 +87,11 @@ loadService( QString name )
 
     return plugin;
 }
+#endif
 
 
 bool
-isAlreadyRunning()
+Moose::isAlreadyRunning()
 {
   #ifdef WIN32
     QString id( "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F" );
@@ -135,7 +108,7 @@ isAlreadyRunning()
 
 
 bool
-sendToInstance( const QString& data, MooseEnums::StartNewInstanceBehaviour behaviour )
+Moose::sendToInstance( const QString& data, Moose::StartNewInstanceBehaviour behaviour )
 {
     LOGL( 3, "sendToInstance (new instance): " << data );
 
@@ -154,7 +127,7 @@ sendToInstance( const QString& data, MooseEnums::StartNewInstanceBehaviour behav
         socket.close();
         return true;
     }
-    else if ( behaviour == MooseEnums::StartNewInstance )
+    else if ( behaviour == Moose::StartNewInstance )
     {
         qDebug() << "Starting instance" << Moose::Settings().path();
         //FIXME doesn't work for some reason
@@ -165,6 +138,7 @@ sendToInstance( const QString& data, MooseEnums::StartNewInstanceBehaviour behav
 }
 
 
+#if 0
 QStringList
 extensionPaths()
 {
@@ -194,65 +168,11 @@ extensionPaths()
 
     return paths;
 }
-
-
-#ifdef WIN32
-
-static QString
-helperStartupShortcutPath()
-{
-    wchar_t acPath[MAX_PATH];
-    HRESULT h = SHGetFolderPathW( NULL, CSIDL_STARTUP | CSIDL_FLAG_CREATE,
-                                  NULL, 0, acPath );
-
-    if ( h == S_OK )
-    {
-        QString shortcutPath;
-        shortcutPath = QString::fromUtf16( reinterpret_cast<const ushort*>( acPath ) );
-        if ( !shortcutPath.endsWith( "\\" ) && !shortcutPath.endsWith( "/" ) )
-            shortcutPath += "\\";
-        shortcutPath += "Last.fm Helper.lnk";
-        return shortcutPath;
-    }
-    else
-    {
-        LOGL( 1, "Uh oh, Windows returned no STARTUP path, not going to be able to disable helper" );
-        return "";
-    }
-}
-
-
-void
-disableHelperApp()
-{
-    // Delete the shortcut from startup and kill process
-    QString shortcutPath = helperStartupShortcutPath();
-    if ( !shortcutPath.isEmpty() && QFile::exists( shortcutPath ) )
-    {
-        bool fine = QFile::remove( shortcutPath );
-        if ( !fine )
-        {
-            LOGL( 1, "Deletion of shortcut failed, helper will still autolaunch" );
-        }
-        else
-        {
-            LOGL( 3, "Helper shortcut removed from Startup" );
-        }
-    }
-}
-
-#endif // WIN32
-
-
-#ifdef Q_OS_MAC
-QString bundleDirPath()
-{
-    return QDir::cleanPath( QDir( qApp->applicationDirPath() ).absoluteFilePath( "../.." ) );
-}
 #endif
 
+
 QString
-sessionInformation()
+Moose::sessionInformation()
 {
     Moose::Settings settings;
     QString clientinfo;
@@ -279,5 +199,3 @@ sessionInformation()
     
     return clientinfo;
 }
-
-} // namespace MooseUtils

@@ -108,7 +108,7 @@ public:
 
     Artist artist() const { return Artist( d->artist ); }
     Album album() const { return Album( artist(), d->album ); }
-    QString track() const { return d->title; } //TODO rename title
+    QString title() const { return d->title; }
     int trackNumber() const { return d->trackNumber; }
     int playCount() const { return d->playCount; }
     int duration() const { return d->duration; }

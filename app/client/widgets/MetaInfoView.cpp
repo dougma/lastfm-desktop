@@ -20,6 +20,7 @@
 #include "MetaInfoView.h"
 #include "PlaybackEvent.h"
 #include "lib/unicorn/Track.h"
+#include <QCoreApplication>
 #include <QDesktopServices>
 
 
@@ -27,11 +28,10 @@ MetaInfoView::MetaInfoView( QWidget* parent )
             : QWebView( parent )
 {   
     load( QUrl( "http://www.google.com") );
-    //page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
     page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     
-    connect( page(), SIGNAL( linkClicked( const QUrl& ) ),
-             this, SLOT( onLinkClicked( const QUrl& ) ) );
+    connect( page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
+    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
 

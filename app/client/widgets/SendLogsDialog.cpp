@@ -20,6 +20,7 @@
 #include "SendLogsDialog.h"
 #include "Settings.h"
 #include "lib/moose/MooseCommon.h"
+#include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/UnicornCommon.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/ws/SendLogsRequest.h"
@@ -57,9 +58,9 @@ SendLogsDialog::onSendClicked()
     SendLogsRequest* request = new SendLogsRequest( PRODUCT_NAME, VERSION, ui.moreInfoTextEdit->toPlainText() );
     connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
     connect( request, SIGNAL( error() ), SLOT( onError() ) );
-    
-    QDir logDir( Unicorn::logPath( ) );
-    QStringList logExt("*.log");
+
+    QDir logDir = UnicornDir::logs();
+    QStringList logExt( "*.log" );
         
     // find logs
     logDir.setFilter( QDir::Files | QDir::Readable );

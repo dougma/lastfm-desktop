@@ -32,6 +32,8 @@
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
+#include "legacy/disableHelperApp.cpp"
+
 
 App::App( int argc, char** argv ) 
    : Unicorn::Application( argc, argv )
@@ -56,6 +58,11 @@ App::App( int argc, char** argv )
     DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
+
+    //TODO do once?
+#ifdef WIN32
+    Legacy::disableHelperApp();
+#endif
 }
 
 

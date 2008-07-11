@@ -54,6 +54,22 @@ namespace Unicorn
         int request( const QHttpRequestHeader & header, QIODevice * data, QIODevice * to );
         int request( const QHttpRequestHeader & header, const QByteArray & data, QIODevice * to );
         int setHost( const QString & hostName, ConnectionMode mode, quint16 port );
+        
+        static QString stateString( QHttp::State state )
+        {
+            switch ( state )
+            {
+                case QHttp::Unconnected: return "No connection";
+                case QHttp::HostLookup: return "Looking up host";
+                case QHttp::Connecting: return "Connecting";
+                case QHttp::Sending: return "Sending request";
+                case QHttp::Reading: return "Downloading";
+                case QHttp::Connected: return "Connected";
+                case QHttp::Closing: return "Closing connection";
+                default: return QString();
+            }
+        }
+        
     };
 }
 

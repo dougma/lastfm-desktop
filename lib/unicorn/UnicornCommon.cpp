@@ -18,57 +18,29 @@
  ***************************************************************************/
 
 #include "UnicornCommon.h"
-
 #include "Logger.h"
-
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QMap>
 #include <QUrl>
 #include <QProcess>
-
 #ifdef WIN32
     #include <windows.h>
     #include <shlobj.h>
 #endif
 
-using namespace std;
-
-namespace Unicorn
-{
-
 
 QString
-md5( const QByteArray& src )
+Unicorn::md5( const QByteArray& src )
 {
     QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
     return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' );
 }
 
 
-#if 0
-//TODO move to QHttp clone
 QString
-QHttpStateToString( int state )
-{
-    switch ( state )
-    {
-        case QHttp::Unconnected: return QCoreApplication::translate( "WebService", "No connection." );
-        case QHttp::HostLookup: return QCoreApplication::translate( "WebService", "Looking up host..." );
-        case QHttp::Connecting: return QCoreApplication::translate( "WebService", "Connecting..." );
-        case QHttp::Sending: return QCoreApplication::translate( "WebService", "Sending request..." );
-        case QHttp::Reading: return QCoreApplication::translate( "WebService", "Downloading." );
-        case QHttp::Connected: return QCoreApplication::translate( "WebService", "Connected." );
-        case QHttp::Closing: return QCoreApplication::translate( "WebService", "Closing connection..." );
-        default: return QString();
-    }
-}
-#endif
-
-
-QString
-qtLanguageToLfmLangCode( QLocale::Language qtLang )
+Unicorn::qtLanguageToLfmLangCode( QLocale::Language qtLang )
 {
     switch ( qtLang )
     {
@@ -90,7 +62,7 @@ qtLanguageToLfmLangCode( QLocale::Language qtLang )
 
 
 QString
-lfmLangCodeToIso639( const QString& code )
+Unicorn::lfmLangCodeToIso639( const QString& code )
 {
     if ( code == "jp" ) return "ja";
     if ( code == "cn" ) return "zh";
@@ -100,7 +72,7 @@ lfmLangCodeToIso639( const QString& code )
 
 
 QString
-localizedHostName( const QString& code )
+Unicorn::localizedHostName( const QString& code )
 {
     if ( code == "en" ) return "www.last.fm"; //first as optimisation
     if ( code == "pt" ) return "www.lastfm.com.br";
@@ -120,217 +92,34 @@ localizedHostName( const QString& code )
 }
 
 
-void
-parseQuotedStrings( const string& sCompound, vector<string>& separated )
+QString
+Unicorn::urlEncodeItem( QString s )
 {
-    string sCopy(sCompound);
-
-    string::size_type nIdxNext = 0;
-
-    while (nIdxNext < sCopy.size())
-    {
-        string::size_type nIdxStart = sCopy.find_first_of('\"', nIdxNext);
-
-        if (nIdxStart == string::npos)
-        {
-            // Not found
-            return;
-        }
-
-        nIdxStart++;
-        if (nIdxStart >= sCopy.size())
-        {
-            // Buggered string
-            return;
-        }
-
-        string::size_type nIdxStop = nIdxStart;
-        bool bStopFound = false;
-        do
-        {
-            nIdxStop = sCopy.find_first_of('\"', nIdxStop);
-            if (nIdxStop == string::npos)
-            {
-                // Buggered string
-                return;
-            }
-            nIdxStop++;
-            if (nIdxStop >= sCopy.size())
-            {
-                // True stop at end of string
-                bStopFound = true;
-                break;
-            }
-
-            // Check if escaped
-            if (sCopy[nIdxStop] == '\"')
-            {
-                // Remove dupe
-                sCopy.erase(nIdxStop, 1);
-            }
-            else
-            {
-                // Not escape, true stop
-                bStopFound = true;
-            }
-
-        } while (!bStopFound);
-
-        string sQuoted = sCopy.substr(nIdxStart, (nIdxStop - 1) - nIdxStart);
-        separated.push_back(sQuoted);
-
-        // Position next just after the closing "
-        nIdxNext = nIdxStop;
-
-    } // end while
-
-}
-
-
-void
-trim( string& str )
-{
-    string::size_type pos1 = str.find_first_not_of(" \t\n\f\r");
-
-    if (pos1 == string::npos)
-    {
-        return;
-    }
-
-    string::size_type pos2 = str.find_last_not_of(" \t");
-
-    str = str.substr(pos1, pos2 - pos1 + 1);
-}
-
-
-void
-stripBBCode( std::string& str )
-{
-    string::size_type nIdxNext = 0;
-
-    while (nIdxNext < str.size())
-    {
-        string::size_type nIdxStart = str.find_first_of('[', nIdxNext);
-
-        if (nIdxStart == string::npos)
-        {
-            // Not found
-            return;
-        }
-
-        nIdxStart++;
-        if (nIdxStart >= str.size())
-        {
-            // Buggered string
-            return;
-        }
-
-        string::size_type nIdxStop = str.find_first_of(']', nIdxStart);
-        if (nIdxStop == string::npos)
-        {
-            // Buggered string
-            return;
-        }
-
-        // Remove BBCode section
-        size_t numRemove = nIdxStop - nIdxStart + 2;
-        str.erase(nIdxStart - 1, numRemove);
-
-        nIdxNext = nIdxStop + 1 - numRemove;
-    }
-
-}
-
-
-void
-stripBBCode( QString& str )
-{
-    int nIdxNext = 0;
-
-    while (nIdxNext < str.size())
-    {
-        int nIdxStart = str.indexOf('[', nIdxNext);
-
-        if (nIdxStart == -1)
-        {
-            // Not found
-            return;
-        }
-
-        nIdxStart++;
-        if (nIdxStart >= str.size())
-        {
-            // Buggered string
-            return;
-        }
-
-        int nIdxStop = str.indexOf(']', nIdxStart);
-        if (nIdxStop == -1)
-        {
-            // Buggered string
-            return;
-        }
-
-        // Remove BBCode section
-        int numRemove = nIdxStop - nIdxStart + 2;
-        str.remove(nIdxStart - 1, numRemove);
-
-        nIdxNext = nIdxStop + 1 - numRemove;
-    }
+    s.replace( "&", "%26" );
+    s.replace( "/", "%2F" );
+    s.replace( ";", "%3B" );
+    s.replace( "+", "%2B" );
+    s.replace( "#", "%23" );
+    return QString::fromAscii( QUrl::toPercentEncoding( s ) );
 }
 
 
 QString
-urlEncodeItem( QString item )
+Unicorn::urlDecodeItem( QString s )
 {
-    urlEncodeSpecialChars( item );
-    item = QUrl::toPercentEncoding( item );
-
-    return item;
-}
-
-
-QString
-urlDecodeItem( QString item )
-{
-    item = QUrl::fromPercentEncoding( item.toLocal8Bit() );
-    urlDecodeSpecialChars( item );
-
-    return item;
-}
-
-
-QString&
-urlEncodeSpecialChars(
-    QString& str)
-{
-    str.replace( "&", "%26" );
-    str.replace( "/", "%2F" );
-    str.replace( ";", "%3B" );
-    str.replace( "+", "%2B" );
-    str.replace( "#", "%23" );
-
-    return str;
-}
-
-
-QString&
-urlDecodeSpecialChars(
-    QString& str)
-{
-    str.replace( "%26", "&" );
-    str.replace( "%2F", "/" );
-    str.replace( "%3B", ";" );
-    str.replace( "%2B", "+" );
-    str.replace( "%23", "#" );
-    str.replace( "+", " " );
-
-    return str;
+    s = QUrl::fromPercentEncoding( s.toAscii() );
+    s.replace( "%26", "&" );
+    s.replace( "%2F", "/" );
+    s.replace( "%3B", ";" );
+    s.replace( "%2B", "+" );
+    s.replace( "%23", "#" );
+    s.replace( '+', ' ' );
+    return s;
 }
 
 
 QStringList
-sortCaseInsensitively( QStringList input )
+Unicorn::sortCaseInsensitively( QStringList input )
 {
     // This cumbersome bit of code here is how the Qt docs suggests you sort
     // a string list case-insensitively
@@ -348,81 +137,7 @@ sortCaseInsensitively( QStringList input )
 
 
 QString
-applicationDataPath()
-{
-    QString path;
-
-    #ifdef WIN32
-        if ((QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based) == 0)
-        {
-            // Use this for non-DOS-based Windowses
-            char acPath[MAX_PATH];
-            HRESULT h = SHGetFolderPathA( NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE,
-                                          NULL, 0, acPath );
-            if ( h == S_OK )
-            {
-                path = QString::fromLocal8Bit( acPath );
-            }
-            else
-            {
-                path = "";
-            }
-        }
-
-    #elif defined(Q_WS_MAC)
-        path = Unicorn::applicationSupportFolderPath();
-
-    #elif defined(Q_WS_X11)
-        path = QDir::home().filePath( ".local/share" );
-
-    #else
-        path = QApplication::applicationDirPath();
-
-    #endif
-
-    QDir d( path );
-    d.mkpath( path );
-
-    return d.absolutePath();
-}
-
-
-QString
-savePath( QString file )
-{
-    QString path;
-
-    #ifdef WIN32
-        path = Unicorn::applicationDataPath();
-        if (path.isEmpty())
-            path = QCoreApplication::applicationDirPath();
-        else
-            path += "/Last.fm/";
-    #else
-        path = Unicorn::applicationDataPath() + "/Last.fm";
-    #endif
-
-    QDir d( path );
-    d.mkpath( path );
-
-    return d.filePath( file );
-}
-
-
-QString
-logPath( QString file )
-{
-    #ifndef Q_WS_MAC
-        return savePath( file );
-    #else
-        QDir const d = QDir::home().filePath( "/Library/Logs/Last.fm" );
-        return d.filePath( file );
-    #endif
-}
-
-
-QString
-verbosePlatformString()
+Unicorn::verbosePlatformString()
 {
     #ifdef Q_WS_WIN
     switch (QSysInfo::WindowsVersion)
@@ -467,7 +182,7 @@ verbosePlatformString()
 
 
 void
-msleep( int ms )
+Unicorn::msleep( int ms )
 {
   #ifdef WIN32
     Sleep( ms );
@@ -476,20 +191,21 @@ msleep( int ms )
   #endif
 }
 
+
 QString
-runCommand( QString cmd )
+Unicorn::runCommand( const QString& command )
 {
-    QProcess process;
+    QProcess p;
+    p.start( command );
+    p.closeWriteChannel();
+    p.waitForFinished();
 
-    process.start( cmd );
-    process.closeWriteChannel();
-    process.waitForFinished();
-
-    return QString( process.readAll() );
+    return QString( p.readAll() );
 }
 
+
 QString 
-systemInformation()
+Unicorn::systemInformation()
 {
     QString information;
     
@@ -557,5 +273,3 @@ systemInformation()
 
     return information;
 }
-
-} // namespace UnicornUtils

@@ -38,7 +38,7 @@ TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent )
         return;
     }
 
-    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.track() + "</b>" );
+    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.title() + "</b>" );
     ui.album->setText( t.album() );
     ui.year->setText( "2000" );
     

@@ -24,7 +24,8 @@
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
 #include "widgets/SendLogsDialog.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornDir.h"
+#include "lib/unicorn/UnicornFile.h"
 #include <QByteArray>
 #include <QClipboard>
 #include <QFile>
@@ -296,7 +297,7 @@ DiagnosticsDialog::populateScrobbleCacheView()
     QList<QTreeWidgetItem *> items;
     foreach (Track t, cache.tracks())
         if ( t.isScrobbled() )
-            items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.track() << t.album() ) );
+            items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.title() << t.album() ) );
 
     ui.cachedTracksList->clear();
     ui.cachedTracksList->insertTopLevelItems( 0, items );
@@ -422,40 +423,24 @@ void
 DiagnosticsDialog::onScrobbleIpodClicked()
 {
 #ifndef Q_WS_X11
-    //TODO: make DRY - this is replicated in WizardTwiddlyBootstrapPage.cpp
-    #ifdef Q_WS_MAC
-        #define TWIDDLY_EXECUTABLE_NAME "/../../Resources/iPodScrobbler"
-    #else
-        #define TWIDDLY_EXECUTABLE_NAME "/../iPodScrobbler.exe"
-    #endif
-
     QStringList args = (QStringList() 
                     << "--device" << "diagnostic" 
                     << "--vid" << "0000" 
                     << "--pid" << "0000" 
                     << "--serial" << "UNKNOWN");
 
-    bool isManual = ( ui.iPodScrobbleType->currentIndex() == 1 );
-    if( isManual )
-        args << "--manual";
+    bool const isManual = ( ui.iPodScrobbleType->currentIndex() == 1 );
+    if (isManual)
+        args += "--manual";
 
-    if( !m_logFile.is_open() )
+    if (!m_logFile.is_open())
     {
-        #ifdef Q_WS_MAC
-            QString twiddlyLogName = "Last.fm Twiddly.log";
-        #else
-            QString twiddlyLogName = "Twiddly.log";
-        #endif
-        
-        qDebug() << "Watching log file: " << Unicorn::logPath( twiddlyLogName );       
- 
-        m_logFile.open(Unicorn::logPath( twiddlyLogName ).toStdString().c_str());
-
+        m_logFile.open( UnicornFile::log( Unicorn::Twiddly ).toStdString().c_str() );
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
     }
 
-    QProcess::startDetached( The::settings().path() + TWIDDLY_EXECUTABLE_NAME, args );
+    QProcess::startDetached( UnicornFile::executable( Unicorn::Twiddly ) );
 #endif
 }
 

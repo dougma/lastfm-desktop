@@ -54,7 +54,7 @@ NowPlaying::submit( const Track& track )
 
     #define e( x ) QUrl::toPercentEncoding( x )
     m_data = "&a=" + e(track.artist()) +
-             "&t=" + e(track.track()) +
+             "&t=" + e(track.title()) +
              "&b=" + e(track.album()) +
              "&l=" + QByteArray::number( track.duration() ) +
              "&n=" + QByteArray::number( track.trackNumber() ) +

@@ -51,7 +51,7 @@ ScrobblerSubmission::submitNextBatch()
         QByteArray const N = QByteArray::number( i );
         #define e( x ) QUrl::toPercentEncoding( x )
         m_data += "&a[" + N + "]=" + e(t.artist()) +
-                  "&t[" + N + "]=" + e(t.track()) +
+                  "&t[" + N + "]=" + e(t.title()) +
                   "&i[" + N + "]=" + QByteArray::number( t.timeStamp().toTime_t() ) +
                   "&o[" + N + "]=" + t.sourceString() +
                   "&r[" + N + "]=" + t.ratingCharacter() +

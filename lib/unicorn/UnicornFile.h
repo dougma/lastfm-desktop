@@ -17,48 +17,53 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_COMMON_MAC_H
-#define UNICORN_COMMON_MAC_H
+#ifndef UNICORN_FILE_H
+#define UNICORN_FILE_H
 
-/** @author <erik@last.fm> */
+#include "UnicornDir.h"
+#include "lib/DllExportMacro.h"
 
-#include <QLocale>
-#include <QString>
-#include <QUrl>
-#include <CoreFoundation/CoreFoundation.h>
+//TODO possibly this isn't actually unicorn material?
 
 
 namespace Unicorn
 {
-    /**
-     * Returns the path to the user's Application Support directory.
-     */
-    QString
-    applicationSupportFolderPath();
-
-    QLocale::Language
-    osxLanguageCode();
-    
-    QByteArray 
-    CFStringToUtf8( CFStringRef );
-
-    inline QString
-    CFStringToQString( CFStringRef s )
+    enum Application
     {
-        return QString::fromUtf8( CFStringToUtf8( s ) );
-    }
-    
-    bool
-    isGrowlInstalled();
-
-    bool
-    iTunesIsOpen();
-
-    bool
-    setPreferredAppForUrlScheme( const QUrl& url, const QString& app );
-
-    QString
-    preferredAppForUrlScheme( const QUrl& url );
+        Moose,
+        Twiddly
+    };
 }
 
-#endif // UNICORN_COMMON_MAC_H
+
+namespace UnicornFile
+{
+    UNICORN_DLLEXPORT inline QString log( Unicorn::Application app )
+    {
+        switch (app)
+        {
+            case Unicorn::Twiddly: return UnicornDir::logs().filePath( "Twiddly.log" );
+            case Unicorn::Moose: return UnicornDir::logs().filePath( "Last.fm.log" );
+        }
+    }
+
+
+    UNICORN_DLLEXPORT inline QString executable( Unicorn::Application app )
+    {
+        switch (app)
+        {
+            case Unicorn::Twiddly:
+                #ifdef Q_WS_MAC
+                    return UnicornSystemDir::bundle().filePath( "Resources/iPodScrobbler" );
+                #else
+                    return QDir( qApp->applicationDirPath() ).filePath( "iPodScrobbler.exe" );
+                #endif
+
+            case Unicorn::Moose:
+                //TODO
+                break;
+        }
+    }
+}
+
+#endif

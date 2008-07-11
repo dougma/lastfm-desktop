@@ -195,7 +195,7 @@ Track::scrobblableStatus() const
         LOGL( 3, "Artist was missing, will not submit" );
         return ArtistNameMissing;
     }
-    if ( track().isEmpty() )
+    if ( d->title.isEmpty() )
     {
         LOGL( 3, "Artist, track or duration was missing, will not submit" );
         return TrackNameMissing;
@@ -227,7 +227,7 @@ QStringList
 Track::topTags() const
 {
     WsReply* reply = WsRequestBuilder( "track.getTopTags" )
-                        .add( "track", track() )
+                        .add( "track", d->title )
                         .add( "artist", d->artist )
                         .get();
     reply->finish();

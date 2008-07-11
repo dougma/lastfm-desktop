@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,111 +17,42 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommonWin.h"
 #include "UnicornCommon.h"
-
-// This file contains legacy code that doesn't work with Unicode.
-//#undef UNICODE
-//#undef _UNICODE
-
-#undef LOG
-#undef LOGL
-#define LOG(x, y)
-#define LOGL(x, y)
-
+#include "UnicornDir.h"
+#include <QDebug>
 #include <QFile>
 #include <QIODevice>
 #include <QSettings>
 #include <QFileInfo>
-
 #include <shlobj.h>
 #include <atlbase.h> // For the COM shortcut stuff
-
 #include <string>
 
-using namespace std;
+using std::string;
+using std::vector;
 
-namespace Unicorn
-{
-
-
-string
-programFilesPath()
-{
-    char acPath[MAX_PATH];
-
-    // TODO: this call is dependant on a specific version of shell32.dll.
-    // Need to degrade gracefully. Need to bundle SHFolder.exe with installer
-    // and execute it on install for this to work on Win98.
-    HRESULT h = SHGetFolderPathA(NULL,
-                                 CSIDL_PROGRAM_FILES, 
-                                 NULL,
-                                 0, // current path
-                                 acPath);
-
-    if (h != S_OK)
-    {
-        LOG(1, "Couldn't get Program Files dir, is this possibly Win 9x?\n");
-
-        //throw logic_error("Couldn't get Program Files dir.");
-
-        acPath[0] = '\0';
-        return acPath;
-    }
-
-    string sPath(acPath);
-
-    if (sPath[sPath.size() - 1] != '\\')
-    {
-        sPath.append( "/" );
-    }
-
-    return sPath;
-}
-
-/******************************************************************************
-    GetTempPath
-******************************************************************************/
-/* use QDir::tempPath instead
-string
-CWinUtils::GetTempDir()
-{
-    TCHAR acTempPath[MAX_PATH];
-    ::GetTempPath(MAX_PATH, acTempPath);
-
-    string sTempPath(acTempPath);
-
-    if (sTempPath[sTempPath.size() - 1] != '\\')
-    {
-        sTempPath.append("\\");
-    }
-
-    return sTempPath;
-}
-*/
 
 bool
-isLimitedUser()
+Unicorn::isLimitedUser()
 {
-    // Try and write to Program Files, if so we should be fine.
-    string pf = programFilesPath();
-    QString file = QString::fromStdString(pf) + "dummy";
-    QFile f( file );
-    if ( !f.open( QIODevice::WriteOnly ) )
+    // If we can write to Program Files we aren't limited
+    QFile f( UnicornSystemDir::programFiles().filePath( "dummy" ) );
+    if (!f.open( QIODevice::WriteOnly ))
     {
-        LOG(3, "Couldn't open test file, it's a limited user.\n");
+        qWarning() << "Couldn't open test file, it's a limited user";
         return true;
     }
     else
     {
-        f.close();
-        QFile::remove(file);
+        QFile::remove( f.fileName() );
         return false;
     }
 }
 
+
+#if 0
 QString
-findDefaultPlayer()
+Unicorn::findDefaultPlayer()
 {
     // Get mp3 progID
     QSettings regKey( "HKEY_LOCAL_MACHINE\\Software\\Classes\\.mp3", QSettings::NativeFormat );
@@ -141,10 +71,11 @@ findDefaultPlayer()
     QFileInfo file(path);
     return file.fileName();
 }
+#endif
 
 
 HRESULT
-createShortcut( LPCTSTR lpszFileName, 
+Unicorn::createShortcut( LPCTSTR lpszFileName, 
                 LPCTSTR lpszDesc, 
                 LPCTSTR lpszShortcutPath )
 {
@@ -202,35 +133,3 @@ createShortcut( LPCTSTR lpszFileName,
 
     return hRes;
 }
-
-
-QString
-globalAppDataPath()
-{
-    wchar_t path_[MAX_PATH];
-    SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, 0, NULL, path_ );
-
-    QString path = QString::fromUtf16( (const ushort*)path_ );
-    path += "\\Last.fm\\Client";
-
-    return path;
-}
-
-
-bool
-setPreferredAppForUrlScheme( const QUrl&, const QString& )
-{
-    return false;
-}
-
-
-QString
-preferredAppForUrlScheme( const QUrl& url )
-{
-    QSettings s( "HKEY_CLASSES_ROOT\\" + url.scheme() + "\\shell\\open\\command", QSettings::NativeFormat );
-    QString app = s.value( "Default" ).toString();
-
-    return app;
-}
-
-} // namespace UnicornUtils
