@@ -18,10 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesPluginInstaller.h"
-#include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 #include <QDir>
 #include <QProcess>
 

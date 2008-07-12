@@ -102,7 +102,7 @@ Moose::isAlreadyRunning()
     // NULL for the SECURITY_ATTRIBUTES on Mutex creation);
     return ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED;
   #else
-    return sendToInstance( "", MooseEnums::DontStartNewInstance );
+    return sendToInstance( "", Moose::DontStartNewInstance );
   #endif
 }
 

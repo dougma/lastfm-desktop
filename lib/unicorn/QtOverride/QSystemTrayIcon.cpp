@@ -19,11 +19,9 @@
 
 #include "./QSystemTrayIcon"
 #undef QSystemTrayIcon
-
-#include "../UnicornCommonMac.h"
-#include "../AppleScript.h"
-#include "../Logger.h"
-
+#include "AppleScript.h"
+#include "Logger.h"
+#include "UnicornUtils.h"
 #include <QBoxLayout>
 #include <QDesktopWidget>
 #include <QLabel>
@@ -50,7 +48,7 @@ Moose::QSystemTrayIcon::showMessage( const QString& title,
                                      MessageIcon icon,
                                      int ms )
 {
-    if (!Unicorn::isGrowlInstalled())
+    if (!Unicorn::isProcessRunning( "GrowlHelperApp" ))
     {
         static QPointer<GrowlClone> w;
         delete w;

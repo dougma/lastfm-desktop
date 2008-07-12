@@ -32,7 +32,9 @@
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
-#include "legacy/disableHelperApp.cpp"
+#ifdef WIN32
+    #include "legacy/disableHelperApp.cpp"
+#endif
 
 
 App::App( int argc, char** argv ) 

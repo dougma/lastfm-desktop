@@ -37,7 +37,7 @@ class EasyDomElement
 public:
     class Exception : public UnicornException
     {
-        friend EasyDomElement;
+        friend class EasyDomElement;
 
         Exception( QString s ) : UnicornException( s )
         {}
@@ -69,9 +69,6 @@ public:
         return EasyDomElement( e.firstChildElement( name ) );
     }
 
-    /** select a specific element, querying by attribute 
-    EasyDomElement operator()( const QString& name )
-
     /** use in all cases where empty would be an error */
     QString nonEmptyText() const 
     {
@@ -92,10 +89,3 @@ public:
         return elements;
     }
 };
-
-
-#include <QDebug>
-inline QDebug& operator<<( QDebug& d, const EasyDomElement::Exception& e )
-{
-    return d << e.what();
-}

@@ -21,7 +21,6 @@
 #include "AppleScript.h"
 #include <QDebug>
 #include <QDir>
-#include <Carbon/Carbon.h>
 
 
 QLocale::Language
@@ -72,7 +71,7 @@ Unicorn::CFStringToUtf8( CFStringRef s )
 #include "common/c++/mac/getBsdProcessList.c"
 
 bool
-isProcessRunning( const QString& processName )
+Unicorn::isProcessRunning( const QString& processName )
 {
     bool found = false;
     
@@ -100,18 +99,4 @@ isProcessRunning( const QString& processName )
 
     free( processList );
     return found;
-}
-
-
-bool
-Unicorn::isGrowlInstalled()
-{
-    return isProcessRunning( "GrowlHelperApp" );
-}
-
-
-bool
-Unicorn::iTunesIsOpen()
-{
-    return isProcessRunning( "iTunes" );
 }

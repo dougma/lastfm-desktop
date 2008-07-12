@@ -25,8 +25,12 @@
 #include <QLocale>
 #include <QUrl>
 
+//FIXME sucks
 #ifdef WIN32
 #include "windows.h"
+#endif
+#ifdef Q_WS_MAC
+#include <Carbon/Carbon.h>
 #endif
 
 
@@ -108,8 +112,11 @@ namespace Unicorn
     {
         return QString::fromUtf8( CFStringToUtf8( s ) );
     }
-    bool isGrowlInstalled();
-    bool iTunesIsOpen();
+    bool isProcessRunning( const QString& );
+    inline bool iTunesIsOpen() 
+    { 
+        return isProcessRunning( "iTunes" ); 
+    }
 #endif
 }
 

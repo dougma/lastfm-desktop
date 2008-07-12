@@ -36,7 +36,7 @@ public:
 };
 
 
-inline QDebug operator<<( QDebug& d, const UnicornException& e )
+inline QDebug operator<<( QDebug d, const UnicornException& e )
 {
     return d.operator<<( e.what() );
 }

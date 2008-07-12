@@ -20,8 +20,12 @@
 #include "UnicornDir.h"
 #include "UnicornUtils.h"
 #include <QDebug>
+#include <QDir>
 #ifdef WIN32
 #include <shlobj.h>
+#endif
+#ifdef Q_WS_MAC
+#include <QCoreApplication>
 #endif
 
 
@@ -53,43 +57,37 @@ UnicornDir::dataDotDot()
     return QDir::home();
 
 #elif defined(Q_WS_MAC)
-    std::string outString;
 
-    OSErr err;
+    #define EIT( x ) { OSErr err = x; if (err != noErr) throw 1; }
+    try
+    {
+        short vRefNum = 0;
+        long dirId;
+        EIT( ::FindFolder( kOnAppropriateDisk, 
+                           kApplicationSupportFolderType,
+                           kDontCreateFolder, 
+                           &vRefNum, 
+                           &dirId ) );
 
-    short vRefNum = 0;
-    StrFileName fileName;
-    fileName[0] = 0;
-    long dirId;
-    err = ::FindFolder( kOnAppropriateDisk, kApplicationSupportFolderType,
-        kDontCreateFolder, &vRefNum, &dirId );
-    if ( err != noErr )
-        return "";
+        // Now we have a vRefNum and a dirID - but *not* an Unix-Path as string.
+        // Lets make one based from this:
+        FSSpec fsspec;
+        EIT( ::FSMakeFSSpec( vRefNum, dirId, NULL, &fsspec ) );
 
-    // Now we have a vRefNum and a dirID - but *not* an Unix-Path as string.
-    // Lets make one based from this:
+        // ...and build an FSRef based on thes FSSpec.
+        FSRef fsref;
+        EIT( ::FSpMakeFSRef( &fsspec, &fsref ) );
 
-    // create a FSSpec...
-    FSSpec fsspec;
-    err = ::FSMakeFSSpec( vRefNum, dirId, NULL, &fsspec );
-    if ( err != noErr )
-        return "";
+        // ...then extract the Unix Path as a C-String from the FSRef
+        unsigned char path[512];
+        EIT( ::FSRefMakePath( &fsref, path, 512 ) );
 
-    // ...and build an FSRef based on thes FSSpec.
-    FSRef fsref;
-    err = ::FSpMakeFSRef( &fsspec, &fsref );
-    if ( err != noErr )
-        return "";
-
-    // ...then extract the Unix Path as a C-String from the FSRef
-    unsigned char path[512];
-    err = ::FSRefMakePath( &fsref, path, 512 );
-    if ( err != noErr )
-        return "";
-
-    // ...and copy this into the result.
-    outString = (const char*)path;
-    return QDir::homePath().filePath( QString::fromStdString( outString ) );
+        return QDir::home().filePath( QString::fromUtf8( (char*)path ) );
+    }
+    catch (int)
+    {
+        return QDir::home().filePath( "Library/Application Support" );
+    }
 
 #elif defined(Q_WS_X11)
     return QDir::home().filePath( ".local/share" );
