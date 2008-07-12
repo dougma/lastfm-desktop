@@ -21,7 +21,7 @@
 #define UNICORN_APPLICATION_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/HideStupidWarnings.h"
+#include "common/HideStupidWarnings.h"
 #include <QApplication>
 
 

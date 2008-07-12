@@ -19,7 +19,7 @@
 
 #include "SettingsDialog.h"
 #include "Settings.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };

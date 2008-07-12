@@ -25,7 +25,7 @@
 #include "scrobbler/ScrobbleCache.h"
 #include "widgets/SendLogsDialog.h"
 #include "lib/unicorn/UnicornDir.h"
-#include "lib/unicorn/UnicornFile.h"
+#include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
 #include <QFile>
@@ -435,12 +435,12 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 
     if (!m_logFile.is_open())
     {
-        m_logFile.open( UnicornFile::log( Unicorn::Twiddly ).toStdString().c_str() );
+        m_logFile.open( UnicornDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
     }
 
-    QProcess::startDetached( UnicornFile::executable( Unicorn::Twiddly ) );
+    QProcess::startDetached( QDir(qApp->applicationDirPath()).filePath( RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE ) );
 #endif
 }
 

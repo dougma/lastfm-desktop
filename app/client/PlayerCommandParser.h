@@ -20,7 +20,7 @@
 #ifndef PLAYER_COMMAND_PARSER_H
 #define PLAYER_COMMAND_PARSER_H
 
-#include "lib/HideStupidWarnings.h"
+#include "common/HideStupidWarnings.h"
 #include "lib/unicorn/Track.h"
 
 

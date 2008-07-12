@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "WsRequestParameters.h"
-#include "../UnicornCommon.h"
+#include "../UnicornUtils.h"
 #include "../../../app/client/version.h"
 
 

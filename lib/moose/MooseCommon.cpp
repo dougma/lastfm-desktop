@@ -21,7 +21,7 @@
 #include "MooseSettings.h"
 
 #include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 #include "lib/unicorn/LastMessageBox.h"
 
 #include <QCoreApplication>
@@ -169,33 +169,3 @@ extensionPaths()
     return paths;
 }
 #endif
-
-
-QString
-Moose::sessionInformation()
-{
-    Moose::Settings settings;
-    QString clientinfo;
-
-    clientinfo += "User: " + settings.username() + "\n";
-    clientinfo += "Is using proxy: " + QString::number( settings.isUseProxy() ) + "\n";
-    if ( settings.isUseProxy() )
-    {
-        clientinfo += "Proxy Host: " + settings.proxyHost() + "\n";
-        clientinfo += "Proxy Port: " + QString::number( settings.proxyPort() ) + "\n";
-    }
-    clientinfo += "Path: " + settings.path() + "\n";
-    clientinfo += "Version: " + settings.version() + "\n";
-    clientinfo += "Scrobble Point: " + QString::number( settings.scrobblePoint() ) + "\n";
-    clientinfo += "Control Port: " + QString::number( settings.controlPort() ) + "\n";
-    if ( !settings.excludedDirs().isEmpty() )
-    {
-        clientinfo += "Excluded dirs:\n";
-        foreach( QString dir, settings.excludedDirs() )
-        {
-            clientinfo += "    " + dir + "\n";
-        }
-    }
-    
-    return clientinfo;
-}

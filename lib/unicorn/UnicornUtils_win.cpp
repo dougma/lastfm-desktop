@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommon.h"
+#include "UnicornUtils.h"
 #include "UnicornDir.h"
 #include <QDebug>
 #include <QFile>

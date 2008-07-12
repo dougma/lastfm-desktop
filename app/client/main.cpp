@@ -24,7 +24,7 @@
 #include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 #include "lib/breakpad/BreakPad.h"
 #include <QDir>
 #include <QTimer>

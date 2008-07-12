@@ -19,7 +19,7 @@
 
 #include "ScrobblerHandshake.h"
 #include "version.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h" // Unicorn::md5
 #include <QDateTime>
 #include <QDebug>
 

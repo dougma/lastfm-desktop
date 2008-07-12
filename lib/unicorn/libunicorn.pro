@@ -14,12 +14,11 @@ HEADERS = $$findSources( h ) \
 FORMS   = $$findSources( ui )
 
 !win32 {
-    SOURCES -= UnicornCommonWin.cpp
-    HEADERS -= UnicornCommonWin.h
+    SOURCES -= UnicornUtils_win.cpp
 }
 !macx {
-    SOURCES -= UnicornCommonMac.cpp AppleScript.cpp QtOverride/QSystemTrayIcon.cpp
-    HEADERS -= UnicornCommonMac.h AppleScript.h
+    SOURCES -= UnicornUtils_mac.cpp AppleScript.cpp QtOverride/QSystemTrayIcon.cpp
+    HEADERS -= AppleScript.h
 }
 
 macx*:LIBS += -framework SystemConfiguration -framework CoreServices

@@ -20,7 +20,7 @@
 #ifndef PLAYER_LISTENER_H
 #define PLAYER_LISTENER_H
 
-#include "lib/HideStupidWarnings.h"
+#include "common/HideStupidWarnings.h"
 #include <QTcpServer>
 class Track;
 

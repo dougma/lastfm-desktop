@@ -17,53 +17,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_FILE_H
-#define UNICORN_FILE_H
+#ifndef COMMON_FILE_LOCATIONS_H
+#define COMMON_FILE_LOCATIONS_H
 
-#include "UnicornDir.h"
-#include "lib/DllExportMacro.h"
-
-//TODO possibly this isn't actually unicorn material?
-
-
-namespace Unicorn
-{
-    enum Application
-    {
-        Moose,
-        Twiddly
-    };
-}
+// relative to UnicornDir::log()
+#define MOOSE_LOG_NAME "Last.fm.log"
+#define TWIDDLY_LOG_NAME "Twiddly.log"
 
 
-namespace UnicornFile
-{
-    UNICORN_DLLEXPORT inline QString log( Unicorn::Application app )
-    {
-        switch (app)
-        {
-            case Unicorn::Twiddly: return UnicornDir::logs().filePath( "Twiddly.log" );
-            case Unicorn::Moose: return UnicornDir::logs().filePath( "Last.fm.log" );
-        }
-    }
-
-
-    UNICORN_DLLEXPORT inline QString executable( Unicorn::Application app )
-    {
-        switch (app)
-        {
-            case Unicorn::Twiddly:
-                #ifdef Q_WS_MAC
-                    return UnicornSystemDir::bundle().filePath( "Resources/iPodScrobbler" );
-                #else
-                    return QDir( qApp->applicationDirPath() ).filePath( "iPodScrobbler.exe" );
-                #endif
-
-            case Unicorn::Moose:
-                //TODO
-                break;
-        }
-    }
-}
+// relative to qApp->applicationFilePath()
+#ifdef WIN32
+    #define RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE "../Resources/iPodScrobbler"
+#endif
+#ifdef Q_WS_MAC
+    #define RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE "iPodScrobbler.exe"
+#endif
 
 #endif

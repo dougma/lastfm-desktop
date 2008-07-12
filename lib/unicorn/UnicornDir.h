@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef COMMON_DIRS_H
-#define COMMON_DIRS_H
+#ifndef UNICORN_DIR_H
+#define UNICORN_DIR_H
 
 #include "lib/DllExportMacro.h"
 #include <QDir>
@@ -27,15 +27,16 @@
 namespace UnicornDir
 {
     /** @returns the path to the top-level Application Data folder
-    * XP:    C:\Documents and Settings\user\Local Settings\Application Data.
-    * Vista: C:\Users\user\AppData\Local
-    * OSX:   ~/Library/Application Support
-    * Unix:  ~/.local/share
-    *
-    * May return an empty string on Windows if the system call to get the
-    * path fails.
-    */
+      * XP:    C:\Documents and Settings\user\Local Settings\Application Data.
+      * Vista: C:\Users\user\AppData\Local
+      * OSX:   ~/Library/Application Support
+      * Unix:  ~/.local/share
+      *
+      * May return an empty string on Windows if the system call to get the
+      * path fails.
+      */
     UNICORN_DLLEXPORT QDir dataDotDot();
+
 
     /** @returns directory where application data can be stored
       * XP:    C:\Documents and Settings\user\Local Settings\Application Data\Last.fm
@@ -48,6 +49,7 @@ namespace UnicornDir
         return dataDotDot().filePath( "Last.fm" );
     }
     
+
     /** @returns directory where logs can be stored
       * XP:    userData()
       * Vista: userData()
@@ -63,6 +65,7 @@ namespace UnicornDir
         #endif
     }
 
+
     /** @returns path to directory for storing cached images etc. */
     UNICORN_DLLEXPORT inline QDir cache()
     {
@@ -72,6 +75,7 @@ namespace UnicornDir
             return data().filePath( "cache/" );
         #endif
     }
+
 
     UNICORN_DLLEXPORT inline void mkpaths()
     {

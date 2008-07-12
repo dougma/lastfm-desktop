@@ -40,12 +40,6 @@ namespace Moose
       * @p command */
     MOOSE_DLLEXPORT bool sendToInstance( const QString& command,
                                          StartNewInstanceBehaviour = DontStartNewInstance );
-
-    /** @returns information about the session. More or less the 
-      * information you get from MooseUtils and MoseSettings */
-    //TODO move to SendLongDialog or whatever
-    MOOSE_DLLEXPORT QString sessionInformation();
-
 }
 
 #endif

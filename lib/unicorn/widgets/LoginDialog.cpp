@@ -20,7 +20,7 @@
 #include "LoginDialog.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 #include "lib/unicorn/ws/WsRequestBuilder.h"
 #include "lib/unicorn/ws/WsReply.h"
 #include <QMovie>

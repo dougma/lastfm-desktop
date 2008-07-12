@@ -21,7 +21,7 @@
 #include "Settings.h"
 #include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/UnicornDir.h"
-#include "lib/unicorn/UnicornCommon.h"
+#include "lib/unicorn/UnicornUtils.h"
 #include "lib/unicorn/LastMessageBox.h"
 #include "lib/unicorn/ws/SendLogsRequest.h"
 #include <QDir>
@@ -52,6 +52,105 @@ SendLogsDialog::SendLogsDialog( QWidget *parent )
 }
 
 
+static QString clientInformationString()
+{
+    Moose::Settings settings;
+    QString s;
+
+    s += "User: " + settings.username() + "\n";
+    s += "Is using proxy: " + QString::number( settings.isUseProxy() ) + "\n";
+    if ( settings.isUseProxy() )
+    {
+        s += "Proxy Host: " + settings.proxyHost() + "\n";
+        s += "Proxy Port: " + QString::number( settings.proxyPort() ) + "\n";
+    }
+    s += "Path: " + settings.path() + "\n";
+    s += "Version: " + settings.version() + "\n";
+    s += "Scrobble Point: " + QString::number( settings.scrobblePoint() ) + "\n";
+    s += "Control Port: " + QString::number( settings.controlPort() ) + "\n";
+    if ( !settings.excludedDirs().isEmpty() )
+    {
+        s += "Excluded dirs:\n";
+        foreach( QString dir, settings.excludedDirs() )
+        {
+            s += "    " + dir + "\n";
+        }
+    }
+
+    return s;
+}
+
+
+static QString systemInformationString()
+{
+    QString s;
+
+    s += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
+
+#ifdef Q_WS_X11
+    s += "CPU: \n";
+    s += runCommand( "cat /proc/cpuinfo" );
+    s += "\n";
+
+    s += "Memory: \n";
+    s += runCommand( "cat /proc/meminfo" );
+    s += "\n";
+
+    s += "Diskspace: \n";
+    s += runCommand( "df -h" );
+    s += "\n";
+
+#elif defined WIN32
+    // CPU
+    SYSTEM_INFO siSysInfo;
+    GetSystemInfo(&siSysInfo); 
+
+    s += "CPU: \n";  
+    s += "Number of processors: " + QString::number( siSysInfo.dwNumberOfProcessors ) + "\n";
+    s += "Page size: " + QString::number( siSysInfo.dwPageSize ) + "\n";
+    s += "Processor type: " + QString::number( siSysInfo.dwProcessorType ) + "\n";
+    s += "Active processor mask: " + QString::number( siSysInfo.dwActiveProcessorMask ) + "\n";
+    s += "\n";
+
+    // Memory
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof (statex);
+    GlobalMemoryStatusEx (&statex);
+
+    s += "Memory used: " + QString::number( statex.dwMemoryLoad ) + "%\n";
+    s += "Total memory: " + QString::number( statex.ullTotalPhys/(1024*1024) ) + "MB\n";
+    s += "Free memory: " + QString::number( statex.ullAvailPhys/(1024*1024) ) + "MB\n";
+    s += "Total virtual memory: " + QString::number( statex.ullTotalVirtual/(1024*1024) ) + "MB\n";
+    s += "Free virtual memory: " + QString::number( statex.ullAvailVirtual/(1024*1024) ) + "MB\n";
+
+    // Disk space
+    __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
+
+    GetDiskFreeSpaceEx( NULL,
+        (PULARGE_INTEGER)&lpFreeBytesAvailable,
+        (PULARGE_INTEGER)&lpTotalNumberOfBytes,
+        (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
+        ); 
+
+    s += "Drive C:\\ \n";
+    s += "   Total diskspace: " + QString::number( lpTotalNumberOfBytes/(1024*1024) )+ "MB\n";
+    s += "   Free diskspace: " + QString::number( lpFreeBytesAvailable/(1024*1024) )  + "MB\n";
+
+#elif defined Q_WS_MAC
+    s += "CPU and Memory: \n";
+    s += Unicorn::runCommand( "hostinfo" );
+    s += "\n";
+
+    s += "Diskspace: \n";
+    s += Unicorn::runCommand( "df -h" );
+    s += "\n";
+
+#endif
+
+    return s;
+}
+
+
 void
 SendLogsDialog::onSendClicked()
 {
@@ -70,8 +169,8 @@ SendLogsDialog::onSendClicked()
     foreach( QFileInfo log, logFiles )
         request->addLog( log.completeBaseName(), log.absoluteFilePath() );
 
-    request->addLogData( "clientinfo", Moose::sessionInformation() );
-    request->addLogData( "sysinfo", Unicorn::systemInformation() );
+    request->addLogData( "clientinfo", clientInformationString() );
+    request->addLogData( "sysinfo", systemInformationString() );
     
     request->send();
     

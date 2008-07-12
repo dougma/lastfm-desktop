@@ -18,7 +18,11 @@
  ***************************************************************************/
 
 #include "UnicornDir.h"
-#include "UnicornCommon.h"
+#include "UnicornUtils.h"
+#include <QDebug>
+#ifdef WIN32
+#include <shlobj.h>
+#endif
 
 
 #ifdef Q_WS_MAC
@@ -44,7 +48,7 @@ UnicornDir::dataDotDot()
                                       0, 
                                       path );
         if (h == S_OK)
-            return QString::fromLocal8Bit( acPath );
+            return QString::fromLocal8Bit( path );
     }
     return QDir::home();
 
@@ -96,19 +100,16 @@ UnicornDir::dataDotDot()
 }
 
 
-QDir
-
-
 #ifdef WIN32
 QDir
-SystemDir::programFiles()
+UnicornSystemDir::programFiles()
 {
-    wchar_t path[MAX_PATH];
+    char path[MAX_PATH];
 
     // TODO: this call is dependant on a specific version of shell32.dll.
     // Need to degrade gracefully. Need to bundle SHFolder.exe with installer
     // and execute it on install for this to work on Win98.
-    HRESULT h = SHGetFolderPath( NULL,
+    HRESULT h = SHGetFolderPathA( NULL,
                                  CSIDL_PROGRAM_FILES, 
                                  NULL,
                                  0, // current path

@@ -41,7 +41,7 @@ osx()
 
 linux()
 {
-    echo unimplemented
+    echo 'Unimplemented :( Please to do it!'
 }
 
 case `uname` in

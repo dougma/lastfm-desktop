@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornCommon.h"
+#include "UnicornUtils.h"
 #include "Logger.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
@@ -201,75 +201,4 @@ Unicorn::runCommand( const QString& command )
     p.waitForFinished();
 
     return QString( p.readAll() );
-}
-
-
-QString 
-Unicorn::systemInformation()
-{
-    QString information;
-    
-    information += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
-
-#ifdef Q_WS_X11
-    information += "CPU: \n";
-    information += runCommand( "cat /proc/cpuinfo" );
-    information += "\n";
-    
-    information += "Memory: \n";
-    information += runCommand( "cat /proc/meminfo" );
-    information += "\n";
-    
-    information += "Diskspace: \n";
-    information += runCommand( "df -h" );
-    information += "\n";
-
-#elif defined WIN32
-    // CPU
-    SYSTEM_INFO siSysInfo;
-    GetSystemInfo(&siSysInfo); 
-
-    information += "CPU: \n";  
-    information += "Number of processors: " + QString::number( siSysInfo.dwNumberOfProcessors ) + "\n";
-    information += "Page size: " + QString::number( siSysInfo.dwPageSize ) + "\n";
-    information += "Processor type: " + QString::number( siSysInfo.dwProcessorType ) + "\n";
-    information += "Active processor mask: " + QString::number( siSysInfo.dwActiveProcessorMask ) + "\n";
-    information += "\n";
-
-    // Memory
-    MEMORYSTATUSEX statex;
-    statex.dwLength = sizeof (statex);
-    GlobalMemoryStatusEx (&statex);
-
-    information += "Memory used: " + QString::number( statex.dwMemoryLoad ) + "%\n";
-    information += "Total memory: " + QString::number( statex.ullTotalPhys/(1024*1024) ) + "MB\n";
-    information += "Free memory: " + QString::number( statex.ullAvailPhys/(1024*1024) ) + "MB\n";
-    information += "Total virtual memory: " + QString::number( statex.ullTotalVirtual/(1024*1024) ) + "MB\n";
-    information += "Free virtual memory: " + QString::number( statex.ullAvailVirtual/(1024*1024) ) + "MB\n";
-
-    // Disk space
-    __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
-
-    GetDiskFreeSpaceEx( NULL,
-                        (PULARGE_INTEGER)&lpFreeBytesAvailable,
-                        (PULARGE_INTEGER)&lpTotalNumberOfBytes,
-                        (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
-                        ); 
-
-    information += "Drive C:\\ \n";
-    information += "   Total diskspace: " + QString::number( lpTotalNumberOfBytes/(1024*1024) )+ "MB\n";
-    information += "   Free diskspace: " + QString::number( lpFreeBytesAvailable/(1024*1024) )  + "MB\n";
-
-#elif defined Q_WS_MAC
-    information += "CPU and Memory: \n";
-    information += Unicorn::runCommand( "hostinfo" );
-    information += "\n";
-    
-    information += "Diskspace: \n";
-    information += Unicorn::runCommand( "df -h" );
-    information += "\n";
-
-#endif
-
-    return information;
 }

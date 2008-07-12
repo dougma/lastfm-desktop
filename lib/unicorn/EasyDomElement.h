@@ -92,3 +92,10 @@ public:
         return elements;
     }
 };
+
+
+#include <QDebug>
+inline QDebug& operator<<( QDebug& d, const EasyDomElement::Exception& e )
+{
+    return d << e.what();
+}
