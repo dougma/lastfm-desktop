@@ -19,8 +19,8 @@
 
 #include "./QHttp"
 #undef QHttp
-#include "UnicornUtils.h"
-#include "UnicornSettings.h"
+#include "../UnicornUtils.h"
+#include "../UnicornSettings.h"
 #include <QHttpRequestHeader>
 #ifdef Q_WS_MAC
 #include <SystemConfiguration/SystemConfiguration.h> 

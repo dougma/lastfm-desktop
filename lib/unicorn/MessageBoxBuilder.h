@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2007-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,51 +17,28 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
-#include "lib/unicorn/UnicornApplication.h"
-#include "lib/unicorn/ws/WsError.h"
+#ifndef MESSAGE_BOX_BUILDER_H
+#define MESSAGE_BOX_BUILDER_H
 
-class App : public Unicorn::Application
+#include "lib/DllExportMacro.h"
+#include <QtGui/QMessageBox>
+
+
+class UNICORN_DLLEXPORT MessageBoxBuilder
 {
-    Q_OBJECT
+    QMessageBox box;
 
 public:
-    App( int, char** );
-    ~App();
-
-    PlaybackState::Enum state() const;
-
-    void setMainWindow( class MainWindow* );
-
-public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
-
-    void love();
-    void ban();
-
-    /** all webservices connect to this and emit in the case of bad errors that
-      * need to be handled at a higher level */
-    void onWsError( Ws::Error );
+    /** Try not to use 0! */
+    MessageBoxBuilder( QWidget* parent ) : box( parent )
+    {}
     
-    void onScrobblerStatusChanged( int );
+    MessageBoxBuilder& setTitle( const QString& x );
+    MessageBoxBuilder& setText( const QString& x );
+    /** the default is Information */
+    MessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
 
-    /** currently also quits, needs fixing! */
-    void logout();
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onTuneIn();
-
-signals:
-    void event( int, const QVariant& );
-
-private:
-    class PlayerListener* m_playerListener;
-    class PlayerManager* m_playerManager;
-    class Scrobbler* m_scrobbler;
-    class RadioPlayer* m_radio;
-    class DrWatson* m_watson;
-    class MainWindow* m_mainWindow;
-
-    class QSystemTrayIcon* m_trayIcon;
+    int exec();
 };
+
+#endif // MESSAGEBOX_H

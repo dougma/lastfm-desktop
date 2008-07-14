@@ -1,1 +1,1 @@
-#error Deprecated. #include "lib/unicorn/LastMessage.h" instead.
+#error Deprecated. #include "lib/unicorn/MessageBoxBuilder.h" instead.

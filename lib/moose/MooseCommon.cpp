@@ -22,7 +22,7 @@
 
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/LastMessageBox.h"
+#include "lib/unicorn/MessageBoxBuilder.h"
 
 #include <QCoreApplication>
 #include <QDir>

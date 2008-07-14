@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UnicornApplication.h"
-#include "LastMessageBox.h"
+#include "MessageBoxBuilder.h"
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
 
@@ -30,9 +30,11 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 #ifdef Q_WS_MAC
     if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
     {
-        LastMessageBox::critical( 
-                QObject::tr( "Unsupported OS X Version" ),
-                QObject::tr( "We are sorry, but Last.fm requires OS X Tiger or above." ) );
+        MessageBoxBuilder( 0 )
+            .setIcon( QMessageBox::Critical )
+            .setTitle( tr("Unsupported OS X Version") )
+            .setText( tr( "We are sorry, but Last.fm requires OS X Tiger or above.") )
+            .exec();
         throw UnsupportedPlatformException();
     }
 #endif

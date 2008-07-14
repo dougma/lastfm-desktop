@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "LoginDialog.h"
-#include "lib/unicorn/LastMessageBox.h"
+#include "lib/unicorn/MessageBoxBuilder.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornUtils.h"
 #include "lib/unicorn/ws/WsRequestBuilder.h"
@@ -99,25 +99,31 @@ LoginDialog::onAuthenticated( WsReply* reply )
         
         case Ws::AuthenticationFailed:
             // COPYTODO
-            LastMessageBox::critical( 
-                    tr( "Login Failed" ), 
-                    tr( "Sorry, we don't recognise that username, or you typed the password wrongly." ) );
+            MessageBoxBuilder( this )
+                .setIcon( QMessageBox::Critical )
+                .setTitle( tr("Login Failed") )
+                .setText( tr("Sorry, we don't recognise that username, or you typed the password wrongly.") )
+                .exec();
             break;
         
         default:
             // COPYTODO
-            LastMessageBox::critical(
-                    tr("Last.fm Unavailable"), 
-                    tr("There was a problem communicating with the Last.fm services. Please try again later.") );
+            MessageBoxBuilder( this )
+                .setIcon( QMessageBox::Critical )
+                .setTitle( tr("Last.fm Unavailable") )
+                .setTitle( tr("There was a problem communicating with the Last.fm services. Please try again later.") )
+                .exec();
             break;
 
         case Ws::UrProxyIsFuckedLol:
         case Ws::UrLocalNetworkIsFuckedLol:
             // TODO proxy prompting?
             // COPYTODO
-            LastMessageBox::critical(
-                    tr("Cannot connect to Last.fm"),
-                    tr("Last.fm cannot be reached. Please check your firewall settings.") );
+            MessageBoxBuilder( this )
+                .setIcon( QMessageBox::Critical )
+                .setTitle( tr("Cannot connect to Last.fm") )
+                .setText( tr("Last.fm cannot be reached. Please check your firewall settings.") )
+                .exec();
             break;
     }
     

@@ -22,7 +22,7 @@
 #include "lib/moose/MooseCommon.h"
 #include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/LastMessageBox.h"
+#include "lib/unicorn/MessageBoxBuilder.h"
 #include "lib/unicorn/ws/SendLogsRequest.h"
 #include <QDir>
 #include <QFileInfo>
@@ -187,9 +187,12 @@ SendLogsDialog::onSuccess()
     ui.spinner->movie()->stop();
     ui.spinner->hide();
 
-    LastMessageBox::information( tr( "Logs sent" ), 
-                                 tr( "Your logs have been sent to the Last.fm support team.\n"
-                                     "We will get back to you as soon as possible." ) );
+    MessageBoxBuilder( this )
+        .setIcon( QMessageBox::Information )
+        .setTitle( tr("Logs sent") )
+        .setText( tr( "Thank you, we will get back to you as soon as possible.") )
+        .exec();
+
     ui.moreInfoTextEdit->clear();
     ui.buttonBox->setEnabled( true );
     ui.moreInfoTextEdit->setEnabled( true );
@@ -200,8 +203,12 @@ SendLogsDialog::onSuccess()
 void
 SendLogsDialog::onError()
 {
-    LastMessageBox::warning( tr( "Couldn't send logs" ), 
-                             tr( "Failed to send the logs. Please try again later." ) );
+    MessageBoxBuilder( this )
+        .setIcon( QMessageBox::Information )
+        .setTitle( tr("Couldn't send logs") )
+        .setText( tr("Please try again later.") )
+        .exec();
+
     ui.spinner->movie()->stop();
     ui.spinner->hide();
     ui.buttonBox->setEnabled( true );

@@ -28,7 +28,7 @@
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
-#include "lib/unicorn/LastMessageBox.h"
+#include "lib/unicorn/MessageBoxBuilder.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -40,6 +40,8 @@
 App::App( int argc, char** argv ) 
    : Unicorn::Application( argc, argv )
 {
+    // IMPORTANT don't allow any GUI thread message loops to run during this
+    // ctor! Things will crash in interesting ways!
     //TODO bootstrapping
     
     Settings::instance = new Settings( VERSION, applicationFilePath() );
@@ -77,6 +79,8 @@ App::~App()
 void
 App::setMainWindow( MainWindow* window )
 {
+    m_mainWindow = window;
+
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
@@ -172,8 +176,11 @@ App::onScrobblerStatusChanged( int e )
     switch (e)
     {
         case Scrobbler::ErrorBannedClient:
-            LastMessageBox::critical( tr( "Old Version" ), 
-                                      tr( "This software is too old to scrobble. Please upgrade." ) );
+            MessageBoxBuilder( m_mainWindow )
+                .setIcon( QMessageBox::Warning )
+                .setTitle( tr("Upgrade Required") )
+                .setText( tr("Scrobbling will not work because this software is too old.") )
+                .exec();
             break;
 
         case Scrobbler::ErrorInvalidSessionKey:
@@ -181,13 +188,16 @@ App::onScrobblerStatusChanged( int e )
             break;
 
         case Scrobbler::ErrorBadTime:
-            LastMessageBox::critical( tr( "Error" ),
-                tr( "<p>Last.fm cannot authorise any scrobbling! :("
-                    "<p>It appears your computer disagrees with us about what the time is."
-                    "<p>If you are sure the time is right, check the date is correct and check your "
-                       "timezone is not set to something miles away, like Mars." 
-                    "<p>We're sorry about this restriction, but we impose it to help prevent "
-                       "scrobble spamming." ) );
+            MessageBoxBuilder( m_mainWindow )
+                .setIcon( QMessageBox::Warning )
+                .setTitle( tr("Incorrect Time") )
+                .setText( tr("<p>Last.fm cannot authorise any scrobbling! :("
+                             "<p>It appears your computer disagrees with us about what the time is."
+                             "<p>If you are sure the time is right, check the <b>date</b> is correct and check your "
+                             "<b>timezone</b> is not set to something miles away, like Mars." 
+                             "<p>We're sorry about this restriction, but we impose it to help prevent "
+                                "scrobble spamming.") )
+                .exec();
             break;
     }
 }

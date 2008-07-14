@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2007-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,51 +17,39 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
-#include "lib/unicorn/UnicornApplication.h"
-#include "lib/unicorn/ws/WsError.h"
+#include "MessageBoxBuilder.h"
+#include <QApplication>
 
-class App : public Unicorn::Application
+
+MessageBoxBuilder&
+MessageBoxBuilder::setTitle( const QString& title )
 {
-    Q_OBJECT
+#ifdef Q_WS_MAC
+    box.setText( title + "\t\t\t" );
+#else
+    box.setWindowTitle( title );
+#endif
+    return *this;
+}
 
-public:
-    App( int, char** );
-    ~App();
 
-    PlaybackState::Enum state() const;
+MessageBoxBuilder&
+MessageBoxBuilder::setText( const QString& text )
+{
+#ifdef Q_WS_MAC
+    box.setInformativeText( text );
+#else
+    box.setText( text );
+#endif
+    return *this;
+}
 
-    void setMainWindow( class MainWindow* );
 
-public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
-
-    void love();
-    void ban();
-
-    /** all webservices connect to this and emit in the case of bad errors that
-      * need to be handled at a higher level */
-    void onWsError( Ws::Error );
-    
-    void onScrobblerStatusChanged( int );
-
-    /** currently also quits, needs fixing! */
-    void logout();
-
-private slots:
-    void onAppEvent( int, const QVariant& );
-    void onTuneIn();
-
-signals:
-    void event( int, const QVariant& );
-
-private:
-    class PlayerListener* m_playerListener;
-    class PlayerManager* m_playerManager;
-    class Scrobbler* m_scrobbler;
-    class RadioPlayer* m_radio;
-    class DrWatson* m_watson;
-    class MainWindow* m_mainWindow;
-
-    class QSystemTrayIcon* m_trayIcon;
-};
+int
+MessageBoxBuilder::exec()
+{
+    QApplication::setOverrideCursor( Qt::ArrowCursor );
+    int const r = box.exec();
+    QApplication::restoreOverrideCursor();
+    return r;
+}
