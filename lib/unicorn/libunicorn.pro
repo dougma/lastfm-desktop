@@ -9,8 +9,7 @@ QT += gui
 include( $$SRC_DIR/common/qmake/include.pro )
 
 SOURCES = $$findSources( cpp )
-HEADERS = $$findSources( h ) \
-           QtOverride/QHttp QtOverride/QSystemTrayIcon QtOverride/QMessageBox
+HEADERS = $$findSources( h )
 FORMS   = $$findSources( ui )
 
 !win32 {

@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "./QHttp"
+#include "./QHttp.h"
 #undef QHttp
 #include "../UnicornUtils.h"
 #include "../UnicornSettings.h"
