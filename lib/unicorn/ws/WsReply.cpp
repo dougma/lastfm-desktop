@@ -112,6 +112,7 @@ WsReply::onFinished()
     }
     catch (Ws::Error e)
     {
+        qWarning() << m_reply->url();
         qWarning() << m_xml.toString();
         m_error = e;
 

@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/DllExportMacro.h"
 #include "UnicornException.h"
 #include <QDomElement>
 #include <QList>
@@ -30,7 +31,7 @@
   * foreach (EasyDomElement e, EasyDomElement( dome )["album"].children( "image" ))
   *     qDebug() << e.text();
   */
-class EasyDomElement
+class UNICORN_DLLEXPORT EasyDomElement
 {
     QDomElement e;
 
@@ -47,45 +48,21 @@ public:
         static Exception emptyTextNode( QString name ) { return Exception( "Unexpected empty text node: " + name ); }
     };
 
+
     EasyDomElement( const QDomElement& x ) : e( x )
     {
         if (e.isNull()) throw Exception::nullNode();
     }
 
-    EasyDomElement operator[]( const QString& name )
-    {
-        QStringList parts = name.split( ' ' );
-        if (parts.size() >= 2)
-        {
-            QString tagName = parts[0];
-            parts = parts[1].split( '=' );
-            QString attributeName = parts.value( 0 );
-            QString attributeValue = parts.value( 1 );
-
-            foreach (EasyDomElement e, children( tagName ))
-                if (e.e.attribute( attributeName ) == attributeValue)
-                    return e;
-        }
-        return EasyDomElement( e.firstChildElement( name ) );
-    }
-
+    /** Selects a child element, you can specify attributes like so:
+      *
+      * e["element"]["element attribute=value"].text();
+      */
+    EasyDomElement operator[]( const QString& name ) const;
+    
     /** use in all cases where empty would be an error */
-    QString nonEmptyText() const 
-    {
-        QString const s = e.text();
-        if (s.isEmpty())
-            throw Exception::emptyTextNode( e.tagName() );
-        return s;
-    }
+    QString nonEmptyText() const;
 
     QString text() const { return e.text(); }
-
-    QList<EasyDomElement> children( const QString& named )
-    {
-        QList<EasyDomElement> elements;
-        QDomNodeList nodes = e.elementsByTagName( named );
-        for (int x = 0; x < nodes.count(); ++x)
-            elements += EasyDomElement( nodes.at( x ).toElement() );
-        return elements;
-    }
+    QList<EasyDomElement> children( const QString& named ) const;
 };

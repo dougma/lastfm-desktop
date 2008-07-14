@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,7 +20,7 @@
 #include "WsRequestParameters.h"
 #include "../UnicornUtils.h"
 #include "../UnicornSettings.h"
-#include "../../../app/client/version.h"
+#include "../../../app/client/version.h" //FIXME
 
 
 WsRequestParameters::WsRequestParameters( QObject* parent )
@@ -34,8 +34,9 @@ WsRequestParameters::operator const QList< QPair< QString,QString > >()
 
     add( "api_key", API_KEY );
     
+    // check username exists first - prevents assert in Unicorn::UserQSettings
     Unicorn::Settings s;
-    if( !s.sessionKey().isEmpty() )
+    if( s.username().size() && !s.sessionKey().isEmpty() )
         add( "sk", s.sessionKey() );
 
     add( "api_sig", methodSignature() );
