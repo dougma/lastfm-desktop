@@ -2,5 +2,6 @@
  <qresource>
      <file>spinner.mng</file>
      <file>as.png</file>
+	 <file>16x16/as.png</file>
  </qresource>
  </RCC> 
