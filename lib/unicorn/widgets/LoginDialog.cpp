@@ -62,7 +62,8 @@ LoginDialog::authenticate()
     ui.spinner->show();
     ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
 
-    m_username = ui.username->text();
+    // always lowercase the username before generating the md5
+    m_username = ui.username->text().toLower();
 
     using Unicorn::md5;
     QString const password = ui.password->text();
