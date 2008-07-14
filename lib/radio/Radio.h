@@ -50,7 +50,6 @@ public:
         QString artist;
         QString album;
         uint duration;
-        QString sponsor;
         QString location;
     };
     
@@ -67,7 +66,6 @@ public:
     /** eg lastfm://user/mxcl/ */
     void tuneIn( const QString& station );
     void fetchNextPlaylist();
-
     bool m_done;
     
 signals:

@@ -21,12 +21,15 @@
 #include "lib/unicorn/UnicornSettings.h"
 #include <QBuffer>
 #include <QDebug>
+#include "lib/unicorn/ws/WsRequestBuilder.h"
+#include "lib/unicorn/ws/WsReply.h"
 #include <QtNetwork/QHttp> //TODO use our override
 #include <QtXml>
 
 //TODO discovery mode
 //TODO skips left
 //TODO multiple locations for the same track
+//TODO set rtp flag in getPlaylist (whether user is scrobbling this radio session or not)
 
 
 Radio::Radio( const QString& username, const QString& password )
@@ -61,7 +64,6 @@ Radio::run()
             m_host = "ws.audioscrobbler.com";
             m_base_path = "/radio";
 
-            handshake();
             adjust();
             for (;;)
             {
@@ -104,80 +106,42 @@ struct Map : QMap<QByteArray, QString>
 };
 
 
-QByteArray
-Radio::get( QString path )
-{
-    //TODO error handling
-
-    QHttp http( m_host );
-
-    path.prepend( m_base_path );
-    qDebug() << "Radio::GET" << m_host + path;
-
-    http.get( path );
-
-    QEventLoop loop;
-    connect( &http, SIGNAL(requestFinished( int, bool )), &loop, SLOT(quit()) );
-    loop.exec();
-
-    return http.readAll();
-}
-
-
-void
-Radio::handshake()
-{
-    QString path = "/handshake.php"
-                   "?version=2.0" //FIXME
-                   "&platform="
-                   "&platfromversion="
-                   "&username=" + m_username +
-                   "&passwordmd5=" + m_password +
-                   "&language=" + Unicorn::Settings().language();
-
-    Map map = get( path );
-
-    m_session = map["session"];
-    m_host = map["base_url"];
-
-    qDebug() << map;
-}
-
-
 void
 Radio::adjust()
 {
-    QString path = "/adjust.php?session=" + m_session + "&url=" + m_station_url + "&lang=" + Unicorn::Settings().language();
+    WsRequestBuilder wsBuilder( "radio.tune" );
+    wsBuilder.add( "station", m_station_url );
+    WsReply* reply = wsBuilder.post();
 
-    get( path );
+    reply->finish();
 }
 
 
 QList<Radio::Track>
 Radio::fetchPlaylist()
 {
-    QString path = "/xspf.php?sk=" + m_session + "&discovery=0&desktop=2.0"; //FIXME
-    QByteArray data = get( path );
+    WsRequestBuilder wsBuilder( "radio.getPlaylist" );
 
-    QDomDocument xml;
-    xml.setContent( data ); //presumably figures out encoding as XML should specify in xml header?
+    WsReply* reply = wsBuilder.get();
+
+    reply->finish();
+
+    EasyDomElement xml = reply->lfm();
 
     QList<Track> tracks;
-    QDomNodeList nodes = xml.documentElement().firstChildElement( "trackList" ).elementsByTagName( "track" );
-    for (int x = 0; x < nodes.count(); ++x)
-    {
-        QDomNode n = nodes.at( x );
 
-        #define h( x ) n.firstChildElement( x ).text()
+    QList<EasyDomElement> trackElements =  xml["playlist"][ "trackList" ].children( "track" );
+    for (int x = 0; x < trackElements.count(); ++x)
+    {
+        EasyDomElement trackElement = trackElements.at( x );
+
         Track t;
-        t.authcode = h("lastfm:authcode");
-        t.title = h("title");
-        t.artist = h("creator");
-        t.album = h("album");
-        t.duration = h("duration").toInt();
-        t.sponsor = h("lastfm:sponsored");
-        t.location = h("location");
-        #undef h
+        t.authcode = trackElement[ "extension" ][ "trackauth" ].text();
+        t.title = trackElement[ "title" ].text();
+        t.artist = trackElement[ "creator" ].text();
+        t.album = trackElement[ "album" ].text();
+        t.duration = trackElement[ "duration" ].text().toInt();
+        t.location = trackElement[ "location" ].text();
         
         tracks += t;
     }

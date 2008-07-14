@@ -19,6 +19,7 @@
 
 #include "WsRequestParameters.h"
 #include "../UnicornUtils.h"
+#include "../UnicornSettings.h"
 #include "../../../app/client/version.h"
 
 
@@ -32,7 +33,13 @@ WsRequestParameters::operator const QList< QPair< QString,QString > >()
     QList< QPair < QString, QString > > params;
 
     add( "api_key", API_KEY );
+    
+    Unicorn::Settings s;
+    if( !s.sessionKey().isEmpty() )
+        add( "sk", s.sessionKey() );
+
     add( "api_sig", methodSignature() );
+
 
     for( QMap< QString, QString >::iterator iter = m_paramList.begin();
          iter != m_paramList.end();
