@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,6 +23,7 @@
 #include "widgets/SettingsDialog.h"
 #include "widgets/TrackListView.h"
 #include "version.h"
+#include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
 #include <QPointer>
 
@@ -81,19 +82,7 @@ MainWindow::showDiagnosticsDialog()
 void
 MainWindow::showAboutDialog()
 {
-    class AboutDialog : public QDialog
-    {
-    public:
-        AboutDialog( QWidget* parent ) : QDialog( parent )
-        {
-            QVBoxLayout* v = new QVBoxLayout( this );
-            v->addWidget( new QLabel( "<b>" PRODUCT_NAME "</b> " VERSION ) );
-            v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
-            setWindowTitle( tr("About") );
-        }
-    };
-    
-    AboutDialog( this ).exec();
+    AboutDialog( VERSION, this ).exec();
 }
 
 
