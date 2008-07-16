@@ -1,0 +1,93 @@
+#!/bin/bash
+
+source common/bash/utils.sh.inc
+source common/bash/generate_ide_projects.sh.inc
+
+MAKEFILES=1
+RELEASE=1
+
+
+header "Last.fm Configure"
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        --ide) 
+            echo 'Will generate IDE project'
+            echo 'Will configure for debugging'
+            unset RELEASE
+            unset MAKEFILES;;
+        --debug)
+            echo 'Will configure for debugging'
+            unset RELEASE;;
+    esac
+    
+    shift
+done
+
+
+middle "Checking for qmake..."
+
+qmake-qt4 -v &> /dev/null
+if [[ $? == 127 ]]
+then
+    qmake -v &> /dev/null
+    if [[ $? == 0 ]]
+    then
+        QMAKE=qmake
+    fi
+else
+    QMAKE=qmake-qt4
+fi
+
+if [[ $? == 127 ]]
+then
+          ##########################################################################80-->
+	echo "Sorry, qmake was not found, is Qt4 installed?"
+	exit
+fi
+
+middle "Checking the installed version of Qt is correct..."
+
+# valid qmake output
+# QMake version 2.01a
+# Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
+
+min=4
+$QMAKE -v | grep -q "^Using Qt version 4.[$min-9]" &> /dev/null
+
+if [[ $? > 0 ]]
+then
+	      ##########################################################################80-->
+	echo "Your version of Qt seems to be too old, we require Qt 4.$min or above."
+	echo
+	echo "It is possible you have Qt3 and Qt4 both installed. Locate your Qt4 installation"
+	echo "and ensure it is placed first in the path, eg:"
+	echo
+	echo "	PATH=/opt/qt4/bin:\$PATH ./configure"
+	echo
+	echo "However this configure script is very basic, perhaps we got it wrong.."
+	echo "Try typing the following, perhaps it will build for you :)"
+	echo
+	echo "	qmake -config release && make"
+	exit
+fi
+
+if [ $MAKEFILES ]
+then
+    header "Generating Makefiles..."
+    $QMAKE -config debug
+    echo "Good, your configure is finished. Now type 'make'"
+    echo "If you have problems during the build, consult the README file."
+else
+    header "Generating IDE Project..."
+    case `uname` in
+        Darwin) gen_xcodeproj;;
+        Linux) qmake -config debug;;
+        *) gen_vs_sln;;
+    esac
+    echo "Now use your IDE to create awe and wonder in the land of Last.fm."
+fi
+
+rmdir -f _build build &> /dev/null
+rmdir _bin

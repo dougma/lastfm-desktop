@@ -1,6 +1,6 @@
 #!/bin/bash
 
-windows()
+gen_vs_sln()
 {
     qmake -recursive -tp vc Last.fm.pro
     
@@ -27,34 +27,11 @@ EndProject'
     echo "$FIRST_BIT$LAST_BIT" >> Last.sln
 }
 
-osx() 
+
+gen_xcodeproj() 
 {
     qmake -config debug -spec macx-xcode Last.fm.pro
     # the only way to add the QtOverride stuff to xcodeprojects, which suggests
     # we should lose it
     perl -pi -e 's|HEADER_SEARCH_PATHS = \(|HEADER_SEARCH_PATHS = \( lib/unicorn/QtOverride,|g' *.xcodeproj/project.pbxproj
-    exit 0
-
-    #this generates one xcodeproj per pro file :(
-    qmake -recursive -spec macx-xcode Last.fm.pro
-    # qmake 4.4 sucks
-    for x in `find . -type d -name \*.xcodeproj`
-    do 
-        pushd $x &> /dev/null
-        test -f project.pbxproj.* && mv project.pbxproj.* project.pbxproj
-        popd &> /dev/null
-    done
 }
-
-linux()
-{
-    echo 'Unimplemented :( Please to do it!'
-}
-
-case `uname` in
-    Darwin) osx;;
-    Linux) linux;;
-    *) windows;;
-esac
-
-rmdir _build

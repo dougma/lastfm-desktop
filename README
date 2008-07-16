@@ -1,17 +1,22 @@
-Check Out From Here?
-====================
-Yes, really. Check out everything below here.
-
 Build Instructions
 ==================
-Use the generate..sh script and open the resulting IDE project file. 
-This will build the Moose suite, ie scrobbler, tuner and resolver.
+./configure && make
+
+But if you want to hack on Last.fm, use ./configure --ide to get a nice project
+file. Except on Linux, where you get Makefiles as usual. But everything good can
+import those.
 
 Build Requirements
 ==================
 Windows
 -------
 cygwin -- tar, perl, ssh, svn, gzip, etc.
+The latest Windows SDK
+Qt 4.4 (built with Phonon support if you want sound)
+
+Mac
+---
+Install macports, then install libmad, taglig, libsamplerate, libfftw3
 
 Folder Structure
 ================
