@@ -4,7 +4,8 @@ else:  ROOT_DIR = $$system( pwd )
 # TODO remove! confusing!
 SRC_DIR = $$ROOT_DIR
 
-BUILD_DIR = _build
+macx-xcode:BUILD_DIR = build
+else:BUILD_DIR = _build
 TOOLS_DIR = $$ROOT_DIR/tools
 
 OBJECTS_DIR = $$BUILD_DIR

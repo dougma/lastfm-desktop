@@ -29,6 +29,13 @@ EndProject'
 
 osx() 
 {
+    qmake -config debug -spec macx-xcode Last.fm.pro
+    # the only way to add the QtOverride stuff to xcodeprojects, which suggests
+    # we should lose it
+    perl -pi -e 's|HEADER_SEARCH_PATHS = \(|HEADER_SEARCH_PATHS = \( lib/unicorn/QtOverride,|g' *.xcodeproj/project.pbxproj
+    exit 0
+
+    #this generates one xcodeproj per pro file :(
     qmake -recursive -spec macx-xcode Last.fm.pro
     # qmake 4.4 sucks
     for x in `find . -type d -name \*.xcodeproj`

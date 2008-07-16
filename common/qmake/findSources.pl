@@ -6,7 +6,7 @@ use Switch;
         
 my $ext = shift;
 
-find( \&show_subs, '.' );
+find( \&show_subs, shift || '.' );
 
 sub show_subs 
 {
