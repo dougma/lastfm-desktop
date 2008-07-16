@@ -226,6 +226,13 @@ App::logout()
 }
 
 
+void
+App::open( const QUrl& url )
+{
+    m_radio->play( url.toString() );
+}
+
+
 namespace The
 {
     App& app() { return *(App*)qApp; }

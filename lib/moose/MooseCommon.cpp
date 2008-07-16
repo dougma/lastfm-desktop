@@ -107,6 +107,7 @@ Moose::isAlreadyRunning()
 }
 
 
+//FIXME this can take up to 500ms to start a new instance!
 bool
 Moose::sendToInstance( const QString& data, Moose::StartNewInstanceBehaviour behaviour )
 {

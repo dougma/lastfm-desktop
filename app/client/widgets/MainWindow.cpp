@@ -26,6 +26,7 @@
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
 #include <QPointer>
+#include <QShortcut>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -46,7 +47,9 @@ MainWindow::MainWindow()
 //    setUnifiedTitleAndToolBarOnMac( true );
     delete ui.toolbar;
 
-
+    QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
+    connect( close, SIGNAL(triggered()), SLOT(close()) );
+    
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );

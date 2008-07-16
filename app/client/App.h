@@ -32,6 +32,9 @@ public:
     PlaybackState::Enum state() const;
 
     void setMainWindow( class MainWindow* );
+    MainWindow& mainWindow() const { return *m_mainWindow; }
+    
+    void open( const class QUrl& url );
 
 public slots:
     void onBootstrapCompleted( const QString& playerId, const QString& username );

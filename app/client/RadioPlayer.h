@@ -19,7 +19,7 @@
 
 #include <QObject>
 #include "lib/radio/Radio.h"
- 
+
 namespace Phonon
 {
     class MediaObject;
