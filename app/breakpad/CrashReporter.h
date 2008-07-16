@@ -1,5 +1,7 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright (C) 2005 - 2007 by                                          *
+ *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
+ *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,43 +19,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_APPLICATION_H
-#define UNICORN_APPLICATION_H
+#ifndef CRASHREPORTER_H
+#define CRASHREPORTER_H
 
-#include "lib/DllExportMacro.h"
-#include "common/HideStupidWarnings.h"
-#include <QApplication>
+#include <QDialog>
+#include <QFile>
+
+#include "ui_CrashReporter.h"
 
 
-namespace Unicorn
+class CrashReporter : public QDialog
 {
-    class UNICORN_DLLEXPORT Application : public QApplication
-    {
-        Q_OBJECT
+    Q_OBJECT
 
-        bool m_logoutAtQuit;
-        
-    public:
-        // shows a message box advising user of error before throwing
-        class UnsupportedPlatformException
-        {};
+public:
+    CrashReporter( const QStringList& argv );
 
-        class StubbornUserException
-        {};
-        
-        /** will put up the log in dialog if necessary, throwing if the user
-          * cancels, ie. they refuse to log in */
-        Application( int, char** ) throw( StubbornUserException, UnsupportedPlatformException );
-        ~Application();
+private:
+    Ui::CrashReporter ui;
 
-        /** when the application exits, the user will be logged out 
-          * the verb is "to log out", not "to logout". Demonstrated by, eg. "He
-          * logged out", or, "she logs out" */
-        void logoutAtQuit() { m_logoutAtQuit = true; }
-        
-    private:
-        void translate();
-    };
-}
+    QString m_username;
+    QString m_minidump;
+    QString m_dir;
+    QString m_product_name;
+    class CachedHttp* m_http;
 
-#endif
+public slots:
+    void send();
+
+private slots:
+    void onDone( const QByteArray& );
+    void onProgress( int done, int total );
+    void onFail( int error, const QString& errorString );
+};
+
+#endif // CRASHREPORTER_H

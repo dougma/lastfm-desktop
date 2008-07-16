@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,27 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "BreakPad.h"
-#include <QString>
-#include "CrashReporter/BinaryFilename.h"
+#ifdef __APPLE__
+    #include "client/mac/handler/exception_handler.h"
+    #define HANDLER_ALL 1
+    #define CRASH_REPORTER_BINARY "CrashReporter"
+#elif defined WIN32
+    #include "client/windows/handler/exception_handler.h"
+    #define CRASH_REPORTER_BINARY L"CrashReporter.exe"
+#elif defined __linux__
+    #include "client/linux/handler/exception_handler.h"
+    #define HANDLER_ALL 1
+    #define CRASH_REPORTER_BINARY "last.breakpad"
+#endif
 
-
-#ifndef NBREAKPAD
 
 #ifndef WIN32
 #include <unistd.h>
 
 static bool
-LaunchUploader( const char* dump_dir,
-               const char* minidump_id,
-               void* that, 
-               bool succeeded )
+execUploader( const char* dump_dir,
+              const char* minidump_id,
+              void* that, 
+              bool succeeded )
 {
-    // DON'T USE THE HEAP!!!
-    // So that indeed means, no QStrings, no qDebug(), no QAnything, seriously!
-
     if (!succeeded)
         return false;
+
+    // DON'T USE THE HEAP!!!
+    // So that indeed means, no QStrings, no qDebug(), no QAnything, 
+    // no std::anything! Seriously!
 
     pid_t pid = fork();
 
@@ -61,28 +68,23 @@ LaunchUploader( const char* dump_dir,
     return true;
 }
 
-BreakPad::BreakPad( const QString& path )
-         :google_breakpad::ExceptionHandler( path.toStdString(), 
-                                             0, 
-                                             LaunchUploader, 
-                                             this, 
-                                             HANDLER_ALL )
-{}
 
 #else
+
 static bool
-LaunchUploader( const wchar_t* dump_dir,
-               const wchar_t* minidump_id,
-               void* that,
-               EXCEPTION_POINTERS *exinfo,
-               MDRawAssertionInfo *assertion,
-               bool succeeded )
+execUploader( const wchar_t* dump_dir,
+              const wchar_t* minidump_id,
+              void* that,
+              EXCEPTION_POINTERS *exinfo,
+              MDRawAssertionInfo *assertion,
+              bool succeeded )
 {
     if (!succeeded)
         return false;
 
     // DON'T USE THE HEAP!!!
-    // So that indeed means, no QStrings, no qDebug(), no QAnything, seriously!
+    // So that indeed means, no QStrings, no qDebug(), no QAnything, 
+    // no std::anything! Seriously!
 
     const char* m_product_name = static_cast<BreakPad*>(that)->productName();
 
@@ -124,14 +126,4 @@ LaunchUploader( const wchar_t* dump_dir,
     return false;
 }
 
-BreakPad::BreakPad( const QString& path )
-         :google_breakpad::ExceptionHandler( path.toStdWString(), 
-                                             0, 
-                                             LaunchUploader, 
-                                             this, 
-                                             HANDLER_ALL )
-{}
-
 #endif // WIN32
-
-#endif // NBREAKPAD

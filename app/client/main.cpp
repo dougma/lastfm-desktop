@@ -21,20 +21,25 @@
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
-#include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/Logger.h"
+#include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/breakpad/BreakPad.h"
 #include <QDir>
 #include <QTimer>
+
+#ifdef NDEBUG
+    #include "app/breakpad/ExceptionHandler.h"
+#endif
 
 
 int main( int argc, char** argv )
 {
-#ifdef _BREAKPAD
-    BreakPad breakpad;
-    breakpad.setProductName( PRODUCT_NAME );
+#ifdef NDEBUG
+    google_breakpad::ExceptionHandler( UnicornDir::save().path().toStdString(),
+                                       0,
+                                       breakPadExecUploader,
+                                       this,
+                                       HANDLER_ALL );
 #endif
 
     // must be set before the Settings object is created
@@ -42,6 +47,7 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
+    // todo move to Unicorn::Application, and the same to logger since it uses it
     UnicornDir::mkpaths();
     
     Logger& logger = Logger::GetLogger();

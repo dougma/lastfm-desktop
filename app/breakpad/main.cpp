@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd <client@last.fm>                      *
+ *   Copyright (C) 2005-2008 Last.fm Ltd.                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,37 +17,28 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifdef _BREAKPAD
+#include "CrashReporter.h"
+#include <iostream>
 
-#include "lib/DllExportMacro.h"
-#include <QString>
+const char* kUsage = "Usage:\n"
+                      "  CrashReporter <logDir> <dumpFileName> <productName> <username>\n";
 
-#ifdef __APPLE__
-#   include "external/src/client/mac/handler/exception_handler.h"
-#   define HANDLER_ALL 1
-#elif defined WIN32
-#   include "external/src/client/windows/handler/exception_handler.h"
-#elif defined __linux__
-#   include "external/src/client/linux/handler/exception_handler.h"
-#   define HANDLER_ALL 1
-#else
-#   define NBREAKPAD
-#endif
-
-class BREAKPAD_DLLEXPORT BreakPad : public google_breakpad::ExceptionHandler
+int main( int argc, char** argv )
 {
-    const char* m_product_name; // yes! It MUST be const char[]
+    Unicorn::Application app( argc, argv );
+    Unicorn::Settings s;
 
-public:
-    BreakPad( const QString &dump_write_dirpath );
-    
-    ~BreakPad() 
-    {}
+    if (!s.isCrashReportingEnabled())
+        return 0;
 
-    void setProductName( const char* s ) { m_product_name = s; };
-    const char* productName() const { return m_product_name; }
-};
+    if (app.arguments().size() != 4)
+    {
+        std::cout << kUsage;
+        return 1;
+    }
 
-#endif
+    CrashReporter reporter( app.arguments() );
+    reporter.show();
 
-#undef char //what's this about?
+    return app.exec();
+}

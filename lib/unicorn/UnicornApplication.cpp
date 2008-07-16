@@ -27,6 +27,12 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
+    // FIXME currently Unicorn doesn't mean Last.fm
+    QCoreApplication::setOrganizationName( "Last.fm" );
+    QCoreApplication::setOrganizationDomain( "last.fm" );    
+
+    translate();
+
 #ifdef Q_WS_MAC
     if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
     {
@@ -40,7 +46,6 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 #endif
 
     Settings s;
-
     if (s.username().isEmpty() || s.sessionKey().isEmpty() || s.logOutOnExit())
     {
         LoginDialog d;
@@ -59,6 +64,24 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             throw StubbornUserException();
         }
     }
+}
+
+
+void
+Unicorn::Application::translate()
+{
+#ifdef NDEBUG
+    QString const lang_code = Unicorn::Settings().language();
+
+    QTranslator* t1 = new QTranslator;
+    t1->load( d.filePath( "i18n/lastfm_" + lang_code );
+
+    QTranslator* t2 = new QTranslator;
+    t2->load( d.filePath( "i18n/qt_" + lang_code );
+
+    installTranslator( t1 );
+    installTranslator( t2 );
+#endif
 }
 
 
