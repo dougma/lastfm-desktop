@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2008 Last.fm Ltd <client@last.fm>                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,46 +17,18 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-#include "AboutDialog.h"
-#include "containerutils.h"
-#include "logger.h"
-#include "FingerprinterSettings.h"
+#include "App.h"
+#include "lib/unicorn/Logger.h"
+#include "lib/unicorn/UnicornDir.h"
 
-#include <QtGui>
 
-AboutDialog::AboutDialog( QWidget* parent )
-        : QDialog( parent )
+int main( int argc, char *argv[] )
 {
-    ui.setupUi( this );
-    ui.line->setFrameShadow( QFrame::Sunken ); // Want etched, not flat
-
-#ifdef WIN32
-    bool bOK = m_watermark.load( dataPath( "about.png" ) );
-#endif
-#ifdef Q_WS_MAC
-    bool bOK = m_watermark.load( dataPath( "about_mac.png" ) );
-#endif
-#ifdef Q_WS_X11
-    bool bOK = m_watermark.load( dataPath( "about_generic.png" ) );
-#endif
-
-    if (!bOK)
-        LOG( 2, "Could not load About watermark\n" );
-
-    QString labelText = tr( "Version %1" ).arg( FingerprinterSettings::instance().version() );
-
-    labelText += '\n' + tr( "Copyright 2007 Last.fm Ltd. (C)" );
-    ui.labelInfo->setText( labelText );
-
-    adjustSize();
-    setFixedSize( sizeHint() );
-}
-
-
-void
-AboutDialog::paintEvent( QPaintEvent* /*event*/ )
-{
-    QPainter painter( this );
-    painter.drawPixmap( 0, 0, m_watermark );
-    painter.end();
+    QCoreApplication::setApplicationName( "Fingerprinter" );
+    QCoreApplication::setOrganizationName( "Last.fm" );
+    QCoreApplication::setOrganizationDomain( "last.fm" );
+    
+    App app( argc, argv );
+    Logger::GetLogger().Init( UnicornDir::logs( "Fingerprinter.log" ) );
+    return app.exec();
 }

@@ -20,17 +20,13 @@
 #ifndef FINGERPRINTER_SETTINGS_H
 #define FINGERPRINTER_SETTINGS_H
 
-#include <QSettings>
-#include <QString>
-#include <QApplication>
 #include "lib/unicorn/UnicornSettings.h"
 
-#include "version.h"
 
 /** @author <petgru@last.fm> 
   * @author <adam@last.fm>
   */
-class FingerprinterSettings
+class Settings : public Unicorn::Settings
 {
     void setValue( QString key, QVariant v )
     {
@@ -51,27 +47,17 @@ class FingerprinterSettings
     }
     
 public:
-    static FingerprinterSettings& instance()
+    static Settings& instance()
     {
-        static FingerprinterSettings* settings = 0;
+        static Settings* settings = 0;
         
         if (!settings)
         {
-            settings = new FingerprinterSettings( qApp );
+            settings = new Settings( qApp );
             settings->setObjectName( "Settings-Instance" );
         }
         return *settings;
     }
-    
-    // APP STUFF
-    QString version() const
-    {
-        return LASTFM_FINGERPRINTER_VERSION;
-    }
-    
-    QString username() { return Unicorn::Settings().username(); }
-    QString password() { return Unicorn::Settings().password(); }
-    QString language() { return Unicorn::Settings().language(); }
 
     // WINDOW STUFF
     void setSize( QSize size ) { setValue ( "window/size", size ); }
@@ -79,9 +65,6 @@ public:
     
     QSize size() { return value<QSize>  ( "window/size", QSize(450, 700) ); }
     QPoint position() { return value<QPoint> ( "window/position", QPoint(200, 200) ); }
-    
-    QString fingerprintUploadUrl() const { return QSettings().value( "FingerprintUploadUrl" ).toString(); }
-    void setFingerprintUploadUrl( QString v ) { QSettings().setValue( "FingerprintUploadUrl", v ); }
 };
 
 #endif

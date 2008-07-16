@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd <client@last.fm>                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,10 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-#ifndef FINGERPRINTERAPPLICATION_H
-#define FINGERPRINTERAPPLICATION_H
+#ifndef FINGERPRINTER_APP_H
+#define FINGERPRINTER_APP_H
 
-#include <QApplication>
+#include "lib/unicorn/UnicornApplication.h"
 #include <QTranslator>
 
 #include "MainWindow.h"
@@ -32,11 +31,10 @@
 #include "libLastFmTools/TrackInfo.h"
 #include "libLastFmTools/LastMessageBox.h"
 
-/**
-    @author <petgru@last.fm> 
-    @author <adam@last.fm>
-*/
-class FingerprinterApplication : public QApplication
+/** @author <petgru@last.fm>
+  * @author <adam@last.fm>
+  */
+class App : public Unicorn::Application
 {
     Q_OBJECT
 

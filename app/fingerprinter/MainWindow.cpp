@@ -19,17 +19,15 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "FingerprinterSettings.h"
-
-#include "AboutDialog.h"
-
-#include "libLastFmTools/browserthread.h"
-
+#include "Settings.h"
+#include "version.h"
+#include "lib/unicorn/AboutDialog.h"
 #include <QUrl>
 #include <QDebug>
 
+
 MainWindow::MainWindow()
-        : QMainWindow()
+          : QMainWindow()
 {
     ui.setupUi( this );
 
@@ -60,7 +58,7 @@ MainWindow::MainWindow()
     QString info = tr(
         "<ol>"
         "<li>Select the folders containing the tracks that you wish to fingerprint."
-        "<li>Press the Fingerprint button at the bottom to start.
+        "<li>Press the Fingerprint button at the bottom to start."
         "</ol>"
         "This operation will not modify your files in any way, it will only analyse them "
         "and post a unique ID (fingerprint) to Last.fm."
@@ -82,34 +80,39 @@ MainWindow::MainWindow()
     
 }
 
-MainWindow::~MainWindow()
-{
-    
-}
 
-void MainWindow::start()
+void
+MainWindow::start()
 {
     show();
     ui.dirTree->init();
 }
 
-void MainWindow::closeEvent( QCloseEvent *event )
+
+void
+MainWindow::closeEvent( QCloseEvent *event )
 {
     emit wantsToClose( event );
 }
 
-void MainWindow::fingerprintButtonClicked()
+
+void
+MainWindow::fingerprintButtonClicked()
 {
     emit startFingerprinting( ui.dirTree->getInclusions() );
 }
 
-void MainWindow::dragEnterEvent (QDragEnterEvent* event)
+
+void
+MainWindow::dragEnterEvent (QDragEnterEvent* event)
 {
     if (event->mimeData()->hasFormat("text/plain"))
         event->acceptProposedAction();
 }
 
-void MainWindow::dropEvent (QDropEvent* event)
+
+void
+MainWindow::dropEvent (QDropEvent* event)
 {
     QStringList files = QUrl::fromEncoded(event->mimeData()->text().toAscii()).toString().split( "\n", QString::SkipEmptyParts );
     
@@ -132,12 +135,16 @@ void MainWindow::dropEvent (QDropEvent* event)
     }
 }
 
-void MainWindow::showFAQ()
+
+void
+MainWindow::showFAQ()
 {
     new BrowserThread( "http://www.last.fm/help/faq/?category=Fingerprinting" );
 }
 
-void MainWindow::aboutDialog()
+
+void
+MainWindow::aboutDialog()
 {
-    AboutDialog( this ).exec();
+    AboutDialog( VERSION, this ).exec();
 }
