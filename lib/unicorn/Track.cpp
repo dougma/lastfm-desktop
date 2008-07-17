@@ -39,7 +39,7 @@ Track::Track( const QDomElement& e )
     d->trackNumber = 0;
     d->duration = e.namedItem( "duration" ).toElement().text().toInt();
     d->playCount = e.namedItem( "playcount" ).toElement().text().toInt();
-    d->path = e.namedItem( "filename" ).toElement().text();
+    d->url = e.namedItem( "url" ).toElement().text();
     d->ratingFlags = e.namedItem( "userActionFlags" ).toElement().text().toUInt();
 
     // this is necessary because the default return for toInt() is 0, and that
@@ -86,10 +86,9 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "duration", QString::number( d->duration ) );
     makeElement( "timestamp", QString::number( d->time.toTime_t() ) );
     makeElement( "playcount", QString::number( d->playCount ) );
-    makeElement( "filename", d->path );
+    makeElement( "url", d->url.toString() );
     makeElement( "source", QString::number( d->source ) );
     makeElement( "userActionFlags", QString::number(d->ratingFlags) );
-    makeElement( "path", path() );
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
     makeElement( "playerId", playerId() );
@@ -104,7 +103,7 @@ Track::toString() const
     if ( d->artist.isEmpty() )
     {
         if ( d->title.isEmpty() )
-            return QFileInfo( d->path ).fileName();
+            return QFileInfo( d->url.path() ).fileName();
         else
             return d->title;
     }

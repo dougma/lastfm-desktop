@@ -21,7 +21,7 @@
 #include "PlaybackEvent.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
-#include "RadioPlayer.h"
+#include "radio/RadioWidget.h"
 #include "Settings.h"
 #include "version.h"
 #include "mac/ITunesListener.h"
@@ -57,7 +57,7 @@ App::App( int argc, char** argv )
 #endif
     
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().sessionKey() );
-    m_radio = new RadioPlayer( The::settings().username(), The::settings().sessionKey() );
+    m_radio = new RadioWidget;
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -72,6 +72,8 @@ App::App( int argc, char** argv )
 
 App::~App()
 {
+    delete m_radio;
+    delete m_scrobbler;
     delete Settings::instance;
 }
 
@@ -83,11 +85,10 @@ App::setMainWindow( MainWindow* window )
 
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
-    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
-    connect( window->ui.tunein, SIGNAL(triggered()), SLOT(onTuneIn()) );
+    connect( window->ui.tunein, SIGNAL(triggered()), m_radio, SLOT(show()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
     m_trayIcon = new QSystemTrayIcon( window );
-    m_trayIcon->setIcon( QPixmap(":/as.png") );
+    m_trayIcon->setIcon( QPixmap(":/16x16/as.png") );
     m_trayIcon->show();
     QMenu* menu = new QMenu;
     menu->addAction( window->ui.quit );
@@ -96,22 +97,6 @@ App::setMainWindow( MainWindow* window )
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
-}
-
-
-void
-App::onTuneIn()
-{
-    QLineEdit* edit = new QLineEdit( "lastfm://user/mxcl/loved" );
-
-    QDialog d;
-    d.setWindowTitle( tr("Start Radio Station") );
-    (new QVBoxLayout( &d ))->addWidget( edit );
-    connect( edit, SIGNAL(returnPressed()), &d, SLOT(accept()) );
-    d.exec();
-
-    if (d.result() == QDialog::Accepted)
-        m_radio->play( edit->text() );
 }
 
 
@@ -229,7 +214,7 @@ App::logout()
 void
 App::open( const QUrl& url )
 {
-    m_radio->play( url.toString() );
+    m_radio->play( RadioStation( url.toString() ) );
 }
 
 

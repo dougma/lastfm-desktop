@@ -155,11 +155,11 @@ PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
 {
     MutableTrack track;
     track.setArtist( args['a'] );
-    track.setTrack( args['t'] );
+    track.setTitle( args['t'] );
     track.setAlbum( args['b'] );
     track.setMbId( args['m'] );
     track.setDuration( args['l'].toInt() );
-    track.setPath( QUrl::fromPercentEncoding( args['p'].toUtf8() ) );
+    track.setUrl( QUrl::fromLocalFile( QUrl::fromPercentEncoding( args['p'].toUtf8() ) ) );
     track.setSource( Track::Player );
     track.setPlayerId( args['c'] );
 

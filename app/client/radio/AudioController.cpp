@@ -17,44 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "RadioPlayer.h"
-//#include "lib/radio/Radio.h"
+#include "AudioController.h"
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <phonon/mediasource.h>
 #include <phonon/backendcapabilities.h>
 #include <QDebug>
-#include <QDir>
-
-QString password, username;
 
 
-RadioPlayer::RadioPlayer( const QString& _username, const QString& _password )
+AudioPlaybackEngine::AudioPlaybackEngine()
 {
-    username = _username; password = _password;
-
     m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+ 
     m_mediaObject = new Phonon::MediaObject( this );
-    
     m_mediaObject->setTickInterval( 1000 );
+    m_mediaObject->setPrefinishMark( 30 * 1000 );
+    connect( m_mediaObject, SIGNAL(prefinishMarkReached()), SIGNAL(thirtySecondsFromPlaylistEnd()) );
 
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
 
 void
-RadioPlayer::play( const QString& url )
+AudioPlaybackEngine::queue( const QList<Track>& tracks )
 {
-    qRegisterMetaType<QList<Radio::Track> >( "QList<Radio::Track>" );
+    QList<QUrl> urls;
+    foreach (const Track& t, tracks)
+        urls += t.url();
 
-    m_radio = new Radio( username, password );
-    connect( m_radio, SIGNAL(tracks( QList<Radio::Track> )), SLOT(onTracksReady( QList<Radio::Track> )) );
-    m_radio->tuneIn( url );
+    m_mediaObject->enqueue( urls );
 }
 
 
 void
-RadioPlayer::skip()
+AudioPlaybackEngine::skip()
 {
     m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
     m_mediaObject->play();
@@ -62,26 +58,14 @@ RadioPlayer::skip()
 
 
 void
-RadioPlayer::stop()
+AudioPlaybackEngine::stop()
 {
     m_mediaObject->stop();
 }
 
 
 void
-RadioPlayer::onTracksReady( const QList<Radio::Track>& tracks )
+AudioPlaybackEngine::play()
 {
-    QList<QUrl> urls;
-    foreach (const Radio::Track& t, tracks)
-        urls += t.location;
-
-    m_mediaObject->enqueue( urls );
     m_mediaObject->play();
-}
-
-
-void
-RadioPlayer::onAboutToFinishPlaylist()
-{
-    m_radio->fetchNextPlaylist();
 }

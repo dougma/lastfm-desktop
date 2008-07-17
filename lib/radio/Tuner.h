@@ -17,45 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_ALBUM_H
-#define UNICORN_ALBUM_H
+#ifndef TUNER_H
+#define TUNER_H
 
-#include "Artist.h"
-#include "Mbid.h"
+#include "RadioStation.h"
 #include "lib/DllExportMacro.h"
-#include <QString>
-class WsReply;
-
-#ifdef QT_GUI_LIB
-#include <QPixmap>
-#endif
+#include "lib/unicorn/Track.h"
+#include <QList>
+#include <QUrl>
 
 
-class UNICORN_DLLEXPORT Album
+class RADIO_DLLEXPORT Tuner
 {
-    Mbid m_mbid;
-    Artist m_artist;
-    QString m_title;
-
 public:
-    explicit Album( Mbid mbid ) : m_mbid( mbid )
+    Tuner()
     {}
 
-    Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
-    {}
+        /** If you aren't a Unicorn::Application, you won't get Radio FIXME lame */
+    explicit Tuner( const RadioStation& );
 
-    operator QString() const { return m_title; }
-    QString title() const { return m_title; }
-    Artist artist() const { return m_artist; }
-    Mbid mbid() const { return m_mbid; }
+    /** returns next 5 tracks */
+    QList<Track> fetchNextPlaylist();
 
-    /** Album.getInfo WebService */
-    WsReply* getInfo() const;
-
-#ifdef QT_GUI_LIB
-    /** downloads image FIXME not synchronously! */
-    QPixmap image();
-#endif
+private:
+    QList<Track> getPlaylist();
 };
 
 #endif

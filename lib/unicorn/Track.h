@@ -27,6 +27,8 @@
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>
 #include <QString>
+#include <QMap>
+#include <QUrl>
 
 
 struct TrackData : QSharedData
@@ -44,8 +46,11 @@ struct TrackData : QSharedData
     QString playerId;
     QString mbId; /// musicbrainz id
     QString fpId; /// fingerprint id
-    QString path;
+    QUrl url;
     QDateTime time; /// the time the track was started at
+
+    //FIXME I hate this, but is used for radio trackauth etc.
+    QMap<QString,QString> extras;
 };
 
 
@@ -114,7 +119,7 @@ public:
     int duration() const { return d->duration; }
     QString durationString() const;
     QString mbId() const { return d->mbId; }
-    QString path() const { return d->path; }
+    QUrl url() const { return d->url; }
     QDateTime timeStamp() const { return d->time; }
     QDateTime dateTime() const { return d->time; }
     Source source() const { return (Source)d->source; }
@@ -181,18 +186,20 @@ public:
 
     void setArtist( QString artist ) { d->artist = artist.trimmed(); }
     void setAlbum( QString album ) { d->album = album.trimmed(); }
-    void setTrack( QString track ) { d->title = track.trimmed(); }
+    void setTitle( QString title ) { d->title = title.trimmed(); }
     void setTrackNumber( int n ) { d->trackNumber = n; }
     void setPlayCount( int playCount ) { d->playCount = playCount; }
     void setDuration( int duration ) { d->duration = duration; }
     void setMbId( QString mbId ) { d->mbId = mbId; }
-    void setPath( QString path ) { d->path = path; }
+    void setUrl( QUrl url ) { d->url = url; }
     void setSource( Source s ) { d->source = s; }
     void setRatingFlag( RatingFlag flag ) { d->ratingFlags |= flag; }
     void setPlayerId( QString id ) { d->playerId = id; }
     void setFpId( QString id ) { d->fpId = id; }
     
     void setTimeStampNow() { d->time = QDateTime::currentDateTime(); }
+
+    void setExtra( QString key, QString value ) { d->extras[key] = value; }
 };
 
 

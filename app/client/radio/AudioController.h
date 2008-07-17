@@ -17,8 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/unicorn/Track.h"
+#include <QList>
 #include <QObject>
-#include "lib/radio/Radio.h"
+
 
 namespace Phonon
 {
@@ -28,24 +30,23 @@ namespace Phonon
 }
 
 
-class RadioPlayer : public QObject
+class AudioPlaybackEngine : public QObject
 {
     Q_OBJECT
     
 public:
-    RadioPlayer( const QString& username, const QString& password );
+    AudioPlaybackEngine();
     
 public slots:
-    void play( const QString& lastfm_url );
+    void queue( const QList<Track>& );
+    void play();
     void skip();
     void stop();
 
-private slots:
-    void onTracksReady( const QList<Radio::Track>& );
-    void onAboutToFinishPlaylist();
+signals:
+    void thirtySecondsFromPlaylistEnd();
 
 private:
-    class Radio* m_radio;
     Phonon::MediaObject *m_mediaObject;
     Phonon::AudioOutput *m_audioOutput;
 };
