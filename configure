@@ -3,23 +3,18 @@
 source common/bash/utils.sh.inc
 source common/bash/generate_ide_projects.sh.inc
 
-MAKEFILES=1
-RELEASE=1
-
-
-header "Last.fm Configure"
+header "Configuring Last.fm"
 
 while [ $# -gt 0 ]
 do
     case "$1" in
-        --ide) 
-            echo 'Will generate IDE project'
-            echo 'Will configure for debugging'
-            unset RELEASE
-            unset MAKEFILES;;
         --debug)
-            echo 'Will configure for debugging'
-            unset RELEASE;;
+            echo "The default is --debug, but let's pretend you made a difference anyway.";;
+        --release)
+            echo 'Will optimise and strip binaries.'
+            RELEASE=1;;
+        --help | -h | --usage)
+            echo "There is one option, it is --release";;
     esac
     
     shift
@@ -73,21 +68,31 @@ then
 	exit
 fi
 
-if [ $MAKEFILES ]
+
+header 'Generating Build System'
+
+if [ $RELEASE ]
 then
-    header "Generating Makefiles..."
-    $QMAKE -config debug
-    echo "Good, your configure is finished. Now type 'make'"
-    echo "If you have problems during the build, consult the README file."
+    qmake -config release
+    which nmake && BUILD_CMD='nmake' || BUILD_CMD='make'
 else
-    header "Generating IDE Project..."
     case `uname` in
-        Darwin) gen_xcodeproj;;
-        Linux) qmake -config debug;;
-        *) gen_vs_sln;;
+        Darwin) 
+            gen_xcodeproj || die "Configure failed."
+            BUILD_CMD='open Last.fm.xcodeproj';;
+        Linux)
+            qmake -config debug || die "Configure failed."
+            BUILD_CMD='make'
+            middle "Configured to produce a debug build.";;
+        *)      
+            gen_vs_sln || die "Configure failed."
+            BUILD_CMD='cygstart Last.sln';;
     esac
-    echo "Now use your IDE to create awe and wonder in the land of Last.fm."
 fi
+
+echo
+echo 'Good, your configure is finished!'
+echo "Now type '$BUILD_CMD' to complete the awesome cycle."
 
 rmdir -f _build build &> /dev/null
 rmdir _bin
