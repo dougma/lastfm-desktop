@@ -3,8 +3,6 @@
 source common/bash/utils.sh.inc
 source common/bash/generate_ide_projects.sh.inc
 
-header "Configuring Last.fm"
-
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -14,13 +12,15 @@ do
             echo 'Will optimise and strip binaries.'
             RELEASE=1;;
         --help | -h | --usage)
-            echo "There is one option, it is --release";;
+            echo "There is one option, it is: --release"
+            exit;;
     esac
     
     shift
 done
 
 
+header "Configuring Last.fm"
 middle "Checking for qmake..."
 
 qmake-qt4 -v &> /dev/null
@@ -74,7 +74,7 @@ header 'Generating Build System'
 if [ $RELEASE ]
 then
     qmake -config release
-    which nmake && BUILD_CMD='nmake' || BUILD_CMD='make'
+    which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 else
     case `uname` in
         Darwin) 
@@ -82,7 +82,7 @@ else
             BUILD_CMD='open Last.fm.xcodeproj';;
         Linux)
             qmake -config debug || die "Configure failed."
-            BUILD_CMD='make'
+            BUILD_CMD='make'snv
             middle "Configured to produce a debug build.";;
         *)      
             gen_vs_sln || die "Configure failed."
@@ -94,5 +94,5 @@ echo
 echo 'Good, your configure is finished!'
 echo "Now type '$BUILD_CMD' to complete the awesome cycle."
 
-rmdir -f _build build &> /dev/null
+rmdir _build build &> /dev/null
 rmdir _bin
