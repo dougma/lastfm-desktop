@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "RadioWidget.h"
-#include "AudioController.h"
+#include "AudioPlaybackEngine.h"
 #include <QAction>
 #include <QEvent>
 #include <QLabel>

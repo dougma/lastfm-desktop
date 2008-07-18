@@ -17,62 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackListView.h"
-#include "ObservedTrack.h"
+#include "ScrobbleProgressBar.h"
 #include "PlayerEvent.h"
-#include "TrackListViewItem.h"
-#include <QLinearGradient>
-#include <QPainter>
-#include <QResizeEvent>
-#include <QTime>
-#include <QTimer>
-#include <QVariant>
-#include <cmath>
+#include <QtGui>
 
 
-TrackListView::TrackListView()
-{
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-
-    ui.layout = new QVBoxLayout( this );
-    ui.layout->addWidget( ui.progress = new ScrobbleProgressWidget );
-    ui.layout->setContentsMargins( 0, 0, 0, 0 );
-    ui.layout->setSpacing( 0 );
-
-    ui.progress->layout()->setContentsMargins( -1, -1, -1, -1 );
-    
-    ui.layout->setAlignment( Qt::AlignTop );
-}
-
-
-void 
-TrackListView::add( const ObservedTrack& t )
-{
-    TrackListViewItem* i = new TrackListViewItem( t, this );
-    i->show();
-
-    ui.progress->m_scrobblePoint = t.scrobblePoint();
-    connect( t.watch(), SIGNAL(tick( int )), ui.progress, SLOT(onPlaybackTick( int )) );
-    connect( t.watch(), SIGNAL(destroyed()), ui.progress->m_progressDisplayTimer, SLOT(stop()) );
-
-    QLabel* time = new QLabel( t.dateTime().toString( "hh:mm:ss" ) );
-    time->setEnabled( false );
-    time->setAttribute( Qt::WA_MacSmallSize );
-    time->setPalette( QPalette( Qt::black, Qt::lightGray ) );
-    time->setAutoFillBackground( true );
-    time->setMargin( 2 );
-    time->setIndent( 1 );
-    time->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-
-    ui.layout->insertWidget( 0, ui.progress );
-    ui.layout->insertWidget( 0, i );
-    ui.layout->insertWidget( 0, time );
-}
-
-
-ScrobbleProgressWidget::ScrobbleProgressWidget()
-                      : m_progressDisplayTick( 0 ),
-                        m_scrobblePoint( 0 )
+ScrobbleProgressBar::ScrobbleProgressBar()
+                   : m_progressDisplayTick( 0 ),
+                     m_scrobblePoint( 0 )
 {
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.time = new QLabel );
@@ -87,17 +39,19 @@ ScrobbleProgressWidget::ScrobbleProgressWidget()
 
     m_progressDisplayTimer = new QTimer( this );
     connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
+
+    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
 
 void
-ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
+ScrobbleProgressBar::paintEvent( QPaintEvent* e )
 {
     QWidget::paintEvent( e );
 
     if (!m_progressDisplayTick)
         return;
-    
+
     static bool b = true;
     static QLinearGradient g( 0, 0, 0, 20 );
     const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
@@ -116,7 +70,7 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
         const QColor k_trackBarScrobbledTop( 0xba, 0xc7, 0xd7, 0xff );
         const QColor k_trackBarScrobbledMiddle( 0xb8, 0xc4, 0xd5, 0xff );
         const QColor k_trackBarScrobbledBottom( 0xb5, 0xc1, 0xd2, 0xff );
-        
+
         g.setColorAt( 0, k_trackBarProgressTop );
         g.setColorAt( 0.5, k_trackBarProgressMiddle );
         g.setColorAt( 0.51, k_trackBarProgressBottom );
@@ -131,14 +85,14 @@ ScrobbleProgressWidget::paintEvent( QPaintEvent* e )
 
 
 void
-ScrobbleProgressWidget::determineProgressDisplayGranularity( const ScrobblePoint& g )
+ScrobbleProgressBar::determineProgressDisplayGranularity( const ScrobblePoint& g )
 {
     m_progressDisplayTimer->setInterval( 1000 * g / width() );
 }
 
 
 void
-ScrobbleProgressWidget::onProgressDisplayTick()
+ScrobbleProgressBar::onProgressDisplayTick()
 {
     m_progressDisplayTick++;
     update();
@@ -146,7 +100,7 @@ ScrobbleProgressWidget::onProgressDisplayTick()
 
 
 void
-ScrobbleProgressWidget::onPlaybackTick( int s )
+ScrobbleProgressBar::onPlaybackTick( int s )
 {
     if ((uint)s < scrobblePoint())
     {
@@ -165,7 +119,7 @@ ScrobbleProgressWidget::onPlaybackTick( int s )
 
 
 void
-ScrobbleProgressWidget::resizeEvent( QResizeEvent* e )
+ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
 {
     if (!scrobblePoint())
         return;
@@ -192,55 +146,37 @@ ScrobbleProgressWidget::resizeEvent( QResizeEvent* e )
 
 
 void
-TrackListView::onAppEvent( int e, const QVariant& v )
+ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
     case PlayerEvent::PlaybackStarted:
     case PlayerEvent::TrackChanged:
-        add( v.value<ObservedTrack>() );
-        break;
-
-    case PlayerEvent::PlaybackEnded:
-        break;
-    }
-
-    // progress display timer
-    switch (e)
-    {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::PlaybackUnstalled:
-    case PlayerEvent::PlaybackUnpaused:
-    {
-        ObservedTrack t = v.value<ObservedTrack>();
-        if (t.isEmpty())
         {
-            ui.progress->ui.timeToScrobblePoint->setText( ":(" );
-            ui.progress->ui.time->clear();
-            ui.progress->m_progressDisplayTimer->stop();
-            return;
+            onPlaybackTick( 0 );
+            m_progressDisplayTick = 0;
+            ObservedTrack t = v.value<ObservedTrack>();
+            determineProgressDisplayGranularity( t.scrobblePoint() );
+            m_scrobblePoint = t.scrobblePoint();
+            connect( t.watch(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
+            connect( t.watch(), SIGNAL(destroyed()), m_progressDisplayTimer, SLOT(stop()) );
+            update();
+            break;
         }
-        else {
-            ui.progress->determineProgressDisplayGranularity( t.scrobblePoint() );
-            ui.progress->m_progressDisplayTimer->start();
-        }
-        break;
     }
 
-    case PlayerEvent::PlaybackStalled:
-    case PlayerEvent::PlaybackPaused:
-    case PlayerEvent::PlaybackEnded:
-        ui.progress->m_progressDisplayTimer->stop();
-        break;
-    }
-    
     switch (e)
     {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::TrackChanged:
-    case PlayerEvent::PlaybackEnded:
-        ui.progress->onPlaybackTick( 0 );
-        ui.progress->m_progressDisplayTick = 0;
-        ui.progress->update();
+        case PlayerEvent::PlaybackStarted:
+        case PlayerEvent::TrackChanged:
+        case PlayerEvent::PlaybackUnstalled:
+        case PlayerEvent::PlaybackUnpaused:
+            m_progressDisplayTimer->start();
+            break;
+
+        case PlayerEvent::PlaybackStalled:
+        case PlayerEvent::PlaybackPaused:
+            m_progressDisplayTimer->stop();
+            break;
     }
 }

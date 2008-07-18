@@ -54,8 +54,11 @@ public:
     QNetworkReply::NetworkError networkError() const { return m_reply->error(); }
     static QString networkErrorString( QNetworkReply::NetworkError );
 
-    /** blocks until complete, runs an event loop, but never do in the GUI thread
-      * of production code, seriously */
+    /** blocks until complete
+      * SERIOUSLY NEVER USE THIS APART FROM FOR EXPERIMENTATION!
+      * It crashes like crazy!
+      * As all sorts of things break when you start running your own event loop
+      * sadly, especially don't chain WsReplys since they do deleteLater() */
     void finish();
 
 signals:

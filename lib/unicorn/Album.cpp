@@ -42,7 +42,7 @@ Album::image()
 
     try
     {
-        QUrl url = reply->lfm()["album"]["image size=small"].text();
+        QUrl url = reply->lfm()["album"]["image size=medium"].text();
 
         QNetworkAccessManager manager;
         QNetworkReply* get = manager.get( QNetworkRequest( url ) );

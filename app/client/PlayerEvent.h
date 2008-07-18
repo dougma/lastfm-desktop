@@ -32,25 +32,16 @@ namespace PlayerEvent
 {
     enum Enum
     {
-        /** The radio handshake has returned, this contains useful data sadly,
-          * so it has its own event */
-        Handshaken,
-
         /** playback has started, data is the playing track 
           * State will be Playing 
           * You will always get a PlaybackEnded event before a non Playback 
-          * event is sent, eg. TuningIn, UserChanged */
+          * event is sent, eg. TuningIn, UserChanged, track will never be empty
+          */
         PlaybackStarted,
 
         /** playback continues, data is the new track
-          * State will be playing */
+          * State will be playing, track will never be empty */
         TrackChanged,
-
-        /** the application object requests metadata for all tracks that are played
-          * the currentTrack() function will from this point onwards contain the 
-          * data for the artist or track */
-        ArtistMetaDataAvailable,
-        TrackMetaDataAvailable,
 
         /** playback has ceased, this will not be sent for transitions, eg
           * buffering, retuning, radio playlist fetching, etc.
@@ -62,7 +53,7 @@ namespace PlayerEvent
           * of user-switching occuring or whatever
           * State will be paused */
         PlaybackPaused,
-        /** state will be playing */
+        /** state will be playing, track will never be empty */
         PlaybackUnpaused,
 
         /** eg. Radio http buffer is empty, we are rebuffering 
@@ -72,11 +63,6 @@ namespace PlayerEvent
         PlaybackStalled,
         /** eg. Radio http rebuffering complete, playback has resumed */
         PlaybackUnstalled,
-
-        /** PlaybackStarted will follow, unless an error occurs, in which case 
-          * PlaybackEnded will be sent, despite the lack of playback, this allows
-          * you to keep the UI in the right state */
-        TuningIn,
 
         /** Note: scrobble submission will not be sent until the end of the
           * track */

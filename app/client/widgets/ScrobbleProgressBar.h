@@ -17,32 +17,44 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackListViewItem.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#include <QWidget>
+#include "ObservedTrack.h" //FIXME move scrobblePoint
 
 
-TrackListViewItem::TrackListViewItem( const Track& t, QWidget* parent ) 
-                 : QWidget( parent ),
-                   m_track( t )
+class ScrobbleProgressBar : public QWidget
 {
-    ui.setupUi( this );
-    ui.year->setEnabled( false );
-    ui.year->setAttribute( Qt::WA_MacSmallSize );
-    ui.album->setAttribute( Qt::WA_MacSmallSize );
+    Q_OBJECT
 
-    if (t.isEmpty())
+public:
+    ScrobbleProgressBar();
+
+    struct Ui
     {
-        //FIXME
-        ui.artist->setText( "Super mega error :(" );
-        return;
-    }
+        class QLabel* time;
+        class QLabel* timeToScrobblePoint;
+    };
 
-    ui.artist->setText( t.artist() + ' ' + QChar(8211) + " <b>" + t.title() + "</b>" );
-    ui.album->setText( t.album() );
-    ui.year->setText( "2000" );
-    
-    QStringList const tags = t.topTags().mid( 0, 3 );
-    ui.tags->setText( tags.join( ", " ) );
-    ui.cover->setPixmap( t.album().image() );
-}
+    Ui ui;
+
+private:
+    /** progress is updated every granularity, so if showing the progress todo
+    * scrobble point, pass the scrobble point in seconds, and the granularity
+    * will be based on the width of the mainwindow and the scrobble point */
+    void determineProgressDisplayGranularity( const class ScrobblePoint& );
+
+    void resizeEvent( QResizeEvent* );
+    void paintEvent( QPaintEvent* );
+
+    class QTimer* m_progressDisplayTimer;
+    uint m_progressDisplayTick;
+
+    ScrobblePoint m_scrobblePoint;
+    ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }
+
+private slots:
+    void onPlaybackTick( int );
+    void onAppEvent( int, const QVariant& );
+
+private slots:
+    void onProgressDisplayTick();
+};

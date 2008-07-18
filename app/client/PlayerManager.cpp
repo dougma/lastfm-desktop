@@ -65,7 +65,7 @@ void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
     delete m_track.m_watch;
-    m_track = Track();
+    m_track = ObservedTrack();
     handleStateChange( PlayerState::Stopped );
 }
 
@@ -97,10 +97,13 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
 
     PlayerState::Enum oldState = m_state;
     m_state = newState;
+    QVariant v = QVariant::fromValue( t );
 
     if (newState == Playing && t.isEmpty())
     {
         qWarning() << "Empty TrackInfo object presented for Playback notification, this is wrong!";
+        emit event( PlayerEvent::PlaybackEnded );
+        return;
     }
 
     switch (oldState)
@@ -109,7 +112,7 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
         switch (newState)
         {
         case Playing:
-            emit event( PlayerEvent::TrackChanged, QVariant::fromValue( t ) );
+            emit event( PlayerEvent::TrackChanged, v );
             break;
         case Stopped:
             emit event( PlayerEvent::PlaybackEnded );
@@ -124,7 +127,7 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
         switch (newState)
         {
         case Playing:
-            emit event( PlayerEvent::PlaybackStarted, QVariant::fromValue( t ) );
+            emit event( PlayerEvent::PlaybackStarted, v );
             break;
         case Stopped:
             // do nothing
@@ -141,7 +144,7 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
         switch (newState)
         {
         case Playing:
-            emit event( PlayerEvent::PlaybackUnpaused );
+            emit event( PlayerEvent::PlaybackUnpaused, v );
             break;
         case Stopped:
             emit event( PlayerEvent::PlaybackEnded );

@@ -19,13 +19,17 @@
 
 #include "NowPlayingView.h"
 #include "PlayerEvent.h"
+#include "ScrobbleProgressBar.h"
 
 
 NowPlayingView::NowPlayingView(QWidget *parent)
               : QWidget(parent)
 {
-    ui.setupUi(this);
+    ui.setupUi( this );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+
+    ui.vboxLayout->addWidget( new ScrobbleProgressBar );
+    ui.vboxLayout->setAlignment( Qt::AlignTop );
 }
 
 
@@ -43,52 +47,11 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
+    case PlayerEvent::PlaybackEnded:
+        // will use empty Track()
     case PlayerEvent::PlaybackStarted:
     case PlayerEvent::TrackChanged:
         setCurrentTrack( v.value<ObservedTrack>() );
-        break;
-
-    case PlayerEvent::PlaybackEnded:
-        break;
-    }
-
-    // progress display timer
-    switch (e)
-    {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::PlaybackUnstalled:
-    case PlayerEvent::PlaybackUnpaused:
-    {
-//         ObservedTrack t = v.value<ObservedTrack>();
-//         if (t.isEmpty())
-//         {
-//             ui.progress->ui.timeToScrobblePoint->setText( ":(" );
-//             ui.progress->ui.time->clear();
-//             ui.progress->m_progressDisplayTimer->stop();
-//             return;
-//         }
-//         else {
-//             ui.progress->determineProgressDisplayGranularity( t.scrobblePoint() );
-//             ui.progress->m_progressDisplayTimer->start();
-//         }
-        break;
-    }
-
-    case PlayerEvent::PlaybackStalled:
-    case PlayerEvent::PlaybackPaused:
-    case PlayerEvent::PlaybackEnded:
-//        ui.progress->m_progressDisplayTimer->stop();
-        break;
-    }
-    
-    switch (e)
-    {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::TrackChanged:
-    case PlayerEvent::PlaybackEnded:
-//         ui.progress->onPlaybackTick( 0 );
-//         ui.progress->m_progressDisplayTick = 0;
-//         ui.progress->update();
         break;
     }
 }
