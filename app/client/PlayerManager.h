@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -24,31 +24,15 @@
 #include <QStack>
 #include <QVariant>
 
-//TODO don't duplicate the Player.state in m_state 
-
-
-struct Player
-{
-    Player( QString _id ) : id( _id ), track( Track() )
-    {}
-
-    QString const id;
-    ObservedTrack track;
-    PlayerState::Enum state;
-};
-
 
 class PlayerManager : public QObject
 {
     Q_OBJECT
 
-    friend class Observed;
-
 public:
     PlayerManager( class PlayerListener* parent );
 
-    PlayerState::Enum state() const { return m_state; }
-    ObservedTrack track() const { return m_players.top()->track; }
+    ObservedTrack track() const { return m_track; }
 
     /** will ban or love the current track */
     void ban();
@@ -72,38 +56,6 @@ private slots:
 private:
     void handleStateChange( PlayerState::Enum, const ObservedTrack& t = ObservedTrack() );
 
-    class UniquePlayerStack : public QStack<Player*>
-    {
-        bool find( const QString& id, QMutableVectorIterator<Player*>& i )
-        {
-            while (i.hasNext())
-                if (i.next()->id == id)
-                    return true;
-            return false;
-        }
-
-    public:
-        Player* operator[]( const QString& id )
-        {
-            QMutableVectorIterator<Player*> i( *this );
-            if (!find( id, i ))
-            {
-                push( new Player( id ) );
-                return top();
-            }
-
-            return i.value();
-        }
-
-        void remove( const QString& id )
-        {
-            QMutableVectorIterator<Player*> i( *this );
-            find( id, i );
-            delete i.value();
-            i.remove();
-        }
-    };
-
-    UniquePlayerStack m_players;
+    ObservedTrack m_track;
     PlayerState::Enum m_state;
 };

@@ -18,16 +18,11 @@
  ***************************************************************************/
 
 #include "lib/unicorn/Track.h"
+#include <Phonon>
 #include <QList>
+#include <QMap>
 #include <QObject>
-
-
-namespace Phonon
-{
-    class MediaObject;
-    class AudioOutput;
-    class MediaSource;
-}
+#include <QUrl>
 
 
 class AudioPlaybackEngine : public QObject
@@ -39,14 +34,26 @@ public:
     
 public slots:
     void queue( const QList<Track>& );
+    void clearQueue();
+
     void play();
     void skip();
     void stop();
 
 signals:
-    void thirtySecondsFromPlaylistEnd();
+    void trackStarted( const Track& );
+    /** queue more tracks or... */
+    void queueStarved();
+    /** ...playback ends */
+    void playbackEnded();
+
+private slots:
+    void onTrackStarted( const Phonon::MediaSource& );
+    void onPhononStateChanged( Phonon::State, Phonon::State );
 
 private:
     Phonon::MediaObject *m_mediaObject;
     Phonon::AudioOutput *m_audioOutput;
+
+    QMap<QUrl, Track> m_queue;
 };

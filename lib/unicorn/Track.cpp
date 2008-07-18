@@ -235,7 +235,7 @@ Track::topTags() const
     try
     {
         foreach (EasyDomElement e, reply->lfm().children( "tag" ))
-            tags += e["name"].text();
+            tags += e["name"].text().toLower();
     }
     catch (EasyDomElement::Exception& e)
     {

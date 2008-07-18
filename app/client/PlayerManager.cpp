@@ -49,21 +49,14 @@ PlayerManager::love()
 void
 PlayerManager::onTrackStarted( const Track& t )
 {   
-    QString const id = t.playerId();
-    Player& p = *m_players[id];
-    delete p.track.m_watch; //stuff is connected to it, break those connections
+    delete m_track.m_watch; //stuff is connected to it, break those connections
 
-    p.track = t;
-    p.state = PlayerState::Playing;
-    p.track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
+    m_track = t;
+    m_state = PlayerState::Playing;
+    m_track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
+    connect( m_track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
 
-    qDebug() << p.track.toString() << p.track.isEmpty();
-
-    if (m_players.top()->id == id)
-    {
-        connect( p.track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
-        handleStateChange( p.state, p.track );
-    }
+    handleStateChange( m_state, m_track );
 }
 
 
@@ -71,47 +64,29 @@ PlayerManager::onTrackStarted( const Track& t )
 void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
-    if( m_players.empty() )
-        return;
-
-    bool const isActive = m_players.top()->id == id;
-
-    QString id_ = m_players.top()->id;
-
-    // do before anything so the state emission we are about to do is reflected
-    // here as well as elsewhere
-    m_players.remove( id );
-
-    if (isActive)
-    {
-        if (m_players.count())
-        {
-            handleStateChange( PlayerState::Playing, m_players.top()->track );
-        }
-        else
-            handleStateChange( PlayerState::Stopped );
-    }
+    delete m_track.m_watch;
+    m_track = Track();
+    handleStateChange( PlayerState::Stopped );
 }
 
 
 void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
-    if( m_players[id]->track.m_watch )
-        m_players[id]->track.m_watch->pause();
+    if (m_track.m_watch)
+        m_track.m_watch->pause();
 
-    if (m_players.top()->id == id)
-        handleStateChange( PlayerState::Paused );
+    handleStateChange( PlayerState::Paused );
 }
 
 
 void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
-    m_players[id]->track.m_watch->resume();
+    if (m_track.m_watch)
+        m_track.m_watch->resume();
 
-    if (m_players.top()->id == id)
-        handleStateChange( PlayerState::Playing );
+    handleStateChange( PlayerState::Playing );
 }
 
 
@@ -193,6 +168,7 @@ PlayerManager::onPlayerInit( const QString &playerId )
 {
     emit event( PlayerEvent::PlayerInit, QVariant::fromValue( playerId ) );
 }
+
 
 void
 PlayerManager::onPlayerTerm( const QString &playerId )

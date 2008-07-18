@@ -29,8 +29,6 @@ public:
     App( int, char** );
     ~App();
 
-    PlayerState::Enum state() const;
-
     void setMainWindow( class MainWindow* );
     MainWindow& mainWindow() const { return *m_mainWindow; }
     
@@ -53,6 +51,9 @@ public slots:
 
 private slots:
     void onAppEvent( int, const QVariant& );
+
+    void onRadioTrackStarted( const class Track& );
+    void onRadioPlaybackEnded();
 
 signals:
     void event( int, const QVariant& );

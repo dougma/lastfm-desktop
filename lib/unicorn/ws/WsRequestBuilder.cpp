@@ -45,24 +45,12 @@ WsRequestBuilder::start()
 
     QNetworkRequest request( url );
     request.setRawHeader( "User-Agent", userAgent() );
-    QNetworkReply* reply = 0;
 
     switch (request_method)
     {
-        case GET:  
-            reply = nam->get( request ); 
-            break;
-
-        case POST: 
-            reply = nam->post( request, url.encodedQuery() ); 
-            break;
-
-        default:
-            Q_ASSERT( !"Unknown RequestType" );
-            break;
+        case GET:  return new WsReply( nam->get( request ) );
+        case POST: return new WsReply( nam->post( request, url.encodedQuery() ) );
     }
-
-    return new WsReply( reply );
 }
 
 

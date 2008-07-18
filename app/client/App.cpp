@@ -57,7 +57,10 @@ App::App( int argc, char** argv )
 #endif
     
     m_scrobbler = new Scrobbler( The::settings().username(), The::settings().sessionKey() );
+    
     m_radio = new RadioWidget;
+    connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
+    connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -97,13 +100,6 @@ App::setMainWindow( MainWindow* window )
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
-}
-
-
-PlayerState::Enum
-App::state() const
-{
-    return m_playerManager->state();
 }
 
 
@@ -215,6 +211,20 @@ void
 App::open( const QUrl& url )
 {
     m_radio->play( RadioStation( url.toString() ) );
+}
+
+
+void
+App::onRadioTrackStarted( const Track& t )
+{
+    m_playerManager->onTrackStarted( t );
+}
+
+
+void
+App::onRadioPlaybackEnded()
+{
+    m_playerManager->onPlaybackEnded( "ass" );
 }
 
 

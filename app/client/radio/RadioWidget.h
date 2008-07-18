@@ -31,6 +31,16 @@ public:
 
     void play( const RadioStation& );
 
+    struct Ui
+    {
+        class QLabel* spinner;
+    } 
+    ui;
+
+signals:
+    void trackStarted( const class Track& );
+    void playbackEnded();
+
 private slots:
     void onTunerReturnPressed();
     void queueMoreTracks();

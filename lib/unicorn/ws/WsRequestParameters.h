@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,22 +25,19 @@
 #include <QList>
 #include <QPair>
 #include <QMap>
-#include <QObject>
 
 
-class UNICORN_DLLEXPORT WsRequestParameters: public QObject
+class WsRequestParameters
 {
-    Q_OBJECT
-
 public:
-    WsRequestParameters( QObject* parent = 0 );
-    
-    WsRequestParameters& add( const QString& key, const QString& value );
-    operator const QList< QPair< QString, QString > >();
+    WsRequestParameters();
+
+    void add( const QString& key, const QString& value ) { m_map[key] = value; }
+    operator const QList<QPair<QString, QString> >() const;
 
 private:
-    QMap< QString, QString > m_paramList;
-    QString methodSignature();
+    QString methodSignature() const;
+    QMap<QString, QString> m_map;
 };
 
 #endif //WS_REQUEST_PARAMETERS_H

@@ -21,58 +21,46 @@
 #include "../UnicornUtils.h"
 #include "../UnicornSettings.h"
 #include "../../../app/client/version.h" //FIXME
+#include <QDebug>
 
 
-WsRequestParameters::WsRequestParameters( QObject* parent )
-                    : QObject( parent )
-{}
-
-
-WsRequestParameters::operator const QList< QPair< QString,QString > >()
+WsRequestParameters::WsRequestParameters()
 {
-    QList< QPair < QString, QString > > params;
-
     add( "api_key", API_KEY );
-    
-    // check username exists first - prevents assert in Unicorn::UserQSettings
+
+    // the branch prevents an assert in Unicorn::UserQSettings()
     Unicorn::Settings s;
-    if( s.username().size() && !s.sessionKey().isEmpty() )
+    if (s.username().size())
         add( "sk", s.sessionKey() );
-
-    add( "api_sig", methodSignature() );
-
-
-    for( QMap< QString, QString >::iterator iter = m_paramList.begin();
-         iter != m_paramList.end();
-         iter++ )
-    {
-        params.push_back( QPair< QString, QString >( iter.key(), iter.value() ) );
-    }
-
-    return params;
 }
 
 
-WsRequestParameters&
-WsRequestParameters::add( const QString& key, const QString& value )
+WsRequestParameters::operator const QList<QPair<QString, QString> >() const
 {
-    m_paramList.insert( key, value );
-    return *this;
+    typedef QPair<QString,QString> Pair;
+
+    QList<Pair> list;
+    QMapIterator<QString, QString> i( m_map );
+    while (i.hasNext()) {
+        i.next();
+        list += Pair( i.key(), i.value() );
+    }
+
+    return list << Pair( "api_sig", methodSignature() );
 }
 
 
-QString 
-WsRequestParameters::methodSignature()
+QString
+WsRequestParameters::methodSignature() const
 {
-    QString paramString;
+    QString s;
 
-    for( QMap<QString, QString>::iterator iter = m_paramList.begin();
-         iter != m_paramList.end();
-         iter++ )
-    {
-        paramString += iter.key() + iter.value();
+    QMapIterator<QString, QString> i( m_map );
+    while (i.hasNext()) {
+        i.next();
+        s += i.key() + i.value();
     }
+    s += API_SECRET;
 
-    paramString += API_SECRET;
-    return Unicorn::md5( paramString.toUtf8() );
+    return Unicorn::md5( s.toUtf8() );
 }

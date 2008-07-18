@@ -53,6 +53,7 @@ TrackListView::add( const ObservedTrack& t )
 
     ui.progress->m_scrobblePoint = t.scrobblePoint();
     connect( t.watch(), SIGNAL(tick( int )), ui.progress, SLOT(onPlaybackTick( int )) );
+    connect( t.watch(), SIGNAL(destroyed()), ui.progress->m_progressDisplayTimer, SLOT(stop()) );
 
     QLabel* time = new QLabel( t.dateTime().toString( "hh:mm:ss" ) );
     time->setEnabled( false );

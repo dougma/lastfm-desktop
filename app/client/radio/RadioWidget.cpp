@@ -20,16 +20,53 @@
 #include "RadioWidget.h"
 #include "AudioController.h"
 #include <QAction>
+#include <QEvent>
+#include <QLabel>
 #include <QLineEdit>
+#include <QMovie>
 #include <QToolBar>
 #include <QVBoxLayout>
+
+
+class SpinnerLabel : public QLabel
+{
+    virtual bool event( QEvent* e )
+    {
+        switch ((int)e->type())
+        {
+        case QEvent::Hide:
+            m_movie->setPaused( true );
+            break;
+        case QEvent::Show:
+            m_movie->start();
+            break;
+        }
+
+        return QLabel::event( e );
+    }
+
+    QMovie* m_movie;
+
+public:
+    SpinnerLabel( QWidget* parent = 0 ) : QLabel( parent )
+    {
+        setMovie( m_movie = new QMovie( ":/spinner.mng" ) );
+        m_movie->setParent( this );
+    }
+};
 
 
 RadioWidget::RadioWidget( QWidget* parent )
            : QWidget( parent )
 {
+    qRegisterMetaType<Track>( "Track" );
+
     m_audio = new AudioPlaybackEngine;
-    connect( m_audio, SIGNAL(thirtySecondsFromPlaylistEnd()), SLOT(queueMoreTracks()) );
+    connect( m_audio, SIGNAL(queueStarved()), SLOT(queueMoreTracks()) );
+
+    // queued because otherwise Phonon breaks
+    connect( m_audio, SIGNAL(trackStarted( Track )), SIGNAL(trackStarted( Track )), Qt::QueuedConnection );
+    connect( m_audio, SIGNAL(playbackEnded()), SIGNAL(playbackEnded()), Qt::QueuedConnection );
 
     QToolBar* bar = new QToolBar( this );
 
@@ -40,10 +77,15 @@ RadioWidget::RadioWidget( QWidget* parent )
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( bar );
     v->addWidget( tuning_dial );
+    v->addWidget( ui.spinner = new SpinnerLabel );
 
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
     connect( skip, SIGNAL(triggered()), m_audio, SLOT(skip()) );
     connect( stop, SIGNAL(triggered()), m_audio, SLOT(stop()) );
+
+    ui.spinner->hide();
+
+    setWindowTitle( tr("Last.fm Radio") );
 }
 
 
@@ -58,15 +100,19 @@ RadioWidget::onTunerReturnPressed()
 void
 RadioWidget::play( const RadioStation& station )
 {
+    ui.spinner->show();
+
+    m_audio->clearQueue();
     m_tuner = Tuner( station );
     queueMoreTracks();
     m_audio->play();
+
+    ui.spinner->hide();
 }
 
 
 void
 RadioWidget::queueMoreTracks()
 {
-    QList<Track> tracks = m_tuner.fetchNextPlaylist();
-    m_audio->queue( tracks );
+    m_audio->queue( m_tuner.fetchNextPlaylist() );
 }
