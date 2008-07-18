@@ -19,7 +19,7 @@
 
 #include "TrackListView.h"
 #include "ObservedTrack.h"
-#include "PlaybackEvent.h"
+#include "PlayerEvent.h"
 #include "TrackListViewItem.h"
 #include <QLinearGradient>
 #include <QPainter>
@@ -195,21 +195,21 @@ TrackListView::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
-    case PlaybackEvent::PlaybackStarted:
-    case PlaybackEvent::TrackChanged:
+    case PlayerEvent::PlaybackStarted:
+    case PlayerEvent::TrackChanged:
         add( v.value<ObservedTrack>() );
         break;
 
-    case PlaybackEvent::PlaybackEnded:
+    case PlayerEvent::PlaybackEnded:
         break;
     }
 
     // progress display timer
     switch (e)
     {
-    case PlaybackEvent::PlaybackStarted:
-    case PlaybackEvent::PlaybackUnstalled:
-    case PlaybackEvent::PlaybackUnpaused:
+    case PlayerEvent::PlaybackStarted:
+    case PlayerEvent::PlaybackUnstalled:
+    case PlayerEvent::PlaybackUnpaused:
     {
         ObservedTrack t = v.value<ObservedTrack>();
         if (t.isEmpty())
@@ -226,18 +226,18 @@ TrackListView::onAppEvent( int e, const QVariant& v )
         break;
     }
 
-    case PlaybackEvent::PlaybackStalled:
-    case PlaybackEvent::PlaybackPaused:
-    case PlaybackEvent::PlaybackEnded:
+    case PlayerEvent::PlaybackStalled:
+    case PlayerEvent::PlaybackPaused:
+    case PlayerEvent::PlaybackEnded:
         ui.progress->m_progressDisplayTimer->stop();
         break;
     }
     
     switch (e)
     {
-    case PlaybackEvent::PlaybackStarted:
-    case PlaybackEvent::TrackChanged:
-    case PlaybackEvent::PlaybackEnded:
+    case PlayerEvent::PlaybackStarted:
+    case PlayerEvent::TrackChanged:
+    case PlayerEvent::PlaybackEnded:
         ui.progress->onPlaybackTick( 0 );
         ui.progress->m_progressDisplayTick = 0;
         ui.progress->update();

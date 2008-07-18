@@ -43,5 +43,5 @@ public slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 
 private:
-    class TrackListView* m_trackListView;
+    class NowPlayingView* m_nowPlayingView;
 };

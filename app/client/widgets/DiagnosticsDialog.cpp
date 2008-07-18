@@ -19,7 +19,7 @@
 
 #include "DiagnosticsDialog.h"
 #include "ObservedTrack.h"
-#include "PlaybackEvent.h"
+#include "PlayerEvent.h"
 #include "Settings.h"
 #include "scrobbler/Scrobbler.h"
 #include "scrobbler/ScrobbleCache.h"
@@ -263,7 +263,7 @@ DiagnosticsDialog::onAppEvent( int event, const QVariant& )
 {
     switch (event)
     {
-    case PlaybackEvent::ScrobblePointReached:
+    case PlayerEvent::ScrobblePointReached:
         populateScrobbleCacheView();
         break;
 

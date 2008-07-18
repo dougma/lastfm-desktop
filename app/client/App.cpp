@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "PlaybackEvent.h"
+#include "PlayerEvent.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
 #include "radio/RadioWidget.h"
@@ -100,7 +100,7 @@ App::setMainWindow( MainWindow* window )
 }
 
 
-PlaybackState::Enum
+PlayerState::Enum
 App::state() const
 {
     return m_playerManager->state();
@@ -112,10 +112,10 @@ App::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
-        case PlaybackEvent::TrackChanged:
+        case PlayerEvent::TrackChanged:
             m_scrobbler->submit();
             // FALL THROUGH
-        case PlaybackEvent::PlaybackStarted:
+        case PlayerEvent::PlaybackStarted:
         {
             Track t = d.value<ObservedTrack>();
             m_scrobbler->nowPlaying( t );
@@ -127,11 +127,11 @@ App::onAppEvent( int e, const QVariant& d )
             break;
         }            
 
-        case PlaybackEvent::ScrobblePointReached:
+        case PlayerEvent::ScrobblePointReached:
             m_scrobbler->cache( d.value<ObservedTrack>() );
             break;
 
-        case PlaybackEvent::PlaybackEnded:
+        case PlayerEvent::PlaybackEnded:
             m_scrobbler->submit();
             break;
     }

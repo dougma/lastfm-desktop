@@ -41,13 +41,16 @@ public:
         Stop,
         Pause,
         Resume,
-        Bootstrap
+        Bootstrap,
+        Init,
+        Term
     };
 
     Command command() const { return m_command; }
     QString playerId() const { return m_playerId; }
     Track track() const { return m_track; }
     QString username() const { return m_username; }
+    QString filename() const { return m_filename; }
 
 private:
     Command extractCommand( QString& line );
@@ -59,6 +62,7 @@ private:
     QString m_playerId;
     Track m_track;
     QString m_username;
+    QString m_filename;
 };
 
 #endif // PLAYERCOMMANDPARSER_H

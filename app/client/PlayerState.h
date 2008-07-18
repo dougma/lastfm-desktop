@@ -17,10 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYBACK_STATE_H
-#define PLAYBACK_STATE_H
+#ifndef PLAYER_STATE_H
+#define PLAYER_STATE_H
 
-namespace PlaybackState
+namespace PlayerState
 {
     // All states can turn into other states
     // This is KEY there is no implied order

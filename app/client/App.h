@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
+#include "PlayerState.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/unicorn/ws/WsError.h"
 
@@ -29,7 +29,7 @@ public:
     App( int, char** );
     ~App();
 
-    PlaybackState::Enum state() const;
+    PlayerState::Enum state() const;
 
     void setMainWindow( class MainWindow* );
     MainWindow& mainWindow() const { return *m_mainWindow; }

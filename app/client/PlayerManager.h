@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlaybackState.h"
+#include "PlayerState.h"
 #include "ObservedTrack.h"
 #include "StopWatch.h"
 #include <QMutableVectorIterator>
@@ -34,7 +34,7 @@ struct Player
 
     QString const id;
     ObservedTrack track;
-    PlaybackState::Enum state;
+    PlayerState::Enum state;
 };
 
 
@@ -47,7 +47,7 @@ class PlayerManager : public QObject
 public:
     PlayerManager( class PlayerListener* parent );
 
-    PlaybackState::Enum state() const { return m_state; }
+    PlayerState::Enum state() const { return m_state; }
     ObservedTrack track() const { return m_players.top()->track; }
 
     /** will ban or love the current track */
@@ -59,6 +59,8 @@ public slots:
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );
     void onPlaybackResumed( const QString& playerId );
+    void onPlayerInit( const QString& playerId );
+    void onPlayerTerm( const QString& playerId );
 
 signals:
     /** the int is a PlaybackEvent, @data is documented with the enum */
@@ -68,7 +70,7 @@ private slots:
     void onStopWatchTimedOut();
 
 private:
-    void handleStateChange( PlaybackState::Enum, const ObservedTrack& t = ObservedTrack() );
+    void handleStateChange( PlayerState::Enum, const ObservedTrack& t = ObservedTrack() );
 
     class UniquePlayerStack : public QStack<Player*>
     {
@@ -103,5 +105,5 @@ private:
     };
 
     UniquePlayerStack m_players;
-    PlaybackState::Enum m_state;
+    PlayerState::Enum m_state;
 };

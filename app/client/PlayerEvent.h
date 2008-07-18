@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYBACK_EVENT_H
-#define PLAYBACK_EVENT_H
+#ifndef PLAYER_EVENT_H
+#define PLAYER_EVENT_H
 
 /** Usage: connect to qApp->event( int, QVariant ), react to events in your slot
   * Note: if you depend on one object's events being handled before another, you
@@ -28,7 +28,7 @@
   * NOTE: some events will always follow each other, see each enum value  for 
   * specification */
 
-namespace PlaybackEvent
+namespace PlayerEvent
 {
     enum Enum
     {
@@ -81,6 +81,12 @@ namespace PlaybackEvent
         /** Note: scrobble submission will not be sent until the end of the
           * track */
         ScrobblePointReached,
+        
+        /** A new media player has sent a message to the client */ 
+        PlayerInit,
+
+        /** A media player has terminated */
+        PlayerTerm,
 
         TypeMax /** leave at end of enum, kthxbai */
     };

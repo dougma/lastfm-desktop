@@ -43,44 +43,73 @@ PlayerListener::onNewConnection()
     {
         QTcpSocket* socket = nextPendingConnection();
 
-        socket->waitForReadyRead(); //FIXME, blocks
+        connect( socket, SIGNAL( readyRead()), SLOT( onDataReady()) );
+        connect( socket, SIGNAL( stateChanged( QAbstractSocket::SocketState )), 
+                         SLOT( onDisconnected( QAbstractSocket::SocketState)) );
+    }
+}
 
-        while (socket->canReadLine())
+
+void
+PlayerListener::onDisconnected( QAbstractSocket::SocketState state )
+{
+    QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
+
+    if( state != QAbstractSocket::ConnectedState && 
+        m_socketMap.contains( socket ) )
+    {
+        emit playerTerm( m_socketMap[ socket ] );
+        m_socketMap.remove( socket );
+    }
+}
+
+
+void
+PlayerListener::onDataReady()
+{
+    QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
+    while (socket->canReadLine())
+    {
+        try
         {
-            try
-            {
-                PlayerCommandParser parser( QString::fromUtf8( socket->readLine() ) );
+            PlayerCommandParser parser( QString::fromUtf8( socket->readLine() ) );
 
-                switch (parser.command())
-                {
-                    case PlayerCommandParser::Start:
-                        emit trackStarted( parser.track() );
-                        break;
-                    case PlayerCommandParser::Stop:
-                        emit playbackEnded( parser.playerId() );
-                        break;
-                    case PlayerCommandParser::Pause:
-                        emit playbackPaused( parser.playerId() );
-                        break;
-                    case PlayerCommandParser::Resume:
-                        emit playbackResumed( parser.playerId() );
-                        break;
-                    case PlayerCommandParser::Bootstrap:
-                        emit bootstrapCompleted( parser.playerId(), parser.username() );
-                        break;
-                }
-
-                socket->write( "OK\n" );
-            }
-            catch (PlayerCommandParser::Exception& e)
+            switch (parser.command())
             {
-                LOGL( 2, e );
-                QString s = "ERROR: " + e + "\n";
-                socket->write( s.toUtf8() );
+                case PlayerCommandParser::Start:
+                    emit trackStarted( parser.track() );
+                    break;
+                case PlayerCommandParser::Stop:
+                    emit playbackEnded( parser.playerId() );
+                    break;
+                case PlayerCommandParser::Pause:
+                    emit playbackPaused( parser.playerId() );
+                    break;
+                case PlayerCommandParser::Resume:
+                    emit playbackResumed( parser.playerId() );
+                    break;
+                case PlayerCommandParser::Bootstrap:
+                    emit bootstrapCompleted( parser.playerId(), parser.username() );
+                    break;
+                case PlayerCommandParser::Init:
+                    emit playerInit( parser.playerId() );
+                    break;
+                case PlayerCommandParser::Term:
+                    m_socketMap.remove( socket );
+                    emit playerTerm( parser.playerId() );
+                    break;
             }
+            
+            if( parser.command() != PlayerCommandParser::Term )
+                m_socketMap[ socket ] = parser.playerId();
+
+            socket->write( "OK\n" );
         }
-
-        socket->waitForBytesWritten(); //FIXME, blocks
-        delete socket;
+        catch (PlayerCommandParser::Exception& e)
+        {
+            LOGL( 2, e );
+            QString s = "ERROR: " + e + "\n";
+            socket->write( s.toUtf8() );
+        }
     }
 }

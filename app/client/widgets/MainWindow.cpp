@@ -21,7 +21,8 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
-#include "widgets/TrackListView.h"
+#include "widgets/NowPlayingView.h"
+#include "widgets/MediaPlayerIndicator.h"
 #include "version.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
@@ -43,13 +44,17 @@ MainWindow::MainWindow()
 {
     ui.setupUi( this );
 
-    setCentralWidget( m_trackListView = new TrackListView );
-//    setUnifiedTitleAndToolBarOnMac( true );
-    delete ui.toolbar;
+    setUnifiedTitleAndToolBarOnMac( true );
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     connect( close, SIGNAL(triggered()), SLOT(close()) );
     
+    QWidget* centralWidget = new QWidget();
+    centralWidget->setLayout( new QVBoxLayout( centralWidget ) );
+    centralWidget->layout()->addWidget( m_nowPlayingView = new NowPlayingView( centralWidget ) );
+    centralWidget->layout()->addWidget( new MediaPlayerIndicator( centralWidget ) );
+    setCentralWidget( centralWidget );
+
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );

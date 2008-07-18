@@ -52,9 +52,16 @@ signals:
     void playbackPaused( const QString& playerId );
     void playbackResumed( const QString& playerId );
     void bootstrapCompleted( const QString& playerId, const QString& username );
+    void playerInit( const QString& playerId );
+    void playerTerm( const QString& playerId );
 
 private slots:
     void onNewConnection();
+    void onDisconnected( QAbstractSocket::SocketState );
+    void onDataReady();
+
+private:
+    QMap< QTcpSocket*, QString > m_socketMap;
 };
 
 #endif

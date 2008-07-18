@@ -18,19 +18,21 @@
  ***************************************************************************/
 
 #include "PlayerManager.h"
-#include "PlaybackEvent.h"
+#include "PlayerEvent.h"
 #include "Settings.h"
 
 
 PlayerManager::PlayerManager( PlayerListener* listener )
              : QObject( (QObject*)listener ),
-               m_state( PlaybackState::Stopped )
+               m_state( PlayerState::Stopped )
 {
     QObject* o = (QObject*)listener;
     connect( o, SIGNAL(trackStarted( Track )), SLOT(onTrackStarted( Track )) );
     connect( o, SIGNAL(playbackEnded( QString )), SLOT(onPlaybackEnded( QString )) );
     connect( o, SIGNAL(playbackPaused( QString )), SLOT(onPlaybackPaused( QString )) );
     connect( o, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
+    connect( o, SIGNAL(playerInit( QString )), SLOT( onPlayerInit( QString )) );
+    connect( o, SIGNAL(playerTerm( QString)), SLOT( onPlayerTerm( QString )) );
 }
 
 
@@ -52,7 +54,7 @@ PlayerManager::onTrackStarted( const Track& t )
     delete p.track.m_watch; //stuff is connected to it, break those connections
 
     p.track = t;
-    p.state = PlaybackState::Playing;
+    p.state = PlayerState::Playing;
     p.track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
 
     qDebug() << p.track.toString() << p.track.isEmpty();
@@ -69,6 +71,9 @@ PlayerManager::onTrackStarted( const Track& t )
 void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
+    if( m_players.empty() )
+        return;
+
     bool const isActive = m_players.top()->id == id;
 
     QString id_ = m_players.top()->id;
@@ -81,10 +86,10 @@ PlayerManager::onPlaybackEnded( const QString& id )
     {
         if (m_players.count())
         {
-            handleStateChange( PlaybackState::Playing, m_players.top()->track );
+            handleStateChange( PlayerState::Playing, m_players.top()->track );
         }
         else
-            handleStateChange( PlaybackState::Stopped );
+            handleStateChange( PlayerState::Stopped );
     }
 }
 
@@ -92,10 +97,11 @@ PlayerManager::onPlaybackEnded( const QString& id )
 void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
-    m_players[id]->track.m_watch->pause();
+    if( m_players[id]->track.m_watch )
+        m_players[id]->track.m_watch->pause();
 
     if (m_players.top()->id == id)
-        handleStateChange( PlaybackState::Paused );
+        handleStateChange( PlayerState::Paused );
 }
 
 
@@ -105,16 +111,16 @@ PlayerManager::onPlaybackResumed( const QString& id )
     m_players[id]->track.m_watch->resume();
 
     if (m_players.top()->id == id)
-        handleStateChange( PlaybackState::Playing );
+        handleStateChange( PlayerState::Playing );
 }
 
 
 void
-PlayerManager::handleStateChange( PlaybackState::Enum newState, const ObservedTrack& t )
+PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrack& t )
 {
-    using namespace PlaybackState;
+    using namespace PlayerState;
 
-    PlaybackState::Enum oldState = m_state;
+    PlayerState::Enum oldState = m_state;
     m_state = newState;
 
     if (newState == Playing && t.isEmpty())
@@ -128,13 +134,13 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const ObservedTr
         switch (newState)
         {
         case Playing:
-            emit event( PlaybackEvent::TrackChanged, QVariant::fromValue( t ) );
+            emit event( PlayerEvent::TrackChanged, QVariant::fromValue( t ) );
             break;
         case Stopped:
-            emit event( PlaybackEvent::PlaybackEnded );
+            emit event( PlayerEvent::PlaybackEnded );
             break;
         case Paused:
-            emit event( PlaybackEvent::PlaybackPaused );
+            emit event( PlayerEvent::PlaybackPaused );
             break;
         }
         break;
@@ -143,7 +149,7 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const ObservedTr
         switch (newState)
         {
         case Playing:
-            emit event( PlaybackEvent::PlaybackStarted, QVariant::fromValue( t ) );
+            emit event( PlayerEvent::PlaybackStarted, QVariant::fromValue( t ) );
             break;
         case Stopped:
             // do nothing
@@ -160,10 +166,10 @@ PlayerManager::handleStateChange( PlaybackState::Enum newState, const ObservedTr
         switch (newState)
         {
         case Playing:
-            emit event( PlaybackEvent::PlaybackUnpaused );
+            emit event( PlayerEvent::PlaybackUnpaused );
             break;
         case Stopped:
-            emit event( PlaybackEvent::PlaybackEnded );
+            emit event( PlayerEvent::PlaybackEnded );
             break;
         case Paused:
             // do nothing;
@@ -178,5 +184,18 @@ void
 PlayerManager::onStopWatchTimedOut()
 {
     MutableTrack( track() ).setRatingFlag( Track::Scrobbled );
-    emit event( PlaybackEvent::ScrobblePointReached, QVariant::fromValue( track() ) );
+    emit event( PlayerEvent::ScrobblePointReached, QVariant::fromValue( track() ) );
+}
+
+
+void
+PlayerManager::onPlayerInit( const QString &playerId )
+{
+    emit event( PlayerEvent::PlayerInit, QVariant::fromValue( playerId ) );
+}
+
+void
+PlayerManager::onPlayerTerm( const QString &playerId )
+{
+    emit event( PlayerEvent::PlayerTerm, QVariant::fromValue( playerId ) );
 }

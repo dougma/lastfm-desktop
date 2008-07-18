@@ -56,6 +56,8 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
         case Bootstrap:
             m_username = args['u'];
             break;
+        case Init:
+            m_filename = args['f'];
         default:
             break;
     }
@@ -78,6 +80,8 @@ PlayerCommandParser::extractCommand( QString& line )
     if (command == "PAUSE") return Pause;
     if (command == "RESUME") return Resume;
     if (command == "BOOTSTRAP") return Bootstrap;
+    if (command == "INIT") return Init;
+    if (command == "TERM") return Term;
 
     throw Exception( "Invalid command" );
 }
@@ -141,10 +145,13 @@ PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
             return "catblp";
         case Bootstrap:
             return "cu";
+        case Init:
+            return "cf";
         default:
         case Stop:
         case Pause:
         case Resume:
+        case Term:
             return "c";
     }
 }

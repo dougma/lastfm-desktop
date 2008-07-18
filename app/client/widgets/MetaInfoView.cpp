@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "MetaInfoView.h"
-#include "PlaybackEvent.h"
+#include "PlayerEvent.h"
 #include "lib/unicorn/Track.h"
 #include <QCoreApplication>
 #include <QDesktopServices>
@@ -45,8 +45,8 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
     qDebug() << "MetaInfoView::onAppEvent: " << e << " : " << d;
     switch (e)
     {
-        case PlaybackEvent::TrackChanged:
-        case PlaybackEvent::PlaybackStarted:
+        case PlayerEvent::TrackChanged:
+        case PlayerEvent::PlaybackStarted:
             Track t = d.value<Track>( );
             // FIXME: get the real page.
             load( QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) ) );
