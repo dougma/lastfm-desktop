@@ -121,7 +121,7 @@ ScrobbleProgressBar::onPlaybackTick( int s )
 void
 ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
 {
-    if (!scrobblePoint())
+    if (!scrobblePoint() || e->oldSize().width() == e->size().width())
         return;
 
     // this is as exact as we can get it in milliseconds

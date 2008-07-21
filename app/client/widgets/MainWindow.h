@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -29,7 +29,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 
-    Ui::MainWindow ui;
+    struct : Ui::MainWindow
+    {
+        class NowPlayingView* nowPlaying;
+        class ScrobbleProgressBar* progress;
+    } 
+    ui;
 
 protected:
     void closeEvent( QCloseEvent* );
@@ -40,8 +45,7 @@ public slots:
     void showAboutDialog();
     void showMetaInfoView();
     
+private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-
-private:
-    class NowPlayingView* m_nowPlayingView;
+    void onAppEvent( int, const QVariant& );
 };

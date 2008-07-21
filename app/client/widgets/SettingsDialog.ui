@@ -2,7 +2,7 @@
  <class>SettingsDialog</class>
  <widget class="QDialog" name="SettingsDialog" >
   <property name="windowModality" >
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry" >
    <rect>
@@ -131,7 +131,8 @@
        <string>General</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/account.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >
+        <normaloff>:/SettingsDialog/account.png</normaloff>:/SettingsDialog/account.png</iconset>
       </property>
      </item>
      <item>
@@ -139,7 +140,8 @@
        <string>Radio</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/radio.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >
+        <normaloff>:/SettingsDialog/radio.png</normaloff>:/SettingsDialog/radio.png</iconset>
       </property>
      </item>
      <item>
@@ -147,7 +149,8 @@
        <string>Scrobbling</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/scrobbling.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >
+        <normaloff>:/SettingsDialog/scrobbling.png</normaloff>:/SettingsDialog/scrobbling.png</iconset>
       </property>
      </item>
      <item>
@@ -155,7 +158,8 @@
        <string>Connection</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/connection.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >
+        <normaloff>:/SettingsDialog/connection.png</normaloff>:/SettingsDialog/connection.png</iconset>
       </property>
      </item>
      <item>
@@ -163,7 +167,8 @@
        <string>iPod</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >:/SettingsDialog/ipod.png</iconset>
+       <iconset resource="SettingsDialog.qrc" >
+        <normaloff>:/SettingsDialog/ipod.png</normaloff>:/SettingsDialog/ipod.png</iconset>
       </property>
      </item>
     </widget>
@@ -187,6 +192,14 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="accountPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>419</width>
+        <height>288</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="accountBox" >
@@ -255,7 +268,7 @@
              <property name="orientation" >
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>40</width>
                <height>20</height>
@@ -270,7 +283,7 @@
            <property name="orientation" >
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0" >
             <size>
              <width>20</width>
              <height>181</height>
@@ -283,6 +296,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="radioPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="groupBox" >
@@ -319,7 +340,7 @@
                 <property name="orientation" >
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" >
+                <property name="sizeHint" stdset="0" >
                  <size>
                   <width>40</width>
                   <height>20</height>
@@ -353,7 +374,7 @@
                 <property name="orientation" >
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" >
+                <property name="sizeHint" stdset="0" >
                  <size>
                   <width>40</width>
                   <height>20</height>
@@ -417,7 +438,7 @@
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0" >
              <size>
               <width>40</width>
               <height>20</height>
@@ -459,7 +480,7 @@
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0" >
              <size>
               <width>40</width>
               <height>20</height>
@@ -475,7 +496,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -486,6 +507,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="scrobblingPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QLabel" name="label_13" >
@@ -527,7 +556,7 @@
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0" >
             <size>
              <width>40</width>
              <height>20</height>
@@ -545,7 +574,7 @@
          <property name="sizeType" >
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>12</height>
@@ -572,7 +601,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -583,6 +612,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="connectionPage" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="proxyBox" >
@@ -605,16 +642,7 @@
           <property name="spacing" >
            <number>6</number>
           </property>
-          <property name="leftMargin" >
-           <number>9</number>
-          </property>
-          <property name="topMargin" >
-           <number>9</number>
-          </property>
-          <property name="rightMargin" >
-           <number>9</number>
-          </property>
-          <property name="bottomMargin" >
+          <property name="margin" >
            <number>9</number>
           </property>
           <item>
@@ -682,16 +710,7 @@
                <property name="spacing" >
                 <number>6</number>
                </property>
-               <property name="leftMargin" >
-                <number>0</number>
-               </property>
-               <property name="topMargin" >
-                <number>0</number>
-               </property>
-               <property name="rightMargin" >
-                <number>0</number>
-               </property>
-               <property name="bottomMargin" >
+               <property name="margin" >
                 <number>0</number>
                </property>
                <item>
@@ -865,7 +884,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -876,6 +895,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>30</height>
+       </rect>
+      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="isIPodScrobblingEnabled" >
@@ -943,7 +970,7 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox" >
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

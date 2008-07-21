@@ -18,27 +18,44 @@
  ***************************************************************************/
 
 #include "NowPlayingView.h"
+#include "ObservedTrack.h"
 #include "PlayerEvent.h"
-#include "ScrobbleProgressBar.h"
+#include <QtGui>
 
 
-NowPlayingView::NowPlayingView(QWidget *parent)
-              : QWidget(parent)
+static inline QImage compose( const QImage &in )
 {
-    ui.setupUi( this );
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+    qDebug() << "Image dimensions:" << in.size();
 
-    ui.vboxLayout->addWidget( new ScrobbleProgressBar );
-    ui.vboxLayout->setAlignment( Qt::AlignTop );
+    const uint H = qreal(in.height()) / 7.5; // 40 for 300px images
+
+    QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
+    QPainter p( &out );
+    p.drawImage( 0, 0, in );
+    
+    QImage reflection = in.copy( 0, in.height() - H, in.width(), H );
+    reflection = reflection.mirrored( false, true /*vertical only*/ );
+
+    QLinearGradient gradient( QPoint( 0, in.height() ), QPoint( 0, out.height() ) );
+    gradient.setColorAt( 0, QColor(0, 0, 0, 100) );
+    gradient.setColorAt( 1, Qt::transparent );
+
+    p.drawImage( 0, in.height(), reflection );
+    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+    p.fillRect( QRect( QPoint( 0, in.height() ), reflection.size() ), gradient );
+
+    return out;
 }
 
 
-void
-NowPlayingView::setCurrentTrack( const ObservedTrack& track )
+
+NowPlayingView::NowPlayingView( QWidget* parent )
+              : QWidget( parent )
 {
-    ui.artist->setText( track.artist() );
-    ui.title->setText( track.title() );
-    ui.artwork->setPixmap( track.album().image() );
+    setMinimumSize( 150, 170 );
+    setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+
+    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
 
@@ -51,7 +68,35 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
         // will use empty Track()
     case PlayerEvent::PlaybackStarted:
     case PlayerEvent::TrackChanged:
-        setCurrentTrack( v.value<ObservedTrack>() );
+        m_cover = v.value<ObservedTrack>().album().image().toImage().convertToFormat( QImage::Format_ARGB32_Premultiplied );
+        m_cover = compose( m_cover );
+        update();
         break;
     }
+}
+
+
+void
+NowPlayingView::paintEvent( QPaintEvent* e )
+{
+    if (m_cover.isNull()) return;
+
+    QPainter p( this );
+    p.setClipRect( e->rect() );
+    p.setRenderHint( QPainter::Antialiasing );
+    p.setRenderHint( QPainter::SmoothPixmapTransform );
+
+    // determine rotated height
+    QTransform trans;
+    trans.rotate( -20, Qt::YAxis );
+    QRectF r1 = rect().translated( -width()/2, -height()/2 );
+    qreal const h = trans.inverted().map( QLineF( r1.topLeft(), r1.bottomLeft() ) ).dy();
+
+    // calculate scaling factor
+    qreal const scale = h / m_cover.height();
+    trans.scale( scale, scale );
+
+    // draw
+    p.setTransform( trans * QTransform().translate( height()/2, height()/2 ) );
+    p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/2 ), m_cover );
 }

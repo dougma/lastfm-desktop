@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = client
 CONFIG += unicorn moose radio
-QT = core gui xml network phonon webkit
+QT = core gui xml network phonon webkit opengl
 INCLUDEPATH += .
 
 include( $$SRC_DIR/common/qmake/include.pro )

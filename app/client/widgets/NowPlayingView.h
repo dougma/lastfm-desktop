@@ -20,9 +20,9 @@
 #ifndef NOW_PLAYING_VIEW_H
 #define NOW_PLAYING_VIEW_H
 
+#include <QImage>
 #include <QWidget>
-#include "ObservedTrack.h"
-#include "ui_NowPlayingView.h"
+
 
 class NowPlayingView : public QWidget
 {
@@ -35,8 +35,9 @@ private slots:
     void onAppEvent( int, const QVariant& );
 
 private:
-    Ui::NowPlayingView ui;
-    void setCurrentTrack( const ObservedTrack& track );
+    void paintEvent( QPaintEvent* );
+
+    QImage m_cover;
 };
 
 #endif // NOW_PLAYING_VIEW_H

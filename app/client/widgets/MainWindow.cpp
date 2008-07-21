@@ -18,8 +18,10 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
+#include "PlayerEvent.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MetaInfoView.h"
+#include "widgets/ScrobbleProgressBar.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/NowPlayingView.h"
 #include "widgets/MediaPlayerIndicator.h"
@@ -47,31 +49,31 @@ MainWindow::MainWindow()
     setUnifiedTitleAndToolBarOnMac( true );
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
-    connect( close, SIGNAL(triggered()), SLOT(close()) );
+    connect( close, SIGNAL(activated()), SLOT(close()) );
     
-    QWidget* centralWidget = new QWidget();
-    centralWidget->setLayout( new QVBoxLayout( centralWidget ) );
-    centralWidget->layout()->addWidget( m_nowPlayingView = new NowPlayingView( centralWidget ) );
-    centralWidget->layout()->addWidget( new MediaPlayerIndicator( centralWidget ) );
-    setCentralWidget( centralWidget );
+    QWidget* w = new QWidget();
+    w->setPalette( QPalette( Qt::white, Qt::black ) );
+    w->setAutoFillBackground( true );
+    QVBoxLayout* v = new QVBoxLayout( w );
+    v->addWidget( ui.nowPlaying = new NowPlayingView );
+    v->addWidget( new MediaPlayerIndicator );
+    v->addWidget( ui.progress = new ScrobbleProgressBar );
+    v->setMargin( 15 );
+    setCentralWidget( w );
+
+    ui.nowPlaying->setContentsMargins( 50, 50, 50, 50 );
 
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
+    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
 
 
 void
 MainWindow::showSettingsDialog()
-{
-    SettingsDialog( this ).exec();
-}
-
-
-void
-MainWindow::showDiagnosticsDialog()
 {
     #define NON_MODAL_MACRO( Type ) \
         static QPointer<Type> d; \
@@ -82,7 +84,14 @@ MainWindow::showDiagnosticsDialog()
             d->show(); \
         } else \
             d->activateWindow();
-            
+
+    NON_MODAL_MACRO( SettingsDialog )
+}
+
+
+void
+MainWindow::showDiagnosticsDialog()
+{
     NON_MODAL_MACRO( DiagnosticsDialog )
 }
 
@@ -190,6 +199,23 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
             else
                 hide();
           #endif
+            break;
+    }
+}
+
+
+void
+MainWindow::onAppEvent( int e, const QVariant& v )
+{
+    switch (e)
+    {
+        case PlayerEvent::PlaybackStarted:
+        case PlayerEvent::TrackChanged:
+            setWindowTitle( v.value<ObservedTrack>().toString() );
+            break;
+
+        case PlayerEvent::PlaybackEnded:
+            setWindowTitle( qApp->applicationName() );
             break;
     }
 }
