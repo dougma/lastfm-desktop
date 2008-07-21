@@ -178,5 +178,18 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
         case PlayerEvent::PlaybackPaused:
             m_progressDisplayTimer->stop();
             break;
+        
+        case PlayerEvent::PlaybackEnded:
+            resetUI();
+            break;
     }
+}
+
+
+void
+ScrobbleProgressBar::resetUI()
+{
+    m_progressDisplayTick = 0;
+    ui.time->setText( "" );
+    ui.timeToScrobblePoint->setText( "" );
 }

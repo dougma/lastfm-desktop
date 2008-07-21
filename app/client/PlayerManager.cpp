@@ -177,4 +177,8 @@ void
 PlayerManager::onPlayerTerm( const QString &playerId )
 {
     emit event( PlayerEvent::PlayerTerm, QVariant::fromValue( playerId ) );
+
+    // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media players 
+    // leaving the scrobbler in a playing state.
+    onPlaybackEnded( playerId );
 }
