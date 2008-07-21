@@ -9,6 +9,7 @@ debug:macx-xcode {
         SOURCES += $$findSources( cpp, $$dir )
         HEADERS += $$findSources( h, $$dir )
         FORMS += $$findSources( ui, $$dir )
+		RESOURCES += $$findSources( qrc, $$dir )	
     }
 
     SOURCES -= lib/unicorn/UnicornUtils_win.cpp
