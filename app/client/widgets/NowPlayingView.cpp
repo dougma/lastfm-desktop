@@ -91,7 +91,7 @@ NowPlayingView::paintEvent( QPaintEvent* e )
 
     // determine rotated height
     QTransform trans;
-    trans.rotate( -20, Qt::YAxis );
+    trans.rotate( -27, Qt::YAxis );
     QRectF r1 = rect().translated( -width()/2, -height()/2 );
     qreal const h = trans.inverted().map( QLineF( r1.topLeft(), r1.bottomLeft() ) ).dy();
 
@@ -100,6 +100,6 @@ NowPlayingView::paintEvent( QPaintEvent* e )
     trans.scale( scale, scale );
 
     // draw
-    p.setTransform( trans * QTransform().translate( height()/2, height()/2 ) );
-    p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/2 ), m_cover );
+    p.setTransform( trans * QTransform().translate( height()/2, height()/3 ) );
+    p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/3 ), m_cover );
 }
