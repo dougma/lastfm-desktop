@@ -31,8 +31,8 @@ PlayerManager::PlayerManager( PlayerListener* listener )
     connect( o, SIGNAL(playbackEnded( QString )), SLOT(onPlaybackEnded( QString )) );
     connect( o, SIGNAL(playbackPaused( QString )), SLOT(onPlaybackPaused( QString )) );
     connect( o, SIGNAL(playbackResumed( QString )), SLOT(onPlaybackResumed( QString )) );
-    connect( o, SIGNAL(playerInit( QString )), SLOT( onPlayerInit( QString )) );
-    connect( o, SIGNAL(playerTerm( QString)), SLOT( onPlayerTerm( QString )) );
+    connect( o, SIGNAL(playerConnected( QString )), SLOT(onPlayerConnected( QString )) );
+    connect( o, SIGNAL(playerDisconnected( QString)), SLOT(onPlayerDisconnected( QString )) );
 }
 
 
@@ -52,11 +52,10 @@ PlayerManager::onTrackStarted( const Track& t )
     delete m_track.m_watch; //stuff is connected to it, break those connections
 
     m_track = t;
-    m_state = PlayerState::Playing;
     m_track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
     connect( m_track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
 
-    handleStateChange( m_state, m_track );
+    handleStateChange( PlayerState::Playing, m_track );
 }
 
 
@@ -87,6 +86,27 @@ PlayerManager::onPlaybackResumed( const QString& id )
         m_track.m_watch->resume();
 
     handleStateChange( PlayerState::Playing );
+}
+
+
+void
+PlayerManager::onPlayerConnected( const QString &playerId )
+{
+    emit event( PlayerEvent::PlayerConnected, QVariant::fromValue( playerId ) );
+}
+
+
+void
+PlayerManager::onPlayerDisconnected( const QString &playerId )
+{
+    emit event( PlayerEvent::PlayerDisconnected, QVariant::fromValue( playerId ) );
+
+    // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media
+    // players leaving the scrobbler in a playing state
+#ifdef NDEBUG
+    #error did you build all the new plugins and that?
+    onPlaybackEnded( playerId );
+#endif
 }
 
 
@@ -163,22 +183,4 @@ PlayerManager::onStopWatchTimedOut()
 {
     MutableTrack( track() ).setRatingFlag( Track::Scrobbled );
     emit event( PlayerEvent::ScrobblePointReached, QVariant::fromValue( track() ) );
-}
-
-
-void
-PlayerManager::onPlayerInit( const QString &playerId )
-{
-    emit event( PlayerEvent::PlayerInit, QVariant::fromValue( playerId ) );
-}
-
-
-void
-PlayerManager::onPlayerTerm( const QString &playerId )
-{
-    emit event( PlayerEvent::PlayerTerm, QVariant::fromValue( playerId ) );
-
-    // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media players 
-    // leaving the scrobbler in a playing state.
-    onPlaybackEnded( playerId );
 }

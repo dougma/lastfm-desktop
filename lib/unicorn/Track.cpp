@@ -98,7 +98,7 @@ Track::toDomElement( QDomDocument& document ) const
 
 
 QString
-Track::toString() const
+Track::prettyTitle( const QChar& separator ) const
 {
     if ( d->artist.isEmpty() )
     {
@@ -111,7 +111,7 @@ Track::toString() const
     if ( d->title.isEmpty() )
         return d->artist;
 
-    return d->artist + ' ' + QChar(8211) /*en dash*/ + ' ' + d->title;
+    return d->artist + ' ' + separator + ' ' + d->title;
 }
 
 
@@ -242,4 +242,17 @@ Track::topTags() const
         qWarning() << e;
     }
     return tags;
+}
+
+
+#include "User.h"
+WsReply*
+Track::share( const User& recipient, const QString& message )
+{
+    return WsRequestBuilder( "track.share" )
+        .add( "recipient", recipient )
+        .add( "artist", d->artist )
+        .add( "track", d->title )
+        .addIfNotEmpty( "message", message )
+        .post();
 }

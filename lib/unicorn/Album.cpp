@@ -19,6 +19,7 @@
 
 #include "Album.h"
 #include "Artist.h"
+#include "User.h"
 #include "ws/WsRequestBuilder.h"
 #include "ws/WsReply.h"
 #include <QEventLoop>
@@ -27,7 +28,7 @@
 WsReply*
 Album::getInfo() const
 {
-    return WsRequestBuilder( "Album.getInfo" )
+    return WsRequestBuilder( "album.getInfo" )
             .add( "artist", m_artist )
             .add( "album", m_title )
             .get();
@@ -61,4 +62,16 @@ Album::image()
     }
 
     return QPixmap();
+}
+
+
+WsReply*
+Album::share( const User& recipient, const QString& message )
+{
+    return WsRequestBuilder( "album.share" )
+        .add( "recipient", recipient )
+        .add( "artist", m_artist )
+        .add( "album", m_title )
+        .addIfNotEmpty( "message", message )
+        .post();
 }

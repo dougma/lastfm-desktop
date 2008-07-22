@@ -28,7 +28,7 @@
    <string>Last.fm Settings</string>
   </property>
   <property name="modal" >
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" >
    <property name="spacing" >
@@ -192,14 +192,6 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="accountPage" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>419</width>
-        <height>288</height>
-       </rect>
-      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="accountBox" >
@@ -296,14 +288,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="radioPage" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>100</width>
-        <height>30</height>
-       </rect>
-      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="groupBox" >
@@ -507,14 +491,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="scrobblingPage" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>100</width>
-        <height>30</height>
-       </rect>
-      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QLabel" name="label_13" >
@@ -612,14 +588,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="connectionPage" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>100</width>
-        <height>30</height>
-       </rect>
-      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="proxyBox" >
@@ -895,14 +863,6 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>100</width>
-        <height>30</height>
-       </rect>
-      </property>
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="isIPodScrobblingEnabled" >

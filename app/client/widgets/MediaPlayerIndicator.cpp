@@ -14,21 +14,15 @@ MediaPlayerIndicator::MediaPlayerIndicator(QWidget *parent)
 }
 
 
-MediaPlayerIndicator::~MediaPlayerIndicator()
-{
-
-}
-
-
 void
 MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 {
     switch( e )
     { 
-        case PlayerEvent::PlayerInit:
+        case PlayerEvent::PlayerConnected:
             mediaPlayerConnected( v.toString() );
             break;
-        case PlayerEvent::PlayerTerm:
+        case PlayerEvent::PlayerDisconnected:
             mediaPlayerDisconnected( v.toString() );
             break;
         default:

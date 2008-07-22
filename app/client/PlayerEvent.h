@@ -69,10 +69,10 @@ namespace PlayerEvent
         ScrobblePointReached,
         
         /** A new media player has sent a message to the client */ 
-        PlayerInit,
+        PlayerConnected,
 
         /** A media player has terminated */
-        PlayerTerm,
+        PlayerDisconnected,
 
         TypeMax /** leave at end of enum, kthxbai */
     };

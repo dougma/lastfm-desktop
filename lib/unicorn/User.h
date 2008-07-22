@@ -17,36 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
+#ifndef UNICORN_USER_H
+#define UNICORN_USER_H
+
+#include <QString>
+#include "lib/DllExportMacro.h"
+#include "lib/unicorn/ws/WsReply.h" //convenience
 
 
-class MainWindow : public QMainWindow
+class UNICORN_DLLEXPORT User
 {
-    Q_OBJECT
+    QString m_name;
 
 public:
-    MainWindow();
+    explicit User( const QString& username ) : m_name( username )
+    {}
 
-    struct : Ui::MainWindow
-    {
-        class NowPlayingView* nowPlaying;
-        class ScrobbleProgressBar* progress;
-    } 
-    ui;
+    operator QString() const { return m_name; }
 
-protected:
-    void closeEvent( QCloseEvent* );
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
+    WsReply* getFriends();
+    static QStringList getFriends( WsReply* );
 };
+
+#endif

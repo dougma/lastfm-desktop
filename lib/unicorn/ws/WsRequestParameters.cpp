@@ -59,6 +59,7 @@ WsRequestParameters::methodSignature() const
     while (i.hasNext()) {
         i.next();
         s += i.key() + i.value();
+        qDebug() << i.key() << i.value();
     }
     s += API_SECRET;
 

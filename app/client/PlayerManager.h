@@ -43,8 +43,8 @@ public slots:
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );
     void onPlaybackResumed( const QString& playerId );
-    void onPlayerInit( const QString& playerId );
-    void onPlayerTerm( const QString& playerId );
+    void onPlayerConnected( const QString& playerId );
+    void onPlayerDisconnected( const QString& playerId );
 
 signals:
     /** the int is a PlaybackEvent, @data is documented with the enum */

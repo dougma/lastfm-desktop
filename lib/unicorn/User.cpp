@@ -17,36 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
+#include "User.h"
+#include "lib/unicorn/ws/WsRequestBuilder.h"
 
 
-class MainWindow : public QMainWindow
+WsReply*
+User::getFriends()
 {
-    Q_OBJECT
+    return WsRequestBuilder( "user.getFriends" ).add( "user", m_name ).get();
+}
 
-public:
-    MainWindow();
 
-    struct : Ui::MainWindow
+QStringList
+User::getFriends( WsReply* r )
+{
+    QStringList names;
+    try
     {
-        class NowPlayingView* nowPlaying;
-        class ScrobbleProgressBar* progress;
-    } 
-    ui;
-
-protected:
-    void closeEvent( QCloseEvent* );
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-};
+        foreach (EasyDomElement e, r->lfm().children( "user" ))
+            names += e["name"].text();
+    }
+    catch (EasyDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }
+    return names;
+}

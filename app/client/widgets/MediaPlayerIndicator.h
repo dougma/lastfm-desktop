@@ -8,8 +8,7 @@ class MediaPlayerIndicator : public QWidget
     Q_OBJECT
 
 public:
-    MediaPlayerIndicator(QWidget *parent = 0);
-    ~MediaPlayerIndicator();
+    MediaPlayerIndicator( QWidget *parent = 0 );
 
 private slots:
     void onAppEvent( int e, const QVariant& v );

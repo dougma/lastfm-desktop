@@ -52,8 +52,8 @@ signals:
     void playbackPaused( const QString& playerId );
     void playbackResumed( const QString& playerId );
     void bootstrapCompleted( const QString& playerId, const QString& username );
-    void playerInit( const QString& playerId );
-    void playerTerm( const QString& playerId );
+    void playerConnected( const QString& playerId );
+    void playerDisconnected( const QString& playerId );
 
 private slots:
     void onNewConnection();

@@ -18,8 +18,10 @@
  ***************************************************************************/
 
 #include "PlayerState.h"
+#include "lib/unicorn/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/unicorn/ws/WsError.h"
+
 
 class App : public Unicorn::Application
 {
@@ -31,6 +33,9 @@ public:
 
     void setMainWindow( class MainWindow* );
     MainWindow& mainWindow() const { return *m_mainWindow; }
+    
+    /** the currently observed track */
+    Track track() const;
     
     void open( const class QUrl& url );
 
@@ -68,3 +73,9 @@ private:
 
     class QSystemTrayIcon* m_trayIcon;
 };
+
+
+namespace The
+{
+    inline App& app() { return *(App*)qApp; }
+}

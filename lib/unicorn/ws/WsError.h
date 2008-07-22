@@ -33,6 +33,7 @@ namespace Ws
         InvalidFormat,
         InvalidParameters,
         InvalidResourceSpecified,
+        OperationFailed,
         InvalidSessionKey,
         InvalidApiKey,
         ServiceOffline,

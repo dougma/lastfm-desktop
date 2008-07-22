@@ -19,6 +19,7 @@
 
 #include "RadioWidget.h"
 #include "AudioPlaybackEngine.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QAction>
 #include <QEvent>
 #include <QLabel>
@@ -26,34 +27,6 @@
 #include <QMovie>
 #include <QToolBar>
 #include <QVBoxLayout>
-
-
-class SpinnerLabel : public QLabel
-{
-    virtual bool event( QEvent* e )
-    {
-        switch ((int)e->type())
-        {
-        case QEvent::Hide:
-            m_movie->setPaused( true );
-            break;
-        case QEvent::Show:
-            m_movie->start();
-            break;
-        }
-
-        return QLabel::event( e );
-    }
-
-    QMovie* m_movie;
-
-public:
-    SpinnerLabel( QWidget* parent = 0 ) : QLabel( parent )
-    {
-        setMovie( m_movie = new QMovie( ":/spinner.mng" ) );
-        m_movie->setParent( this );
-    }
-};
 
 
 RadioWidget::RadioWidget( QWidget* parent )

@@ -18,13 +18,16 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
+#include "App.h"
 #include "PlayerEvent.h"
+#include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
+#include "widgets/MediaPlayerIndicator.h"
 #include "widgets/MetaInfoView.h"
+#include "widgets/NowPlayingView.h"
 #include "widgets/ScrobbleProgressBar.h"
 #include "widgets/SettingsDialog.h"
-#include "widgets/NowPlayingView.h"
-#include "widgets/MediaPlayerIndicator.h"
+#include "widgets/ShareDialog.h"
 #include "version.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
@@ -67,6 +70,7 @@ MainWindow::MainWindow()
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
+    connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
@@ -81,6 +85,7 @@ MainWindow::showSettingsDialog()
             d = new Type( this ); \
             d->setAttribute( Qt::WA_DeleteOnClose ); \
             d->setWindowFlags( Qt::Dialog ); \
+            d->setModal( false ); \
             d->show(); \
         } else \
             d->activateWindow();
@@ -106,7 +111,15 @@ MainWindow::showAboutDialog()
 void
 MainWindow::showMetaInfoView()
 {
-    NON_MODAL_MACRO( MetaInfoView )
+
+}
+
+
+void
+MainWindow::showShareDialog()
+{
+    NON_MODAL_MACRO( ShareDialog )
+    d->setTrack( The::app().track() );
 }
 
 
@@ -211,11 +224,22 @@ MainWindow::onAppEvent( int e, const QVariant& v )
     {
         case PlayerEvent::PlaybackStarted:
         case PlayerEvent::TrackChanged:
-            setWindowTitle( v.value<ObservedTrack>().toString() );
+            setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
+
+            ui.share->setEnabled( true );
+            ui.tag->setEnabled( true );
+            ui.love->setEnabled( true );
+            ui.ban->setEnabled( true );
+
             break;
 
         case PlayerEvent::PlaybackEnded:
             setWindowTitle( qApp->applicationName() );
+
+            ui.share->setEnabled( false );
+            ui.tag->setEnabled( false );
+            ui.love->setEnabled( false );
+            ui.ban->setEnabled( false );
             break;
     }
 }

@@ -54,8 +54,10 @@ public:
 
     /** add a parameter to the request */
     WsRequestBuilder& add( const QString& key, const QString& value ) { params.add( key, value ); return *this; }
-
-    
+    /** adds the parameter if @p value is not empty */
+    WsRequestBuilder& addIfNotEmpty( const QString& key, const QString& v ) { if (v.size()) params.add( key, v ); return *this; }
+  
+    /** connects the receiver and slot to the reply's done() signal */
     WsRequestBuilder& connect( QObject* receiver, const char* slot );
 };
 

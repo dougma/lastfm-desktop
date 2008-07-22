@@ -21,6 +21,7 @@
 #define UNICORN_ARTIST_H
 
 #include "lib/DllExportMacro.h"
+#include "lib/unicorn/ws/WsReply.h" //convenience
 #include <QString>
 
 
@@ -36,6 +37,8 @@ public:
     {}
 
     operator QString() const { return m_name; }
+
+    WsReply* share( const class User& recipient, const QString& message = "" );
 };
 
 #endif

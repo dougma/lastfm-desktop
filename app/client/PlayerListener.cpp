@@ -55,10 +55,9 @@ PlayerListener::onDisconnected( QAbstractSocket::SocketState state )
 {
     QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
 
-    if( state != QAbstractSocket::ConnectedState && 
-        m_socketMap.contains( socket ) )
+    if (state != QAbstractSocket::ConnectedState && m_socketMap.contains( socket ))
     {
-        emit playerTerm( m_socketMap[ socket ] );
+        emit playerDisconnected( m_socketMap[ socket ] );
         m_socketMap.remove( socket );
     }
 }
@@ -92,11 +91,11 @@ PlayerListener::onDataReady()
                     emit bootstrapCompleted( parser.playerId(), parser.username() );
                     break;
                 case PlayerCommandParser::Init:
-                    emit playerInit( parser.playerId() );
+                    emit playerConnected( parser.playerId() );
                     break;
                 case PlayerCommandParser::Term:
                     m_socketMap.remove( socket );
-                    emit playerTerm( parser.playerId() );
+                    emit playerDisconnected( parser.playerId() );
                     break;
             }
             

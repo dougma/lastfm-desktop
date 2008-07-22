@@ -26,6 +26,9 @@ class Settings;
 namespace The { Settings& settings(); }
 
 
+/** usage, only put interesting settings in here, which mostly means ones set in
+  * in the settings dialog. For class local settings, just make a small 
+  * QSettings local derived class */
 class Settings : public Moose::Settings
 {
     Settings( const QString& version, const QString& path );
@@ -33,10 +36,6 @@ class Settings : public Moose::Settings
     static Settings* instance;
     friend class App;
     friend Settings& The::settings();
-
-public:
-    QByteArray containerGeometry() const { return QSettings().value( "MainWindowGeometry" ).toByteArray(); }
-    Qt::WindowState containerWindowState() const { return (Qt::WindowState) QSettings().value( "MainWindowState" ).toInt(); }
 
 private:
     bool m_weWereJustUpgraded;
@@ -51,8 +50,6 @@ public:
 
     void setControlPort( int v ) { QSettings().setValue( "ControlPort", v ); }
     void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
-    void setContainerWindowState( int state ) { QSettings().setValue( "MainWindowState", state ); }
-    void setContainerGeometry( QByteArray state ) { QSettings().setValue( "MainWindowGeometry", state ); }
 };
 
 

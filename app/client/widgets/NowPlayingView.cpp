@@ -65,7 +65,10 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
     switch (e)
     {
     case PlayerEvent::PlaybackEnded:
-        // will use empty Track()
+        m_cover = QImage();
+        update();
+        break;
+
     case PlayerEvent::PlaybackStarted:
     case PlayerEvent::TrackChanged:
         m_cover = v.value<ObservedTrack>().album().image().toImage().convertToFormat( QImage::Format_ARGB32_Premultiplied );

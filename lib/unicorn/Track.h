@@ -133,7 +133,7 @@ public:
     bool isBanned() const { return d->ratingFlags & Track::Banned; }
     bool isScrobbled() const { return d->ratingFlags & Track::Scrobbled; }
 
-    QString toString() const;
+    QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
 
     /** only one rating is possible, we have to figure out which from various flags applied */
     QString ratingCharacter() const;
@@ -154,6 +154,8 @@ public:
 
     // TODO not asyncronous! return a WsReply object!
     QStringList topTags() const;
+
+    WsReply* share( const class User& recipient, const QString& message = "" );
 
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise
@@ -216,7 +218,7 @@ TrackData::TrackData()
 #include <QDebug>
 inline QDebug operator<<( QDebug d, const Track& t )
 {
-    return d << t.toString().replace( QChar(8211), '-' );
+    return d << t.prettyTitle( '-' );
 }
 
 

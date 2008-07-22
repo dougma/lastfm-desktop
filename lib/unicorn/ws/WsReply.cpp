@@ -118,6 +118,7 @@ WsReply::onFinished()
 
         switch (m_error)
         {
+            case Ws::OperationFailed:
             case Ws::InvalidSessionKey:
                 // NOTE will never be received during the LoginDialog stage
                 // since that happens before this slot is registered with

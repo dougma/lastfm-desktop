@@ -118,7 +118,7 @@ App::onAppEvent( int e, const QVariant& d )
 
             // no tooltips on mac
         #ifndef Q_WS_MAC
-            m_trayIcon->setToolTip( t.toString() );
+            m_trayIcon->setToolTip( t.prettyTitle() );
         #endif
             break;
         }            
@@ -141,6 +141,15 @@ App::onWsError( Ws::Error e )
 {
     switch (e)
     {
+        case Ws::OperationFailed:
+            //TODOCOPY
+            //TODO use the non intrusive status messages
+            MessageBoxBuilder( m_mainWindow )
+                    .setTitle( "Oops" )
+                    .setText( "Last.fm is b0rked" )
+                    .exec();
+            break;
+
         case Ws::InvalidSessionKey:
             logout();
             break;
@@ -228,7 +237,8 @@ App::onRadioPlaybackEnded()
 }
 
 
-namespace The
+Track
+App::track() const
 {
-    App& app() { return *(App*)qApp; }
+    return m_playerManager->track();
 }

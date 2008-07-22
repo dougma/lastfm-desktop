@@ -1,6 +1,5 @@
  <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
-     <file>as.png</file>
-	 <file>16x16/as.png</file>
+     <file>spinner.mng</file>
  </qresource>
  </RCC> 

@@ -17,36 +17,36 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
+#ifndef SHARE_DIALOG_H
+#define SHARE_DIALOG_H
+
+#include "lib/unicorn/Track.h"
+#include "ui_ShareDialog.h"
 
 
-class MainWindow : public QMainWindow
+class ShareDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    MainWindow();
+    ShareDialog( QWidget* parent );
 
-    struct : Ui::MainWindow
-    {
-        class NowPlayingView* nowPlaying;
-        class ScrobbleProgressBar* progress;
-    } 
-    ui;
+    /** for the love of all that is holy, call this before show! */
+    void setTrack( const Track& );
 
-protected:
-    void closeEvent( QCloseEvent* );
+    Ui::ShareDialog ui;
 
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    
 private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
+    void onFriendsReturn( class WsReply* );
+    void enableDisableOk();
+
+private:
+    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
+
+    virtual bool eventFilter( QObject*, QEvent* );
+    virtual void accept();
+
+    Track m_track;
 };
+
+#endif

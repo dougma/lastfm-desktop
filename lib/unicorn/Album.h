@@ -56,6 +56,8 @@ public:
     /** downloads image FIXME not synchronously! */
     QPixmap image();
 #endif
+
+    WsReply* share( const class User& recipient, const QString& message = "" );
 };
 
 #endif

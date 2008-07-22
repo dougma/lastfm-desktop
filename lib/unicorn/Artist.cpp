@@ -17,36 +17,18 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
+#include "Artist.h"
+#include "User.h"
+#include "lib/unicorn/ws/WsRequestBuilder.h"
 
 
-class MainWindow : public QMainWindow
+WsReply*
+Artist::share( const User& user, const QString& message )
 {
-    Q_OBJECT
-
-public:
-    MainWindow();
-
-    struct : Ui::MainWindow
-    {
-        class NowPlayingView* nowPlaying;
-        class ScrobbleProgressBar* progress;
-    } 
-    ui;
-
-protected:
-    void closeEvent( QCloseEvent* );
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-};
+    return WsRequestBuilder( "artist.share" )
+        .add( "recipient", user )
+        .add( "artist", m_name )
+        .addIfNotEmpty( "message", message )
+        //TODO this must be post! you're testing here
+        .get();
+}
