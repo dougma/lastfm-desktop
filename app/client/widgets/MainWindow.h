@@ -38,7 +38,9 @@ public:
     ui;
 
 protected:
+#ifdef WIN32
     void closeEvent( QCloseEvent* );
+#endif
 
 public slots:
     void showSettingsDialog();

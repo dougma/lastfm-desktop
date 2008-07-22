@@ -33,6 +33,7 @@ public:
 
     /** for the love of all that is holy, call this before show! */
     void setTrack( const Track& );
+	Track track() const { return m_track; }
 
     Ui::ShareDialog ui;
 

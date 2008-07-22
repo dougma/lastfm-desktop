@@ -84,14 +84,17 @@ MainWindow::MainWindow()
 void
 MainWindow::showSettingsDialog()
 {
+	#define THROW_AWAY_DIALOG( Type ) \
+		d = new Type( this ); \
+		d->setAttribute( Qt::WA_DeleteOnClose ); \
+		d->setWindowFlags( Qt::Dialog ); \
+		d->setModal( false ); \
+		d->show(); \
+	
     #define NON_MODAL_MACRO( Type ) \
         static QPointer<Type> d; \
         if (!d) { \
-            d = new Type( this ); \
-            d->setAttribute( Qt::WA_DeleteOnClose ); \
-            d->setWindowFlags( Qt::Dialog ); \
-            d->setModal( false ); \
-            d->show(); \
+			THROW_AWAY_DIALOG( Type ); \
         } else \
             d->activateWindow();
 
@@ -123,15 +126,24 @@ MainWindow::showMetaInfoView()
 void
 MainWindow::showShareDialog()
 {
-    NON_MODAL_MACRO( ShareDialog )
-    d->setTrack( The::app().track() );
+	// Show non modal ShareDialogs, one for every track played
+	// As the user requests them anyway...
+	
+	static QPointer<ShareDialog> d;
+	Track t = The::app().track();
+	if (d && d->track() == t)
+		d->activateWindow();
+	else {
+		THROW_AWAY_DIALOG( ShareDialog )
+		d->setTrack( t );
+	}
 }
 
 
+#ifdef WIN32
 void
 MainWindow::closeEvent( QCloseEvent* event )
 {
-#ifdef WIN32
     //TEST this works on XP as it sure doesn't on Vista
 
     hide();
@@ -160,10 +172,8 @@ MainWindow::closeEvent( QCloseEvent* event )
     // Make it release memory as when minimised
     HANDLE h = ::GetCurrentProcess();
     SetProcessWorkingSetSize( h, -1 ,-1 );
-#else
-    QMainWindow::closeEvent( event );
-#endif
 }
+#endif
 
 
 void
@@ -233,7 +243,7 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             Track t = v.value<ObservedTrack>();
             setWindowTitle( t.prettyTitle() );
 
-            ui.label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
+            ui.label->setText( t.artist() );// + "<br><b>" + t.title() + "</b><br>" + t.album() );
 
             ui.share->setEnabled( true );
             ui.tag->setEnabled( true );
