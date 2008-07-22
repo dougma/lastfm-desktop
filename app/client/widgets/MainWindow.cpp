@@ -54,17 +54,22 @@ MainWindow::MainWindow()
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     connect( close, SIGNAL(activated()), SLOT(close()) );
     
-    QWidget* w = new QWidget();
+    QWidget* w = ui.nowPlaying = new NowPlayingView;
     w->setPalette( QPalette( Qt::white, Qt::black ) );
     w->setAutoFillBackground( true );
+    
+    QHBoxLayout* h = new QHBoxLayout;
+    h->addStretch();
+    h->addWidget( ui.label = new QLabel );
+
     QVBoxLayout* v = new QVBoxLayout( w );
-    v->addWidget( ui.nowPlaying = new NowPlayingView );
+    v->addLayout( h );
+    v->setStretchFactor( h, 1 );
     v->addWidget( new MediaPlayerIndicator );
     v->addWidget( ui.progress = new ScrobbleProgressBar );
-    v->setMargin( 15 );
-    setCentralWidget( w );
+    v->setMargin( 10 );
 
-    ui.nowPlaying->setContentsMargins( 50, 50, 50, 50 );
+    setCentralWidget( w );
 
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
@@ -224,7 +229,11 @@ MainWindow::onAppEvent( int e, const QVariant& v )
     {
         case PlayerEvent::PlaybackStarted:
         case PlayerEvent::TrackChanged:
-            setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
+        {
+            Track t = v.value<ObservedTrack>();
+            setWindowTitle( t.prettyTitle() );
+
+            ui.label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
 
             ui.share->setEnabled( true );
             ui.tag->setEnabled( true );
@@ -232,6 +241,7 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             ui.ban->setEnabled( true );
 
             break;
+        }
 
         case PlayerEvent::PlaybackEnded:
             setWindowTitle( qApp->applicationName() );

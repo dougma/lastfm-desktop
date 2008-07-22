@@ -27,7 +27,7 @@ static inline QImage compose( const QImage &in )
 {
     qDebug() << "Image dimensions:" << in.size();
 
-    const uint H = qreal(in.height()) / 7.5; // 40 for 300px images
+    const uint H = qreal(in.height()) / 2;
 
     QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
     QPainter p( &out );
@@ -52,7 +52,7 @@ static inline QImage compose( const QImage &in )
 NowPlayingView::NowPlayingView( QWidget* parent )
               : QWidget( parent )
 {
-    setMinimumSize( 150, 170 );
+    setMinimumSize( 150, 225 );
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );

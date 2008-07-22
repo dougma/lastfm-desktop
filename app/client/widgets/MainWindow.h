@@ -33,6 +33,7 @@ public:
     {
         class NowPlayingView* nowPlaying;
         class ScrobbleProgressBar* progress;
+        class QLabel* label;
     } 
     ui;
 
