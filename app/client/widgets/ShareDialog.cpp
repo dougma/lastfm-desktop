@@ -91,18 +91,22 @@ ShareDialog::eventFilter( QObject* o, QEvent* e )
 {
     if (e->type() != QEvent::Paint)
         return false;
-
-    QWidget* w = (QWidget*)o;
-
-    if (w->hasFocus()) return false;
+	
+	QLineEdit *w = (QLineEdit*)o;
+    if (w->hasFocus() || w->text().size()) 
+		return false;
     
-    o->event( e );
+    w->event( e );
     
     QString const text = tr( "Type friends' names or emails, separated by commas" );
     QRect r = w->rect().adjusted( 5, 2, -5, 0 );
     QPainter p( w );
-    p.setPen( Qt::gray );
-    p.setFont( w->font() );
+    p.setPen( Qt::gray );	
+#ifdef Q_WS_MAC
+	QFont f = font();
+	f.setPixelSize( 10 );
+	p.setFont( f );
+#endif
     p.drawText( r, Qt::AlignVCenter, text );
 
     return true; //eat event
