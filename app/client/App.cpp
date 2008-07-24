@@ -75,7 +75,6 @@ App::App( int argc, char** argv )
 
 App::~App()
 {
-    delete m_radio;
     delete m_scrobbler;
     delete Settings::instance;
 }
