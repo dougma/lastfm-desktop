@@ -72,6 +72,7 @@
     #define FINGERPRINT_DLLEXPORT
     #define WS_DLLEXPORT
     #define CORE_DLLEXPORT
+    #define TYPES_DLLEXPORT
 #endif
 
 #endif
