@@ -20,7 +20,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{3FDD67B7-DF67-4F22-8545-755D722794BC}"
 	ProjectSection(SolutionItems) = preProject
 		common\qrc\common.qrc = common\qrc\common.qrc
-		common\DllExportMacro.h = common\DllExportMacro.h
+		lib\DllExportMacro.h = lib\DllExportMacro.h
 	EndProjectSection
 EndProject'
 

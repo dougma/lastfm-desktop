@@ -42,9 +42,6 @@
   */
 namespace Unicorn
 {
-    /** the 32 hex-character md5 hash */
-    UNICORN_DLLEXPORT QString md5( const QByteArray& );
-
     /** Translate a Qt language code into the language code used on the Last.fm 
       * site */
     UNICORN_DLLEXPORT QString qtLanguageToLfmLangCode( QLocale::Language qtLang );

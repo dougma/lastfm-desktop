@@ -17,26 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_USER_H
-#define UNICORN_USER_H
+#ifndef UNICORN_ALBUM_H
+#define UNICORN_ALBUM_H
 
-#include <QString>
+#include "Artist.h"
+#include "Mbid.h"
 #include "lib/DllExportMacro.h"
-#include "lib/ws/WsReply.h" //convenience
+#include <QString>
+class WsReply;
 
 
-class UNICORN_DLLEXPORT User
+class TYPES_DLLEXPORT Album
 {
-    QString m_name;
+    Mbid m_mbid;
+    Artist m_artist;
+    QString m_title;
 
 public:
-    explicit User( const QString& username ) : m_name( username )
+    explicit Album( Mbid mbid ) : m_mbid( mbid )
     {}
 
-    operator QString() const { return m_name; }
+    Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
+    {}
 
-    WsReply* getFriends();
-    static QStringList getFriends( WsReply* );
+    operator QString() const { return m_title; }
+    QString title() const { return m_title; }
+    Artist artist() const { return m_artist; }
+    Mbid mbid() const { return m_mbid; }
+
+    /** Album.getInfo WebService */
+    WsReply* getInfo() const;
+
+    /** downloads image, use QPixmap::loadFromData FIXME not synchronously! */
+    QByteArray image();
+
+    WsReply* share( const class User& recipient, const QString& message = "" );
 };
 
 #endif

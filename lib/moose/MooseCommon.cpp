@@ -20,9 +20,8 @@
 #include "MooseCommon.h"
 #include "MooseSettings.h"
 
-#include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/MessageBoxBuilder.h"
+#include "lib/core/MessageBoxBuilder.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -111,8 +110,6 @@ Moose::isAlreadyRunning()
 bool
 Moose::sendToInstance( const QString& data, Moose::StartNewInstanceBehaviour behaviour )
 {
-    LOGL( 3, "sendToInstance (new instance): " << data );
-
     QTcpSocket socket;
     socket.connectToHost( QHostAddress::LocalHost, Moose::Settings().controlPort() );
 

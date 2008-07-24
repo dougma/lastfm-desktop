@@ -19,7 +19,7 @@
 
 #include "MetaInfoView.h"
 #include "PlayerEvent.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include <QCoreApplication>
 #include <QDesktopServices>
 

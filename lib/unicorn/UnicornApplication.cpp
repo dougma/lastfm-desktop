@@ -18,16 +18,20 @@
  ***************************************************************************/
 
 #include "UnicornApplication.h"
-#include "MessageBoxBuilder.h"
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
+#include "lib/core/MessageBoxBuilder.h"
+#include "lib/ws/WsKeys.h"
 
 
 Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
-    // FIXME currently Unicorn doesn't mean Last.fm
+    // HI! DON'T USE OURS! GET YOUR OWN! http://www.last.fm/api
+    Ws::SharedSecret = "73582dfc9e556d307aead069af110ab8";
+    Ws::ApiKey = "c8c7b163b11f92ef2d33ba6cd3c2c3c3";
+
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );    
 
@@ -64,6 +68,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             throw StubbornUserException();
         }
     }
+
+    Ws::SessionKey = qstrdup( s.sessionKey().toAscii().data() );
 }
 
 

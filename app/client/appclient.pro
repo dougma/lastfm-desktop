@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = client
-CONFIG += unicorn moose radio
+CONFIG += unicorn moose radio core ws types
 QT = core gui xml network phonon webkit opengl
 INCLUDEPATH += .
 

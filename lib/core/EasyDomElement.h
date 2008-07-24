@@ -31,7 +31,7 @@
   * foreach (EasyDomElement e, EasyDomElement( dome )["album"].children( "image" ))
   *     qDebug() << e.text();
   */
-class UNICORN_DLLEXPORT EasyDomElement
+class CORE_DLLEXPORT EasyDomElement
 {
     QDomElement e;
 

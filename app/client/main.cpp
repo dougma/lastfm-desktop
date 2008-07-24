@@ -21,8 +21,8 @@
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
+#include "lib/core/Logger.h"
 #include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/UnicornUtils.h"
 #include <QDir>

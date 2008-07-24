@@ -20,7 +20,7 @@
 #ifndef OBSERVED_TRACK_H
 #define OBSERVED_TRACK_H
 
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include "StopWatch.h" // sadly necessary dep
 #include <QPointer>
 

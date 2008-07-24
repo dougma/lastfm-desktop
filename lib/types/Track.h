@@ -54,7 +54,7 @@ struct TrackData : QSharedData
 };
 
 
-class UNICORN_DLLEXPORT Track
+class TYPES_DLLEXPORT Track
 {
 public:
     enum Source
@@ -175,7 +175,7 @@ public:
 };
 
 
-class UNICORN_DLLEXPORT MutableTrack : public Track
+class TYPES_DLLEXPORT MutableTrack : public Track
 {
 public:
     MutableTrack()

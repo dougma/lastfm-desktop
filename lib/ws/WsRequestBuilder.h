@@ -20,10 +20,9 @@
 #ifndef WS_REQUEST_MANAGER_H
 #define WS_REQUEST_MANAGER_H
 
-#include "WsRequestParameters.h"
 #include "lib/DllExportMacro.h"
-
-class WsReply;
+#include "WsReply.h" //conveience
+#include "WsRequestParameters.h"
 
    
 class WS_DLLEXPORT WsRequestBuilder

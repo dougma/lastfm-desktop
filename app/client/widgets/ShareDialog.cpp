@@ -19,7 +19,7 @@
 
 #include "ShareDialog.h"
 #include "Settings.h"
-#include "lib/unicorn/User.h"
+#include "lib/types/User.h"
 #include <QLineEdit>
 #include <QPainter>
 #include <QTimer>

@@ -17,28 +17,17 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_ARTIST_H
-#define UNICORN_ARTIST_H
+#ifndef UNICORN_MBID_H
+#define UNICORN_MBID_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/ws/WsReply.h" //convenience
 #include <QString>
 
 
-class UNICORN_DLLEXPORT Artist
+class TYPES_DLLEXPORT Mbid : private QString
 {
-    QString m_name;
-
 public:
-    Artist()
-    {}
-
-    explicit Artist( const QString& name ) : m_name( name )
-    {}
-
-    operator QString() const { return m_name; }
-
-    WsReply* share( const class User& recipient, const QString& message = "" );
+    operator QString() const { return *this; }
 };
 
 #endif

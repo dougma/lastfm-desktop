@@ -28,7 +28,7 @@
 #include "scrobbler/Scrobbler.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
-#include "lib/unicorn/MessageBoxBuilder.h"
+#include "lib/core/MessageBoxBuilder.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 

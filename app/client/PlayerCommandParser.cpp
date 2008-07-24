@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "PlayerCommandParser.h"
-#include "lib/unicorn/Logger.h"
 #include <QStringList>
 #include <QUrl>
 

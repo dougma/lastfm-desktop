@@ -22,7 +22,7 @@
 
 #include "RadioStation.h"
 #include "lib/DllExportMacro.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include <QList>
 #include <QUrl>
 

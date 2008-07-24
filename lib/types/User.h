@@ -17,47 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SEND_LOGS_REQUEST_H
-#define SEND_LOGS_REQUEST_H
+#ifndef UNICORN_USER_H
+#define UNICORN_USER_H
 
 #include <QString>
-#include <QStringList>
-#include <QByteArray>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include "lib/DllExportMacro.h"
+#include "lib/ws/WsReply.h" //convenience
 
 
-class SendLogsRequest : public QObject
+class TYPES_DLLEXPORT User
 {
-    Q_OBJECT
+    QString m_name;
 
-    signals:
-        void success();
-        void error();
+public:
+    explicit User( const QString& username ) : m_name( username )
+    {}
 
-    public:
-        SendLogsRequest(QString clientname, QString clientversion, QString usernotes );
-        
-        void addLog( QString name, QString filename );
-        void addLogData( QString name, QString data );
-        
-        void send();
-        
-    protected:
-        QString escapeString( QString );
-        QByteArray postData( QString name, QByteArray data );
-        
-        QNetworkAccessManager m_networkAccessManager; //FIXME: this should be shared
-        QByteArray m_data;
-        QStringList m_logs;
-        QString m_clientname, m_clientversion, m_usernotes;
-        bool m_error;
-    
-    private slots:
-        void onFinished();
-        void onError( QNetworkReply::NetworkError code );
+    operator QString() const { return m_name; }
+
+    WsReply* getFriends();
+    static QStringList getFriends( WsReply* );
 };
 
 #endif
-

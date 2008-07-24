@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2007-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,28 +17,28 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MESSAGE_BOX_BUILDER_H
-#define MESSAGE_BOX_BUILDER_H
+#ifndef UNICORN_ARTIST_H
+#define UNICORN_ARTIST_H
 
 #include "lib/DllExportMacro.h"
-#include <QtGui/QMessageBox>
+#include "lib/ws/WsReply.h" //convenience
+#include <QString>
 
 
-class UNICORN_DLLEXPORT MessageBoxBuilder
+class TYPES_DLLEXPORT Artist
 {
-    QMessageBox box;
+    QString m_name;
 
 public:
-    /** Try not to use 0! */
-    MessageBoxBuilder( QWidget* parent ) : box( parent )
+    Artist()
     {}
-    
-    MessageBoxBuilder& setTitle( const QString& x );
-    MessageBoxBuilder& setText( const QString& x );
-    /** the default is Information */
-    MessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
 
-    int exec();
+    explicit Artist( const QString& name ) : m_name( name )
+    {}
+
+    operator QString() const { return m_name; }
+
+    WsReply* share( const class User& recipient, const QString& message = "" );
 };
 
-#endif // MESSAGEBOX_H
+#endif

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerState.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/ws/WsError.h"
 

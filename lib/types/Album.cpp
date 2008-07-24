@@ -17,47 +17,58 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_ALBUM_H
-#define UNICORN_ALBUM_H
-
+#include "Album.h"
 #include "Artist.h"
-#include "Mbid.h"
-#include "lib/DllExportMacro.h"
-#include <QString>
-class WsReply;
-
-#ifdef QT_GUI_LIB
-#include <QPixmap>
-#endif
+#include "User.h"
+#include "lib/ws/WsRequestBuilder.h"
+#include <QEventLoop>
 
 
-class UNICORN_DLLEXPORT Album
+WsReply*
+Album::getInfo() const
 {
-    Mbid m_mbid;
-    Artist m_artist;
-    QString m_title;
+    return WsRequestBuilder( "album.getInfo" )
+            .add( "artist", m_artist )
+            .add( "album", m_title )
+            .get();
+}
 
-public:
-    explicit Album( Mbid mbid ) : m_mbid( mbid )
-    {}
 
-    Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
-    {}
+QByteArray
+Album::image()
+{
+    WsReply* reply = getInfo();
+    reply->finish();
 
-    operator QString() const { return m_title; }
-    QString title() const { return m_title; }
-    Artist artist() const { return m_artist; }
-    Mbid mbid() const { return m_mbid; }
+    try
+    {
+        QUrl url = reply->lfm()["album"]["image size=large"].text();
 
-    /** Album.getInfo WebService */
-    WsReply* getInfo() const;
+        QNetworkAccessManager manager;
+        QNetworkReply* get = manager.get( QNetworkRequest( url ) );
+        QEventLoop loop;
+        QObject::connect( get, SIGNAL(finished()), &loop, SLOT(quit()) );
+        loop.exec();
+        QByteArray bytes = get->readAll();
+        delete get;
+        return bytes;
+    }
+    catch (EasyDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }
 
-#ifdef QT_GUI_LIB
-    /** downloads image FIXME not synchronously! */
-    QPixmap image();
-#endif
+    return "";
+}
 
-    WsReply* share( const class User& recipient, const QString& message = "" );
-};
 
-#endif
+WsReply*
+Album::share( const User& recipient, const QString& message )
+{
+    return WsRequestBuilder( "album.share" )
+        .add( "recipient", recipient )
+        .add( "artist", m_artist )
+        .add( "album", m_title )
+        .addIfNotEmpty( "message", message )
+        .post();
+}

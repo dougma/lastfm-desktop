@@ -36,9 +36,11 @@ WsReply::WsReply( QNetworkReply* r )
 void
 WsReply::finish()
 {
+#ifndef NDEBUG
     QEventLoop eventLoop;
     QObject::connect( m_reply, SIGNAL(finished()), &eventLoop, SLOT(quit()) );
     eventLoop.exec();
+#endif
 }
 
 

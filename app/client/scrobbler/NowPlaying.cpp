@@ -19,7 +19,7 @@
 
 #include "NowPlaying.h"
 #include "Scrobbler.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include <QDebug>
 #include <QTimer>
 

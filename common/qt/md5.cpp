@@ -17,61 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Album.h"
-#include "Artist.h"
-#include "User.h"
-#include "ws/WsRequestBuilder.h"
-#include "ws/WsReply.h"
-#include <QEventLoop>
+#include <QCryptographicHash>
 
 
-WsReply*
-Album::getInfo() const
+namespace Qt
 {
-    return WsRequestBuilder( "album.getInfo" )
-            .add( "artist", m_artist )
-            .add( "album", m_title )
-            .get();
-}
-
-
-QPixmap
-Album::image()
-{
-    WsReply* reply = getInfo();
-    reply->finish();
-
-    try
+    static inline QString md5( const QByteArray& src )
     {
-        QUrl url = reply->lfm()["album"]["image size=large"].text();
-
-        QNetworkAccessManager manager;
-        QNetworkReply* get = manager.get( QNetworkRequest( url ) );
-        QEventLoop loop;
-        QObject::connect( get, SIGNAL(finished()), &loop, SLOT(quit()) );
-        loop.exec();
-        QByteArray bytes = get->readAll();
-        delete get;
-        QPixmap p;
-        p.loadFromData( bytes );
-        return p;
+        QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
+        return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' );
     }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-
-    return QPixmap();
-}
-
-
-WsReply*
-Album::share( const User& recipient, const QString& message )
-{
-    return WsRequestBuilder( "album.share" )
-        .add( "recipient", recipient )
-        .add( "artist", m_artist )
-        .add( "album", m_title )
-        .addIfNotEmpty( "message", message )
-        .post();
 }

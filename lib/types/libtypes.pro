@@ -1,11 +1,11 @@
-TARGET = ws
+TARGET = types
 TEMPLATE = lib
-QT = core network xml
-CONFIG += core
+QT = core
+CONFIG += core ws
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
 SOURCES = $$findSources( cpp )
 HEADERS = $$findSources( h )
 
-DEFINES += _WS_DLLEXPORT
+DEFINES += _TYPES_DLLEXPORT

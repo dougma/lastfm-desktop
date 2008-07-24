@@ -19,7 +19,6 @@
 
 #include "PlayerListener.h"
 #include "PlayerCommandParser.h"
-#include "lib/unicorn/Logger.h"
 #include <QTcpSocket>
 
 
@@ -106,8 +105,8 @@ PlayerListener::onDataReady()
         }
         catch (PlayerCommandParser::Exception& e)
         {
-            LOGL( 2, e );
-            QString s = "ERROR: " + e + "\n";
+            qWarning() << e;
+            QString s = "ERROR: " + e.what() + "\n";
             socket->write( s.toUtf8() );
         }
     }

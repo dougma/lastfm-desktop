@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "LoginDialog.h"
-#include "lib/unicorn/MessageBoxBuilder.h"
-#include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornUtils.h"
+#include "common/qt/md5.cpp"
+#include "lib/core/MessageBoxBuilder.h"
+#include "lib/core/Logger.h"
 #include "lib/ws/WsRequestBuilder.h"
 #include "lib/ws/WsReply.h"
 #include <QMovie>
@@ -65,12 +65,11 @@ LoginDialog::authenticate()
     // always lowercase the username before generating the md5
     m_username = ui.username->text().toLower();
 
-    using Unicorn::md5;
     QString const password = ui.password->text();
 
     WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
             .add( "username", m_username )
-            .add( "authToken", md5( (m_username + md5( password.toUtf8() )).toUtf8() ) )
+            .add( "authToken", Qt::md5( (m_username + Qt::md5( password.toUtf8() )).toUtf8() ) )
             .get();
 
     connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAuthenticated( WsReply* )) );

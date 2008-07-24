@@ -18,12 +18,11 @@
  ***************************************************************************/
 
 #include "SendLogsDialog.h"
+#include "SendLogsRequest.h"
 #include "Settings.h"
-#include "lib/moose/MooseCommon.h"
+#include "lib/core/MessageBoxBuilder.h"
 #include "lib/unicorn/UnicornDir.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/MessageBoxBuilder.h"
-#include "lib/ws/SendLogsRequest.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>

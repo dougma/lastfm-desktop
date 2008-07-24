@@ -52,6 +52,18 @@
     #else
         #define WS_DLLEXPORT __declspec(dllimport)
     #endif
+
+    #ifdef _TYPES_DLLEXPORT
+        #define TYPES_DLLEXPORT __declspec(dllexport)
+    #else
+        #define TYPES_DLLEXPORT __declspec(dllimport)
+    #endif
+    
+    #ifdef _CORE_DLLEXPORT
+        #define CORE_DLLEXPORT __declspec(dllexport)
+    #else
+        #define CORE_DLLEXPORT __declspec(dllimport)
+    #endif
     
 #else
     #define MOOSE_DLLEXPORT
@@ -59,6 +71,7 @@
     #define RADIO_DLLEXPORT
     #define FINGERPRINT_DLLEXPORT
     #define WS_DLLEXPORT
+    #define CORE_DLLEXPORT
 #endif
 
 #endif

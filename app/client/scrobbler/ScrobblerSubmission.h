@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ScrobblerHttp.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include <QList>
 
 

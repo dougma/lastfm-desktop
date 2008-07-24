@@ -1,3 +1,1 @@
-// We have a separate QHttp.h to work around a bug in QMake that generated bad
-// Makefiles, bug found Qt-4.4.0 by Max
-#include "./QHttp.h"
+#error Use QNetworkManager instead.

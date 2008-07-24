@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "Track.h"
-#include "Logger.h"
-#include "UnicornSettings.h"
+#include "lib/core/Logger.h" //FIXME
+#include "lib/unicorn/UnicornSettings.h" //FIXME
 #include <QDir>
 
 

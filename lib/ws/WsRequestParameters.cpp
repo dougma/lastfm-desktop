@@ -18,20 +18,15 @@
  ***************************************************************************/
 
 #include "WsRequestParameters.h"
-#include "lib/unicorn/UnicornUtils.h" //Unicorn::md5
-#include "lib/unicorn/UnicornSettings.h"
-#include "../../../app/client/version.h" //FIXME
+#include "WsKeys.h"
+#include "common/qt/md5.cpp"
 #include <QDebug>
 
 
 WsRequestParameters::WsRequestParameters()
 {
-    add( "api_key", API_KEY );
-
-    // the branch prevents an assert in Unicorn::UserQSettings()
-    Unicorn::Settings s;
-    if (s.username().size())
-        add( "sk", s.sessionKey() );
+    add( "api_key", Ws::ApiKey );
+    if (Ws::SessionKey) add( "sk", Ws::SessionKey );
 }
 
 
@@ -61,7 +56,15 @@ WsRequestParameters::methodSignature() const
         s += i.key() + i.value();
         qDebug() << i.key() << i.value();
     }
-    s += API_SECRET;
+    s += Ws::SharedSecret;
 
-    return Unicorn::md5( s.toUtf8() );
+    return Qt::md5( s.toUtf8() );
+}
+
+
+namespace Ws
+{
+    const char* SessionKey = "";
+    const char* SharedSecret = "";
+    const char* ApiKey = "";
 }

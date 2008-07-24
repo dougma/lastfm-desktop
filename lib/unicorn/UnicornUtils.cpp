@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UnicornUtils.h"
-#include "Logger.h"
+#include "lib/core/Logger.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
@@ -30,13 +30,6 @@
     #include <shlobj.h>
 #endif
 
-
-QString
-Unicorn::md5( const QByteArray& src )
-{
-    QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
-    return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' );
-}
 
 
 QString

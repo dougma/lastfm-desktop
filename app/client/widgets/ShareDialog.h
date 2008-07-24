@@ -20,7 +20,7 @@
 #ifndef SHARE_DIALOG_H
 #define SHARE_DIALOG_H
 
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include "ui_ShareDialog.h"
 
 

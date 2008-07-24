@@ -19,7 +19,8 @@
 
 #include "ScrobblerHandshake.h"
 #include "version.h"
-#include "lib/unicorn/UnicornUtils.h" // Unicorn::md5
+#include "common/qt/md5.cpp"
+#include "lib/ws/WsKeys.h"
 #include <QDateTime>
 #include <QDebug>
 
@@ -37,7 +38,7 @@ void
 ScrobblerHandshake::request()
 {
     QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
-    QString auth_token = Unicorn::md5( (API_SECRET + timestamp).toUtf8() );
+    QString auth_token = Qt::md5( (Ws::SharedSecret + timestamp).toUtf8() );
 
     QString query_string = QString() +
         "?hs=true" +
@@ -47,7 +48,7 @@ ScrobblerHandshake::request()
         "&u=" + QString(QUrl::toPercentEncoding( m_username )) +
         "&t=" + timestamp +
         "&a=" + auth_token +
-        "&api_key=" API_KEY +
+        "&api_key=" + Ws::ApiKey +
         "&sk=" + m_session;
 
     m_id = get( '/' + query_string );

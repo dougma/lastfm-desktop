@@ -1,6 +1,4 @@
-
 include( findsources.pro.inc )
-
 include( breakpad.pro.inc )
 include( debug.pro.inc )
 #win32:include( manifest.pro.inc )
@@ -18,17 +16,15 @@ CONFIG( extension ) {
     TARGET = $$TARGET.extension
 }
 
-CONFIG( unicorn ) {
-    LIBS += -lunicorn
+CONFIG( core )   :LIBS += -lcore
+CONFIG( ws ) {
+    LIBS += -lws
+    QT += xml network
 }
-
-CONFIG( moose ) {
-    LIBS += -lmoose
-}
-
-CONFIG( radio ) {
-    LIBS += -lradio
-}
+CONFIG( types )  :LIBS += -ltypes
+CONFIG( unicorn ):LIBS += -lunicorn
+CONFIG( moose )  :LIBS += -lmoose
+CONFIG( radio )  :LIBS += -lradio
 
 CONFIG( qtestlib ) {
     DESTDIR = $$DESTDIR/tests

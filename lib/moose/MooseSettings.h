@@ -21,7 +21,7 @@
 #define MOOSE_SETTINGS_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include <QStringList>
 

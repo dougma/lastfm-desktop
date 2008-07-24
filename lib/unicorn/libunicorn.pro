@@ -1,10 +1,7 @@
 TARGET = unicorn
 TEMPLATE = lib
-
-#fixme make libwebservice
-QT += network xml
-#fixme make UnicornGui
-QT += gui
+QT = core gui
+CONFIG += ws core
 
 include( $$SRC_DIR/common/qmake/include.pro )
 

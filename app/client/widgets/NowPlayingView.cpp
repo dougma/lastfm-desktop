@@ -64,17 +64,21 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
-    case PlayerEvent::PlaybackEnded:
-        m_cover = QImage();
-        update();
-        break;
+        case PlayerEvent::PlaybackEnded:
+            m_cover = QImage();
+            update();
+            break;
 
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::TrackChanged:
-        m_cover = v.value<ObservedTrack>().album().image().toImage().convertToFormat( QImage::Format_ARGB32_Premultiplied );
-        m_cover = compose( m_cover );
-        update();
-        break;
+        case PlayerEvent::PlaybackStarted:
+        case PlayerEvent::TrackChanged:
+        {
+            QByteArray const data = v.value<ObservedTrack>().album().image();
+            m_cover.loadFromData( data );
+            m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+            m_cover = compose( m_cover );
+            update();
+            break;
+        }
     }
 }
 

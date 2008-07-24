@@ -1,8 +1,7 @@
 TEMPLATE = lib
 TARGET = radio
-CONFIG += unicorn
-QT += xml network
-QT -= gui
+CONFIG += ws types core
+QT = core
 
 include( $$SRC_DIR/common/qmake/include.pro )
 

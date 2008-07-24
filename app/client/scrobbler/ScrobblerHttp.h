@@ -20,7 +20,7 @@
 #ifndef SCROBBLER_HTTP_H
 #define SCROBBLER_HTTP_H
 
-#include <QHttp>
+#include <QtNetwork/QHttp>
 #include <QUrl>
 
 
@@ -33,8 +33,12 @@ public:
     void retry();
     int requestId() const { return m_id; }
 
+    QString host() const { return m_host; }
+
 protected:
     ScrobblerHttp( QObject* parent = 0 );
+
+    void setHost( QString s, int i=80 ) { m_host = s; QHttp::setHost( s, i ); }
 
 protected slots:
     virtual void request() = 0;
@@ -52,6 +56,8 @@ private slots:
 
 private:
     void resetRetryTimer();
+
+    QString m_host;
 };
 
 

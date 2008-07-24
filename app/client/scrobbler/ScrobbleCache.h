@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/unicorn/Track.h"
+#include "lib/types/Track.h"
 #include <QList>
 #include <QString>
 

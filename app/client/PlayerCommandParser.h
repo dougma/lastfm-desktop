@@ -21,15 +21,16 @@
 #define PLAYER_COMMAND_PARSER_H
 
 #include "common/HideStupidWarnings.h"
-#include "lib/unicorn/Track.h"
+#include "lib/core/UnicornException.h"
+#include "lib/types/Track.h"
 
 
 class PlayerCommandParser
 {
 public:
-    struct Exception : QString
+    struct Exception : UnicornException
     {
-        Exception( QString s ) : QString( s )
+        Exception( QString s ) : UnicornException( s )
         {}
     };
 

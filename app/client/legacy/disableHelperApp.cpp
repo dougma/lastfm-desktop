@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/unicorn/Logger.h"
+#include "lib/core/Logger.h"
 #include <QFile>
 #include <windows.h>
 #include <shlobj.h>
