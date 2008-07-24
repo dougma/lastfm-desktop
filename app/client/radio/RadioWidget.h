@@ -40,6 +40,9 @@ public:
 signals:
     void trackStarted( const class Track& );
     void playbackEnded();
+    
+public slots:
+    void toggle();
 
 private slots:
     void onTunerReturnPressed();

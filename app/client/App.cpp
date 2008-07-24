@@ -88,11 +88,13 @@ App::setMainWindow( MainWindow* window )
 
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
-    connect( window->ui.tunein, SIGNAL(triggered()), m_radio, SLOT(show()) );
+    connect( window->ui.tunein, SIGNAL(triggered()), m_radio, SLOT(toggle()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
     m_trayIcon = new QSystemTrayIcon( window );
     m_trayIcon->setIcon( QPixmap(":/16x16/as.png") );
     m_trayIcon->show();
+    m_radio->setParent( window, Qt::Drawer );
+    m_radio->hide();
     QMenu* menu = new QMenu;
     menu->addAction( window->ui.quit );
     m_trayIcon->setContextMenu( menu );

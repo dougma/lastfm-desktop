@@ -89,3 +89,10 @@ RadioWidget::queueMoreTracks()
 {
     m_audio->queue( m_tuner.fetchNextPlaylist() );
 }
+
+
+void
+RadioWidget::toggle()
+{
+    setVisible( !isVisible() );
+}
