@@ -21,8 +21,8 @@
 #include "lib/unicorn/MessageBoxBuilder.h"
 #include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#include "lib/ws/WsRequestBuilder.h"
+#include "lib/ws/WsReply.h"
 #include <QMovie>
 #include <QPushButton>
 

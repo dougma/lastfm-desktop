@@ -3,7 +3,7 @@ debug:macx-xcode {
 
     include( $$SRC_DIR/common/qmake/include.pro )
 
-    DIRS = app/client lib/unicorn lib/moose lib/radio
+    DIRS = app/client lib/unicorn lib/moose lib/radio lib/ws
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )
@@ -25,6 +25,7 @@ else {
 
     SUBDIRS += app/client/appclient.pro \ #LEAVE THIS FIRST! --mxcl
                lib/unicorn/libunicorn.pro \
+               lib/ws/libws.pro \
                lib/moose/libmoose.pro \
                lib/radio/libradio.pro
 }

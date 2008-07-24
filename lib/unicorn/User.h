@@ -22,7 +22,7 @@
 
 #include <QString>
 #include "lib/DllExportMacro.h"
-#include "lib/unicorn/ws/WsReply.h" //convenience
+#include "lib/ws/WsReply.h" //convenience
 
 
 class UNICORN_DLLEXPORT User

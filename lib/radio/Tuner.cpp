@@ -21,8 +21,8 @@
 #include "lib/unicorn/UnicornSettings.h"
 #include <QBuffer>
 #include <QDebug>
-#include "lib/unicorn/ws/WsRequestBuilder.h"
-#include "lib/unicorn/ws/WsReply.h"
+#include "lib/ws/WsRequestBuilder.h"
+#include "lib/ws/WsReply.h"
 #include <QtNetwork/QHttp> //TODO use our override
 #include <QtXml>
 

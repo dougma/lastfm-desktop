@@ -33,7 +33,7 @@
   * to receive errors that require user interaction. If you don't your user
   * experience will suck :P
   */
-class UNICORN_DLLEXPORT WsReply : public QObject
+class WS_DLLEXPORT WsReply : public QObject
 {
     Q_OBJECT
 
@@ -60,6 +60,8 @@ public:
       * As all sorts of things break when you start running your own event loop
       * sadly, especially don't chain WsReplys since they do deleteLater() */
     void finish();
+
+    QByteArray data() const { return m_data; }
 
 signals:
     /** we call deleteLater() immediately after emitting this signal, so don't

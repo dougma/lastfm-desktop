@@ -19,7 +19,7 @@
 
 #include "Artist.h"
 #include "User.h"
-#include "lib/unicorn/ws/WsRequestBuilder.h"
+#include "lib/ws/WsRequestBuilder.h"
 
 
 WsReply*

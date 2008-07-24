@@ -26,7 +26,7 @@
 class WsReply;
 
    
-class UNICORN_DLLEXPORT WsRequestBuilder
+class WS_DLLEXPORT WsRequestBuilder
 {
     enum RequestMethod
     {

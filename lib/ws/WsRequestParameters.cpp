@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "WsRequestParameters.h"
-#include "../UnicornUtils.h"
-#include "../UnicornSettings.h"
+#include "lib/unicorn/UnicornUtils.h" //Unicorn::md5
+#include "lib/unicorn/UnicornSettings.h"
 #include "../../../app/client/version.h" //FIXME
 #include <QDebug>
 

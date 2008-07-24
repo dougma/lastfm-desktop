@@ -47,18 +47,18 @@
         #define FINGERPRINT_DLLEXPORT __declspec(dllimport)
     #endif
 
-    #ifdef _BREAKPAD_DLLEXPORT
-        #define BREAKPAD_DLLEXPORT __declspec(dllexport)
+    #ifdef _WS_DLLEXPORT
+        #define WS_DLLEXPORT __declspec(dllexport)
     #else
-        #define BREAKPAD_DLLEXPORT __declspec(dllimport)
+        #define WS_DLLEXPORT __declspec(dllimport)
     #endif
-
+    
 #else
     #define MOOSE_DLLEXPORT
     #define UNICORN_DLLEXPORT
     #define RADIO_DLLEXPORT
     #define FINGERPRINT_DLLEXPORT
-    #define BREAKPAD_DLLEXPORT
+    #define WS_DLLEXPORT
 #endif
 
 #endif

@@ -21,7 +21,7 @@
 #define UNICORN_ARTIST_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/unicorn/ws/WsReply.h" //convenience
+#include "lib/ws/WsReply.h" //convenience
 #include <QString>
 
 
