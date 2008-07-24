@@ -160,18 +160,6 @@ public:
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise
     QExplicitlySharedDataPointer<TrackData> d;
-
-public:
-    // Limits for user-configurable scrobble point in percent
-    static const int kScrobblePointMin = 50;
-    static const int kScrobblePointMax = 100;
-    // Shortest track length allowed to scrobble in seconds
-    static const int kScrobbleMinLength = 31;
-    // Upper limit for scrobble time in seconds
-    static const int kScrobbleTimeMax = 240;
-    // Percentage of track length at which to scrobble
-    //TODO should be a float, percentages are meaningless in the middle of code
-    static const int kDefaultScrobblePoint = 50;
 };
 
 

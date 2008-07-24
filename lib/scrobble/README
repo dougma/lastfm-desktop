@@ -1,0 +1,5 @@
+This library depends on Last.fm's lib/core and Qt 4.4.
+
+You must set QCoreApplication::applicationVersion().
+
+Love and kisses, max@last.fm

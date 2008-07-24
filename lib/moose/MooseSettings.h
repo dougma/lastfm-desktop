@@ -21,7 +21,7 @@
 #define MOOSE_SETTINGS_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/types/Track.h"
+#include "lib/scrobble/ScrobblePoint.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include <QStringList>
 
@@ -40,7 +40,7 @@ namespace Moose
         //TODO shouldn't be necessary
         /** is percentage */
         //TODO percentage is confusing in implementations, use float
-        int scrobblePoint() const { return QSettings().value( "ScrobblePoint", Track::kDefaultScrobblePoint ).toInt(); }
+        int scrobblePoint() const { return QSettings().value( "ScrobblePoint", ScrobblePoint::kDefaultScrobblePoint ).toInt(); }
 
         // used by Moose::sendToInstance
         // needed by Twiddly

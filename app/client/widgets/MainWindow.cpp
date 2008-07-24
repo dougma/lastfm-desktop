@@ -243,7 +243,7 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             Track t = v.value<ObservedTrack>();
             setWindowTitle( t.prettyTitle() );
 
-            ui.label->setText( t.artist() );// + "<br><b>" + t.title() + "</b><br>" + t.album() );
+            ui.label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
 
             ui.share->setEnabled( true );
             ui.tag->setEnabled( true );
@@ -255,6 +255,8 @@ MainWindow::onAppEvent( int e, const QVariant& v )
 
         case PlayerEvent::PlaybackEnded:
             setWindowTitle( qApp->applicationName() );
+
+            ui.label->clear();
 
             ui.share->setEnabled( false );
             ui.tag->setEnabled( false );

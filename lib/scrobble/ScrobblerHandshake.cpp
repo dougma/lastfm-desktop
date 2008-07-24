@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,19 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "AboutDialog.h"
+#include "ScrobblerHandshake.h"
+#include "common/qt/md5.cpp"
+#include "lib/ws/WsKeys.h"
 #include <QCoreApplication>
-#include <QLabel>
-#include <QVBoxLayout>
+#include <QDateTime>
+#include <QDebug>
 
 
-AboutDialog::AboutDialog( const char* version, QWidget* parent )
-           : QDialog( parent )
+ScrobblerHandshake::ScrobblerHandshake( const ScrobblerInit& init )
+                  : m_init( init )
 {
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new QLabel( "<b>" + qApp->applicationName() + "</b> " + version ) );
-    v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
-    v->addWidget( new QLabel( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a> #audioscrobbler" ) );
-    setWindowTitle( tr("About") );
-    v->setSizeConstraint( QLayout::SetFixedSize );
+    setHost( "post.audioscrobbler.com" );
+    request();
+}
+
+
+void
+ScrobblerHandshake::request()
+{
+    QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
+    QString auth_token = Qt::md5( (Ws::SharedSecret + timestamp).toUtf8() );
+
+    QString query_string = QString() +
+        "?hs=true" +
+        "&p=1.2.1"
+        "&c=" + m_init.clientId +
+        "&v=" + qApp->applicationVersion() +
+        "&u=" + QString(QUrl::toPercentEncoding( m_init.username )) +
+        "&t=" + timestamp +
+        "&a=" + auth_token +
+        "&api_key=" + Ws::ApiKey +
+        "&sk=" + m_init.sessionKey;
+
+    m_id = get( '/' + query_string );
+
+    qDebug() << "HTTP GET" << host() + '/' + query_string;
 }

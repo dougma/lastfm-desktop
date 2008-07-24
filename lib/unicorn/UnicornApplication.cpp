@@ -19,8 +19,11 @@
 
 #include "UnicornApplication.h"
 #include "UnicornSettings.h"
+#include "UnicornUtils.h"
 #include "widgets/LoginDialog.h"
+#include "lib/core/Logger.h"
 #include "lib/core/MessageBoxBuilder.h"
+#include "lib/core/StoreDir.h"
 #include "lib/ws/WsKeys.h"
 
 
@@ -34,6 +37,14 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );    
+
+    StoreDir::mkpaths();
+
+    Logger& logger = Logger::GetLogger();
+    logger.Init( StoreDir::logs().filePath( applicationName() + ".log" ), false );
+    logger.SetLevel( Logger::Debug );
+    LOGL( 3, "Application: " << applicationName() << " " << applicationVersion() );
+    LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );
 
     translate();
 

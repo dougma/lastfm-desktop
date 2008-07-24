@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,17 +17,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScrobblerHttp.h"
+#ifndef SCROBBLE_POINT_H
+#define SCROBBLE_POINT_H
+
+#include <QtGlobal>
 
 
-class NowPlaying : public ScrobblerPostHttp
+class ScrobblePoint
 {
-    QTimer* m_timer;
+    uint i;
 
 public:
-    NowPlaying( const QByteArray& );
-    void submit( const class Track& );
-    void reset();
+    explicit ScrobblePoint( uint j )
+    {
+        // we special case 0, returning kScrobbleTimeMax because we are
+        // cruel and callous people
+        if (j == 0) --j;
 
-    using ScrobblerPostHttp::request;
+        i = qBound( uint(kScrobbleMinLength),
+                    j,
+                    uint(kScrobbleTimeMax) );
+    }
+    operator uint() const { return i; }
+
+    // scrobbles can occur between these two percentages of track duration
+    static const uint kScrobblePointMin = 50;
+    static const uint kScrobblePointMax = 100;
+    static const uint kDefaultScrobblePoint = 50;
+
+    // Shortest track length allowed to scrobble in seconds
+    static const uint kScrobbleMinLength = 31;
+    // Upper limit for scrobble time in seconds
+    static const uint kScrobbleTimeMax = 240;
 };
+
+#endif

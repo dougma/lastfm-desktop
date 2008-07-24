@@ -16,15 +16,16 @@ CONFIG( extension ) {
     TARGET = $$TARGET.extension
 }
 
-CONFIG( core )   :LIBS += -lcore
+CONFIG( core ):LIBS += -lcore
 CONFIG( ws ) {
     LIBS += -lws
     QT += xml network
 }
-CONFIG( types )  :LIBS += -ltypes
+CONFIG( types ):LIBS += -ltypes
 CONFIG( unicorn ):LIBS += -lunicorn
-CONFIG( moose )  :LIBS += -lmoose
-CONFIG( radio )  :LIBS += -lradio
+CONFIG( moose ):LIBS += -lmoose
+CONFIG( radio ):LIBS += -lradio
+CONFIG( scrobble ):LIBS += -lscrobble
 
 CONFIG( qtestlib ) {
     DESTDIR = $$DESTDIR/tests

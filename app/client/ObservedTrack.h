@@ -20,25 +20,11 @@
 #ifndef OBSERVED_TRACK_H
 #define OBSERVED_TRACK_H
 
+#include "lib/scrobble/ScrobblePoint.h"
 #include "lib/types/Track.h"
 #include "StopWatch.h" // sadly necessary dep
 #include <QPointer>
 
-
-//TODO to seperate file
-class ScrobblePoint
-{
-    uint i;
-
-public:
-    explicit ScrobblePoint( uint const j )
-    {
-        i = qBound( uint(Track::kScrobbleMinLength),
-                    j,
-                    uint(Track::kScrobbleTimeMax) );
-    }
-    operator uint() const { return i; }
-};
 
 
 class ObservedTrack : public Track

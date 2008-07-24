@@ -64,6 +64,13 @@
     #else
         #define CORE_DLLEXPORT __declspec(dllimport)
     #endif
+
+    #ifdef _SCROBBLE_DLLEXPORT
+        #define SCROBBLE_DLLEXPORT __declspec(dllexport)
+    #else
+        #define SCROBBLE_DLLEXPORT __declspec(dllimport)
+    #endif
+
     
 #else
     #define MOOSE_DLLEXPORT
@@ -73,6 +80,7 @@
     #define WS_DLLEXPORT
     #define CORE_DLLEXPORT
     #define TYPES_DLLEXPORT
+    #define SCROBBLE_DLLEXPORT
 #endif
 
 #endif

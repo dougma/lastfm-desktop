@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -22,18 +22,16 @@
 #include "ScrobbleCache.h"
 #include "ScrobblerHandshake.h"
 #include "ScrobblerSubmission.h"
-#include <QDebug>
 
 
-Scrobbler::Scrobbler( const QString& username, const QString& password )
-        : m_username( username ),
-          m_password( password ),
+Scrobbler::Scrobbler( const ScrobblerInit& init )
+        : m_init( init ),
           m_handshake( 0 ), 
           m_np( 0 ), 
           m_submitter( 0 ),
           m_hard_failures( 0 )
 {
-    m_cache = new ScrobbleCache( username );
+    m_cache = new ScrobbleCache( init.username );
 
     handshake();
     submit(); // will submit what's there once the handshake completes
@@ -61,7 +59,7 @@ Scrobbler::handshake()
     delete m_np;
     delete m_submitter;
     
-    m_handshake = new ScrobblerHandshake( m_username, m_password );
+    m_handshake = new ScrobblerHandshake( m_init );
     connect( m_handshake, SIGNAL(done( QByteArray )), SLOT(onHandshakeReturn( QByteArray )) );
     connect( m_handshake, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHandshakeHeaderReceived( QHttpResponseHeader )) );
     m_np = new NowPlaying( np_data );
@@ -136,7 +134,7 @@ Scrobbler::onHandshakeReturn( const QByteArray& result ) //TODO trim before pass
         m_submitter->setSession( results[1] );
         m_submitter->setUrl( QString::fromUtf8( results[3] ) );
 
-        emit status( Scrobbler::Handshaken, m_username );
+        emit status( Scrobbler::Handshaken, m_init.username );
 
         // submit any queued work
         m_np->request();

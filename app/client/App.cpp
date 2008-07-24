@@ -21,14 +21,14 @@
 #include "PlayerEvent.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
-#include "radio/RadioWidget.h"
 #include "Settings.h"
 #include "version.h"
 #include "mac/ITunesListener.h"
-#include "scrobbler/Scrobbler.h"
+#include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
 #include "lib/core/MessageBoxBuilder.h"
+#include "lib/scrobble/Scrobbler.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -56,7 +56,11 @@ App::App( int argc, char** argv )
     new ITunesListener( m_playerListener->port(), this );
 #endif
     
-    m_scrobbler = new Scrobbler( The::settings().username(), The::settings().sessionKey() );
+    ScrobblerInit init;
+    init.username = The::settings().username();
+    init.sessionKey = The::settings().sessionKey();
+    init.clientId = "ass";
+    m_scrobbler = new Scrobbler( init );
     
     m_radio = new RadioWidget;
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );

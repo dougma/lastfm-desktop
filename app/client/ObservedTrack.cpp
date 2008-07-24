@@ -24,14 +24,9 @@
 ScrobblePoint
 ObservedTrack::scrobblePoint() const
 {
-    // If we don't have a length or it's less than the minimum, return the
-    // max. threshold
-    if ( duration() <= 0 || duration() < int(kScrobbleMinLength) )
-        return ScrobblePoint( kScrobbleTimeMax );
-
-    float F = qBound( int(kScrobblePointMin),
+    float F = qBound( int(ScrobblePoint::kScrobblePointMin),
                       Moose::Settings().scrobblePoint(),
-                      int(kScrobblePointMax) );
+                      int(ScrobblePoint::kScrobblePointMax) );
     F /= 100.0f;
 
     return ScrobblePoint( F * duration() );

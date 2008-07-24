@@ -60,7 +60,7 @@ public:
       */
     EasyDomElement operator[]( const QString& name ) const;
     
-    /** use in all cases where empty would be an error */
+    /** use in all cases where empty would be an error, it throws if empty */
     QString nonEmptyText() const;
 
     QString text() const { return e.text(); }

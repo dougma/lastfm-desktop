@@ -18,27 +18,20 @@
  ***************************************************************************/
 
 #include "ScrobbleCache.h"
-#include "version.h"
-#include "lib/unicorn/UnicornDir.h"
+#include "lib/core/StoreDir.h"
 #include <QFile>
 #include <QDomElement>
 #include <QDomDocument>
 
 
-//FIXME! Doesn't suit multi user feel of this class as it is currently
-static QList<Track> g_tracks;
 
-
-ScrobbleCache::ScrobbleCache( const QString& username ) : m_tracks( g_tracks )
+ScrobbleCache::ScrobbleCache( const QString& username )
 {
     Q_ASSERT( username.length() );
 
-//    m_path = QDir( QDesktopServices::storageLocation( QDesktopServices::DataLocation ) ).filePath( username + "_submissions_cache.xml" );
-    m_path = UnicornDir::data().filePath( username + "_subs_cache.xml" );
+    m_path = StoreDir::data().filePath( username + "_subs_cache.xml" );
     m_username = username;
-
-    //HACK due to bad design with this m_tracks global instance thing
-    if (m_tracks.isEmpty()) read();
+    read();
 }
 
 
@@ -71,8 +64,8 @@ ScrobbleCache::write()
     else {
         QDomDocument xml;
         QDomElement e = xml.createElement( "submissions" );
-        e.setAttribute( "product", PRODUCT_NAME );
-        e.setAttribute( "version", "1.2" );
+        e.setAttribute( "product", "Last.fm Audioscrobbler" );
+        e.setAttribute( "version", "2" );
 
         foreach (Track i, m_tracks)
             e.appendChild( i.toDomElement( xml ) );

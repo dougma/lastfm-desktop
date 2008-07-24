@@ -20,6 +20,8 @@
 #ifndef SCROBBLER_H
 #define SCROBBLER_H
 
+#include "lib/DllExportMacro.h"
+#include "ScrobblerInit.h"
 #include <QByteArray>
 #include <QList>
 #include <QString>
@@ -31,12 +33,11 @@
   * version 1.2 for a single Last.fm user
   * http://www.audioscrobbler.net/development/protocol/
   */
-class Scrobbler : public QObject
+class SCROBBLE_DLLEXPORT Scrobbler : public QObject
 {
     Q_OBJECT
 
-    QString const m_username;
-    QString const m_password;
+    ScrobblerInit const m_init;
 
     class ScrobblerHandshake* m_handshake;
     class NowPlaying* m_np;
@@ -45,8 +46,7 @@ class Scrobbler : public QObject
     uint m_hard_failures;
 
 public:
-    /** password should be already a 32 character md5 hash */
-    Scrobbler( const QString& username, const QString& password );
+    Scrobbler( const ScrobblerInit& );
     ~Scrobbler();
 
     /** will ask Last.fm to update the now playing information for username() */
@@ -56,7 +56,7 @@ public:
     /** will submit the ScrobbleCache for this user */
     void submit();
 
-    QString username() const { return m_username; }
+    QString username() const { return m_init.username; }
 
     enum Status
     {

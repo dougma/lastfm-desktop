@@ -22,9 +22,7 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/core/Logger.h"
-#include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/UnicornDir.h"
-#include "lib/unicorn/UnicornUtils.h"
+#include "lib/core/StoreDir.h"
 #include <QDir>
 #include <QTimer>
 
@@ -50,17 +48,9 @@ int main( int argc, char** argv )
 
     // must be set before the Settings object is created
     QCoreApplication::setApplicationName( PRODUCT_NAME );
+    QCoreApplication::setApplicationVersion( VERSION );
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
-
-    // todo move to Unicorn::Application, and the same to logger since it uses it
-    UnicornDir::mkpaths();
-    
-    Logger& logger = Logger::GetLogger();
-    logger.Init( UnicornDir::logs().filePath( PRODUCT_NAME ".log" ), false );
-    logger.SetLevel( Logger::Debug );
-    LOGL( 3, "Application: " << PRODUCT_NAME << " " << VERSION );
-    LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );
 
     try
     {

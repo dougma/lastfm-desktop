@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,19 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "AboutDialog.h"
-#include <QCoreApplication>
-#include <QLabel>
-#include <QVBoxLayout>
+#include "lib/DllExportMacro.h"
+#include "lib/types/Track.h"
+#include <QList>
+#include <QString>
 
 
-AboutDialog::AboutDialog( const char* version, QWidget* parent )
-           : QDialog( parent )
+/** absolutely not thread-safe */
+class SCROBBLE_DLLEXPORT ScrobbleCache
 {
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new QLabel( "<b>" + qApp->applicationName() + "</b> " + version ) );
-    v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
-    v->addWidget( new QLabel( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a> #audioscrobbler" ) );
-    setWindowTitle( tr("About") );
-    v->setSizeConstraint( QLayout::SetFixedSize );
-}
+    QString m_path;
+    QString m_username;
+    QList<Track> m_tracks;
+
+    int m_subs_end;
+
+    void read();  /// reads from m_path into m_tracks
+    void write(); /// writes m_tracks to m_path
+
+    friend class ScrobblerSubmission;
+
+public:
+    explicit ScrobbleCache( const QString& username );
+
+    /** note this is unique for Track::sameAs() and equal timestamps 
+      * obviously playcounts will not be increased for the same timestamp */
+    void add( const Track& );
+    void add( const QList<Track>& );
+
+    /** returns the number of tracks left in the queue */
+    int remove( const QList<Track>& );
+
+    QList<Track> tracks() const { return m_tracks; }
+    QString path() const { return m_path; }
+    QString username() const { return m_username; }
+
+private:
+    bool operator==( const ScrobbleCache& ); //undefined
+};

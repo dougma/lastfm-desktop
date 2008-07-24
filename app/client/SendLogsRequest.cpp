@@ -19,7 +19,7 @@
 
 #include "SendLogsRequest.h"
 
-#include "../UnicornSettings.h"
+#include "Settings.h"
 
 #include <QFile>
 #include <QTextDocument>
@@ -60,11 +60,9 @@ SendLogsRequest::addLogData( QString name, QString data )
 void
 SendLogsRequest::send()
 {
-    Unicorn::Settings settings;
-
     QString url = "http://oops.last.fm/logsubmission/add";
     
-    url += "?username=" + settings.username();
+    url += "?username=" + The::settings().username();
     #ifdef Q_WS_MAC
         url += "&platform=macosx";
     #elif defined WIN32

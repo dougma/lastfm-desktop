@@ -17,41 +17,17 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScrobblerHandshake.h"
-#include "version.h"
-#include "common/qt/md5.cpp"
-#include "lib/ws/WsKeys.h"
-#include <QDateTime>
-#include <QDebug>
+#include "ScrobblerHttp.h"
 
 
-ScrobblerHandshake::ScrobblerHandshake( const QString& username, const QString& session )
-                  : m_username( username ),
-                    m_session( session )
+class NowPlaying : public ScrobblerPostHttp
 {
-    setHost( "post.audioscrobbler.com" );
-    request();
-}
+    class QTimer* m_timer;
 
+public:
+    NowPlaying( const QByteArray& );
+    void submit( const class Track& );
+    void reset();
 
-void
-ScrobblerHandshake::request()
-{
-    QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
-    QString auth_token = Qt::md5( (Ws::SharedSecret + timestamp).toUtf8() );
-
-    QString query_string = QString() +
-        "?hs=true" +
-        "&p=1.2.1" + //protocol version
-        "&c=" + THREE_LETTER_SCROBBLE_CODE
-        "&v=" + VERSION +
-        "&u=" + QString(QUrl::toPercentEncoding( m_username )) +
-        "&t=" + timestamp +
-        "&a=" + auth_token +
-        "&api_key=" + Ws::ApiKey +
-        "&sk=" + m_session;
-
-    m_id = get( '/' + query_string );
-
-    qDebug() << "HTTP GET" << host() + '/' + query_string;
-}
+    using ScrobblerPostHttp::request;
+};

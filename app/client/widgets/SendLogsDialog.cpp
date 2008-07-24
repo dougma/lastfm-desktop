@@ -21,7 +21,7 @@
 #include "SendLogsRequest.h"
 #include "Settings.h"
 #include "lib/core/MessageBoxBuilder.h"
-#include "lib/unicorn/UnicornDir.h"
+#include "lib/core/StoreDir.h"
 #include "lib/unicorn/UnicornUtils.h"
 #include <QDir>
 #include <QFileInfo>
@@ -157,7 +157,7 @@ SendLogsDialog::onSendClicked()
     connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
     connect( request, SIGNAL( error() ), SLOT( onError() ) );
 
-    QDir logDir = UnicornDir::logs();
+    QDir logDir = StoreDir::logs();
     QStringList logExt( "*.log" );
         
     // find logs

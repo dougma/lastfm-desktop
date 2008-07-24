@@ -17,21 +17,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornDir.h"
-#include "UnicornUtils.h"
+#include "StoreDir.h"
 #include <QDebug>
 #include <QDir>
 #ifdef WIN32
-#include <shlobj.h>
+    #include <shlobj.h>
 #endif
 #ifdef Q_WS_MAC
-#include <QCoreApplication>
+    #include <QCoreApplication>
 #endif
 
 
 #ifdef Q_WS_MAC
 QDir
-UnicornSystemDir::bundle()
+SystemDir::bundle()
 {
     return QDir( qApp->applicationDirPath() ).absoluteFilePath( "../.." );
 }
@@ -39,7 +38,7 @@ UnicornSystemDir::bundle()
 
 
 QDir
-UnicornDir::dataDotDot()
+StoreDir::dataDotDot()
 {
 #ifdef WIN32
     if ((QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based) == 0)
@@ -100,7 +99,7 @@ UnicornDir::dataDotDot()
 
 #ifdef WIN32
 QDir
-UnicornSystemDir::programFiles()
+SystemDir::programFiles()
 {
     char path[MAX_PATH];
 

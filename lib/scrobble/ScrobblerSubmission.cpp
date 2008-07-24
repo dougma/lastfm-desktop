@@ -20,7 +20,6 @@
 #include "ScrobblerSubmission.h"
 #include "ScrobbleCache.h"
 #include "Scrobbler.h"
-#include "version.h"
 
 
 void

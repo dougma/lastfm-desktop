@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UnicornUtils.h"
-#include "UnicornDir.h"
+#include "lib/core/StoreDir.h"
 #include <QDebug>
 #include <QFile>
 #include <QIODevice>
@@ -36,7 +36,7 @@ bool
 Unicorn::isLimitedUser()
 {
     // If we can write to Program Files we aren't limited
-    QFile f( UnicornSystemDir::programFiles().filePath( "dummy" ) );
+    QFile f( SystemDir::programFiles().filePath( "dummy" ) );
     if (!f.open( QIODevice::WriteOnly ))
     {
         qWarning() << "Couldn't open test file, it's a limited user";

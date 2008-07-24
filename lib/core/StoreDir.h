@@ -17,14 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_DIR_H
-#define UNICORN_DIR_H
+#ifndef STORE_DIR_H
+#define STORE_DIR_H
 
 #include "lib/DllExportMacro.h"
 #include <QDir>
 
 
-namespace UnicornDir
+namespace StoreDir
 {
     /** @returns the path to the top-level Application Data folder
       * XP:    C:\Documents and Settings\user\Local Settings\Application Data.
@@ -35,7 +35,7 @@ namespace UnicornDir
       * May return an empty string on Windows if the system call to get the
       * path fails.
       */
-    UNICORN_DLLEXPORT QDir dataDotDot();
+    CORE_DLLEXPORT QDir dataDotDot();
 
 
     /** @returns directory where application data can be stored
@@ -44,7 +44,7 @@ namespace UnicornDir
       * OSX:   ~/Library/Application Support/Last.fm/
       * Unix:  ~/.local/share/Last.fm/
       */
-    UNICORN_DLLEXPORT inline QDir data()
+    CORE_DLLEXPORT inline QDir data()
     {
         return dataDotDot().filePath( "Last.fm" );
     }
@@ -56,7 +56,7 @@ namespace UnicornDir
       * OSX:   ~/Library/Logs/Last.fm/ on OS X.
       * Unix:  userData()
       */
-    UNICORN_DLLEXPORT inline QDir logs()
+    CORE_DLLEXPORT inline QDir logs()
     {
         #ifdef Q_WS_MAC
             return QDir::home().filePath( "Library/Logs/Last.fm" );
@@ -67,7 +67,7 @@ namespace UnicornDir
 
 
     /** @returns path to directory for storing cached images etc. */
-    UNICORN_DLLEXPORT inline QDir cache()
+    CORE_DLLEXPORT inline QDir cache()
     {
         #ifdef Q_WS_MAC
             return QDir::home().filePath( "Library/Cache/Last.fm" );
@@ -77,7 +77,7 @@ namespace UnicornDir
     }
 
 
-    UNICORN_DLLEXPORT inline void mkpaths()
+    CORE_DLLEXPORT inline void mkpaths()
     {
         cache().mkpath( "." );
         data().mkpath( "." );
@@ -86,16 +86,16 @@ namespace UnicornDir
 }
 
 
-namespace UnicornSystemDir
+namespace SystemDir
 {
     #ifdef WIN32
         /** @returns the system's equivalent of c:\Program Files\ */
-        UNICORN_DLLEXPORT QDir programFiles();
+        CORE_DLLEXPORT QDir programFiles();
     #endif
 
     #ifdef Q_WS_MAC
         /** eg. /Applications/Last.fm.app/ */
-        UNICORN_DLLEXPORT QDir bundle();
+        QDir bundle();
     #endif
 }
 

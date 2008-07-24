@@ -151,11 +151,11 @@ Track::durationString() const
 }
 
 
-
+#if 0 
 Track::ScrobblableStatus
 Track::scrobblableStatus() const
 {
-    if ( duration() < kScrobbleMinLength )
+    if ( duration() < ScrobblePoint::kScrobbleMinLength )
     {
         LOGL( 3, "Duration is too short (" << duration() << "s), will not submit.\n" );
         return TooShort;
@@ -218,6 +218,7 @@ Track::scrobblableStatus() const
     // All tests passed!
     return OkToScrobble;
 }
+#endif
 
 
 #include "lib/ws/WsRequestBuilder.h"

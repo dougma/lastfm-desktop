@@ -21,10 +21,10 @@
 #include "ObservedTrack.h"
 #include "PlayerEvent.h"
 #include "Settings.h"
-#include "scrobbler/Scrobbler.h"
-#include "scrobbler/ScrobbleCache.h"
+#include "lib/scrobble/Scrobbler.h"
+#include "lib/scrobble/ScrobbleCache.h"
 #include "widgets/SendLogsDialog.h"
-#include "lib/unicorn/UnicornDir.h"
+#include "lib/core/StoreDir.h"
 #include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
@@ -435,7 +435,7 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 
     if (!m_logFile.is_open())
     {
-        m_logFile.open( UnicornDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
+        m_logFile.open( StoreDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
     }

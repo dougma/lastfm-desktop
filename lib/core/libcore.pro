@@ -10,6 +10,6 @@ HEADERS = $$findSources( h )
 DEFINES += _CORE_DLLEXPORT
 
 !macx {
-    SOURCES -= AppleScript.cpp
+    SOURCES -= AppleScript.cpp QtOverride/QSystemTrayIcon.cpp
     HEADERS -= AppleScript.h
 }

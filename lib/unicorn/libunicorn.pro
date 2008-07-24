@@ -5,18 +5,16 @@ CONFIG += ws core
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
-SOURCES = $$findSources( cpp )
-HEADERS = $$findSources( h )
-FORMS   = $$findSources( ui )
+SOURCES   = $$findSources( cpp )
+HEADERS   = $$findSources( h )
+FORMS     = $$findSources( ui )
+RESOURCES = $$findSources(qrc )
 
 !win32 {
     SOURCES -= UnicornUtils_win.cpp
 }
 !macx {
-    SOURCES -= UnicornUtils_mac.cpp AppleScript.cpp QtOverride/QSystemTrayIcon.cpp
-    HEADERS -= AppleScript.h
+    SOURCES -= UnicornUtils_mac.cpp
 }
-
-macx*:LIBS += -framework SystemConfiguration -framework CoreServices
 
 DEFINES += _UNICORN_DLLEXPORT

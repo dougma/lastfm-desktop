@@ -86,12 +86,17 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
 void
 NowPlayingView::paintEvent( QPaintEvent* e )
 {
-    if (m_cover.isNull()) return;
-
     QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
     p.setRenderHint( QPainter::SmoothPixmapTransform );
+
+    QLinearGradient g( QPoint(), QPoint( width(), height() ) );
+    g.setColorAt( 0, Qt::transparent );
+    g.setColorAt( 1, QColor( 0x2b, 0x2b, 0x2b ) );
+    p.fillRect( rect(), g );
+
+    if (m_cover.isNull()) return;
 
     // determine rotated height
     QTransform trans;
@@ -104,6 +109,6 @@ NowPlayingView::paintEvent( QPaintEvent* e )
     trans.scale( scale, scale );
 
     // draw
-    p.setTransform( trans * QTransform().translate( height()/2, height()/3 ) );
+    p.setTransform( trans * QTransform().translate( height()/2, height()/3 + 10 ) );
     p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/3 ), m_cover );
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,17 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScrobblerHttp.h"
+#ifndef SCROBBLER_INIT_H
+#define SCROBBLER_INIT_H
+
 #include <QString>
 
 
-class ScrobblerHandshake : public ScrobblerHttp
+struct ScrobblerInit
 {
-    QString const m_username;
-    QString const m_session;
+    /** you must call qApp->setApplicationVersion() before using this! */
 
-public:
-    ScrobblerHandshake( const QString& username, const QString& session );
-
-    virtual void request();
+    QString username;
+    QString sessionKey; /** http://last.fm/api */
+    QString clientId;   /** http://audioscrobbler.net/development/protocol/ */
 };
+
+#endif
