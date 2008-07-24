@@ -37,9 +37,13 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 WsReply*
 WsRequestBuilder::start()
 {
+#ifndef Q_WS_MAC
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
+#else
+    QUrl url( "http://ws.audioscrobbler.com/2.0/" );    
+#endif
 
     url.setQueryItems( params );
 

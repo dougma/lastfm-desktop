@@ -18,12 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesListener.h"
-
+#include "lib/core/AppleScript.h"
 #include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/Logger.h"
 #include "lib/unicorn/UnicornUtils.h"
-#include "lib/unicorn/AppleScript.h"
-
 #include <QTcpSocket>
 #include <QThread>
 #include <QHostAddress>
@@ -220,7 +217,7 @@ ITunesListener::transmit( const QString& data )
 
         if (bytesWritten == -1)
         {
-            LOGL( 1, "Sending submission through socket failed." )
+            qCritical() << "Sending submission through socket failed.";
         }
     }
 }
