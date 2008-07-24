@@ -25,6 +25,7 @@
 #endif
 #ifdef Q_WS_MAC
     #include <QCoreApplication>
+    #include <Carbon/Carbon.h>
 #endif
 
 
