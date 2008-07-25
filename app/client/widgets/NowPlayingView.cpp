@@ -60,7 +60,7 @@ NowPlayingView::NowPlayingView( QWidget* parent )
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addStretch();
     v->addWidget( m_label = new QLabel );
-    v->addSpacing( 10 );
+    v->addSpacing( 8 );
     
     m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     m_label->setTextFormat( Qt::RichText );
@@ -74,6 +74,7 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
     {
         case PlayerEvent::PlaybackEnded:
             m_cover = QImage();
+            m_label->clear();
             update();
             break;
 

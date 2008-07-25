@@ -45,45 +45,24 @@ ScrobbleProgressBar::ScrobbleProgressBar()
 
 
 void
-ScrobbleProgressBar::paintEvent( QPaintEvent* e )
+ScrobbleProgressBar::paintEvent( QPaintEvent* )
 {
-    QWidget::paintEvent( e );
+    uint const h = height();
+
+    if (ui.time->text().isEmpty())
+        return;
+
+    QPainter p( this );
+    p.setRenderHint( QPainter::Antialiasing );
+    p.setBrush( QColor( 0xd0, 0xd9, 0xe2, 127 ) );
+    p.setOpacity( 0.30 );
+    p.drawRect( 3, h-6, width()-6, 3 );
 
     if (!m_progressDisplayTick)
         return;
 
-    static bool b = true;
-    static QLinearGradient g( 0, 0, 0, 20 );
-    if (b)
-    {
-        // Track bar blue bg colour
-        const QColor k_trackBarBkgrBlueTop( 0xeb, 0xf0, 0xf2, 0xff );
-        const QColor k_trackBarBkgrBlueMiddle( 0xe5, 0xe9, 0xec, 0xff );
-        const QColor k_trackBarBkgrBlueBottom( 0xdc, 0xe2, 0xe5, 0xff );
-
-        // Track bar progress bar colour
-        const QColor k_trackBarProgressTop( 0xd6, 0xde, 0xe6, 0xff );
-        const QColor k_trackBarProgressMiddle( 0xd0, 0xd9, 0xe2, 0xff );
-        const QColor k_trackBarProgressBottom( 0xca, 0xd4, 0xdc, 0xff );
-
-        // Track bar scrobbled colour
-        const QColor k_trackBarScrobbledTop( 0xba, 0xc7, 0xd7, 0xff );
-        const QColor k_trackBarScrobbledMiddle( 0xb8, 0xc4, 0xd5, 0xff );
-        const QColor k_trackBarScrobbledBottom( 0xb5, 0xc1, 0xd2, 0xff );
-
-        g.setColorAt( 0, k_trackBarProgressTop );
-        g.setColorAt( 0.5, k_trackBarProgressMiddle );
-        g.setColorAt( 0.51, k_trackBarProgressBottom );
-        g.setColorAt( 1, k_trackBarProgressBottom );
-    }
-
-    QPainter p( this );
-    p.setRenderHint( QPainter::Antialiasing );
     p.setPen( Qt::white );
-    p.setBrush( g );
-    p.setOpacity( 0.75 );
-
-    uint const h = height();
+    p.setOpacity( 0.85 );
     p.drawRoundRect( 1, h - 8, m_progressDisplayTick, 7  );
 }
 
@@ -194,6 +173,7 @@ void
 ScrobbleProgressBar::resetUI()
 {
     m_progressDisplayTick = 0;
-    ui.time->setText( "" );
-    ui.timeToScrobblePoint->setText( "" );
+    ui.time->clear();
+    ui.timeToScrobblePoint->clear();
+    update();
 }
