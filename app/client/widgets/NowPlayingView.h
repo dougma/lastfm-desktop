@@ -38,6 +38,7 @@ private:
     void paintEvent( QPaintEvent* );
 
     QImage m_cover;
+    class QLabel* m_label;
 };
 
 #endif // NOW_PLAYING_VIEW_H

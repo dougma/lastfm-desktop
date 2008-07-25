@@ -66,22 +66,47 @@ MainWindow::MainWindow()
 
 
 void
+MainWindow::onAppEvent( int e, const QVariant& v )
+{
+    switch (e)
+    {
+    case PlayerEvent::PlaybackStarted:
+    case PlayerEvent::TrackChanged:
+        {
+            ui.share->setEnabled( true );
+            ui.tag->setEnabled( true );
+            ui.love->setEnabled( true );
+            ui.ban->setEnabled( true );
+
+        #ifndef Q_WS_MAC
+            Track t = v.value<ObservedTrack>();
+            setWindowTitle( t.prettyTitle() );
+        #endif
+            break;
+        }
+
+    case PlayerEvent::PlaybackEnded:
+        ui.share->setEnabled( false );
+        ui.tag->setEnabled( false );
+        ui.love->setEnabled( false );
+        ui.ban->setEnabled( false );
+
+    #ifndef Q_WS_MAC
+        setWindowTitle( qApp->applicationName() );
+    #endif
+        break;
+    }
+}
+
+
+void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
     ui.toolbar->hide(); // no longer used
 
-    QWidget* w = ui.nowPlaying = new NowPlayingView;
-    w->setPalette( QPalette( Qt::white, Qt::black ) );
-    w->setAutoFillBackground( true );
-
-    QHBoxLayout* h = new QHBoxLayout;
-    h->addStretch();
-    h->addWidget( ui.label = new QLabel );
-    h->setMargin( 10 );
-
-    QWidget* actionbar = new QWidget;
-    QHBoxLayout* h2 = new QHBoxLayout( actionbar );
+    ui.actionbar = new QWidget;
+    QHBoxLayout* h2 = new QHBoxLayout( ui.actionbar );
     h2->addStretch();
     h2->addWidget( label( ":/MainWindow/love.png" ) );
     h2->addWidget( label( ":/MainWindow/ban.png" ) );
@@ -90,6 +115,16 @@ MainWindow::setupUi()
     h2->setSpacing( 1 );
     h2->setMargin( 0 );
     h2->setSizeConstraint( QLayout::SetFixedSize );
+
+#if 0
+    QWidget* w = ui.nowPlaying = new NowPlayingView;
+    w->setPalette( QPalette( Qt::white, Qt::black ) );
+    w->setAutoFillBackground( true );
+
+    QHBoxLayout* h = new QHBoxLayout;
+    h->addStretch();
+    h->addWidget( ui.label = new QLabel );
+    h->setMargin( 10 );
 
     QVBoxLayout* v2 = new QVBoxLayout;
     v2->addWidget( new MediaPlayerIndicator );
@@ -103,9 +138,36 @@ MainWindow::setupUi()
     v->addWidget( actionbar );
     v->setAlignment( actionbar, Qt::AlignCenter );
     v->setMargin( 0 );
+#endif
+
+    QWidget* w = new QWidget;
+
+    QVBoxLayout* iv = new QVBoxLayout;
+    iv->addWidget( ui.cover = new NowPlayingView );
+    iv->addWidget( ui.progress = new ScrobbleProgressBar );
+    iv->setMargin( 10 );
+    iv->setSpacing( 0 );
+
+    QVBoxLayout* v = new QVBoxLayout( w );
+    v->addLayout( iv );
+    v->addWidget( ui.actionbar );
+    v->setMargin( 0 );
+    v->setAlignment( ui.actionbar, Qt::AlignCenter );
 
     setCentralWidget( w );
-    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+
+    // make minimum and default size so the content area is square
+    QSize const s = ui.actionbar->sizeHint();
+    w->setMinimumSize( s.width(), s.width() );
+
+    QLinearGradient g( QPoint(), w->rect().bottomLeft() );
+    g.setColorAt( 0, Qt::black );
+    g.setColorAt( 0.75, QColor( 0x2b, 0x2b, 0x2b ) );
+
+    QPalette p( Qt::white, Qt::black );
+    p.setBrush( QPalette::Window, g );
+    w->setPalette( p );
+    w->setAutoFillBackground( true );
 }
 
 
@@ -255,41 +317,6 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
             else
                 hide();
           #endif
-            break;
-    }
-}
-
-
-void
-MainWindow::onAppEvent( int e, const QVariant& v )
-{
-    switch (e)
-    {
-        case PlayerEvent::PlaybackStarted:
-        case PlayerEvent::TrackChanged:
-        {
-            Track t = v.value<ObservedTrack>();
-            setWindowTitle( t.prettyTitle() );
-
-            ui.label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
-
-            ui.share->setEnabled( true );
-            ui.tag->setEnabled( true );
-            ui.love->setEnabled( true );
-            ui.ban->setEnabled( true );
-
-            break;
-        }
-
-        case PlayerEvent::PlaybackEnded:
-            setWindowTitle( qApp->applicationName() );
-
-            ui.label->clear();
-
-            ui.share->setEnabled( false );
-            ui.tag->setEnabled( false );
-            ui.love->setEnabled( false );
-            ui.ban->setEnabled( false );
             break;
     }
 }

@@ -31,9 +31,9 @@ public:
 
     struct : Ui::MainWindow
     {
-        class NowPlayingView* nowPlaying;
+        class NowPlayingView* cover;
         class ScrobbleProgressBar* progress;
-        class QLabel* label;
+        class QWidget* actionbar;
     } 
     ui;
 

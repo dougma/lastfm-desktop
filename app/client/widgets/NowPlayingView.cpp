@@ -52,10 +52,18 @@ static inline QImage compose( const QImage &in )
 NowPlayingView::NowPlayingView( QWidget* parent )
               : QWidget( parent )
 {
-    setMinimumSize( 150, 225 );
+    //setMinimumSize( 150, 225 );
     setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addStretch();
+    v->addWidget( m_label = new QLabel );
+    v->addSpacing( 10 );
+    
+    m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    m_label->setTextFormat( Qt::RichText );
 }
 
 
@@ -72,7 +80,8 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
         case PlayerEvent::PlaybackStarted:
         case PlayerEvent::TrackChanged:
         {
-            QByteArray const data = v.value<ObservedTrack>().album().image();
+            Track t = v.value<ObservedTrack>();
+            QByteArray const data = t.album().image();
             if (data.size()) {
                 m_cover.loadFromData( data );
                 m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
@@ -80,6 +89,9 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
             }
             else
                 m_cover = QImage();
+
+            //TODO album/artist/track may be empty
+            m_label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
             update();
             break;
         }
@@ -90,6 +102,7 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
 void
 NowPlayingView::paintEvent( QPaintEvent* e )
 {
+#if 0
     QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
@@ -115,4 +128,23 @@ NowPlayingView::paintEvent( QPaintEvent* e )
     // draw
     p.setTransform( trans * QTransform().translate( height()/2, height()/3 + 10 ) );
     p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/3 ), m_cover );
+#endif
+
+    if (m_cover.isNull()) return;
+
+    QPainter p( this );
+    p.setClipRect( e->rect() );
+    p.setRenderHint( QPainter::Antialiasing );
+    p.setRenderHint( QPainter::SmoothPixmapTransform );
+    QTransform trans;
+    qreal const scale = qreal(height()) / m_cover.height();
+    trans.scale( scale, scale );
+    p.setTransform( trans );
+
+    QPointF f = trans.inverted().map( QPointF( width(), 0 ) );
+
+    f.rx() -= m_cover.width();
+    f.rx() /= 2;
+
+    p.drawImage( f, m_cover );
 }
