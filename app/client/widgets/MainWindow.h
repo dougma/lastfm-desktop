@@ -52,4 +52,7 @@ public slots:
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
     void onAppEvent( int, const QVariant& );
+
+private:
+    void setupUi();
 };

@@ -73,9 +73,13 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
         case PlayerEvent::TrackChanged:
         {
             QByteArray const data = v.value<ObservedTrack>().album().image();
-            m_cover.loadFromData( data );
-            m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
-            m_cover = compose( m_cover );
+            if (data.size()) {
+                m_cover.loadFromData( data );
+                m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+                m_cover = compose( m_cover );
+            }
+            else
+                m_cover = QImage();
             update();
             break;
         }

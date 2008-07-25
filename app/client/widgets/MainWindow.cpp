@@ -45,32 +45,16 @@
 #endif
 
 
+QLabel* label( const QString& path ) { QPixmap p( path ); QLabel*l = new QLabel; l->setPixmap( p ); l->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ); return l; }
+
+
 MainWindow::MainWindow()
 {
-    ui.setupUi( this );
-
-    setUnifiedTitleAndToolBarOnMac( true );
+    setupUi();
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     connect( close, SIGNAL(activated()), SLOT(close()) );
-    
-    QWidget* w = ui.nowPlaying = new NowPlayingView;
-    w->setPalette( QPalette( Qt::white, Qt::black ) );
-    w->setAutoFillBackground( true );
-    
-    QHBoxLayout* h = new QHBoxLayout;
-    h->addStretch();
-    h->addWidget( ui.label = new QLabel );
-
-    QVBoxLayout* v = new QVBoxLayout( w );
-    v->addLayout( h );
-    v->setStretchFactor( h, 1 );
-    v->addWidget( new MediaPlayerIndicator );
-    v->addWidget( ui.progress = new ScrobbleProgressBar );
-    v->setMargin( 10 );
-
-    setCentralWidget( w );
-
+   
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
@@ -78,6 +62,50 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+}
+
+
+void
+MainWindow::setupUi()
+{
+    ui.setupUi( this );
+    ui.toolbar->hide(); // no longer used
+
+    QWidget* w = ui.nowPlaying = new NowPlayingView;
+    w->setPalette( QPalette( Qt::white, Qt::black ) );
+    w->setAutoFillBackground( true );
+
+    QHBoxLayout* h = new QHBoxLayout;
+    h->addStretch();
+    h->addWidget( ui.label = new QLabel );
+    h->setMargin( 10 );
+
+    QWidget* actionbar = new QWidget;
+    QHBoxLayout* h2 = new QHBoxLayout( actionbar );
+    h2->addStretch();
+    h2->addWidget( label( ":/MainWindow/love.png" ) );
+    h2->addWidget( label( ":/MainWindow/ban.png" ) );
+    h2->addWidget( label( ":/MainWindow/tag.png" ) );
+    h2->addWidget( label( ":/MainWindow/share.png" ) );
+    h2->setSpacing( 1 );
+    h2->setMargin( 0 );
+    h2->setSizeConstraint( QLayout::SetFixedSize );
+
+    QVBoxLayout* v2 = new QVBoxLayout;
+    v2->addWidget( new MediaPlayerIndicator );
+    v2->addWidget( ui.progress = new ScrobbleProgressBar );
+    v2->setMargin( 11 );
+
+    QVBoxLayout* v = new QVBoxLayout( w );
+    v->addLayout( h );
+    v->setStretchFactor( h, 1 );
+    v->addLayout( v2 );
+    v->addWidget( actionbar );
+    v->setAlignment( actionbar, Qt::AlignCenter );
+    v->setMargin( 0 );
+
+    setCentralWidget( w );
+    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 }
 
 
