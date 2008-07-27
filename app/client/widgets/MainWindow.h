@@ -39,7 +39,7 @@ public:
 
 protected:
 #ifdef WIN32
-    void closeEvent( QCloseEvent* );
+    virtual void closeEvent( QCloseEvent* );
 #endif
 
 public slots:

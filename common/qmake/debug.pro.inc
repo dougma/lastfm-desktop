@@ -3,8 +3,10 @@ CONFIG( debug, debug|release ) {
 		#speeds up debug builds by only compiling x86
 		CONFIG += x86
 		CONFIG -= ppc
-        CONFIG -= app_bundle
+
+        !macx-xcode:CONFIG -= app_bundle
 	}
+
 
     linux* {
         QMAKE_CXXFLAGS_DEBUG = -ggdb

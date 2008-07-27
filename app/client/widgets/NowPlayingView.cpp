@@ -49,18 +49,21 @@ static inline QImage compose( const QImage &in )
 
 
 
-NowPlayingView::NowPlayingView( QWidget* parent )
-              : QWidget( parent )
+NowPlayingView::NowPlayingView()
 {
-    //setMinimumSize( 150, 225 );
-    setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
-
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 
     QVBoxLayout* v = new QVBoxLayout( this );
+    v->setMargin( 0 );
     v->addStretch();
     v->addWidget( m_label = new QLabel );
+#ifdef Q_WS_MAC
+    v->addSpacing( 13 );
+    m_label->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
+//    m_label->setAttribute( Qt::WA_MacSmallSize );
+#else
     v->addSpacing( 8 );
+#endif
     
     m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     m_label->setTextFormat( Qt::RichText );

@@ -30,10 +30,13 @@ ScrobbleProgressBar::ScrobbleProgressBar()
     h->addWidget( ui.time = new QLabel );
     h->addStretch();
     h->addWidget( ui.timeToScrobblePoint = new QLabel );
+    h->setContentsMargins( 0, 0, 0, 11 );
     setLayout( h );
 
     ui.time->setDisabled( true ); //aesthetics
     ui.timeToScrobblePoint->setDisabled( true ); //aesthetics
+    ui.time->setAttribute( Qt::WA_MacMiniSize );
+    ui.timeToScrobblePoint->setAttribute( Qt::WA_MacMiniSize );
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
@@ -51,19 +54,15 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
 
     if (ui.time->text().isEmpty())
         return;
-
+    
     QPainter p( this );
-    p.setRenderHint( QPainter::Antialiasing );
-    p.setBrush( QColor( 0xd0, 0xd9, 0xe2, 127 ) );
-    p.setOpacity( 0.30 );
-    p.drawRect( 3, h-6, width()-6, 3 );
-
-    if (!m_progressDisplayTick)
-        return;
-
-    p.setPen( Qt::white );
-    p.setOpacity( 0.85 );
-    p.drawRoundRect( 1, h - 8, m_progressDisplayTick, 7  );
+    p.setPen( QColor( 0x37, 0x37, 0x37 ) );
+    p.setBrush( QColor( 0xff, 0xff, 0xff, 20 ) );
+    p.drawRect( 0, h-8, width()-1, 5 );
+    
+    p.setPen( Qt::transparent );
+    p.setBrush( Qt::white );
+    p.drawRect( 1, h-7, m_progressDisplayTick, 4 );
 }
 
 

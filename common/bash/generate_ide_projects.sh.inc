@@ -2,7 +2,7 @@
 
 gen_vs_sln()
 {
-    qmake -recursive -tp vc Last.fm.pro || return $?
+    qmake -recursive -tp vc Last.fm.pro "CONFIG -= flat" || return $?
     
     FIRST_BIT='
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qmake", "qmake", "{780C13D3-8172-4EE0-8FD5-26ED6489851C}"

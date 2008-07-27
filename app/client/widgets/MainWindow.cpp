@@ -68,6 +68,8 @@ MainWindow::MainWindow()
 void
 MainWindow::onAppEvent( int e, const QVariant& v )
 {
+    Q_UNUSED( v ); //--warning mac
+    
     switch (e)
     {
     case PlayerEvent::PlaybackStarted:
@@ -79,8 +81,7 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             ui.ban->setEnabled( true );
 
         #ifndef Q_WS_MAC
-            Track t = v.value<ObservedTrack>();
-            setWindowTitle( t.prettyTitle() );
+            setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
         #endif
             break;
         }
@@ -103,7 +104,6 @@ void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
-    ui.toolbar->hide(); // no longer used
 
     ui.actionbar = new QWidget;
     QHBoxLayout* h2 = new QHBoxLayout( ui.actionbar );
@@ -116,36 +116,31 @@ MainWindow::setupUi()
     h2->setMargin( 0 );
     h2->setSizeConstraint( QLayout::SetFixedSize );
 
-#if 0
-    QWidget* w = ui.nowPlaying = new NowPlayingView;
-    w->setPalette( QPalette( Qt::white, Qt::black ) );
-    w->setAutoFillBackground( true );
-
-    QHBoxLayout* h = new QHBoxLayout;
-    h->addStretch();
-    h->addWidget( ui.label = new QLabel );
-    h->setMargin( 10 );
-
-    QVBoxLayout* v2 = new QVBoxLayout;
-    v2->addWidget( new MediaPlayerIndicator );
-    v2->addWidget( ui.progress = new ScrobbleProgressBar );
-    v2->setMargin( 11 );
-
-    QVBoxLayout* v = new QVBoxLayout( w );
-    v->addLayout( h );
-    v->setStretchFactor( h, 1 );
-    v->addLayout( v2 );
-    v->addWidget( actionbar );
-    v->setAlignment( actionbar, Qt::AlignCenter );
-    v->setMargin( 0 );
-#endif
-
-    QWidget* w = new QWidget;
+    struct CentralWidget : QWidget
+    {
+        QWidget* cover;
+        
+        virtual void resizeEvent( QResizeEvent* )
+        {
+            QLinearGradient g( 0, cover->height()*5/7 + 10 /*margin*/, 0, height() );
+            g.setColorAt( 0, Qt::black );
+            g.setColorAt( 1, QColor( 0x20, 0x20, 0x20 ) );
+            
+            QPalette p = palette();
+            p.setBrush( QPalette::Window, g );
+            
+            //inefficient as sets recursively on child widgets? 
+            //may be better to just paintEvent it
+            setPalette( p );        
+        }
+    };
+    
+    CentralWidget* w = new CentralWidget;
 
     QVBoxLayout* iv = new QVBoxLayout;
     iv->addWidget( ui.cover = new NowPlayingView );
     iv->addWidget( ui.progress = new ScrobbleProgressBar );
-    iv->setMargin( 10 );
+    iv->setContentsMargins( 10, 10, 10, 0 );
     iv->setSpacing( 0 );
 
     QVBoxLayout* v = new QVBoxLayout( w );
@@ -154,18 +149,14 @@ MainWindow::setupUi()
     v->setMargin( 0 );
     v->setAlignment( ui.actionbar, Qt::AlignCenter );
 
+    w->cover = ui.cover;
     setCentralWidget( w );
 
     // make minimum and default size so the content area is square
-    QSize const s = ui.actionbar->sizeHint();
-    w->setMinimumSize( s.width(), s.width() );
-
-    QLinearGradient g( QPoint(), w->rect().bottomLeft() );
-    g.setColorAt( 0, Qt::black );
-    g.setColorAt( 0.75, QColor( 0x2b, 0x2b, 0x2b ) );
+    uint const W = ui.actionbar->sizeHint().width();
+    w->setMinimumSize( W, W );
 
     QPalette p( Qt::white, Qt::black );
-    p.setBrush( QPalette::Window, g );
     w->setPalette( p );
     w->setAutoFillBackground( true );
 }

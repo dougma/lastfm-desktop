@@ -29,7 +29,7 @@ class NowPlayingView : public QWidget
     Q_OBJECT
 
 public:
-    NowPlayingView( QWidget *parent = 0 );
+    NowPlayingView();
 
 private slots:
     void onAppEvent( int, const QVariant& );

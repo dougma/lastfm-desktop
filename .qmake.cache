@@ -4,21 +4,22 @@ else:  ROOT_DIR = $$system( pwd )
 # TODO remove! confusing!
 SRC_DIR = $$ROOT_DIR
 
-macx-xcode:BUILD_DIR = build
-else:BUILD_DIR = _build
-TOOLS_DIR = $$ROOT_DIR/tools
+macx-xcode {
+    BUILD_DIR = build
+} else {
+    # With Xcode we generate a bundle
+    BUILD_DIR = _build
+    DESTDIR = $$ROOT_DIR/_bin
+    LIBS += -L$$DESTDIR
+}
 
 OBJECTS_DIR = $$BUILD_DIR
 MOC_DIR = $$BUILD_DIR
 UI_DIR = $$BUILD_DIR
 RCC_DIR = $$BUILD_DIR
-DESTDIR = $$ROOT_DIR/_bin
 INCLUDEPATH += $$ROOT_DIR
 
-LIBS += -L$$DESTDIR
 
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN
 
 COMMON_LIBS_DIR = /svn/libs/cpp
-
-DEFINES += 'THREE_LETTER_SCROBBLE_CODE="ass"'

@@ -19,6 +19,7 @@ debug:macx-xcode {
 
     TEMPLATE = app
     TARGET = Last.fm
+    ICON = app/client/mac/client.icns
 }
 else {
     TEMPLATE = subdirs
