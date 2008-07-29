@@ -18,7 +18,8 @@
  ***************************************************************************/
 
 #include "lib/types/Track.h"
-#include <Phonon>
+#include <phonon/mediaobject.h>
+#include <phonon/audiooutput.h>
 #include <QList>
 #include <QMap>
 #include <QObject>

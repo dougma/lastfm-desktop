@@ -88,15 +88,15 @@ static QString systemInformationString()
 
 #ifdef Q_WS_X11
     s += "CPU: \n";
-    s += runCommand( "cat /proc/cpuinfo" );
+    s += Unicorn::runCommand( "cat /proc/cpuinfo" );
     s += "\n";
 
     s += "Memory: \n";
-    s += runCommand( "cat /proc/meminfo" );
+    s += Unicorn::runCommand( "cat /proc/meminfo" );
     s += "\n";
 
     s += "Diskspace: \n";
-    s += runCommand( "df -h" );
+    s += Unicorn::runCommand( "df -h" );
     s += "\n";
 
 #elif defined WIN32
