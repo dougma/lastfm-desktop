@@ -82,7 +82,7 @@ else
             BUILD_CMD='open Last.fm.xcodeproj';;
         Linux)
             qmake -config debug || die "Configure failed."
-            BUILD_CMD='make'snv
+            BUILD_CMD='make'
             middle "Configured to produce a debug build.";;
         *)      
             gen_vs_sln || die "Configure failed."
