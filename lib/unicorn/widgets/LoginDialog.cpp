@@ -20,7 +20,6 @@
 #include "LoginDialog.h"
 #include "common/qt/md5.cpp"
 #include "lib/core/MessageBoxBuilder.h"
-#include "lib/core/Logger.h"
 #include "lib/ws/WsRequestBuilder.h"
 #include "lib/ws/WsReply.h"
 #include <QMovie>

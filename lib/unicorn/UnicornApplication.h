@@ -23,6 +23,7 @@
 #include "lib/DllExportMacro.h"
 #include "common/HideStupidWarnings.h"
 #include <QApplication>
+class Logger;
 
 
 namespace Unicorn
@@ -32,7 +33,8 @@ namespace Unicorn
         Q_OBJECT
 
         bool m_logoutAtQuit;
-        
+        Logger* m_log;
+
     public:
         // shows a message box advising user of error before throwing
         class UnsupportedPlatformException
@@ -53,6 +55,7 @@ namespace Unicorn
         
     private:
         void translate();
+        static void qMsgHandler( QtMsgType, const char* );
     };
 }
 

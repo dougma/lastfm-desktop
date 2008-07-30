@@ -21,7 +21,6 @@
 #include "PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
-#include "lib/core/Logger.h"
 #include "lib/core/StoreDir.h"
 #include <QDir>
 #include <QTimer>

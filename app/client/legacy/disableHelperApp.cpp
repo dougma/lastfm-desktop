@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/core/Logger.h"
 #include <QFile>
+#include <QDebug>
 #include <windows.h>
 #include <shlobj.h>
 
@@ -43,7 +43,7 @@ namespace Legacy
         }
         else
         {
-            LOGL( 1, "Uh oh, Windows returned no STARTUP path, not going to be able to disable helper" );
+            qCritical() << "Uh oh, Windows returned no STARTUP path, not going to be able to disable helper";
             return "";
         }
     }
@@ -59,11 +59,11 @@ namespace Legacy
             bool fine = QFile::remove( shortcutPath );
             if ( !fine )
             {
-                LOGL( 1, "Deletion of shortcut failed, helper will still autolaunch" );
+                qCritical() << "Deletion of shortcut failed, helper will still autolaunch";
             }
             else
             {
-                LOGL( 3, "Helper shortcut removed from Startup" );
+                qInfo() << "Helper shortcut removed from Startup";
             }
         }
     }

@@ -21,6 +21,7 @@
 #define STORE_DIR_H
 
 #include "lib/DllExportMacro.h"
+#include <QCoreApplication>
 #include <QDir>
 
 
@@ -63,6 +64,16 @@ namespace StoreDir
         #else
             return data();    
         #endif
+    }
+
+
+    CORE_DLLEXPORT inline QString mainLog()
+    {
+    #ifdef NDEBUG
+        return logs().filePath( qApp->applicationName() + ".log" );
+    #else
+        return logs().filePath( qApp->applicationName() + ".debug.log" );
+    #endif
     }
 
 

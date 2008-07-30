@@ -25,6 +25,11 @@
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/core/StoreDir.h"
 #include "lib/ws/WsKeys.h"
+#include <QDebug>
+
+#ifdef WIN32
+extern void qWinMsgHandler(QtMsgType t, const char* str);
+#endif
 
 
 Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
@@ -40,11 +45,17 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 
     StoreDir::mkpaths();
 
-    Logger& logger = Logger::GetLogger();
-    logger.Init( StoreDir::logs().filePath( applicationName() + ".log" ), false );
-    logger.SetLevel( Logger::Debug );
-    LOGL( 3, "Application: " << applicationName() << " " << applicationVersion() );
-    LOGL( 3, "Platform: " << Unicorn::verbosePlatformString() );
+    qInstallMsgHandler( qMsgHandler );
+#ifdef WIN32
+    QString bytes = StoreDir::mainLog();
+    const wchar_t* path = bytes.utf16();
+#else
+    QString bytes = StoreDir::mainLog().toLocal8Bit();
+    const char* path = bytes.data();
+#endif
+    m_log = new Logger( path );
+    qInfo() << "Introducing" << applicationName()+'-'+applicationVersion();
+    qInfo() << "Directed by" << Unicorn::verbosePlatformString();
 
     translate();
 
@@ -113,4 +124,41 @@ Unicorn::Application::~Application()
         s.remove( "SessionKey" );
         Unicorn::QSettings().remove( "Username" ); // do after the UserQSettings or it doesn't work!
     }
+
+    delete m_log;
+}
+
+
+void
+Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
+{
+    Logger::Severity level;
+    switch (type)
+    {
+        case QtDebugMsg: 
+            level = Logger::Debug; 
+            break;
+        case QtWarningMsg: 
+            level = Logger::Warning; 
+            break;
+        case QtFatalMsg:
+        case QtCriticalMsg: 
+            level = Logger::Critical; 
+            break;
+        default:
+            level = Logger::Info;
+            break;
+    }
+
+    Logger::the().log( msg );
+
+#ifdef NDEBUG
+    if (arguments().contains( "--debug" ))
+#endif
+#ifdef WIN32
+        qWinMsgHandler( type, msg );
+#else
+        fprintf( stderr, "%s\n", msg );
+        fflush( stderr );
+#endif
 }

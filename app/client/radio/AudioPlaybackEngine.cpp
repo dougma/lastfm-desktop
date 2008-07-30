@@ -100,6 +100,8 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
 void
 AudioPlaybackEngine::onTrackStarted( const Phonon::MediaSource& source )
 {
+    Q_DEBUG_BLOCK << source.fileName();
+
     Track t = m_queue.take( source.url() );
     emit trackStarted( t );
 

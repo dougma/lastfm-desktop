@@ -26,6 +26,7 @@
     #define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
+
 #ifndef QT_NO_DEBUG
 
 /** @author <max@last.fm> - mxcl
@@ -89,10 +90,7 @@ public:
         return d;
     }
 
-
-    /**
-     * so you can do: Q_DEBUG_BLOCK << somestring;
-     */
+    /** so you can do: Q_DEBUG_BLOCK << somestring; */
     QDebugBlock &operator<<( const QVariant& v )
     {
         QString const s = v.toString();
@@ -103,24 +101,22 @@ public:
     }
 };
 
-#define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
-
-#define qDebug() QDebugBlock::debug()
-
-
+    #define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
+    #define Q_DEBUG_FUNCTION QDebugBlock::debug
+    
 #else // QT_NO_DEBUG
-
-    #include <QDateTime>
-
-    #define Q_DEBUG_BLOCK qDebug()
+    #define Q_DEBUG_FUNCTION qDebug
+    #define Q_DEBUG_BLOCK Q_DEBUG_FUNCTION()
     class QDebugBlock { public: QDebugBlock( QString ) {} };
-
-    // If we don't do this, we won't get function names/line numbers from qDebug statements
-    #define qDebug() qDebug() << QDateTime::currentDateTime().toUTC().toString( "yyMMdd hh:mm:ss" ) \
-                              << '-' << QString( "%1" ).arg( (int)QThread::currentThreadId(), 8, 16, QChar( '0' ) ) \
-                              << '-' << __PRETTY_FUNCTION__ << '(' << __LINE__<< ") - L3\n  "
-
-    #define qWarning() qDebug()
 #endif
+
+inline QDebug qInfo() { return QDebug( (QtMsgType) 10 ); }
+
+#define Q_DEBUG_STAMP QString(__FILE__ ":") + QString::number(__LINE__)
+
+#define qDebug() Q_DEBUG_FUNCTION() << Q_DEBUG_STAMP
+#define qInfo() qInfo() << Q_DEBUG_STAMP
+#define qWarning() qWarning() << Q_DEBUG_STAMP
+#define qError() qError() << Q_DEBUG_STAMP
 
 #endif

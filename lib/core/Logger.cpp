@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2008 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,285 +17,147 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-//#define ASSERT_ON_QT_WARNINGS_IN_DEBUG_BUILD
-
 #include "Logger.h"
+#include <ctime>
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
 
 #ifndef WIN32
     #include <sys/stat.h>
     #include <pthread.h>
 #endif
 
+Logger* Logger::instance = 0;
 using namespace std;
 
 
-#ifdef QT_CORE_LIB
-/******************************************************************************
-    loggingMsgHandler
-    
-    Message handler for redirecting qDebug output
-******************************************************************************/
-static void
-loggingMsgHandler(
-    QtMsgType   type,
-    const char* msg )
+Logger::Logger( const LOGGER_CHAR* path, Severity severity ) 
+      : mLevel( severity )
 {
-#ifdef QT_NO_DEBUG
+    instance = this;
 
-    // Release build, redirect to log file
-    switch (type)
-    {
-        case QtDebugMsg:
-            Logger::GetLogger().Log( msg );
-            break;
-        
-        case QtWarningMsg:
-            LOGL(Logger::Warning, msg);
-            break;
-        
-        case QtCriticalMsg:
-            LOGL(Logger::Critical, msg);
-            break;
-        
-        case QtFatalMsg:
-            LOGL(Logger::Critical, msg);
-            Logger::GetLogger().mDefaultMsgHandler(type, msg);
-            break;
-    }    
-
-#else
-
-    // Debug build, use default handler
-    QtMsgHandler& defHandler = Logger::GetLogger().mDefaultMsgHandler;
-
-    switch (type)
-    {
-        case QtDebugMsg:
-            defHandler(type, msg);
-            break;
-
-        case QtWarningMsg:
-        case QtCriticalMsg:
-            defHandler(type, msg);
-            #ifdef ASSERT_ON_QT_WARNINGS_IN_DEBUG_BUILD
-                Q_ASSERT(!"Qt warning, might be a good idea to fix this");
-            #endif
-            break;
-
-        case QtFatalMsg:
-            defHandler(type, msg);
-            break;
-    }    
-
-#endif // QT_NO_DEBUG
-}
-
-/******************************************************************************
-    defaultMsgHandler
-
-    On Mac (and Linux?), Qt doesn't give us a previously installed message
-    handler on calling qInstallMsgHandler, so we'll give it this one instead.
-    This code is pretty much copied from qt_message_output which isn't ideal
-    but there was no way of falling back on calling that function in the
-    default case as it would lead to infinite recursion.
-******************************************************************************/
-static void
-defaultMsgHandler(
-    QtMsgType   type,
-    const char* msg )
-{
-    fprintf(stderr, "%s\n", msg);
-    fflush(stderr);
-
-    if (type == QtFatalMsg ||
-       (type == QtWarningMsg && (!qgetenv("QT_FATAL_WARNINGS").isNull())) )
-    {
-        #if defined(Q_OS_UNIX) && defined(QT_DEBUG)
-            abort(); // trap; generates core dump
-        #else
-            exit(1);
-        #endif
-    }
-}
-#endif // QT_CORE_LIB
-
-
-/******************************************************************************
-    Init
-******************************************************************************/
-void
-Logger::Init(
-    LFM_LOGGER_STRING sFilename,
-    bool bOverwrite )
-{
-    mFilePath = sFilename;
-    long fileSize = 0;
+#ifdef WIN32
+    InitializeCriticalSection( &mMutex );
 
     // Trim file size if above 500k
-    #ifdef WIN32
-        HANDLE hFile = CreateFileW(mFilePath.c_str(), 
-                                   GENERIC_READ,
-                                   0, 
-                                   NULL,
-                                   OPEN_EXISTING, 
-                                   FILE_ATTRIBUTE_NORMAL, 
-                                   NULL);
-        fileSize = GetFileSize( hFile, NULL );
-        CloseHandle( hFile );
-    #else
-        struct stat st;
-        if ( !stat( sFilename.c_str(), &st ) )
-            fileSize = st.st_size;
-    #endif
+    HANDLE hFile = CreateFileW( path,
+                               GENERIC_READ,
+                               0, 
+                               NULL,
+                               OPEN_EXISTING, 
+                               FILE_ATTRIBUTE_NORMAL, 
+                               NULL);
+    long const fileSize = GetFileSize( hFile, NULL );
+    CloseHandle( hFile );
+#else
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init( &attr );
+    pthread_mutex_init( &mMutex, &attr );
 
-    LOG( 3, "Log File Size:" << fileSize );
+    struct stat st;
+    long const fileSize = stat( path, &st ) == 0 ? st.st_size : 0;
+#endif
 
     if ( fileSize > 500000 )
     {
-        ifstream inFile( sFilename.c_str() );
+        ifstream inFile( path );
         inFile.seekg( static_cast<streamoff>( fileSize - 400000 ) );
         istreambuf_iterator<char> bufReader( inFile ), end;
         string sFile;
         sFile.reserve( 400005 );
         sFile.assign( bufReader, end );
         inFile.close();
-        ofstream outFile( sFilename.c_str() );
+        ofstream outFile( path );
         outFile << sFile << flush;
         outFile.close();
     }
 
     ios::openmode flags = ios::out;
-    if (!bOverwrite)
-    {
-        flags |= ios::app;
-    }
-    mFileOut.open(sFilename.c_str(), flags);
+    mFileOut.open( path, flags );
 
     if (!mFileOut)
     {
-//         qWarning() << "Could not open log file" << sFilename;
+        cerr << "Could not open log file" << path;
         return;
     }
 
-    SetLevel(Info);
-
     // Print some initial startup info
-//     QString osVer = UnicornUtils::getOSVersion();
-    LOG(1, "************************************* STARTUP ********************************************\n");
-    LOG(1, "File-size: " << fileSize << "\n");
-
-    #ifdef QT_CORE_LIB
-        // Install message handler for dealing with qDebug output
-        mDefaultMsgHandler = qInstallMsgHandler(loggingMsgHandler);
-        if ( mDefaultMsgHandler == 0 )
-        {
-            // This will happen on the Mac. (And on Linux?)
-            LOGL(2, "No default message handler found, using our own." );
-            mDefaultMsgHandler = defaultMsgHandler;
-        }
-    #endif
+    LOG( 1, "******************************** STARTUP ***************************************" );
+    LOG( 1, "Log size: " << fileSize );
 }
 
-/******************************************************************************
-    GetLogger
-******************************************************************************/
-Logger&
-Logger::GetLogger()
+
+Logger::~Logger()
 {
-    // This does only construct one instance of the logger object even if
-    // called from lots of different modules. Yay!
-    static Logger logger;
-    return logger;
+    mFileOut.close();
+#ifdef WIN32
+    DeleteCriticalSection( &mMutex );
+#else
+    pthread_mutex_destroy( &mMutex );
+#endif
 }
 
-/******************************************************************************
-    Log
-******************************************************************************/
+
+static inline std::string time()
+{
+    time_t now;
+    time( &now );
+    char s[128];
+    strftime( s, 127, "%y%m%d %H:%M:%S", gmtime( &now ) );
+    return std::string( s);
+}
+
+
 void
-Logger::Log(
-    Severity level,
-    string message,
-    string function,
-    int line)
+Logger::log( const char* message )
 {
-    #ifdef WIN32
-        EnterCriticalSection( &mMutex );
-    #else
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init( &attr );
-        pthread_mutex_init( &mMutex, &attr );
-    #endif
-
-    if (mFileOut && level <= GetLevel())
-    {
-        mFileOut <<
-            GetTime() << " - " <<
-        #ifdef QT_CORE_LIB
-            std::setw(4) << QThread::currentThreadId() << " - " <<
-        #endif
-            function << "(" << line << ") - " <<
-            "L" << level << "\n  " << message << std::endl;
-    }
-
-    #ifdef WIN32
-        LeaveCriticalSection( &mMutex );
-    #else
-        pthread_mutex_destroy( &mMutex );
-    #endif
-}
-
+    if (!mFileOut)
+        return;
 
 #ifdef WIN32
-/******************************************************************************
-    LogW
-******************************************************************************/
+    EnterCriticalSection( &mMutex );
+#else
+    pthread_mutex_lock( pthread_mutex_t &mMutex );
+#endif
+
+    mFileOut << "[" << time() << "] " << message << "\n";
+
+#ifdef WIN32
+    LeaveCriticalSection( &mMutex );
+#else
+    pthread_mutex_unlock( &mMutex );
+#endif
+}
+
+
 void
-Logger::LogW(
-    Severity level,
-    wstring message,
-    string function,
-    int line)
+Logger::log( Severity level, const std::string& message, const char* function, int line )
+{
+    if (level > mLevel)
+        return;
+
+    std::ostringstream s;
+    s << function << "():" << line << " L" << level << std::endl;
+    s << message;
+
+    log( s.str().c_str() );
+}
+
+
+void
+Logger::log( Severity level, const std::wstring& in, const char* function, int line )
 {
     // first call works out required buffer length
-    int recLen = WideCharToMultiByte( CP_ACP, 0, message.c_str(), (int)(message.size()), NULL, NULL, NULL, NULL );
+    int recLen = WideCharToMultiByte( CP_ACP, 0, in.c_str(), (int)in.size(), NULL, NULL, NULL, NULL );
 
     char* buffer = new char[recLen + 1];
     memset(buffer,0,recLen+1);
 
     // second call actually converts
-    WideCharToMultiByte(CP_ACP,0,message.c_str(),(int)(message.size()),buffer,recLen,NULL,NULL);
-    std::string s = buffer;
+    WideCharToMultiByte( CP_ACP, 0, in.c_str(), (int)in.size(), buffer, recLen, NULL, NULL );
+    std::string message = buffer;
     delete[] buffer;
 
-    Log( level, s, function, line );
-}
-
-#endif
-
-
-/******************************************************************************
-    Log
-******************************************************************************/
-void
-Logger::Log(
-    const char* message )
-{
-    #ifdef WIN32
-        EnterCriticalSection( &mMutex );
-    #else
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init( &attr );
-        pthread_mutex_init( &mMutex, &attr );
-    #endif
-
-    if ( mFileOut )
-    {
-        mFileOut << message << std::endl << std::endl;
-    }
-
-    #ifdef WIN32
-        LeaveCriticalSection( &mMutex );
-    #else
-        pthread_mutex_destroy( &mMutex );
-    #endif
+    log( level, message, function, line );
 }

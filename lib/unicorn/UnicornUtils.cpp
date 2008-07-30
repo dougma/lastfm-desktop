@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "UnicornUtils.h"
-#include "lib/core/Logger.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDir>
