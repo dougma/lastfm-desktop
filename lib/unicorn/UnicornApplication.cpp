@@ -21,7 +21,7 @@
 #include "UnicornSettings.h"
 #include "UnicornUtils.h"
 #include "widgets/LoginDialog.h"
-#include "lib/core/Logger.h"
+#include "common/c++/Logger.h"
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/core/StoreDir.h"
 #include "lib/ws/WsKeys.h"

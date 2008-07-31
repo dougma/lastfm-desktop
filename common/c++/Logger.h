@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,7 +20,6 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "lib/DllExportMacro.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -35,7 +34,7 @@
 #endif
 
 
-class CORE_DLLEXPORT Logger
+class Logger
 {
     static Logger* instance;
 

@@ -20,7 +20,6 @@
 #include "./QSystemTrayIcon.h"
 #undef QSystemTrayIcon
 #include "AppleScript.h"
-#include "Logger.h"
 #include "UnicornUtils.h"
 #include <QBoxLayout>
 #include <QDesktopWidget>
