@@ -40,6 +40,8 @@ RadioWidget::RadioWidget( QWidget* parent )
     // queued because otherwise Phonon breaks
     connect( m_audio, SIGNAL(trackStarted( Track )), SIGNAL(trackStarted( Track )), Qt::QueuedConnection );
     connect( m_audio, SIGNAL(playbackEnded()), SIGNAL(playbackEnded()), Qt::QueuedConnection );
+    connect( m_audio, SIGNAL(buffering()), SIGNAL(buffering()), Qt::QueuedConnection );
+    connect( m_audio, SIGNAL(finishedBuffering()), SIGNAL(finishedBuffering()), Qt::QueuedConnection );
 
     QToolBar* bar = new QToolBar( this );
 
@@ -81,6 +83,7 @@ RadioWidget::play( const RadioStation& station )
     m_audio->play();
 
     ui.spinner->hide();
+    emit newStationStarted();
 }
 
 
@@ -88,11 +91,4 @@ void
 RadioWidget::queueMoreTracks()
 {
     m_audio->queue( m_tuner.fetchNextPlaylist() );
-}
-
-
-void
-RadioWidget::toggle()
-{
-    setVisible( !isVisible() );
 }

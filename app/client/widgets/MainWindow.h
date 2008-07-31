@@ -37,6 +37,8 @@ public:
     } 
     ui;
 
+    void setRadio( class RadioWidget* );
+
 protected:
 #ifdef WIN32
     virtual void closeEvent( QCloseEvent* );
@@ -48,6 +50,8 @@ public slots:
     void showAboutDialog();
     void showShareDialog();
     void showMetaInfoView();
+    void showScrobbleView(){ toggleRadio( ScrobbleView ); }
+    void toggleRadio( int index = -1 );
     
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
@@ -55,4 +59,10 @@ private slots:
 
 private:
     void setupUi();
+    void setupScrobbleView();
+
+    class QStackedWidget* m_layout;
+
+    enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
+
 };

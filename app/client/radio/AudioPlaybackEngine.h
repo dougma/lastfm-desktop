@@ -47,14 +47,19 @@ signals:
     void queueStarved();
     /** ...playback ends */
     void playbackEnded();
+    /** buffering has occured mid-track */
+    void buffering();
+    /** when the player has finished buffering mid-track */
+    void finishedBuffering();
 
 private slots:
-    void onTrackStarted( const Phonon::MediaSource& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
+    void onPhononSourceChanged( const Phonon::MediaSource& );
 
 private:
     Phonon::MediaObject *m_mediaObject;
     Phonon::AudioOutput *m_audioOutput;
 
     QMap<QUrl, Track> m_queue;
+
 };

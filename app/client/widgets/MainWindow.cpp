@@ -19,6 +19,7 @@
 
 #include "MainWindow.h"
 #include "App.h"
+#include "radio/RadioWidget.h"
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
@@ -33,6 +34,7 @@
 #include <QCloseEvent>
 #include <QPointer>
 #include <QShortcut>
+#include <QStackedWidget>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -62,6 +64,7 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+    connect( ui.tunein, SIGNAL(triggered()), SLOT(toggleRadio()) );
 }
 
 
@@ -104,7 +107,16 @@ void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
+    m_layout = new QStackedWidget();
+    setCentralWidget( m_layout );
 
+    setupScrobbleView();
+}
+
+
+void 
+MainWindow::setupScrobbleView()
+{
     ui.actionbar = new QWidget;
     QHBoxLayout* h2 = new QHBoxLayout( ui.actionbar );
     h2->addStretch();
@@ -116,10 +128,11 @@ MainWindow::setupUi()
     h2->setMargin( 0 );
     h2->setSizeConstraint( QLayout::SetFixedSize );
 
-    struct CentralWidget : QWidget
+    struct ScrobbleViewWidget : QWidget
     {
+        ScrobbleViewWidget( QWidget* w ): QWidget( w ){};
         QWidget* cover;
-        
+
         virtual void resizeEvent( QResizeEvent* )
         {
             QLinearGradient g( 0, cover->height()*5/7 + 10 /*margin*/, 0, height() );
@@ -134,8 +147,8 @@ MainWindow::setupUi()
             setPalette( p );        
         }
     };
-    
-    CentralWidget* w = new CentralWidget;
+
+    ScrobbleViewWidget* w = new ScrobbleViewWidget( this );
 
     QVBoxLayout* iv = new QVBoxLayout;
     iv->addWidget( ui.cover = new NowPlayingView );
@@ -150,7 +163,7 @@ MainWindow::setupUi()
     v->setAlignment( ui.actionbar, Qt::AlignCenter );
 
     w->cover = ui.cover;
-    setCentralWidget( w );
+    m_layout->addWidget( w );
 
     // make minimum and default size so the content area is square
     uint const W = ui.actionbar->sizeHint().width();
@@ -310,4 +323,33 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
           #endif
             break;
     }
+}
+
+
+void
+MainWindow::toggleRadio( int index )
+{
+    if( index > -1 && index < MaxViewCount )
+    {
+        m_layout->setCurrentIndex( index );
+        return;
+    }
+
+    if( m_layout->currentIndex() == ScrobbleView )
+        m_layout->setCurrentIndex( RadioView );
+    else
+        m_layout->setCurrentIndex( ScrobbleView );
+}
+
+
+void
+MainWindow::setRadio( RadioWidget* r )
+{
+    if( !r )
+    {
+        Q_ASSERT( r );
+    }
+
+    m_layout->insertWidget( RadioView, r );
+
 }

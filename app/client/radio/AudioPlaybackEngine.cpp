@@ -32,7 +32,7 @@ AudioPlaybackEngine::AudioPlaybackEngine()
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-    connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onTrackStarted( Phonon::MediaSource )) );
+    connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononSourceChanged( Phonon::MediaSource )) );
 
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
@@ -82,7 +82,7 @@ AudioPlaybackEngine::play()
 
 
 void
-AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ )
+AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
     switch (newstate)
     {
@@ -93,18 +93,45 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
         case Phonon::StoppedState:
             emit playbackEnded();
             break;
+
+        case Phonon::BufferingState:
+            emit buffering();
+            break;
+
+        case Phonon::PlayingState:
+            if( oldstate == Phonon::LoadingState ||
+                oldstate == Phonon::StoppedState )
+            {
+                Q_DEBUG_BLOCK << m_mediaObject->currentSource().url();
+
+                Track t = m_queue.take( m_mediaObject->currentSource().url() );
+                if( t.isEmpty() )
+                    break;
+
+                emit trackStarted( t );
+
+                if (m_queue.isEmpty())
+                    emit queueStarved();
+
+                break;
+            }
+            if( oldstate == Phonon::BufferingState )
+                emit finishedBuffering();
+            break;
     }
 }
 
 
 void
-AudioPlaybackEngine::onTrackStarted( const Phonon::MediaSource& source )
+AudioPlaybackEngine::onPhononSourceChanged( const Phonon::MediaSource& source )
 {
-    Q_DEBUG_BLOCK << source.fileName();
-
-    Track t = m_queue.take( source.url() );
-    emit trackStarted( t );
-
-    if (m_queue.isEmpty())
-        emit queueStarved();
+    // This is not a particularly nice work around to force the scrobbler 
+    // to change track when the radio track changes.
+    // (The phonon state will not automatically change as the tracks will already 
+    //  have been queued up and so it will seemlessly continue without changing state)
+    
+    // Another reason for this being a bad solution is that the track wont 
+    // necessarily have started when the source changes but mearly started buffering!
+    
+    onPhononStateChanged( Phonon::PlayingState, Phonon::LoadingState );
 }

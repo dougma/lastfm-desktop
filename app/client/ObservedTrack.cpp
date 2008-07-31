@@ -29,5 +29,5 @@ ObservedTrack::scrobblePoint() const
                       int(ScrobblePoint::kScrobblePointMax) );
     F /= 100.0f;
 
-    return ScrobblePoint( F * duration() );
+    return ScrobblePoint( ( F * duration() ) / 1000.0f );
 }

@@ -65,6 +65,7 @@ App::App( int argc, char** argv )
     m_radio = new RadioWidget;
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
+    connect( m_radio, SIGNAL(buffering()), SLOT(onRadioBuffering()) );
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -89,15 +90,20 @@ App::setMainWindow( MainWindow* window )
 {
     m_mainWindow = window;
 
+    connect( m_radio, SIGNAL(newStationStarted()), m_mainWindow, SLOT(showScrobbleView()) );
+
+    if( m_radio )
+    {
+        m_mainWindow->setRadio( m_radio );
+    }
+
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
-    connect( window->ui.tunein, SIGNAL(triggered()), m_radio, SLOT(toggle()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
     m_trayIcon = new QSystemTrayIcon( window );
     m_trayIcon->setIcon( QPixmap(":/16x16/as.png") );
     m_trayIcon->show();
-    m_radio->setParent( window, Qt::Drawer );
-    m_radio->hide();
+
     QMenu* menu = new QMenu;
     menu->addAction( window->ui.quit );
     m_trayIcon->setContextMenu( menu );
@@ -239,6 +245,20 @@ void
 App::onRadioPlaybackEnded()
 {
     m_playerManager->onPlaybackEnded( "ass" );
+}
+
+
+void
+App::onRadioBuffering()
+{
+    m_playerManager->onPlaybackPaused( "ass" );
+}
+
+
+void
+App::onRadioFinishedBuffering()
+{
+    m_playerManager->onPlaybackResumed( "ass" );
 }
 
 

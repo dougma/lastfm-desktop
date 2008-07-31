@@ -59,6 +59,8 @@ private slots:
 
     void onRadioTrackStarted( const class Track& );
     void onRadioPlaybackEnded();
+    void onRadioBuffering();
+    void onRadioFinishedBuffering();
 
 signals:
     void event( int, const QVariant& );

@@ -40,9 +40,10 @@ public:
 signals:
     void trackStarted( const class Track& );
     void playbackEnded();
-    
-public slots:
-    void toggle();
+    void buffering();
+    void finishedBuffering();
+    void newStationStarted();
+
 
 private slots:
     void onTunerReturnPressed();
