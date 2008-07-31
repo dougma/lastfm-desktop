@@ -21,6 +21,11 @@ debug:macx-xcode {
     TEMPLATE = app
     TARGET = Last.fm
     ICON = app/client/mac/client.icns
+    
+    # FIXME copied from appclient.pro
+    DEFINE = $${LITERAL_HASH}define
+    system( echo \\'$$DEFINE VERSION \\\"2.0.0\\\"\\' > app/client/version.h )
+    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> app/client/version.h )    
 }
 else {
     TEMPLATE = subdirs
