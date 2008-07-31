@@ -29,6 +29,7 @@
 #include "widgets/ScrobbleProgressBar.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
+#include "widgets/RadioMiniControls.h"
 #include "version.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
@@ -108,7 +109,19 @@ MainWindow::setupUi()
 {
     ui.setupUi( this );
     m_layout = new QStackedWidget();
-    setCentralWidget( m_layout );
+    QWidget* mainWidget = new QWidget;
+    mainWidget->setContentsMargins( 0, 0, 0, 0 );
+    m_layout->setContentsMargins( 0, 0, 0, 0 );
+    QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
+    mainLayout->setSpacing( 0 );
+
+        
+    mainLayout->addWidget( m_layout );
+    m_radioMiniControls = new RadioMiniControls( this );
+    mainLayout->addWidget( m_radioMiniControls );
+    
+    mainWidget->setLayout( mainLayout );
+    setCentralWidget( mainWidget );
 
     setupScrobbleView();
 }
@@ -351,5 +364,7 @@ MainWindow::setRadio( RadioWidget* r )
     }
 
     m_layout->insertWidget( RadioView, r );
+
+    m_radioMiniControls->setAudioOutput( r->audioOutput() );
 
 }

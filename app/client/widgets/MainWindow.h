@@ -34,7 +34,7 @@ public:
         class NowPlayingView* cover;
         class ScrobbleProgressBar* progress;
         class QWidget* actionbar;
-    } 
+    }
     ui;
 
     void setRadio( class RadioWidget* );
@@ -62,6 +62,7 @@ private:
     void setupScrobbleView();
 
     class QStackedWidget* m_layout;
+    class RadioMiniControls* m_radioMiniControls;
 
     enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
 

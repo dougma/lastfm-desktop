@@ -92,3 +92,10 @@ RadioWidget::queueMoreTracks()
 {
     m_audio->queue( m_tuner.fetchNextPlaylist() );
 }
+
+
+Phonon::AudioOutput*
+RadioWidget::audioOutput()
+{
+    return m_audio->audioOutput();
+}

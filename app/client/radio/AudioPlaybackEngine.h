@@ -32,6 +32,7 @@ class AudioPlaybackEngine : public QObject
     
 public:
     AudioPlaybackEngine();
+    Phonon::AudioOutput* audioOutput(){ return m_audioOutput; }
     
 public slots:
     void queue( const QList<Track>& );

@@ -21,6 +21,7 @@
 #include "lib/radio/RadioStation.h"
 #include "lib/radio/Tuner.h"
 
+namespace Phonon{ class AudioOutput; }
 
 class RadioWidget : public QWidget
 {
@@ -36,6 +37,8 @@ public:
         class QLabel* spinner;
     } 
     ui;
+    
+    Phonon::AudioOutput* audioOutput();
 
 signals:
     void trackStarted( const class Track& );
