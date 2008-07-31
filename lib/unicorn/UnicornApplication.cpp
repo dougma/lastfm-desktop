@@ -19,13 +19,14 @@
 
 #include "UnicornApplication.h"
 #include "UnicornSettings.h"
-#include "UnicornUtils.h"
 #include "widgets/LoginDialog.h"
 #include "common/c++/Logger.h"
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/core/StoreDir.h"
+#include "lib/core/UnicornUtils.h"
 #include "lib/ws/WsKeys.h"
 #include <QDebug>
+#include <QTranslator>
 
 #ifdef WIN32
 extern void qWinMsgHandler(QtMsgType t, const char* str);
@@ -50,7 +51,7 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     QString bytes = StoreDir::mainLog();
     const wchar_t* path = bytes.utf16();
 #else
-    QString bytes = StoreDir::mainLog().toLocal8Bit();
+    QByteArray bytes = StoreDir::mainLog().toLocal8Bit();
     const char* path = bytes.data();
 #endif
     m_log = new Logger( path );
@@ -101,11 +102,18 @@ Unicorn::Application::translate()
 #ifdef NDEBUG
     QString const lang_code = Unicorn::Settings().language();
 
+#ifdef Q_WS_MAC
+    QDir d = SystemDir::bundle().filePath( "Contents/Resources/qm" );
+#else
+    QDir d = qApp->applicationFolderPath() + "/i18n";
+#endif
+
+    //TODO need a unicorn/core/etc. translation, plus policy of no translations elsewhere or something!
     QTranslator* t1 = new QTranslator;
-    t1->load( d.filePath( "i18n/lastfm_" + lang_code );
+    t1->load( d.filePath( "lastfm_" + lang_code ) );
 
     QTranslator* t2 = new QTranslator;
-    t2->load( d.filePath( "i18n/qt_" + lang_code );
+    t2->load( d.filePath( "qt_" + lang_code ) );
 
     installTranslator( t1 );
     installTranslator( t2 );

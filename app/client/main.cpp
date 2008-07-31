@@ -25,6 +25,8 @@
 #include <QDir>
 #include <QTimer>
 
+#undef NDEBUG //tmp
+
 #ifdef NDEBUG
     #include "app/breakpad/ExceptionHandler.h"
 #endif

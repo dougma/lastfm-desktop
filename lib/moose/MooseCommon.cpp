@@ -20,7 +20,7 @@
 #include "MooseCommon.h"
 #include "MooseSettings.h"
 
-#include "lib/unicorn/UnicornUtils.h"
+#include "lib/core/UnicornUtils.h"
 #include "lib/core/MessageBoxBuilder.h"
 
 #include <QCoreApplication>

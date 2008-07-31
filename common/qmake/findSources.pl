@@ -6,9 +6,9 @@ use Switch;
         
 my $ext = shift;
 
-find( \&show_subs, shift || '.' );
+find( \&find_sources, shift || '.' );
 
-sub show_subs 
+sub find_sources 
 {
     if (-d) 
     {

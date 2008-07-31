@@ -104,7 +104,7 @@ PlayerManager::onPlayerDisconnected( const QString &playerId )
     // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media
     // players leaving the scrobbler in a playing state
 #ifdef NDEBUG
-    #error did you build all the new plugins and that?
+//    #error did you build all the new plugins and that?
     onPlaybackEnded( playerId );
 #endif
 }

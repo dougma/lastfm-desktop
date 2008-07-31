@@ -22,7 +22,7 @@
 #include "Settings.h"
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/core/StoreDir.h"
-#include "lib/unicorn/UnicornUtils.h"
+#include "lib/core/UnicornUtils.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>

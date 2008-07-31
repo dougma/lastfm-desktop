@@ -20,7 +20,7 @@
 #include "ITunesListener.h"
 #include "lib/core/AppleScript.h"
 #include "lib/moose/MooseCommon.h"
-#include "lib/unicorn/UnicornUtils.h"
+#include "lib/core/UnicornUtils.h"
 #include <QTcpSocket>
 #include <QThread>
 #include <QHostAddress>

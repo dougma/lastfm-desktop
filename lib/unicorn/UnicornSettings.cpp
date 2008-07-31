@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornUtils.h"
+#include "lib/core/UnicornUtils.h"
 #include "UnicornSettings.h"
 #include <QLocale>
 

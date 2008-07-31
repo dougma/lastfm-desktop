@@ -118,7 +118,7 @@ Logger::log( const char* message )
 #ifdef WIN32
     EnterCriticalSection( &mMutex );
 #else
-    pthread_mutex_lock( pthread_mutex_t &mMutex );
+    pthread_mutex_lock( &mMutex );
 #endif
 
     mFileOut << "[" << time() << "] " << message << "\n";
@@ -145,6 +145,7 @@ Logger::log( Severity level, const std::string& message, const char* function, i
 }
 
 
+#ifdef WIN32
 void
 Logger::log( Severity level, const std::wstring& in, const char* function, int line )
 {
@@ -161,3 +162,4 @@ Logger::log( Severity level, const std::wstring& in, const char* function, int l
 
     log( level, message, function, line );
 }
+#endif

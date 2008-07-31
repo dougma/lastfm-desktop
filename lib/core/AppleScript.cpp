@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "AppleScript.h"
-#include "logger.h"
+#include <QDebug>
 
 ComponentInstance AppleScript::s_component = NULL;
 

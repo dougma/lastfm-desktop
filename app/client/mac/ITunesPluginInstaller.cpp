@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ITunesPluginInstaller.h"
-#include "lib/unicorn/UnicornUtils.h"
+#include "lib/core/UnicornUtils.h"
 #include <QDebug>
 #include <QDir>
 #include <QProcess>

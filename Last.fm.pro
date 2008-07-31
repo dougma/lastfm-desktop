@@ -12,7 +12,8 @@ debug:macx-xcode {
 		RESOURCES += $$findSources( qrc, $$dir )	
     }
 
-    SOURCES -= lib/unicorn/UnicornUtils_win.cpp
+    SOURCES += common/c++/Logger.cpp
+    SOURCES -= lib/core/UnicornUtils_win.cpp
 
     INCLUDEPATH += app/client
     LIBS += -framework SystemConfiguration -framework CoreServices
