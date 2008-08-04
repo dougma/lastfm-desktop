@@ -28,6 +28,7 @@ class ScrobblePoint
     uint i;
 
 public:
+    /** j is in seconds */
     explicit ScrobblePoint( uint j )
     {
         // we special case 0, returning kScrobbleTimeMax because we are

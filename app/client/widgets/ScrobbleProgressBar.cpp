@@ -23,7 +23,7 @@
 
 
 ScrobbleProgressBar::ScrobbleProgressBar()
-                   : m_progressDisplayTick( 0 ),
+                   : m_scrobbleProgressTick( 0 ),
                      m_scrobblePoint( 0 )
 {
     QHBoxLayout* h = new QHBoxLayout;
@@ -40,8 +40,8 @@ ScrobbleProgressBar::ScrobbleProgressBar()
 
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
-    m_progressDisplayTimer = new QTimer( this );
-    connect( m_progressDisplayTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
+    m_progressPaintTimer = new QTimer( this );
+    connect( m_progressPaintTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
 
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
 }
@@ -58,25 +58,30 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
     QPainter p( this );
     p.setPen( QColor( 0x37, 0x37, 0x37 ) );
     p.setBrush( QColor( 0xff, 0xff, 0xff, 20 ) );
-    p.drawRect( 0, h-8, width()-1, 5 );
+    p.drawRect( 0, h-10, width()-1, 9 );
     
     p.setPen( Qt::transparent );
-    p.setBrush( Qt::white );
-    p.drawRect( 1, h-7, m_progressDisplayTick, 4 );
+    p.setBrush( QColor( 255, 255, 255, 70 ) );
+    p.drawRect( 1, h-9, m_scrobbleProgressTick / 2, 8 );
+    
+    p.setPen( Qt::white );
+    p.setBrush( Qt::transparent );
+    for (uint x = 3; x < m_scrobbleProgressTick; x+=2)
+        p.drawLine( x, h-7, x, h-4 );
 }
 
 
 void
 ScrobbleProgressBar::determineProgressDisplayGranularity( const ScrobblePoint& g )
 {
-    m_progressDisplayTimer->setInterval( 1000 * g / width() );
+    m_progressPaintTimer->setInterval( 1000 * g / width() );
 }
 
 
 void
 ScrobbleProgressBar::onProgressDisplayTick()
 {
-    m_progressDisplayTick++;
+    m_scrobbleProgressTick++;
     update();
 }
 
@@ -107,20 +112,20 @@ ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
         return;
 
     // this is as exact as we can get it in milliseconds
-    uint exactElapsedScrobbleTime = m_progressDisplayTick * m_progressDisplayTimer->interval();
+    uint exactElapsedScrobbleTime = m_scrobbleProgressTick * m_progressPaintTimer->interval();
 
     determineProgressDisplayGranularity( scrobblePoint() );
 
     if (e->oldSize().width() == 0)
     {
-        m_progressDisplayTick = 0;
+        m_scrobbleProgressTick = 0;
     }
     else
     {
         double f = exactElapsedScrobbleTime;
         f /= scrobblePoint() * 1000;
         f *= e->size().width();
-        m_progressDisplayTick = ceil( f );
+        m_scrobbleProgressTick = ceil( f );
     }
 
     update();
@@ -136,12 +141,12 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
     case PlayerEvent::TrackChanged:
         {
             onPlaybackTick( 0 );
-            m_progressDisplayTick = 0;
+            m_scrobbleProgressTick = 0;
             ObservedTrack t = v.value<ObservedTrack>();
             determineProgressDisplayGranularity( t.scrobblePoint() );
             m_scrobblePoint = t.scrobblePoint();
             connect( t.watch(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
-            connect( t.watch(), SIGNAL(destroyed()), m_progressDisplayTimer, SLOT(stop()) );
+            connect( t.watch(), SIGNAL(destroyed()), m_progressPaintTimer, SLOT(stop()) );
             update();
             break;
         }
@@ -153,12 +158,12 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
         case PlayerEvent::TrackChanged:
         case PlayerEvent::PlaybackUnstalled:
         case PlayerEvent::PlaybackUnpaused:
-            m_progressDisplayTimer->start();
+            m_progressPaintTimer->start();
             break;
 
         case PlayerEvent::PlaybackStalled:
         case PlayerEvent::PlaybackPaused:
-            m_progressDisplayTimer->stop();
+            m_progressPaintTimer->stop();
             break;
         
         case PlayerEvent::PlaybackEnded:
@@ -171,7 +176,7 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
 void
 ScrobbleProgressBar::resetUI()
 {
-    m_progressDisplayTick = 0;
+    m_scrobbleProgressTick = 0;
     ui.time->clear();
     ui.timeToScrobblePoint->clear();
     update();

@@ -34,10 +34,13 @@ public:
         class NowPlayingView* cover;
         class ScrobbleProgressBar* progress;
         class QWidget* actionbar;
+        
     }
     ui;
 
     void setRadio( class RadioWidget* );
+    
+    QSize sizeHint() const;
 
 protected:
 #ifdef WIN32

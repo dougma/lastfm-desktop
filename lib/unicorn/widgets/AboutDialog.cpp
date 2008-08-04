@@ -18,18 +18,40 @@
  ***************************************************************************/
 
 #include "AboutDialog.h"
-#include <QCoreApplication>
+#include <QApplication>
+#include <QIcon>
 #include <QLabel>
 #include <QVBoxLayout>
+
+
+static inline QLabel* label( const QString& text, Qt::WidgetAttribute size = Qt::WA_MacSmallSize )
+{
+    QLabel* l = new QLabel( text );
+    l->setAttribute( size );
+    l->setOpenExternalLinks( true );
+    return l;
+}
 
 
 AboutDialog::AboutDialog( const char* version, QWidget* parent )
            : QDialog( parent )
 {
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new QLabel( "<b>" + qApp->applicationName() + "</b> " + version ) );
-    v->addWidget( new QLabel( "Copyright 2005-2008 Last.fm Ltd." ) );
-    v->addWidget( new QLabel( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a> #audioscrobbler" ) );
-    setWindowTitle( tr("About") );
+    v->addWidget( new QLabel( "<b>" + qApp->applicationName() ) );
+    v->addWidget( label( version ) );
+    v->addSpacing( 10 );
+    v->addWidget( label( "<a href='http://www.last.fm'>www.last.fm</a>" ) );
+    v->addWidget( label( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a>" ) );
+    v->addSpacing( 10 );
+    v->addWidget( label( QString::fromUtf8("Copyright © 2005-2008 Last.fm Ltd.") ) );
     v->setSizeConstraint( QLayout::SetFixedSize );
+    v->setSpacing( 2 );
+
+#ifdef Q_WS_MAC
+    foreach (QLabel* l, findChildren<QLabel*>())
+        l->setAlignment( Qt::AlignHCenter );
+#else
+    // yeah, really, don't do it on Mac. Weird.
+    setWindowTitle( tr("About") );
+#endif
 }

@@ -45,8 +45,9 @@ private:
     void resizeEvent( QResizeEvent* );
     void paintEvent( QPaintEvent* );
 
-    class QTimer* m_progressDisplayTimer;
-    uint m_progressDisplayTick;
+    class QTimer* m_progressPaintTimer;
+
+    uint m_scrobbleProgressTick;
 
     ScrobblePoint m_scrobblePoint;
     ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }

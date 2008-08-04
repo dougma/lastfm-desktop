@@ -110,11 +110,9 @@ MainWindow::setupUi()
     ui.setupUi( this );
     m_layout = new QStackedWidget();
     QWidget* mainWidget = new QWidget;
-    mainWidget->setContentsMargins( 0, 0, 0, 0 );
-    m_layout->setContentsMargins( 0, 0, 0, 0 );
     QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
     mainLayout->setSpacing( 0 );
-
+    mainLayout->setMargin( 0 );
         
     mainLayout->addWidget( m_layout );
     m_radioMiniControls = new RadioMiniControls( this );
@@ -158,33 +156,31 @@ MainWindow::setupScrobbleView()
             //inefficient as sets recursively on child widgets? 
             //may be better to just paintEvent it
             setPalette( p );        
+            
+            qDebug() << size();
         }
     };
 
     ScrobbleViewWidget* w = new ScrobbleViewWidget( this );
 
-    QVBoxLayout* iv = new QVBoxLayout;
-    iv->addWidget( ui.cover = new NowPlayingView );
-    iv->addWidget( ui.progress = new ScrobbleProgressBar );
-    iv->setContentsMargins( 10, 10, 10, 0 );
-    iv->setSpacing( 0 );
-
     QVBoxLayout* v = new QVBoxLayout( w );
-    v->addLayout( iv );
+    v->addWidget( ui.cover = new NowPlayingView );
+    v->addWidget( ui.progress = new ScrobbleProgressBar );
     v->addWidget( ui.actionbar );
-    v->setMargin( 0 );
+    v->setMargin( 10 );
     v->setAlignment( ui.actionbar, Qt::AlignCenter );
 
     w->cover = ui.cover;
     m_layout->addWidget( w );
 
-    // make minimum and default size so the content area is square
-    uint const W = ui.actionbar->sizeHint().width();
-    w->setMinimumSize( W, W );
+    uint const W = ui.actionbar->sizeHint().width() + 20;
+    w->setMinimumWidth( W );
 
     QPalette p( Qt::white, Qt::black );
     w->setPalette( p );
     w->setAutoFillBackground( true );
+    
+    adjustSize(); //because Qt sucks? It uses the UI size initially I think
 }
 
 
@@ -358,13 +354,14 @@ MainWindow::toggleRadio( int index )
 void
 MainWindow::setRadio( RadioWidget* r )
 {
-    if( !r )
-    {
-        Q_ASSERT( r );
-    }
-
+    Q_ASSERT( r );
     m_layout->insertWidget( RadioView, r );
 
-    m_radioMiniControls->setAudioOutput( r->audioOutput() );
+}
 
+
+QSize
+MainWindow::sizeHint() const
+{
+    return QSize( 300, 300 );
 }
