@@ -663,11 +663,21 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
             {
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
-                IITTrack* track = 0;
-                HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
-                if ( res == S_OK )
+                if ( d == 0 )
                 {
-                    m_handler->onPlay( ITunesTrack( track ) );
+                    LOGL( 2, "d null in onPlay, sending empty track" );
+
+                    // iTunes can return 0 here, so we use a null track
+                    m_handler->onPlay( ITunesTrack() );
+                }
+                else
+                {
+                    IITTrack* track = 0;
+                    HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
+                    if ( res == S_OK )
+                    {
+                        m_handler->onPlay( ITunesTrack( track ) );
+                    }
                 }
             }
             else
@@ -683,11 +693,21 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
             {
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
-                IITTrack* track = 0;
-                HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
-                if ( res == S_OK )
+                if ( d == 0 )
                 {
-                    m_handler->onStop( ITunesTrack( track ) );
+                    LOGL( 2, "d null in onStop, sending empty track" );
+                    
+                    // iTunes can return 0 here, so we use a null track
+                    m_handler->onStop( ITunesTrack() );
+                }
+                else
+                {
+                    IITTrack* track = 0;
+                    HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
+                    if ( res == S_OK )
+                    {
+                        m_handler->onStop( ITunesTrack( track ) );
+                    }
                 }
             }
             else
@@ -703,11 +723,21 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
             {
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
-                IITTrack* track = 0;
-                HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
-                if ( res == S_OK )
+                if ( d == 0 )
                 {
-                    m_handler->onTrackChanged( ITunesTrack( track ) );
+                    LOGL( 2, "d null in onTrackChanged, sending empty track" );
+
+                    // iTunes can return 0 here, so we use a null track
+                    m_handler->onTrackChanged( ITunesTrack() );
+                }
+                else
+                {
+                    IITTrack* track = 0;
+                    HRESULT res = d->QueryInterface( IID_IITTrack, (void**)&track );
+                    if ( res == S_OK )
+                    {
+                        m_handler->onTrackChanged( ITunesTrack( track ) );
+                    }
                 }
             }
             else
