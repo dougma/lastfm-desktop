@@ -160,7 +160,11 @@ Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
 
     Logger::the().log( msg );
 
-#ifdef NDEBUG
+	// it crashes on mac if you call arguments()! Qt 4.4.1 --mxcl	
+#ifndef Q_WS_MAC && defined NDEBUG
+	#if QT_VERSION > 0x00040401
+		#error check if the next bit works yet
+	#endif
     if (arguments().contains( "--debug" ))
 #endif
 #ifdef WIN32
