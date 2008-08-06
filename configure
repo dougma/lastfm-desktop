@@ -49,7 +49,7 @@ middle "Checking the installed version of Qt is correct..."
 # Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
 
 min=4
-$QMAKE -v | grep -q "^Using Qt version 4.[$min-9]" &> /dev/null
+$QMAKE -v 2> /dev/null | grep -q "^Using Qt version 4.[$min-9]"
 
 if [[ $? > 0 ]]
 then
