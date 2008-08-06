@@ -4,26 +4,27 @@
 #include <QObject>
 #include "RadioStation.h"
 #include "lib/DllExportMacro.h"
-#include "lib/types/Track.h"
+class AudioPlaybackEngine;
 
-class RADIO_DLLEXPORT RadioController: public QObject
+
+class RADIO_DLLEXPORT RadioController : public QObject
 {
     Q_OBJECT
-    
-    public:
+
+public:
     RadioController();
-	class AudioPlaybackEngine* audioPlaybackEngine(){ return m_audio; }
-    
-    public slots:
-    void play( const class RadioStation& s = RadioStation( "" ) );
+	AudioPlaybackEngine* audioPlaybackEngine() const { return m_audio; }
+
+public slots:
+    void play( const RadioStation& s = RadioStation( "" ) );
     void stop();
     void skip();
-    
-    private slots:
+
+private slots:
     void onQueueStarved();
-    
-    signals:
-    void trackStarted( const Track& );
+
+signals:
+    void trackStarted( const class Track& );
     /** queue more tracks or... */
     void queueStarved();
     /** ...playback ends */
@@ -32,11 +33,11 @@ class RADIO_DLLEXPORT RadioController: public QObject
     void buffering();
     /** when the player has finished buffering mid-track */
     void finishedBuffering();
-	
+
 	void tuningStateChanged( bool );
-    
-    private:
-    class AudioPlaybackEngine* m_audio;
+
+private:
+    AudioPlaybackEngine* m_audio;
 };
 
 #endif //RADIOCONTROLLER_H
