@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "ui_RadioMiniControls.h"
 
-namespace Phonon{ class VolumeSlider; class AudioOutput; }
+namespace Phonon{ class VolumeSlider; }
 
 class RadioMiniControls : public QWidget
 {
@@ -14,7 +14,14 @@ public:
     RadioMiniControls(QWidget *parent = 0);
     ~RadioMiniControls();
 
-    void setAudioOutput( Phonon::AudioOutput* o );
+    void setAudioPlaybackEngine( class AudioPlaybackEngine* o );
+    
+public slots:
+    void play();
+	void onRadioToggled();
+
+signals:
+	void radioToggled();
 
 private:
     struct : Ui::RadioMiniControls

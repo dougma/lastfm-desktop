@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "RadioWidget.h"
-#include "AudioPlaybackEngine.h"
+#include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QAction>
 #include <QEvent>
@@ -34,20 +34,11 @@ RadioWidget::RadioWidget( QWidget* parent )
 {
     qRegisterMetaType<Track>( "Track" );
 
-    m_audio = new AudioPlaybackEngine;
-    connect( m_audio, SIGNAL(queueStarved()), SLOT(queueMoreTracks()) );
-
-    // queued because otherwise Phonon breaks
-    connect( m_audio, SIGNAL(trackStarted( Track )), SIGNAL(trackStarted( Track )), Qt::QueuedConnection );
-    connect( m_audio, SIGNAL(playbackEnded()), SIGNAL(playbackEnded()), Qt::QueuedConnection );
-    connect( m_audio, SIGNAL(buffering()), SIGNAL(buffering()), Qt::QueuedConnection );
-    connect( m_audio, SIGNAL(finishedBuffering()), SIGNAL(finishedBuffering()), Qt::QueuedConnection );
-
     QToolBar* bar = new QToolBar( this );
 
     QLineEdit* tuning_dial = new QLineEdit;
-    QAction* skip = bar->addAction( "Skip" );
-    QAction* stop = bar->addAction( "Stop" );
+    skip = bar->addAction( "Skip" );
+    stop = bar->addAction( "Stop" );
 
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( bar );
@@ -55,9 +46,7 @@ RadioWidget::RadioWidget( QWidget* parent )
     v->addWidget( ui.spinner = new SpinnerLabel );
 
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
-    connect( skip, SIGNAL(triggered()), m_audio, SLOT(skip()) );
-    connect( stop, SIGNAL(triggered()), m_audio, SLOT(stop()) );
-
+	
     ui.spinner->hide();
 
     setWindowTitle( tr("Last.fm Radio") );
@@ -68,34 +57,16 @@ void
 RadioWidget::onTunerReturnPressed()
 {
     QString url = static_cast<QLineEdit*>(sender())->text();
-    play( RadioStation( url ) );
+    m_radioController->play( RadioStation( url ) );
+	emit newStationStarted();
 }
 
 
 void
-RadioWidget::play( const RadioStation& station )
+RadioWidget::setRadioController( RadioController* r )
 {
-    ui.spinner->show();
-
-    m_audio->clearQueue();
-    m_tuner = Tuner( station );
-    queueMoreTracks();
-    m_audio->play();
-
-    ui.spinner->hide();
-    emit newStationStarted();
-}
-
-
-void
-RadioWidget::queueMoreTracks()
-{
-    m_audio->queue( m_tuner.fetchNextPlaylist() );
-}
-
-
-Phonon::AudioOutput*
-RadioWidget::audioOutput()
-{
-    return m_audio->audioOutput();
+	m_radioController = r;
+	connect( skip, SIGNAL(triggered()), m_radioController, SLOT(skip()) );
+	connect( stop, SIGNAL(triggered()), m_radioController, SLOT(stop()) );
+	connect( m_radioController, SIGNAL(tuningStateChanged(bool)), ui.spinner, SLOT(setVisible(bool)) );
 }

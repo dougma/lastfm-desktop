@@ -69,9 +69,9 @@ private:
     class PlayerListener* m_playerListener;
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;
-    class RadioWidget* m_radio;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
+    class RadioController* m_radio;
 
     class QSystemTrayIcon* m_trayIcon;
 };

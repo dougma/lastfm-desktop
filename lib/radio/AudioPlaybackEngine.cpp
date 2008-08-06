@@ -25,7 +25,8 @@
 #include <QDebug>
 
 
-AudioPlaybackEngine::AudioPlaybackEngine()
+AudioPlaybackEngine::AudioPlaybackEngine( QObject* parent )
+                    :QObject( parent )
 {
     m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
  
@@ -33,7 +34,7 @@ AudioPlaybackEngine::AudioPlaybackEngine()
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
     connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononSourceChanged( Phonon::MediaSource )) );
-
+	connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(onPhononAboutToFinish()) );
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
@@ -91,12 +92,16 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
             break;
 
         case Phonon::StoppedState:
-            emit playbackEnded();
+          //  emit playbackEnded();
             break;
 
         case Phonon::BufferingState:
             emit buffering();
             break;
+			
+		case Phonon::PausedState:
+			emit playbackEnded();
+			break;
 
         case Phonon::PlayingState:
             if( oldstate == Phonon::LoadingState ||
@@ -134,4 +139,11 @@ AudioPlaybackEngine::onPhononSourceChanged( const Phonon::MediaSource& source )
     // necessarily have started when the source changes but mearly started buffering!
     
     onPhononStateChanged( Phonon::PlayingState, Phonon::LoadingState );
+}
+
+
+void
+AudioPlaybackEngine::onPhononAboutToFinish()
+{
+	emit playbackEnded();
 }

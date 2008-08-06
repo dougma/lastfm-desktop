@@ -38,7 +38,7 @@ public:
     }
     ui;
 
-    void setRadio( class RadioWidget* );
+    void setRadio( class RadioController* );
     
     QSize sizeHint() const;
 
@@ -65,8 +65,12 @@ private:
     void setupScrobbleView();
 
     class QStackedWidget* m_layout;
+	class RadioWidget* m_radioWidget;
     class RadioMiniControls* m_radioMiniControls;
 
     enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
+	
+signals:
+	void radioToggled();
 
 };

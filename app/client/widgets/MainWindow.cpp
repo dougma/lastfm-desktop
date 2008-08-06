@@ -19,7 +19,7 @@
 
 #include "MainWindow.h"
 #include "App.h"
-#include "radio/RadioWidget.h"
+#include "lib/radio/RadioController.h"
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
@@ -30,6 +30,7 @@
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/RadioMiniControls.h"
+#include "radio/RadioWidget.h"
 #include "version.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include <QCloseEvent>
@@ -109,19 +110,28 @@ MainWindow::setupUi()
 {
     ui.setupUi( this );
     m_layout = new QStackedWidget();
+    
     QWidget* mainWidget = new QWidget;
     QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
     mainLayout->setSpacing( 0 );
+
     mainLayout->setMargin( 0 );
         
     mainLayout->addWidget( m_layout );
     m_radioMiniControls = new RadioMiniControls( this );
+	connect( m_radioMiniControls, SIGNAL( radioToggled()), SLOT( toggleRadio()) );
+	connect( this, SIGNAL( radioToggled()), m_radioMiniControls, SLOT( onRadioToggled()) );
+	
     mainLayout->addWidget( m_radioMiniControls );
     
     mainWidget->setLayout( mainLayout );
     setCentralWidget( mainWidget );
 
     setupScrobbleView();
+	
+	m_radioWidget = new RadioWidget( this );
+	m_layout->insertWidget( RadioView, m_radioWidget );
+	connect( m_radioWidget, SIGNAL( newStationStarted()), SLOT( showScrobbleView()) );
 }
 
 
@@ -340,7 +350,11 @@ MainWindow::toggleRadio( int index )
 {
     if( index > -1 && index < MaxViewCount )
     {
+		if( m_layout->currentIndex() == index )
+			return;
+		
         m_layout->setCurrentIndex( index );
+		emit radioToggled();
         return;
     }
 
@@ -348,15 +362,16 @@ MainWindow::toggleRadio( int index )
         m_layout->setCurrentIndex( RadioView );
     else
         m_layout->setCurrentIndex( ScrobbleView );
+	
 }
 
 
 void
-MainWindow::setRadio( RadioWidget* r )
+MainWindow::setRadio( RadioController* r )
 {
     Q_ASSERT( r );
-    m_layout->insertWidget( RadioView, r );
-
+    m_radioMiniControls->setAudioPlaybackEngine( r->audioPlaybackEngine() );
+	m_radioWidget->setRadioController( r );	
 }
 
 

@@ -31,7 +31,7 @@ class AudioPlaybackEngine : public QObject
     Q_OBJECT
     
 public:
-    AudioPlaybackEngine();
+    AudioPlaybackEngine( QObject* parent = 0 );
     Phonon::AudioOutput* audioOutput(){ return m_audioOutput; }
     
 public slots:
@@ -56,6 +56,7 @@ signals:
 private slots:
     void onPhononStateChanged( Phonon::State, Phonon::State );
     void onPhononSourceChanged( const Phonon::MediaSource& );
+	void onPhononAboutToFinish();
 
 private:
     Phonon::MediaObject *m_mediaObject;

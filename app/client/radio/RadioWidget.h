@@ -21,8 +21,6 @@
 #include "lib/radio/RadioStation.h"
 #include "lib/radio/Tuner.h"
 
-namespace Phonon{ class AudioOutput; }
-
 class RadioWidget : public QWidget
 {
     Q_OBJECT
@@ -30,7 +28,7 @@ class RadioWidget : public QWidget
 public:
     RadioWidget( QWidget* parent = 0 );
 
-    void play( const RadioStation& );
+	void setRadioController( class RadioController* r );
 
     struct Ui
     {
@@ -38,21 +36,17 @@ public:
     } 
     ui;
     
-    Phonon::AudioOutput* audioOutput();
-
 signals:
-    void trackStarted( const class Track& );
-    void playbackEnded();
-    void buffering();
-    void finishedBuffering();
     void newStationStarted();
 
 
 private slots:
     void onTunerReturnPressed();
-    void queueMoreTracks();
 
+	
 private:
-    class AudioPlaybackEngine* m_audio;
-    Tuner m_tuner;
+    class RadioController* m_radioController;
+	QAction* skip;
+	QAction* stop;
+
 };

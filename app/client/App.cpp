@@ -29,6 +29,7 @@
 #include "widgets/MainWindow.h"
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/scrobble/Scrobbler.h"
+#include "lib/radio/RadioController.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 
@@ -61,9 +62,9 @@ App::App( int argc, char** argv )
     init.sessionKey = The::settings().sessionKey();
     init.clientId = "ass";
     m_scrobbler = new Scrobbler( init );
-    
-    m_radio = new RadioWidget;
-    connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
+    m_radio = new RadioController;
+
+    connect( m_radio, SIGNAL(trackStarted( const Track& )), SLOT(onRadioTrackStarted( const Track& )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
     connect( m_radio, SIGNAL(buffering()), SLOT(onRadioBuffering()) );
 
@@ -89,13 +90,8 @@ void
 App::setMainWindow( MainWindow* window )
 {
     m_mainWindow = window;
-
-    connect( m_radio, SIGNAL(newStationStarted()), m_mainWindow, SLOT(showScrobbleView()) );
-
-    if( m_radio )
-    {
-        m_mainWindow->setRadio( m_radio );
-    }
+	
+    m_mainWindow->setRadio( m_radio );
 
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
@@ -132,8 +128,8 @@ App::onAppEvent( int e, const QVariant& d )
             m_trayIcon->setToolTip( t.prettyTitle() );
         #endif
             break;
-        }            
-
+        }
+			
         case PlayerEvent::ScrobblePointReached:
             m_scrobbler->cache( d.value<ObservedTrack>() );
             break;
