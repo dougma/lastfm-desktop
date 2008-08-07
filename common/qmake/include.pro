@@ -40,3 +40,18 @@ CONFIG( mad ) {
     linux*: PKGCONFIG += mad
     else: LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
 }
+
+
+defineTest( generateVersionH ) {
+	DEFINE = $${LITERAL_HASH}define
+
+	win32 {
+		// Windows is different for some reason :( *cries*
+	    system( echo '$$DEFINE VERSION "$$VERSION"' > version.h )
+	    system( echo '$$DEFINE PRODUCT_NAME "$$TARGET"' >> version.h )
+	}
+	else {
+	    system( echo \\'$$DEFINE VERSION \\\"$$VERSION\\\"\\' > version.h )
+	    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> version.h )
+	}
+}

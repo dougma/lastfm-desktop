@@ -1,13 +1,12 @@
 TEMPLATE = app
-TARGET = client
+TARGET = Last.fm
 CONFIG += unicorn moose radio core ws types scrobble
 QT = core gui xml network phonon webkit
 VERSION = 2.0.0
-INCLUDEPATH += .
 
 include( $$SRC_DIR/common/qmake/include.pro )
 
-release:TARGET=Last.fm
+generateVersionH()
 
 SOURCES   += $$findSources( cpp )
 HEADERS   += $$findSources( h )
@@ -15,21 +14,19 @@ FORMS     += $$findSources( ui )
 RESOURCES += $$findSources( qrc )
 RESOURCES += $$SRC_DIR/common/qrc/common.qrc
 
-!macx*:SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
-
-# included directly into App.cpp
+# included directly into App.cpp, so avoid link error
 SOURCES -= legacy/disableHelperApp.cpp
 
-ICON = mac/client.icns
+macx* {
+	QMAKE_INFO_PLIST = mac/Info.plist.in
+	ICON = mac/client.icns
 
-DEFINE = $${LITERAL_HASH}define
-
-#qmake is shit
-win32 {
-    system( echo '$$DEFINE VERSION "$$VERSION"' > version.h )
-    system( echo '$$DEFINE PRODUCT_NAME "$$TARGET"' >> version.h )
+	!macx-xcode:release {
+		system( $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT > Makefile.dmg )
+		QMAKE_EXTRA_INCLUDES += Makefile.dmg
+	}
 }
 else {
-    system( echo \\'$$DEFINE VERSION \\\"$$VERSION\\\"\\' > version.h )
-    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> version.h )
+	SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
+	INCLUDEPATH += .
 }

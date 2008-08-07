@@ -4,18 +4,15 @@
 # usage:  Pass the bundle directory as the only parameter
 ################################################################################
 
-
-if [ -z $VERSION ]
+if [[ $# < 2 ]]
 then
-    echo "VERSION must be set."
-    exit 2
+	echo "Usage: $0 [path] [version]"
+	exit 1
 fi
 
-if [ -z "$BUNDLE" ]
-then
-    echo "BUNDLE must be set."
-    exit 3
-fi
+BUNDLE="$1"
+VERSION="$2"
+
 ################################################################################
 
 

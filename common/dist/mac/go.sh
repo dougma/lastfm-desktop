@@ -1,9 +1,16 @@
 #!/bin/bash
 
 source common/bash/utils.sh.inc
-export ROOT=`pwd`
-export VERSION='2.0.0'
-export BUNDLE=_bin/Last.fm.app
+
+
+if [[ -z $QTDIR ]]
+then
+	QTDIR=`which qmake`
+	QTDIR=`dirname $QTDIR`
+	QTDIR=`dirname $QTDIR`
+	test -L "$QTDIR" && QTDIR=`readlink $QTDIR`
+	export QTDIR
+fi
 
 
 header "Copying remaining stuff into $BUNDLE"
@@ -21,7 +28,12 @@ done
 cp COPYING $BUNDLE/Contents/
 cp ChangeLog.txt $BUNDLE/Contents/ChangeLog
 
+header Modifying Info.plist
+perl -pi -e 's/0\.0\.0\.0/'$VERSION'/g' $BUNDLE/Contents/Info.plist
+perl -pi -e 's/0\.0\.0/'`echo $VERSION | cut -d'.' -f1,2,3`'/g' $BUNDLE/Contents/Info.plist
 
+
+ROOT=`pwd`
 pushd $BUNDLE
     header "Copying Qt frameworks"
     $ROOT/common/dist/mac/add_Qt_to_bundle.sh 'QtGui QtCore QtNetwork QtWebKit QtXml phonon QtDBus' imageformats

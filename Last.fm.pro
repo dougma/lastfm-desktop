@@ -1,6 +1,12 @@
 debug:macx-xcode {
     QT = core gui network phonon xml webkit
 
+    TEMPLATE = app
+    TARGET = Last.fm
+    ICON = app/client/mac/client.icns
+	VERSION	= 2.0.0
+	QMAKE_INFO_PLIST = app/client/mac/Info.plist.in
+
     include( $$SRC_DIR/common/qmake/include.pro )
 
     DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble
@@ -17,16 +23,6 @@ debug:macx-xcode {
 
     INCLUDEPATH += app/client
     LIBS += -framework SystemConfiguration -framework CoreServices
-
-    TEMPLATE = app
-    TARGET = Last.fm
-    ICON = app/client/mac/client.icns
-	VERSION	= 2.0.0
-    
-    # FIXME copied from appclient.pro
-    DEFINE = $${LITERAL_HASH}define
-    system( echo \\'$$DEFINE VERSION \\\"$$VERSION\\\"\\' > app/client/version.h )
-    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> app/client/version.h )    
 }
 else {
     TEMPLATE = subdirs
