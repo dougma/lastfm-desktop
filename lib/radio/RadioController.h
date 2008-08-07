@@ -15,7 +15,7 @@ public:
     RadioController();
 	AudioPlaybackEngine* audioPlaybackEngine() const { return m_audio; }
     
-    public slots:
+public slots:
     void play( const RadioStation& s = RadioStation( "", RadioStation::SimilarArtist ) );
     void stop();
     void skip();
