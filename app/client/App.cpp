@@ -96,6 +96,9 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
+
+	// for now not on mac, FIXME eventually, in tray as option, default off
+#ifndef Q_WS_MAC
     m_trayIcon = new QSystemTrayIcon( window );
     m_trayIcon->setIcon( QPixmap(":/16x16/as.png") );
     m_trayIcon->show();
@@ -107,6 +110,7 @@ App::setMainWindow( MainWindow* window )
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
+#endif
 }
 
 
