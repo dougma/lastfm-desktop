@@ -41,7 +41,7 @@ WsRequestParameters::operator const QList<QPair<QString, QString> >() const
         list += Pair( i.key(), i.value() );
     }
 
-    return list << Pair( "api_sig", methodSignature() );
+    return ( list << Pair( "api_sig", methodSignature() ) );
 }
 
 

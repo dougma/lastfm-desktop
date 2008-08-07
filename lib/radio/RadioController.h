@@ -14,9 +14,9 @@ class RADIO_DLLEXPORT RadioController : public QObject
 public:
     RadioController();
 	AudioPlaybackEngine* audioPlaybackEngine() const { return m_audio; }
-
-public slots:
-    void play( const RadioStation& s = RadioStation( "" ) );
+    
+    public slots:
+    void play( const RadioStation& s = RadioStation( "", RadioStation::SimilarArtist ) );
     void stop();
     void skip();
 

@@ -24,11 +24,28 @@
 #include <QString>
 
 
-class RADIO_DLLEXPORT RadioStation : public QString
+class RADIO_DLLEXPORT RadioStation
 {
 public:
-    explicit RadioStation( QString s ) : QString( s )
-    {}
+	enum Type { SimilarArtist = 0, Url };
+	
+    RadioStation( QString s, Type t ) : m_station( s ), m_type( t ){}
+    RadioStation( QString s ) : m_station( s ), m_type( Url ){}	
+	
+	operator const QString() const
+	{
+		switch ( m_type ) 
+		{
+			case SimilarArtist:	return "lastfm://artist/" + m_station + "/similarartists";
+			//case Url: return m_station;
+			
+			default: Q_ASSERT( !"I can't generate station url string for an unknown station type:" + m_type );
+		}
+	}
+	
+private:
+	QString m_station;
+	Type m_type;
 };
 
 #endif

@@ -57,7 +57,7 @@ void
 RadioWidget::onTunerReturnPressed()
 {
     QString url = static_cast<QLineEdit*>(sender())->text();
-    m_radioController->play( RadioStation( url ) );
+    m_radioController->play( RadioStation( url, RadioStation::SimilarArtist ) );
 	emit newStationStarted();
 }
 

@@ -45,15 +45,31 @@ WsRequestBuilder::start()
     QUrl url( "http://ws.audioscrobbler.com/2.0/" );    
 #endif
 
-    url.setQueryItems( params );
-
+	//Only GET requests should include query parameters
+	if( request_method == GET )
+		url.setQueryItems( params );
+	
     QNetworkRequest request( url );
     request.setRawHeader( "User-Agent", userAgent() );
 
     switch (request_method)
     {
         case GET:  return new WsReply( nam->get( request ) );
-        case POST: return new WsReply( nam->post( request, url.encodedQuery() ) );
+        case POST: 
+		{
+			//Build encoded query for use in the POST Content
+			QByteArray query;
+			QList<QPair<QString, QString> > paramList = params;
+			for( int i = 0; i < paramList.count(); i++ )
+			{
+				query += QUrl::toPercentEncoding( paramList[ i ].first, "!$&'()*+,;=:@/?" )
+					  + "="
+					  + QUrl::toPercentEncoding( paramList[ i ].second, "!$&'()*+,;=:@/?" )
+					  + "&";
+			}
+			
+			return new WsReply( nam->post( request, query ) );
+		}
     }
 }
 
