@@ -60,7 +60,7 @@ int main( int argc, char** argv )
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
         AEInstallEventHandler( 'GURL', 'GURL', h, 0, false );
-        AEInstallEventHandler( kCoreEventClass, kAEQuitApplication, h, 0, false );
+        //AEInstallEventHandler( kCoreEventClass, kAEQuitApplication, h, 0, false ); //QCoreApplication handles this for us
         AEInstallEventHandler( kCoreEventClass, kAEReopenApplication, h, 0, false );
       #endif
         
