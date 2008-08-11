@@ -1,7 +1,7 @@
 #!/bin/sh
 # Author: max@last.fm
 # Brief:  otools a binary file that is already in the bundle
-# Usage: deposx.sh target $$QMAKE_LIBDIR_QT
+# Usage: deposx.sh target_binary $$QMAKE_LIBDIR_QT
 ################################################################################
 
 if [[ $# < 2 ]]

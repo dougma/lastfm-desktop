@@ -1,7 +1,6 @@
 #!/bin/sh
-# author: max@last.fm
-# brief:  Produces a compressed DMG from a bundle directory
-# usage:  Pass the bundle directory as the only parameter
+# Author: max@last.fm
+# Brief:  Produces a compressed DMG from a bundle directory
 ################################################################################
 
 if [[ $# < 2 ]]
