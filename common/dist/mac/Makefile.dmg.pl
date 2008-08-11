@@ -4,6 +4,9 @@
 # You must include this from within an app target qmake pro file for it to work!
 # the above usage refers to the QMAKE variables
 
+use Cwd 'abs_path';
+use File::Basename;
+
 $DESTDIR = shift;
 $VERSION = shift;
 $QT_FRAMEWORKS_DIR = shift;
@@ -16,12 +19,11 @@ while( my $v = shift )
 	}
 }
 
-
 @QT_MODULES = ("QtCore", "QtGui", "QtWebKit", "QtXml", "QtNetwork", "phonon");
 $bundle_frameworks_dir = "\$(CONTENTS)/Frameworks";
 $bundle_macos_dir = "\$(CONTENTS)/MacOS";
 $plist = "\$(CONTENTS)/Info.plist";
-$root = "$DESTDIR/.."; #FIXME should do it relative to this script
+$root = abs_path( dirname( $0 ) . "/../../../" );
 
 foreach my $x (@QT_MODULES)
 {
@@ -84,7 +86,7 @@ foreach my $x (@QT_MODULES)
 	print "\t" . "rm $bundle_frameworks_dir/$x.framework/${x}_debug*\n";
 	print "\t" . "\$(DIST_TOOLS_DIR)/deposx.sh $bundle_frameworks_dir/$x.framework/$x $QT_FRAMEWORKS_DIR\n";
 	my $y = "$x.framework/Versions/4/$x";
-	print "\t" . "cd \$(CONTENTS)/Frameworks && install_name_tool -id $QT_FRAMEWORKS_DIR/$y $y\n";
+	print "\t" . "install_name_tool -id $y \$(CONTENTS)/Frameworks/$y\n";
 }
 
 foreach my $dylib (@DYLIBS)

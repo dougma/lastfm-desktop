@@ -75,6 +75,13 @@ if [ $RELEASE ]
 then
     qmake -config release
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
+
+    case `uname` in
+        Darwin)
+			middle='all\n\tcd app/client && make -f Makefile.appclient'
+            perl -e "print \"dmg: $middle dmg\n\"" >> Makefile
+            perl -e "print \"bundle: $middle bundle\n\"" >> Makefile
+	esac
 else
     case `uname` in
         Darwin) 
