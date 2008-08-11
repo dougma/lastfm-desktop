@@ -78,9 +78,15 @@ then
 
     case `uname` in
         Darwin)
-			middle='all\n\tcd app/client && make -f Makefile.appclient'
-            perl -e "print \"dmg: $middle dmg\n\"" >> Makefile
-            perl -e "print \"bundle: $middle bundle\n\"" >> Makefile
+		cat <<HEREDOC>>Makefile
+dmg: all
+	cd app/client && make -f Makefile.appclient dmg
+bundle: all
+	cd app/client && make -f Makefile.appclient bundle
+install: all
+	cd app/client && make -f Makefile.appclient bundle-install
+HEREDOC
+
 	esac
 else
     case `uname` in

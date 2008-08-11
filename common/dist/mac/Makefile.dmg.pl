@@ -48,13 +48,17 @@ BUNDLE_MACOS = $bundle_macos
 everything: all
 
 bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS)
-	perl -pi -e 's/__VERSION/'\$(VERSION)'/g' $plist
-	perl -pi -e 's/__SHORT_VERSION/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
+	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
+	perl -pi -e 's/@SHORT_VERSION@/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
 	\$(DIST_TOOLS_DIR)/deposx.sh \$(TARGET) $QT_FRAMEWORKS_DIR
 
 bundle-clean:
 	rm -rf \$(BUNDLE_FRAMEWORKS)
 	rm -f \$(BUNDLE_MACOS)
+
+bundle-install: bundle
+	rm -rf /Applications/\$(QMAKE_TARGET).app
+	cp -R \$(DESTDIR)\$(QMAKE_TARGET).app /Applications
 
 \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg:
 	cd \$(DESTDIR) && \$(DIST_TOOLS_DIR)/gimme_dmg.sh \$(QMAKE_TARGET).app \$(VERSION)
@@ -63,9 +67,6 @@ dmg: bundle \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
 	
 dmg-clean: bundle-clean
 	rm -f \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
-
-$bundle_frameworks_dir:
-	 mkdir -p $bundle_frameworks_dir
 
 \$(CONTENTS)/MacOS/imageformats: $QT_FRAMEWORKS_DIR/../plugins/imageformats
 	cp -R $QT_FRAMEWORKS_DIR/../plugins/imageformats $bundle_macos_dir
@@ -79,8 +80,9 @@ print $out;
 
 foreach my $x (@QT_MODULES)
 {
-	print "\$(CONTENTS)/Frameworks/$x.framework: $QT_FRAMEWORKS_DIR/$x.framework $bundle_frameworks_dir\n";
+	print "\$(CONTENTS)/Frameworks/$x.framework: $QT_FRAMEWORKS_DIR/$x.framework\n";
 	print "\t" . "rm -rf $bundle_frameworks_dir/$x.framework\n";
+	print "\t" . "mkdir -p $bundle_frameworks_dir\n";
 	print "\t" . "cp -R $QT_FRAMEWORKS_DIR/$x.framework $bundle_frameworks_dir\n";
 	print "\t" . "rm $bundle_frameworks_dir/$x.framework/Versions/4/${x}_debug\n";
 	print "\t" . "rm $bundle_frameworks_dir/$x.framework/${x}_debug*\n";

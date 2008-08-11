@@ -17,9 +17,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleVersion</key>
-	<string>__VERSION</string>
+	<string>@VERSION@</string>
 	<key>CFBundleShortVersionString</key>
-	<string>__SHORT_VERSION</string>
+	<string>@SHORT_VERSION@</string>
 	<key>CFBundleName</key>
 	<string>Last.fm</string>
 	<key>LSMinimumSystemVersion</key>
