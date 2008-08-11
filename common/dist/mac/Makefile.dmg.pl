@@ -1,13 +1,27 @@
 #!/usr/bin/perl
-# Usage: Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT
+# Author: max@last.fm
+# Usage: Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT $$LIBS
 # You must include this from within an app target qmake pro file for it to work!
+# the above usage refers to the QMAKE variables
+
+$DESTDIR = shift;
+$VERSION = shift;
+$QT_FRAMEWORKS_DIR = shift;
+
+while( my $v = shift )
+{
+	if ($v =~ m/^-l(.*)/)
+	{
+		push( @DYLIBS, "lib$1.1.dylib" );
+	}
+}
+
 
 @QT_MODULES = ("QtCore", "QtGui", "QtWebKit", "QtXml", "QtNetwork", "phonon");
-@DYLIBS = split( ' ', `cd $ARGV[0] && ls *.1.dylib` );
 $bundle_frameworks_dir = "\$(CONTENTS)/Frameworks";
 $bundle_macos_dir = "\$(CONTENTS)/MacOS";
 $plist = "\$(CONTENTS)/Info.plist";
-$root = "$ARGV[0]/..";
+$root = "$DESTDIR/.."; #FIXME should do it relative to this script
 
 foreach my $x (@QT_MODULES)
 {
@@ -22,29 +36,37 @@ $out = <<END;
 DIST_TOOLS_DIR = $root/common/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
 CONTENTS = \$(BUNDLE)/Contents
-VERSION = $ARGV[1]
+VERSION = $VERSION
 BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
 
 .PHONY = dmg
 .PHONY = dmg-clean
 
-dmg: \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(TARGET)
-	\$(DIST_TOOLS_DIR)/deposx.sh \$(TARGET)
+everything: all
+
+bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS)
 	perl -pi -e 's/__VERSION/'\$(VERSION)'/g' $plist
 	perl -pi -e 's/__SHORT_VERSION/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
-	cd \$(DESTDIR) && \$(DIST_TOOLS_DIR)/gimme_dmg.sh \$(QMAKE_TARGET).app \$(VERSION)
-	
-dmg-clean:
+	\$(DIST_TOOLS_DIR)/deposx.sh \$(TARGET) $QT_FRAMEWORKS_DIR
+
+bundle-clean:
 	rm -rf \$(BUNDLE_FRAMEWORKS)
 	rm -f \$(BUNDLE_MACOS)
-	rm -f \$(QMAKE_TARGET)-\$(VERSION).dmg
+
+\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+	cd \$(DESTDIR) && \$(DIST_TOOLS_DIR)/gimme_dmg.sh \$(QMAKE_TARGET).app \$(VERSION)
+
+dmg: bundle \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+	
+dmg-clean: bundle-clean
+	rm -f \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
 
 $bundle_frameworks_dir:
 	 mkdir -p $bundle_frameworks_dir
 
-\$(CONTENTS)/MacOS/imageformats: $ARGV[2]/../plugins/imageformats
-	cp -R $ARGV[2]/../plugins/imageformats $bundle_macos_dir
+\$(CONTENTS)/MacOS/imageformats: $QT_FRAMEWORKS_DIR/../plugins/imageformats
+	cp -R $QT_FRAMEWORKS_DIR/../plugins/imageformats $bundle_macos_dir
 
 \$(CONTENTS)/COPYING:
 	cp $root/COPYING \$(CONTENTS)/COPYING
@@ -55,18 +77,19 @@ print $out;
 
 foreach my $x (@QT_MODULES)
 {
-	print "\$(CONTENTS)/Frameworks/$x.framework: $ARGV[2]/$x.framework $bundle_frameworks_dir\n";
-	print "\t" . "cp -R $ARGV[2]/$x.framework $bundle_frameworks_dir\n";
+	print "\$(CONTENTS)/Frameworks/$x.framework: $QT_FRAMEWORKS_DIR/$x.framework $bundle_frameworks_dir\n";
+	print "\t" . "rm -rf $bundle_frameworks_dir/$x.framework\n";
+	print "\t" . "cp -R $QT_FRAMEWORKS_DIR/$x.framework $bundle_frameworks_dir\n";
 	print "\t" . "rm $bundle_frameworks_dir/$x.framework/Versions/4/${x}_debug\n";
 	print "\t" . "rm $bundle_frameworks_dir/$x.framework/${x}_debug*\n";
-	print "\t" . "\$(DIST_TOOLS_DIR)/deposx.sh $bundle_frameworks_dir/$x.framework/$x\n";
+	print "\t" . "\$(DIST_TOOLS_DIR)/deposx.sh $bundle_frameworks_dir/$x.framework/$x $QT_FRAMEWORKS_DIR\n";
 	my $y = "$x.framework/Versions/4/$x";
-	print "\t" . "cd \$(CONTENTS)/Frameworks && install_name_tool -id $ARGV[2]/$y $y\n";
+	print "\t" . "cd \$(CONTENTS)/Frameworks && install_name_tool -id $QT_FRAMEWORKS_DIR/$y $y\n";
 }
 
 foreach my $dylib (@DYLIBS)
 {
 	print "$bundle_macos_dir/$dylib: \$(DESTDIR)$dylib\n";
 	print "\t" . "cp \$(DESTDIR)$dylib $bundle_macos_dir\n";
-	print "\t" . "\$(DIST_TOOLS_DIR)/deposx.sh $bundle_macos_dir/$dylib\n";
+	print "\t" . "\$(DIST_TOOLS_DIR)/deposx.sh $bundle_macos_dir/$dylib $QT_FRAMEWORKS_DIR\n";
 }

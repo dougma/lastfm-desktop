@@ -1,18 +1,40 @@
 #!/bin/sh
-# author: max@last.fm
-# brief:  otools a binary file that is already in the bundle
+# Author: max@last.fm
+# Brief:  otools a binary file that is already in the bundle
+# Usage: deposx.sh target $$QMAKE_LIBDIR_QT
 ################################################################################
 
-FRAMEWORKS="QtGui QtCore QtNetwork QtWebKit QtXml phonon"
-################################################################################
+if [[ $# < 2 ]]
+then 
+	echo "Usage: $0 [target] [QT_FRAMEWORKS_DIR]"
+	exit 1
+fi
 
-for y in $FRAMEWORKS
+QT_FRAMEWORK_DIR=$2
+
+function isQt {
+	for x in `echo $QT_FRAMEWORK_DIR/*.framework`
+	do
+		echo $1 | grep "^$x" && return 0;
+	done
+	return 1
+}
+
+otool -L $1 | while read LINE
 do
-    lib=$(otool -L "$1" | grep $y.framework | cut -d' ' -f1 | xargs echo)
-    if [ -n "$lib" ]
+	x=`echo $LINE | cut -d' ' -f1` #won't work if spaces in dirnames! which is unlikely..
+	
+	if [ `isQt $x` ]
 	then
-		install_name_tool -change "$lib" \
-                          @executable_path/../Frameworks/$y.framework/Versions/4/$y \
-                          "$1"
+		module=`echo $x | sed "s|$QT_FRAMEWORK_DIR/\(.*\)\.framework/.*|\1|"`
+		install_name_tool -change "$x" \
+                      "@executable_path/../Frameworks/$module.framework/Versions/4/$module" \
+                      "$1"
+	elif [ `echo $x | grep '^[/@]'` ]
+	then
+		true
+	else
+		# if not an absolute path and not already name-tooled
+		install_name_tool -change "$x" "@executable_path/$x" "$1"
 	fi
 done

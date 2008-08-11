@@ -22,7 +22,7 @@ macx* {
 	ICON = mac/client.icns
 
 	!macx-xcode:release {
-		system( $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT > Makefile.dmg )
+		system( $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT $$LIBS > Makefile.dmg )
 		QMAKE_EXTRA_INCLUDES += Makefile.dmg
 	}
 }

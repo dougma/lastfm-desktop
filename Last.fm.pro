@@ -30,12 +30,19 @@ debug:macx-xcode {
 else {
     TEMPLATE = subdirs
 
-    SUBDIRS += app/client/appclient.pro \ #LEAVE THIS FIRST! --mxcl
-               lib/core/libcore.pro \
+	# QMake is broken on OSX and doesn't figure out the intra-project 
+	# dependencies
+	
+	CONFIG += ordered
+    SUBDIRS += lib/core/libcore.pro \
                lib/ws/libws.pro \
                lib/types/libtypes.pro \
                lib/unicorn/libunicorn.pro \               
                lib/moose/libmoose.pro \
                lib/radio/libradio.pro \
-               lib/scrobble/libscrobble.pro
+               lib/scrobble/libscrobble.pro \
+			   app/client/appclient.pro
+
+	# make the app client the default project
+	win32:SUBDIRS = $$unique( app/client/appclient.pro $$SUBDIRS )
 }

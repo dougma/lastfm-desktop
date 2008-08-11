@@ -48,7 +48,6 @@ ITunesListener::run()
                                      CFSTR( "com.apple.iTunes.playerInfo" ), 
                                      NULL, 
                                      CFNotificationSuspensionBehaviorDeliverImmediately );
-    
     exec();
 }
 
