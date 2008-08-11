@@ -54,7 +54,7 @@ bundle-clean:
 	rm -rf \$(BUNDLE_FRAMEWORKS)
 	rm -f \$(BUNDLE_MACOS)
 
-\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg:
 	cd \$(DESTDIR) && \$(DIST_TOOLS_DIR)/gimme_dmg.sh \$(QMAKE_TARGET).app \$(VERSION)
 
 dmg: bundle \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
