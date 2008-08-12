@@ -56,6 +56,11 @@ private:
                           CFStringRef, 
                           const void*, 
                           CFDictionaryRef );
+    static void callback2( CFNotificationCenterRef, 
+						 void*, 
+						 CFStringRef, 
+						 const void*, 
+						 CFDictionaryRef );
 
     void callback( CFDictionaryRef );
     void transmit( const QString& data );

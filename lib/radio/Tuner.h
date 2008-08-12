@@ -38,9 +38,11 @@ public:
 
     /** returns next 5 tracks */
     QList<Track> fetchNextPlaylist();
+	const QString& stationName() const{ return m_stationName; }
 
 private:
     QList<Track> getPlaylist();
+	QString m_stationName;
 };
 
 #endif

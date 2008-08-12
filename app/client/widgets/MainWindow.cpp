@@ -174,6 +174,7 @@ MainWindow::setupScrobbleView()
     ScrobbleViewWidget* w = new ScrobbleViewWidget( this );
 
     QVBoxLayout* v = new QVBoxLayout( w );
+	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator( this ) );
     v->addWidget( ui.cover = new NowPlayingView );
     v->addWidget( ui.progress = new ScrobbleProgressBar );
     v->addWidget( ui.actionbar );

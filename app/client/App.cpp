@@ -67,6 +67,7 @@ App::App( int argc, char** argv )
     connect( m_radio, SIGNAL(trackStarted( const Track& )), SLOT(onRadioTrackStarted( const Track& )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
     connect( m_radio, SIGNAL(buffering()), SLOT(onRadioBuffering()) );
+	connect( m_radio, SIGNAL(newStationTuned( const QString& )), SLOT(onRadioStationTuned( const QString& )) );
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -259,6 +260,13 @@ void
 App::onRadioFinishedBuffering()
 {
     m_playerManager->onPlaybackResumed( "ass" );
+}
+
+
+void
+App::onRadioStationTuned( const QString& s )
+{
+	onAppEvent( PlayerEvent::PlayerChangedContext, s );
 }
 
 

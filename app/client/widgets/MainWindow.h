@@ -34,7 +34,7 @@ public:
         class NowPlayingView* cover;
         class ScrobbleProgressBar* progress;
         class QWidget* actionbar;
-        
+        class MediaPlayerIndicator* playerIndicator;
     }
     ui;
 

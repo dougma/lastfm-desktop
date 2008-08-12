@@ -23,6 +23,7 @@
 #include "lib/ws/WsError.h"
 
 
+class RadioController;
 class App : public Unicorn::Application
 {
     Q_OBJECT
@@ -33,6 +34,7 @@ public:
 
     void setMainWindow( class MainWindow* );
     MainWindow& mainWindow() const { return *m_mainWindow; }
+	RadioController& radioController(){ return *m_radio; }
     
     /** the currently observed track */
     Track track() const;
@@ -61,6 +63,7 @@ private slots:
     void onRadioPlaybackEnded();
     void onRadioBuffering();
     void onRadioFinishedBuffering();
+	void onRadioStationTuned( const QString& );
 
 signals:
     void event( int, const QVariant& );
@@ -71,7 +74,7 @@ private:
     class Scrobbler* m_scrobbler;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
-    class RadioController* m_radio;
+    RadioController* m_radio;
 
     class QSystemTrayIcon* m_trayIcon;
 };

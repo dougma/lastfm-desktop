@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "Tuner.h"
+#include "Playlist.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include <QBuffer>
 #include <QDebug>
@@ -26,10 +27,6 @@
 #include <QtNetwork/QHttp> //TODO use our override
 #include <QtXml>
 
-namespace Radio
-{
-    QList<Track> getPlaylist();
-}
 
 //TODO discovery mode
 //TODO skips left
@@ -43,53 +40,21 @@ Tuner::Tuner( const RadioStation& station )
         .add( "station", station )
         .post();
     reply->finish();
+	if( reply->error() == Ws::NoError )
+		m_stationName = reply->lfm()["station"]["name"].text();
+	else
+		m_stationName = "";
 }
 
 
 QList<Track>
 Tuner::fetchNextPlaylist()
 {
-    QList<Track> tracks = Radio::getPlaylist();
+	const Playlist& p = Playlist::getPlaylist();
+    QList<Track> tracks = p.tracks();
+	m_stationName = p.title();
     foreach (Track t, tracks)
         qDebug() << t;
     return tracks;
 }
 
-
-QList<Track>
-Radio::getPlaylist()
-{
-    WsReply* reply = WsRequestBuilder( "radio.getPlaylist" ).get();
-    reply->finish();
-
-    QList<Track> tracks;
-    try
-    {
-        foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
-        {
-            MutableTrack t;
-            try
-            {
-                //TODO we don't want to throw an exception for any of these really,
-                //TODO only if we couldn't get any, but even then so what
-                t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-                t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-                t.setTitle( e[ "title" ].text() );
-                t.setArtist( e[ "creator" ].text() );
-                t.setAlbum( e[ "album" ].text() );
-                t.setDuration( e[ "duration" ].text().toInt() );
-            }
-            catch (EasyDomElement::Exception& e)
-            {
-            	
-            }
-            tracks += t; // outside since location is enough basically
-        }
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-
-    }
-
-    return tracks;
-}

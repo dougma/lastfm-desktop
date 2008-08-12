@@ -73,6 +73,9 @@ namespace PlayerEvent
 
         /** A media player has terminated */
         PlayerDisconnected,
+		
+		/** A media player (most likely the last.fm radio) has changed listening context. */
+		PlayerChangedContext,
 
         TypeMax /** leave at end of enum, kthxbai */
     };

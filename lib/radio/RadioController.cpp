@@ -22,8 +22,12 @@ RadioController::play( const RadioStation& s )
     Tuner t( s );
 	emit tuningStateChanged( true );
     QList<Track> tracks = t.fetchNextPlaylist();
-	emit tuningStateChanged( false );
+	m_audio->clearQueue();
     m_audio->queue( tracks );
+	m_audio->skip();
+	emit tuningStateChanged( false );
+	m_currentStation = t.stationName();
+	emit newStationTuned( m_currentStation );
     m_audio->play();
 }
 
@@ -33,6 +37,12 @@ RadioController::onQueueStarved()
 {
     Tuner t;
     QList<Track> tracks = t.fetchNextPlaylist();
+	if( t.stationName() != m_currentStation )
+	{
+		m_currentStation = t.stationName();
+		emit( newStationTuned( m_currentStation ));
+	}
+			 
     m_audio->queue( tracks );
 }
 

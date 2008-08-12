@@ -35,9 +35,12 @@ signals:
     void finishedBuffering();
 
 	void tuningStateChanged( bool );
+	
+	void newStationTuned( const QString& );
 
 private:
     AudioPlaybackEngine* m_audio;
+	QString m_currentStation;
 };
 
 #endif //RADIOCONTROLLER_H
