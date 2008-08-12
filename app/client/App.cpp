@@ -165,6 +165,9 @@ App::onWsError( Ws::Error e )
         case Ws::InvalidSessionKey:
             logout();
             break;
+			
+		default:
+			break;
     }
 }
 
@@ -212,13 +215,23 @@ App::onBootstrapCompleted( const QString& playerId, const QString& username )
 
 void
 App::love()
-{}
+{
+	Track t = track();
+	MutableTrack( t ).upgradeRating( Track::Loved );
+	MessageBoxBuilder( m_mainWindow ).setText( "We need to set the love button to look loved or some other feedback!" ).exec();
+	t.love();
+}
 
 
 void
 App::ban()
-{}
-
+{
+	Track t = track();
+	MutableTrack( t ).upgradeRating( Track::Banned );
+	m_radio->skip();
+	t.ban();
+}
+ 
 
 void
 App::logout()

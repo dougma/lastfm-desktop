@@ -55,7 +55,11 @@ public slots:
     void showMetaInfoView();
     void showScrobbleView(){ toggleRadio( ScrobbleView ); }
     void toggleRadio( int index = -1 );
-    
+
+signals:
+	void loved();
+	void banned();
+	
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
     void onAppEvent( int, const QVariant& );
@@ -73,4 +77,24 @@ private:
 signals:
 	void radioToggled();
 
+};
+
+
+#include <QLabel>
+class SimpleButton : public QLabel
+{
+	QAction* const a;
+	
+	virtual void mouseReleaseEvent( QMouseEvent* ) 
+	{
+		if (a->isEnabled()) 
+			a->activate( QAction::Trigger );
+	}
+	
+public:
+	SimpleButton( const QString& icon, QAction* action ) : a( action )
+	{
+		setPixmap( QPixmap( icon ) );
+		setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+	}
 };

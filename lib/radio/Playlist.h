@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,15 +19,19 @@
 
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
+
 #include "lib/types/Track.h"
 #include <QList>
+
 
 class Playlist
 {
 public:
+	/** calls Radio.getPlaylist, Make a Radio class to be consistent with libtypes? */
 	static Playlist getPlaylist();
-	const QList<Track>& tracks() const { return m_tracks; }
-	const QString& title() const{ return m_title; }
+
+	QList<Track> tracks() const { return m_tracks; }
+	QString title() const{ return m_title; }
 	
 private:
 	Playlist( class WsReply* );
@@ -35,4 +39,5 @@ private:
 	QString m_title;
 	
 };
+
 #endif //PLAYLIST_H

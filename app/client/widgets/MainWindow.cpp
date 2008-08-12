@@ -49,8 +49,6 @@
 #endif
 
 
-QLabel* label( const QString& path ) { QPixmap p( path ); QLabel*l = new QLabel; l->setPixmap( p ); l->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed ); return l; }
-
 
 MainWindow::MainWindow()
 {
@@ -141,10 +139,10 @@ MainWindow::setupScrobbleView()
     ui.actionbar = new QWidget;
     QHBoxLayout* h2 = new QHBoxLayout( ui.actionbar );
     h2->addStretch();
-    h2->addWidget( label( ":/MainWindow/love.png" ) );
-    h2->addWidget( label( ":/MainWindow/ban.png" ) );
-    h2->addWidget( label( ":/MainWindow/tag.png" ) );
-    h2->addWidget( label( ":/MainWindow/share.png" ) );
+    h2->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ) );
+    h2->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ) );
+    h2->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ) );
+    h2->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ) );
     h2->setSpacing( 1 );
     h2->setMargin( 0 );
     h2->setSizeConstraint( QLayout::SetFixedSize );

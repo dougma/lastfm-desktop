@@ -39,7 +39,7 @@ Track::Track( const QDomElement& e )
     d->duration = e.namedItem( "duration" ).toElement().text().toInt();
     d->playCount = e.namedItem( "playcount" ).toElement().text().toInt();
     d->url = e.namedItem( "url" ).toElement().text();
-    d->ratingFlags = e.namedItem( "userActionFlags" ).toElement().text().toUInt();
+    d->rating = e.namedItem( "rating" ).toElement().text().toUInt();
 
     // this is necessary because the default return for toInt() is 0, and that
     // corresponds to Radio not Unknown :( oops.
@@ -87,7 +87,7 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "playcount", QString::number( d->playCount ) );
     makeElement( "url", d->url.toString() );
     makeElement( "source", QString::number( d->source ) );
-    makeElement( "userActionFlags", QString::number(d->ratingFlags) );
+    makeElement( "rating", QString::number(d->rating) );
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
     makeElement( "playerId", playerId() );
@@ -117,12 +117,17 @@ Track::prettyTitle( const QChar& separator ) const
 QString
 Track::ratingCharacter() const
 {
-    if (isBanned()) return "B";
-    if (isLoved()) return "L";
-    if (isScrobbled()) return "";
-    if (isSkipped()) return "S";
-
-    return "";
+	switch (d->rating)
+	{
+		case NotScrobbled: return "";
+		case Scrobbled: return "";
+		case Skipped: return "S";
+		case Loved: return "L";
+		case Banned: return "B";
+		default:
+			Q_ASSERT_X( 0, "ratingCharacter()", "Unhandled rating enum value" );
+			return "";
+	}
 }
 
 
@@ -255,4 +260,24 @@ Track::share( const User& recipient, const QString& message )
         .add( "track", d->title )
         .addIfNotEmpty( "message", message )
         .post();
+}
+
+
+WsReply*
+Track::love()
+{
+	return WsRequestBuilder( "track.love" )
+		.add( "artist", d->artist )
+		.add( "track", d->title )
+		.post();
+}
+
+
+WsReply*
+Track::ban()
+{
+	return WsRequestBuilder( "track.ban" )
+		.add( "artist", d->artist )
+		.add( "track", d->title )
+		.post();
 }

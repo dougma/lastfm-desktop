@@ -44,9 +44,6 @@ public:
 public slots:
     void onBootstrapCompleted( const QString& playerId, const QString& username );
 
-    void love();
-    void ban();
-
     /** all webservices connect to this and emit in the case of bad errors that
       * need to be handled at a higher level */
     void onWsError( Ws::Error );
@@ -56,6 +53,9 @@ public slots:
     /** currently also quits, needs fixing! */
     void logout();
 
+	void love();
+	void ban();
+	
 private slots:
     void onAppEvent( int, const QVariant& );
 

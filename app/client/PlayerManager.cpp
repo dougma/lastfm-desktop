@@ -181,6 +181,6 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
 void
 PlayerManager::onStopWatchTimedOut()
 {
-    MutableTrack( track() ).setRatingFlag( Track::Scrobbled );
+    MutableTrack( track() ).upgradeRating( Track::Scrobbled );
     emit event( PlayerEvent::ScrobblePointReached, QVariant::fromValue( track() ) );
 }

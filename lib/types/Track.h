@@ -42,7 +42,7 @@ struct TrackData : QSharedData
     int playCount;
     int duration;
     short source;
-    short ratingFlags;
+    short rating;
     QString playerId;
     QString mbId; /// musicbrainz id
     QString fpId; /// fingerprint id
@@ -68,15 +68,17 @@ public:
         MediaDevice
     };
 
-    enum RatingFlag
+    enum Rating
     {
         // DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OR VALUES OF THIS ENUM!
         // you will cause broken settings and b0rked scrobbler cache submissions
+		//NOTE sorted in precedence order
 
-        Skipped = 1,
-        Loved = 2,
-        Banned = 4,
-        Scrobbled = 8
+		NotScrobbled,
+		Scrobbled,
+        Skipped,
+        Loved,
+        Banned,
     };
 
     enum ScrobblableStatus
@@ -123,15 +125,36 @@ public:
     QDateTime timeStamp() const { return d->time; }
     QDateTime dateTime() const { return d->time; }
     Source source() const { return (Source)d->source; }
+
     /** scrobbler submission source string code */
     QString sourceString() const;
     QString playerId() const { return d->playerId; }
     QString fpId() const { return d->fpId; }
 
-    bool isSkipped() const { return d->ratingFlags & Track::Skipped; }
-    bool isLoved() const { return d->ratingFlags & Track::Loved; }
-    bool isBanned() const { return d->ratingFlags & Track::Banned; }
-    bool isScrobbled() const { return d->ratingFlags & Track::Scrobbled; }
+    bool isLoved() const { return d->rating == Loved; }
+    bool isBanned() const { return d->rating == Banned; }
+	bool isSkipped() const 
+	{ 
+		switch (d->rating)
+		{
+			case Skipped:
+			case Banned:
+				return true;
+			default:
+				return false;
+		}
+	}
+	bool isScrobbled() const
+	{ 
+		switch (d->rating)
+		{
+			case Scrobbled:
+			case Loved:
+				return true;
+			default:
+				return false;
+		}
+	}
 
     QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
 
@@ -156,6 +179,8 @@ public:
     QStringList topTags() const;
 
     WsReply* share( const class User& recipient, const QString& message = "" );
+	WsReply* love();
+	WsReply* ban();
 
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise
@@ -183,10 +208,14 @@ public:
     void setMbId( QString mbId ) { d->mbId = mbId; }
     void setUrl( QUrl url ) { d->url = url; }
     void setSource( Source s ) { d->source = s; }
-    void setRatingFlag( RatingFlag flag ) { d->ratingFlags |= flag; }
     void setPlayerId( QString id ) { d->playerId = id; }
     void setFpId( QString id ) { d->fpId = id; }
     
+	void upgradeRating( Rating r )
+	{
+		d->rating = qMax( (short)r, d->rating );
+	}
+	
     void setTimeStampNow() { d->time = QDateTime::currentDateTime(); }
 
     void setExtra( QString key, QString value ) { d->extras[key] = value; }
@@ -199,7 +228,7 @@ TrackData::TrackData()
                playCount( 0 ),
                duration( 0 ),
                source( Track::Unknown ),
-               ratingFlags( 0 )
+               rating( 0 )
 {}
 
 
