@@ -23,10 +23,7 @@
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "widgets/MediaPlayerIndicator.h"
 #include "widgets/MetaInfoView.h"
-#include "widgets/NowPlayingView.h"
-#include "widgets/ScrobbleProgressBar.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/RadioMiniControls.h"
@@ -37,6 +34,7 @@
 #include <QPointer>
 #include <QShortcut>
 #include <QStackedWidget>
+#include <QSplitter>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -136,60 +134,25 @@ MainWindow::setupUi()
 void 
 MainWindow::setupScrobbleView()
 {
-    ui.actionbar = new QWidget;
-    QHBoxLayout* h2 = new QHBoxLayout( ui.actionbar );
+    ScrobbleViewWidget* w = new ScrobbleViewWidget;
+	QHBoxLayout* h2 = new QHBoxLayout( w->ui.actionbar );
     h2->addStretch();
-    h2->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ) );
-    h2->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ) );
-    h2->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ) );
-    h2->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ) );
+    h2->addWidget( new SimpleButton( ":/MainWindow/love.png" , ui.love ));
+    h2->addWidget( new SimpleButton( ":/MainWindow/ban.png" , ui.ban ));
+    h2->addWidget( new SimpleButton( ":/MainWindow/tag.png" , ui.tag ));
+    h2->addWidget( new SimpleButton( ":/MainWindow/share.png" , ui.share ));
     h2->setSpacing( 1 );
     h2->setMargin( 0 );
     h2->setSizeConstraint( QLayout::SetFixedSize );
+	
+	QSplitter* s = new QSplitter( Qt::Vertical );
+	s->addWidget( w );
+	s->addWidget( new MetaInfoView );
+	s->setSizes( QList<int>() << 80 << 80 );
+	s->setStretchFactor( 0, 1 );
+	s->setStretchFactor( 1, 3 );
+    m_layout->addWidget( s );
 
-    struct ScrobbleViewWidget : QWidget
-    {
-        ScrobbleViewWidget( QWidget* w ): QWidget( w ){};
-        QWidget* cover;
-
-        virtual void resizeEvent( QResizeEvent* )
-        {
-            QLinearGradient g( 0, cover->height()*5/7 + 10 /*margin*/, 0, height() );
-            g.setColorAt( 0, Qt::black );
-            g.setColorAt( 1, QColor( 0x20, 0x20, 0x20 ) );
-            
-            QPalette p = palette();
-            p.setBrush( QPalette::Window, g );
-            
-            //inefficient as sets recursively on child widgets? 
-            //may be better to just paintEvent it
-            setPalette( p );        
-            
-            qDebug() << size();
-        }
-    };
-
-    ScrobbleViewWidget* w = new ScrobbleViewWidget( this );
-
-    QVBoxLayout* v = new QVBoxLayout( w );
-	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator( this ) );
-    v->addWidget( ui.cover = new NowPlayingView );
-    v->addWidget( ui.progress = new ScrobbleProgressBar );
-    v->addWidget( ui.actionbar );
-    v->setMargin( 10 );
-    v->setAlignment( ui.actionbar, Qt::AlignCenter );
-
-    w->cover = ui.cover;
-    m_layout->addWidget( w );
-
-    uint const W = ui.actionbar->sizeHint().width() + 20;
-    w->setMinimumWidth( W );
-
-    QPalette p( Qt::white, Qt::black );
-    w->setPalette( p );
-    w->setAutoFillBackground( true );
-    
-    adjustSize(); //because Qt sucks? It uses the UI size initially I think
 }
 
 

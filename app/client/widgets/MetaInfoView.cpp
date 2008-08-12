@@ -19,7 +19,7 @@
 
 #include "MetaInfoView.h"
 #include "PlayerEvent.h"
-#include "lib/types/Track.h"
+#include "ObservedTrack.h"
 #include <QCoreApplication>
 #include <QDesktopServices>
 
@@ -27,7 +27,7 @@
 MetaInfoView::MetaInfoView( QWidget* parent )
             : QWebView( parent )
 {   
-    load( QUrl( "http://www.google.com") );
+   // load( QUrl( "http://www.google.com") );
     page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     
     connect( page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
@@ -47,10 +47,17 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
     {
         case PlayerEvent::TrackChanged:
         case PlayerEvent::PlaybackStarted:
-            Track t = d.value<Track>( );
+		{
+            ObservedTrack t = d.value<ObservedTrack>( );
             // FIXME: get the real page.
             load( QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) ) );
+			qDebug() << QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) );
+			qDebug() << t.artist();
             break;
+		}
+		case PlayerEvent::PlaybackEnded:
+			//clear the web view
+			setHtml( "<html/>" );
     }
 }
 

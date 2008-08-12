@@ -17,58 +17,47 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include "widgets/ScrobbleViewWidget.h"
+#include "ScrobbleViewWidget.h"
+#include "widgets/MediaPlayerIndicator.h"
+#include "widgets/NowPlayingView.h"
+#include "widgets/ScrobbleProgressBar.h"
+#include <QHBoxLayout>
 
-class MainWindow : public QMainWindow
+ScrobbleViewWidget::ScrobbleViewWidget()
 {
-    Q_OBJECT
-
-public:
-    MainWindow();
-
-    void setRadio( class RadioController* );
+	ui.actionbar = new QWidget;
+	
+	QVBoxLayout* v = new QVBoxLayout( this );
+	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
+    v->addWidget( ui.cover = new NowPlayingView );
+    v->addWidget( ui.progress = new ScrobbleProgressBar );
+    v->addWidget( ui.actionbar );
+    v->setMargin( 10 );
+    v->setAlignment( ui.actionbar, Qt::AlignCenter );
+	
+	uint const W = ui.actionbar->sizeHint().width() + 20;
+    setMinimumWidth( W );
+	
+	QPalette p( Qt::white, Qt::black );
+    setPalette( p );
+    setAutoFillBackground( true );
     
-    QSize sizeHint() const;
+    adjustSize(); //because Qt sucks? It uses the UI size initially I think
 	
-	Ui::MainWindow ui;
+}
 
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    void showScrobbleView(){ toggleRadio( ScrobbleView ); }
-    void toggleRadio( int index = -1 );
-
-signals:
-	void loved();
-	void banned();
+void
+ScrobbleViewWidget::resizeEvent( QResizeEvent* )
+{
+	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
+	g.setColorAt( 0, Qt::black );
+	g.setColorAt( 1, QColor( 0x20, 0x20, 0x20 ) );
 	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-
-private:
-    void setupUi();
-    void setupScrobbleView();
-
-    class QStackedWidget* m_layout;
-	class RadioWidget* m_radioWidget;
-    class RadioMiniControls* m_radioMiniControls;
-
-    enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
+	QPalette p = palette();
+	p.setBrush( QPalette::Window, g );
 	
-signals:
-	void radioToggled();
-
-};
-
+	//inefficient as sets recursively on child widgets? 
+	//may be better to just paintEvent it
+	setPalette( p );        
+	
+}

@@ -17,58 +17,53 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
-#include <QMap>
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include "widgets/ScrobbleViewWidget.h"
+#ifndef SCROBBLE_VIEW_WIDGET_H
+#define SCROBBLE_VIEW_WIDGET_H
+#include <QWidget>
+#include <QAction>
 
-class MainWindow : public QMainWindow
+class ScrobbleViewWidget : public QWidget
 {
-    Q_OBJECT
-
 public:
-    MainWindow();
-
-    void setRadio( class RadioController* );
-    
-    QSize sizeHint() const;
+	ScrobbleViewWidget();
 	
-	Ui::MainWindow ui;
-
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-    void showMetaInfoView();
-    void showScrobbleView(){ toggleRadio( ScrobbleView ); }
-    void toggleRadio( int index = -1 );
-
-signals:
-	void loved();
-	void banned();
+	virtual void resizeEvent( QResizeEvent* );
 	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-
-private:
-    void setupUi();
-    void setupScrobbleView();
-
-    class QStackedWidget* m_layout;
-	class RadioWidget* m_radioWidget;
-    class RadioMiniControls* m_radioMiniControls;
-
-    enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
+	//Most of the ui should only be touched by the Widget itself
+	//however the actionbar is created by the window so it can
+	//share QActions for use in the menus etc.
+	struct 
+	{
+		friend class ScrobbleViewWidget;
+		class QWidget* actionbar;
 	
-signals:
-	void radioToggled();
-
+	private:
+		class NowPlayingView* cover;
+		class ScrobbleProgressBar* progress;
+		class MediaPlayerIndicator* playerIndicator;
+		
+	} ui;
+	
 };
 
+
+#include <QLabel>
+class SimpleButton : public QLabel
+{
+	QAction* const a;
+	
+	virtual void mouseReleaseEvent( QMouseEvent* ) 
+	{
+		if (a->isEnabled()) 
+			a->activate( QAction::Trigger );
+	}
+	
+public:
+	SimpleButton( const QString& icon, QAction* action ) : a( action )
+	{
+		setPixmap( QPixmap( icon ) );
+		setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+	}
+};
+
+#endif

@@ -8,8 +8,7 @@
 #include <QApplication>
 
 
-MediaPlayerIndicator::MediaPlayerIndicator(QWidget *parent)
-    : QWidget(parent)
+MediaPlayerIndicator::MediaPlayerIndicator()
 {
     setLayout( new QHBoxLayout( this ) );
 	layout()->setMargin( 0 );
