@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,44 +17,31 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef RADIO_STATION_H
-#define RADIO_STATION_H
+#ifndef MY_STATIONS_H
+#define MY_STATIONS_H
 
-#include "lib/DllExportMacro.h"
-#include <QString>
-#include <QMetaType>
+#include <QList>
+#include "ui_MyStations.h"
 
-
-class RADIO_DLLEXPORT RadioStation
+class MyStations : public QWidget
 {
+
+Q_OBJECT
+	
 public:
-	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Url };
+	MyStations();
 	
-    RadioStation( QString s, Type t = Url, QString title = "" ) : m_station( s ), m_type( t ), m_title( title ){}
-	
-	operator const QString() const
-	{
-		switch ( m_type ) 
-		{
-			case SimilarArtist:	return "lastfm://artist/" + m_station + "/similarartists";
-			case Recommendation: return "lastfm://user/" + m_station + "/recommended";
-			case Library: return "lastfm://user/" + m_station + "/personal";
-			case Neighbourhood: return "lastfm://user/" + m_station + "/neighbours";
-			case Loved: return "lastfm://user/" + m_station + "/loved";	
-				
-			case Url: return m_station;
-			
-			default: Q_ASSERT( !"I can't generate station url string for an unknown station type:" + m_type ); return "";
-		}
-	}
-	
-	const QString& title() const{ return m_title; }
+protected:
+	void mouseMoveEvent( QMouseEvent* );
 	
 private:
-	QString m_station;
-	QString m_title;
+	Ui::MyStations ui;
+	QList< class RadioStation* > m_myStationList;
 	
-	Type m_type;
+private slots:
+	void onItemHover( QListWidgetItem* );
+	void onItemClicked( QListWidgetItem* );
+	
 };
 
 #endif

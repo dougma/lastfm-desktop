@@ -25,17 +25,18 @@
 Playlist::Playlist( WsReply* reply )
 {
 	
-	m_title = reply->lfm()["playlist"]["title"].text();
-	
-	//The title is url encoded, has + instead of space characters 
-	//and has a + at the begining. So it needs cleaning up:
-	m_title.replace( "+", " " );
-	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-	m_title = m_title.trimmed();
 	
     try
     {
-        foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
+		m_title = reply->lfm()["playlist"]["title"].text();
+		
+		//The title is url encoded, has + instead of space characters 
+		//and has a + at the begining. So it needs cleaning up:
+		m_title.replace( "+", " " );
+		m_title = QUrl::fromPercentEncoding( m_title.toAscii());
+		m_title = m_title.trimmed();
+        
+		foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
         {
             MutableTrack t;
             try

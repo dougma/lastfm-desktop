@@ -20,6 +20,7 @@
 #include "RadioWidget.h"
 #include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "../widgets/MyStations.h"
 #include <QAction>
 #include <QEvent>
 #include <QLabel>
@@ -43,6 +44,7 @@ RadioWidget::RadioWidget( QWidget* parent )
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( bar );
     v->addWidget( tuning_dial );
+	v->addWidget( new MyStations );
     v->addWidget( ui.spinner = new SpinnerLabel );
 
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );

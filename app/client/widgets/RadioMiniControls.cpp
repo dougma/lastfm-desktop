@@ -35,7 +35,6 @@ RadioMiniControls::setAudioPlaybackEngine( AudioPlaybackEngine* a )
 void
 RadioMiniControls::play()
 {
-    
 }
 
 
