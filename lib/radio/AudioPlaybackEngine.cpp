@@ -104,10 +104,9 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
 			break;
 
         case Phonon::PlayingState:
-            if( oldstate == Phonon::LoadingState ||
-                oldstate == Phonon::StoppedState )
+            if (oldstate == Phonon::LoadingState || oldstate == Phonon::StoppedState)
             {
-                Q_DEBUG_BLOCK << m_mediaObject->currentSource().url();
+                qDebug() << m_mediaObject->currentSource().url();
 
                 Track t = m_queue.take( m_mediaObject->currentSource().url() );
                 if( t.isEmpty() )
@@ -120,7 +119,7 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
 
                 break;
             }
-            if( oldstate == Phonon::BufferingState )
+            if (oldstate == Phonon::BufferingState)
                 emit finishedBuffering();
             break;
     }
