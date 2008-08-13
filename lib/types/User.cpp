@@ -28,6 +28,13 @@ User::getFriends()
 }
 
 
+WsReply*
+User::getTopTags()
+{
+    return WsRequestBuilder( "user.getTopTags" ).add( "user", m_name ).get();
+}
+
+
 QStringList
 User::getFriends( WsReply* r )
 {

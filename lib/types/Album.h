@@ -34,6 +34,9 @@ class TYPES_DLLEXPORT Album
     QString m_title;
 
 public:
+	Album()
+	{}
+
     explicit Album( Mbid mbid ) : m_mbid( mbid )
     {}
 
@@ -45,6 +48,9 @@ public:
     Artist artist() const { return m_artist; }
     Mbid mbid() const { return m_mbid; }
 
+	/** artist may have been set, since we allow that in the ctor, but should we handle untitled albums? */
+	bool isNull() const { return m_title.isEmpty() && m_mbid.isNull(); }
+	
     /** Album.getInfo WebService */
     WsReply* getInfo() const;
 

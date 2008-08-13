@@ -27,6 +27,8 @@
 class TYPES_DLLEXPORT Mbid : private QString
 {
 public:
+	bool isNull() const { return QString::isNull(); }
+	
     operator QString() const { return *this; }
 };
 

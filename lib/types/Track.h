@@ -178,9 +178,12 @@ public:
     // TODO not asyncronous! return a WsReply object!
     QStringList topTags() const;
 
+	/** See last.fm/api Track section */
     WsReply* share( const class User& recipient, const QString& message = "" );
 	WsReply* love();
 	WsReply* ban();
+	WsReply* getTags(); // for the logged in user
+	WsReply* getTopTags();
 
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise

@@ -18,7 +18,10 @@
  ***************************************************************************/
 
 #include "Track.h"
+#include "User.h"
 #include "lib/unicorn/UnicornSettings.h" //FIXME
+#include "lib/ws/WsRequestBuilder.h"
+#include "lib/ws/WsReply.h"
 #include <QDir>
 
 
@@ -136,7 +139,7 @@ Track::sourceString() const
 {
     switch (d->source)
     {
-        case Radio: return "L" /*+ authCode()*/;
+        case Radio: return "L" + d->extras["trackauth"];
         case Player: return "P" /*+ playerId()*/;
         case MediaDevice: return "P" /*+ mediaDeviceId()*/;
         default: return "U";
@@ -225,32 +228,6 @@ Track::scrobblableStatus() const
 #endif
 
 
-#include "lib/ws/WsRequestBuilder.h"
-#include "lib/ws/WsReply.h"
-QStringList
-Track::topTags() const
-{
-    WsReply* reply = WsRequestBuilder( "track.getTopTags" )
-                        .add( "track", d->title )
-                        .add( "artist", d->artist )
-                        .get();
-    reply->finish();
-
-    QStringList tags;
-    try
-    {
-        foreach (EasyDomElement e, reply->lfm().children( "tag" ))
-            tags += e["name"].text().toLower();
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-    return tags;
-}
-
-
-#include "User.h"
 WsReply*
 Track::share( const User& recipient, const QString& message )
 {
@@ -280,4 +257,38 @@ Track::ban()
 		.add( "artist", d->artist )
 		.add( "track", d->title )
 		.post();
+}
+
+
+struct TrackWsRequestBuilder : WsRequestBuilder
+{
+	TrackWsRequestBuilder( const char* p ) : WsRequestBuilder( p )
+	{}
+	
+	TrackWsRequestBuilder& add( const Track& t )
+	{
+		if (t.mbId().isEmpty()) 
+		{
+			WsRequestBuilder::add( "artist", t.artist() );
+			WsRequestBuilder::add( "track", t.title() );
+		}
+		else
+			WsRequestBuilder::add( "mbid", t.mbId() );
+
+		return *this;
+	}
+};
+
+
+WsReply*
+Track::getTopTags()
+{
+	return TrackWsRequestBuilder( "track.getTopTags" ).add( *this ).get();
+}
+
+
+WsReply*
+Track::getTags()
+{
+	return TrackWsRequestBuilder( "track.getTags" ).add( *this ).get();
 }

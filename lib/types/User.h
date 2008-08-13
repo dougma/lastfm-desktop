@@ -28,7 +28,7 @@
 class TYPES_DLLEXPORT User
 {
     QString m_name;
-
+	
 public:
     explicit User( const QString& username ) : m_name( username )
     {}
@@ -37,6 +37,8 @@ public:
 
     WsReply* getFriends();
     static QStringList getFriends( WsReply* );
+	
+	WsReply* getTopTags();
 };
 
 #endif
