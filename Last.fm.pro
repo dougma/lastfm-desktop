@@ -43,6 +43,9 @@ else {
                lib/scrobble/libscrobble.pro \
 			   app/client/appclient.pro
 
-	# make the app client the default project
-	win32:SUBDIRS = $$unique( app/client/appclient.pro $$SUBDIRS )
+	# make the app client the default project in visual studio
+	debug:win32 {
+		SUBDIRS -= app/client/appclient.pro
+		SUBDIRS = app/client/appclient.pro $$SUBDIRS
+	}
 }
