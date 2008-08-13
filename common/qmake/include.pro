@@ -42,7 +42,7 @@ CONFIG( mad ) {
 }
 
 
-defineTest( generateVersionH ) {
+defineTest( generateVersionHeader ) {
 	DEFINE = $${LITERAL_HASH}define
 
 	win32 {
@@ -53,5 +53,14 @@ defineTest( generateVersionH ) {
 	else {
 	    system( echo \\'$$DEFINE VERSION \\\"$$VERSION\\\"\\' > version.h )
 	    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> version.h )
+	}
+}
+
+
+# you also need to QMAKE_EXTRA_INCLUDES += Makefile.dmg sadly
+defineReplace( generateInstallerMakefile ) {
+	macx*:!macx-xcode:release:contains( TEMPLATE, app ) {
+		system( $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT $$LIBS > Makefile.dmg )
+		return( Makefile.dmg )
 	}
 }

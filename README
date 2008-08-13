@@ -18,6 +18,8 @@ Mac
 ---
 Install macports, then install libmad, taglig, libsamplerate, libfftw3
 
+./configure --release && make dmg
+
 Folder Structure
 ================
 dist/
