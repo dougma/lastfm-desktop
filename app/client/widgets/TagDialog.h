@@ -17,30 +17,51 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MEDIAPLAYERINDICATOR_H
-#define MEDIAPLAYERINDICATOR_H
+#ifndef TAG_DIALOG_H
+#define TAG_DIALOG_H
 
-#include <QWidget>
-class QLabel;
+#include "lib/types/Track.h"
+#include "ui_tagdialog.h"
 
 
-class MediaPlayerIndicator : public QWidget
+class TagDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    MediaPlayerIndicator();
+    TagDialog( QWidget *parent );
+
+	Track track() const { return m_track; }
+	
+	/** you can only call this once, and you must call it before you show or exec() */
+	void setTrack( const Track& t );
+	
+    void setTaggingType( int i ) { ui.tagTypeBox->setCurrentIndex( i ); }
 
 private slots:
-    void onAppEvent( int e, const QVariant& v );
-    void mediaPlayerConnected( const QString& id );
-    void mediaPlayerDisconnected( const QString& id );
-	
+    void searchAsYouType( const QString& );
+
+    void onAccepted();
+    void onTagTypeChanged( int type );
+    void onWsFinished( WsReply* );
+    void onTagActivated( QTreeWidgetItem *item );
+    void onTagEditChanged();
+
+    void saveSettings();
+
 private:
-	QLabel* m_playerDescription;
-	QLabel* m_nowPlayingIndicator;
-	void formatRadioStationString();
-	QString m_currentContext;
+    void follow( WsReply* );
+    virtual bool eventFilter( QObject*, QEvent* );
+
+private:
+    Ui::TagDialog ui;
+
+    Track m_track;
+    QStringList m_originalTags;
+    QStringList m_publicTags;
+    QStringList m_userTags;
+
+    QList<WsReply*> m_activeRequests;
 };
 
-#endif // MEDIAPLAYERINDICATOR_H
+#endif

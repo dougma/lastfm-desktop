@@ -45,8 +45,9 @@ public slots:
     void showDiagnosticsDialog();
     void showAboutDialog();
     void showShareDialog();
+	void showTagDialog();
     void showMetaInfoView();
-    void showScrobbleView(){ toggleRadio( ScrobbleView ); }
+    void showScrobbleView() { toggleRadio( ScrobbleView ); }
     void toggleRadio( int index = -1 );
 
 signals:

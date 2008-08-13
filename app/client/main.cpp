@@ -22,6 +22,7 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/core/StoreDir.h"
+#include "lib/core/MessageBoxBuilder.h"
 #include <QDir>
 #include <QTimer>
 
@@ -80,6 +81,12 @@ int main( int argc, char** argv )
         //TODO message to user
         //FIXME can't have it so that there is no radio option if listener socket fails!
         qDebug() << "Socket failure:" << e.what();
+		
+		MessageBoxBuilder( 0 )
+			.setTitle( "Sorry Old Boy" )
+			.setText( "You can't run the old client and the new client at once!" )
+			.exec();
+		
         return 1;
     }
     catch (Unicorn::Application::UnsupportedPlatformException&)

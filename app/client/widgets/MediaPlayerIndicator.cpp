@@ -10,12 +10,12 @@
 
 MediaPlayerIndicator::MediaPlayerIndicator()
 {
-    setLayout( new QHBoxLayout( this ) );
+    setLayout( new QHBoxLayout );
 	layout()->setMargin( 0 );
-	layout()->addWidget( m_nowPlayingIndicator = new QLabel( "Now playing", this ));
+	layout()->addWidget( m_nowPlayingIndicator = new QLabel( "Now playing" ));
 	static_cast<QBoxLayout*>(layout())->addStretch();
-	layout()->addWidget( m_playerDescription = new QLabel( this ) );
-    connect( qApp, SIGNAL(event(int, QVariant)), SLOT( onAppEvent( int, QVariant )) );
+	layout()->addWidget( m_playerDescription = new QLabel );
+    connect( qApp, SIGNAL(event(int, QVariant)), SLOT(onAppEvent( int, QVariant )) );
 
 	m_playerDescription->setPalette( QPalette( Qt::white, Qt::black ) );
 	m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
@@ -23,9 +23,9 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
 	m_nowPlayingIndicator->hide();
 	
-	#ifdef Q_WS_MAC
-		m_playerDescription->setText( "iTunes" );
-	#endif
+#ifdef Q_WS_MAC
+	m_playerDescription->setText( "iTunes" );
+#endif
 }
 
 

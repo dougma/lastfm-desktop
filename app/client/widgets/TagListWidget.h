@@ -1,5 +1,6 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright (C) 2005 - 2007 by                                          *
+ *      Last.fm Ltd <client@last.fm>                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,30 +18,54 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MEDIAPLAYERINDICATOR_H
-#define MEDIAPLAYERINDICATOR_H
+#ifndef TAGLISTWIDGET_H
+#define TAGLISTWIDGET_H
 
-#include <QWidget>
-class QLabel;
+#include <QTreeWidget>
+#include <QMenu>
+
+namespace Tags
+{
+    enum SortOrder
+    {
+        MostPopularOrder,
+        AscendingOrder,
+        DescendingOrder
+    };
+}
 
 
-class MediaPlayerIndicator : public QWidget
+class TagListWidget : public QTreeWidget
 {
     Q_OBJECT
 
 public:
-    MediaPlayerIndicator();
+    TagListWidget( QWidget* parent = 0 );
+
+    void setSortOrder( Tags::SortOrder sortOrder );
+    Tags::SortOrder sortOrder() { return m_sortOrder; }
+
+    void sort();
+
+    QTreeWidgetItem* addItem( QString tag );
+    void addItems( const QStringList& labels );
+
+private:
+    QMenu m_sortTagsMenu;
+    Tags::SortOrder m_sortOrder;
+
+    QAction* m_actionSortMostPopular;
+    QAction* m_actionSortAZ;
+    QAction* m_actionSortZA;
 
 private slots:
-    void onAppEvent( int e, const QVariant& v );
-    void mediaPlayerConnected( const QString& id );
-    void mediaPlayerDisconnected( const QString& id );
-	
-private:
-	QLabel* m_playerDescription;
-	QLabel* m_nowPlayingIndicator;
-	void formatRadioStationString();
-	QString m_currentContext;
+    void showSortContextMenu( const QPoint& point );
+    
+    void openTagPageForCurrentItem();
+
+    void sortAZ();
+    void sortZA();
+    void sortMostPopular();
 };
 
-#endif // MEDIAPLAYERINDICATOR_H
+#endif // TAGLISTWIDGET_H

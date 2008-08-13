@@ -25,6 +25,8 @@
 #include <QTimer>
 #include <QPushButton>
 
+static const char* kHintText = QT_TR_NOOP( "Type friends' names or emails, comma separated" );
+
 
 ShareDialog::ShareDialog( QWidget* parent )
         : QDialog( parent )
@@ -32,12 +34,12 @@ ShareDialog::ShareDialog( QWidget* parent )
     ui.setupUi( this );
     connect( ui.friends, SIGNAL(editTextChanged( QString )), SLOT(enableDisableOk()) );
     ok()->setText( tr("Share") );
+	ok()->setEnabled( false );
 
     WsReply* r = User( The::settings().username() ).getFriends();
     connect( r, SIGNAL(finished( WsReply* )), SLOT(onFriendsReturn( WsReply* )) );
 
     ui.friends->lineEdit()->installEventFilter( this );
-
 }
 
 
@@ -98,15 +100,18 @@ ShareDialog::eventFilter( QObject* o, QEvent* e )
     
     w->event( e );
     
-    QString const text = tr( "Type friends' names or emails, separated by commas" );
-    QRect r = w->rect().adjusted( 5, 2, -5, 0 );
+    QString const text = tr( kHintText );
     QPainter p( w );
-    p.setPen( Qt::gray );	
+    p.setPen( Qt::darkGray );	
 #ifdef Q_WS_MAC
 	QFont f = font();
 	f.setPixelSize( 10 );
 	p.setFont( f );
+    QRect r = w->rect().adjusted( 5, 0, -5, -2 );
+#else
+	QRect r = w->rect().adjusted( 5, 2, -5, 0 );
 #endif
+	
     p.drawText( r, Qt::AlignVCenter, text );
 
     return true; //eat event

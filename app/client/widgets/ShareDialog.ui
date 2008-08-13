@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>305</width>
-    <height>296</height>
+    <width>324</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -34,6 +34,9 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" >
+     <property name="spacing" >
+      <number>-1</number>
+     </property>
      <property name="leftMargin" >
       <number>9</number>
      </property>
@@ -122,15 +125,8 @@
        <property name="tabChangesFocus" >
         <bool>true</bool>
        </property>
-       <property name="html" >
-        <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;/p>&lt;/body>&lt;/html></string>
-       </property>
        <property name="acceptRichText" >
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>

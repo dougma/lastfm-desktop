@@ -26,6 +26,7 @@
 #include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
+#include "widgets/TagDialog.h"
 #include "widgets/RadioMiniControls.h"
 #include "radio/RadioWidget.h"
 #include "version.h"
@@ -60,6 +61,7 @@ MainWindow::MainWindow()
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
+	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.tunein, SIGNAL(triggered()), SLOT(toggleRadio()) );
@@ -203,15 +205,24 @@ MainWindow::showShareDialog()
 {
 	// Show non modal ShareDialogs, one for every track played
 	// As the user requests them anyway...
+	#define PER_TRACK_DIALOG( Type ) \
+		static QPointer<Type> d; \
+		Track t = The::app().track(); \
+		if (d && d->track() == t) \
+			d->activateWindow(); \
+		else { \
+			THROW_AWAY_DIALOG( Type ) \
+			d->setTrack( t ); \
+		}
 	
-	static QPointer<ShareDialog> d;
-	Track t = The::app().track();
-	if (d && d->track() == t)
-		d->activateWindow();
-	else {
-		THROW_AWAY_DIALOG( ShareDialog )
-		d->setTrack( t );
-	}
+	PER_TRACK_DIALOG( ShareDialog )
+}
+
+
+void
+MainWindow::showTagDialog()
+{
+	PER_TRACK_DIALOG( TagDialog )
 }
 
 
