@@ -32,6 +32,8 @@ foreach my $x (@DYLIBS)
 	$bundle_macos .= "\$(CONTENTS)/MacOS/$x ";
 }
 
+$DEPOSX = "\$(DIST_TOOLS_DIR)/deposx.sh";
+
 print <<END;
 DIST_TOOLS_DIR = $root/common/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
@@ -45,109 +47,148 @@ INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
 
 YOUR_MUM: all
 
-help:
-	echo "make bundle"
-	echo "make bundle-clean"
-	echo "make bundle-install"
-	echo "make dmg"
-	echo "make dmg-clean"
-
-bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/MacOS/imageformats \$(CONTENTS)/COPYING \$(DESTDIR)mxcl-rules
-
-\$(DESTDIR)mxcl-rules:
+\$(DESTDIR)mxcl-is-super: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
 	perl -pi -e 's/@SHORT_VERSION@/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
-	\$(DIST_TOOLS_DIR)/deposx.sh \$(TARGET) $QT_FRAMEWORKS_DIR
-	touch \$(DESTDIR)mxcl-rules
+	$DEPOSX \$(TARGET) $QT_FRAMEWORKS_DIR
+	touch \$\@
 
 bundle-clean:
 	rm -rf \$(BUNDLE_FRAMEWORKS)
 	rm -f \$(BUNDLE_MACOS)
 	rm -rf \$(CONTENTS)/MacOS/imageformats
 	rm -f \$(CONTENTS)/COPYING
+	rm -f \$(CONTENTS)/Resources/qt.conf
 
-dmg: bundle \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
-	
+dmg: \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+
 dmg-clean: bundle-clean
 	rm -f \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
 
-\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg:
-	cd \$(DESTDIR) && \$(DIST_TOOLS_DIR)/gimme_dmg.sh \$(QMAKE_TARGET).app \$(VERSION)
+\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg: bundle
+	hdiutil create -srcfolder '\$(DESTDIR)\$(QMAKE_TARGET).app' -format UDZO -imagekey zlib-level=9 -scrub '\$\@'
 
-\$(CONTENTS)/MacOS/imageformats: $QT_FRAMEWORKS_DIR/../plugins/imageformats
-	cp -R $QT_FRAMEWORKS_DIR/../plugins/imageformats \$(CONTENTS)/MacOS
+\$(CONTENTS)/Resources/qt.conf:
+	echo '[Paths]' > /tmp/qt.conf
+	echo 'plugins = MacOS' >> /tmp/qt.conf
+	mv /tmp/qt.conf \$(CONTENTS)/Resources
 
 \$(CONTENTS)/COPYING:
 	cp $root/COPYING \$(CONTENTS)/COPYING
 
 END
 
-foreach my $x (@QT_MODULES)
+
+QtFrameworks();
+imagePlugins();
+dylibs();
+
+
+sub imagePlugins 
 {
-	my $d = "\$(CONTENTS)/Frameworks";
-	my $target = "$d/$x.framework";
+	my $from = abs_path( "$QT_FRAMEWORKS_DIR/../plugins/imageformats" );
+	my $to = "\$(CONTENTS)/MacOS/imageformats";
+	my $install = "\$(INSTALLDIR)/Contents/MacOS/imageformats";
 
-	my $install_dir = "\$(INSTALLDIR)/Contents/Frameworks";
-	my $install_target = "$install_dir/$x.framework";
-	my $dep = $target;
-	
-	print <<END;
+print <<END;
+$to:
+	mkdir -p \$\@
 
-$target: $QT_FRAMEWORKS_DIR/$x.framework
-	mkdir -p $d
-	rm -rf $target
-	cp -R $QT_FRAMEWORKS_DIR/$x.framework $d
-	rm $target/Versions/4/${x}_debug $target/${x}_debug*
-	\$(DIST_TOOLS_DIR)/deposx.sh $target/$x $QT_FRAMEWORKS_DIR
-	install_name_tool -id $x.framework/Versions/4/$x $target/Versions/4/$x
-	
-$install_target: $dep
-	mkdir -p $install_dir
-	cp -R $dep $install_dir
+$install:
+	mkdir -p \$\@
+
 END
-	
-	$install_deps .= " $install_target";
+
+	opendir( DIR, $from );
+	foreach my $name (grep( /\.dylib$/, readdir( DIR ) ))
+	{
+		print <<END;
+$to/$name: $from/$name |$to
+	cp $from/$name \$\@
+	$DEPOSX \$\@ $QT_FRAMEWORKS_DIR
+
+$install/$name: $to/$name |$install
+	cp $to/$name \$\@
+
+END
+		$bundle_deps .= " $to/$name";
+		$install_deps .= " $install/$name";
+	}
+	closedir( DIR );
 }
 
-foreach my $dylib (@DYLIBS)
+
+sub QtFrameworks
 {
-	my $target = "\$(CONTENTS)/MacOS/$dylib";
-	my $install_dir = "\$(INSTALLDIR)/Contents/MacOS";
-	my $install_target = "$install_dir/$dylib";
-	my $dep = $target;
-
-	print <<END;
+	my $to = "\$(CONTENTS)/Frameworks";
+	my $install = "\$(INSTALLDIR)/Contents/Frameworks";
 	
-$target: \$(DESTDIR)$dylib
-	cp \$(DESTDIR)$dylib \$(CONTENTS)/MacOS
-	\$(DIST_TOOLS_DIR)/deposx.sh $target $QT_FRAMEWORKS_DIR
+	print <<END;
+$to:
+	mkdir -p \$\@
 
-$install_target: $dep
-	mkdir -p $install_dir
-	cp $dep $install_dir
+$install:
+	mkdir -p \$\@
 END
+	foreach my $module (@QT_MODULES)
+	{
+		print <<END;
 
-	$install_deps .= " $install_target";
+$to/$module.framework: $QT_FRAMEWORKS_DIR/$module.framework |$to
+	cp -Rf $QT_FRAMEWORKS_DIR/$module.framework \$\@
+	rm \$\@/Versions/4/${module}_debug \$\@/${module}_debug*
+	$DEPOSX \$\@/$module $QT_FRAMEWORKS_DIR
+	install_name_tool -id \$\@/Versions/4/$module \$\@/Versions/4/$module
+
+$install/$module.framework: $to/$module.framework
+	cp -Rf $to/$module.framework $install
+END
+		$install_deps .= " $install/$module.framework";
+	}
+}
+
+sub dylibs
+{
+	my $to = "\$(CONTENTS)/MacOS";
+	my $install = "\$(INSTALLDIR)/Contents/MacOS";
+	
+	foreach my $dylib (@DYLIBS)
+	{
+		print <<END;
+
+$to/$dylib: \$(DESTDIR)$dylib
+	cp \$(DESTDIR)$dylib \$\@
+	$DEPOSX \$\@ $QT_FRAMEWORKS_DIR
+
+$install/$dylib: $to/$dylib |$install
+	cp $to/$dylib \$\@
+END
+		$install_deps .= " $install/$dylib";
+	}	
 }
 
 print <<END;
 
-\$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET):
-	mkdir -p \$(INSTALLDIR)/Contents/MacOS
+\$(INSTALLDIR)/Contents:
+	mkdir -p \$\@
+
+\$(INSTALLDIR)/Contents/MacOS:
+	mkdir -p \$\@
+	
+\$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET): |\$(INSTALLDIR)/Contents/MacOS
 	cp \$(TARGET) \$(INSTALLDIR)/Contents/MacOS
 
-\$(INSTALLDIR)/Contents/Info.plist:
-	mkdir -p \$(INSTALLDIR)/Contents
+\$(INSTALLDIR)/Contents/Info.plist: |\$(INSTALLDIR)/Contents
 	cp \$(CONTENTS)/Info.plist \$(INSTALLDIR)/Contents
 
-\$(INSTALLDIR)/Contents/MacOS/imageformats:
-	mkdir -p \$(INSTALLDIR)/Contents/MacOS
-	cp -R \$(CONTENTS)/MacOS/imageformats \$(INSTALLDIR)/Contents/MacOS/
+\$(INSTALLDIR)/Contents/Resources/qt.conf: \$(INSTALLDIR)/Contents/Resources
+	cp \$(CONTENTS)/Resources/qt.conf \$(INSTALLDIR)/Contents/Resources
 
-\$(INSTALLDIR)/Resources:
-	mkdir -p \$(INSTALLDIR)/Contents
+\$(INSTALLDIR)/Contents/Resources: |\$(INSTALLDIR)/Contents
 	cp -r \$(CONTENTS)/Resources \$(INSTALLDIR)/Contents
 
-bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist \$(INSTALLDIR)/Resources $install_deps
+bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist \$(INSTALLDIR)/Resources $install_deps \$(INSTALLDIR)/Contents/Resources/qt.conf
+
+bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(DESTDIR)mxcl-is-super \$(CONTENTS)/Resources/qt.conf $bundle_deps
 
 END
