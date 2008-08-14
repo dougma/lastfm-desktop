@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "RadioWidget.h"
+#include "NowPlayingTuner.h"
 #include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "MyStations.h"
@@ -28,38 +29,42 @@
 #include <QMovie>
 #include <QToolBar>
 #include <QVBoxLayout>
-
+#include <QSplitter>
+#include <QTabWidget>
 
 RadioWidget::RadioWidget( QWidget* parent )
            : QWidget( parent )
 {
+	setLayout( new QHBoxLayout );
+	
     qRegisterMetaType<Track>( "Track" );
 
-    QToolBar* bar = new QToolBar( this );
-
-    QLineEdit* tuning_dial = new QLineEdit;
-    skip = bar->addAction( "Skip" );
-    stop = bar->addAction( "Stop" );
-
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( bar );
-    v->addWidget( tuning_dial );
-	v->addWidget( new MyStations );
-    v->addWidget( ui.spinner = new SpinnerLabel );
-
-    connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
 	
-    ui.spinner->hide();
+	QTabWidget* tabWidget = new QTabWidget;
+	NowPlayingTuner* nowPlaying = new NowPlayingTuner;
+	tabWidget->addTab( nowPlaying, "Now Playing" );
+	connect( nowPlaying, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
 
+	QSplitter* s = new QSplitter( Qt::Vertical, this );
+	s->addWidget( tabWidget );
+	s->addWidget( new MyStations );
+	
+	//FIXME: should not rely on hard coded sizes
+	//		 but I can't be dealing with getting
+	//		 sizing policies working right now!
+	s->setSizes( QList<int>() << 373 << 98 );
+
+	layout()->addWidget( s );
+	
     setWindowTitle( tr("Last.fm Radio") );
+
 }
 
 
 void
-RadioWidget::onTunerReturnPressed()
+RadioWidget::onTune( const RadioStation& r )
 {
-    QString url = static_cast<QLineEdit*>(sender())->text();
-    m_radioController->play( RadioStation( url, RadioStation::SimilarArtist ) );
+    m_radioController->play( r );
 	emit newStationStarted();
 }
 
@@ -68,7 +73,4 @@ void
 RadioWidget::setRadioController( RadioController* r )
 {
 	m_radioController = r;
-	connect( skip, SIGNAL(triggered()), m_radioController, SLOT(skip()) );
-	connect( stop, SIGNAL(triggered()), m_radioController, SLOT(stop()) );
-	connect( m_radioController, SIGNAL(tuningStateChanged(bool)), ui.spinner, SLOT(setVisible(bool)) );
 }

@@ -17,34 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef NOW_PLAYING_TUNER_H
+#define NOW_PLAYING_TUNER_H
+
+#include "ui_NowPlayingTuner.h"
 #include <QWidget>
-#include "lib/radio/RadioStation.h"
-#include "lib/radio/Tuner.h"
 
-class RadioWidget : public QWidget
+class NowPlayingTuner :public QWidget
 {
-    Q_OBJECT
-
+	Q_OBJECT
+	
 public:
-    RadioWidget( QWidget* parent = 0 );
-
-	void setRadioController( class RadioController* r );
-
-    struct Ui
-    {
-        class QLabel* spinner;
-    } 
-    ui;
-    
-signals:
-    void newStationStarted();
-
-
-private slots:
-    void onTune( const RadioStation& );
-
+	NowPlayingTuner();
 	
 private:
-    class RadioController* m_radioController;
-
+	Ui::NowPlayingTuner ui;
+	
+private slots:
+	void onTunerReturnPressed();
+	
+signals:
+	void tune( const class RadioStation& );
 };
+
+#endif //NOW_PLAYING_TUNER_H

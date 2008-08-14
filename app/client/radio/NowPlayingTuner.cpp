@@ -17,34 +17,34 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QWidget>
+#include "NowPlayingTuner.h"
 #include "lib/radio/RadioStation.h"
-#include "lib/radio/Tuner.h"
+#include <QVBoxLayout>
+#include <QToolBar>
+#include <QLineEdit>
 
-class RadioWidget : public QWidget
+
+NowPlayingTuner::NowPlayingTuner()
 {
-    Q_OBJECT
+	ui.setupUi( this );
+	ui.tagsTab->addItem( new QListWidgetItem( QIcon( ":/station.png" ), "Test" ));
 
-public:
-    RadioWidget( QWidget* parent = 0 );
+	QLineEdit* tuning_dial = new QLineEdit;
+    connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
 
-	void setRadioController( class RadioController* r );
+	QWidget* tempPage = new QWidget();
+	QVBoxLayout* l = new QVBoxLayout;
+	tempPage->setLayout( l );
 
-    struct Ui
-    {
-        class QLabel* spinner;
-    } 
-    ui;
-    
-signals:
-    void newStationStarted();
-
-
-private slots:
-    void onTune( const RadioStation& );
-
+    l->addWidget( tuning_dial );
+	ui.tabWidget->addTab( tempPage, "Temp" );
 	
-private:
-    class RadioController* m_radioController;
+}
 
-};
+
+void 
+NowPlayingTuner::onTunerReturnPressed()
+{
+	QString url = static_cast<QLineEdit*>(sender())->text();
+	emit tune( RadioStation( url, RadioStation::SimilarArtist ));
+}
