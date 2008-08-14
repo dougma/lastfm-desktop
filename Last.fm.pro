@@ -9,7 +9,7 @@ debug:macx-xcode {
 
     include( $$SRC_DIR/common/qmake/include.pro )
 
-	generateVersionH()
+	generateVersionHeader()
 	system( mv version.h app/client )
 
     DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble
