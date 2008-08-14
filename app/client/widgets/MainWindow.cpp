@@ -137,22 +137,22 @@ void
 MainWindow::setupScrobbleView()
 {
     ScrobbleViewWidget* w = new ScrobbleViewWidget;
-	QHBoxLayout* h2 = new QHBoxLayout( w->ui.actionbar );
-    h2->addStretch();
-    h2->addWidget( new SimpleButton( ":/MainWindow/love.png" , ui.love ));
-    h2->addWidget( new SimpleButton( ":/MainWindow/ban.png" , ui.ban ));
-    h2->addWidget( new SimpleButton( ":/MainWindow/tag.png" , ui.tag ));
-    h2->addWidget( new SimpleButton( ":/MainWindow/share.png" , ui.share ));
-    h2->setSpacing( 1 );
-    h2->setMargin( 0 );
-    h2->setSizeConstraint( QLayout::SetFixedSize );
+	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
+    h->addStretch();
+    h->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ));
+    h->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ));
+    h->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ));
+    h->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ));
+    h->setSpacing( 0 );
+    h->setMargin( 0 );
+    h->setSizeConstraint( QLayout::SetFixedSize );
 	
 	QSplitter* s = new QSplitter( Qt::Vertical );
 	s->addWidget( w );
 	s->addWidget( new MetaInfoView );
 	s->setSizes( QList<int>() << 80 << 80 );
-	s->setStretchFactor( 0, 1 );
-	s->setStretchFactor( 1, 3 );
+	s->setStretchFactor( 0, 0 );
+	s->setStretchFactor( 1, 1 );
     m_layout->addWidget( s );
 
 }

@@ -19,8 +19,10 @@
 
 #ifndef SCROBBLE_VIEW_WIDGET_H
 #define SCROBBLE_VIEW_WIDGET_H
+
 #include <QWidget>
 #include <QAction>
+
 
 class ScrobbleViewWidget : public QWidget
 {
@@ -28,6 +30,7 @@ public:
 	ScrobbleViewWidget();
 	
 	virtual void resizeEvent( QResizeEvent* );
+	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
 	
 	//Most of the ui should only be touched by the Widget itself
 	//however the actionbar is created by the window so it can

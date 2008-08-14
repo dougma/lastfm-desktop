@@ -29,15 +29,20 @@ ScrobbleProgressBar::ScrobbleProgressBar()
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.time = new QLabel );
     h->addStretch();
-    h->addWidget( ui.timeToScrobblePoint = new QLabel );
-    h->setContentsMargins( 0, 0, 0, 11 );
+    h->addWidget( ui.timeToGo = new QLabel );
+	h->setMargin( 0 );
+	h->setSpacing( 0 );
     setLayout( h );
 
-    ui.time->setDisabled( true ); //aesthetics
-    ui.timeToScrobblePoint->setDisabled( true ); //aesthetics
     ui.time->setAttribute( Qt::WA_MacMiniSize );
-    ui.timeToScrobblePoint->setAttribute( Qt::WA_MacMiniSize );
+    ui.timeToGo->setAttribute( Qt::WA_MacMiniSize );
 
+#ifdef Q_WS_MAC
+	QPalette p( Qt::white, Qt::black );
+	ui.time->setPalette( p );
+	ui.timeToGo->setPalette( p );
+#endif
+	
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
     m_progressPaintTimer = new QTimer( this );
@@ -55,19 +60,16 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
     if (ui.time->text().isEmpty())
         return;
     
+	int x1 = ui.time->rect().right() + 7;
+	int w = width() - ui.timeToGo->width() - x1 - 7;
+	
     QPainter p( this );
-    p.setPen( QColor( 0x37, 0x37, 0x37 ) );
-    p.setBrush( QColor( 0xff, 0xff, 0xff, 20 ) );
-    p.drawRect( 0, h-10, width()-1, 9 );
-    
-    p.setPen( Qt::transparent );
-    p.setBrush( QColor( 255, 255, 255, 70 ) );
-    p.drawRect( 1, h-9, m_scrobbleProgressTick / 2, 8 );
-    
-    p.setPen( Qt::white );
+    p.fillRect( x1, 0, w, h-1, QColor( 0x23, 0x23, 0x23 ) );
+	
+    p.setPen( QColor( 174, 174, 174 ) );
     p.setBrush( Qt::transparent );
-    for (uint x = 3; x < m_scrobbleProgressTick; x+=2)
-        p.drawLine( x, h-7, x, h-4 );
+    for (uint x = x1 + 2; x < m_scrobbleProgressTick + x1 + 2; x+=2)
+        p.drawLine( x, 2, x, h-4 );
 }
 
 
@@ -89,17 +91,12 @@ ScrobbleProgressBar::onProgressDisplayTick()
 void
 ScrobbleProgressBar::onPlaybackTick( int s )
 {
-    if ((uint)s < scrobblePoint())
-    {
-        QTime t( 0, 0 );
-        t = t.addSecs( scrobblePoint() );
-        t = t.addSecs( -s );
-        ui.timeToScrobblePoint->setText( t.toString( "-mm:ss" ) );
-    }
-    else
-        ui.timeToScrobblePoint->setText( tr( "Scrobbled" ) );
+	QTime t( 0, 0 );
+	t = t.addSecs( scrobblePoint() );
+	t = t.addSecs( -s );
+	ui.timeToGo->setText( t.toString( "-mm:ss" ) );
 
-    QTime t( 0, 0 );
+    t = QTime( 0, 0 );
     t = t.addSecs( s );
     ui.time->setText( t.toString( "mm:ss" ) );
 }
@@ -178,6 +175,6 @@ ScrobbleProgressBar::resetUI()
 {
     m_scrobbleProgressTick = 0;
     ui.time->clear();
-    ui.timeToScrobblePoint->clear();
+    ui.timeToGo->clear();
     update();
 }

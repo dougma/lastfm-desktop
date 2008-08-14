@@ -31,7 +31,7 @@ public:
     struct Ui
     {
         class QLabel* time;
-        class QLabel* timeToScrobblePoint;
+        class QLabel* timeToGo;
     };
 
     Ui ui;

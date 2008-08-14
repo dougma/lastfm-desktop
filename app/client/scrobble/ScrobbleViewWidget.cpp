@@ -29,10 +29,15 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 	
 	QVBoxLayout* v = new QVBoxLayout( this );
 	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
+	v->addSpacing( 8 );
     v->addWidget( ui.cover = new NowPlayingView );
-    v->addWidget( ui.progress = new ScrobbleProgressBar );
+	v->addSpacing( 4 );
     v->addWidget( ui.actionbar );
-    v->setMargin( 10 );
+	v->addSpacing( 12 );
+    v->addWidget( ui.progress = new ScrobbleProgressBar );
+	v->setSpacing( 0 );
+
+    v->setContentsMargins( 10, 8, 10, 14 );
     v->setAlignment( ui.actionbar, Qt::AlignCenter );
 	
 	uint const W = ui.actionbar->sizeHint().width() + 20;
@@ -41,18 +46,18 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 	QPalette p( Qt::white, Qt::black );
     setPalette( p );
     setAutoFillBackground( true );
-    
-    adjustSize(); //because Qt sucks? It uses the UI size initially I think
 	
+	setMinimumHeight( sizeHint().height() );
 }
 
 void
 ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 {
-	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
+//	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
+	QLinearGradient g( 0, height() - 327, 0, height() );
 	g.setColorAt( 0, Qt::black );
-	g.setColorAt( 1, QColor( 0x20, 0x20, 0x20 ) );
-	
+	g.setColorAt( 1, QColor( 0x30, 0x2e, 0x2e ) );
+
 	QPalette p = palette();
 	p.setBrush( QPalette::Window, g );
 	
@@ -60,4 +65,5 @@ ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 	//may be better to just paintEvent it
 	setPalette( p );        
 	
+	qDebug() << size();
 }

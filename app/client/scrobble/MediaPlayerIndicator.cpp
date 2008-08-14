@@ -1,6 +1,7 @@
 #include "App.h"
 #include "MediaPlayerIndicator.h"
 #include "PlayerEvent.h"
+#include "Settings.h"
 #include "lib/types/Track.h"
 #include <QVariant>
 #include <QLayout>
@@ -12,19 +13,19 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 {
     setLayout( new QHBoxLayout );
 	layout()->setMargin( 0 );
-	layout()->addWidget( m_nowPlayingIndicator = new QLabel( "Now playing" ));
+	layout()->addWidget( m_nowPlayingIndicator = new QLabel( "<b>" + The::settings().username() ) );
 	static_cast<QBoxLayout*>(layout())->addStretch();
 	layout()->addWidget( m_playerDescription = new QLabel );
     connect( qApp, SIGNAL(event(int, QVariant)), SLOT(onAppEvent( int, QVariant )) );
 
-	m_playerDescription->setPalette( QPalette( Qt::white, Qt::black ) );
 	m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
-	m_nowPlayingIndicator->setDisabled( true );
 	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
-	m_nowPlayingIndicator->hide();
 	
 #ifdef Q_WS_MAC
-	m_playerDescription->setText( "iTunes" );
+	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
+	m_nowPlayingIndicator->setPalette( p );
+	m_playerDescription->setPalette( p );
+	m_playerDescription->setText( "<b><font color=#343434>listening to</font> iTunes" );
 #endif
 }
 
@@ -50,13 +51,10 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 
 			if( m_playerDescription->objectName() == "ass" )
 				formatRadioStationString();
-			
-			m_nowPlayingIndicator->show();
 			break;
 		}
 		case PlayerEvent::PlaybackEnded:
 		case PlayerEvent::PlaybackPaused:
-			m_nowPlayingIndicator->hide();			
 			break;
 			
 		case PlayerEvent::PlayerChangedContext:
@@ -98,7 +96,7 @@ MediaPlayerIndicator::mediaPlayerConnected( const QString& id )
 	qDebug() << id;
 	
 	m_playerDescription->setObjectName( id );
-    m_playerDescription->setText( playerName );
+    m_playerDescription->setText( "<font color=#343434>listening to</font> " + playerName );
 }
 
 

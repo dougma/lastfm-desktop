@@ -27,7 +27,7 @@ static inline QImage compose( const QImage &in )
 {
     qDebug() << "Image dimensions:" << in.size();
 
-    const uint H = qreal(in.height()) / 2;
+    const uint H = qreal(in.height()) / 3;
 
     QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
     QPainter p( &out );
@@ -58,11 +58,11 @@ NowPlayingView::NowPlayingView()
     v->addStretch();
     v->addWidget( m_label = new QLabel );
 #ifdef Q_WS_MAC
-    v->addSpacing( 13 );
+    v->addSpacing( 11 );
     m_label->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
-//    m_label->setAttribute( Qt::WA_MacSmallSize );
+    m_label->setAttribute( Qt::WA_MacSmallSize );
 #else
-    v->addSpacing( 8 );
+    v->addSpacing( 4 );
 #endif
     
     m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
@@ -95,7 +95,7 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
                 m_cover = QImage();
 
             //TODO album/artist/track may be empty
-            m_label->setText( t.artist() + "<br><b>" + t.title() + "</b><br>" + t.album() );
+            m_label->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
             update();
             break;
         }
