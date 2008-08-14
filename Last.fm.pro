@@ -7,7 +7,7 @@ debug:macx-xcode {
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 
-    include( $$SRC_DIR/common/qmake/include.pro )
+    include( $$ROOT_DIR/common/qmake/include.pro )
 
 	generateVersionHeader()
 	system( mv version.h app/client )

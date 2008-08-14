@@ -3,7 +3,7 @@ QT += testlib xml network
 TEMPLATE = app
 INCLUDEPATH += ../
 
-include( $$SRC_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/common/qmake/include.pro )
 
 # Input
 SOURCES +=  TestPlayerCommandParser.cpp \

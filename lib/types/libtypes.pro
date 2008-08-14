@@ -3,7 +3,7 @@ TEMPLATE = lib
 QT = core
 CONFIG += core ws
 
-include( $$SRC_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/common/qmake/include.pro )
 
 SOURCES = $$findSources( cpp )
 HEADERS = $$findSources( h )

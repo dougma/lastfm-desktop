@@ -3,7 +3,7 @@ TARGET = radio
 CONFIG += ws types core
 QT = core phonon
 
-include( $$SRC_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/common/qmake/include.pro )
 
 SOURCES += $$findSources( cpp )
 HEADERS += $$findSources( h )

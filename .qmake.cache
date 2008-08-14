@@ -1,9 +1,6 @@
 win32: ROOT_DIR = $$system( cd )
 else:  ROOT_DIR = $$system( pwd )
 
-# TODO remove! confusing!
-SRC_DIR = $$ROOT_DIR
-
 macx-xcode {
     BUILD_DIR = build
 } else {

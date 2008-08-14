@@ -3,7 +3,7 @@ QT += testlib xml network
 TEMPLATE = app
 INCLUDEPATH += ../ ../scrobbler .
 
-include( $$SRC_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/common/qmake/include.pro )
 
 # Input
 HEADERS +=  ../scrobbler/Scrobbler.h \
