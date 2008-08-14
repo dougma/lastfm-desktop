@@ -23,7 +23,7 @@
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "widgets/MetaInfoView.h"
+#include "Scrobble/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"

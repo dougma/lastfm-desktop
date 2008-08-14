@@ -20,7 +20,7 @@
 #include "ui_MainWindow.h"
 #include <QMap>
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include "widgets/ScrobbleViewWidget.h"
+#include "scrobble/ScrobbleViewWidget.h"
 
 class MainWindow : public QMainWindow
 {

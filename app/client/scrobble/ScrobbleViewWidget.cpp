@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "ScrobbleViewWidget.h"
-#include "widgets/MediaPlayerIndicator.h"
-#include "widgets/NowPlayingView.h"
+#include "MediaPlayerIndicator.h"
+#include "NowPlayingView.h"
 #include "widgets/ScrobbleProgressBar.h"
 #include <QHBoxLayout>
 

@@ -20,7 +20,7 @@
 #include "RadioWidget.h"
 #include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "../widgets/MyStations.h"
+#include "MyStations.h"
 #include <QAction>
 #include <QEvent>
 #include <QLabel>
