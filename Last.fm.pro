@@ -5,7 +5,7 @@ debug:macx-xcode {
     TARGET = Last.fm
     ICON = app/client/mac/client.icns
 	VERSION	= 2.0.0
-	QMAKE_INFO_PLIST = app/client/mac/Info.plist.in
+	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 
     include( $$SRC_DIR/common/qmake/include.pro )
 
