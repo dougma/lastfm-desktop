@@ -43,6 +43,9 @@ public:
     Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
     {}
 
+	bool operator==( const Album& that ) const { return m_title == that.m_title && m_artist == that.m_artist; }
+	bool operator!=( const Album& that ) const { return m_title != that.m_title || m_artist != that.m_artist; }
+	
     operator QString() const { return m_title; }
     QString title() const { return m_title; }
     Artist artist() const { return m_artist; }
@@ -53,11 +56,36 @@ public:
 	
     /** Album.getInfo WebService */
     WsReply* getInfo() const;
-
-    /** downloads image, use QPixmap::loadFromData FIXME not synchronously! */
-    QByteArray image();
-
     WsReply* share( const class User& recipient, const QString& message = "" );
+	
+	enum ImageSize
+	{
+		Small,
+		Medium,
+		Large /** seemingly 300x300 */
+	};
+};
+
+
+/** fetches the album art for an album, via album.getInfo */
+class AlbumImageFetcher : public QObject
+{
+	Q_OBJECT
+	
+	Album::ImageSize m_size;
+	class QNetworkAccessManager* m_manager;
+	
+public:
+	AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
+	
+signals:
+	/** you can init a QPixmap or QImage with this
+	  * if the image download fails, you'll get a null bytearray */
+	void finished( const QByteArray& );
+	
+private slots:
+	void onGetInfoFinished( WsReply* );
+	void onImageDataDownloaded();
 };
 
 #endif

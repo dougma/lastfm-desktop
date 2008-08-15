@@ -52,6 +52,13 @@ ScrobbleProgressBar::ScrobbleProgressBar()
 }
 
 
+uint
+ScrobbleProgressBar::progressBarWidth() const
+{
+	return width() - ui.time->width() - ui.timeToGo->width() - 14;
+}
+
+
 void
 ScrobbleProgressBar::paintEvent( QPaintEvent* )
 {
@@ -60,23 +67,26 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
     if (ui.time->text().isEmpty())
         return;
     
-	int x1 = ui.time->rect().right() + 7;
-	int w = width() - ui.timeToGo->width() - x1 - 7;
+	uint x1 = ui.time->rect().right() + 7;
+	uint w = progressBarWidth();
 	
     QPainter p( this );
     p.fillRect( x1, 0, w, h-1, QColor( 0x23, 0x23, 0x23 ) );
 	
     p.setPen( QColor( 174, 174, 174 ) );
     p.setBrush( Qt::transparent );
-    for (uint x = x1 + 2; x < m_scrobbleProgressTick + x1 + 2; x+=2)
-        p.drawLine( x, 2, x, h-4 );
+    for (uint x = 0, n = qMin( m_scrobbleProgressTick, progressBarWidth() - 4 ); x < n; x += 2)
+	{
+		uint const i = x+x1+2;
+        p.drawLine( i, 2, i, h-4 );
+	}
 }
 
 
 void
 ScrobbleProgressBar::determineProgressDisplayGranularity( const ScrobblePoint& g )
 {
-    m_progressPaintTimer->setInterval( 1000 * g / width() );
+    m_progressPaintTimer->setInterval( 1000 * g / progressBarWidth() );
 }
 
 
@@ -92,9 +102,13 @@ void
 ScrobbleProgressBar::onPlaybackTick( int s )
 {
 	QTime t( 0, 0 );
-	t = t.addSecs( scrobblePoint() );
-	t = t.addSecs( -s );
-	ui.timeToGo->setText( t.toString( "-mm:ss" ) );
+	if (s > scrobblePoint())
+		ui.timeToGo->setText( ":)" );
+	else {
+		t = t.addSecs( scrobblePoint() );
+		t = t.addSecs( -s );
+		ui.timeToGo->setText( t.toString( "-mm:ss" ) );
+	}
 
     t = QTime( 0, 0 );
     t = t.addSecs( s );
@@ -121,7 +135,7 @@ ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
     {
         double f = exactElapsedScrobbleTime;
         f /= scrobblePoint() * 1000;
-        f *= e->size().width();
+        f *= progressBarWidth();
         m_scrobbleProgressTick = ceil( f );
     }
 

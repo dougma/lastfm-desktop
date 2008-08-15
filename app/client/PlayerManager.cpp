@@ -82,6 +82,12 @@ PlayerManager::onPlaybackPaused( const QString& id )
 void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
+	if (m_state != PlayerState::Paused)
+		// we can't show any new information, so we won't try
+		// NOTE some implementations are buggy and a quick pause/unpause skips
+		// the pause, so we receive this.
+		return;
+	
     if (m_track.m_watch)
         m_track.m_watch->resume();
 
@@ -119,13 +125,21 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
     m_state = newState;
     QVariant v = QVariant::fromValue( t );
 
-    if (newState == Playing && t.isEmpty())
-    {
-        qWarning() << "Empty TrackInfo object presented for Playback notification, this is wrong!";
-        emit event( PlayerEvent::PlaybackEnded );
-        return;
-    }
-
+	if (t.isEmpty())
+	{
+		if (newState == Playing && oldState == Stopped)
+		{
+			qWarning() << "Empty TrackInfo object presented for PlaybackStarted notification, this is wrong!";
+			return;
+		}
+		if (newState == Playing && oldState == Playing)
+		{
+			qWarning() << "Empty TrackInfo object presented for TrackChanged notification, this is wrong!";
+			emit event( PlayerEvent::PlaybackEnded );
+			return;
+		}
+	}
+	
     switch (oldState)
     {
     case Playing:

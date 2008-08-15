@@ -42,12 +42,13 @@ MetaInfoView::~MetaInfoView()
 void
 MetaInfoView::onAppEvent( int e, const QVariant& d )
 {
-    qDebug() << "MetaInfoView::onAppEvent: " << e << " : " << d;
     switch (e)
     {
         case PlayerEvent::TrackChanged:
         case PlayerEvent::PlaybackStarted:
 		{
+			return; //currently hogs the bandwidth! and slows the main thread too :(
+			
             ObservedTrack t = d.value<ObservedTrack>( );
             // FIXME: get the real page.
             load( QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) ) );

@@ -103,16 +103,18 @@ public:
 
     #define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
     #define Q_DEBUG_FUNCTION QDebugBlock::debug
-    
+	#define Q_DEBUG_STAMP (QString(__FILE__).mid( QString(__FILE__).lastIndexOf( '/' ) + 1 ) + ":" + __FUNCTION__ + "():" + QString::number(__LINE__)).toAscii().data()
+
 #else // QT_NO_DEBUG
     #define Q_DEBUG_FUNCTION qDebug
     #define Q_DEBUG_BLOCK Q_DEBUG_FUNCTION()
+	#define Q_DEBUG_STAMP (  QString(__FILE__":") + QString::number(__LINE__)).toAscii().data()
     class QDebugBlock { public: QDebugBlock( QString ) {} };
 #endif
 
 inline QDebug qInfo() { return QDebug( (QtMsgType) 10 ); }
 
-#define Q_DEBUG_STAMP QString(__FILE__ ":") + QString::number(__LINE__)
+
 
 #define qDebug() Q_DEBUG_FUNCTION() << Q_DEBUG_STAMP
 #define qInfo() qInfo() << Q_DEBUG_STAMP

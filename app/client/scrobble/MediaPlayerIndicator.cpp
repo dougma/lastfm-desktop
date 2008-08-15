@@ -25,7 +25,7 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
 	m_nowPlayingIndicator->setPalette( p );
 	m_playerDescription->setPalette( p );
-	m_playerDescription->setText( "<b><font color=#343434>listening to</font> iTunes" );
+	mediaPlayerConnected( "osx" );
 #endif
 }
 
@@ -35,41 +35,34 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 {
     switch( e )
     { 
-        case PlayerEvent::PlayerConnected:
-            mediaPlayerConnected( v.toString() );
-            break;
+		// we are guarenteed that the playerid will not change without a disconnected first
         case PlayerEvent::PlayerDisconnected:
-            mediaPlayerDisconnected( v.toString() );
+#ifndef Q_WS_MAC //FIXME
+			m_playerDescription->setText( "<b><font color=#343434>no player connection" );
+#endif
             break;
+
+		case PlayerEvent::PlaybackPaused:
+			m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
+			break;
+
+		case PlayerEvent::PlayerConnected:
+            mediaPlayerConnected( v.toString() );
+			// fall through
+		case PlayerEvent::PlaybackEnded:
 		case PlayerEvent::PlaybackStarted:
 		case PlayerEvent::PlaybackUnpaused:
-		{
-			const Track& t = v.value<Track>();
-			QString playerId = t.playerId();
-			if( m_playerDescription->objectName() != v.toString() )
-				mediaPlayerConnected( v.toString() );
-
-			if( m_playerDescription->objectName() == "ass" )
-				formatRadioStationString();
-			break;
-		}
-		case PlayerEvent::PlaybackEnded:
-		case PlayerEvent::PlaybackPaused:
+			m_playerDescription->setText( m_playbackCommencedString );
 			break;
 			
 		case PlayerEvent::PlayerChangedContext:
-			m_currentContext = v.toString();
-			formatRadioStationString();
+			m_playerName = tr("Last.fm radio");
+			m_playbackCommencedString = tr( "<b><font color=#343434>%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( v.toString() );
+			m_playerDescription->setText( m_playbackCommencedString ); 
+
         default:
             return;
     }
-}
-
-
-void
-MediaPlayerIndicator::formatRadioStationString()
-{
-	m_playerDescription->setText( m_currentContext + " on Last.fm" ); 
 }
 
 
@@ -81,8 +74,7 @@ MediaPlayerIndicator::mediaPlayerConnected( const QString& id )
     if( id == "foo" )
         playerName = "Foobar";
 	
-	else if( id == "osx" ||
-			 id == "itw" )
+	else if( id == "osx" || id == "itw" )
 		playerName = "iTunes";
 	
 	else if( id == "wmp" )
@@ -93,16 +85,7 @@ MediaPlayerIndicator::mediaPlayerConnected( const QString& id )
 	
 	else if( id == "ass" )
 		playerName = "Last.fm";
-	qDebug() << id;
-	
-	m_playerDescription->setObjectName( id );
-    m_playerDescription->setText( "<font color=#343434>listening to</font> " + playerName );
-}
 
-
-void
-MediaPlayerIndicator::mediaPlayerDisconnected( const QString& id )
-{
-	if( m_playerDescription->text() == id )
-		m_playerDescription->setText( "" );
+	m_playerName = playerName;
+	m_playbackCommencedString = tr("<b><font color=#343434>listening to</font> %1").arg( m_playerName );
 }

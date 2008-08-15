@@ -34,13 +34,12 @@ public:
 private slots:
     void onAppEvent( int e, const QVariant& v );
     void mediaPlayerConnected( const QString& id );
-    void mediaPlayerDisconnected( const QString& id );
 	
 private:
 	QLabel* m_playerDescription;
 	QLabel* m_nowPlayingIndicator;
-	void formatRadioStationString();
-	QString m_currentContext;
+	QString m_playbackCommencedString;
+	QString m_playerName;
 };
 
 #endif // MEDIAPLAYERINDICATOR_H

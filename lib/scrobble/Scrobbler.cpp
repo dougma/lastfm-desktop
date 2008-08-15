@@ -95,7 +95,7 @@ Scrobbler::submit()
 void
 Scrobbler::onError( Scrobbler::Error code )
 {
-    Q_DEBUG_BLOCK << code; //TODO error text
+    qDebug() << code; //TODO error text
 
     switch (code)
     {
@@ -119,7 +119,7 @@ Scrobbler::onError( Scrobbler::Error code )
 }
 
 
-#define SPLIT( x ) QList<QByteArray> const results = x.split( '\n' ); QByteArray const code =  results.value( 0 ); Q_DEBUG_BLOCK << x.trimmed();
+#define SPLIT( x ) QList<QByteArray> const results = x.split( '\n' ); QByteArray const code =  results.value( 0 ); qDebug() << x.trimmed();
 
 
 void

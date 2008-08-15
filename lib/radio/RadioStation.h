@@ -25,6 +25,8 @@
 #include <QMetaType>
 
 
+/** FIXME I think these should be static constructors, enum types look contrived in code that uses them 
+  */
 class RADIO_DLLEXPORT RadioStation
 {
 public:

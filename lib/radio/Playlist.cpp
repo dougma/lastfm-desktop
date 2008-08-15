@@ -48,7 +48,7 @@ Playlist::Playlist( WsReply* reply )
                 t.setTitle( e[ "title" ].text() );
                 t.setArtist( e[ "creator" ].text() );
                 t.setAlbum( e[ "album" ].text() );
-                t.setDuration( e[ "duration" ].text().toInt() );
+                t.setDuration( e[ "duration" ].text().toInt() / 1000 );
             }
             catch (EasyDomElement::Exception& e)
             {

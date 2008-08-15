@@ -353,3 +353,34 @@ MainWindow::sizeHint() const
 {
     return QSize( 300, 300 );
 }
+
+
+static QList<QUrl> lastfmUrls( QList<QUrl> urls )
+{
+	QMutableListIterator<QUrl> i( urls );
+
+	while (i.hasNext())
+		if (i.next().scheme() != "lastfm")
+			i.remove();
+	return urls;
+}
+
+
+void
+MainWindow::dragEnterEvent( QDragEnterEvent* e )
+{
+	if (!e->mimeData()->hasUrls())
+		return;
+	if (lastfmUrls( e->mimeData()->urls() ).count())
+		e->accept();
+}
+
+
+void
+MainWindow::dropEvent( QDropEvent* e )
+{
+	QList<QUrl> urls = lastfmUrls( e->mimeData()->urls() );
+	
+	if (urls.count())
+		The::app().open( urls[0] );
+}

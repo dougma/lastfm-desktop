@@ -68,6 +68,9 @@ private:
 
     enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
 	
+	virtual void dragEnterEvent( QDragEnterEvent* );
+	virtual void dropEvent( QDropEvent* );
+	
 signals:
 	void radioToggled();
 

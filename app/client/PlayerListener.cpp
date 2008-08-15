@@ -36,8 +36,6 @@ PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketF
 void
 PlayerListener::onNewConnection()
 {
-    Q_DEBUG_BLOCK;
-
     while (hasPendingConnections())
     {
         QTcpSocket* socket = nextPendingConnection();

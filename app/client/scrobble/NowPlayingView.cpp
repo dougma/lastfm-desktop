@@ -84,22 +84,43 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
         case PlayerEvent::PlaybackStarted:
         case PlayerEvent::TrackChanged:
         {
-            Track t = v.value<ObservedTrack>();
-            QByteArray const data = t.album().image();
-            if (data.size()) {
-                m_cover.loadFromData( data );
-                m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
-                m_cover = compose( m_cover );
-            }
-            else
-                m_cover = QImage();
+			Track t = v.value<ObservedTrack>();
+			
+			//TODO for scrobbled tracks we should get the artwork out of the track
+			if (m_track.album() != t.album())
+			{
+				m_cover = QImage();
+				update();
+				
+				qDeleteAll( findChildren<AlbumImageFetcher*>() );
+				QObject* o = new AlbumImageFetcher( t.album(), Album::Large );
+				connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
+				o->setParent( this );
+			}
+			
+			m_track = t;
 
-            //TODO album/artist/track may be empty
-            m_label->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
-            update();
+			// TODO handle bad data
+			m_label->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
+			
             break;
         }
     }
+}
+
+
+void
+NowPlayingView::onAlbumImageDownloaded( const QByteArray& data )
+{
+	if (data.size()) 
+	{
+		m_cover.loadFromData( data );
+		m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+		m_cover = compose( m_cover );
+		update();
+	}
+
+	sender()->deleteLater();
 }
 
 

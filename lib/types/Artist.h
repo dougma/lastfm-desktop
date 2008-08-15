@@ -36,6 +36,9 @@ public:
     explicit Artist( const QString& name ) : m_name( name )
     {}
 
+	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
+	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
+	
     operator QString() const { return m_name; }
 
     WsReply* share( const class User& recipient, const QString& message = "" );

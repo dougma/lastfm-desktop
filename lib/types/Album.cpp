@@ -34,41 +34,52 @@ Album::getInfo() const
 }
 
 
-QByteArray
-Album::image()
-{
-    WsReply* reply = getInfo();
-    reply->finish();
-
-    try
-    {
-        QUrl url = reply->lfm()["album"]["image size=large"].text();
-
-        QNetworkAccessManager manager;
-        QNetworkReply* get = manager.get( QNetworkRequest( url ) );
-        QEventLoop loop;
-        QObject::connect( get, SIGNAL(finished()), &loop, SLOT(quit()) );
-        loop.exec();
-        QByteArray bytes = get->readAll();
-        delete get;
-        return bytes;
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-
-    return "";
-}
-
-
 WsReply*
 Album::share( const User& recipient, const QString& message )
 {
     return WsRequestBuilder( "album.share" )
-        .add( "recipient", recipient )
-        .add( "artist", m_artist )
-        .add( "album", m_title )
-        .addIfNotEmpty( "message", message )
-        .post();
+	.add( "recipient", recipient )
+	.add( "artist", m_artist )
+	.add( "album", m_title )
+	.addIfNotEmpty( "message", message )
+	.post();
+}
+
+
+AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
+				 : m_size( size ),
+				   m_manager( 0 )
+{
+    WsReply* reply = album.getInfo();
+	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetInfoFinished( WsReply* )) );
+}
+
+
+void
+AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
+{
+    try
+    {
+        QUrl url = reply->lfm()["album"]["image size=large"].text();
+		
+		m_manager = new QNetworkAccessManager( this );
+		
+        QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
+		connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
+	}
+    catch (EasyDomElement::Exception& e)
+    {
+        qWarning() << e;
+		emit finished( QByteArray() );
+    }
+}
+
+
+void
+AlbumImageFetcher::onImageDataDownloaded()
+{
+	QNetworkReply* reply = (QNetworkReply*)sender();
+	emit finished( reply->readAll() );
+	reply->deleteLater(); //never delete an object in a slot connected to it
+						  //always call deleteLater _after_ emit
 }

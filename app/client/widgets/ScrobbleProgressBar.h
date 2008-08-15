@@ -52,6 +52,8 @@ private:
     ScrobblePoint m_scrobblePoint;
     ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }
 
+	uint progressBarWidth() const;
+	
 private slots:
     void onPlaybackTick( int );
     void onAppEvent( int, const QVariant& );

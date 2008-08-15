@@ -24,8 +24,6 @@
 
 PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandParser::Exception )
 {
-    Q_DEBUG_BLOCK;
-
     line = line.trimmed();
     if (line.isEmpty()) throw Exception( "Command string seems to be empty" );
 

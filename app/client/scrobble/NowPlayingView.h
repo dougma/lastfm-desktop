@@ -22,6 +22,7 @@
 
 #include <QImage>
 #include <QWidget>
+#include "lib/types/Track.h"
 
 
 class NowPlayingView : public QWidget
@@ -33,12 +34,14 @@ public:
 
 private slots:
     void onAppEvent( int, const QVariant& );
+	void onAlbumImageDownloaded( const QByteArray& );
 
 private:
     void paintEvent( QPaintEvent* );
 
     QImage m_cover;
     class QLabel* m_label;
+	Track m_track;
 };
 
 #endif // NOW_PLAYING_VIEW_H

@@ -29,6 +29,9 @@
 /** @brief Essentially our QNetworkReply, hence the name 
   * @author <max@last.fm>
   *
+  * When you get this back from WsRequestBuilder the request has already been
+  * sent. So connect to the finished signal before the event loop resumes!
+  *
   * Create a slot in your derived QApplication object onWsError( Ws::Error )
   * to receive errors that require user interaction. If you don't your user
   * experience will suck :P

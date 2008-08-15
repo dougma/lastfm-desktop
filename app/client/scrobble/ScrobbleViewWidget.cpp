@@ -63,7 +63,5 @@ ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 	
 	//inefficient as sets recursively on child widgets? 
 	//may be better to just paintEvent it
-	setPalette( p );        
-	
-	qDebug() << size();
+	setPalette( p );
 }

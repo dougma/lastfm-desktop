@@ -75,7 +75,7 @@ public:
               state( getState() )
     {}
 
-    void determineTrackrmation();
+    void determineTrackInformation();
         
     QString artist, name, album, path, pid;
     int duration, position;
@@ -123,7 +123,7 @@ ITunesDictionaryHelper::token<int>( CFStringRef t )
 
 
 void
-ITunesDictionaryHelper::determineTrackrmation()
+ITunesDictionaryHelper::determineTrackInformation()
 {
     duration = token<int>( CFSTR("Total Time") ) / 1000;
     artist = token<QString>( CFSTR("Artist") );
@@ -174,7 +174,7 @@ ITunesListener::callback( CFDictionaryRef info )
                 break;
             }
 
-            dict.determineTrackrmation();
+            dict.determineTrackInformation();
 
             // if the track is restarted it has the same pid and a position of 0
             if (m_previousPid == dict.pid && dict.position != 0)
