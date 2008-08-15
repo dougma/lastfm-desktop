@@ -187,7 +187,7 @@ print <<END;
 \$(INSTALLDIR)/Contents/Resources: |\$(INSTALLDIR)/Contents
 	cp -r \$(CONTENTS)/Resources \$(INSTALLDIR)/Contents
 
-bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist \$(INSTALLDIR)/Resources $install_deps \$(INSTALLDIR)/Contents/Resources/qt.conf
+bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist $install_deps \$(INSTALLDIR)/Contents/Resources/qt.conf
 
 bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(DESTDIR)mxcl-is-super \$(CONTENTS)/Resources/qt.conf $bundle_deps
 
