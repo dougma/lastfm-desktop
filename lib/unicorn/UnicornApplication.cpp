@@ -46,6 +46,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 
     StoreDir::mkpaths();
 
+	qDebug() << StoreDir::data() << StoreDir::cache() << StoreDir::logs();
+	
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
     QString bytes = StoreDir::mainLog();

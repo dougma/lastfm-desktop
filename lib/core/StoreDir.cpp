@@ -82,7 +82,7 @@ StoreDir::dataDotDot()
         unsigned char path[512];
         EIT( ::FSRefMakePath( &fsref, path, 512 ) );
 
-        return QDir::home().filePath( QString::fromUtf8( (char*)path ) );
+        return QDir::homePath() + QString::fromUtf8( (char*)path );
     }
     catch (int)
     {

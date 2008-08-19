@@ -19,7 +19,7 @@ while( my $v = shift )
 	}
 }
 
-@QT_MODULES = ("QtCore", "QtGui", "QtWebKit", "QtXml", "QtNetwork", "phonon");
+@QT_MODULES = ("QtCore", "QtGui", "QtWebKit", "QtXml", "QtNetwork", "QtOpenGL", "phonon");
 $plist = "\$(CONTENTS)/Info.plist";
 $root = abs_path( dirname( $0 ) . "/../../../" );
 
@@ -80,15 +80,18 @@ END
 
 
 QtFrameworks();
-imagePlugins();
+plugins( "imageformats" );
+plugins( "phonon_backend" );
 dylibs();
 
 
-sub imagePlugins 
+sub plugins
 {
-	my $from = abs_path( "$QT_FRAMEWORKS_DIR/../plugins/imageformats" );
-	my $to = "\$(CONTENTS)/MacOS/imageformats";
-	my $install = "\$(INSTALLDIR)/Contents/MacOS/imageformats";
+	my $d = shift;
+	
+	my $from = abs_path( "$QT_FRAMEWORKS_DIR/../plugins/$d" );
+	my $to = "\$(CONTENTS)/MacOS/$d";
+	my $install = "\$(INSTALLDIR)/Contents/MacOS/$d";
 
 print <<END;
 $to:
@@ -142,6 +145,7 @@ $to/$module.framework: $QT_FRAMEWORKS_DIR/$module.framework |$to
 
 $install/$module.framework: $to/$module.framework
 	cp -Rf $to/$module.framework $install
+
 END
 		$install_deps .= " $install/$module.framework";
 	}
@@ -175,7 +179,7 @@ print <<END;
 \$(INSTALLDIR)/Contents/MacOS:
 	mkdir -p \$\@
 	
-\$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET): |\$(INSTALLDIR)/Contents/MacOS
+\$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET): \$(TARGET) |\$(INSTALLDIR)/Contents/MacOS
 	cp \$(TARGET) \$(INSTALLDIR)/Contents/MacOS
 
 \$(INSTALLDIR)/Contents/Info.plist: |\$(INSTALLDIR)/Contents

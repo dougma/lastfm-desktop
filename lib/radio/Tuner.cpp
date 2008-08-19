@@ -37,24 +37,47 @@
 Tuner::Tuner( const RadioStation& station )
 {
     WsReply* reply = WsRequestBuilder( "radio.tune" )
-        .add( "station", station )
-        .post();
-    reply->finish();
-	if( reply->error() == Ws::NoError )
-		m_stationName = reply->lfm()["station"]["name"].text();
-	else
-		m_stationName = "";
+			.add( "station", station )
+			.post();
+	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onTuneReturn( WsReply* )) );
 }
 
 
-QList<Track>
-Tuner::fetchNextPlaylist()
+void
+Tuner::onTuneReturn( WsReply* reply )
 {
-	const Playlist& p = Playlist::getPlaylist();
-    QList<Track> tracks = p.tracks();
-	m_stationName = p.title();
-    foreach (Track t, tracks)
-        qDebug() << t;
-    return tracks;
+	if (reply->error() == Ws::NoError)
+	{
+		try 
+		{
+			m_stationName = reply->lfm()["station"]["name"].text();
+			emit stationName( m_stationName );
+		}
+		catch (UnicornException&)
+		{}
+		
+		fetchFiveMoreTracks();
+	}
+	else
+		emit error( 0 );
 }
 
+
+void
+Tuner::fetchFiveMoreTracks()
+{
+    WsReply* reply = WsRequestBuilder( "radio.getPlaylist" ).add( "rtp", "1" ).get();
+	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetPlaylistReturn( WsReply* )) );
+}
+
+
+void
+Tuner::onGetPlaylistReturn( WsReply* reply )
+{
+	Playlist p( reply );
+	
+	foreach (Track t, p.tracks())
+		qDebug() << t << t.duration();
+	
+	emit tracks( p.tracks() );
+}

@@ -60,7 +60,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 {
     try
     {
-        QUrl url = reply->lfm()["album"]["image size=large"].text();
+        QUrl url = reply->lfm()["album"]["image size="+size()].text();
 		
 		m_manager = new QNetworkAccessManager( this );
 		
@@ -70,6 +70,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
     catch (EasyDomElement::Exception& e)
     {
         qWarning() << e;
+		qWarning() << reply->lfm();
 		emit finished( QByteArray() );
     }
 }

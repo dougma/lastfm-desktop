@@ -71,10 +71,11 @@ static QString clientInformationString()
     {
         s += "Excluded dirs:\n";
         foreach( QString dir, settings.excludedDirs() )
-        {
             s += "    " + dir + "\n";
-        }
     }
+	s += "Plugin paths:\n";
+	foreach (QString path, qApp->libraryPaths())
+		s+= "    " + path + "\n";
 
     return s;
 }

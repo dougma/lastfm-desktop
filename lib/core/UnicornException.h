@@ -30,6 +30,10 @@ class UnicornException
 protected:
     UnicornException( QString x ) : s( x )
     {}
+	
+	// objects that may be used polymorphically must have a virtual function!
+	virtual ~UnicornException()
+	{}
 
 public:
     QString what() const { return s; }

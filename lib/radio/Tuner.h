@@ -20,28 +20,40 @@
 #ifndef TUNER_H
 #define TUNER_H
 
-#include "RadioStation.h"
+#include "RadioStation.h" //convenience
 #include "lib/DllExportMacro.h"
 #include "lib/types/Track.h"
 #include <QList>
-#include <QUrl>
 
 
-class RADIO_DLLEXPORT Tuner
+class RADIO_DLLEXPORT Tuner : public QObject
 {
+	Q_OBJECT
+	
 public:
-    Tuner()
-    {}
-
-        /** If you aren't a Unicorn::Application, you won't get Radio FIXME lame */
+	/** you need to have assigned Ws::* for this to work, creating the tuner
+	  * automatically fetches the first 5 tracks for the station */
     explicit Tuner( const RadioStation& );
 
-    /** returns next 5 tracks */
-    QList<Track> fetchNextPlaylist();
-	const QString& stationName() const{ return m_stationName; }
+	QString stationName() const { return m_stationName; }
+	
+public slots:
+    /** will emit 5 tracks from tracks(), they have to played within an hour
+	  * or the streamer will refuse to stream them */
+    void fetchFiveMoreTracks();
+
+signals:
+	void stationName( const QString& );
+	void tracks( const QList<Track>& );
+	
+	//TODO flesh out enum
+	void error( int );
+
+private slots:
+	void onTuneReturn( WsReply* );
+	void onGetPlaylistReturn( WsReply* );
 
 private:
-    QList<Track> getPlaylist();
 	QString m_stationName;
 };
 

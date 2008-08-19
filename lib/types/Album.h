@@ -86,6 +86,17 @@ signals:
 private slots:
 	void onGetInfoFinished( WsReply* );
 	void onImageDataDownloaded();
+	
+private:
+	QString size() const
+	{
+		switch (m_size)
+		{
+			case Album::Small:return"small";
+			case Album::Medium:return"medium";
+			case Album::Large:return"large";
+		}
+	}
 };
 
 #endif

@@ -4,46 +4,37 @@
 
 
 RadioController::RadioController()
+			   : m_tuner( 0 )
 {
     m_audio = new AudioPlaybackEngine( this );
     
-    connect( m_audio, SIGNAL(trackStarted(const Track&)), SIGNAL(trackStarted(const Track&)) );
+    connect( m_audio, SIGNAL(trackStarted( Track )), SIGNAL(trackStarted( Track )) );
     connect( m_audio, SIGNAL(playbackEnded()), SIGNAL(playbackEnded()) );
     connect( m_audio, SIGNAL(buffering()), SIGNAL(buffering()) );
-    connect( m_audio, SIGNAL(finishedBuffering()), SIGNAL(finishedBuffering()) );
-    
-    connect( m_audio, SIGNAL(queueStarved()), SLOT(onQueueStarved()) );
+    connect( m_audio, SIGNAL(finishedBuffering()), SIGNAL(playbackResumed()) );
 }
 
 
 void
-RadioController::play( const RadioStation& s )
+RadioController::play( const RadioStation& station )
 {
-    Tuner t( s );
-	emit tuningStateChanged( true );
-    QList<Track> tracks = t.fetchNextPlaylist();
 	m_audio->clearQueue();
-    m_audio->queue( tracks );
-	m_audio->skip();
-	emit tuningStateChanged( false );
-	m_currentStation = t.stationName();
-	emit newStationTuned( m_currentStation );
-    m_audio->play();
+	delete m_tuner;
+	
+	emit tuningIn( station );
+    m_tuner = new Tuner( station );
+	connect( m_tuner, SIGNAL(stationName( QString )), SIGNAL(tuned( QString )) );
+	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
+
+    connect( m_audio, SIGNAL(queueStarved()), m_tuner, SLOT(fetchFiveMoreTracks()) );
 }
 
 
 void
-RadioController::onQueueStarved()
+RadioController::enqueue( const QList<Track>& tracks )
 {
-    Tuner t;
-    QList<Track> tracks = t.fetchNextPlaylist();
-	if( t.stationName() != m_currentStation )
-	{
-		m_currentStation = t.stationName();
-		emit( newStationTuned( m_currentStation ));
-	}
-			 
     m_audio->queue( tracks );
+    m_audio->play();
 }
 
 

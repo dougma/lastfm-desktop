@@ -1,10 +1,14 @@
 #ifndef RADIOCONTROLLER_H
 #define RADIOCONTROLLER_H
 
+#include <QList>
 #include <QObject>
-#include "RadioStation.h"
+#include "lib/types/Track.h"
 #include "lib/DllExportMacro.h"
 class AudioPlaybackEngine;
+class RadioStation;
+class Tuner;
+class Track;
 
 
 class RADIO_DLLEXPORT RadioController : public QObject
@@ -13,32 +17,32 @@ class RADIO_DLLEXPORT RadioController : public QObject
 
 public:
     RadioController();
+	//TODO remove
 	AudioPlaybackEngine* audioPlaybackEngine() const { return m_audio; }
     
 public slots:
-    void play( const RadioStation& s = RadioStation( "", RadioStation::SimilarArtist ) );
+    void play( const RadioStation& );
     void stop();
     void skip();
 
 private slots:
-    void onQueueStarved();
+    void enqueue( const QList<Track>& );
 
 signals:
-    void trackStarted( const class Track& );
-    /** queue more tracks or... */
-    void queueStarved();
-    /** ...playback ends */
+	void tuningIn( const RadioStation& );
+	void tuned( const QString& title );
+	void preparing( const Track& );
+	/** buffering and percentage, you can get this mid-track too, if so, see playbackResumed() */
+	void buffering( int );
+    void trackStarted( const Track& );
+	/** stop() was called or a serious radio error occurred */
     void playbackEnded();
-    /** buffering has occured mid-track */
-    void buffering();
-    /** when the player has finished buffering mid-track */
-    void finishedBuffering();
-
-	void tuningStateChanged( bool );
 	
-	void newStationTuned( const QString& );
+    /** if the buffers empty mid track, you'll get buffering */
+    void playbackResumed();
 
 private:
+	Tuner* m_tuner;
     AudioPlaybackEngine* m_audio;
 	QString m_currentStation;
 };

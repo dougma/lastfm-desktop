@@ -83,4 +83,16 @@ public:
     QByteArray postData() const { return m_data; }
 };
 
+
+inline QDebug operator<<( QDebug d, ScrobblerHttp* http )
+{
+    d << "  Http response: " << http->lastResponse().statusCode() << "\n"
+  	  << "  QHttp error code: " << http->error() << "\n"
+	  << "  QHttp error text: " << http->errorString() << "\n"
+	  << "  Request: " << http->host() + http->currentRequest().path() << "\n"
+	  << "  Bytes returned: " << http->bytesAvailable();
+	
+    return d;
+}
+
 #endif

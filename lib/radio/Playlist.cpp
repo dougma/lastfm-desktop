@@ -19,56 +19,39 @@
 
 #include "Playlist.h"
 #include "lib/ws/WsReply.h"
-#include "lib/ws/WsRequestBuilder.h"
 #include <QUrl>
 
-Playlist::Playlist( WsReply* reply )
-{
-	
-	
-    try
-    {
-		m_title = reply->lfm()["playlist"]["title"].text();
-		
-		//The title is url encoded, has + instead of space characters 
-		//and has a + at the begining. So it needs cleaning up:
-		m_title.replace( "+", " " );
-		m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-		m_title = m_title.trimmed();
-        
-		foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
-        {
-            MutableTrack t;
-            try
-            {
-                //TODO we don't want to throw an exception for any of these really,
-                //TODO only if we couldn't get any, but even then so what
-                t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-                t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-                t.setTitle( e[ "title" ].text() );
-                t.setArtist( e[ "creator" ].text() );
-                t.setAlbum( e[ "album" ].text() );
-                t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-            }
-            catch (EasyDomElement::Exception& e)
-            {
-            	
-            }
-            m_tracks += t; // outside since location is enough basically
-        }
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-		
-    }
-}
 
-
-/* static */ Playlist 
-Playlist::getPlaylist()
+Playlist::Playlist( WsReply* reply ) throw( UnicornException )
 {
-    WsReply* reply = WsRequestBuilder( "radio.getPlaylist" ).get();
-    reply->finish();
+	m_title = reply->lfm()["playlist"]["title"].text();
+		
+	//FIXME should we use UnicornUtils::urlDecode()?
+	//The title is url encoded, has + instead of space characters 
+	//and has a + at the begining. So it needs cleaning up:
+	m_title.replace( '+', ' ' );
+	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
+	m_title = m_title.trimmed();
 	
-	return Playlist( reply );	
+	foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
+	{
+		MutableTrack t;
+		try
+		{
+			//TODO we don't want to throw an exception for any of these really,
+			//TODO only if we couldn't get any, but even then so what
+			t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
+			t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
+			t.setTitle( e[ "title" ].text() );
+			t.setArtist( e[ "creator" ].text() );
+			t.setAlbum( e[ "album" ].text() );
+			t.setDuration( e[ "duration" ].text().toInt() / 1000 );
+			t.setSource( Track::LastFmRadio );
+		}
+		catch (EasyDomElement::Exception& e)
+		{
+			
+		}
+		m_tracks += t; // outside since location is enough basically
+	}
 }

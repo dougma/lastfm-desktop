@@ -64,10 +64,10 @@ App::App( int argc, char** argv )
     m_scrobbler = new Scrobbler( init );
     m_radio = new RadioController;
 
-    connect( m_radio, SIGNAL(trackStarted( const Track& )), SLOT(onRadioTrackStarted( const Track& )) );
+    connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
-    connect( m_radio, SIGNAL(buffering()), SLOT(onRadioBuffering()) );
-	connect( m_radio, SIGNAL(newStationTuned( const QString& )), SLOT(onRadioStationTuned( const QString& )) );
+    connect( m_radio, SIGNAL(buffering( int )), SLOT(onRadioBuffering()) );
+	connect( m_radio, SIGNAL(tuned( QString )), SLOT(onRadioStationTuned( QString )) );
 
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -115,9 +115,32 @@ App::setMainWindow( MainWindow* window )
 }
 
 
+namespace PlayerEvent
+{
+	static inline void debug( int e, const QVariant& d )
+	{
+		#define _( x ) x: qDebug() << #x
+		switch (e)
+		{
+			case _(PlayerEvent::PlayerConnected) << d.toString(); break;
+			case _(PlayerEvent::PlaybackStarted) << d.value<ObservedTrack>(); break;
+			case _(PlayerEvent::PlaybackPaused); break;
+			case _(PlayerEvent::PlaybackUnpaused); break;
+			case _(PlayerEvent::PlaybackStalled); break;
+			case _(PlayerEvent::PlaybackUnstalled); break;
+			case _(PlayerEvent::PlaybackEnded); break;
+			case _(PlayerEvent::PlayerDisconnected) << d.toString(); break;
+		}
+		#undef _
+	}
+}
+
+
 void
 App::onAppEvent( int e, const QVariant& d )
 {
+	PlayerEvent::debug( e, d );
+	
     switch (e)
     {
         case PlayerEvent::TrackChanged:

@@ -19,6 +19,7 @@
 
 #include "lib/DllExportMacro.h"
 #include "UnicornException.h"
+#include <QDebug>
 #include <QDomElement>
 #include <QList>
 #include <QStringList>
@@ -35,6 +36,8 @@ class CORE_DLLEXPORT EasyDomElement
 {
     QDomElement e;
 
+	friend QDebug operator<<( QDebug, const EasyDomElement& );
+	
 public:
     class Exception : public UnicornException
     {
@@ -66,3 +69,11 @@ public:
     QString text() const { return e.text(); }
     QList<EasyDomElement> children( const QString& named ) const;
 };
+
+
+inline QDebug operator<<( QDebug debug, const EasyDomElement& e )
+{
+	QDomDocument dom;
+	dom.appendChild( e.e );
+	return debug << dom.toString();
+}

@@ -119,7 +119,7 @@ Scrobbler::onError( Scrobbler::Error code )
 }
 
 
-#define SPLIT( x ) QList<QByteArray> const results = x.split( '\n' ); QByteArray const code =  results.value( 0 ); qDebug() << x.trimmed();
+#define SPLIT( x ) QList<QByteArray> const results = x.split( '\n' ); QByteArray const code =  results.value( 0 ); qDebug() << "HTTP response:" << x.trimmed();
 
 
 void

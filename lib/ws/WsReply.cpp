@@ -33,6 +33,7 @@ WsReply::WsReply( QNetworkReply* r )
 }
 
 
+#if 0
 void
 WsReply::finish()
 {
@@ -42,6 +43,7 @@ WsReply::finish()
     eventLoop.exec();
 #endif
 }
+#endif
 
 
 void
@@ -127,6 +129,9 @@ WsReply::onFinished()
                 // QMetaObject in App::App(). Neat :)
                 QMetaObject::invokeMethod( qApp, "onWsError", Q_ARG( Ws::Error, m_error ) );
                 break;
+			
+			default: //please, I want a pragma to remove this warning
+				break;
         }
     }
 

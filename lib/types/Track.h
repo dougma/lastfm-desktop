@@ -63,9 +63,11 @@ public:
         // you will cause broken settings and b0rked scrobbler cache submissions
 
         Unknown = -1,
-        Radio,
+        LastFmRadio,
         Player,
-        MediaDevice
+        MediaDevice,
+		NonPersonalisedBroadcast, // eg Shoutcast, BBC Radio 1, etc.
+		PersonalisedRecommendation, // eg Pandora, but not Last.fm
     };
 
     enum Rating

@@ -139,9 +139,11 @@ Track::sourceString() const
 {
     switch (d->source)
     {
-        case Radio: return "L" + d->extras["trackauth"];
+        case LastFmRadio: return "L" + d->extras["trackauth"];
         case Player: return "P" /*+ playerId()*/;
         case MediaDevice: return "P" /*+ mediaDeviceId()*/;
+		case NonPersonalisedBroadcast: return "R";
+		case PersonalisedRecommendation: return "E";
         default: return "U";
     }
 }

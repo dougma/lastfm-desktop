@@ -57,7 +57,6 @@ private:
 private slots:
     void onPlaybackTick( int );
     void onAppEvent( int, const QVariant& );
-    void resetUI();
 
 private slots:
     void onProgressDisplayTick();

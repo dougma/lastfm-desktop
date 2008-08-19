@@ -62,7 +62,7 @@ public:
       * It crashes like crazy!
       * As all sorts of things break when you start running your own event loop
       * sadly, especially don't chain WsReplys since they do deleteLater() */
-    void finish();
+//    void finish();
 
     QByteArray data() const { return m_data; }
 
