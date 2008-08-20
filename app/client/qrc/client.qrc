@@ -1,5 +1,8 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
+<RCC>
+  <qresource>
     <file>station.png</file>
-</qresource>
+    <file>play.png</file>
+    <file>skip.png</file>
+    <file>stop.png</file>
+  </qresource>
 </RCC>

@@ -3,13 +3,14 @@
 #include <phonon/volumeslider.h>
 
 RadioMiniControls::RadioMiniControls(QWidget *parent)
-    : QWidget(parent)
+    : QFrame(parent)
 {
     ui.setupUi(this);
 
     ui.volumeSlider = new Phonon::VolumeSlider( this );
 	ui.radio->setAutoExclusive( true );
 	ui.scrobble->setAutoExclusive( true );
+	
 	
     layout()->addWidget( ui.volumeSlider );
 	connect( ui.scrobble, SIGNAL( clicked()), SIGNAL( radioToggled()) );

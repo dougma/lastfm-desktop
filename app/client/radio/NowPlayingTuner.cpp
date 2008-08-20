@@ -70,6 +70,10 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 			connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
 		}
 		break;
+
+		case PlayerEvent::PlaybackEnded:
+			ui.tagsTab->clear();
+		break;
 	}
 }
 
