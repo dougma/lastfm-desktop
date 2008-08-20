@@ -43,52 +43,12 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <widget class="QPushButton" name="scrobble" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>120</width>
-         <height>19</height>
-        </size>
-       </property>
+      <widget class="QToolButton" name="toggle" >
        <property name="focusPolicy" >
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="text" >
-        <string>Now Playing</string>
-       </property>
-       <property name="checkable" >
-        <bool>true</bool>
-       </property>
-       <property name="checked" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="radio" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>60</width>
-         <height>19</height>
-        </size>
-       </property>
-       <property name="focusPolicy" >
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="text" >
-        <string>Tuning</string>
+        <string>Tuner</string>
        </property>
        <property name="checkable" >
         <bool>true</bool>
@@ -103,7 +63,7 @@
       <number>0</number>
      </property>
      <property name="sizeConstraint" >
-      <enum>QLayout::SetMaximumSize</enum>
+      <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>
       <widget class="ImageButton" name="play" >

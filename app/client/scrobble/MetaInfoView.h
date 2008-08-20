@@ -17,20 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QWebView>
+#include <QWidget>
 
 
-class MetaInfoView : public QWebView
+class MetaInfoView : public QWidget
 {
     Q_OBJECT
-
+	
+	struct
+	{
+		class QTabBar* tabs;
+		class QWebView* web;
+	}
+	ui;
+	
 public:
     MetaInfoView();
 
 public slots:
-    void onAppEvent( int, const QVariant& );
+    void onAppEvent( int, const class QVariant& );
 
 private slots:
-    void onLinkClicked( const QUrl& );      
-	void onAuthenticationRequired( QNetworkReply*, QAuthenticator* );
+    void onLinkClicked( const class QUrl& );
+	void onAuthenticationRequired( class QNetworkReply*, class QAuthenticator* );
+
+private:
+	virtual void resizeEvent( QResizeEvent* );
 };

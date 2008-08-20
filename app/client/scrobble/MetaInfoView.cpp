@@ -24,14 +24,30 @@
 #include <QAuthenticator>
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QWebView>
 
 
 MetaInfoView::MetaInfoView()
 {   
-    page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
-    connect( page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
+	QVBoxLayout* v = new QVBoxLayout( this );
+	v->addWidget( ui.web = new QWebView );
+	v->setSpacing( 0 );
+	v->setMargin( 0 );
+	
+	ui.tabs = new QTabBar( ui.web );
+    ui.tabs->addTab( tr( "Artist" ) );
+	ui.tabs->addTab( tr( "Album" ) );
+	ui.tabs->addTab( tr( "Track" ) );
+	ui.tabs->setDrawBase( false );
+	
+	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
+    connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-	connect( page()->networkAccessManager(), SIGNAL(authenticationRequired ( QNetworkReply*, QAuthenticator* )), SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
+	connect( ui.web->page()->networkAccessManager(), 
+			 SIGNAL(authenticationRequired ( QNetworkReply*, QAuthenticator* )), 
+			 SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
+	
+	setBackgroundRole( QPalette::Base );
 }
 
 
@@ -48,18 +64,22 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
-        case PlayerEvent::TrackChanged:
+
         case PlayerEvent::PlaybackStarted:
+			ui.tabs->show();
+			// fall through
+		case PlayerEvent::TrackChanged:
 		{
-			setHtml( "<html/>" ); //clear the web view
+			ui.web->setHtml( "<html/>" ); //clear the web view
 			
 			QUrl url = d.value<ObservedTrack>().artist().www();
-            load( CoreUrl( url ).mobilised() );
+            ui.web->load( CoreUrl( url ).mobilised() );
             break;
 		}
 		case PlayerEvent::PlaybackEnded:
 		{
-			setHtml( "<html/>" ); //clear the web view
+			ui.tabs->hide();
+			ui.web->setHtml( "<html/>" ); //clear the web view
 			break;
 		}
     }
@@ -70,4 +90,11 @@ void
 MetaInfoView::onLinkClicked( const QUrl& url )
 {
     QDesktopServices::openUrl( url );
+}
+
+
+void
+MetaInfoView::resizeEvent( QResizeEvent* )
+{
+	ui.tabs->move( ui.web->width() - 24 - ui.tabs->sizeHint().width(), 4 );
 }

@@ -54,9 +54,8 @@ public:
 	
 private:
 	QString m_station;
-	QString m_title;
-	
 	Type m_type;
+	QString m_title;
 };
 
 #endif

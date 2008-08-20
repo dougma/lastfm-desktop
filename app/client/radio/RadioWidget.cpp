@@ -32,13 +32,10 @@
 #include <QSplitter>
 #include <QTabWidget>
 
-RadioWidget::RadioWidget( QWidget* parent )
-           : QWidget( parent )
+
+RadioWidget::RadioWidget()
 {
 	setLayout( new QHBoxLayout );
-	
-    qRegisterMetaType<Track>( "Track" );
-
 	
 	QTabWidget* tabWidget = new QTabWidget;
 	NowPlayingTuner* nowPlaying = new NowPlayingTuner;

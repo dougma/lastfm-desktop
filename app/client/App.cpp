@@ -97,6 +97,7 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
+	connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
 
 	// for now not on mac, FIXME eventually, in tray as option, default off
 #ifndef Q_WS_MAC

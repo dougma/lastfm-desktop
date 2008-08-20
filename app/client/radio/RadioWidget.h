@@ -21,12 +21,13 @@
 #include "lib/radio/RadioStation.h"
 #include "lib/radio/Tuner.h"
 
+
 class RadioWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    RadioWidget( QWidget* parent = 0 );
+    RadioWidget();
 
 	void setRadioController( class RadioController* r );
 
@@ -39,12 +40,9 @@ public:
 signals:
     void newStationStarted();
 
-
 private slots:
     void onTune( const RadioStation& );
-
 	
 private:
     class RadioController* m_radioController;
-
 };

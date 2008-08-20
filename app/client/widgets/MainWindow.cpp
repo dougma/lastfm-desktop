@@ -31,11 +31,13 @@
 #include "radio/RadioWidget.h"
 #include "version.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
+#include "lib/radio/AudioPlaybackEngine.h"
 #include <QCloseEvent>
 #include <QPointer>
 #include <QShortcut>
 #include <QStackedWidget>
 #include <QSplitter>
+#include <phonon/volumeslider.h>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -64,7 +66,7 @@ MainWindow::MainWindow()
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-    connect( ui.tunein, SIGNAL(triggered()), SLOT(toggleRadio()) );
+    connect( ui.tunein, SIGNAL(triggered()), SLOT(showTuner()) );
 }
 
 
@@ -107,29 +109,26 @@ void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
-    m_layout = new QStackedWidget();
     
-    QWidget* mainWidget = new QWidget;
-    QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
+	QWidget* mainWidget = new QWidget;
+	QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
     mainLayout->setSpacing( 0 );
-
     mainLayout->setMargin( 0 );
-        
-    mainLayout->addWidget( m_layout );
-    m_radioMiniControls = new RadioMiniControls( this );
-	connect( m_radioMiniControls, SIGNAL( radioToggled()), SLOT( toggleRadio()) );
-	connect( this, SIGNAL( radioToggled()), m_radioMiniControls, SLOT( onRadioToggled()) );
-	
-    mainLayout->addWidget( m_radioMiniControls );
-    
-    mainWidget->setLayout( mainLayout );
-    setCentralWidget( mainWidget );
+    mainLayout->addWidget( ui.stack = new QStackedWidget );
+	mainLayout->addWidget( ui.controls = new RadioMiniControls );
 
-    setupScrobbleView();
+    connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
+	connect( ui.controls->ui.toggle, SIGNAL(toggled( bool )), SLOT(setTunerToggled( bool )) );
 	
-	m_radioWidget = new RadioWidget( this );
-	m_layout->insertWidget( RadioView, m_radioWidget );
-	connect( m_radioWidget, SIGNAL( newStationStarted()), SLOT( showScrobbleView()) );
+	setCentralWidget( mainWidget );
+
+    setupScrobbleView(); //TODO its own widget too
+	
+	ui.tuner = new RadioWidget;
+	connect( ui.tuner, SIGNAL(newStationStarted()), SLOT(showNowPlaying()) );
+	
+	ui.stack->addWidget( ui.np );
+	ui.stack->addWidget( ui.tuner );
 }
 
 
@@ -153,8 +152,8 @@ MainWindow::setupScrobbleView()
 	s->setSizes( QList<int>() << 80 << 80 );
 	s->setStretchFactor( 0, 0 );
 	s->setStretchFactor( 1, 1 );
-    m_layout->addWidget( s );
 
+	ui.np = s;
 }
 
 
@@ -319,23 +318,12 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
 
 
 void
-MainWindow::toggleRadio( int index )
+MainWindow::setTunerToggled( bool show_tuner )
 {
-    if( index > -1 && index < MaxViewCount )
-    {
-		if( m_layout->currentIndex() == index )
-			return;
-		
-        m_layout->setCurrentIndex( index );
-		emit radioToggled();
-        return;
-    }
-
-    if( m_layout->currentIndex() == ScrobbleView )
-        m_layout->setCurrentIndex( RadioView );
-    else
-        m_layout->setCurrentIndex( ScrobbleView );
+	ui.stack->setCurrentIndex( show_tuner ? 1 : 0 );
 	
+	if (sender() != ui.controls->ui.toggle)
+		ui.controls->ui.toggle->setChecked( show_tuner );
 }
 
 
@@ -343,8 +331,10 @@ void
 MainWindow::setRadio( RadioController* r )
 {
     Q_ASSERT( r );
-    m_radioMiniControls->setAudioPlaybackEngine( r->audioPlaybackEngine() );
-	m_radioWidget->setRadioController( r );	
+
+	//FIXME encapsulation!!!!!
+    ui.controls->ui.volume->setAudioOutput( r->audioPlaybackEngine()->audioOutput() );
+	ui.tuner->setRadioController( r );
 }
 
 

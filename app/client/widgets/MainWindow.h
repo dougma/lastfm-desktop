@@ -22,6 +22,7 @@
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include "scrobble/ScrobbleViewWidget.h"
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -33,7 +34,15 @@ public:
     
     QSize sizeHint() const;
 	
-	Ui::MainWindow ui;
+	struct Ui : ::Ui::MainWindow
+	{
+		QStackedWidget* stack;
+	    class RadioMiniControls* controls;
+		class RadioWidget* tuner;
+		QWidget* np;
+	};
+	
+	Ui ui;
 
 protected:
 #ifdef WIN32
@@ -47,8 +56,10 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showMetaInfoView();
-    void showScrobbleView() { toggleRadio( ScrobbleView ); }
-    void toggleRadio( int index = -1 );
+
+	void setTunerToggled( bool );
+	void showTuner() { setTunerToggled( true ); }
+	void showNowPlaying() { setTunerToggled( false ); }
 
 signals:
 	void loved();
@@ -61,18 +72,7 @@ private slots:
 private:
     void setupUi();
     void setupScrobbleView();
-
-    class QStackedWidget* m_layout;
-	class RadioWidget* m_radioWidget;
-    class RadioMiniControls* m_radioMiniControls;
-
-    enum ViewIndex{ ScrobbleView = 0, RadioView, MaxViewCount };
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
-	
-signals:
-	void radioToggled();
-
 };
-

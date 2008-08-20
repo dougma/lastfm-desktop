@@ -1,46 +1,28 @@
+/***************************************************************************
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ ***************************************************************************/
+
 #include "RadioMiniControls.h"
-#include "lib/radio/AudioPlaybackEngine.h"
 #include <phonon/volumeslider.h>
 
-RadioMiniControls::RadioMiniControls(QWidget *parent)
-    : QFrame(parent)
+
+RadioMiniControls::RadioMiniControls()
 {
     ui.setupUi(this);
-
-    ui.volumeSlider = new Phonon::VolumeSlider( this );
-	ui.radio->setAutoExclusive( true );
-	ui.scrobble->setAutoExclusive( true );
-	
-	
-    layout()->addWidget( ui.volumeSlider );
-	connect( ui.scrobble, SIGNAL( clicked()), SIGNAL( radioToggled()) );
-	connect( ui.radio, SIGNAL( clicked()), SIGNAL( radioToggled()) );
-}
-
-
-RadioMiniControls::~RadioMiniControls()
-{
-
-}
-
-
-void
-RadioMiniControls::setAudioPlaybackEngine( AudioPlaybackEngine* a )
-{
-    ui.volumeSlider->setAudioOutput( a->audioOutput() );
-    connect( ui.play, SIGNAL( clicked() ), SLOT( play() ));
-    connect( ui.skip, SIGNAL( clicked() ), a, SLOT( skip() ) );
-}
-
-
-void
-RadioMiniControls::play()
-{
-}
-
-
-void
-RadioMiniControls::onRadioToggled()
-{
-	ui.scrobble->toggle();
+    layout()->addWidget( ui.volume = new Phonon::VolumeSlider );
 }
