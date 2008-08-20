@@ -151,6 +151,13 @@
       <bool>false</bool>
      </property>
      <widget class="QListWidget" name="tagsTab" >
+      <property name="font" >
+       <font>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="frameShape" >
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -160,14 +167,48 @@
       <property name="lineWidth" >
        <number>0</number>
       </property>
-      <property name="sortingEnabled" >
+      <property name="midLineWidth" >
+       <number>0</number>
+      </property>
+      <property name="editTriggers" >
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="alternatingRowColors" >
        <bool>true</bool>
+      </property>
+      <property name="iconSize" >
+       <size>
+        <width>17</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="movement" >
+       <enum>QListView::Static</enum>
+      </property>
+      <property name="layoutMode" >
+       <enum>QListView::SinglePass</enum>
+      </property>
+      <property name="spacing" >
+       <number>0</number>
+      </property>
+      <property name="selectionRectVisible" >
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled" >
+       <bool>false</bool>
       </property>
       <attribute name="title" >
        <string>Tags</string>
       </attribute>
      </widget>
      <widget class="QListWidget" name="similarArtistsTab" >
+      <property name="font" >
+       <font>
+        <pointsize>15</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="frameShape" >
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -176,6 +217,12 @@
       </property>
       <property name="lineWidth" >
        <number>0</number>
+      </property>
+      <property name="spacing" >
+       <number>10</number>
+      </property>
+      <property name="selectionRectVisible" >
+       <bool>true</bool>
       </property>
       <attribute name="title" >
        <string>Similar Artists</string>

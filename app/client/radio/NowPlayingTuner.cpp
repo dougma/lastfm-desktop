@@ -19,6 +19,11 @@
 
 #include "NowPlayingTuner.h"
 #include "lib/radio/RadioStation.h"
+#include "StationDelegate.h"
+#include "App.h"
+#include "ObservedTrack.h"
+#include "PlayerEvent.h"
+#include "lib/types/Track.h"
 #include <QVBoxLayout>
 #include <QToolBar>
 #include <QLineEdit>
@@ -27,10 +32,12 @@
 NowPlayingTuner::NowPlayingTuner()
 {
 	ui.setupUi( this );
-	ui.tagsTab->addItem( new QListWidgetItem( QIcon( ":/station.png" ), "Test" ));
+	
+	ui.tagsTab->setItemDelegate( new StationDelegate( this ) );
 
 	QLineEdit* tuning_dial = new QLineEdit;
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
+	connect( &The::app(), SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
 
 	QWidget* tempPage = new QWidget();
 	QVBoxLayout* l = new QVBoxLayout;
@@ -47,4 +54,28 @@ NowPlayingTuner::onTunerReturnPressed()
 {
 	QString url = static_cast<QLineEdit*>(sender())->text();
 	emit tune( RadioStation( url, RadioStation::SimilarArtist ));
+}
+
+
+void
+NowPlayingTuner::onAppEvent( int e, const QVariant& d )
+{
+	switch( e )
+	{
+		case PlayerEvent::TrackChanged:
+		{
+			Track t = d.value<ObservedTrack>();
+			ui.tagsTab->clear();
+			WsReply* r = t.getTopTags();
+			connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
+		}
+		break;
+	}
+}
+
+
+void
+NowPlayingTuner::onFetchedTopTags(WsReply* r)
+{
+	ui.tagsTab->addItems( Track::getTopTags( r ));
 }

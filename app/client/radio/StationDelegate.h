@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -16,30 +16,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#include <QItemDelegate>
 
-#ifndef NOW_PLAYING_TUNER_H
-#define NOW_PLAYING_TUNER_H
-
-#include "ui_NowPlayingTuner.h"
-#include <QWidget>
-
-class NowPlayingTuner :public QWidget
+class StationDelegate : public QItemDelegate
 {
-	Q_OBJECT
+Q_OBJECT
 	
 public:
-	NowPlayingTuner();
+	StationDelegate( QObject* parent = 0 ):QItemDelegate( parent ){};
 	
-private:
-	Ui::NowPlayingTuner ui;
+	void paint( QPainter* painter, 
+				const QStyleOptionViewItem& option, 
+			    const QModelIndex& index ) const;
 	
-private slots:
-	void onTunerReturnPressed();
-	void onAppEvent( int, const QVariant& );
-	void onFetchedTopTags( class WsReply* );
-	
-signals:
-	void tune( const class RadioStation& );
+	QSize sizeHint( const QStyleOptionViewItem& option, 
+				    const QModelIndex& index ) const;
 };
-
-#endif //NOW_PLAYING_TUNER_H

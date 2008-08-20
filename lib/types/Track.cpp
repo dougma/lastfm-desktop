@@ -289,6 +289,23 @@ Track::getTopTags()
 }
 
 
+QStringList /* static */
+Track::getTopTags( WsReply* r )
+{
+	QStringList tags;
+	try
+	{
+		foreach (EasyDomElement e, r->lfm().children( "tag" ))
+			tags += e["name"].text();
+	}
+	catch( EasyDomElement::Exception& e)
+	{
+		qWarning() << e;
+	}
+	return tags;
+}
+
+
 WsReply*
 Track::getTags()
 {

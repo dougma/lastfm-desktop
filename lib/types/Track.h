@@ -186,6 +186,7 @@ public:
 	WsReply* ban();
 	WsReply* getTags(); // for the logged in user
 	WsReply* getTopTags();
+	static QStringList getTopTags( WsReply* );
 
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise

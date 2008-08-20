@@ -68,7 +68,7 @@ public:
 
 
 /** fetches the album art for an album, via album.getInfo */
-class AlbumImageFetcher : public QObject
+class TYPES_DLLEXPORT AlbumImageFetcher : public QObject
 {
 	Q_OBJECT
 	
