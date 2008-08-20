@@ -59,7 +59,7 @@ public:
     
     bool isEmpty() const { return m_code.isEmpty(); }
     QString code() const { return m_code; }
-
+	
 private:    
     void compile();
     void logError();

@@ -19,6 +19,7 @@
 
 #include "Artist.h"
 #include "User.h"
+#include "lib/core/CoreUrl.h"
 #include "lib/ws/WsRequestBuilder.h"
 
 
@@ -31,4 +32,11 @@ Artist::share( const User& user, const QString& message )
         .addIfNotEmpty( "message", message )
         //TODO this must be post! you're testing here
         .get();
+}
+
+
+QUrl
+Artist::url() const
+{
+	return "http://www.last.fm/music/" + CoreUrl::encode( m_name );
 }

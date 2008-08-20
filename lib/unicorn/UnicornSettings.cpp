@@ -17,22 +17,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/CoreLocale.h"
 #include "UnicornSettings.h"
 #include <QLocale>
-
-
-QString
-Unicorn::Settings::language() const
-{
-    QString const code = Unicorn::QSettings().value( "AppLanguage" ).toString();
-    if (code.size())
-        return code;
-
-    // If none found, use system locale
-#ifdef Q_WS_MAC
-    return Unicorn::qtLanguageToLfmLangCode( Unicorn::osxLanguageCode() );
-#else
-    return Unicorn::qtLanguageToLfmLangCode( QLocale::system().language() );
-#endif
-}

@@ -21,6 +21,7 @@
 #include "TagListWidget.h"
 #include "Settings.h"
 #include "lib/core/UnicornUtils.h"
+#include "lib/types/Tag.h"
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QUrl>
@@ -155,8 +156,5 @@ TagListWidget::setSortOrder( Tags::SortOrder sortOrder )
 void
 TagListWidget::openTagPageForCurrentItem()
 {
-    QUrl url = "http://" + Unicorn::localizedHostName( The::settings().language() ) +
-               "/tag/" + Unicorn::urlEncodeItem( currentItem()->text( 0 ) );
-    
-    QDesktopServices::openUrl( url );
+	QDesktopServices::openUrl( Tag( currentItem()->text( 0 ) ).url() );
 }

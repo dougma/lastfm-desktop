@@ -20,23 +20,27 @@
 #include "MetaInfoView.h"
 #include "PlayerEvent.h"
 #include "ObservedTrack.h"
+#include "lib/core/CoreUrl.h"
+#include <QAuthenticator>
 #include <QCoreApplication>
 #include <QDesktopServices>
 
 
-MetaInfoView::MetaInfoView( QWidget* parent )
-            : QWebView( parent )
+MetaInfoView::MetaInfoView()
 {   
-   // load( QUrl( "http://www.google.com") );
     page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
-    
     connect( page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+	connect( page()->networkAccessManager(), SIGNAL(authenticationRequired ( QNetworkReply*, QAuthenticator* )), SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
 }
 
 
-MetaInfoView::~MetaInfoView()
-{}
+void 
+MetaInfoView::onAuthenticationRequired( QNetworkReply*, QAuthenticator* a )
+{
+	a->setUser( "tester" );
+	a->setPassword( "futureofmusic" );
+}
 
 
 void
@@ -47,18 +51,17 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
         case PlayerEvent::TrackChanged:
         case PlayerEvent::PlaybackStarted:
 		{
-			return; //currently hogs the bandwidth! and slows the main thread too :(
+			setHtml( "<html/>" ); //clear the web view
 			
-            ObservedTrack t = d.value<ObservedTrack>( );
-            // FIXME: get the real page.
-            load( QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) ) );
-			qDebug() << QUrl( QString( "http://www.last.fm/music/%1" ).arg( t.artist() ) );
-			qDebug() << t.artist();
+			QUrl url = d.value<ObservedTrack>().artist().url();
+            load( CoreUrl( url ).mobilised() );
             break;
 		}
 		case PlayerEvent::PlaybackEnded:
-			//clear the web view
-			setHtml( "<html/>" );
+		{
+			setHtml( "<html/>" ); //clear the web view
+			break;
+		}
     }
 }
 
@@ -66,6 +69,5 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 void
 MetaInfoView::onLinkClicked( const QUrl& url )
 {
-    qDebug() << "Url clicked: " << url;
     QDesktopServices::openUrl( url );
 }

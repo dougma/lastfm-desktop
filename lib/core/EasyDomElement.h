@@ -73,7 +73,8 @@ public:
 
 inline QDebug operator<<( QDebug debug, const EasyDomElement& e )
 {
-	QDomDocument dom;
-	dom.appendChild( e.e );
-	return debug << dom.toString();
+	QString s;
+	QTextStream t( &s, QIODevice::WriteOnly );
+	e.e.save( t, 2 );
+	return debug << s;
 }

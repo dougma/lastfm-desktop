@@ -19,7 +19,7 @@
 
 #include "SettingsDialog.h"
 #include "Settings.h"
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/CoreLocale.h"
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
@@ -40,17 +40,17 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 
     // Add languages to language drop-down
     ui.languages->addItem( tr( "System Language" ), "" );
-    ui.languages->addItem( "English", Unicorn::qtLanguageToLfmLangCode( QLocale::English ) );
-    ui.languages->addItem( QString( "Fran" ) + QChar( 0xe7 ) + QString( "ais" ), Unicorn::qtLanguageToLfmLangCode( QLocale::French ) );
-    ui.languages->addItem( "Italiano", Unicorn::qtLanguageToLfmLangCode( QLocale::Italian ) );
-    ui.languages->addItem( "Deutsch", Unicorn::qtLanguageToLfmLangCode( QLocale::German ) );
-    ui.languages->addItem( QString( "Espa" ) + QChar( 0xf1 ) + QString( "ol" ), Unicorn::qtLanguageToLfmLangCode( QLocale::Spanish ) );
-    ui.languages->addItem( QString( "Portugu" ) + QChar( 0xea ) + QString( "s" ), Unicorn::qtLanguageToLfmLangCode( QLocale::Portuguese ) );
-    ui.languages->addItem( "Polski", Unicorn::qtLanguageToLfmLangCode( QLocale::Polish ) );
-    ui.languages->addItem( "Svenska", Unicorn::qtLanguageToLfmLangCode( QLocale::Swedish ) );
-    ui.languages->addItem( QString::fromUtf8( "Türkçe" ), Unicorn::qtLanguageToLfmLangCode( QLocale::Turkish ) );
-    ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), Unicorn::qtLanguageToLfmLangCode( QLocale::Russian ) );
-    ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), Unicorn::qtLanguageToLfmLangCode( QLocale::Chinese ) );
+    ui.languages->addItem( "English", CoreLocale( QLocale::English ).code() );
+    ui.languages->addItem( QString( "Fran" ) + QChar( 0xe7 ) + QString( "ais" ), CoreLocale( QLocale::French ).code() );
+    ui.languages->addItem( "Italiano", CoreLocale( QLocale::Italian ).code() );
+    ui.languages->addItem( "Deutsch", CoreLocale( QLocale::German ).code() );
+    ui.languages->addItem( QString( "Espa" ) + QChar( 0xf1 ) + QString( "ol" ), CoreLocale( QLocale::Spanish ).code() );
+    ui.languages->addItem( QString( "Portugu" ) + QChar( 0xea ) + QString( "s" ), CoreLocale( QLocale::Portuguese ).code() );
+    ui.languages->addItem( "Polski", CoreLocale( QLocale::Polish ).code() );
+    ui.languages->addItem( "Svenska", CoreLocale( QLocale::Swedish ).code() );
+    ui.languages->addItem( QString::fromUtf8( "Türkçe" ), CoreLocale( QLocale::Turkish ).code() );
+    ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), CoreLocale( QLocale::Russian ).code() );
+    ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), CoreLocale( QLocale::Chinese ).code() );
 
     //setup widgets
     ui.logOutOnExit->setChecked( The::settings().logOutOnExit() );

@@ -17,34 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_ARTIST_H
-#define UNICORN_ARTIST_H
+#ifndef CORE_LOCALE_H
+#define CORE_LOCALE_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/ws/WsReply.h" //convenience
-#include <QString>
+#include <QLocale>
 
 
-class TYPES_DLLEXPORT Artist
+class CORE_DLLEXPORT CoreLocale
 {
-    QString m_name;
-
+	QLocale::Language m_language;
+	
 public:
-    Artist()
-    {}
+	/** constructs a CoreLocale that returns true from isNull() */
+	CoreLocale( const QLocale& l ) : m_language( l.language() ) {}
+	CoreLocale( QLocale::Language l ) : m_language( l ) {}
 
-    explicit Artist( const QString& name ) : m_name( name )
-    {}
-
-	/** the url for this artist's page at www.last.fm */
-	QUrl url() const;
+	/** @returns the equivalent ISO language code as used in HTTP headers */
+	QString iso639() const;
 	
-	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
-	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
+	/** the two letter langauge codes we use on the side */
+	QString code() const;
 	
-    operator QString() const { return m_name; }
-
-    WsReply* share( const class User& recipient, const QString& message = "" );
+	QLocale qlocale() const { return QLocale( m_language ); }
+	
+	/** this is the system locale, or the user specified locale, the user can
+	  * change this from the official last.fm client */
+	static CoreLocale system();
 };
 
 #endif

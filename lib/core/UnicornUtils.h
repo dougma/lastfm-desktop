@@ -42,31 +42,6 @@
   */
 namespace Unicorn
 {
-    /** Translate a Qt language code into the language code used on the Last.fm 
-      * site */
-    UNICORN_DLLEXPORT QString qtLanguageToLfmLangCode( QLocale::Language qtLang );
-
-    /** Translate a Last.fm site language code into the equivalent ISO 639
-      * language code as used in HTTP headers */
-    UNICORN_DLLEXPORT QString lfmLangCodeToIso639( const QString& code );
-
-    /** Translate a Last.fm site language code into the equivalent hostname */
-    UNICORN_DLLEXPORT QString localizedHostName( const QString& code );
-
-    /** Use this to URL encode any database item (artist, track, album). It
-      * internally calls UrlEncodeSpecialChars to double encode some special
-      * symbols according to the same pattern as that used on the website.
-      *
-      * &, /, ;, +, #
-      *
-      * Use for any urls that go to www.last.fm
-      * Do not use for ws.audioscrobbler.com
-      *
-      * @param[in] str String to encode.
-      */
-    UNICORN_DLLEXPORT QString urlEncodeItem( QString item );
-    UNICORN_DLLEXPORT QString urlDecodeItem( QString item );
-
     /** QStringList::sort() sorts with uppercase first */
     UNICORN_DLLEXPORT QStringList sortCaseInsensitively( QStringList input );
 
@@ -85,6 +60,7 @@ namespace Unicorn
     /** @returns true if we're running on a limited user account */
     UNICORN_DLLEXPORT bool isLimitedUser();
 
+	//TODO move to PlayerManager
     /** @returns the name of the default player. "" if not found */
     UNICORN_DLLEXPORT QString findDefaultPlayer();
 
@@ -103,14 +79,13 @@ namespace Unicorn
 #endif
 
 #ifdef Q_WS_MAC
-    QLocale::Language osxLanguageCode();
     QByteArray CFStringToUtf8( CFStringRef );
     inline QString CFStringToQString( CFStringRef s )
     {
         return QString::fromUtf8( CFStringToUtf8( s ) );
     }
     bool isProcessRunning( const QString& );
-    inline bool iTunesIsOpen() 
+    inline bool iTunesIsOpen()
     { 
         return isProcessRunning( "iTunes" ); 
     }

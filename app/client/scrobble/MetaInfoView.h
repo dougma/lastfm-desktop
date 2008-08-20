@@ -25,12 +25,12 @@ class MetaInfoView : public QWebView
     Q_OBJECT
 
 public:
-    MetaInfoView( QWidget* parent = 0 );
-    ~MetaInfoView();
+    MetaInfoView();
 
 public slots:
     void onAppEvent( int, const QVariant& );
 
 private slots:
     void onLinkClicked( const QUrl& );      
+	void onAuthenticationRequired( QNetworkReply*, QAuthenticator* );
 };

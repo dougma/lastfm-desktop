@@ -17,65 +17,20 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornUtils.h"
-#include "AppleScript.h"
-#include <QDebug>
-#include <QDir>
+#include "Tag.h"
+#include "User.h"
+#include "lib/core/CoreUrl.h"
 
 
-QByteArray
-Unicorn::CFStringToUtf8( CFStringRef s )
+QUrl
+Tag::url() const
 {
-    QByteArray result;
-
-    if (s != NULL) 
-    {
-        CFIndex length;
-        length = CFStringGetLength( s );
-        length = CFStringGetMaximumSizeForEncoding( length, kCFStringEncodingUTF8 ) + 1;
-        char* buffer = new char[length];
-
-        if (CFStringGetCString( s, buffer, length, kCFStringEncodingUTF8 ))
-            result = QByteArray( buffer );
-        else
-            qWarning() << "CFString conversion failed.";
-
-        delete[] buffer;
-    }
-
-    return result;
+	return CoreUrl( "http://www.last.fm/tag/" + CoreUrl::encode( m_name ) ).localised();
 }
 
 
-#include "common/c++/mac/getBsdProcessList.c"
-
-bool
-Unicorn::isProcessRunning( const QString& processName )
+QUrl
+Tag::url( const User& user ) const
 {
-    bool found = false;
-    
-    kinfo_proc* processList = NULL;
-    size_t processCount = 0;
-
-    if ( getBsdProcessList( &processList, &processCount ) )
-    {
-        return false;
-    }
-
-    uint const uid = ::getuid();
-    for ( size_t processIndex = 0; processIndex < processCount; processIndex++ )
-    {
-        if ( processList[processIndex].kp_eproc.e_pcred.p_ruid == uid )
-        {
-            if ( strcmp( processList[processIndex].kp_proc.p_comm, 
-                         processName.toLocal8Bit() ) == 0 )
-            {
-                found = true;
-                break;
-            }
-        }
-    }
-
-    free( processList );
-    return found;
+	return CoreUrl( "http://www.last.fm/" + CoreUrl::encode( user ) + "/tags/" + CoreUrl::encode( m_name ) ).localised();
 }

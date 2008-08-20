@@ -17,34 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_ARTIST_H
-#define UNICORN_ARTIST_H
+#ifndef TAG_H
+#define TAG_H
 
-#include "lib/DllExportMacro.h"
-#include "lib/ws/WsReply.h" //convenience
 #include <QString>
+#include <QUrl>
 
-
-class TYPES_DLLEXPORT Artist
+class Tag
 {
-    QString m_name;
-
+	QString m_name;
+	
 public:
-    Artist()
-    {}
-
-    explicit Artist( const QString& name ) : m_name( name )
-    {}
-
-	/** the url for this artist's page at www.last.fm */
+	Tag( const QString& name ) : m_name( name )
+	{}
+	
+	operator QString() const { return m_name; }
+	
+	/** the global tag page at www.last.fm */
 	QUrl url() const;
 	
-	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
-	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
-	
-    operator QString() const { return m_name; }
-
-    WsReply* share( const class User& recipient, const QString& message = "" );
+	/** the tag page for user @p user at www.last.fm */
+	QUrl url( const class User& user ) const;
 };
 
 #endif

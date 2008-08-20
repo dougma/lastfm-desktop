@@ -23,7 +23,8 @@
 #include "lib/DllExportMacro.h"
 #include <QSettings>
 #include <QString>
-#include "app/client/version.h" //FIXME for PRODUCT_NAME
+#include "lib/core/CoreSettings.h" //CORE_ORGANISATION_DOMAIN
+#include "app/client/version.h"    //PRODUCT_NAME
 
 
 namespace Unicorn
@@ -37,7 +38,7 @@ namespace Unicorn
     class QSettings : public ::QSettings
     {
     public:
-        QSettings() : ::QSettings( "Last.fm", PRODUCT_NAME )
+        QSettings() : ::QSettings( CORE_ORGANISATION_DOMAIN, PRODUCT_NAME )
         {}
     };
     
@@ -70,9 +71,6 @@ namespace Unicorn
 
         // all Unicorn::Applications obey this
         bool logOutOnExit() const { return UserQSettings().value( "LogOutOnExit", false ).toBool(); }
-
-        /** @returns one of our pre-defined 2-letter language codes */
-        QString language() const;
     };
     
 

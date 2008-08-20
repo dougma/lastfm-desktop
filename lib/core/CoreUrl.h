@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,41 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Playlist.h"
-#include "lib/ws/WsReply.h"
+#ifndef CORE_URL_H
+#define CORE_URL_H
+
+#include "lib/DllExportMacro.h"
+#include <QString>
 #include <QUrl>
 
 
-Playlist::Playlist( WsReply* reply ) throw( UnicornException )
+struct CORE_DLLEXPORT CoreUrl : public QUrl
 {
-	m_title = reply->lfm()["playlist"]["title"].text();
-		
-	//FIXME should we use UnicornUtils::urlDecode()?
-	//The title is url encoded, has + instead of space characters 
-	//and has a + at the begining. So it needs cleaning up:
-	m_title.replace( '+', ' ' );
-	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-	m_title = m_title.trimmed();
+	CoreUrl( const QUrl& url ) : QUrl( url )
+	{}
 	
-	foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
-	{
-		MutableTrack t;
-		try
-		{
-			//TODO we don't want to throw an exception for any of these really,
-			//TODO only if we couldn't get any, but even then so what
-			t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-			t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-			t.setTitle( e[ "title" ].text() );
-			t.setArtist( e[ "creator" ].text() );
-			t.setAlbum( e[ "album" ].text() );
-			t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-			t.setSource( Track::LastFmRadio );
-		}
-		catch (EasyDomElement::Exception& exception)
-		{
-			qWarning() << exception << e;
-		}
-		m_tracks += t; // outside since location is enough basically
-	}
-}
+	/** www.last.fm becomes the local version, eg www.lastfm.de */
+	CoreUrl localised() const;
+	/** www.last.fm becomes m.last.fm, localisation is preserved */
+	CoreUrl mobilised() const;
+
+	/** Use this to URL encode any database item (artist, track, album). It
+	 * internally calls UrlEncodeSpecialChars to double encode some special
+	 * symbols according to the same pattern as that used on the website.
+	 *
+	 * &, /, ;, +, #
+	 *
+	 * Use for any urls that go to www.last.fm
+	 * Do not use for ws.audioscrobbler.com
+	 *
+	 * @param[in] str String to encode.
+	 */
+	static QString encode( QString );
+	static QString decode( QString );
+	
+	/** returns eg. www.lastfm.de */
+	static QString localisedHostName( const class CoreLocale& );
+};
+
+#endif

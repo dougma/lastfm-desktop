@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,41 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Playlist.h"
-#include "lib/ws/WsReply.h"
-#include <QUrl>
+#ifndef CORE_SETTINGS_H
+#define CORE_SETTINGS_H
+
+#include <QSettings>
+#include "CoreLocale.h"
+
+#define CORE_ORGANISATION_DOMAIN "Last.fm"
 
 
-Playlist::Playlist( WsReply* reply ) throw( UnicornException )
+/** Settings that are global to all Last.fm libraries */
+class CoreSettings : public QSettings
 {
-	m_title = reply->lfm()["playlist"]["title"].text();
-		
-	//FIXME should we use UnicornUtils::urlDecode()?
-	//The title is url encoded, has + instead of space characters 
-	//and has a + at the begining. So it needs cleaning up:
-	m_title.replace( '+', ' ' );
-	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-	m_title = m_title.trimmed();
+public:
+	CoreSettings() : QSettings( CORE_ORGANISATION_DOMAIN )
+	{}
 	
-	foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
+	CoreLocale locale() const
 	{
-		MutableTrack t;
-		try
-		{
-			//TODO we don't want to throw an exception for any of these really,
-			//TODO only if we couldn't get any, but even then so what
-			t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-			t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-			t.setTitle( e[ "title" ].text() );
-			t.setArtist( e[ "creator" ].text() );
-			t.setAlbum( e[ "album" ].text() );
-			t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-			t.setSource( Track::LastFmRadio );
-		}
-		catch (EasyDomElement::Exception& exception)
-		{
-			qWarning() << exception << e;
-		}
-		m_tracks += t; // outside since location is enough basically
+		QVariant const v = value( "locale" );
+		return v.isValid() ? QLocale( v.toString() ) : CoreLocale::system();
 	}
-}
+};
+
+#endif
