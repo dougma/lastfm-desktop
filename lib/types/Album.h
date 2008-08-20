@@ -24,6 +24,7 @@
 #include "Mbid.h"
 #include "lib/DllExportMacro.h"
 #include <QString>
+#include <QUrl>
 class WsReply;
 
 
@@ -57,6 +58,8 @@ public:
     /** Album.getInfo WebService */
     WsReply* getInfo() const;
     WsReply* share( const class User& recipient, const QString& message = "" );
+	
+	QUrl www() const;
 	
 	enum ImageSize
 	{

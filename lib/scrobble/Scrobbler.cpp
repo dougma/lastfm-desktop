@@ -206,7 +206,12 @@ Scrobbler::onSubmissionReturn( const QByteArray& result )
     {
         onError( Scrobbler::ErrorBadSession );
     }
-    else if (++m_hard_failures >= 3)
+	else if (code.startsWith( "FAILED Plugin bug" ))
+	{
+		qWarning() << "YOU SUCK! Attempting reasonable error handling...";
+		m_cache->remove( m_submitter->batch() );
+	}
+	else if (++m_hard_failures >= 3)
     {
         onError( Scrobbler::ErrorThreeHardFailures );
     }

@@ -169,7 +169,7 @@ PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
 
     //TODO should be done earlier, NOTE don't get the plugin to send a stamp 
     // time as this is prolly unecessary, and I bet you get new bugs!
-    track.setTimeStampNow();
+    track.stamp();
     
     return track;
 }

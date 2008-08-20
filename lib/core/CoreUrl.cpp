@@ -77,7 +77,7 @@ CoreUrl
 CoreUrl::localised() const
 {
 	CoreUrl url = *this;
-	url.setHost( host().replace( QRegExp("^www.last.fm"), localisedHostName( CoreSettings().locale() ) ) );
+	url.setHost( host().replace( QRegExp("^(www.)?last.fm"), localisedHostName( CoreSettings().locale() ) ) );
 	return url;
 }
 
@@ -86,6 +86,6 @@ CoreUrl
 CoreUrl::mobilised() const
 {
 	CoreUrl url = *this;
-	url.setHost( host().replace( QRegExp("^www."), "mdev." ) );
+	url.setHost( host().replace( QRegExp("^(www.)?last"), "mdev.last" ) );
 	return url;
 }

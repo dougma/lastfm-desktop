@@ -63,8 +63,12 @@ AudioPlaybackEngine::clearQueue()
 void
 AudioPlaybackEngine::skip()
 {
-    m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
-    m_mediaObject->play();
+	if (m_mediaObject->queue().size())
+	{
+		m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
+		m_mediaObject->play();	
+	}
+	//else we alrady asked for more tracks, so wait I guess
 }
 
 
@@ -111,6 +115,8 @@ AudioPlaybackEngine::onPhononStateChanged( Phonon::State newstate, Phonon::State
                 Track t = m_queue.take( m_mediaObject->currentSource().url() );
                 if( t.isEmpty() )
                     break;
+
+				MutableTrack( t ).stamp();
 
                 emit trackStarted( t );
 

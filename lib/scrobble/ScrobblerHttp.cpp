@@ -39,11 +39,11 @@ ScrobblerHttp::ScrobblerHttp( QObject* parent )
 void
 ScrobblerHttp::onRequestFinished( int id, bool error )
 {
-    if (error && this->error() == QHttp::Aborted)
-        return;
-
     if (id == m_id)
     {
+		if (error && this->error() == QHttp::Aborted)
+			return;
+		
         QByteArray const data = readAll();
 
         if (error)
@@ -51,12 +51,13 @@ ScrobblerHttp::onRequestFinished( int id, bool error )
             qDebug() << "ERROR!" << this;
             emit done( QByteArray() );
         }
-        else if (data.startsWith( "OK\n" ))
+        else
         {
             resetRetryTimer();
             emit done( data );
         }
-
+		
+		// just in case
         m_id = -1;
     }
 }

@@ -36,7 +36,7 @@ Artist::share( const User& user, const QString& message )
 
 
 QUrl
-Artist::url() const
+Artist::www() const
 {
 	return "http://www.last.fm/music/" + CoreUrl::encode( m_name );
 }

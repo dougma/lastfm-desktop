@@ -53,7 +53,7 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 		{
 			setHtml( "<html/>" ); //clear the web view
 			
-			QUrl url = d.value<ObservedTrack>().artist().url();
+			QUrl url = d.value<ObservedTrack>().artist().www();
             load( CoreUrl( url ).mobilised() );
             break;
 		}

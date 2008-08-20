@@ -24,6 +24,8 @@
 
 Playlist::Playlist( WsReply* reply ) throw( UnicornException )
 {
+	qDebug() << "\n" << reply->data() << "\n";
+	
 	m_title = reply->lfm()["playlist"]["title"].text();
 		
 	//FIXME should we use UnicornUtils::urlDecode()?
@@ -52,6 +54,7 @@ Playlist::Playlist( WsReply* reply ) throw( UnicornException )
 		{
 			qWarning() << exception << e;
 		}
+		
 		m_tracks += t; // outside since location is enough basically
 	}
 }

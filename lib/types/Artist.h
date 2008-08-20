@@ -37,7 +37,7 @@ public:
     {}
 
 	/** the url for this artist's page at www.last.fm */
-	QUrl url() const;
+	QUrl www() const;
 	
 	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
 	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }

@@ -19,6 +19,7 @@
 
 #include "Track.h"
 #include "User.h"
+#include "lib/core/CoreUrl.h"
 #include "lib/unicorn/UnicornSettings.h" //FIXME
 #include "lib/ws/WsRequestBuilder.h"
 #include "lib/ws/WsReply.h"
@@ -43,6 +44,7 @@ Track::Track( const QDomElement& e )
     d->playCount = e.namedItem( "playcount" ).toElement().text().toInt();
     d->url = e.namedItem( "url" ).toElement().text();
     d->rating = e.namedItem( "rating" ).toElement().text().toUInt();
+	d->extras["trackauth"] = e.namedItem( "auth" ).toElement().text();
 
     // this is necessary because the default return for toInt() is 0, and that
     // corresponds to Radio not Unknown :( oops.
@@ -75,12 +77,15 @@ Track::toDomElement( QDomDocument& document ) const
 {
     QDomElement item = document.createElement( "item" );
 
-    #define makeElement( tagname, getter ) \
-    { \
-        QDomElement e = document.createElement( tagname ); \
-        e.appendChild( document.createTextNode( getter ) ); \
-        item.appendChild( e ); \
-    }
+    #define makeElement( tagname, getter ) { \
+		QString v = getter; \
+		if (!v.isEmpty())\
+		{ \
+			QDomElement e = document.createElement( tagname ); \
+			e.appendChild( document.createTextNode( v ) ); \
+			item.appendChild( e ); \
+		} \
+	}
 
     makeElement( "artist", d->artist );
     makeElement( "album", d->album );
@@ -94,6 +99,7 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
     makeElement( "playerId", playerId() );
+	makeElement( "auth", d->extras["trackauth"] );
 
     return item;
 }
@@ -310,4 +316,13 @@ WsReply*
 Track::getTags()
 {
 	return TrackWsRequestBuilder( "track.getTags" ).add( *this ).get();
+}
+
+
+QUrl
+Track::www() const
+{
+	QString const artist = CoreUrl::encode( d->artist );
+	QString const track = CoreUrl::encode( d->title );
+	return CoreUrl( "http://www.last.fm/music/" + artist + "/_/" + track ).localised();
 }

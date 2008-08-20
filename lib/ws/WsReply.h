@@ -65,6 +65,8 @@ public:
 //    void finish();
 
     QByteArray data() const { return m_data; }
+	
+	bool failed() const { return m_error != Ws::NoError; }
 
 signals:
     /** we call deleteLater() immediately after emitting this signal, so don't

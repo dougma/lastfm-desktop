@@ -188,6 +188,9 @@ public:
 	WsReply* getTopTags();
 	static QStringList getTopTags( WsReply* );
 
+	/** the url for this track's page at last.fm */
+	QUrl www() const;
+	
 protected:
     friend class MutableTrack; //FIXME wtf? but compiler error otherwise
     QExplicitlySharedDataPointer<TrackData> d;
@@ -222,7 +225,7 @@ public:
 		d->rating = qMax( (short)r, d->rating );
 	}
 	
-    void setTimeStampNow() { d->time = QDateTime::currentDateTime(); }
+    void stamp() { d->time = QDateTime::currentDateTime(); }
 
     void setExtra( QString key, QString value ) { d->extras[key] = value; }
 };
