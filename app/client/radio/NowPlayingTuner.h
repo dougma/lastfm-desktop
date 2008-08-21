@@ -32,12 +32,15 @@ public:
 	
 private:
 	Ui::NowPlayingTuner ui;
-	class StationDelegate* m_tagListDelegate;
 	
 private slots:
 	void onTunerReturnPressed();
 	void onAppEvent( int, const QVariant& );
 	void onFetchedTopTags( class WsReply* );
+	void onFetchedSimilarArtists( WsReply* r );
+	
+	void onTagClicked( QListWidgetItem* );
+	void onArtistClicked( QListWidgetItem* );
 	
 signals:
 	void tune( const class RadioStation& );

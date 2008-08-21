@@ -30,7 +30,7 @@
 class RADIO_DLLEXPORT RadioStation
 {
 public:
-	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Url };
+	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Tag, Url };
 	
     RadioStation( QString s, Type t = Url, QString title = "" ) : m_station( s ), m_type( t ), m_title( title ){}
 	
@@ -42,7 +42,8 @@ public:
 			case Recommendation: return "lastfm://user/" + m_station + "/recommended";
 			case Library: return "lastfm://user/" + m_station + "/personal";
 			case Neighbourhood: return "lastfm://user/" + m_station + "/neighbours";
-			case Loved: return "lastfm://user/" + m_station + "/loved";	
+			case Loved: return "lastfm://user/" + m_station + "/loved";
+			case Tag: return "lastfm://globaltags/" + m_station;
 				
 			case Url: return m_station;
 			

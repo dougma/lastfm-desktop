@@ -24,7 +24,7 @@ class StationDelegate : public QItemDelegate
 Q_OBJECT
 	
 public:
-	StationDelegate( QObject* parent = 0 ):QItemDelegate( parent ), m_count( 0 ){};
+	StationDelegate( QObject* parent = 0 ):QItemDelegate( parent ), m_maxCount( 0 ){};
 	
 	void paint( QPainter* painter, 
 				const QStyleOptionViewItem& option, 
@@ -33,10 +33,10 @@ public:
 	QSize sizeHint( const QStyleOptionViewItem& option, 
 				    const QModelIndex& index ) const;
 	
-	void setMaxCount( int count ){ m_count = count; }
+	void setMaxCount( float count ){ m_maxCount = count; }
 	
 	enum IndexDataRole{ CountRole = Qt::UserRole };
 	
 private:
-	int m_count;
+	float m_maxCount;
 };

@@ -218,11 +218,35 @@
       <property name="lineWidth" >
        <number>0</number>
       </property>
+      <property name="midLineWidth" >
+       <number>0</number>
+      </property>
+      <property name="editTriggers" >
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="alternatingRowColors" >
+       <bool>true</bool>
+      </property>
+      <property name="iconSize" >
+       <size>
+        <width>17</width>
+        <height>15</height>
+       </size>
+      </property>
+      <property name="movement" >
+       <enum>QListView::Static</enum>
+      </property>
+      <property name="layoutMode" >
+       <enum>QListView::SinglePass</enum>
+      </property>
       <property name="spacing" >
-       <number>10</number>
+       <number>0</number>
       </property>
       <property name="selectionRectVisible" >
        <bool>true</bool>
+      </property>
+      <property name="sortingEnabled" >
+       <bool>false</bool>
       </property>
       <attribute name="title" >
        <string>Similar Artists</string>

@@ -21,6 +21,7 @@
 #define UNICORN_ARTIST_H
 
 #include "lib/DllExportMacro.h"
+#include "lib/core/WeightedStringList.h"
 #include "lib/ws/WsReply.h" //convenience
 #include <QString>
 
@@ -45,6 +46,9 @@ public:
     operator QString() const { return m_name; }
 
     WsReply* share( const class User& recipient, const QString& message = "" );
+	
+	WsReply* getSimilar();
+	static WeightedStringList getSimilar( WsReply* );
 };
 
 #endif

@@ -305,7 +305,7 @@ Track::getTopTags( WsReply* r )
 		{
 			QString tagname = e["name"].text();
 			int count = e["count"].text().toInt();
-			tags.push_back( WeightedString::counted( tagname, count ));
+			tags.push_back( WeightedString( tagname, count ));
 		}
 			
 	}

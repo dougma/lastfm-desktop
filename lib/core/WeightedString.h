@@ -25,33 +25,13 @@
 
 class CORE_DLLEXPORT WeightedString : public QString
 {
-    union
-    {
-        int weighting;
-        int count;
-    } u;
+    float m_weighting;
 
 public:
-    WeightedString() { u.weighting = -1; }
+    WeightedString() { m_weighting = -1.0f; }
     
-    explicit WeightedString( QString name, int w = -1 ) : QString( name ) { u.weighting = w; }
-    
-    static WeightedString weighted( QString name, int w )
-    {
-        WeightedString t( name );
-        t.u.weighting = w;
-        return t;
-    }
-    
-    static WeightedString counted( QString name, int c )
-    {
-        WeightedString t( name );
-        t.u.count = c;
-        return t;
-    }
-
-    int count() const { return u.count; }
-    int weighting() const { return u.weighting; }
+    explicit WeightedString( QString name, float w = -1.0f ) : QString( name ), m_weighting( w ) {};
+    int weighting() const { return m_weighting; }
 };
 
 

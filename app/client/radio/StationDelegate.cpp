@@ -37,17 +37,21 @@ StationDelegate::paint(QPainter* painter,
 	}
 
 	//Draw popularity of tag bar graph
-	int count = index.data( CountRole ).toInt();
-	QRect tagRect = option.rect;
-	tagRect.setWidth( ( tagRect.width() / m_count ) * count );
-	tagRect.setY( tagRect.y() + 2 );
-	tagRect.setHeight( tagRect.height() - 1 );
+	if( m_maxCount > 0 )
+	{
+		float count = index.data( CountRole ).value<float>();
+		QRect tagRect = option.rect;
+		tagRect.setWidth( ( (float)tagRect.width() / (float)m_maxCount ) * count );
+		tagRect.setY( tagRect.y() + 2 );
+		tagRect.setHeight( tagRect.height() - 1 );
 
-	if( !itemSelected )
-		painter->fillRect( tagRect, QBrush( QColor( 210, 210, 210 ) ) );
-	else
-		painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
-	
+		if( !itemSelected )
+			painter->fillRect( tagRect, QBrush( QColor( 210, 210, 210 ) ) );
+		else
+			painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
+		
+			qDebug() << index.data().toString() << " == (" << count << " / " << m_maxCount << ")";
+	}
 	
 	//Draw tag text
 	QRect textRect = option.rect;
@@ -83,8 +87,8 @@ StationDelegate::paint(QPainter* painter,
 
 
 QSize 
-StationDelegate::sizeHint( const QStyleOptionViewItem& option, 
-						   const QModelIndex& index ) const
+StationDelegate::sizeHint( const QStyleOptionViewItem& /* option */, 
+						   const QModelIndex& /* index */ ) const
 {
 	return QSize( 1, 35 );
 }

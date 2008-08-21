@@ -20,6 +20,8 @@
 #include "NowPlayingTuner.h"
 #include "lib/radio/RadioStation.h"
 #include "StationDelegate.h"
+#include "RadioStation.h"
+#include "RadioController.h"
 #include "App.h"
 #include "ObservedTrack.h"
 #include "PlayerEvent.h"
@@ -33,12 +35,17 @@ NowPlayingTuner::NowPlayingTuner()
 {
 	ui.setupUi( this );
 	
-	ui.tagsTab->setItemDelegate( m_tagListDelegate = new StationDelegate( this ) );
+	ui.tagsTab->setItemDelegate( new StationDelegate( this ) );
+	ui.similarArtistsTab->setItemDelegate( new StationDelegate( this ) );
 
 	QLineEdit* tuning_dial = new QLineEdit;
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
+	
 	connect( &The::app(), SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
-
+	
+	connect( ui.tagsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onTagClicked( QListWidgetItem*)) );
+	connect( ui.similarArtistsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onArtistClicked( QListWidgetItem*)) );
+	
 	QWidget* tempPage = new QWidget();
 	QVBoxLayout* l = new QVBoxLayout;
 	tempPage->setLayout( l );
@@ -62,32 +69,80 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 {
 	switch( e )
 	{
+		case PlayerEvent::PlaybackStarted:
 		case PlayerEvent::TrackChanged:
 		{
 			Track t = d.value<ObservedTrack>();
+			
+			//Load Tags
 			ui.tagsTab->clear();
 			WsReply* r = t.getTopTags();
 			connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
+			
+			//Load Similar Artists
+			ui.similarArtistsTab->clear();
+			WsReply* similarReply = t.artist().getSimilar();
+			connect( similarReply, SIGNAL( finished( WsReply*)), SLOT( onFetchedSimilarArtists(WsReply*)) );
 		}
 		break;
 
 		case PlayerEvent::PlaybackEnded:
 			ui.tagsTab->clear();
+			ui.similarArtistsTab->clear();
 		break;
 	}
 }
 
 
+void addWeightedStringsToList( WeightedStringList& stringList, QListWidget* list )
+{
+	if( stringList.isEmpty() )
+		return;
+
+	stringList.sortWeightingDescending();
+	
+	float maxTagCount = stringList.first().weighting();
+
+	StationDelegate* delegate = static_cast<StationDelegate*>( list->itemDelegate() );
+	delegate->setMaxCount( maxTagCount );
+
+	foreach( const WeightedString& weightedString, stringList )
+	{
+		QListWidgetItem* item = new QListWidgetItem( weightedString );
+		item->setData( StationDelegate::CountRole, weightedString.weighting() );
+		list->addItem( item );
+	}
+}
+
+
 void
-NowPlayingTuner::onFetchedTopTags(WsReply* r)
+NowPlayingTuner::onFetchedTopTags( WsReply* r )
 {
 	WeightedStringList tags = Track::getTopTags( r );
-	
-	m_tagListDelegate->setMaxCount( tags.first().count() );
-	foreach( const WeightedString& tag, tags )
-	{
-		QListWidgetItem* item = new QListWidgetItem( tag );
-		item->setData( StationDelegate::CountRole, tag.count() ); 
-		ui.tagsTab->addItem( item );
-	}
+	addWeightedStringsToList( tags, ui.tagsTab );
+}
+
+
+void
+NowPlayingTuner::onFetchedSimilarArtists( WsReply* r )
+{
+	qDebug() << r->lfm();
+	WeightedStringList artists = Artist::getSimilar( r );
+	addWeightedStringsToList( artists, ui.similarArtistsTab );
+}
+
+
+void
+NowPlayingTuner::onTagClicked( QListWidgetItem* i )
+{
+	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
+	The::app().radioController().play( r );
+}
+
+
+void
+NowPlayingTuner::onArtistClicked( QListWidgetItem* i )
+{
+	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::SimilarArtist );
+	The::app().radioController().play( r );
 }

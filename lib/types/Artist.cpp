@@ -23,7 +23,7 @@
 #include "lib/ws/WsRequestBuilder.h"
 
 
-WsReply*
+WsReply* 
 Artist::share( const User& user, const QString& message )
 {
     return WsRequestBuilder( "artist.share" )
@@ -35,8 +35,37 @@ Artist::share( const User& user, const QString& message )
 }
 
 
-QUrl
+QUrl 
 Artist::www() const
 {
 	return "http://www.last.fm/music/" + CoreUrl::encode( m_name );
+}
+
+
+WsReply* 
+Artist::getSimilar()
+{
+	return WsRequestBuilder( "artist.getSimilar" ).add( "artist", *this ).get();
+}
+
+
+WeightedStringList /* static */
+Artist::getSimilar( WsReply* r )
+{
+	WeightedStringList artists;
+	try
+	{
+		foreach (EasyDomElement e, r->lfm().children( "artist" ))
+		{
+			QString artistName = e["name"].text();
+			float match = e["match"].text().toFloat();
+			artists.push_back( WeightedString( artistName, match ));
+		}
+		
+	}
+	catch( EasyDomElement::Exception& e)
+	{
+		qWarning() << e;
+	}
+	return artists;
 }
