@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QWidget>
+#include "lib/types/Track.h"
 
 
 class MetaInfoView : public QWidget
@@ -31,6 +32,8 @@ class MetaInfoView : public QWidget
 	}
 	ui;
 	
+	Track m_track;
+	
 public:
     MetaInfoView();
 
@@ -40,6 +43,7 @@ public slots:
 private slots:
     void onLinkClicked( const class QUrl& );
 	void onAuthenticationRequired( class QNetworkReply*, class QAuthenticator* );
+	void load();
 
 private:
 	virtual void resizeEvent( QResizeEvent* );

@@ -42,6 +42,7 @@ MetaInfoView::MetaInfoView()
 	ui.tabs->addTab( tr( "Track" ) );
 	ui.tabs->setDrawBase( false );
 	ui.tabs->hide();
+	connect( ui.tabs, SIGNAL(currentChanged( int )), SLOT(load()) );
 	
 	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
@@ -70,20 +71,16 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
         case PlayerEvent::PlaybackStarted:
 			ui.tabs->show();
 			// fall through
+		
 		case PlayerEvent::TrackChanged:
-		{
-			ui.web->setHtml( "<html/>" ); //clear the web view
-			
-			QUrl url = d.value<ObservedTrack>().artist().www();
-            ui.web->load( CoreUrl( url ).mobilised() );
+			m_track = d.value<ObservedTrack>();
+			load();
             break;
-		}
+
 		case PlayerEvent::PlaybackEnded:
-		{
 			ui.tabs->hide();
 			ui.web->setHtml( "<html/>" ); //clear the web view
 			break;
-		}
     }
 }
 
@@ -99,4 +96,21 @@ void
 MetaInfoView::resizeEvent( QResizeEvent* )
 {
 	ui.tabs->move( ui.web->width() - 24 - ui.tabs->sizeHint().width(), 4 );
+}
+
+
+void
+MetaInfoView::load()
+{
+	ui.web->load( QUrl("about:blank") ); //clear the web view first
+	
+	QUrl url;
+	switch (ui.tabs->currentIndex())
+	{
+		case 0: url = m_track.artist().www(); break;
+		case 1: url = m_track.album().www(); break;
+		case 2: url = m_track.www(); break;
+	}
+
+	ui.web->load( CoreUrl( url ).mobilised() );
 }
