@@ -18,6 +18,8 @@ RadioController::RadioController()
 void
 RadioController::play( const RadioStation& station )
 {
+	qInfo() << "Tuning to:" << station;
+	
 	m_audio->clearQueue();
 	delete m_tuner;
 	
