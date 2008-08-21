@@ -39,7 +39,10 @@ public:
 		if (isDown())
 			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
 		
-		p.drawPixmap( event->rect(), icon().pixmap( event->rect().width(), event->rect().height()) );
+		QIcon::Mode state = isEnabled() ? QIcon::Normal : QIcon::Disabled;
+		
+		p.setClipRect( event->rect() );
+		icon().paint( &p, rect(), Qt::AlignTop, state );
 	}
 };
 
