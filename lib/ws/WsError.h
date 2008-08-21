@@ -39,6 +39,11 @@ namespace Ws
         ServiceOffline,
         SubscribersOnly,
 
+		NotEnoughContent = 20,
+		NotEnoughMembers,
+		NotEnoughFans,
+		NotEnoughNeighbours,
+		
         /** Last.fm sucks, or something weird happened. 
           * Call networkError() for more details */
         TryAgain = 100,
