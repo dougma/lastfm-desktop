@@ -126,7 +126,6 @@ NowPlayingTuner::onFetchedTopTags( WsReply* r )
 void
 NowPlayingTuner::onFetchedSimilarArtists( WsReply* r )
 {
-	qDebug() << r->lfm();
 	WeightedStringList artists = Artist::getSimilar( r );
 	addWeightedStringsToList( artists, ui.similarArtistsTab );
 }
