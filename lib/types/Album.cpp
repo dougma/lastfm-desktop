@@ -20,6 +20,7 @@
 #include "Album.h"
 #include "Artist.h"
 #include "User.h"
+#include "lib/core/CoreUrl.h"
 #include "lib/ws/WsRequestBuilder.h"
 #include <QEventLoop>
 
@@ -38,11 +39,20 @@ WsReply*
 Album::share( const User& recipient, const QString& message )
 {
     return WsRequestBuilder( "album.share" )
-	.add( "recipient", recipient )
-	.add( "artist", m_artist )
-	.add( "album", m_title )
-	.addIfNotEmpty( "message", message )
-	.post();
+		.add( "recipient", recipient )
+		.add( "artist", m_artist )
+		.add( "album", m_title )
+		.addIfNotEmpty( "message", message )
+		.post();
+}
+
+
+QUrl
+Album::www() const
+{
+	QString const artist = CoreUrl::encode( m_artist );
+	QString const album = CoreUrl::encode( m_title );
+	return CoreUrl( "http://www.last.fm/music/" + artist + "/" + album ).localised();	
 }
 
 
