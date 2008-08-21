@@ -51,7 +51,6 @@ StationDelegate::paint(QPainter* painter,
 		else
 			painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
 		
-			qDebug() << index.data().toString() << " == (" << count << " / " << m_maxCount << ")";
 	}
 	
 	//Draw tag text
