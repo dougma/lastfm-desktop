@@ -42,6 +42,7 @@ private:
     QImage m_cover;
     class QLabel* m_label;
 	Track m_track;
+	class SpinnerLabel* m_spinner;
 };
 
 #endif // NOW_PLAYING_VIEW_H

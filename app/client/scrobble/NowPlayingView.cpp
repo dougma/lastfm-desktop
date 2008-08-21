@@ -20,6 +20,7 @@
 #include "NowPlayingView.h"
 #include "ObservedTrack.h"
 #include "PlayerEvent.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QtGui>
 
 
@@ -67,6 +68,9 @@ NowPlayingView::NowPlayingView()
     
     m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     m_label->setTextFormat( Qt::RichText );
+	
+	m_spinner = new SpinnerLabel( this );
+	m_spinner->hide();
 }
 
 
@@ -96,6 +100,8 @@ NowPlayingView::onAppEvent( int e, const QVariant& v )
 				QObject* o = new AlbumImageFetcher( t.album(), Album::Large );
 				connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
 				o->setParent( this );
+				
+				m_spinner->show();
 			}
 			
 			m_track = t;
@@ -113,14 +119,17 @@ void
 NowPlayingView::onAlbumImageDownloaded( const QByteArray& data )
 {
 	if (data.size()) 
-	{
 		m_cover.loadFromData( data );
-		m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
-		m_cover = compose( m_cover );
-		update();
-	}
+	else
+		m_cover = QImage( ":/blank/cover.png" );
+
+	m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+	m_cover = compose( m_cover );
+	update();
 
 	sender()->deleteLater();
+	
+	m_spinner->hide();
 }
 
 
