@@ -84,7 +84,7 @@ int main( int argc, char** argv )
 		
 		MessageBoxBuilder( 0 )
 			.setTitle( "Sorry Old Boy" )
-			.setText( "You can't run the old client and the new client at once!" )
+			.setText( "You can't run the old client and the new client at once yet!" )
 			.exec();
 		
         return 1;

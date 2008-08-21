@@ -36,7 +36,7 @@ public:
 	
 	struct Ui : ::Ui::MainWindow
 	{
-		QStackedWidget* stack;
+		class QStackedWidget* stack;
 	    class RadioMiniControls* controls;
 		class RadioWidget* tuner;
 		QWidget* np;
