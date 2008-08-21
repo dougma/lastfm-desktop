@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef RADIOMINICONTROLS_H
-#define RADIOMINICONTROLS_H
+#ifndef RADIO_MINI_CONTROLS_H
+#define RADIO_MINI_CONTROLS_H
 
 #include <QPushButton>
 #include <QPainter>
@@ -29,8 +29,10 @@ namespace Phonon{ class VolumeSlider; }
 class ImageButton : public QPushButton
 {
 	Q_OBJECT
+
 public:
-	ImageButton( QWidget* parent ) : QPushButton( parent ){};
+	ImageButton( QWidget* parent ) : QPushButton( parent )
+	{}
 	
 	void paintEvent ( QPaintEvent* event )
 	{
@@ -63,4 +65,4 @@ public:
 };
 
 
-#endif // RADIOMINICONTROLS_H
+#endif RADIO_MINI_CONTROLS_H

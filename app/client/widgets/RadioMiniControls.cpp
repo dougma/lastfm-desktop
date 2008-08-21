@@ -25,4 +25,6 @@ RadioMiniControls::RadioMiniControls()
 {
     ui.setupUi(this);
     layout()->addWidget( ui.volume = new Phonon::VolumeSlider );
+	
+	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
 }

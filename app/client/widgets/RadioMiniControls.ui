@@ -161,7 +161,7 @@
   <customwidget>
    <class>ImageButton</class>
    <extends>QPushButton</extends>
-   <header>RadioMiniControls.h</header>
+   <header>widgets/RadioMiniControls.h</header>
   </customwidget>
  </customwidgets>
  <resources>
