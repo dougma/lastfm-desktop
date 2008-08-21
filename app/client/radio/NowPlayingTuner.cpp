@@ -33,7 +33,7 @@ NowPlayingTuner::NowPlayingTuner()
 {
 	ui.setupUi( this );
 	
-	ui.tagsTab->setItemDelegate( new StationDelegate( this ) );
+	ui.tagsTab->setItemDelegate( m_tagListDelegate = new StationDelegate( this ) );
 
 	QLineEdit* tuning_dial = new QLineEdit;
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
@@ -81,5 +81,13 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 void
 NowPlayingTuner::onFetchedTopTags(WsReply* r)
 {
-	ui.tagsTab->addItems( Track::getTopTags( r ));
+	WeightedStringList tags = Track::getTopTags( r );
+	
+	m_tagListDelegate->setMaxCount( tags.first().count() );
+	foreach( const WeightedString& tag, tags )
+	{
+		QListWidgetItem* item = new QListWidgetItem( tag );
+		item->setData( StationDelegate::CountRole, tag.count() ); 
+		ui.tagsTab->addItem( item );
+	}
 }

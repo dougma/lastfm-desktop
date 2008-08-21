@@ -23,6 +23,7 @@
 #include "Album.h"
 #include "Artist.h"
 #include "lib/DllExportMacro.h"
+#include "lib/core/WeightedStringList.h"
 #include <QDateTime>
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>
@@ -186,7 +187,7 @@ public:
 	WsReply* ban();
 	WsReply* getTags(); // for the logged in user
 	WsReply* getTopTags();
-	static QStringList getTopTags( WsReply* );
+	static WeightedStringList getTopTags( WsReply* );
 
 	/** the url for this track's page at last.fm */
 	QUrl www() const;

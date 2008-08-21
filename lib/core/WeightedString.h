@@ -16,27 +16,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#include <QItemDelegate>
 
-class StationDelegate : public QItemDelegate
+#ifndef WEIGHTEDSTRING_H
+#define WEIGHTEDSTRING_H
+
+#include "lib/DllExportMacro.h"
+#include <QStringList>
+
+class CORE_DLLEXPORT WeightedString : public QString
 {
-Q_OBJECT
-	
+    union
+    {
+        int weighting;
+        int count;
+    } u;
+
 public:
-	StationDelegate( QObject* parent = 0 ):QItemDelegate( parent ), m_count( 0 ){};
-	
-	void paint( QPainter* painter, 
-				const QStyleOptionViewItem& option, 
-			    const QModelIndex& index ) const;
-	
-	QSize sizeHint( const QStyleOptionViewItem& option, 
-				    const QModelIndex& index ) const;
-	
-	void setMaxCount( int count ){ m_count = count; }
-	
-	enum IndexDataRole{ CountRole = Qt::UserRole };
-	
-private:
-	int m_count;
+    WeightedString() { u.weighting = -1; }
+    
+    explicit WeightedString( QString name, int w = -1 ) : QString( name ) { u.weighting = w; }
+    
+    static WeightedString weighted( QString name, int w )
+    {
+        WeightedString t( name );
+        t.u.weighting = w;
+        return t;
+    }
+    
+    static WeightedString counted( QString name, int c )
+    {
+        WeightedString t( name );
+        t.u.count = c;
+        return t;
+    }
+
+    int count() const { return u.count; }
+    int weighting() const { return u.weighting; }
 };
+
+
+#endif // WEIGHTEDSTRING_H

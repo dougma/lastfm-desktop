@@ -16,27 +16,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#include <QItemDelegate>
 
-class StationDelegate : public QItemDelegate
+#ifndef WEIGHTEDSTRINGLIST_H
+#define WEIGHTEDSTRINGLIST_H
+
+#include "lib/DllExportMacro.h"
+#include "WeightedString.h"
+
+#include <QStringList>
+
+
+class CORE_DLLEXPORT WeightedStringList : public QList<WeightedString>
 {
-Q_OBJECT
-	
 public:
-	StationDelegate( QObject* parent = 0 ):QItemDelegate( parent ), m_count( 0 ){};
-	
-	void paint( QPainter* painter, 
-				const QStyleOptionViewItem& option, 
-			    const QModelIndex& index ) const;
-	
-	QSize sizeHint( const QStyleOptionViewItem& option, 
-				    const QModelIndex& index ) const;
-	
-	void setMaxCount( int count ){ m_count = count; }
-	
-	enum IndexDataRole{ CountRole = Qt::UserRole };
-	
-private:
-	int m_count;
+    WeightedStringList() {}
+    WeightedStringList( QList<WeightedString> list ) : QList<WeightedString>( list ) {}
+
+    operator QStringList() 
+    {
+        QStringList strings;
+        foreach (WeightedString t, *this)
+            strings << QString(t);
+        return strings;
+    }
+
+    void sortWeightingAscending() 
+    {
+        qSort( begin(), end(), weightLessThan ); 
+    }
+    
+    void sortWeightingDescending() 
+    {
+        qSort( begin(), end(), weightMoreThan );
+    }
+    
+    void sortAscending()
+    {
+        qSort( begin(), end(), caseInsensitiveLessThan );
+    }
+    
+    void sortDescending()    
+    {
+        qSort( begin(), end(), qGreater<WeightedString>() );        
+    }
+    
+    static bool caseInsensitiveLessThan(const QString &s1, const QString &s2)
+    {
+        return s1.toLower() < s2.toLower();
+    } 
+    
+    static bool weightLessThan(const WeightedString &s1, const WeightedString &s2)
+    {
+        return s1.weighting() < s2.weighting();
+    }
+    
+    static bool weightMoreThan(const WeightedString &s1, const WeightedString &s2)
+    {
+        return s1.weighting() > s2.weighting();
+    }
 };
+
+#endif // WEIGHTEDSTRINGLIST_H

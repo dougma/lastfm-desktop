@@ -32,6 +32,7 @@ public:
 	
 private:
 	Ui::NowPlayingTuner ui;
+	class StationDelegate* m_tagListDelegate;
 	
 private slots:
 	void onTunerReturnPressed();

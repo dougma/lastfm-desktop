@@ -27,18 +27,33 @@ StationDelegate::paint(QPainter* painter,
 					   const QModelIndex& index) const
 {
 	painter->save();
+	QPalette palette;
+	bool itemSelected = option.state & QStyle::State_Selected;
 	
+	if( itemSelected )
+	{
+		painter->fillRect( option.rect, palette.highlight() );
+		painter->setPen( palette.highlightedText().color() );
+	}
+
+	//Draw popularity of tag bar graph
+	int count = index.data( CountRole ).toInt();
+	QRect tagRect = option.rect;
+	tagRect.setWidth( ( tagRect.width() / m_count ) * count );
+	tagRect.setY( tagRect.y() + 2 );
+	tagRect.setHeight( tagRect.height() - 1 );
+
+	if( !itemSelected )
+		painter->fillRect( tagRect, QBrush( QColor( 210, 210, 210 ) ) );
+	else
+		painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
+	
+	
+	//Draw tag text
 	QRect textRect = option.rect;
 	textRect.setX( textRect.x() + 10 );
 	textRect.setY( textRect.y() + 10 );
 	textRect.setWidth( textRect.width() - 35 );
-	
-	if( option.state & QStyle::State_Selected )
-	{
-		painter->fillRect( option.rect, QPalette().highlight() );
-		painter->setPen( QPalette().highlightedText().color() );
-	}
-	
 	painter->drawText( textRect, Qt::TextSingleLine, index.data().toString(), &textRect );
 	
 	
