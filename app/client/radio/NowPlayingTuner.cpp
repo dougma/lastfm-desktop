@@ -18,12 +18,11 @@
  ***************************************************************************/
 
 #include "NowPlayingTuner.h"
-#include "lib/radio/RadioStation.h"
-#include "StationDelegate.h"
-#include "RadioController.h"
 #include "App.h"
-#include "ObservedTrack.h"
+#include "StationDelegate.h"
 #include "PlayerEvent.h"
+#include "ObservedTrack.h"
+#include "lib/radio/RadioController.h"
 #include "lib/radio/RadioStation.h"
 #include "lib/types/Track.h"
 #include <QVBoxLayout>
@@ -41,7 +40,7 @@ NowPlayingTuner::NowPlayingTuner()
 	QLineEdit* tuning_dial = new QLineEdit;
     connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
 	
-	connect( &The::app(), SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
+	connect( qApp, SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
 	
 	connect( ui.tagsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onTagClicked( QListWidgetItem*)) );
 	connect( ui.similarArtistsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onArtistClicked( QListWidgetItem*)) );
