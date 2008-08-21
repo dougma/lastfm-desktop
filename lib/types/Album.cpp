@@ -60,8 +60,11 @@ AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size 
 void
 AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 {
-	if (reply->failed())
-		return; // error is reported higher up
+	if (reply->failed()) {
+		// we output a qWarning at a higher level
+		emit finished( QByteArray() );
+		return;
+	}
 	
     try
     {
