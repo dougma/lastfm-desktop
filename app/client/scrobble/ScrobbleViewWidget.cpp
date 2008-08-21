@@ -50,11 +50,12 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 	setMinimumHeight( sizeHint().height() );
 }
 
+
 void
 ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 {
 //	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
-	QLinearGradient g( 0, height() - 327, 0, height() );
+	QLinearGradient g( 0, height() - 300, 0, height() );
 	g.setColorAt( 0, Qt::black );
 	g.setColorAt( 1, QColor( 0x30, 0x2e, 0x2e ) );
 
