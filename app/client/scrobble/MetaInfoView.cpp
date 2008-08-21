@@ -24,6 +24,8 @@
 #include <QAuthenticator>
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QTabBar>
+#include <QVBoxLayout>
 #include <QWebView>
 
 
@@ -39,6 +41,7 @@ MetaInfoView::MetaInfoView()
 	ui.tabs->addTab( tr( "Album" ) );
 	ui.tabs->addTab( tr( "Track" ) );
 	ui.tabs->setDrawBase( false );
+	ui.tabs->hide();
 	
 	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
@@ -64,7 +67,6 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
-
         case PlayerEvent::PlaybackStarted:
 			ui.tabs->show();
 			// fall through
