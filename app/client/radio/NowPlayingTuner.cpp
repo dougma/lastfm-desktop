@@ -20,11 +20,11 @@
 #include "NowPlayingTuner.h"
 #include "lib/radio/RadioStation.h"
 #include "StationDelegate.h"
-#include "RadioStation.h"
 #include "RadioController.h"
 #include "App.h"
 #include "ObservedTrack.h"
 #include "PlayerEvent.h"
+#include "lib/radio/RadioStation.h"
 #include "lib/types/Track.h"
 #include <QVBoxLayout>
 #include <QToolBar>

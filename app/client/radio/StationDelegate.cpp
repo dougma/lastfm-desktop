@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "StationDelegate.h"
+#include <QDebug>
 #include <QPainter>
 
 
