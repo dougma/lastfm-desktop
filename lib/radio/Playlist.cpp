@@ -24,7 +24,7 @@
 
 Playlist::Playlist( WsReply* reply ) throw( UnicornException )
 {
-	qDebug() << "\n" << reply->data() << "\n";
+	qDebug() << reply;
 	
 	m_title = reply->lfm()["playlist"]["title"].text();
 		
