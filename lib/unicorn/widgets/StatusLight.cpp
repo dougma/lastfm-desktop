@@ -31,12 +31,10 @@
 StatusLight::StatusLight( QWidget* parent )
            : QWidget( parent )
 {
-    m_color = Qt::white;
+    m_color = Qt::green;
 
     int const M = fontMetrics().height();
     setFixedSize( M, M );
-
-    qDebug() << M;
 }
 
 
@@ -46,18 +44,18 @@ void StatusLight::paintEvent( QPaintEvent* )
 	p.setRenderHint( QPainter::Antialiasing, true );
 	p.setWindow( -50,-50, 100, 100 );
 	
-	p.setPen(Qt::white);
-	p.drawArc(-25,-25,50,50,0,5670);
-	p.drawArc(-32,-33,66,66,0,5670);
-	p.setPen(Qt::darkGray);
-	p.drawArc(-34,-33,66,66,3400,3000);
+	p.setPen( Qt::white );
+	p.drawArc( -25, -25, 50, 50, 0, 5670 );
+	p.drawArc( -32, -33, 66, 66, 0, 5670 );
+	p.setPen( QColor(Qt::darkGray).lighter( 125 ) );
+	p.drawArc( -34, -33, 66, 66, 0, 180*16 );
 	
-    QRadialGradient radialGrad(QPointF(-8, -8), 20);
-    radialGrad.setColorAt(0, Qt::white);
-    radialGrad.setColorAt(1, m_color);
+    QRadialGradient radialGrad(QPointF(0, -14), 20);
+    radialGrad.setColorAt( 0, QColor( 0xff, 0xff, 0xff, 0.8 ) );
+    radialGrad.setColorAt( 1, m_color );
 
     QBrush brush(radialGrad);
     p.setBrush(brush);
-    p.setPen(Qt::black);
+    p.setPen( m_color.darker() );
     p.drawEllipse(-25,-25,50,50);
 }

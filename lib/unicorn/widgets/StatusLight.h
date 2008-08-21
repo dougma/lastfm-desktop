@@ -37,10 +37,11 @@ class UNICORN_DLLEXPORT StatusLight : public QWidget
 
 public: 
     StatusLight( QWidget* parent = 0 );
-    void setColor( QColor c ) { m_color = c; }
+	
+    void setColor( const QColor& c ) { m_color = c; }
 
 protected:
-    void paintEvent( QPaintEvent* event );
+    void paintEvent( QPaintEvent* );
 };
 
 #endif
