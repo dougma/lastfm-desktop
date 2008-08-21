@@ -102,7 +102,7 @@ void
 Unicorn::Application::translate()
 {
 #ifdef NDEBUG
-    QString const lang_code = Unicorn::Settings().language();
+    QString const lang_code = CoreLocale::system().code();
 
 #ifdef Q_WS_MAC
     QDir d = SystemDir::bundle().filePath( "Contents/Resources/qm" );
