@@ -331,6 +331,8 @@ void
 MainWindow::setRadio( RadioController* r )
 {
     Q_ASSERT( r );
+	
+	connect( r, SIGNAL( tuningIn( const RadioStation&)), SLOT( showNowPlaying()));
 
 	//FIXME encapsulation!!!!!
     ui.controls->ui.volume->setAudioOutput( r->audioPlaybackEngine()->audioOutput() );

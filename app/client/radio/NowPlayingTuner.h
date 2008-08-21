@@ -33,9 +33,14 @@ public:
 private:
 	Ui::NowPlayingTuner ui;
 	
+	/** Note the QListWidget must have a StationDelegate class set as the delegate
+	 otherwise this will break. Should probably fix this at some point. */
+	void addWeightedStringsToList( class WeightedStringList& stringList, QListWidget* list );
+	
 private slots:
 	void onTunerReturnPressed();
 	void onAppEvent( int, const QVariant& );
+	
 	void onFetchedTopTags( class WsReply* );
 	void onFetchedSimilarArtists( WsReply* r );
 	

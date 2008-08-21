@@ -57,6 +57,7 @@ void
 AudioPlaybackEngine::clearQueue()
 {
     m_mediaObject->clearQueue();
+	
 }
 
 
@@ -75,7 +76,11 @@ AudioPlaybackEngine::skip()
 void
 AudioPlaybackEngine::stop()
 {
-    m_mediaObject->stop();
+	if (m_mediaObject->queue().size())
+	{
+		m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
+	}	
+	m_mediaObject->stop();
 }
 
 

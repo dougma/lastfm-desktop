@@ -93,7 +93,8 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 }
 
 
-void addWeightedStringsToList( WeightedStringList& stringList, QListWidget* list )
+void 
+NowPlayingTuner::addWeightedStringsToList( WeightedStringList& stringList, QListWidget* list )
 {
 	if( stringList.isEmpty() )
 		return;
