@@ -68,15 +68,19 @@ namespace PlayerEvent
           * track */
         ScrobblePointReached,
         
-        /** A new media player has sent a message to the client */ 
+        /** A new media player has connected to the client, although many 
+		  * players can connect at once, we only notify you about one at a time
+		  * so when one disconnects we send a connect message for the next one
+		  * in the queue */ 
         PlayerConnected,
 
-        /** A media player has terminated */
+        /** A known media player has disconnected from the client */
         PlayerDisconnected,
-		
-		/** A media player (most likely the last.fm radio) has changed listening context. */
-		PlayerChangedContext,
 
+		/** A media player (most likely Last.fm Radio) has changed listening 
+		  * context */
+		PlayerChangedContext,
+		
         TypeMax /** leave at end of enum, kthxbai */
     };
 }
