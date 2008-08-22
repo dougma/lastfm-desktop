@@ -70,7 +70,7 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 			
 			delete ui.miniNowPlaying;
 			ui.miniNowPlaying = new MiniNowPlayingView( t );
-			ui.verticalLayout->insertWidget( 0, ui.miniNowPlaying );
+			static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
 			
 		}
 		break;
