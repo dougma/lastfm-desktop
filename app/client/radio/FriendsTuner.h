@@ -20,6 +20,9 @@
 #ifndef FREINDS_TUNER_H
 #define FRIENDS_TUNER_H
 
+#include <QListWidget>
+
+
 class FriendsTuner : public QListWidget
 {
 	Q_OBJECT
@@ -29,7 +32,7 @@ public:
 	
 private slots:
 	void onFetchedFriends( class WsReply* );
-	void onFriendClicked( QListWidgetItem* i );
+	void onFriendClicked( class QListWidgetItem* );
 
 signals:
 	void tune( const class RadioStation& );

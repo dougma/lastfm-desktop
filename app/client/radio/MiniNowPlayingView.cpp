@@ -22,6 +22,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+
 MiniNowPlayingView::MiniNowPlayingView( const Track& t )
 {
 	setupUi();
@@ -47,10 +48,8 @@ MiniNowPlayingView::onAlbumImageDownloaded( QByteArray b )
 void
 MiniNowPlayingView::setupUi()
 {
-	
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
-
 	
     horizontalLayout = new QHBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -112,5 +111,4 @@ MiniNowPlayingView::setupUi()
     horizontalLayout->addLayout(verticalLayout);
 	
 	setLayout( horizontalLayout );
-	
 }

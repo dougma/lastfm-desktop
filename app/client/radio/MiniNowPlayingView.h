@@ -20,15 +20,17 @@
 #ifndef MINI_NOW_PLAYING_VIEW_H
 #define MINI_NOW_PLAYING_VIEW_H
 
+#include <QWidget>
 #include "lib/types/Track.h"
-
 class QLabel;
+
+
 class MiniNowPlayingView : public QWidget
 {
 	Q_OBJECT
 	
 public:
-	MiniNowPlayingView( QWidget* p = 0 ) : QWidget( p ){ setupUi(); }
+	MiniNowPlayingView( QWidget* p = 0 ) : QWidget( p ) { setupUi(); }
 	MiniNowPlayingView( const Track& t );
 	
 private:
