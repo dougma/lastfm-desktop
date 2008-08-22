@@ -24,112 +24,80 @@
 #include <QtGui>
 
 
-static inline QImage compose( const QImage &in )
-{
-    qDebug() << "Image dimensions:" << in.size();
-
-    const uint H = qreal(in.height()) / 3;
-
-    QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
-    QPainter p( &out );
-    p.drawImage( 0, 0, in );
-    
-    QImage reflection = in.copy( 0, in.height() - H, in.width(), H );
-    reflection = reflection.mirrored( false, true /*vertical only*/ );
-
-    QLinearGradient gradient( QPoint( 0, in.height() ), QPoint( 0, out.height() ) );
-    gradient.setColorAt( 0, QColor(0, 0, 0, 100) );
-    gradient.setColorAt( 1, Qt::transparent );
-
-    p.drawImage( 0, in.height(), reflection );
-    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
-    p.fillRect( QRect( QPoint( 0, in.height() ), reflection.size() ), gradient );
-
-    return out;
-}
-
-
-
 NowPlayingView::NowPlayingView()
 {
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-
     QVBoxLayout* v = new QVBoxLayout( this );
     v->setMargin( 0 );
     v->addStretch();
-    v->addWidget( m_label = new QLabel );
+    v->addWidget( ui.text = new QLabel );
 #ifdef Q_WS_MAC
     v->addSpacing( 11 );
-    m_label->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
-    m_label->setAttribute( Qt::WA_MacSmallSize );
+    ui.text->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
+    ui.text->setAttribute( Qt::WA_MacSmallSize );
 #else
     v->addSpacing( 4 );
 #endif
     
-    m_label->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
-    m_label->setTextFormat( Qt::RichText );
+    ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    ui.text->setTextFormat( Qt::RichText );
 	
-	m_spinner = new SpinnerLabel( this );
-	m_spinner->hide();
+	ui.spinner = new SpinnerLabel( this );
+	ui.spinner->hide();
 }
 
 
 void
-NowPlayingView::onAppEvent( int e, const QVariant& v )
+NowPlayingView::clear()
 {
-    switch (e)
-    {
-        case PlayerEvent::PlaybackEnded:
-            m_cover = QImage();
-            m_label->clear();
-            update();
-            break;
+	m_cover = QImage();
+	ui.text->clear();
+	ui.spinner->hide();
+	qDeleteAll( findChildren<AlbumImageFetcher*>() );
+	update();
+}
 
-        case PlayerEvent::PlaybackStarted:
-        case PlayerEvent::TrackChanged:
-        {
-			Track t = v.value<ObservedTrack>();
-			
-			//TODO for scrobbled tracks we should get the artwork out of the track
-			if (m_track.album() != t.album())
-			{
-				m_cover = QImage();
-				update();
-				
-				qDeleteAll( findChildren<AlbumImageFetcher*>() );
-				QObject* o = new AlbumImageFetcher( t.album(), Album::Large );
-				connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
-				o->setParent( this );
-				
-				m_spinner->show();
-			}
-			
-			m_track = t;
 
-			// TODO handle bad data
-			m_label->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
-			
-            break;
-        }
-    }
+void
+NowPlayingView::setTrack( const Track& t )
+{
+	//TODO for scrobbled tracks we should get the artwork out of the track
+	if (m_track.album() != t.album())
+	{
+		m_cover = QImage();
+		update();
+		
+		qDeleteAll( findChildren<AlbumImageFetcher*>() );
+		QObject* o = new AlbumImageFetcher( t.album(), Album::Large );
+		connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
+		o->setParent( this );
+		
+		ui.spinner->show();
+	}
+
+	m_track = t;
+
+	// TODO handle bad data
+	ui.text->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
 }
 
 
 void
 NowPlayingView::onAlbumImageDownloaded( const QByteArray& data )
 {
-	if (data.size()) 
+	if (data.size())
+	{
 		m_cover.loadFromData( data );
+	    qDebug() << "Image dimensions:" << m_cover.size();
+	}
 	else
-		m_cover = QImage( ":/blank/cover.png" );
+		m_cover = QImage( ":/blank/cover.png" ); //TODO blank cover in unicorn
 
-	m_cover = m_cover.convertToFormat( QImage::Format_ARGB32_Premultiplied );
-	m_cover = compose( m_cover );
+	m_cover = addReflection( m_cover );
 	update();
 
 	sender()->deleteLater();
 	
-	m_spinner->hide();
+	ui.spinner->hide();
 }
 
 
@@ -181,4 +149,30 @@ NowPlayingView::paintEvent( QPaintEvent* e )
     f.rx() /= 2;
 
     p.drawImage( f, m_cover );
+}
+
+
+QImage //static
+NowPlayingView::addReflection( const QImage &in )
+{
+    const uint H = qreal(in.height()) / 3;
+	
+    QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
+    QPainter p( &out );
+	QImage in2 = in;
+	in2.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+    p.drawImage( 0, 0, in2 );
+    
+    QImage reflection = in.copy( 0, in.height() - H, in.width(), H );
+    reflection = reflection.mirrored( false, true /*vertical only*/ );
+	
+    QLinearGradient gradient( QPoint( 0, in.height() ), QPoint( 0, out.height() ) );
+    gradient.setColorAt( 0, QColor(0, 0, 0, 100) );
+    gradient.setColorAt( 1, Qt::transparent );
+	
+    p.drawImage( 0, in.height(), reflection );
+    p.setCompositionMode( QPainter::CompositionMode_DestinationIn );
+    p.fillRect( QRect( QPoint( 0, in.height() ), reflection.size() ), gradient );
+	
+    return out;
 }

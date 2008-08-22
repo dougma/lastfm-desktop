@@ -26,6 +26,8 @@
 
 class ScrobbleViewWidget : public QWidget
 {
+	Q_OBJECT
+	
 public:
 	ScrobbleViewWidget();
 	
@@ -44,9 +46,12 @@ public:
 		class NowPlayingView* cover;
 		class ScrobbleProgressBar* progress;
 		class MediaPlayerIndicator* playerIndicator;
-		
-	} ui;
+	} 
+	ui;
 	
+private slots:
+	void onAppEvent( int, const class QVariant& );
+	void onRadioTuningIn( const QString& title );
 };
 
 

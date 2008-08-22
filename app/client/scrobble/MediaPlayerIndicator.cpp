@@ -21,12 +21,22 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 	m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
 	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
 	
+	// prevent the text length resizing the window!
+	m_nowPlayingIndicator->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+	
 #ifdef Q_WS_MAC
 	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
 	m_nowPlayingIndicator->setPalette( p );
 	m_playerDescription->setPalette( p );
 	mediaPlayerConnected( "osx" );
 #endif
+}
+
+
+void
+MediaPlayerIndicator::setTuningIn( const QString& /*title*/ )
+{
+	m_playerDescription->setText( tr("<b><font color=#343434>tuning in...") );
 }
 
 
@@ -38,7 +48,7 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 		// we are guarenteed that the playerid will not change without a disconnected first
         case PlayerEvent::PlayerDisconnected:
 #ifndef Q_WS_MAC //FIXME
-			m_playerDescription->setText( "<b><font color=#343434>no player connection" );
+			m_playerDescription->setText( tr("<b><font color=#343434>no player connection") );
 #endif
             break;
 
@@ -58,7 +68,7 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 		case PlayerEvent::PlayerChangedContext:
 			m_playerName = tr("Last.fm radio");
 			m_playbackCommencedString = tr( "<b><font color=#343434>%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( v.toString() );
-			m_playerDescription->setText( m_playbackCommencedString ); 
+			// don't set m_playerDescription until we actually start playing
 
         default:
             return;

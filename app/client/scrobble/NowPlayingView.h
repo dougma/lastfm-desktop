@@ -32,17 +32,28 @@ class NowPlayingView : public QWidget
 public:
     NowPlayingView();
 
+	void setTrack( const Track& );
+	void clear();
+	
+	struct Ui
+	{
+		class QLabel* text;
+		class SpinnerLabel* spinner;
+		
+	};
+	
+	Ui ui;
+	
 private slots:
-    void onAppEvent( int, const QVariant& );
 	void onAlbumImageDownloaded( const QByteArray& );
 
 private:
     void paintEvent( QPaintEvent* );
 
     QImage m_cover;
-    class QLabel* m_label;
 	Track m_track;
-	class SpinnerLabel* m_spinner;
+	
+	static QImage addReflection( const QImage& );
 };
 
 #endif // NOW_PLAYING_VIEW_H

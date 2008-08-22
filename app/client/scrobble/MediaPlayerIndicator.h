@@ -31,6 +31,8 @@ class MediaPlayerIndicator : public QWidget
 public:
     MediaPlayerIndicator();
 
+	void setTuningIn( const QString& station_title );
+	
 private slots:
     void onAppEvent( int e, const QVariant& v );
     void mediaPlayerConnected( const QString& id );

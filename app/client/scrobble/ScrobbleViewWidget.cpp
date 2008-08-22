@@ -20,8 +20,12 @@
 #include "ScrobbleViewWidget.h"
 #include "MediaPlayerIndicator.h"
 #include "NowPlayingView.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/ScrobbleProgressBar.h"
-#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include "App.h"
+#include "PlayerEvent.h"
+
 
 ScrobbleViewWidget::ScrobbleViewWidget()
 {
@@ -48,6 +52,13 @@ ScrobbleViewWidget::ScrobbleViewWidget()
     setAutoFillBackground( true );
 	
 	setMinimumHeight( sizeHint().height() );
+	
+	connect( (QObject*)&The::app().radioController(), 
+			 SIGNAL(tuningIn( QString )),
+			 SLOT(onRadioTuningIn( QString )) );
+	connect( qApp,
+			 SIGNAL(event(int, QVariant )),
+ 			 SLOT(onAppEvent( int, QVariant )) );
 }
 
 
@@ -65,4 +76,32 @@ ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 	//inefficient as sets recursively on child widgets? 
 	//may be better to just paintEvent it
 	setPalette( p );
+}
+
+
+void
+ScrobbleViewWidget::onAppEvent( int e, const QVariant& v )
+{
+	switch (e)
+	{
+		case PlayerEvent::PlaybackStarted:
+		case PlayerEvent::TrackChanged:
+		{
+			Track t = v.value<ObservedTrack>();
+			ui.cover->setTrack( t );
+			break;
+		}
+
+		case PlayerEvent::PlaybackEnded:
+			ui.cover->clear();
+			break;
+	}
+}
+
+
+void
+ScrobbleViewWidget::onRadioTuningIn( const QString& title )
+{
+	ui.cover->ui.spinner->show();
+	ui.playerIndicator->setTuningIn( title );
 }
