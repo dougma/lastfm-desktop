@@ -383,15 +383,18 @@ MainWindow::dropEvent( QDropEvent* e )
 void
 MainWindow::onUserGetInfoReturn( WsReply* reply )
 {
+	qDebug() << reply;
+	
 	try
 	{
 		EasyDomElement e = reply->lfm()["user"];
 		QString gender = e["gender"].text();
 		QString age = e["age"].text();
-		if (gender.size() && gender.size())
+		uint scrobbles = e["playcount"].text().toUInt();
+		if (gender.size() && gender.size() && scrobbles > 0)
 		{
 			gender = (gender == "m") ? "boy" : "girl";
-			QString text = tr("A %1 %2 years of age").arg( gender ).arg( age );
+			QString text = tr("A %1, %2 years of age with %L3 scrobbles").arg( gender ).arg( age ).arg( scrobbles );
 			ui.account->addAction( text )->setEnabled( false );
 		}
 	}
