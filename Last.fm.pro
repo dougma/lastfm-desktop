@@ -27,7 +27,7 @@ debug:macx-xcode {
     INCLUDEPATH += app/client
     LIBS += -framework SystemConfiguration -framework CoreServices
 
-	PRECOMPILED_HEADER = common/precompiled.h
+#	PRECOMPILED_HEADER = common/precompiled.h
 }
 else {
     TEMPLATE = subdirs
