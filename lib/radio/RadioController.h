@@ -17,7 +17,7 @@ class RADIO_DLLEXPORT RadioController : public QObject
 
 public:
     RadioController();
-	//TODO remove
+	//TODO remove, instead return a volume slider that is configured and ready
 	AudioPlaybackEngine* audioPlaybackEngine() const { return m_audio; }
     
 public slots:
@@ -29,7 +29,7 @@ private slots:
     void enqueue( const QList<Track>& );
 
 signals:
-	void tuningIn( const RadioStation& );
+	void tuningIn( const QString& title );
 	void tuned( const QString& title );
 	void preparing( const Track& );
 	/** buffering and percentage, you can get this mid-track too, if so, see playbackResumed() */

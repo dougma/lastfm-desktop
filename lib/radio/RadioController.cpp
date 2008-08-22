@@ -20,7 +20,7 @@ RadioController::play( const RadioStation& station )
 {
 	qInfo() << "Tuning to:" << station;
 	
-	m_audio->clearQueue();
+	m_audio->stop();
 	delete m_tuner;
 	
 	emit tuningIn( station );

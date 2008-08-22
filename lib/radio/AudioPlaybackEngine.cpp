@@ -54,33 +54,27 @@ AudioPlaybackEngine::queue( const QList<Track>& tracks )
 
 
 void
-AudioPlaybackEngine::clearQueue()
-{
-    m_mediaObject->clearQueue();
-	
-}
-
-
-void
 AudioPlaybackEngine::skip()
 {
-	if (m_mediaObject->queue().size())
+	QList<Phonon::MediaSource> q = m_mediaObject->queue();
+	if (q.size())
 	{
-		m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
-		m_mediaObject->play();	
+		Phonon::MediaSource source = q.front();
+		q.pop_front();
+		m_mediaObject->setQueue( q );
+		m_mediaObject->setCurrentSource( source );
+		m_mediaObject->play();
 	}
-	//else we alrady asked for more tracks, so wait I guess
+	//else we already asked for more tracks, so wait I guess
 }
 
 
 void
 AudioPlaybackEngine::stop()
 {
-	if (m_mediaObject->queue().size())
-	{
-		m_mediaObject->setCurrentSource( m_mediaObject->queue().front() );
-	}	
 	m_mediaObject->stop();
+	m_mediaObject->clearQueue();
+	m_mediaObject->setCurrentSource( QUrl() );
 }
 
 
@@ -88,6 +82,13 @@ void
 AudioPlaybackEngine::play()
 {
     m_mediaObject->play();
+}
+
+
+void
+AudioPlaybackEngine::pause()
+{
+	m_mediaObject->pause();
 }
 
 
@@ -148,7 +149,7 @@ AudioPlaybackEngine::onPhononSourceChanged( const Phonon::MediaSource& source )
     // Another reason for this being a bad solution is that the track wont 
     // necessarily have started when the source changes but mearly started buffering!
     
-    onPhononStateChanged( Phonon::PlayingState, Phonon::LoadingState );
+//    onPhononStateChanged( Phonon::PlayingState, Phonon::LoadingState );
 }
 
 

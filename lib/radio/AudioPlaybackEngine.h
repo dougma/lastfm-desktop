@@ -36,11 +36,12 @@ public:
     
 public slots:
     void queue( const QList<Track>& );
-    void clearQueue();
 
     void play();
     void skip();
+	/** stops playback and clears queue */
     void stop();
+	void pause();
 
 signals:
     void trackStarted( const Track& );
