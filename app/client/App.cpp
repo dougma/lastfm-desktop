@@ -32,6 +32,7 @@
 #include "lib/radio/RadioController.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
+#include "phonon/audiooutput.h"
 
 #ifdef WIN32
     #include "legacy/disableHelperApp.cpp"
@@ -62,11 +63,11 @@ App::App( int argc, char** argv )
     init.sessionKey = The::settings().sessionKey();
     init.clientId = "ass";
     m_scrobbler = new Scrobbler( init );
-    m_radio = new RadioController;
-
+    
+	m_radio = new RadioController( new Phonon::AudioOutput );
+	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
-    connect( m_radio, SIGNAL(buffering( int )), SLOT(onRadioBuffering()) );
 	connect( m_radio, SIGNAL(tuned( QString )), SLOT(onRadioStationTuned( QString )) );
 
     DiagnosticsDialog::observe( m_scrobbler );
@@ -91,8 +92,6 @@ void
 App::setMainWindow( MainWindow* window )
 {
     m_mainWindow = window;
-	
-    m_mainWindow->setRadio( m_radio );
 
     connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
@@ -283,20 +282,6 @@ void
 App::onRadioPlaybackEnded()
 {
     m_playerManager->onPlaybackEnded( "ass" );
-}
-
-
-void
-App::onRadioBuffering()
-{
-    m_playerManager->onPlaybackPaused( "ass" );
-}
-
-
-void
-App::onRadioFinishedBuffering()
-{
-    m_playerManager->onPlaybackResumed( "ass" );
 }
 
 

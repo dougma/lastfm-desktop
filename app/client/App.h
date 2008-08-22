@@ -34,7 +34,7 @@ public:
 
     void setMainWindow( class MainWindow* );
     MainWindow& mainWindow() const { return *m_mainWindow; }
-	RadioController& radioController(){ return *m_radio; }
+	RadioController& radioController() const { return *m_radio; }
     
     /** the currently observed track */
     Track track() const;
@@ -63,8 +63,6 @@ private slots:
 
     void onRadioTrackStarted( const class Track& );
     void onRadioPlaybackEnded();
-    void onRadioBuffering();
-    void onRadioFinishedBuffering();
 	void onRadioStationTuned( const QString& );
 
 signals:
