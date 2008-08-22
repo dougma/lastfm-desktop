@@ -22,6 +22,7 @@
 
 #include <QString>
 #include "lib/DllExportMacro.h"
+#include "lib/core/WeightedStringList.h"
 #include "lib/ws/WsReply.h" //convenience
 
 
@@ -39,6 +40,7 @@ public:
     static QStringList getFriends( WsReply* );
 	
 	WsReply* getTopTags();
+	static WeightedStringList getTopTags( WsReply* );
 };
 
 #endif

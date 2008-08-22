@@ -17,58 +17,45 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "User.h"
-#include "lib/ws/WsRequestBuilder.h"
+#include "MyTagsTuner.h"
+#include "StationDelegate.h"
+#include "lib/types/User.h"
+#include "lib/radio/RadioStation.h"
+#include "Settings.h"
 
-
-WsReply*
-User::getFriends()
+MyTagsTuner::MyTagsTuner()
 {
-    return WsRequestBuilder( "user.getFriends" ).add( "user", m_name ).get();
+	setItemDelegate( new StationDelegate );
+	User u( The::settings().username() );
+	WsReply* reply = u.getTopTags();
+	connect( reply, SIGNAL( finished( WsReply*)), SLOT(onFetchedTags( WsReply*)) );
+	connect( this, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onTagClicked( QListWidgetItem*)) );
 }
 
 
-WsReply*
-User::getTopTags()
+void
+MyTagsTuner::onFetchedTags( WsReply* r )
 {
-    return WsRequestBuilder( "user.getTopTags" ).add( "user", m_name ).get();
-}
-
-
-QStringList
-User::getFriends( WsReply* r )
-{
-    QStringList names;
-    try
-    {
-        foreach (EasyDomElement e, r->lfm().children( "user" ))
-            names += e["name"].text();
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-    return names;
-}
-
-
-WeightedStringList /* static */
-User::getTopTags( WsReply* r )
-{
-	WeightedStringList tags;
-	try
+	const WeightedStringList& tags = User::getTopTags( r );
+	
+	if( tags.isEmpty() ) 
+		return;
+	
+	static_cast<StationDelegate*>( itemDelegate() )->setMaxCount( tags.first().weighting() );
+	
+	foreach( const WeightedString& tag, tags )
 	{
-		foreach (EasyDomElement e, r->lfm().children( "tag" ))
-		{
-			QString tagname = e["name"].text();
-			int count = e["count"].text().toInt();
-			tags.push_back( WeightedString( tagname, count ));
-		}
-		
+		QListWidgetItem* i = new QListWidgetItem( tag, this );
+		i->setData( StationDelegate::CountRole, tag.weighting() );
+		addItem( i );
 	}
-	catch( EasyDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
-	return tags;
+}
+
+
+void
+MyTagsTuner::onTagClicked( QListWidgetItem* i )
+{
+	const QString& tag = i->data( Qt::DisplayRole ).toString();
+	RadioStation r( tag, RadioStation::Tag );
+	emit tune( r );
 }

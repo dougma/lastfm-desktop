@@ -17,58 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "User.h"
-#include "lib/ws/WsRequestBuilder.h"
+#ifndef MY_TAGS_TUNER_H
+#define MY_TAGS_TUNER_H
 
+#include <QListWidget>
 
-WsReply*
-User::getFriends()
+class MyTagsTuner : public QListWidget
 {
-    return WsRequestBuilder( "user.getFriends" ).add( "user", m_name ).get();
-}
+	Q_OBJECT
+	
+public:
+	MyTagsTuner();
 
+	
+private slots:
+	void onFetchedTags( class WsReply* );
+	void onTagClicked( QListWidgetItem* i );
+	
+signals:
+	void tune( const class RadioStation& );
+	
+};
 
-WsReply*
-User::getTopTags()
-{
-    return WsRequestBuilder( "user.getTopTags" ).add( "user", m_name ).get();
-}
-
-
-QStringList
-User::getFriends( WsReply* r )
-{
-    QStringList names;
-    try
-    {
-        foreach (EasyDomElement e, r->lfm().children( "user" ))
-            names += e["name"].text();
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-    return names;
-}
-
-
-WeightedStringList /* static */
-User::getTopTags( WsReply* r )
-{
-	WeightedStringList tags;
-	try
-	{
-		foreach (EasyDomElement e, r->lfm().children( "tag" ))
-		{
-			QString tagname = e["name"].text();
-			int count = e["count"].text().toInt();
-			tags.push_back( WeightedString( tagname, count ));
-		}
-		
-	}
-	catch( EasyDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
-	return tags;
-}
+#endif //MY_TAGS_TUNER_H

@@ -20,6 +20,7 @@
 #include "RadioWidget.h"
 #include "NowPlayingTuner.h"
 #include "FriendsTuner.h"
+#include "MyTagsTuner.h"
 #include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "MyStations.h"
@@ -46,7 +47,11 @@ RadioWidget::RadioWidget()
 
 	FriendsTuner* friendsTuner = new FriendsTuner;
 	connect( friendsTuner, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
-	tabWidget->addTab( friendsTuner, "My Friends" );	
+	tabWidget->addTab( friendsTuner, "My Friends" );
+	
+	MyTagsTuner* tagsTuner = new MyTagsTuner;
+	connect( tagsTuner, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
+	tabWidget->addTab( tagsTuner, "My Tags" );	
 
 	QSplitter* s = new QSplitter( Qt::Vertical, this );
 	s->addWidget( tabWidget );
