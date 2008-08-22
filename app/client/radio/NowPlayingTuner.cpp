@@ -78,6 +78,13 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 		case PlayerEvent::PlaybackEnded:
 			ui.tagsTab->clear();
 			ui.similarArtistsTab->clear();
+			
+			//Clear the minimetaview - 
+			//deleting the object and replacing it with a blank one will
+			//ensure that any pending albumArt does not get loaded.
+			delete ui.miniNowPlaying;
+			ui.miniNowPlaying = new MiniNowPlayingView;
+			static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
 		break;
 	}
 }
