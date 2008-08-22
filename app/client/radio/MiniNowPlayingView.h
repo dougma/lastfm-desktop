@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,37 +17,32 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef NOW_PLAYING_TUNER_H
-#define NOW_PLAYING_TUNER_H
+#ifndef MINI_NOW_PLAYING_VIEW_H
+#define MINI_NOW_PLAYING_VIEW_H
 
-#include "ui_NowPlayingTuner.h"
-#include <QWidget>
+#include "lib/types/Track.h"
 
-class NowPlayingTuner :public QWidget
+class QLabel;
+class MiniNowPlayingView : public QWidget
 {
 	Q_OBJECT
 	
 public:
-	NowPlayingTuner();
+	MiniNowPlayingView( QWidget* p = 0 ) : QWidget( p ){ setupUi(); }
+	MiniNowPlayingView( const Track& t );
 	
 private:
-	Ui::NowPlayingTuner ui;
+	void setupUi();
 	
-	/** Note the QListWidget must have a StationDelegate class set as the delegate
-	 otherwise this will break. Should probably fix this at some point. */
-	void addWeightedStringsToList( class WeightedStringList& stringList, QListWidget* list );
+	struct {
+		QLabel *albumArt;
+		QLabel *artist;
+		QLabel *track;
+		QLabel *album;
+	} ui;
 	
 private slots:
-	void onAppEvent( int, const QVariant& );
-	
-	void onFetchedTopTags( class WsReply* );
-	void onFetchedSimilarArtists( WsReply* r );
-	
-	void onTagClicked( QListWidgetItem* );
-	void onArtistClicked( QListWidgetItem* );
-	
-signals:
-	void tune( const class RadioStation& );
+	void onAlbumImageDownloaded( QByteArray b );
 };
 
-#endif //NOW_PLAYING_TUNER_H
+#endif //MINI_NOW_PLAYING_VIEW_H

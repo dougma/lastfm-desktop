@@ -75,11 +75,17 @@ StationDelegate::paint(QPainter* painter,
 	//Draw seperating lines
 	painter->setPen( QPalette().mid().color() );
 
-	painter->drawLine( QPoint( option.rect.x(), option.rect.y()  ),
-					  QPoint( option.rect.x() + option.rect.width(), option.rect.y() ) );
+	int lineL = option.rect.x();
+	int lineR = lineL + option.rect.width();
 	
-	painter->drawLine( QPoint( option.rect.x(), option.rect.y() + option.rect.height() ),
-					  QPoint( option.rect.x() + option.rect.width(), option.rect.y() + option.rect.height() ) );
+	int topY = option.rect.y();
+	int bottomY = topY + option.rect.height();
+	
+	painter->drawLine( QPoint( lineL, topY ),
+					   QPoint( lineR, topY ) );
+	
+	painter->drawLine( QPoint( lineL, bottomY ),
+					   QPoint( lineR, bottomY ) );
 	
 
 	painter->restore();

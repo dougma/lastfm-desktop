@@ -45,21 +45,6 @@ NowPlayingTuner::NowPlayingTuner()
 	connect( ui.tagsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onTagClicked( QListWidgetItem*)) );
 	connect( ui.similarArtistsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onArtistClicked( QListWidgetItem*)) );
 	
-	QWidget* tempPage = new QWidget();
-	QVBoxLayout* l = new QVBoxLayout;
-	tempPage->setLayout( l );
-
-    l->addWidget( tuning_dial );
-	ui.tabWidget->addTab( tempPage, "Temp" );
-	
-}
-
-
-void 
-NowPlayingTuner::onTunerReturnPressed()
-{
-	QString url = static_cast<QLineEdit*>(sender())->text();
-	emit tune( RadioStation( url, RadioStation::SimilarArtist ));
 }
 
 
@@ -82,6 +67,11 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 			ui.similarArtistsTab->clear();
 			WsReply* similarReply = t.artist().getSimilar();
 			connect( similarReply, SIGNAL( finished( WsReply*)), SLOT( onFetchedSimilarArtists(WsReply*)) );
+			
+			delete ui.miniNowPlaying;
+			ui.miniNowPlaying = new MiniNowPlayingView( t );
+			ui.verticalLayout->insertWidget( 0, ui.miniNowPlaying );
+			
 		}
 		break;
 
