@@ -41,6 +41,9 @@ public:
 	
 	WsReply* getTopTags();
 	static WeightedStringList getTopTags( WsReply* );
+	
+	WsReply* getNeighbours();
+	static WeightedStringList getNeighbours( WsReply* );
 };
 
 #endif

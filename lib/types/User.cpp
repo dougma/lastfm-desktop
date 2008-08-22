@@ -35,6 +35,13 @@ User::getTopTags()
 }
 
 
+WsReply* 
+User::getNeighbours()
+{
+	return WsRequestBuilder( "user.getNeighbours" ).add( "user", m_name ).get();
+}
+
+
 QStringList
 User::getFriends( WsReply* r )
 {
@@ -71,4 +78,26 @@ User::getTopTags( WsReply* r )
 		qWarning() << e;
 	}
 	return tags;
+}
+
+
+WeightedStringList /* static */
+User::getNeighbours( WsReply* r )
+{
+	WeightedStringList neighbours;
+	try
+	{
+		foreach (EasyDomElement e, r->lfm().children( "user" ))
+		{
+			QString name = e["name"].text();
+			int match = e["match"].text().toFloat();
+			neighbours.push_back( WeightedString( name, match ));
+		}
+		
+	}
+	catch( EasyDomElement::Exception& e)
+	{
+		qWarning() << e;
+	}
+	return neighbours;
 }

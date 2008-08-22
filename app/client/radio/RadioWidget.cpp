@@ -21,6 +21,7 @@
 #include "NowPlayingTuner.h"
 #include "FriendsTuner.h"
 #include "MyTagsTuner.h"
+#include "NeighboursTuner.h"
 #include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "MyStations.h"
@@ -41,17 +42,17 @@ RadioWidget::RadioWidget()
 	
 	QTabWidget* tabWidget = new QTabWidget;
 	
-	NowPlayingTuner* nowPlaying = new NowPlayingTuner;
-	connect( nowPlaying, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
-	tabWidget->addTab( nowPlaying, "Now Playing" );
+	#define TUNER(Class, Name) { \
+		Class* a##Class = new Class; \
+		connect( a##Class, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&))); \
+		tabWidget->addTab( a##Class, Name ); }
 
-	FriendsTuner* friendsTuner = new FriendsTuner;
-	connect( friendsTuner, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
-	tabWidget->addTab( friendsTuner, "My Friends" );
-	
-	MyTagsTuner* tagsTuner = new MyTagsTuner;
-	connect( tagsTuner, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&)));
-	tabWidget->addTab( tagsTuner, "My Tags" );	
+	TUNER( NowPlayingTuner, "Now Playing" );
+	TUNER( FriendsTuner, "My Friends" );
+	TUNER( MyTagsTuner, "My Tags" );
+	TUNER( NeighboursTuner, "My Neighbours" );
+
+	#undef TUNER
 
 	QSplitter* s = new QSplitter( Qt::Vertical, this );
 	s->addWidget( tabWidget );
