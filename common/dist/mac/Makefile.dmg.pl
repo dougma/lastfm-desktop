@@ -10,6 +10,7 @@ use File::Basename;
 $DESTDIR = shift;
 $VERSION = shift;
 $QT_FRAMEWORKS_DIR = shift;
+$REVISION = `svn info | grep "Last Changed Rev" | cut -d' ' -f4`;
 
 while( my $v = shift )
 {
@@ -33,12 +34,14 @@ foreach my $x (@DYLIBS)
 }
 
 $DEPOSX = "\$(DIST_TOOLS_DIR)/deposx.sh";
+$dmg = "\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION)-\$(REVISION).dmg";
 
 print <<END;
 DIST_TOOLS_DIR = $root/common/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
 CONTENTS = \$(BUNDLE)/Contents
 VERSION = $VERSION
+REVISION = $REVISION
 BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
 INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
@@ -60,12 +63,12 @@ bundle-clean:
 	rm -f \$(CONTENTS)/COPYING
 	rm -f \$(CONTENTS)/Resources/qt.conf
 
-dmg: \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+dmg: $dmg
 
 dmg-clean: bundle-clean
-	rm -f \$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg
+	rm -f $dmg
 
-\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION).dmg: bundle
+$dmg: bundle
 	hdiutil create -srcfolder '\$(DESTDIR)\$(QMAKE_TARGET).app' -format UDZO -imagekey zlib-level=9 -scrub '\$\@'
 
 \$(CONTENTS)/Resources/qt.conf:
