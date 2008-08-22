@@ -61,7 +61,7 @@ public slots:
 private slots:
     void onAppEvent( int, const QVariant& );
 
-    void onRadioTrackStarted( const class Track& );
+    void onRadioTrackStarted( Track );
     void onRadioPlaybackEnded();
 	void onRadioStationTuned( const QString& );
 

@@ -20,40 +20,14 @@
 #ifndef RADIO_MINI_CONTROLS_H
 #define RADIO_MINI_CONTROLS_H
 
-#include <QPushButton>
-#include <QPainter>
-#include <QPaintEvent>
 namespace Phonon{ class VolumeSlider; }
-
-
-class ImageButton : public QPushButton
-{
-	Q_OBJECT
-
-public:
-	ImageButton( QWidget* parent ) : QPushButton( parent )
-	{}
-	
-	void paintEvent ( QPaintEvent* event )
-	{
-		QPainter p( this );
-		
-		if (isDown())
-			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
-		
-		QIcon::Mode state = isEnabled() ? QIcon::Normal : QIcon::Disabled;
-		
-		p.setClipRect( event->rect() );
-		icon().paint( &p, rect(), Qt::AlignTop, state );
-	}
-};
-
 
 #include "ui_RadioMiniControls.h"
 
 
 class RadioMiniControls : public QFrame
 {
+	Q_OBJECT
 public:
     RadioMiniControls();
 
@@ -62,6 +36,13 @@ public:
         Phonon::VolumeSlider* volume;
     } 
 	ui;
+	
+private slots:
+	void onAppEvent( int, const QVariant&);
+	void onPlayClicked();
+	
+signals:
+	void stop();
 };
 
 

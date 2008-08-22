@@ -16,54 +16,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+#include <QPushButton>
+#include <QPainter>
+#include <QPaintEvent>
 
-#include "RadioMiniControls.h"
-#include "App.h"
-#include "PlayerEvent.h"
-#include <phonon/volumeslider.h>
-#include "ObservedTrack.h"
-
-
-RadioMiniControls::RadioMiniControls()
+class ImageButton : public QPushButton
 {
-    ui.setupUi(this);
+	Q_OBJECT
 	
-	ui.play->setCheckedIcon( QIcon( ":/stop.png" ));
+public:
+	ImageButton( QWidget* parent ) : QPushButton( parent )
+	{}
 	
-    layout()->addWidget( ui.volume = new Phonon::VolumeSlider );
-	
-	connect( &The::app(), SIGNAL(event( int, const QVariant&)), SLOT( onAppEvent( int, const QVariant&)) );
-	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
-	
-	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
-}
-
-void 
-RadioMiniControls::onAppEvent( int e, const QVariant& d )
-{
-	switch ( e ) 
+	void paintEvent ( QPaintEvent* event )
 	{
-		case PlayerEvent::PlaybackStarted:
-		{
-			Track t = d.value<ObservedTrack>();
-			if( t.source() == Track::LastFmRadio )
-				ui.play->setChecked( true );
-			break;
-		}
+		QPainter p( this );
 		
-		case PlayerEvent::PlaybackEnded:
-		case PlayerEvent::PlaybackPaused:
-			
-			break;
-		default:
-			break;
+		if( isDown() )
+			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
+		
+		QIcon::Mode state = isEnabled() ? QIcon::Normal : QIcon::Disabled;
+		
+		p.setClipRect( event->rect() );
+		
+		QIcon i;
+		if( isChecked() && !m_checkedIcon.isNull() )
+			i = m_checkedIcon;
+		else
+			i = icon();
+		
+		i.paint( &p, rect(), Qt::AlignTop, state );
 	}
-}
-
-
-void
-RadioMiniControls::onPlayClicked()
-{
-	if( !ui.play->isChecked() )
-		emit stop();
-}
+	
+	void setCheckedIcon( const QIcon& i ){ m_checkedIcon = i; }
+	
+private:
+	QIcon m_checkedIcon;
+};

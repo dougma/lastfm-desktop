@@ -272,7 +272,7 @@ App::open( const QUrl& url )
 
 
 void
-App::onRadioTrackStarted( const Track& t )
+App::onRadioTrackStarted( Track t )
 {
     m_playerManager->onTrackStarted( t );
 }

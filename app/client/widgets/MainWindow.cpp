@@ -134,6 +134,7 @@ MainWindow::setupUi()
 	
     connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
 	connect( ui.controls->ui.toggle, SIGNAL(toggled( bool )), SLOT(setTunerToggled( bool )) );
+	connect( ui.controls, SIGNAL(stop()), &The::app().radioController(), SLOT( stop()) );
 	
 	setCentralWidget( mainWidget );
 

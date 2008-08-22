@@ -99,7 +99,7 @@
         </size>
        </property>
        <property name="checkable" >
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="checked" >
         <bool>false</bool>
@@ -161,7 +161,7 @@
   <customwidget>
    <class>ImageButton</class>
    <extends>QPushButton</extends>
-   <header>widgets/RadioMiniControls.h</header>
+   <header>widgets/ImageButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>
