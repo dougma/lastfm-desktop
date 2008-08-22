@@ -30,7 +30,7 @@ public:
 	
 private slots:
 	void onFetchedNeighbours( class WsReply* );
-	void onTagClicked( QListWidgetItem* );
+	void onUserClicked( QListWidgetItem* );
 	
 signals:
 	void tune( const class RadioStation& );
