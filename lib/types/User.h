@@ -39,6 +39,9 @@ public:
     WsReply* getFriends();
     static QStringList getFriends( WsReply* );
 	
+	/** you can only get information about the autheticated user */
+	static WsReply* getInfo();
+
 	WsReply* getTopTags();
 	static WeightedStringList getTopTags( WsReply* );
 	

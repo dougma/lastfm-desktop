@@ -19,19 +19,22 @@
 
 #include "MainWindow.h"
 #include "App.h"
-#include "lib/radio/RadioController.h"
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "Scrobble/MetaInfoView.h"
+#include "scrobble/MetaInfoView.h"
+#include "scrobble/ScrobbleViewWidget.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "widgets/RadioMiniControls.h"
 #include "radio/RadioWidget.h"
+#include "Settings.h"
 #include "version.h"
+#include "lib/types/User.h"
+#include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
-#include "lib/radio/AudioPlaybackEngine.h"
+#include "lib/ws/WsReply.h"
 #include <QCloseEvent>
 #include <QPointer>
 #include <QShortcut>
@@ -66,7 +69,14 @@ MainWindow::MainWindow()
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-    connect( ui.tunein, SIGNAL(triggered()), SLOT(showTuner()) );
+    connect( ui.tuner, SIGNAL(triggered()), SLOT(showTuner()) );
+
+	RadioController* r = &The::app().radioController();
+	connect( r, SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
+	
+	//FIXME encapsulation!!!!!
+
+	ui.tuner->setRadioController( r );
 }
 
 
@@ -109,7 +119,10 @@ void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
-    
+	
+	ui.account->setTitle( The::settings().username() );
+   	connect( User::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
+	
 	QWidget* mainWidget = new QWidget;
 	QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
     mainLayout->setSpacing( 0 );
@@ -117,6 +130,8 @@ MainWindow::setupUi()
     mainLayout->addWidget( ui.stack = new QStackedWidget );
 	mainLayout->addWidget( ui.controls = new RadioMiniControls );
 
+	ui.controls->ui.volume->setAudioOutput( The::app().radioController().audioOutput() );
+	
     connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
 	connect( ui.controls->ui.toggle, SIGNAL(toggled( bool )), SLOT(setTunerToggled( bool )) );
 	
@@ -327,19 +342,6 @@ MainWindow::setTunerToggled( bool show_tuner )
 }
 
 
-void
-MainWindow::setRadio( RadioController* r )
-{
-    Q_ASSERT( r );
-	
-	connect( r, SIGNAL( tuningIn( const RadioStation&)), SLOT( showNowPlaying()));
-
-	//FIXME encapsulation!!!!!
-    ui.controls->ui.volume->setAudioOutput( r->audioPlaybackEngine()->audioOutput() );
-	ui.tuner->setRadioController( r );
-}
-
-
 QSize
 MainWindow::sizeHint() const
 {
@@ -375,4 +377,24 @@ MainWindow::dropEvent( QDropEvent* e )
 	
 	if (urls.count())
 		The::app().open( urls[0] );
+}
+
+
+void
+MainWindow::onUserGetInfoReturn( WsReply* reply )
+{
+	try
+	{
+		EasyDomElement e = reply->lfm()["user"];
+		QString gender = e["gender"].text();
+		QString age = e["age"].text();
+		if (gender.size() && gender.size())
+		{
+			gender = (gender == "m") ? "boy" : "girl";
+			QString text = tr("A %1 %2 years of age").arg( gender ).arg( age );
+			ui.account->addAction( text )->setEnabled( false );
+		}
+	}
+	catch (EasyDomElement::Exception&)
+	{}
 }

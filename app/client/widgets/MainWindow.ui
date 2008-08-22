@@ -24,17 +24,17 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile" >
+   <widget class="QMenu" name="account" >
     <property name="title" >
-     <string>&amp;File</string>
+     <string>Account</string>
     </property>
-    <addaction name="tunein" />
+    <addaction name="profile" />
     <addaction name="separator" />
     <addaction name="logout" />
     <addaction name="separator" />
     <addaction name="quit" />
    </widget>
-   <widget class="QMenu" name="menuHelp" >
+   <widget class="QMenu" name="help" >
     <property name="title" >
      <string>&amp;Help</string>
     </property>
@@ -42,17 +42,18 @@
     <addaction name="separator" />
     <addaction name="about" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
+   <widget class="QMenu" name="view" >
     <property name="title" >
-     <string>&amp;Tools</string>
+     <string>View</string>
     </property>
     <addaction name="meta" />
+    <addaction name="tuner" />
     <addaction name="separator" />
     <addaction name="settings" />
    </widget>
-   <addaction name="menuFile" />
-   <addaction name="menuTools" />
-   <addaction name="menuHelp" />
+   <addaction name="account" />
+   <addaction name="view" />
+   <addaction name="help" />
   </widget>
   <action name="settings" >
    <property name="text" >
@@ -131,9 +132,9 @@
     <string>Skip</string>
    </property>
   </action>
-  <action name="tunein" >
+  <action name="tuner" >
    <property name="text" >
-    <string>Tune In...</string>
+    <string>Tuner</string>
    </property>
   </action>
   <action name="about" >
@@ -144,6 +145,17 @@
   <action name="meta" >
    <property name="text" >
     <string>Meta Information</string>
+   </property>
+  </action>
+  <action name="profile" >
+   <property name="text" >
+    <string>Profile</string>
+   </property>
+   <property name="iconText" >
+    <string>Profile</string>
+   </property>
+   <property name="toolTip" >
+    <string>Your profile page at www.last.fm</string>
    </property>
   </action>
  </widget>

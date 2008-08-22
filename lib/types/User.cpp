@@ -59,7 +59,14 @@ User::getFriends( WsReply* r )
 }
 
 
-WeightedStringList /* static */
+WsReply*
+User::getInfo()
+{
+	return WsRequestBuilder( "user.getInfo" ).get();
+}
+
+
+WeightedStringList //static
 User::getTopTags( WsReply* r )
 {
 	WeightedStringList tags;
@@ -81,7 +88,7 @@ User::getTopTags( WsReply* r )
 }
 
 
-WeightedStringList /* static */
+WeightedStringList //static
 User::getNeighbours( WsReply* r )
 {
 	WeightedStringList neighbours;

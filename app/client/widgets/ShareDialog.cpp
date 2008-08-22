@@ -40,6 +40,8 @@ ShareDialog::ShareDialog( QWidget* parent )
     connect( r, SIGNAL(finished( WsReply* )), SLOT(onFriendsReturn( WsReply* )) );
 
     ui.friends->lineEdit()->installEventFilter( this );
+	
+	ui.friends->setFocus();
 }
 
 

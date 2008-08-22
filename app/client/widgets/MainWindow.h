@@ -18,9 +18,7 @@
  ***************************************************************************/
 
 #include "ui_MainWindow.h"
-#include <QMap>
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include "scrobble/ScrobbleViewWidget.h"
 
 
 class MainWindow : public QMainWindow
@@ -30,8 +28,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 
-    void setRadio( class RadioController* );
-    
     QSize sizeHint() const;
 	
 	struct Ui : ::Ui::MainWindow
@@ -68,7 +64,8 @@ signals:
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
     void onAppEvent( int, const QVariant& );
-
+	void onUserGetInfoReturn( class WsReply* );
+	
 private:
     void setupUi();
     void setupScrobbleView();
