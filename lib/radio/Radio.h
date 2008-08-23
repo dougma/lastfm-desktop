@@ -34,12 +34,12 @@ namespace Phonon
 }
 
 
-class RADIO_DLLEXPORT RadioController : public QObject
+class RADIO_DLLEXPORT Radio : public QObject
 {
     Q_OBJECT
 
 public:
-    RadioController( Phonon::AudioOutput* );
+    Radio( Phonon::AudioOutput* );
 
 	Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
 	

@@ -31,8 +31,8 @@
 #include "radio/RadioWidget.h"
 #include "Settings.h"
 #include "version.h"
+#include "the/radio.h"
 #include "lib/types/User.h"
-#include "lib/radio/RadioController.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/ws/WsReply.h"
 #include <QCloseEvent>
@@ -70,12 +70,7 @@ MainWindow::MainWindow()
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
-
-	RadioController* r = &The::app().radioController();
-	connect( r, SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
-	
-	//FIXME encapsulation!!!!!
-	ui.tuner->setRadioController( r );
+	connect( &The::radio(), SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
     
     // set up window in default state
     onAppEvent( PlayerEvent::PlaybackEnded, QVariant() );
@@ -144,11 +139,11 @@ MainWindow::setupUi()
     mainLayout->addWidget( ui.stack = new QStackedWidget );
 	mainLayout->addWidget( ui.controls = new RadioMiniControls );
 
-	ui.controls->ui.volume->setAudioOutput( The::app().radioController().audioOutput() );
+	ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
 	
     connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
 	connect( ui.controls->ui.toggle, SIGNAL(toggled( bool )), SLOT(setTunerToggled( bool )) );
-	connect( ui.controls, SIGNAL(stop()), &The::app().radioController(), SLOT( stop()) );
+	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
 	
 	setCentralWidget( mainWidget );
 

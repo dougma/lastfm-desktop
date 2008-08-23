@@ -18,12 +18,10 @@
  ***************************************************************************/
 
 #include "NowPlayingTuner.h"
-#include "App.h"
 #include "StationDelegate.h"
 #include "PlayerEvent.h"
 #include "ObservedTrack.h"
-#include "lib/radio/RadioController.h"
-#include "lib/radio/RadioStation.h"
+#include "the/radio.h"
 #include "lib/types/Track.h"
 #include <QVBoxLayout>
 #include <QToolBar>
@@ -132,7 +130,7 @@ void
 NowPlayingTuner::onTagClicked( QListWidgetItem* i )
 {
 	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
-	The::app().radioController().play( r );
+	The::radio().play( r );
 }
 
 
@@ -140,5 +138,5 @@ void
 NowPlayingTuner::onArtistClicked( QListWidgetItem* i )
 {
 	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::SimilarArtist );
-	The::app().radioController().play( r );
+	The::radio().play( r );
 }

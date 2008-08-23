@@ -20,11 +20,12 @@
 #include "ScrobbleViewWidget.h"
 #include "MediaPlayerIndicator.h"
 #include "NowPlayingView.h"
+#include "PlayerEvent.h"
+#include "the/definitions.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/ScrobbleProgressBar.h"
+#include <QCoreApplication>
 #include <QVBoxLayout>
-#include "App.h"
-#include "PlayerEvent.h"
 
 
 ScrobbleViewWidget::ScrobbleViewWidget()
@@ -53,7 +54,7 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 	
 	setMinimumHeight( sizeHint().height() );
 	
-	connect( (QObject*)&The::app().radioController(), 
+	connect( (QObject*)&The::radio(), 
 			 SIGNAL(tuningIn( QString )),
 			 SLOT(onRadioTuningIn( QString )) );
 	connect( qApp,

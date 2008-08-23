@@ -18,16 +18,13 @@
  ***************************************************************************/
 
 #include "MyStations.h"
-#include "lib/radio/RadioStation.h"
-#include "lib/radio/RadioController.h"
-
-#include "App.h"
-#include "Settings.h"
-
+#include "the/radio.h"
+#include "the/settings.h"
 #include <QListWidgetItem>
-#include <qdebug>
+#include <QDebug>
 
 Q_DECLARE_METATYPE( RadioStation* )
+
 
 MyStations::MyStations()
 {
@@ -45,6 +42,9 @@ MyStations::MyStations()
 	foreach( RadioStation* r, m_myStationList )
 	{
 		QListWidgetItem* i = new QListWidgetItem( QIcon( ":/station.png" ), r->title() );
+        //FIXME
+        // Pointers are dangerous, and there is no copying these by value
+        //FIXME
 		i->setData( Qt::UserRole, QVariant::fromValue<RadioStation*>( r ));
 		ui.list->addItem( i );
 	}
@@ -71,5 +71,5 @@ void
 MyStations::onItemClicked( QListWidgetItem* i )
 {
 	RadioStation* r = i->data( Qt::UserRole ).value< RadioStation* >();
-	The::app().radioController().play( *r );
+	The::radio().play( *r );
 }

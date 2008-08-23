@@ -52,13 +52,4 @@ public:
     void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
 };
 
-
-namespace The
-{
-    inline Settings& settings()
-    {
-        return *Settings::instance;
-    }
-}
-
 #endif

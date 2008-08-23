@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include "lib/radio/RadioStation.h"
-#include "lib/radio/Tuner.h"
 
 
 class RadioWidget : public QWidget
@@ -29,20 +27,6 @@ class RadioWidget : public QWidget
 public:
     RadioWidget();
 
-	void setRadioController( class RadioController* r );
-
-    struct Ui
-    {
-        class QLabel* spinner;
-    } 
-    ui;
-    
-signals:
-    void newStationStarted();
-
 private slots:
-    void onTune( const RadioStation& );
-	
-private:
-    class RadioController* m_radioController;
+    void onTune( const class RadioStation& );
 };

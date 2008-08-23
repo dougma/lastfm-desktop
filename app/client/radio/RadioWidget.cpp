@@ -22,8 +22,7 @@
 #include "FriendsTuner.h"
 #include "MyTagsTuner.h"
 #include "NeighboursTuner.h"
-#include "lib/radio/RadioController.h"
-#include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "the/radio.h"
 #include "MyStations.h"
 #include <QAction>
 #include <QEvent>
@@ -44,7 +43,7 @@ RadioWidget::RadioWidget()
 	
 	#define TUNER(Class, Name) { \
 		Class* a##Class = new Class; \
-		connect( a##Class, SIGNAL( tune( const RadioStation&)), SLOT( onTune( const RadioStation&))); \
+		connect( a##Class, SIGNAL(tune( const RadioStation&)), SLOT(onTune( const RadioStation&)) ); \
 		tabWidget->addTab( a##Class, Name ); }
 
 	TUNER( NowPlayingTuner, "Now Playing" );
@@ -73,13 +72,5 @@ RadioWidget::RadioWidget()
 void
 RadioWidget::onTune( const RadioStation& r )
 {
-    m_radioController->play( r );
-	emit newStationStarted();
-}
-
-
-void
-RadioWidget::setRadioController( RadioController* r )
-{
-	m_radioController = r;
+    The::radio().play( r );
 }

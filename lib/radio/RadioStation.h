@@ -59,4 +59,5 @@ private:
 	QString m_title;
 };
 
+
 #endif

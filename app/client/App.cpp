@@ -29,7 +29,7 @@
 #include "widgets/MainWindow.h"
 #include "lib/core/MessageBoxBuilder.h"
 #include "lib/scrobble/Scrobbler.h"
-#include "lib/radio/RadioController.h"
+#include "lib/radio/Radio.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include "phonon/audiooutput.h"
@@ -46,7 +46,7 @@ App::App( int argc, char** argv )
     // ctor! Things will crash in interesting ways!
     //TODO bootstrapping
     
-    Settings::instance = new Settings( VERSION, applicationFilePath() );
+    m_settings = new Settings( VERSION, applicationFilePath() );
 
     m_playerListener = new PlayerListener( this );
     connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
@@ -64,7 +64,7 @@ App::App( int argc, char** argv )
     init.clientId = "ass";
     m_scrobbler = new Scrobbler( init );
     
-	m_radio = new RadioController( new Phonon::AudioOutput );
+	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
@@ -296,4 +296,12 @@ Track
 App::track() const
 {
     return m_playerManager->track();
+}
+
+
+namespace The
+{
+    Radio& radio() { return *app().m_radio; }
+    MainWindow& mainWindow() { return *app().m_mainWindow; }
+    Settings& settings() { return *app().m_settings; }
 }

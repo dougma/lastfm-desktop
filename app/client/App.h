@@ -21,21 +21,23 @@
 #include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/ws/WsError.h"
+#include "the/definitions.h"
 
 
-class RadioController;
 class App : public Unicorn::Application
 {
     Q_OBJECT
 
+    friend Radio& The::radio();
+    friend MainWindow& The::mainWindow();
+    friend Settings& The::settings();
+    
 public:
     App( int, char** );
     ~App();
 
-    void setMainWindow( class MainWindow* );
-    MainWindow& mainWindow() const { return *m_mainWindow; }
-	RadioController& radioController() const { return *m_radio; }
-    
+    void setMainWindow( class MainWindow* ); //access via The::mainWindow()
+
     /** the currently observed track */
     Track track() const;
     
@@ -74,7 +76,8 @@ private:
     class Scrobbler* m_scrobbler;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
-    RadioController* m_radio;
+    class Radio* m_radio;
+    class Settings* m_settings;
 
     class QSystemTrayIcon* m_trayIcon;
 };

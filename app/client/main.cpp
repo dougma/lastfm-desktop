@@ -117,7 +117,7 @@ static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
 
         case kAEReopenApplication:
         {
-            MainWindow& w = static_cast<App&>(*qApp).mainWindow();
+            MainWindow& w = The::mainWindow();
             w.show();
             w.raise();
             return noErr;

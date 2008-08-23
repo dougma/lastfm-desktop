@@ -17,12 +17,12 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "RadioController.h"
+#include "Radio.h"
 #include "Tuner.h"
 #include "phonon"
 
 
-RadioController::RadioController( Phonon::AudioOutput* output )
+Radio::Radio( Phonon::AudioOutput* output )
 			   : m_tuner( 0 ),
 			     m_audioOutput( output )
 {
@@ -36,7 +36,7 @@ RadioController::RadioController( Phonon::AudioOutput* output )
 
 
 void
-RadioController::play( const RadioStation& station )
+Radio::play( const RadioStation& station )
 {
 	qInfo() << "Tuning to:" << station;
 	
@@ -51,7 +51,7 @@ RadioController::play( const RadioStation& station )
 
 
 void
-RadioController::enqueue( const QList<Track>& tracks )
+Radio::enqueue( const QList<Track>& tracks )
 {
     QList<QUrl> urls;
     foreach (const Track& t, tracks)
@@ -66,7 +66,7 @@ RadioController::enqueue( const QList<Track>& tracks )
 
 
 void
-RadioController::skip()
+Radio::skip()
 {
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
 	if (q.size())
@@ -82,7 +82,7 @@ RadioController::skip()
 
 
 void
-RadioController::stop()
+Radio::stop()
 {
 	m_mediaObject->stop();
 	m_mediaObject->clearQueue();
@@ -92,14 +92,14 @@ RadioController::stop()
 
 
 void
-RadioController::pause()
+Radio::pause()
 {
 	m_mediaObject->pause();
 }
 
 
 void
-RadioController::unpause()
+Radio::unpause()
 {
 	m_mediaObject->play();
 }
@@ -131,7 +131,7 @@ namespace Phonon
 
 
 void
-RadioController::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
+Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
 	Phonon::debug( newstate, oldstate );
 	
@@ -190,7 +190,7 @@ RadioController::onPhononStateChanged( Phonon::State newstate, Phonon::State old
 
 
 void
-RadioController::onPhononAboutToFinish()
+Radio::onPhononAboutToFinish()
 {
 //	emit playbackEnded();
 }
