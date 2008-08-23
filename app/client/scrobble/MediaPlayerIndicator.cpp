@@ -56,10 +56,14 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 			m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
 			break;
 
+		case PlayerEvent::PlaybackEnded:
+            m_playerDescription->clear();
+            m_playbackCommencedString.clear();
+            break;
+            
 		case PlayerEvent::PlayerConnected:
             mediaPlayerConnected( v.toString() );
 			// fall through
-		case PlayerEvent::PlaybackEnded:
 		case PlayerEvent::PlaybackStarted:
 		case PlayerEvent::PlaybackUnpaused:
 			m_playerDescription->setText( m_playbackCommencedString );

@@ -69,14 +69,16 @@ MainWindow::MainWindow()
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-    connect( ui.tuner, SIGNAL(triggered()), SLOT(showTuner()) );
+    connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
 
 	RadioController* r = &The::app().radioController();
 	connect( r, SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
 	
 	//FIXME encapsulation!!!!!
-
 	ui.tuner->setRadioController( r );
+    
+    // set up window in default state
+    onAppEvent( PlayerEvent::PlaybackEnded, QVariant() );
 }
 
 
@@ -94,6 +96,14 @@ MainWindow::onAppEvent( int e, const QVariant& v )
             ui.tag->setEnabled( true );
             ui.love->setEnabled( true );
             ui.ban->setEnabled( true );
+            
+            Track t = v.value<ObservedTrack>();
+            if (t.source() == Track::LastFmRadio)
+            {
+                ui.controls->ui.play->show();
+                ui.controls->ui.skip->show();
+                ui.controls->ui.volume->show();
+            }
 
         #ifndef Q_WS_MAC
             setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
@@ -107,6 +117,10 @@ MainWindow::onAppEvent( int e, const QVariant& v )
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
 
+        ui.controls->ui.play->hide();
+        ui.controls->ui.skip->hide();
+        ui.controls->ui.volume->hide();
+            
     #ifndef Q_WS_MAC
         setWindowTitle( qApp->applicationName() );
     #endif
@@ -339,7 +353,12 @@ MainWindow::setTunerToggled( bool show_tuner )
 	ui.stack->setCurrentIndex( show_tuner ? 1 : 0 );
 	
 	if (sender() != ui.controls->ui.toggle)
-		ui.controls->ui.toggle->setChecked( show_tuner );
+    {
+        QAbstractButton* o = ui.controls->ui.toggle;
+        o->blockSignals( true ); //avoid recursively calling this function
+        o->setChecked( show_tuner );
+        o->blockSignals( false );
+    }
 }
 
 
