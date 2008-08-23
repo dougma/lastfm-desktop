@@ -142,7 +142,7 @@ END
 
 $to/$module.framework: $QT_FRAMEWORKS_DIR/$module.framework |$to
 	cp -Rf $QT_FRAMEWORKS_DIR/$module.framework \$\@
-	rm \$\@/Versions/4/${module}_debug \$\@/${module}_debug*
+	rm -f \$\@/Versions/4/${module}_debug \$\@/${module}_debug*
 	$DEPOSX \$\@/$module $QT_FRAMEWORKS_DIR
 	install_name_tool -id \$\@/Versions/4/$module \$\@/Versions/4/$module
 
