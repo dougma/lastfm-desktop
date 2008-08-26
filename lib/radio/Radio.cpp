@@ -108,7 +108,7 @@ Radio::unpause()
 
 namespace Phonon
 {
-	static inline QString debug( int state )
+	static inline QString debug( Phonon::State state )
 	{
 	#define _( x ) x: return #x;
 		switch (state)
@@ -120,6 +120,7 @@ namespace Phonon
 			case _(Phonon::PausedState)
 			case _(Phonon::ErrorState)
 		}
+		return "Unknown";
 	#undef _
 	}
 	
@@ -140,7 +141,13 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
     switch (newstate)
     {
         case Phonon::ErrorState:
-            qCritical() << m_mediaObject->errorString();
+			if (m_mediaObject->errorType() == Phonon::FatalError)
+			{
+				qCritical() << m_mediaObject->errorString();
+				emit playbackEnded();
+			}
+			else 
+				skip();
             break;
 			
         case Phonon::StoppedState:
@@ -152,7 +159,8 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
             break;
 			
 		case Phonon::PausedState:
-			emit playbackPaused();
+			// if the phono play queue runs out we get this for some reason
+			emit playbackEnded();
 			break;
 			
 		case Phonon::LoadingState:
