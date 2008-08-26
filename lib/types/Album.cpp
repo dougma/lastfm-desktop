@@ -59,9 +59,7 @@ Album::www() const
 AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
 				 : m_size( size ),
 				   m_manager( 0 )
-{
-	qDebug() << "Fetching image for" << album;
-	
+{	
     WsReply* reply = album.getInfo();
 	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetInfoFinished( WsReply* )) );
 }
