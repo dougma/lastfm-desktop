@@ -23,10 +23,19 @@
 class RadioWidget : public QWidget
 {
     Q_OBJECT
-
+	
 public:
     RadioWidget();
-
+	
+private:
+	struct 
+	{
+		class QTabWidget* tabWidget;
+	} ui;
+	
 private slots:
     void onTune( const class RadioStation& );
+
+public slots:
+	void addTab( QWidget*, const QString );
 };

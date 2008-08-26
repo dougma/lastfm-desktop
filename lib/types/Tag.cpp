@@ -20,7 +20,7 @@
 #include "Tag.h"
 #include "User.h"
 #include "lib/core/CoreUrl.h"
-
+#include "lib/ws/WsRequestBuilder.h"
 
 QUrl
 Tag::url() const
@@ -33,4 +33,30 @@ QUrl
 Tag::url( const User& user ) const
 {
 	return CoreUrl( "http://www.last.fm/" + CoreUrl::encode( user ) + "/tags/" + CoreUrl::encode( m_name ) ).localised();
+}
+
+
+WsReply*
+Tag::search() const
+{
+	return WsRequestBuilder( "tag.search" ).add( "tag", *this ).get();
+}
+
+
+QStringList /* static */
+Tag::search( WsReply* r )
+{
+	QStringList tags;
+	try
+	{
+		foreach( EasyDomElement e, r->lfm().children( "tag" ))
+		{
+			tags += e["name"].text();
+		}
+	}
+	catch( EasyDomElement::Exception& e )
+	{
+		qWarning() << e;
+	}
+	return tags;
 }

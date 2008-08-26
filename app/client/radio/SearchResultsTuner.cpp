@@ -17,30 +17,54 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAG_H
-#define TAG_H
+#include "SearchResultsTuner.h"
+#include <QListWidget>
+#include "StationDelegate.h"
+#include "lib/radio/RadioStation.h"
+#include "the/radio.h"
+#include <QListWidgetItem>
 
-#include <QString>
-#include <QUrl>
-
-class Tag
+SearchResultsTuner::SearchResultsTuner()
 {
-	QString m_name;
+	addTab( ui.artistList = new QListWidget, tr( "Artists" ) );
+	addTab( ui.tagList = new QListWidget, tr( "Tags" ) );
 	
-public:
-	Tag( const QString& name ) : m_name( name )
-	{}
+	ui.artistList->setItemDelegate( new StationDelegate );
+	ui.tagList->setItemDelegate( new StationDelegate );
 	
-	operator QString() const { return m_name; }
+	connect( ui.artistList, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onArtistClicked( QListWidgetItem* )) );
+	connect( ui.tagList, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onTagClicked( QListWidgetItem* )) );
 	
-	/** the global tag page at www.last.fm */
-	QUrl url() const;
-	
-	/** the tag page for user @p user at www.last.fm */
-	QUrl url( const class User& user ) const;
-	
-	class WsReply* search() const;
-	static QStringList search( WsReply* );
-};
+}
 
-#endif
+
+void
+SearchResultsTuner::addArtists( QStringList a )
+{
+	ui.artistList->addItems( a );
+}
+
+
+void
+SearchResultsTuner::addTags( QStringList t )
+{
+	ui.tagList->addItems( t );
+}
+
+
+void 
+SearchResultsTuner::onArtistClicked( QListWidgetItem* i )
+{
+	i->setSelected( false );
+	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::SimilarArtist );
+	The::radio().play( r );
+}
+
+
+void 
+SearchResultsTuner::onTagClicked( QListWidgetItem* i )
+{
+	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
+	The::radio().play( r );
+	i->setSelected( false );
+}

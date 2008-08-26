@@ -35,9 +35,6 @@ NowPlayingTuner::NowPlayingTuner()
 	ui.tagsTab->setItemDelegate( new StationDelegate( this ) );
 	ui.similarArtistsTab->setItemDelegate( new StationDelegate( this ) );
 
-	QLineEdit* tuning_dial = new QLineEdit;
-    connect( tuning_dial, SIGNAL(returnPressed()), SLOT(onTunerReturnPressed()) );
-	
 	connect( qApp, SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
 	
 	connect( ui.tagsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onTagClicked( QListWidgetItem*)) );
@@ -131,6 +128,7 @@ NowPlayingTuner::onTagClicked( QListWidgetItem* i )
 {
 	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
 	The::radio().play( r );
+	i->setSelected( false );
 }
 
 
@@ -139,4 +137,5 @@ NowPlayingTuner::onArtistClicked( QListWidgetItem* i )
 {
 	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::SimilarArtist );
 	The::radio().play( r );
+	i->setSelected( false );
 }

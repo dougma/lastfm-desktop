@@ -39,23 +39,26 @@ RadioWidget::RadioWidget()
 {
 	setLayout( new QHBoxLayout );
 	
-	QTabWidget* tabWidget = new QTabWidget;
+	ui.tabWidget = new QTabWidget;
 	
 	#define TUNER(Class, Name) { \
 		Class* a##Class = new Class; \
 		connect( a##Class, SIGNAL(tune( const RadioStation&)), SLOT(onTune( const RadioStation&)) ); \
-		tabWidget->addTab( a##Class, Name ); }
+		ui.tabWidget->addTab( a##Class, Name ); }
 
 	TUNER( NowPlayingTuner, "Now Playing" );
 	TUNER( FriendsTuner, "My Friends" );
 	TUNER( MyTagsTuner, "My Tags" );
 	TUNER( NeighboursTuner, "My Neighbours" );
-
+	
 	#undef TUNER
 
 	QSplitter* s = new QSplitter( Qt::Vertical, this );
-	s->addWidget( tabWidget );
-	s->addWidget( new MyStations );
+	s->addWidget( ui.tabWidget );
+
+	MyStations* myStations = new MyStations;
+	connect( myStations, SIGNAL(searchResultComplete( QWidget*, const QString )), SLOT( addTab( QWidget*, const QString )));
+	s->addWidget( myStations );
 	
 	//FIXME: should not rely on hard coded sizes
 	//		 but I can't be dealing with getting
@@ -73,4 +76,11 @@ void
 RadioWidget::onTune( const RadioStation& r )
 {
     The::radio().play( r );
+}
+
+
+void
+RadioWidget::addTab( QWidget* w, const QString s )
+{
+	ui.tabWidget->addTab( w, s );
 }

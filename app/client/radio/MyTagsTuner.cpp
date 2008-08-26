@@ -58,4 +58,5 @@ MyTagsTuner::onTagClicked( QListWidgetItem* i )
 	const QString& tag = i->data( Qt::DisplayRole ).toString();
 	RadioStation r( tag, RadioStation::Tag );
 	emit tune( r );
+	i->setSelected( false );
 }

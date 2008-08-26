@@ -23,6 +23,8 @@
 #include <QList>
 #include "ui_MyStations.h"
 
+class WsReply;
+
 class MyStations : public QWidget
 {
 
@@ -36,11 +38,19 @@ protected:
 	
 private:
 	Ui::MyStations ui;
+	
+	class SearchResultsTuner* m_searchResults;
 	QList< class RadioStation* > m_myStationList;
 	
 private slots:
 	void onItemHover( QListWidgetItem* );
 	void onItemClicked( QListWidgetItem* );
+	void onSearch();
+	void onArtistSearchResults( WsReply* );
+	void onTagSearchResults( WsReply* );
+	
+signals:
+	void searchResultComplete( QWidget*, const QString );
 	
 };
 

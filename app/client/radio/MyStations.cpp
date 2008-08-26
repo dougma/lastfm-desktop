@@ -20,13 +20,18 @@
 #include "MyStations.h"
 #include "the/radio.h"
 #include "the/settings.h"
+#include "the/mainWindow.h"
 #include <QListWidgetItem>
 #include <QDebug>
+#include "lib/types/Tag.h"
+#include "SearchResultsTuner.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 
 Q_DECLARE_METATYPE( RadioStation* )
 
 
 MyStations::MyStations()
+		   :m_searchResults( 0 )
 {
 	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Library, "My Library" );	
 	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Recommendation, "Recommended" );
@@ -36,6 +41,11 @@ MyStations::MyStations()
 	ui.setupUi( this );
 	connect( ui.list, SIGNAL( itemEntered( QListWidgetItem* )), SLOT( onItemHover( QListWidgetItem* )));
 	connect( ui.list, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onItemClicked( QListWidgetItem* )));
+	
+	ui.spinner->hide();
+	connect( ui.searchBox, SIGNAL( returnPressed()), SLOT( onSearch()));
+	connect( ui.searchButton, SIGNAL( clicked()), SLOT( onSearch()));
+	
 	ui.list->setMouseTracking( true );
 	setMouseTracking( true );
 	
@@ -72,4 +82,39 @@ MyStations::onItemClicked( QListWidgetItem* i )
 {
 	RadioStation* r = i->data( Qt::UserRole ).value< RadioStation* >();
 	The::radio().play( *r );
+}
+
+
+void
+MyStations::onSearch()
+{
+	ui.spinner->show();
+	delete m_searchResults;
+	m_searchResults = new SearchResultsTuner;
+	m_searchResults->setObjectName( ui.searchBox->text() + " - Search Results" );
+	
+	Artist a( ui.searchBox->text());
+	Tag t( ui.searchBox->text());
+	
+	connect( a.search(), SIGNAL(finished( WsReply*)), SLOT(onArtistSearchResults( WsReply*)) );
+	connect( t.search(), SIGNAL(finished( WsReply*)), SLOT(onTagSearchResults( WsReply*)) );
+	
+}
+
+
+void 
+MyStations::onArtistSearchResults( WsReply* r )
+{
+	QStringList results = Artist::search( r );
+	m_searchResults->addArtists( results );
+	emit searchResultComplete( m_searchResults, m_searchResults->objectName() );
+	ui.spinner->hide();
+}
+
+
+void
+MyStations::onTagSearchResults( WsReply* r )
+{
+	QStringList results = Tag::search( r );
+	m_searchResults->addTags( results );
 }

@@ -289,7 +289,7 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 
 
 WsReply*
-Track::getTopTags()
+Track::getTopTags() const
 {
 	return TrackWsRequestBuilder( "track.getTopTags" ).add( *this ).get();
 }
@@ -318,7 +318,7 @@ Track::getTopTags( WsReply* r )
 
 
 WsReply*
-Track::getTags()
+Track::getTags() const
 {
 	return TrackWsRequestBuilder( "track.getTags" ).add( *this ).get();
 }

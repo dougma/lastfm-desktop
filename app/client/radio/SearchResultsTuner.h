@@ -16,31 +16,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef SEARCH_RESULTS_TUNER_H
+#define SEARCH_RESULTS_TUNER_H
 
-#ifndef TAG_H
-#define TAG_H
-
-#include <QString>
-#include <QUrl>
-
-class Tag
+#include <QTabWidget>
+class SearchResultsTuner : public QTabWidget
 {
-	QString m_name;
-	
+	Q_OBJECT
+
 public:
-	Tag( const QString& name ) : m_name( name )
-	{}
+	SearchResultsTuner();
+	void addArtists( QStringList );
+	void addTags( QStringList );
+
+private slots:
+	void onArtistClicked( class QListWidgetItem* );
+	void onTagClicked( class QListWidgetItem* );
+
+private:
+	struct
+	{
+		class QListWidget* artistList;
+		class QListWidget* tagList;
+	} ui;
 	
-	operator QString() const { return m_name; }
-	
-	/** the global tag page at www.last.fm */
-	QUrl url() const;
-	
-	/** the tag page for user @p user at www.last.fm */
-	QUrl url( const class User& user ) const;
-	
-	class WsReply* search() const;
-	static QStringList search( WsReply* );
 };
 
 #endif

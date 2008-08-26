@@ -16,6 +16,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+#ifndef SPINNER_LABEL_H
+#define SPINNER_LABEL_H
 
 #include <QEvent>
 #include <QLabel> //TODO implementation
@@ -48,3 +50,5 @@ public:
         m_movie->setParent( this );
     }
 };
+
+#endif //SPINNER_LABEL_H

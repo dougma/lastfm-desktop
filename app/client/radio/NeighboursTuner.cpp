@@ -59,4 +59,5 @@ NeighboursTuner::onUserClicked( QListWidgetItem* i )
 	const QString& neighbour = i->data( Qt::DisplayRole ).toString();
 	RadioStation r( neighbour, RadioStation::Library );
 	emit tune( r );
+	i->setSelected( false );
 }

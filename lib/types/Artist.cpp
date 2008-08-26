@@ -49,6 +49,13 @@ Artist::getSimilar()
 }
 
 
+WsReply* 
+Artist::search()
+{
+	return WsRequestBuilder( "artist.search" ).add( "artist", *this ).get();
+}
+
+
 WeightedStringList /* static */
 Artist::getSimilar( WsReply* r )
 {
@@ -68,4 +75,23 @@ Artist::getSimilar( WsReply* r )
 		qWarning() << e;
 	}
 	return artists;
+}
+
+
+QStringList /* static */
+Artist::search( WsReply* r )
+{
+	QStringList results;
+	try
+	{
+		foreach( EasyDomElement e, r->lfm().children( "artist" ))
+		{
+			results += e["name"].text();
+		}
+	}
+	catch( EasyDomElement::Exception& e)
+	{
+		qWarning() << e;
+	}
+	return results;
 }

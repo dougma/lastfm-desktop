@@ -49,6 +49,9 @@ public:
 	
 	WsReply* getSimilar();
 	static WeightedStringList getSimilar( WsReply* );
+	
+	WsReply* search();
+	static QStringList search( WsReply* );
 };
 
 #endif

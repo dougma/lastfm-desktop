@@ -6,16 +6,13 @@
     <x>0</x>
     <y>0</y>
     <width>429</width>
-    <height>144</height>
+    <height>166</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
-   <property name="margin" >
-    <number>0</number>
-   </property>
    <item>
     <widget class="QLabel" name="label" >
      <property name="enabled" >
@@ -140,8 +137,36 @@
      </property>
     </widget>
    </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
+     <item>
+      <widget class="SpinnerLabel" name="spinner" >
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="searchBox" />
+     </item>
+     <item>
+      <widget class="QPushButton" name="searchButton" >
+       <property name="text" >
+        <string>Search</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SpinnerLabel</class>
+   <extends>QLabel</extends>
+   <header>SpinnerLabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../qrc/client.qrc" />
  </resources>
