@@ -49,7 +49,7 @@ NowPlaying::reset()
 void
 NowPlaying::submit( const Track& track )
 {
-    if (track.isEmpty())
+    if (track.isNull())
         return;
 
     #define e( x ) QUrl::toPercentEncoding( x )

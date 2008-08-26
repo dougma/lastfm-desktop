@@ -124,7 +124,7 @@ PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrac
     m_state = newState;
     QVariant v = QVariant::fromValue( t );
 
-	if (t.isEmpty())
+	if (t.isNull())
 	{
 		if (newState == Playing && oldState == Stopped)
 		{

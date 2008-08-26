@@ -29,7 +29,6 @@ Radio::Radio( Phonon::AudioOutput* output )
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-	connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(onPhononAboutToFinish()) );
 	connect( m_mediaObject, SIGNAL(bufferStatus( int )), SIGNAL(buffering( int )) );
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
@@ -78,6 +77,12 @@ public:
 void
 Radio::enqueue( const QList<Track>& tracks )
 {
+	if (tracks.isEmpty()) {
+		qWarning() << "Received blank playlist, Last.fm is b0rked";
+		stop();
+		return;
+	}
+	
     QList<QUrl> urls;
     foreach (const Track& t, tracks)
     {
@@ -94,19 +99,59 @@ Radio::enqueue( const QList<Track>& tracks )
 }
 
 
+class SkipThread : public QThread
+{
+	Phonon::MediaObject* m_mediaObject;
+	
+public:
+	SkipThread( Phonon::MediaObject* object )
+	{
+		m_mediaObject = object;
+		start();
+	}
+	
+	static bool eat_stop;
+	
+	virtual void run()
+	{
+		QList<Phonon::MediaSource> q = m_mediaObject->queue();
+		Phonon::MediaSource source = q.front();
+		q.pop_front();
+	
+		eat_stop = true; //hack because threading it seems to break it a little
+		m_mediaObject->setCurrentSource( source );
+		m_mediaObject->setQueue( q );
+		m_mediaObject->play();
+		eat_stop = false;
+	}
+};
+
+bool SkipThread::eat_stop = false;
+
+
 void
 Radio::skip()
 {
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
 	if (q.size())
 	{
+#ifdef Q_WS_MAC
+		new SkipThread( m_mediaObject );
+#else
 		Phonon::MediaSource source = q.front();
 		q.pop_front();
 		m_mediaObject->setQueue( q );
 		m_mediaObject->setCurrentSource( source );
 		m_mediaObject->play();
+#endif
 	}
-	//else we already asked for more tracks, so wait I guess
+	else
+	{
+		m_mediaObject->blockSignals( true );
+		stop();
+		m_mediaObject->blockSignals( false );
+		emit tuningIn( "" );
+	}
 }
 
 
@@ -163,6 +208,11 @@ namespace Phonon
 void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
+	if (SkipThread::eat_stop && newstate == Phonon::StoppedState) {
+		qDebug() << "Eating Phonon's naughty stop";
+		return;
+	}
+	
 	Phonon::debug( newstate, oldstate );
 	
 	QUrl const url = m_mediaObject->currentSource().url();
@@ -204,7 +254,7 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 					qDebug() << "PlaybackStarted:" << url;
 					
 					Track t = m_queue.take( url );
-					if( t.isEmpty() )
+					if( t.isNull() )
 						break;
 					
 					MutableTrack( t ).stamp();
@@ -223,11 +273,4 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 			}
 			break;
     }
-}
-
-
-void
-Radio::onPhononAboutToFinish()
-{
-//	emit playbackEnded();
 }

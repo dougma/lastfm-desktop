@@ -111,7 +111,7 @@ public:
 
     /** not a great isEmpty check, but most services will complain if these two
       * are empty */
-    bool isEmpty() const { return d->artist.isEmpty() && d->title.isEmpty(); }
+    bool isNull() const { return d->artist.isEmpty() && d->title.isEmpty(); }
 
     /** the standard representation of this object as an XML node */
     QDomElement toDomElement( class QDomDocument& ) const;
