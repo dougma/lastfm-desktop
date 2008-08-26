@@ -49,6 +49,7 @@ NowPlayingView::NowPlayingView()
 void
 NowPlayingView::clear()
 {
+	m_track = Track();
 	m_cover = QImage();
 	ui.text->clear();
 	ui.spinner->hide();
