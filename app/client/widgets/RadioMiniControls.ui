@@ -48,7 +48,11 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="text" >
-        <string>Tuner</string>
+        <string/>
+       </property>
+       <property name="icon" >
+        <iconset resource="../qrc/client.qrc" >
+         <normaloff>:/station.png</normaloff>:/station.png</iconset>
        </property>
        <property name="checkable" >
         <bool>true</bool>

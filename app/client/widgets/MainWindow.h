@@ -65,6 +65,7 @@ private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
     void onAppEvent( int, const QVariant& );
 	void onUserGetInfoReturn( class WsReply* );
+	void onStackIndexChanged( int );
 	
 private:
     void setupUi();

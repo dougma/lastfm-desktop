@@ -71,6 +71,7 @@ MainWindow::MainWindow()
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
 	connect( &The::radio(), SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
+	connect( ui.stack, SIGNAL(currentChanged( int )), SLOT(onStackIndexChanged( int )) );
     
     // set up window in default state
     onAppEvent( PlayerEvent::PlaybackEnded, QVariant() );
@@ -343,17 +344,27 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
 
 
 void
-MainWindow::setTunerToggled( bool show_tuner )
+MainWindow::setTunerToggled( bool const show_tuner )
 {
 	ui.stack->setCurrentIndex( show_tuner ? 1 : 0 );
+}
+
+
+void
+MainWindow::onStackIndexChanged( int const page )
+{
+	QAbstractButton* o = ui.controls->ui.toggle;
+	o->blockSignals( true ); //avoid recursively calling this function
+	o->setChecked( page == 1 );
+	o->blockSignals( false );
 	
-	if (sender() != ui.controls->ui.toggle)
-    {
-        QAbstractButton* o = ui.controls->ui.toggle;
-        o->blockSignals( true ); //avoid recursively calling this function
-        o->setChecked( show_tuner );
-        o->blockSignals( false );
-    }
+#ifdef Q_WS_MAC
+	switch (page)
+	{
+		case 0: setWindowTitle( "Last.fm" ); break;
+		case 1: setWindowTitle( tr("Tuner" ) ); break;	
+	}
+#endif
 }
 
 
