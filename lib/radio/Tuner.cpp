@@ -35,6 +35,7 @@
 
 
 Tuner::Tuner( const RadioStation& station )
+     : m_retry_counter( 0 )
 {
     WsReply* reply = WsRequestBuilder( "radio.tune" )
 			.add( "station", station )
@@ -59,7 +60,7 @@ Tuner::onTuneReturn( WsReply* reply )
 		fetchFiveMoreTracks();
 	}
 	else
-		emit error( 0 );
+		emit error( reply );
 }
 
 
@@ -74,10 +75,24 @@ Tuner::fetchFiveMoreTracks()
 void
 Tuner::onGetPlaylistReturn( WsReply* reply )
 {
+	if (reply->failed())
+		emit error( reply );
+	
 	Playlist p( reply );
-	
-	foreach (Track t, p.tracks())
-		qDebug() << t << t.duration();
-	
-	emit tracks( p.tracks() );
+
+	if (p.tracks().isEmpty())
+	{
+		// sometimes the recs service craps out and gives us a blank playlist
+		
+		if (++m_retry_counter > 5)
+		{
+			emit tracks( QList<Track>() );
+		}
+		else
+			fetchFiveMoreTracks();		
+	}
+	else {
+		m_retry_counter = 0;
+		emit tracks( p.tracks() );
+	}
 }

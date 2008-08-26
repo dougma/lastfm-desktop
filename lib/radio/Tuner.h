@@ -45,9 +45,7 @@ public slots:
 signals:
 	void stationName( const QString& );
 	void tracks( const QList<Track>& );
-	
-	//TODO flesh out enum
-	void error( int );
+	void error( WsReply* );
 
 private slots:
 	void onTuneReturn( WsReply* );
@@ -55,6 +53,7 @@ private slots:
 
 private:
 	QString m_stationName;
+	uint m_retry_counter;
 };
 
 #endif
