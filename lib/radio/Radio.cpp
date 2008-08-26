@@ -50,6 +50,31 @@ Radio::play( const RadioStation& station )
 }
 
 
+#include <QThread>
+/** my gosh, this is dangerous, FIXME!
+  * done because on mac Phonon would hang in enqueu for a few seconds, which
+  * sucked */
+class EnqueueThread : public QThread
+{
+	QList<QUrl> m_urls;
+	Phonon::MediaObject* m_o;
+	
+public:
+	EnqueueThread( const QList<QUrl>& urls, Phonon::MediaObject* object )
+	{
+		m_o = object;
+		m_urls = urls;
+		start();
+	}
+	
+	virtual void run()
+	{
+		m_o->enqueue( m_urls );
+		m_o->play();
+	}
+}; 
+
+
 void
 Radio::enqueue( const QList<Track>& tracks )
 {
@@ -60,8 +85,12 @@ Radio::enqueue( const QList<Track>& tracks )
         m_queue[t.url()] = t;
     }
 	
-    m_mediaObject->enqueue( urls );
+#ifdef Q_WS_MAC
+	new EnqueueThread( urls, m_mediaObject );
+#else
+	m_mediaObject->enqueue( urls );
 	m_mediaObject->play();
+#endif
 }
 
 
