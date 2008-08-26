@@ -33,15 +33,13 @@ WsReply::WsReply( QNetworkReply* r )
 }
 
 
-#if 0
+#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH && !defined NDEBUG
 void
 WsReply::finish()
 {
-#ifndef NDEBUG
     QEventLoop eventLoop;
     QObject::connect( m_reply, SIGNAL(finished()), &eventLoop, SLOT(quit()) );
     eventLoop.exec();
-#endif
 }
 #endif
 
@@ -72,8 +70,8 @@ WsReply::onFinished()
                         : Ws::Error( error.attribute( "code" ).toUInt() );
             }
 
-            if (n == 0) // nothing useful in the response
-                throw Ws::MalformedResponse;
+			// no elements beyond the lfm is perfectably acceptable
+            //if (n == 0) // nothing useful in the response
         }
 
         switch (m_reply->error())
@@ -116,8 +114,8 @@ WsReply::onFinished()
     }
     catch (Ws::Error e)
     {
-        qWarning() << m_reply->url();
-        qWarning() << m_xml.toString();
+        qWarning() << m_reply;
+
         m_error = e;
 
         switch (m_error)

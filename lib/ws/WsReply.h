@@ -57,12 +57,14 @@ public:
     QNetworkReply::NetworkError networkError() const { return m_reply->error(); }
     static QString networkErrorString( QNetworkReply::NetworkError );
 
+#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH
     /** blocks until complete
       * SERIOUSLY NEVER USE THIS APART FROM FOR EXPERIMENTATION!
       * It crashes like crazy!
       * As all sorts of things break when you start running your own event loop
       * sadly, especially don't chain WsReplys since they do deleteLater() */
-//    void finish();
+    void finish();
+#endif
 
     QByteArray data() const { return m_data; }
 	
@@ -76,5 +78,13 @@ signals:
 private slots:
     void onFinished();
 };
+
+
+#include <QDebug>
+inline QDebug operator<<( QDebug d, WsReply* r )
+{
+	return d << r->url() << ":\n"
+			 << r->data().trimmed();
+}
 
 #endif
