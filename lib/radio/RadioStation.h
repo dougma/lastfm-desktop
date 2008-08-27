@@ -30,12 +30,14 @@
 class RADIO_DLLEXPORT RadioStation
 {
 public:
-	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Tag, Url };
+	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Tag, Url, Invalid };
 	
+	RadioStation() :m_type( Invalid ){};
     RadioStation( QString s, Type t = Url, QString title = "" ) : m_station( s ), m_type( t ), m_title( title ){}
 	
 	operator const QString() const
 	{
+		Q_ASSERT( m_type != Invalid );
 		switch ( m_type ) 
 		{
 			case SimilarArtist:	return "lastfm://artist/" + m_station + "/similarartists";
@@ -51,7 +53,7 @@ public:
 		}
 	}
 	
-	const QString& title() const{ return m_title; }
+	const QString& title() const{ Q_ASSERT( m_type != Invalid ); return m_title; }
 	
 private:
 	QString m_station;
@@ -59,5 +61,6 @@ private:
 	QString m_title;
 };
 
+Q_DECLARE_METATYPE( RadioStation )
 
 #endif

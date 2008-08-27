@@ -60,7 +60,9 @@ ShareDialog::onFriendsReturn( WsReply* r )
 {
     QString const edit_text = ui.friends->currentText();
     ui.friends->clear();
-    ui.friends->addItems( User::getFriends( r ) );
+
+	foreach( User user, User::getFriends( r ))
+		ui.friends->addItem( user );
     ui.friends->setEditText( edit_text );
 }
 

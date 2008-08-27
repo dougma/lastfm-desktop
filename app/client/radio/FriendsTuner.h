@@ -29,10 +29,15 @@ class FriendsTuner : public QListWidget
 	
 public:
 	FriendsTuner();
+
+private:
+	class QNetworkAccessManager* m_networkManager;
 	
 private slots:
 	void onFetchedFriends( class WsReply* );
 	void onFriendClicked( class QListWidgetItem* );
+	
+	void onImageDownloaded();
 
 signals:
 	void tune( const class RadioStation& );

@@ -52,7 +52,7 @@ RadioWidget::RadioWidget()
 	TUNER( NeighboursTuner, "My Neighbours" );
 	
 	#undef TUNER
-
+	
 	QSplitter* s = new QSplitter( Qt::Vertical, this );
 	s->addWidget( ui.tabWidget );
 

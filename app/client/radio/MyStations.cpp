@@ -28,20 +28,21 @@
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "MyStationsDelegate.h"
 
-Q_DECLARE_METATYPE( RadioStation* )
-
-
 MyStations::MyStations()
 		   :m_searchResults( 0 )
 {
-	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Library, "My Library" );	
-	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Recommendation, "Recommended" );
-	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Loved, "My Loved Tracks" );
-	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Neighbourhood, "My Neighbourhood" );
+	m_myStationList << RadioStation( The::settings().username(), RadioStation::Library, "My Library" );	
+	m_myStationList << RadioStation( The::settings().username(), RadioStation::Recommendation, "Recommended" );
+	m_myStationList << RadioStation( The::settings().username(), RadioStation::Loved, "My Loved Tracks" );
+	m_myStationList << RadioStation( The::settings().username(), RadioStation::Neighbourhood, "My Neighbourhood" );
 	
 	ui.setupUi( this );
+	
+	ui.list->viewport()->setBackgroundRole( QPalette::Background );
+	ui.list->viewport()->setAutoFillBackground( true );
 	ui.list->setItemDelegate( new MyStationsDelegate );
 	ui.list->setSpacing( 3 );
+	
 	connect( ui.list, SIGNAL( itemEntered( QListWidgetItem* )), SLOT( onItemHover( QListWidgetItem* )));
 	connect( ui.list, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onItemClicked( QListWidgetItem* )));
 	
@@ -52,13 +53,11 @@ MyStations::MyStations()
 	ui.list->setMouseTracking( true );
 	setMouseTracking( true );
 	
-	foreach( RadioStation* r, m_myStationList )
+	foreach( const RadioStation& r, m_myStationList )
 	{
-		QListWidgetItem* i = new QListWidgetItem( QIcon( ":/station.png" ), r->title() );
-        //FIXME
-        // Pointers are dangerous, and there is no copying these by value
-        //FIXME
-		i->setData( Qt::UserRole, QVariant::fromValue<RadioStation*>( r ));
+		QListWidgetItem* i = new QListWidgetItem( QIcon( ":/station.png" ), r.title() );
+
+		i->setData( Qt::UserRole, QVariant::fromValue<RadioStation>( r ));
 		ui.list->addItem( i );
 	}
 	
@@ -83,8 +82,8 @@ MyStations::mouseMoveEvent( QMouseEvent* /* e */ )
 void
 MyStations::onItemClicked( QListWidgetItem* i )
 {
-	RadioStation* r = i->data( Qt::UserRole ).value< RadioStation* >();
-	The::radio().play( *r );
+	RadioStation r = i->data( Qt::UserRole ).value< RadioStation >();
+	The::radio().play( r );
 }
 
 

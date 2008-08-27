@@ -22,9 +22,13 @@
 #include "Settings.h"
 #include "StationDelegate.h"
 #include "lib/radio/RadioStation.h"
+#include <QNetworkAccessManager>
+
+Q_DECLARE_METATYPE( QListWidgetItem* );
 
 FriendsTuner::FriendsTuner()
 {
+	m_networkManager = new QNetworkAccessManager();
 	setItemDelegate( new StationDelegate );
 	setSortingEnabled( true );
 	User u( The::settings().username() );
@@ -37,8 +41,24 @@ FriendsTuner::FriendsTuner()
 void
 FriendsTuner::onFetchedFriends( WsReply* r )
 {
-	const QStringList& friends = User::getFriends( r );
-	addItems( friends );
+	const UserList& friends = User::getFriends( r );
+	
+	foreach( User user, friends )
+	{
+		QListWidgetItem* item = new QListWidgetItem( user );
+		item->setData( Qt::DecorationRole, QImage( ":/blank/user.png" ));
+		addItem( item );
+		
+		if( user.smallImageUrl().isEmpty() )
+			continue;
+		
+		QNetworkRequest request( user.smallImageUrl() );
+		
+		request.setAttribute( QNetworkRequest::User, QVariant::fromValue<QListWidgetItem*>( item ));
+		QNetworkReply* get = m_networkManager->get( request );
+		connect( get, SIGNAL(finished()), SLOT( onImageDownloaded()) );
+		
+	}
 }
 
 
@@ -49,4 +69,14 @@ FriendsTuner::onFriendClicked( QListWidgetItem* i )
 	RadioStation r( username, RadioStation::Library );
 	emit tune( r );
 	i->setSelected( false );
+}
+
+
+void
+FriendsTuner::onImageDownloaded()
+{
+	QNetworkReply* r = static_cast<QNetworkReply*>(sender());
+	QListWidgetItem* i = r->request().attribute( QNetworkRequest::User ).value< QListWidgetItem*>();
+
+	i->setData( Qt::DecorationRole, QImage::fromData( r->readAll() ));
 }

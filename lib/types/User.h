@@ -26,6 +26,8 @@
 #include "lib/ws/WsReply.h" //convenience
 
 
+typedef QList<class User> UserList;
+
 class TYPES_DLLEXPORT User
 {
     QString m_name;
@@ -37,7 +39,7 @@ public:
     operator QString() const { return m_name; }
 
     WsReply* getFriends();
-    static QStringList getFriends( WsReply* );
+    static UserList getFriends( WsReply* );
 	
 	/** you can only get information about the autheticated user */
 	static WsReply* getInfo();
@@ -47,6 +49,15 @@ public:
 	
 	WsReply* getNeighbours();
 	static WeightedStringList getNeighbours( WsReply* );
+	
+	QUrl smallImageUrl(){ return m_smallImage; }
+	QUrl mediumImageUrl(){ return m_mediumImage; }
+	QUrl largeImageUrl(){ return m_largeImage; }
+	
+private:
+	QUrl m_smallImage;
+	QUrl m_mediumImage;
+	QUrl m_largeImage;
 };
 
 #endif

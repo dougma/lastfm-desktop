@@ -5,8 +5,8 @@
     <file>skip.png</file>
     <file>stop.png</file>
   </qresource>
-
-  <qresource prefix='blank'>
-	<file alias='cover.png'>blank_cover.png</file>
+  <qresource prefix="blank" >
+    <file alias="user.png" >nouser_small.png</file>
+    <file alias="cover.png" >blank_cover.png</file>
   </qresource>
 </RCC>

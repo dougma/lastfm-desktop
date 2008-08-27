@@ -42,20 +42,26 @@ User::getNeighbours()
 }
 
 
-QStringList
+UserList
 User::getFriends( WsReply* r )
 {
-    QStringList names;
+	UserList users;
     try
     {
         foreach (EasyDomElement e, r->lfm().children( "user" ))
-            names += e["name"].text();
+		{
+            User user( e["name"].text() );
+			user.m_smallImage = e["image size=small"].text();
+			user.m_mediumImage = e["image size=medium"].text();
+			user.m_largeImage = e["image size=large"].text();
+			users += user;
+		}
     }
     catch (EasyDomElement::Exception& e)
     {
         qWarning() << e;
     }
-    return names;
+    return users;
 }
 
 

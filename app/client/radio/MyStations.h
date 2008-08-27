@@ -22,6 +22,7 @@
 
 #include <QList>
 #include "ui_MyStations.h"
+#include "lib/radio/RadioStation.h"
 
 class WsReply;
 
@@ -40,7 +41,7 @@ private:
 	Ui::MyStations ui;
 	
 	class SearchResultsTuner* m_searchResults;
-	QList< class RadioStation* > m_myStationList;
+	QList< RadioStation > m_myStationList;
 	
 private slots:
 	void onItemHover( QListWidgetItem* );

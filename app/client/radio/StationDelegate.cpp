@@ -23,8 +23,9 @@
 #include <QApplication>
 #include <QFontMetrics>
 
-static const int kLeftMargin = 10;
-static const int kIconWidth = 25;
+static const int k_leftMargin = 10;
+static const int k_stationIconWidth = 25;
+static const int k_minHeight = 35;
 
 void 
 StationDelegate::paint(QPainter* painter, 
@@ -32,6 +33,8 @@ StationDelegate::paint(QPainter* painter,
 					   const QModelIndex& index) const
 {
 	painter->save();
+	painter->eraseRect( option.rect );
+
 	QPalette palette;
 	bool itemSelected = option.state & QStyle::State_Selected;
 	
@@ -39,6 +42,23 @@ StationDelegate::paint(QPainter* painter,
 	{
 		painter->fillRect( option.rect, palette.highlight() );
 		painter->setPen( palette.highlightedText().color() );
+	}
+	
+	//Draw Decoration ( Avatar, Artist Image etc.. )
+	QRect iconRect;
+	if( !index.data( Qt::DecorationRole ).isNull())
+	{
+		iconRect = option.rect;
+		const QImage& icon = index.data( Qt::DecorationRole ).value< QImage >();
+		iconRect.setWidth( icon.width() );
+		iconRect.setHeight( icon.height() );
+		
+		if( iconRect.height() < k_minHeight )
+		{
+			iconRect.setY( (iconRect.y() + ( k_minHeight / 2 )) - ( iconRect.height() / 2 ) );
+		}
+		
+		painter->drawImage( iconRect, icon );
 	}
 
 	//Draw popularity of tag bar graph
@@ -59,22 +79,22 @@ StationDelegate::paint(QPainter* painter,
 	
 	//Draw tag text
 	QRect textRect = option.rect;
-	textRect.setX( textRect.x() + kLeftMargin );
+	textRect.setX( textRect.x() + k_leftMargin + iconRect.width() );
 	textRect.setY( textRect.y() + 10 );
-	textRect.setWidth( textRect.width() - kLeftMargin - kIconWidth );
+	textRect.setWidth( textRect.width() - k_leftMargin - k_stationIconWidth - iconRect.width() );
 	QString text = option.fontMetrics.elidedText( index.data().toString(), Qt::ElideRight, textRect.width() );
 	painter->drawText( textRect, Qt::TextSingleLine, index.data().toString(), &textRect );
 	
 	
-	//Draw the icon
-	QRect pixmapRect = option.rect;
-	pixmapRect.setX( pixmapRect.width() - kIconWidth );
-	pixmapRect.setY( pixmapRect.y() + ( pixmapRect.height() / 2 ) - 7 );
-	pixmapRect.setWidth( 18 );
-	pixmapRect.setHeight( 14 );
+	//Draw the station icon
+	QRect stationIconRect = option.rect;
+	stationIconRect.setX( stationIconRect.width() - k_stationIconWidth );
+	stationIconRect.setY( stationIconRect.y() + ( stationIconRect.height() / 2 ) - 7 );
+	stationIconRect.setWidth( 18 );
+	stationIconRect.setHeight( 14 );
 
 	painter->setRenderHint( QPainter::SmoothPixmapTransform );
-	painter->drawPixmap( pixmapRect, QPixmap( ":/station.png" ) );
+	painter->drawPixmap( stationIconRect, QPixmap( ":/station.png" ) );
 	
 
 	//Draw seperating lines
@@ -101,11 +121,21 @@ QSize
 StationDelegate::sizeHint( const QStyleOptionViewItem& option, 
 						   const QModelIndex& index ) const
 {
-	QSize size = option.fontMetrics.size( Qt::TextSingleLine, index.data().toString() );
-
-	size.setWidth( size.width() + kLeftMargin + kIconWidth );
+	QRect iconRect;
+	if( !index.data( Qt::DecorationRole ).isNull() )
+	{
+		const QImage& icon = index.data( Qt::DecorationRole ).value< QImage >();
+		iconRect.setWidth( icon.width() );
+		iconRect.setHeight( icon.height() );
+	}
 	
-	size = size.expandedTo( QSize( 1, 35 ) ).expandedTo( QApplication::globalStrut() );
+	QSize size = option.fontMetrics.size( Qt::TextSingleLine, index.data().toString() );
+	
+	size.setWidth( size.width() + k_leftMargin + k_stationIconWidth + iconRect.width() );
+
+	size = size.expandedTo( QSize( 1, iconRect.height()) );
+	
+	size = size.expandedTo( QSize( 1, k_minHeight ) ).expandedTo( QApplication::globalStrut() );
 	
 	return size;
 }
