@@ -83,4 +83,5 @@ void
 RadioWidget::addTab( QWidget* w, const QString s )
 {
 	ui.tabWidget->addTab( w, s );
+	ui.tabWidget->setCurrentWidget( w );
 }

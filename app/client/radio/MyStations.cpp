@@ -26,6 +26,7 @@
 #include "lib/types/Tag.h"
 #include "SearchResultsTuner.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "MyStationsDelegate.h"
 
 Q_DECLARE_METATYPE( RadioStation* )
 
@@ -39,6 +40,8 @@ MyStations::MyStations()
 	m_myStationList << new RadioStation( The::settings().username(), RadioStation::Neighbourhood, "My Neighbourhood" );
 	
 	ui.setupUi( this );
+	ui.list->setItemDelegate( new MyStationsDelegate );
+	ui.list->setSpacing( 3 );
 	connect( ui.list, SIGNAL( itemEntered( QListWidgetItem* )), SLOT( onItemHover( QListWidgetItem* )));
 	connect( ui.list, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onItemClicked( QListWidgetItem* )));
 	

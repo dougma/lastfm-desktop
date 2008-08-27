@@ -20,7 +20,11 @@
 #include "StationDelegate.h"
 #include <QDebug>
 #include <QPainter>
+#include <QApplication>
+#include <QFontMetrics>
 
+static const int kLeftMargin = 10;
+static const int kIconWidth = 25;
 
 void 
 StationDelegate::paint(QPainter* painter, 
@@ -55,15 +59,16 @@ StationDelegate::paint(QPainter* painter,
 	
 	//Draw tag text
 	QRect textRect = option.rect;
-	textRect.setX( textRect.x() + 10 );
+	textRect.setX( textRect.x() + kLeftMargin );
 	textRect.setY( textRect.y() + 10 );
-	textRect.setWidth( textRect.width() - 35 );
+	textRect.setWidth( textRect.width() - kLeftMargin - kIconWidth );
+	QString text = option.fontMetrics.elidedText( index.data().toString(), Qt::ElideRight, textRect.width() );
 	painter->drawText( textRect, Qt::TextSingleLine, index.data().toString(), &textRect );
 	
 	
 	//Draw the icon
 	QRect pixmapRect = option.rect;
-	pixmapRect.setX( pixmapRect.width() - 25 );
+	pixmapRect.setX( pixmapRect.width() - kIconWidth );
 	pixmapRect.setY( pixmapRect.y() + ( pixmapRect.height() / 2 ) - 7 );
 	pixmapRect.setWidth( 18 );
 	pixmapRect.setHeight( 14 );
@@ -93,8 +98,14 @@ StationDelegate::paint(QPainter* painter,
 
 
 QSize 
-StationDelegate::sizeHint( const QStyleOptionViewItem& /* option */, 
-						   const QModelIndex& /* index */ ) const
+StationDelegate::sizeHint( const QStyleOptionViewItem& option, 
+						   const QModelIndex& index ) const
 {
-	return QSize( 1, 35 );
+	QSize size = option.fontMetrics.size( Qt::TextSingleLine, index.data().toString() );
+
+	size.setWidth( size.width() + kLeftMargin + kIconWidth );
+	
+	size = size.expandedTo( QSize( 1, 35 ) ).expandedTo( QApplication::globalStrut() );
+	
+	return size;
 }
