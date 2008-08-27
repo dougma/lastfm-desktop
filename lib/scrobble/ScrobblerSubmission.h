@@ -28,9 +28,10 @@ class ScrobblerSubmission : public ScrobblerPostHttp
     QList<Track> m_batch;
 
 public:
+	/** tracks will be submitted in batches of 50 */
     void setTracks( const QList<Track>& );
-    /** submits a batch of 50 to the scrobbling service */
+    /** submits a batch, if we are already submitting, does nothing */
     void submitNextBatch();
-    /** the current batch, depending on */
+    /** the batch that is being submitted currently */
     QList<Track> batch() const { return m_batch; }
 };
