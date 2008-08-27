@@ -164,7 +164,7 @@
   <customwidget>
    <class>SpinnerLabel</class>
    <extends>QLabel</extends>
-   <header>SpinnerLabel.h</header>
+   <header>lib/unicorn/widgets/SpinnerLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>
