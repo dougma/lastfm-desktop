@@ -37,7 +37,7 @@ Radio::Radio( Phonon::AudioOutput* output )
 void
 Radio::play( const RadioStation& station )
 {
-	qInfo() << "Tuning to:" << station;
+	qDebug() << "Tuning to:" << station;
 	
 	stop();
 	delete m_tuner;
@@ -46,6 +46,13 @@ Radio::play( const RadioStation& station )
     m_tuner = new Tuner( station );
 	connect( m_tuner, SIGNAL(stationName( QString )), SIGNAL(tuned( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
+}
+
+
+void
+Radio::onTunerError( WsReply* reply )
+{
+
 }
 
 
@@ -251,11 +258,14 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 			{
 				default:
 				{
-					qDebug() << "PlaybackStarted:" << url;
-					
 					Track t = m_queue.take( url );
-					if( t.isNull() )
-						break;
+					qDebug() << "PlaybackStarted:" << url ;
+					
+					if (t.isNull())
+					{
+						qWarning() << "Some bug as got null track:" << url;
+						return;
+					}
 					
 					MutableTrack( t ).stamp();
 					

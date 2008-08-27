@@ -245,7 +245,7 @@ TrackData::TrackData()
 #include <QDebug>
 inline QDebug operator<<( QDebug d, const Track& t )
 {
-    return d << t.prettyTitle( '-' );
+    return d << t.prettyTitle( '-' ) << t.album();
 }
 
 

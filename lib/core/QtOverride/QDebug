@@ -99,25 +99,32 @@ public:
 
         return *this;
     }
+	
+	static QByteArray stamp( const QByteArray& file, uint line, const QByteArray& function )
+	{
+		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
+		QByteArray out;
+		out += QTime::currentTime().toString( "[hh:mm:ss] " );
+		out += filename + ":";
+		out += function + "():";
+		out += QString::number( line ) + ":";
+		return out;
+	}
 };
 
     #define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
     #define Q_DEBUG_FUNCTION QDebugBlock::debug
-	#define Q_DEBUG_STAMP (QString(__FILE__).mid( QString(__FILE__).lastIndexOf( '/' ) + 1 ) + ":" + __FUNCTION__ + "():" + QString::number(__LINE__) + ":").toAscii().data()
+	#define Q_DEBUG_STAMP QDebugBlock::stamp( __FILE__, __LINE__, __FUNCTION__ ).data()
 
 #else // QT_NO_DEBUG
     #define Q_DEBUG_FUNCTION qDebug
     #define Q_DEBUG_BLOCK Q_DEBUG_FUNCTION()
-	#define Q_DEBUG_STAMP (QString(__FILE__":") + QString::number(__LINE__) + ":").toAscii().data()
+	#define Q_DEBUG_STAMP (QByteArray(__FILE__":") + QByteArray::number(__LINE__) + ":").data()
     class QDebugBlock { public: QDebugBlock( QString ) {} };
 #endif
 
-inline QDebug qInfo() { return QDebug( (QtMsgType) 10 ); }
-
-
 
 #define qDebug() Q_DEBUG_FUNCTION() << Q_DEBUG_STAMP
-#define qInfo() qInfo() << Q_DEBUG_STAMP
 #define qWarning() qWarning() << Q_DEBUG_STAMP
 #define qError() qError() << Q_DEBUG_STAMP
 

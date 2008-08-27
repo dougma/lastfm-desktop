@@ -114,7 +114,7 @@ WsReply::onFinished()
     }
     catch (Ws::Error e)
     {
-        qWarning() << m_reply;
+        qWarning() << this;
 
         m_error = e;
 

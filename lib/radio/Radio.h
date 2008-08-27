@@ -53,6 +53,7 @@ public slots:
 private slots:
     void enqueue( const QList<Track>& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
+	void onTunerError( WsReply* );
 	
 signals:
 	void tuningIn( const QString& title );

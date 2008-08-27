@@ -45,8 +45,6 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     QCoreApplication::setOrganizationDomain( "last.fm" );    
 
     StoreDir::mkpaths();
-
-	qDebug() << StoreDir::data() << StoreDir::cache() << StoreDir::logs();
 	
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
@@ -57,8 +55,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     const char* path = bytes.data();
 #endif
     m_log = new Logger( path );
-    qInfo() << "Introducing" << applicationName()+'-'+applicationVersion();
-    qInfo() << "Directed by" << Unicorn::verbosePlatformString();
+    qDebug() << "Introducing" << applicationName()+'-'+applicationVersion();
+    qDebug() << "Directed by" << Unicorn::verbosePlatformString();
 
     translate();
 
