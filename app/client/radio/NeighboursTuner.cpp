@@ -22,10 +22,14 @@
 #include "lib/types/User.h"
 #include "Settings.h"
 #include "lib/radio/RadioStation.h"
+#include <QNetworkAccessManager>
+
+Q_DECLARE_METATYPE(QListWidgetItem*);
 
 
 NeighboursTuner::NeighboursTuner()
 {
+	m_networkManager = new QNetworkAccessManager( this );
 	setItemDelegate( new StationDelegate );
 	User u( The::settings().username() );
 	WsReply* reply = u.getNeighbours();
@@ -37,18 +41,29 @@ NeighboursTuner::NeighboursTuner()
 void
 NeighboursTuner::onFetchedNeighbours( WsReply* r )
 {
-	const WeightedStringList& neighbours = User::getNeighbours( r );
+	const UserList& neighbours = User::getNeighbours( r );
 	
 	if( neighbours.isEmpty() ) 
 		return;
 	
-	static_cast<StationDelegate*>( itemDelegate() )->setMaxCount( neighbours.first().weighting() );
+	static_cast<StationDelegate*>( itemDelegate() )->setMaxCount( neighbours.first().match() );
 	
-	foreach( const WeightedString& neighbour, neighbours )
+	foreach( const User& user, neighbours )
 	{
-		QListWidgetItem* i = new QListWidgetItem( neighbour, this );
-		i->setData( StationDelegate::CountRole, neighbour.weighting() );
+		QListWidgetItem* i = new QListWidgetItem( user, this );
+		i->setData( Qt::DecorationRole, QImage( ":/blank/user.png" ));
+		i->setData( StationDelegate::CountRole, user.match() );
 		addItem( i );
+		
+		if( user.smallImageUrl().isEmpty() )
+			continue;
+		
+		QNetworkRequest request( user.smallImageUrl() );
+		
+		request.setAttribute( QNetworkRequest::User, QVariant::fromValue<QListWidgetItem*>( i ));
+		QNetworkReply* get = m_networkManager->get( request );
+		connect( get, SIGNAL(finished()), SLOT( onImageDownloaded()) );
+		
 	}
 }
 
@@ -60,4 +75,17 @@ NeighboursTuner::onUserClicked( QListWidgetItem* i )
 	RadioStation r( neighbour, RadioStation::Library );
 	emit tune( r );
 	i->setSelected( false );
+}
+
+
+void
+NeighboursTuner::onImageDownloaded()
+{
+	QNetworkReply* r = static_cast<QNetworkReply*>(sender());
+	QListWidgetItem* i = r->request().attribute( QNetworkRequest::User ).value< QListWidgetItem*>();
+
+	if( r->error() != QNetworkReply::NoError )
+		return;
+	
+	i->setData( Qt::DecorationRole, QImage::fromData( r->readAll() ));
 }

@@ -32,6 +32,11 @@ private slots:
 	void onFetchedNeighbours( class WsReply* );
 	void onUserClicked( QListWidgetItem* );
 	
+	void onImageDownloaded();
+	
+private:
+	class QNetworkAccessManager* m_networkManager;
+	
 signals:
 	void tune( const class RadioStation& );
 };

@@ -28,7 +28,7 @@ Q_DECLARE_METATYPE( QListWidgetItem* );
 
 FriendsTuner::FriendsTuner()
 {
-	m_networkManager = new QNetworkAccessManager();
+	m_networkManager = new QNetworkAccessManager( this );
 	setItemDelegate( new StationDelegate );
 	setSortingEnabled( true );
 	User u( The::settings().username() );
@@ -43,7 +43,7 @@ FriendsTuner::onFetchedFriends( WsReply* r )
 {
 	const UserList& friends = User::getFriends( r );
 	
-	foreach( User user, friends )
+	foreach( const User& user, friends )
 	{
 		QListWidgetItem* item = new QListWidgetItem( user );
 		item->setData( Qt::DecorationRole, QImage( ":/blank/user.png" ));
@@ -57,7 +57,7 @@ FriendsTuner::onFetchedFriends( WsReply* r )
 		request.setAttribute( QNetworkRequest::User, QVariant::fromValue<QListWidgetItem*>( item ));
 		QNetworkReply* get = m_networkManager->get( request );
 		connect( get, SIGNAL(finished()), SLOT( onImageDownloaded()) );
-		
+
 	}
 }
 
@@ -78,5 +78,8 @@ FriendsTuner::onImageDownloaded()
 	QNetworkReply* r = static_cast<QNetworkReply*>(sender());
 	QListWidgetItem* i = r->request().attribute( QNetworkRequest::User ).value< QListWidgetItem*>();
 
+	if( r->error() != QNetworkReply::NoError )
+		return;
+	
 	i->setData( Qt::DecorationRole, QImage::fromData( r->readAll() ));
 }

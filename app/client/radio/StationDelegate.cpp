@@ -44,6 +44,22 @@ StationDelegate::paint(QPainter* painter,
 		painter->setPen( palette.highlightedText().color() );
 	}
 	
+	//Draw popularity of tag / friend match etc bar graph
+	if( m_maxCount > 0 )
+	{
+		float count = index.data( CountRole ).value<float>();
+		QRect tagRect = option.rect;
+		tagRect.setWidth( ( (float)tagRect.width() / (float)m_maxCount ) * count );
+		tagRect.setY( tagRect.y() + 2 );
+		tagRect.setHeight( tagRect.height() - 1 );
+		
+		if( !itemSelected )
+			painter->fillRect( tagRect, QBrush( QColor( 210, 210, 210 ) ) );
+		else
+			painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
+		
+	}
+	
 	//Draw Decoration ( Avatar, Artist Image etc.. )
 	QRect iconRect;
 	if( !index.data( Qt::DecorationRole ).isNull())
@@ -59,22 +75,6 @@ StationDelegate::paint(QPainter* painter,
 		}
 		
 		painter->drawImage( iconRect, icon );
-	}
-
-	//Draw popularity of tag bar graph
-	if( m_maxCount > 0 )
-	{
-		float count = index.data( CountRole ).value<float>();
-		QRect tagRect = option.rect;
-		tagRect.setWidth( ( (float)tagRect.width() / (float)m_maxCount ) * count );
-		tagRect.setY( tagRect.y() + 2 );
-		tagRect.setHeight( tagRect.height() - 1 );
-
-		if( !itemSelected )
-			painter->fillRect( tagRect, QBrush( QColor( 210, 210, 210 ) ) );
-		else
-			painter->fillRect( tagRect, QBrush( QColor( 200, 200, 255 ) ) );
-		
 	}
 	
 	//Draw tag text

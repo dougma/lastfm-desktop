@@ -33,7 +33,7 @@ class TYPES_DLLEXPORT User
     QString m_name;
 	
 public:
-    explicit User( const QString& username ) : m_name( username )
+    explicit User( const QString& username ) : m_name( username ), m_match( -1.0f )
     {}
 
     operator QString() const { return m_name; }
@@ -48,16 +48,23 @@ public:
 	static WeightedStringList getTopTags( WsReply* );
 	
 	WsReply* getNeighbours();
-	static WeightedStringList getNeighbours( WsReply* );
+	static UserList getNeighbours( WsReply* );
 	
-	QUrl smallImageUrl(){ return m_smallImage; }
-	QUrl mediumImageUrl(){ return m_mediumImage; }
-	QUrl largeImageUrl(){ return m_largeImage; }
+	QUrl smallImageUrl() const{ return m_smallImage; }
+	QUrl mediumImageUrl() const{ return m_mediumImage; }
+	QUrl largeImageUrl() const{ return m_largeImage; }
+	
+	/** Returns the match between the logged in user
+		and the user which this object represents
+		( if < 0.0f then not set ) */
+	float match() const{ return m_match; }
 	
 private:
 	QUrl m_smallImage;
 	QUrl m_mediumImage;
 	QUrl m_largeImage;
+	
+	float m_match;
 };
 
 #endif

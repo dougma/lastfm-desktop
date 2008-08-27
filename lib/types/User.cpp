@@ -94,17 +94,24 @@ User::getTopTags( WsReply* r )
 }
 
 
-WeightedStringList //static
+UserList //static
 User::getNeighbours( WsReply* r )
 {
-	WeightedStringList neighbours;
+	UserList neighbours;
 	try
 	{
 		foreach (EasyDomElement e, r->lfm().children( "user" ))
 		{
-			QString name = e["name"].text();
-			int match = e["match"].text().toFloat();
-			neighbours.push_back( WeightedString( name, match ));
+			User user( e["name"].text() );
+			user.m_match = e["match"].text().toFloat();
+			
+			#warning Have the user.getNeighbours webservice been fixed yet? \
+					 uncomment me if it has!
+			/*
+			user.m_smallImage = e["image size=small"].text();
+			user.m_mediumImage = e["image size=medium"].text();
+			user.m_largeImage = e["image size=large"].text(); */
+			neighbours << user;
 		}
 		
 	}
