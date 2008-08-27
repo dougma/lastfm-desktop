@@ -66,7 +66,7 @@ private slots:
     void onAppEvent( int, const QVariant& );
 	void onUserGetInfoReturn( class WsReply* );
 	void onStackIndexChanged( int );
-	
+
 private:
     void setupUi();
     void setupScrobbleView();

@@ -53,7 +53,6 @@
 #endif
 
 
-
 MainWindow::MainWindow()
 {
     setupUi();
@@ -149,12 +148,9 @@ MainWindow::setupUi()
 	setCentralWidget( mainWidget );
 
     setupScrobbleView(); //TODO its own widget too
-	
-	ui.tuner = new RadioWidget;
-	connect( ui.tuner, SIGNAL(newStationStarted()), SLOT(showNowPlaying()) );
-	
+
 	ui.stack->addWidget( ui.np );
-	ui.stack->addWidget( ui.tuner );
+	ui.stack->addWidget( ui.tuner = new RadioWidget );
 }
 
 
@@ -409,8 +405,6 @@ MainWindow::dropEvent( QDropEvent* e )
 void
 MainWindow::onUserGetInfoReturn( WsReply* reply )
 {
-	qDebug() << reply;
-	
 	try
 	{
 		EasyDomElement e = reply->lfm()["user"];
@@ -422,6 +416,10 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 			gender = (gender == "m") ? "boy" : "girl";
 			QString text = tr("A %1, %2 years of age with %L3 scrobbles").arg( gender ).arg( age ).arg( scrobbles );
 			ui.account->addAction( text )->setEnabled( false );
+		}
+		else if (scrobbles > 0)
+		{
+			ui.account->addAction( tr("%L1 scrobbles").arg( scrobbles ) )->setEnabled( false );			
 		}
 	}
 	catch (EasyDomElement::Exception&)
