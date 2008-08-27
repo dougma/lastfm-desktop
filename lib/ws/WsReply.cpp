@@ -91,7 +91,7 @@ WsReply::onFinished()
             case QNetworkReply::ProtocolInvalidOperationError:
             case QNetworkReply::ProtocolFailure:
                 qDebug() << networkErrorString( m_reply->error() );
-                throw Ws::TryAgain;
+                throw Ws::TryAgainLater;
 
             case QNetworkReply::HostNotFoundError:
             case QNetworkReply::UnknownNetworkError:
@@ -178,4 +178,11 @@ WsReply::networkErrorString( QNetworkReply::NetworkError e )
     }
 
     #undef CASE
+}
+
+
+QString
+WsReply::method() const
+{
+	return m_reply->url().queryItemValue( "method" );
 }

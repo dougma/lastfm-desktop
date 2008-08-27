@@ -45,8 +45,13 @@ namespace Ws
 		NotEnoughNeighbours,
 		
         /** Last.fm sucks, or something weird happened. 
-          * Call networkError() for more details */
-        TryAgain = 100,
+          * Call networkError() for more details
+		  * Advise the user to try again in a _few_minutes_.
+		  * For some cases, you may want to try again yourself, at this point
+		  * in the API you will have to. Eventually we will discourage this and
+		  * do it for you, as we don't want to strain Last.fm's servers
+		  */
+        TryAgainLater = 100,
 
         /** Last.fm fucked up, or something mangled the response on its way */
         MalformedResponse,
