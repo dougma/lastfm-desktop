@@ -100,21 +100,26 @@ public:
         return *this;
     }
 	
-	static QByteArray stamp( const QByteArray& file, uint line, const QByteArray& function )
+	static QByteArray stamp( const QByteArray& file, uint line, QByteArray function )
 	{
 		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
 		QByteArray out;
 		out += QTime::currentTime().toString( "[hh:mm:ss] " );
-		out += filename + ":";
-		out += function + "():";
-		out += QString::number( line ) + ":";
+//		out += filename + ":" + QString::number( line );
+
+		#if __GNUG__
+		int const n = function.indexOf( ' ' ) + 1;
+		function = function.mid( n, function.indexOf( '(' ) - n );
+		#endif
+
+		out += function + "()";
 		return out;
 	}
 };
 
     #define Q_DEBUG_BLOCK QDebugBlock mxcl_block = QDebugBlock( __PRETTY_FUNCTION__ )
     #define Q_DEBUG_FUNCTION QDebugBlock::debug
-	#define Q_DEBUG_STAMP QDebugBlock::stamp( __FILE__, __LINE__, __FUNCTION__ ).data()
+	#define Q_DEBUG_STAMP QDebugBlock::stamp( __FILE__, __LINE__, __PRETTY_FUNCTION__ ).data()
 
 #else // QT_NO_DEBUG
     #define Q_DEBUG_FUNCTION qDebug
