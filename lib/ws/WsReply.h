@@ -47,6 +47,7 @@ class WS_DLLEXPORT WsReply : public QObject
     QByteArray m_data;
 
     friend class WsRequestBuilder;
+	friend QDebug operator<<( QDebug, WsReply* );
 
     WsReply( QNetworkReply* );
 
@@ -83,7 +84,7 @@ private slots:
 #include <QDebug>
 inline QDebug operator<<( QDebug d, WsReply* r )
 {
-	return d << r->url() << ":\n"
+	return d << r->m_reply->url() << ":\n"
 			 << r->data().trimmed();
 }
 
