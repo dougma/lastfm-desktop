@@ -29,7 +29,7 @@ Radio::Radio( Phonon::AudioOutput* output )
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-	connect( m_mediaObject, SIGNAL(bufferStatus( int )), SIGNAL(buffering( int )) );
+	connect( m_mediaObject, SIGNAL(bufferStatus( int )), SIGNAL(onBuffering( int )) );
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 

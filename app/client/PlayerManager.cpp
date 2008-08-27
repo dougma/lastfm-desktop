@@ -108,7 +108,7 @@ PlayerManager::onPlaybackResumed( const QString& id )
 void
 PlayerManager::onPlayerConnected( const QString &id )
 {
-	ONE_PLAYER_HACK( id )
+	if (m_playerId.size()) return;
 	
 	m_playerId = id;
     emit event( PlayerEvent::PlayerConnected, QVariant::fromValue( id ) );
