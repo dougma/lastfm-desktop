@@ -58,4 +58,6 @@ private:
 
     ObservedTrack m_track;
     PlayerState::Enum m_state;
+	
+	QString m_playerId;
 };

@@ -46,9 +46,13 @@ PlayerManager::love()
 {}
 
 
+#define ONE_PLAYER_HACK( id ) if (m_playerId.size() && m_playerId != id ) return;
+
 void
 PlayerManager::onTrackStarted( const Track& t )
 {   
+	ONE_PLAYER_HACK( t.playerId() )
+	
     delete m_track.m_watch; //stuff is connected to it, break those connections
 
     m_track = t;
@@ -63,6 +67,8 @@ PlayerManager::onTrackStarted( const Track& t )
 void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
+	ONE_PLAYER_HACK( id )
+	
     delete m_track.m_watch;
     m_track = ObservedTrack();
     handleStateChange( PlayerState::Stopped );
@@ -72,6 +78,8 @@ PlayerManager::onPlaybackEnded( const QString& id )
 void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
+	ONE_PLAYER_HACK( id )
+	
     if (m_track.m_watch)
         m_track.m_watch->pause();
 
@@ -82,6 +90,8 @@ PlayerManager::onPlaybackPaused( const QString& id )
 void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
+	ONE_PLAYER_HACK( id )
+	
 	if (m_state != PlayerState::Paused)
 		// we can't show any new information, so we won't try
 		// NOTE some implementations are buggy and a quick pause/unpause skips
@@ -96,21 +106,26 @@ PlayerManager::onPlaybackResumed( const QString& id )
 
 
 void
-PlayerManager::onPlayerConnected( const QString &playerId )
+PlayerManager::onPlayerConnected( const QString &id )
 {
-    emit event( PlayerEvent::PlayerConnected, QVariant::fromValue( playerId ) );
+	ONE_PLAYER_HACK( id )
+	
+	m_playerId = id;
+    emit event( PlayerEvent::PlayerConnected, QVariant::fromValue( id ) );
 }
 
 
 void
-PlayerManager::onPlayerDisconnected( const QString &playerId )
+PlayerManager::onPlayerDisconnected( const QString &id )
 {
-    emit event( PlayerEvent::PlayerDisconnected, QVariant::fromValue( playerId ) );
+	ONE_PLAYER_HACK( id )
+	
+    emit event( PlayerEvent::PlayerDisconnected, QVariant::fromValue( id ) );
 
     // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media
     // players leaving the scrobbler in a playing state
 #if 0
-    onPlaybackEnded( playerId );
+    onPlaybackEnded( id );
 #endif
 }
 
