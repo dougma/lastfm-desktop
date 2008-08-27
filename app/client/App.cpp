@@ -66,10 +66,13 @@ App::App( int argc, char** argv )
     
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
+	connect( m_radio, SIGNAL(preparing( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
 	connect( m_radio, SIGNAL(tuned( QString )), SLOT(onRadioStationTuned( QString )) );
-
+	connect( m_radio, SIGNAL(buffering( int )), SLOT(onRadioPlaybackStalled()) );
+	connect( m_radio, SIGNAL(playbackResumed()), SLOT(onRadioPlaybackUnstalled()) );
+	
     DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
@@ -274,6 +277,8 @@ App::open( const QUrl& url )
 void
 App::onRadioTrackStarted( Track t )
 {
+	m_playerManager->onPlayerConnected( "ass" );
+	MutableTrack( t ).setPlayerId( "ass" );
     m_playerManager->onTrackStarted( t );
 }
 
@@ -289,6 +294,20 @@ void
 App::onRadioStationTuned( const QString& s )
 {
 	onAppEvent( PlayerEvent::PlayerChangedContext, s );
+}
+
+
+void
+App::onRadioPlaybackStalled()
+{
+	m_playerManager->onPlaybackPaused( "ass" );
+}
+
+
+void
+App::onRadioPlaybackUnstalled()
+{
+	m_playerManager->onPlaybackResumed( "ass" );
 }
 
 

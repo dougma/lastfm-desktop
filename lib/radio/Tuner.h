@@ -23,6 +23,7 @@
 #include "RadioStation.h" //convenience
 #include "lib/DllExportMacro.h"
 #include "lib/types/Track.h"
+#include "lib/ws/WsError.h"
 #include <QList>
 
 
@@ -45,13 +46,20 @@ public slots:
 signals:
 	void stationName( const QString& );
 	void tracks( const QList<Track>& );
-	void error( WsReply* );
+	
+	/** we handle Ws::TryAgain up to 5 times, don't try again after that!
+	  * Just tell the user to try again later */
+	void error( Ws::Error );
 
 private slots:
 	void onTuneReturn( WsReply* );
 	void onGetPlaylistReturn( WsReply* );
 
 private:
+	/** tries again up to 5 times 
+	  * @returns true if we tried again, otherwise you should emit error */
+	bool tryAgain();
+	
 	QString m_stationName;
 	uint m_retry_counter;
 };

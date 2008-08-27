@@ -66,7 +66,9 @@ private slots:
     void onRadioTrackStarted( Track );
     void onRadioPlaybackEnded();
 	void onRadioStationTuned( const QString& );
-
+	void onRadioPlaybackStalled();
+	void onRadioPlaybackUnstalled();
+	
 signals:
     void event( int, const QVariant& );
 

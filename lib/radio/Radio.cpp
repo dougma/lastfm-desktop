@@ -46,13 +46,7 @@ Radio::play( const RadioStation& station )
     m_tuner = new Tuner( station );
 	connect( m_tuner, SIGNAL(stationName( QString )), SIGNAL(tuned( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
-}
-
-
-void
-Radio::onTunerError( WsReply* reply )
-{
-
+	connect( m_tuner, SIGNAL(error( Ws::Error )), SIGNAL(error( Ws::Error )) );
 }
 
 
@@ -283,4 +277,18 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 			}
 			break;
     }
+}
+
+
+Phonon::State
+Radio::state() const
+{
+	return m_mediaObject->state();
+}
+
+
+void
+Radio::onBuffering( int pc )
+{
+	qDebug() << "Buffering:" << pc;
 }

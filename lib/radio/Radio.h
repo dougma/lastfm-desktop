@@ -42,6 +42,7 @@ public:
     Radio( Phonon::AudioOutput* );
 
 	Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
+	Phonon::State state() const;
 	
 public slots:
     void play( const RadioStation& );
@@ -50,11 +51,6 @@ public slots:
 	void pause();
 	void unpause();
 
-private slots:
-    void enqueue( const QList<Track>& );
-    void onPhononStateChanged( Phonon::State, Phonon::State );
-	void onTunerError( WsReply* );
-	
 signals:
 	void tuningIn( const QString& title );
 	void tuned( const QString& title );
@@ -71,6 +67,16 @@ signals:
     /** follows pause and buffering */
     void playbackResumed();
 
+	/** playback may still be occuring, so you may want to hold the error
+	  * eg. NotEnoughContent mid-track means we can't get anymore tracks after
+	  * the current playlist finishes */
+	void error( Ws::Error );
+
+private slots:
+    void enqueue( const QList<Track>& );
+    void onPhononStateChanged( Phonon::State, Phonon::State );
+	void onBuffering( int );
+	
 private:
 	class Tuner* m_tuner;
 	Phonon::AudioOutput* m_audioOutput;

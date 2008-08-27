@@ -47,20 +47,19 @@ Tuner::Tuner( const RadioStation& station )
 void
 Tuner::onTuneReturn( WsReply* reply )
 {
-	if (reply->error() == Ws::NoError)
-	{
-		try 
-		{
-			m_stationName = reply->lfm()["station"]["name"].text();
-			emit stationName( m_stationName );
-		}
-		catch (UnicornException&)
-		{}
-		
-		fetchFiveMoreTracks();
+	if (reply->error() != Ws::NoError) {
+		emit error( reply->error() );
+		return;
 	}
-	else
-		emit error( reply );
+
+	try {
+		m_stationName = reply->lfm()["station"]["name"].text();
+		emit stationName( m_stationName );
+	}
+	catch (UnicornException&)
+	{}
+	
+	fetchFiveMoreTracks();
 }
 
 
@@ -72,24 +71,46 @@ Tuner::fetchFiveMoreTracks()
 }
 
 
+bool
+Tuner::tryAgain()
+{
+	if (++m_retry_counter > 5)
+		return false;
+	fetchFiveMoreTracks();
+	return true;
+}
+
+
 void
 Tuner::onGetPlaylistReturn( WsReply* reply )
 {
-	if (reply->failed())
-		emit error( reply );
-	
+	switch (reply->error())
+	{
+		case Ws::NoError:
+			break;
+
+		case Ws::TryAgainLater:
+			if (!tryAgain())
+				emit error( Ws::TryAgainLater );
+			return;
+
+		default:
+			emit error( reply->error() );
+			return;
+	}
+			
 	Playlist p( reply );
 
 	if (p.tracks().isEmpty())
 	{
 		// sometimes the recs service craps out and gives us a blank playlist
 		
-		if (++m_retry_counter > 5)
+		if (!tryAgain())
 		{
-			emit tracks( QList<Track>() );
+			// an empty playlist is a bug, if there is no content
+			// NotEnoughContent should have been returned with the WsReply
+			emit error( Ws::MalformedResponse );
 		}
-		else
-			fetchFiveMoreTracks();		
 	}
 	else {
 		m_retry_counter = 0;
