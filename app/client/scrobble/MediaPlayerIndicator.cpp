@@ -53,7 +53,13 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
             break;
 
 		case PlayerEvent::PlaybackPaused:
-			m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
+		{
+			if (m_playerName == "ass")
+				m_playerDescription->setText( tr("<b>buffering...</font>").arg( m_playerName ) );
+			else
+				m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
+		}
+			
 			break;
 
 		case PlayerEvent::PlaybackEnded:
@@ -98,7 +104,10 @@ MediaPlayerIndicator::mediaPlayerConnected( const QString& id )
 		playerName = "Winamp";
 	
 	else if( id == "ass" )
+	{
 		playerName = "Last.fm";
+		return;
+	}
 
 	m_playerName = playerName;
 	m_playbackCommencedString = tr("<b><font color=#343434>listening to</font> %1").arg( m_playerName );
