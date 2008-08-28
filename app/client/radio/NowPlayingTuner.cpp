@@ -126,9 +126,9 @@ NowPlayingTuner::onFetchedSimilarArtists( WsReply* r )
 void
 NowPlayingTuner::onTagClicked( QListWidgetItem* i )
 {
+	i->setSelected( false );
 	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
 	The::radio().play( r );
-	i->setSelected( false );
 }
 
 

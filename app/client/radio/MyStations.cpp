@@ -94,13 +94,21 @@ MyStations::onItemClicked( QListWidgetItem* i )
 void
 MyStations::onSearch()
 {
+	const QString& searchTerm = ui.searchBox->text();
+	
+	if( searchTerm.startsWith( "lastfm://", Qt::CaseInsensitive ))
+	{
+		The::radio().play( RadioStation( searchTerm, RadioStation::Url ));
+		return;
+	}
+	
 	ui.spinner->show();
 	delete m_searchResults;
 	m_searchResults = new SearchResultsTuner;
-	m_searchResults->setObjectName( ui.searchBox->text() + " - Search Results" );
+	m_searchResults->setObjectName( searchTerm + " - Search Results" );
 	
-	Artist a( ui.searchBox->text());
-	Tag t( ui.searchBox->text());
+	Artist a( searchTerm);
+	Tag t( searchTerm);
 	
 	connect( a.search(), SIGNAL(finished( WsReply*)), SLOT(onArtistSearchResults( WsReply*)) );
 	connect( t.search(), SIGNAL(finished( WsReply*)), SLOT(onTagSearchResults( WsReply*)) );
