@@ -38,10 +38,14 @@ MyStations::MyStations()
 	
 	ui.setupUi( this );
 	
-	ui.list->viewport()->setBackgroundRole( QPalette::Background );
-	ui.list->viewport()->setAutoFillBackground( true );
 	ui.list->setItemDelegate( new MyStationsDelegate );
-	ui.list->setSpacing( 3 );
+	
+	//It would be nice to set the backgroundRole to Window but this screws up
+	//the painting when scrolling / hovering items :(
+	//
+	//ui.list->viewport()->setBackgroundRole( QPalette::Window );
+	
+	ui.list->setSpacing( 0 );
 	
 	connect( ui.list, SIGNAL( itemEntered( QListWidgetItem* )), SLOT( onItemHover( QListWidgetItem* )));
 	connect( ui.list, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onItemClicked( QListWidgetItem* )));

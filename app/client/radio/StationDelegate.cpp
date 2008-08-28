@@ -133,7 +133,7 @@ StationDelegate::sizeHint( const QStyleOptionViewItem& option,
 	
 	size.setWidth( size.width() + k_leftMargin + k_stationIconWidth + iconRect.width() );
 
-	size = size.expandedTo( QSize( 1, iconRect.height()) );
+	size = size.expandedTo( QSize( 1, iconRect.height() ) );
 	
 	size = size.expandedTo( QSize( 1, k_minHeight ) ).expandedTo( QApplication::globalStrut() );
 	
