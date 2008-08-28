@@ -68,16 +68,16 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 {
     switch (e)
     {
-        case PlayerEvent::PlaybackStarted:
+        case PlayerEvent::PlaybackSessionStarted:
 			ui.tabs->show();
-			// fall through
+			break;
 		
-		case PlayerEvent::TrackChanged:
+		case PlayerEvent::TrackStarted:
 			m_track = d.value<ObservedTrack>();
 			load();
             break;
 
-		case PlayerEvent::PlaybackEnded:
+		case PlayerEvent::PlaybackSessionEnded:
 			ui.tabs->hide();
 			ui.web->setHtml( "<html/>" ); //clear the web view
 			break;

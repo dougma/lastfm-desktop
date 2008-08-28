@@ -24,7 +24,8 @@
 
 ScrobbleProgressBar::ScrobbleProgressBar()
                    : m_scrobbleProgressTick( 0 ),
-                     m_scrobblePoint( 0 )
+                     m_scrobblePoint( 0 ),
+					 m_playback( false )
 {
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.time = new QLabel );
@@ -62,11 +63,11 @@ ScrobbleProgressBar::progressBarWidth() const
 void
 ScrobbleProgressBar::paintEvent( QPaintEvent* )
 {
-    uint const h = height();
-
-    if (ui.time->text().isEmpty())
+    if (!m_playback)
         return;
-    
+
+	uint const h = height();
+	
 	uint x1 = ui.time->rect().right() + 7;
 	uint w = progressBarWidth();
 	
@@ -148,8 +149,7 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
 {
     switch (e)
     {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::TrackChanged:
+    case PlayerEvent::TrackStarted:
         {
             onPlaybackTick( 0 );
             m_scrobbleProgressTick = 0;
@@ -165,8 +165,14 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
 
     switch (e)
     {
-        case PlayerEvent::PlaybackStarted:
-        case PlayerEvent::TrackChanged:
+		case PlayerEvent::PlaybackSessionStarted:
+			m_playback = true;
+			break;
+		case PlayerEvent::PlaybackSessionEnded:			
+			m_playback = false;
+			break;
+			
+        case PlayerEvent::TrackStarted:
         case PlayerEvent::PlaybackUnstalled:
         case PlayerEvent::PlaybackUnpaused:
             m_progressPaintTimer->start();
@@ -177,7 +183,7 @@ ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
             m_progressPaintTimer->stop();
             break;
         
-        case PlayerEvent::PlaybackEnded:
+        case PlayerEvent::TrackEnded:
 			m_scrobbleProgressTick = 0;
 			m_progressPaintTimer->stop();
 			ui.time->clear();

@@ -18,10 +18,9 @@
  ***************************************************************************/
 
 #include "RadioMiniControls.h"
-#include "App.h"
 #include "PlayerEvent.h"
-#include <phonon/volumeslider.h>
 #include "ObservedTrack.h"
+#include <phonon/volumeslider.h>
 
 
 RadioMiniControls::RadioMiniControls()
@@ -32,29 +31,27 @@ RadioMiniControls::RadioMiniControls()
 	
     layout()->addWidget( ui.volume = new Phonon::VolumeSlider );
 	
-	connect( &The::app(), SIGNAL(event( int, const QVariant&)), SLOT( onAppEvent( int, const QVariant&)) );
+	connect( qApp, SIGNAL(event( int, const QVariant&)), SLOT( onAppEvent( int, const QVariant&)) );
 	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
 	
 	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
 }
+
 
 void 
 RadioMiniControls::onAppEvent( int e, const QVariant& d )
 {
 	switch ( e ) 
 	{
-		case PlayerEvent::PlaybackStarted:
-		{
-			Track t = d.value<ObservedTrack>();
-			if( t.source() == Track::LastFmRadio )
+		case PlayerEvent::PlaybackSessionStarted:
+			if( d.toString() == "ass" )
 				ui.play->setChecked( true );
 			break;
-		}
 		
-		case PlayerEvent::PlaybackEnded:
+		case PlayerEvent::PlaybackSessionEnded:
 		case PlayerEvent::PlaybackPaused:
-			
 			break;
+
 		default:
 			break;
 	}

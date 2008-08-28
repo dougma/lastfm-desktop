@@ -40,49 +40,90 @@ class RADIO_DLLEXPORT Radio : public QObject
 
 public:
     Radio( Phonon::AudioOutput* );
+	
+	enum State
+	{
+		TuningIn,     /** Tuning into station() */
+		Playing,
+		Rebuffering,
+		Stopped
+	};
+
+	State state() const { return m_state; }
+	RadioStation station() const { return m_station; }
+	Track track() const { return m_track; }
 
 	Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
-	Phonon::State state() const;
+	/** provided for giggles, but it shouldn't concern you */
+	Phonon::State phononState() const; 
 	
 public slots:
     void play( const RadioStation& );
-    void stop();
     void skip();
-	void pause();
-	void unpause();
+    void stop();
 
 signals:
-	void tuningIn( const QString& title );
-	void tuned( const QString& title );
-	void preparing( const Track& );
-	/** buffer fill status as a percentage, you can get this mid-track too, if 
-	  * so, see playbackResumed() */
-	void buffering( int );
-    void trackStarted( const Track& );
-	/** stop() was called or a serious radio error occurred */
-    void playbackEnded();
+	void stateChanged( Radio::State from, Radio::State to );
+	/** state changes are always announced first with above signal */
+	void trackStarted( const Track& );
 	
-	void playbackPaused();
-	
-    /** follows pause and buffering */
-    void playbackResumed();
-
 	/** playback may still be occuring, so you may want to hold the error
 	  * eg. NotEnoughContent mid-track means we can't get anymore tracks after
 	  * the current playlist finishes */
+	//TODO hold error until it's relevant?
 	void error( Ws::Error );
 
 private slots:
     void enqueue( const QList<Track>& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
-	void onBuffering( int );
+	void onTunerError( Ws::Error );
+
+	/** we get a "proper" station name from the tune webservice */
+	void setStationNameIfCurrentlyBlank( const QString& s ) { m_station.setTitle( s ); }
 	
 private:
+	/** emits stateChanged if appropriate */
+	void changeState( State );
+	
 	class Tuner* m_tuner;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
+	Radio::State m_state;
+	Track m_track;
+	RadioStation m_station;
 	
     QMap<QUrl, Track> m_queue;
 };
 
-#endif //RADIOCONTROLLER_H
+
+#define CASE(x) case x: return d << #x
+#include <QDebug>
+inline QDebug operator<<( QDebug d, Radio::State s )
+{
+	switch (s)
+	{
+		CASE(Radio::TuningIn);
+		CASE(Radio::Playing);
+		CASE(Radio::Rebuffering);
+		CASE(Radio::Stopped);
+	}
+}
+
+inline QDebug operator<<( QDebug d, Phonon::State s )
+{
+	switch (s)
+	{
+		CASE(Phonon::LoadingState);
+		CASE(Phonon::StoppedState);
+		CASE(Phonon::PlayingState);
+		CASE(Phonon::BufferingState);
+		CASE(Phonon::PausedState);
+		CASE(Phonon::ErrorState);
+	}
+}
+#undef CASE
+
+
+Q_DECLARE_METATYPE( Radio::State );
+
+#endif //RADIO_H

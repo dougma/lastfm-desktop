@@ -34,10 +34,6 @@ public:
 
     ObservedTrack track() const { return m_track; }
 
-    /** will ban or love the current track */
-    void ban();
-    void love();
-
 public slots:
     void onTrackStarted( const Track& );
     void onPlaybackEnded( const QString& playerId );
@@ -54,8 +50,6 @@ private slots:
     void onStopWatchTimedOut();
 
 private:
-    void handleStateChange( PlayerState::Enum, const ObservedTrack& t = ObservedTrack() );
-
     ObservedTrack m_track;
     PlayerState::Enum m_state;
 	

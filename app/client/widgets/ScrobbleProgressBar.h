@@ -53,6 +53,8 @@ private:
     ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }
 
 	uint progressBarWidth() const;
+
+	bool m_playback;
 	
 private slots:
     void onPlaybackTick( int );

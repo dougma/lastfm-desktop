@@ -32,33 +32,34 @@ namespace PlayerEvent
 {
     enum Enum
     {
-        /** playback has started, data is the playing track 
-          * State will be Playing 
-          * You will always get a PlaybackEnded event before a non Playback 
-          * event is sent, eg. TuningIn, UserChanged, track will never be empty
+        /** A playback session is the time inbetween the user starting some 
+		  * music and either THE USER stopping the music, or a playlist coming
+		  * to a natural end, or playback halting due to some more serious 
+		  * issue.
+		  * The point in having an overall PlaybackSession concept is so that
+		  * you can know to leave some stuff displayed, even if buffering or
+		  * other indeterminate time transitions are occurring
           */
-        PlaybackStarted,
+        PlaybackSessionStarted,
 
-        /** playback continues, data is the new track
-          * State will be playing, track will never be empty */
-        TrackChanged,
+		/** The user stopped the playback, or started playing in a different 
+		  * player, etc. you get the idea I hope */
+        PlaybackSessionEnded,		
+		
+		/** You'll get this 30 seconds before the next track starts, if 
+		  * possible, you may not get it at all though, so don't depend on it */
+		PrepareNextTrack,
+		
+        TrackStarted,
+		TrackEnded,
 
-        /** playback has ceased, this will not be sent for transitions, eg
-          * buffering, retuning, radio playlist fetching, etc.
-          * State will be stopped */
-        PlaybackEnded,
-
-        /** a player that we listen to paused
-          * event will be followed by unpaused or playbackended, even in the case
-          * of user-switching occuring or whatever
-          * State will be paused */
+        /** This will be followed by PlaybackUnpaused or TrackEnded */
         PlaybackPaused,
         /** state will be playing, track will never be empty */
         PlaybackUnpaused,
 
         /** eg. Radio http buffer is empty, we are rebuffering 
-          * you'll either get Unstalled, TrackChanged or Ended after this
-          * State: TODO
+          * you'll either get Unstalled, TrackEnded after this
           */
         PlaybackStalled,
         /** eg. Radio http rebuffering complete, playback has resumed */
@@ -77,12 +78,40 @@ namespace PlayerEvent
         /** A known media player has disconnected from the client */
         PlayerDisconnected,
 
-		/** A media player (most likely Last.fm Radio) has changed listening 
-		  * context */
-		PlayerChangedContext,
-		
-        TypeMax /** leave at end of enum, kthxbai */
+		/** The active player is Last.fm and we're tuning into a station
+		  * The data is a RadioStation object.
+		  * The station title may be blank, if so bad luck 
+		  * TuningIn can occur after TrackEnd and not just after 
+		  * PlaybackSessionStarted, as there may be issues getting playlists
+		  * from the last.fm radio service be aware of that!
+		  */
+		TuningIn,
     };
 }
 
+#include <QDebug>
+inline QDebug operator<<( QDebug d, PlayerEvent::Enum e )
+{
+	#define _( x ) x: return d << #x
+	switch ((PlayerEvent::Enum) e)
+	{
+		case _(PlayerEvent::PlayerConnected);
+		case _(PlayerEvent::PlaybackSessionStarted);
+		case _(PlayerEvent::TrackStarted);
+		case _(PlayerEvent::PlaybackPaused);
+		case _(PlayerEvent::PlaybackUnpaused);
+		case _(PlayerEvent::PlaybackStalled);
+		case _(PlayerEvent::PlaybackUnstalled);
+		case _(PlayerEvent::TrackEnded);
+		case _(PlayerEvent::PlaybackSessionEnded);
+		case _(PlayerEvent::PlayerDisconnected);
+			
+		case _(PlayerEvent::PrepareNextTrack);
+		case _(PlayerEvent::TuningIn);
+		case _(PlayerEvent::ScrobblePointReached);
+	}
+	#undef _
+}
+
 #endif
+

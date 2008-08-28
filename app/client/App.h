@@ -20,6 +20,7 @@
 #include "PlayerState.h"
 #include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
+#include "lib/radio/Radio.h" //for Radio::State FIXME
 #include "lib/ws/WsError.h"
 #include "the/definitions.h"
 
@@ -51,8 +52,6 @@ public slots:
     /** all webservices connect to this and emit in the case of bad errors that
       * need to be handled at a higher level */
     void onWsError( Ws::Error );
-    
-    void onScrobblerStatusChanged( int );
 
     /** currently also quits, needs fixing! */
     void logout();
@@ -63,11 +62,10 @@ public slots:
 private slots:
     void onAppEvent( int, const QVariant& );
 
-    void onRadioTrackStarted( Track );
-    void onRadioPlaybackEnded();
-	void onRadioStationTuned( const QString& );
-	void onRadioPlaybackStalled();
-	void onRadioPlaybackUnstalled();
+	void onScrobblerStatusChanged( int );
+	
+	void onRadioTrackStarted( const Track& );
+	void onRadioStateChanged( Radio::State, Radio::State );
 	
 signals:
     void event( int, const QVariant& );

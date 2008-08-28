@@ -66,12 +66,8 @@ App::App( int argc, char** argv )
     
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
-	connect( m_radio, SIGNAL(preparing( Track )), SLOT(onRadioTrackStarted( Track )) );
+	connect( m_radio, SIGNAL(stateChanged( Radio::State, Radio::State )), SLOT(onRadioStateChanged( Radio::State, Radio::State )) );
     connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
-    connect( m_radio, SIGNAL(playbackEnded()), SLOT(onRadioPlaybackEnded()) );
-	connect( m_radio, SIGNAL(tuned( QString )), SLOT(onRadioStationTuned( QString )) );
-	connect( m_radio, SIGNAL(buffering( int )), SLOT(onRadioPlaybackStalled()) );
-	connect( m_radio, SIGNAL(playbackResumed()), SLOT(onRadioPlaybackUnstalled()) );
 	
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -118,38 +114,14 @@ App::setMainWindow( MainWindow* window )
 }
 
 
-namespace PlayerEvent
-{
-	static inline void debug( int e, const QVariant& d )
-	{
-		#define _( x ) x: qDebug() << #x
-		switch (e)
-		{
-			case _(PlayerEvent::PlayerConnected) << d.toString(); break;
-			case _(PlayerEvent::PlaybackStarted) << d.value<ObservedTrack>(); break;
-			case _(PlayerEvent::PlaybackPaused); break;
-			case _(PlayerEvent::PlaybackUnpaused); break;
-			case _(PlayerEvent::PlaybackStalled); break;
-			case _(PlayerEvent::PlaybackUnstalled); break;
-			case _(PlayerEvent::PlaybackEnded); break;
-			case _(PlayerEvent::PlayerDisconnected) << d.toString(); break;
-		}
-		#undef _
-	}
-}
-
-
 void
 App::onAppEvent( int e, const QVariant& d )
 {
-	PlayerEvent::debug( e, d );
+	qDebug() << (PlayerEvent::Enum)e;
 	
     switch (e)
     {
-        case PlayerEvent::TrackChanged:
-            m_scrobbler->submit();
-            // FALL THROUGH
-        case PlayerEvent::PlaybackStarted:
+        case PlayerEvent::TrackStarted:
         {
             Track t = d.value<ObservedTrack>();
             m_scrobbler->nowPlaying( t );
@@ -160,13 +132,13 @@ App::onAppEvent( int e, const QVariant& d )
         #endif
             break;
         }
+
+		case PlayerEvent::TrackEnded:
+            m_scrobbler->submit();
+            break;
 			
         case PlayerEvent::ScrobblePointReached:
             m_scrobbler->cache( d.value<ObservedTrack>() );
-            break;
-
-        case PlayerEvent::PlaybackEnded:
-            m_scrobbler->submit();
             break;
     }
 
@@ -234,6 +206,36 @@ App::onScrobblerStatusChanged( int e )
 }
 
 
+void
+App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
+{
+	qDebug() << newstate << "but was:" << oldstate;
+	
+	switch (newstate)
+	{
+		case Radio::Playing:
+			if (oldstate == Radio::Rebuffering)
+				m_playerManager->onPlaybackResumed( "ass" );
+			break;
+			
+		case Radio::Stopped:
+		    m_playerManager->onPlaybackEnded( "ass" );
+			break;
+			
+		case Radio::TuningIn:
+			if (oldstate == Radio::Stopped)
+				m_playerManager->onPlayerConnected( "ass" );
+			onAppEvent( PlayerEvent::TrackEnded, QVariant::fromValue( track() ) );
+			onAppEvent( PlayerEvent::TuningIn, QVariant::fromValue( m_radio->station() ) );
+			break;
+			
+		case Radio::Rebuffering:
+			m_playerManager->onPlaybackPaused( "ass" );
+			break;
+	}
+}
+
+
 void 
 App::onBootstrapCompleted( const QString& playerId, const QString& username )
 {}
@@ -275,39 +277,10 @@ App::open( const QUrl& url )
 
 
 void
-App::onRadioTrackStarted( Track t )
+App::onRadioTrackStarted( const Track& t )
 {
-	m_playerManager->onPlayerConnected( "ass" );
 	MutableTrack( t ).setPlayerId( "ass" );
-    m_playerManager->onTrackStarted( t );
-}
-
-
-void
-App::onRadioPlaybackEnded()
-{
-    m_playerManager->onPlaybackEnded( "ass" );
-}
-
-
-void
-App::onRadioStationTuned( const QString& s )
-{
-	onAppEvent( PlayerEvent::PlayerChangedContext, s );
-}
-
-
-void
-App::onRadioPlaybackStalled()
-{
-	m_playerManager->onPlaybackPaused( "ass" );
-}
-
-
-void
-App::onRadioPlaybackUnstalled()
-{
-	m_playerManager->onPlaybackResumed( "ass" );
+	m_playerManager->onTrackStarted( t );
 }
 
 

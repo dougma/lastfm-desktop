@@ -36,42 +36,69 @@ PlayerManager::PlayerManager( PlayerListener* listener )
 }
 
 
-void
-PlayerManager::ban()
-{}
-
-
-void
-PlayerManager::love()
-{}
-
-
 #define ONE_PLAYER_HACK( id ) if (m_playerId.size() && m_playerId != id ) return;
 
 void
 PlayerManager::onTrackStarted( const Track& t )
 {   
 	ONE_PLAYER_HACK( t.playerId() )
+	using namespace PlayerState;
+	
+	if (t.isNull() && (m_state == Stopped || m_state == Playing))
+	{
+		qWarning() << "Empty TrackInfo object presented for PlaybackStarted notification, this is wrong!";
+		emit event( PlayerEvent::PlaybackSessionEnded );
+		return;
+	}
+
+	PlayerState::Enum oldState = m_state;
+	m_state = Playing;
+	
+	if (oldState == Stopped) {
+		Q_ASSERT( m_track.isNull() );
+		emit event( PlayerEvent::PlaybackSessionStarted, t.playerId() );
+	}
+	else if (!m_track.isNull())
+		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
 	
     delete m_track.m_watch; //stuff is connected to it, break those connections
 
-    m_track = t;
-    m_track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
-    connect( m_track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
+	m_track = t;
+	m_track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
+	connect( m_track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
 
-    handleStateChange( PlayerState::Playing, m_track );
+	emit event( PlayerEvent::TrackStarted, QVariant::fromValue( m_track ) );
 }
 
 
-//TODO really we should be doing more checking, like is the top player actually in the playing state? could be paused.
 void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
 	ONE_PLAYER_HACK( id )
+	using namespace PlayerState;
 	
-    delete m_track.m_watch;
-    m_track = ObservedTrack();
-    handleStateChange( PlayerState::Stopped );
+	switch (m_state)
+	{
+		case Stopped:
+			qWarning() << "Ignoring request by connected player to set Stopped state again";
+			return;
+			
+		case Playing:
+		case Paused:
+		case Stalled:
+			break;
+	}
+	
+	m_state = Stopped;
+	
+	if (!m_track.isNull())
+	{
+		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+		delete m_track.m_watch;
+		m_track = ObservedTrack();
+	}
+	
+	emit event( PlayerEvent::PlaybackSessionEnded );
 }
 
 
@@ -79,11 +106,29 @@ void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
 	ONE_PLAYER_HACK( id )
+	using namespace PlayerState;
 	
-    if (m_track.m_watch)
-        m_track.m_watch->pause();
+	switch (m_state)
+	{
+		case Paused:
+			qWarning() << "Ignoring request by connected player to set Paused state again";
+		case Stopped:
+			return;
+			
+		case Playing:
+		case Stalled:
+			break;
+	}
 
-    handleStateChange( PlayerState::Paused );
+	if (m_track.isNull())
+		return;
+	
+	Q_ASSERT( m_track.m_watch );
+	
+	m_track.m_watch->pause();
+	m_state = Paused;
+
+	emit event( PlayerEvent::PlaybackPaused, QVariant::fromValue( m_track ) );
 }
 
 
@@ -91,17 +136,31 @@ void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
 	ONE_PLAYER_HACK( id )
+	using namespace PlayerState;
 	
-	if (m_state != PlayerState::Paused)
-		// we can't show any new information, so we won't try
-		// NOTE some implementations are buggy and a quick pause/unpause skips
-		// the pause, so we receive this.
-		return;
-	
-    if (m_track.m_watch)
-        m_track.m_watch->resume();
+	switch (m_state)
+	{
+		case Playing:
+			// no point as nothing would change
+			qWarning() << "Ignoring request by connected player to resume playing track";
+			return;
+			
+		case Stopped:
+			qWarning() << "Ignoring request by connected player to resume null track";
+			return;
 
-    handleStateChange( PlayerState::Playing );
+		case Stalled:
+		case Paused:
+			break;
+	}
+	
+    Q_ASSERT( m_track.m_watch );
+	Q_ASSERT( !m_track.isNull() );
+	
+	m_state = Playing;
+	m_track.m_watch->resume();
+
+	emit event( PlayerEvent::PlaybackUnpaused, QVariant::fromValue( m_track ) );
 }
 
 
@@ -127,82 +186,6 @@ PlayerManager::onPlayerDisconnected( const QString &id )
 #if 0
     onPlaybackEnded( id );
 #endif
-}
-
-
-void
-PlayerManager::handleStateChange( PlayerState::Enum newState, const ObservedTrack& t )
-{
-    using namespace PlayerState;
-
-    PlayerState::Enum oldState = m_state;
-    m_state = newState;
-    QVariant v = QVariant::fromValue( t );
-
-	if (t.isNull())
-	{
-		if (newState == Playing && oldState == Stopped)
-		{
-			qWarning() << "Empty TrackInfo object presented for PlaybackStarted notification, this is wrong!";
-			return;
-		}
-		if (newState == Playing && oldState == Playing)
-		{
-			qWarning() << "Empty TrackInfo object presented for TrackChanged notification, this is wrong!";
-			emit event( PlayerEvent::PlaybackEnded );
-			return;
-		}
-	}
-	
-    switch (oldState)
-    {
-    case Playing:
-        switch (newState)
-        {
-        case Playing:
-            emit event( PlayerEvent::TrackChanged, v );
-            break;
-        case Stopped:
-            emit event( PlayerEvent::PlaybackEnded );
-            break;
-        case Paused:
-            emit event( PlayerEvent::PlaybackPaused );
-            break;
-        }
-        break;
-
-    case Stopped:
-        switch (newState)
-        {
-        case Playing:
-            emit event( PlayerEvent::PlaybackStarted, v );
-            break;
-        case Stopped:
-            // do nothing
-            break;
-        case Paused:
-            //TODO this shouldn't happen, but needs handling
-            // perhaps we should just stay looking stopped? after all what else
-            // can be done?
-            break;
-        }
-        break;
-
-    case Paused:
-        switch (newState)
-        {
-        case Playing:
-            emit event( PlayerEvent::PlaybackUnpaused, v );
-            break;
-        case Stopped:
-            emit event( PlayerEvent::PlaybackEnded );
-            break;
-        case Paused:
-            // do nothing;
-            break;
-        }
-        break;
-    }
 }
 
 

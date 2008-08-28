@@ -2,6 +2,7 @@
 #include "MediaPlayerIndicator.h"
 #include "PlayerEvent.h"
 #include "Settings.h"
+#include "lib/radio/RadioStation.h"
 #include "lib/types/Track.h"
 #include <QVariant>
 #include <QLayout>
@@ -34,35 +35,25 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 
 
 void
-MediaPlayerIndicator::setTuningIn( const QString& /*title*/ )
-{
-	m_playerDescription->setText( tr("<b><font color=#343434>tuning in...") );
-}
-
-
-void
 MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 {
     switch( e )
     { 
 		// we are guarenteed that the playerid will not change without a disconnected first
         case PlayerEvent::PlayerDisconnected:
-#ifndef Q_WS_MAC //FIXME
+		#ifndef Q_WS_MAC //FIXME
 			m_playerDescription->setText( tr("<b><font color=#343434>no player connection") );
-#endif
+		#endif
             break;
 
 		case PlayerEvent::PlaybackPaused:
-		{
-			if (m_playerName == "ass")
+			if (m_playerName == "Last.fm")
 				m_playerDescription->setText( tr("<b>buffering...</font>").arg( m_playerName ) );
 			else
 				m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
-		}
-			
 			break;
 
-		case PlayerEvent::PlaybackEnded:
+		case PlayerEvent::PlaybackSessionEnded:
             m_playerDescription->clear();
             m_playbackCommencedString.clear();
             break;
@@ -70,18 +61,22 @@ MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
 		case PlayerEvent::PlayerConnected:
             mediaPlayerConnected( v.toString() );
 			// fall through
-		case PlayerEvent::PlaybackStarted:
+
+		case PlayerEvent::TrackStarted:
 		case PlayerEvent::PlaybackUnpaused:
 			m_playerDescription->setText( m_playbackCommencedString );
 			break;
 			
-		case PlayerEvent::PlayerChangedContext:
-			m_playerName = tr("Last.fm radio");
-			m_playbackCommencedString = tr( "<b><font color=#343434>%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( v.toString() );
-			// don't set m_playerDescription until we actually start playing
+		case PlayerEvent::TuningIn:
+		{
+			RadioStation station = v.value<RadioStation>();
+			m_playerDescription->setText( tr("<b><font color=#343434>tuning in...") );
+			m_playbackCommencedString = tr( "<b><font color=#343434>%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( station.title() );
+			break;
+		}
 
         default:
-            return;
+            break;
     }
 }
 

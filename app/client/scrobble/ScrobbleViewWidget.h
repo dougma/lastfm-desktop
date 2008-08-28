@@ -51,7 +51,6 @@ public:
 	
 private slots:
 	void onAppEvent( int, const class QVariant& );
-	void onRadioTuningIn( const QString& title );
 };
 
 

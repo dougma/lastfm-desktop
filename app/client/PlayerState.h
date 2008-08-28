@@ -23,20 +23,15 @@
 namespace PlayerState
 {
     // All states can turn into other states
-    // This is KEY there is no implied order
+    // This is KEY, there is no implied order
     // Do not add a state if it may have some implied dependence or order
     // instead make an Event
-    //NOTE some state transitions may cause multiple events to be emitted
-    // eg stopped -> paused will cause a PlaybackStarted, then PlaybackPaused to
-    // be emitted
     enum Enum
     {
         Stopped,
-        TuningIn,
         Playing,
         Paused,
-
-        TypeMax // leave here pls, kthxbai
+		Stalled,
     };
 }
 

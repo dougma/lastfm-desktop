@@ -48,8 +48,7 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 {
 	switch( e )
 	{
-		case PlayerEvent::PlaybackStarted:
-		case PlayerEvent::TrackChanged:
+		case PlayerEvent::TrackStarted:
 		{
 			Track t = d.value<ObservedTrack>();
 			
@@ -70,7 +69,7 @@ NowPlayingTuner::onAppEvent( int e, const QVariant& d )
 		}
 		break;
 
-		case PlayerEvent::PlaybackEnded:
+		case PlayerEvent::PlaybackSessionEnded:
 			ui.tagsTab->clear();
 			ui.similarArtistsTab->clear();
 			

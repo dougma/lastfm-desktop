@@ -54,9 +54,6 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 	
 	setMinimumHeight( sizeHint().height() );
 	
-	connect( (QObject*)&The::radio(), 
-			 SIGNAL(tuningIn( QString )),
-			 SLOT(onRadioTuningIn( QString )) );
 	connect( qApp,
 			 SIGNAL(event(int, QVariant )),
  			 SLOT(onAppEvent( int, QVariant )) );
@@ -85,24 +82,18 @@ ScrobbleViewWidget::onAppEvent( int e, const QVariant& v )
 {
 	switch (e)
 	{
-		case PlayerEvent::PlaybackStarted:
-		case PlayerEvent::TrackChanged:
-		{
-			Track t = v.value<ObservedTrack>();
-			ui.cover->setTrack( t );
+		case PlayerEvent::TrackStarted:
+			ui.cover->setTrack( v.value<ObservedTrack>() );
 			break;
-		}
-
-		case PlayerEvent::PlaybackEnded:
+			
+		case PlayerEvent::TuningIn:
 			ui.cover->clear();
+			ui.cover->ui.spinner->show();
+			break;
+
+		case PlayerEvent::PlaybackSessionEnded:
+			ui.cover->clear();
+			ui.cover->ui.spinner->hide();
 			break;
 	}
-}
-
-
-void
-ScrobbleViewWidget::onRadioTuningIn( const QString& title )
-{
-	ui.cover->ui.spinner->show();
-	ui.playerIndicator->setTuningIn( title );
 }

@@ -55,6 +55,8 @@ public:
 	
 	const QString& title() const{ Q_ASSERT( m_type != Invalid ); return m_title; }
 	
+	void setTitle( const QString& s ) { m_title = s; }
+	
 private:
 	QString m_station;
 	Type m_type;

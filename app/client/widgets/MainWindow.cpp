@@ -69,11 +69,10 @@ MainWindow::MainWindow()
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
-	connect( &The::radio(), SIGNAL(tuningIn( QString )), SLOT(showNowPlaying()) );
 	connect( ui.stack, SIGNAL(currentChanged( int )), SLOT(onStackIndexChanged( int )) );
     
     // set up window in default state
-    onAppEvent( PlayerEvent::PlaybackEnded, QVariant() );
+    onAppEvent( PlayerEvent::PlaybackSessionEnded, QVariant() );
 }
 
 
@@ -84,42 +83,50 @@ MainWindow::onAppEvent( int e, const QVariant& v )
     
     switch (e)
     {
-    case PlayerEvent::PlaybackStarted:
-    case PlayerEvent::TrackChanged:
-        {
-            ui.share->setEnabled( true );
-            ui.tag->setEnabled( true );
-            ui.love->setEnabled( true );
-            ui.ban->setEnabled( true );
-            
-            Track t = v.value<ObservedTrack>();
-            if (t.source() == Track::LastFmRadio)
+		case PlayerEvent::PlaybackSessionStarted:
+		{
+            if (v.toString() == "ass")
             {
                 ui.controls->ui.play->show();
                 ui.controls->ui.skip->show();
                 ui.controls->ui.volume->show();
             }
-
-        #ifndef Q_WS_MAC
+		#ifndef Q_WS_MAC
             setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
-        #endif
-            break;
+		#endif
+			break;
+		}
+
+		case PlayerEvent::PlaybackSessionEnded:
+			ui.controls->ui.play->hide();
+			ui.controls->ui.skip->hide();
+			ui.controls->ui.volume->hide();
+
+		#ifndef Q_WS_MAC
+			setWindowTitle( qApp->applicationName() );
+		#endif
+
+			break;
+
+		case PlayerEvent::TrackStarted:
+        {
+            ui.share->setEnabled( true );
+            ui.tag->setEnabled( true );
+            ui.love->setEnabled( true );
+            ui.ban->setEnabled( true );
+			break;
         }
 
-    case PlayerEvent::PlaybackEnded:
+	case PlayerEvent::TuningIn:
+		showNowPlaying();
+		break;
+			
+    case PlayerEvent::TrackEnded:
         ui.share->setEnabled( false );
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
-
-        ui.controls->ui.play->hide();
-        ui.controls->ui.skip->hide();
-        ui.controls->ui.volume->hide();
-            
-    #ifndef Q_WS_MAC
-        setWindowTitle( qApp->applicationName() );
-    #endif
-        break;
+		break;
     }
 }
 

@@ -102,6 +102,8 @@ public:
 	
 	static QByteArray stamp( const QByteArray& file, uint line, QByteArray function )
 	{
+		Q_UNUSED( line );
+	
 		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
 		QByteArray out;
 		out += QTime::currentTime().toString( "[hh:mm:ss] " );
