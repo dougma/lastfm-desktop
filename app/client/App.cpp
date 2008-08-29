@@ -117,7 +117,7 @@ App::setMainWindow( MainWindow* window )
 void
 App::onAppEvent( int e, const QVariant& d )
 {
-	qDebug() << (PlayerEvent::Enum)e;
+	qDebug() << (PlayerEvent::Enum)e << d;
 	
     switch (e)
     {
@@ -223,9 +223,15 @@ App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
 			break;
 			
 		case Radio::TuningIn:
-			if (oldstate == Radio::Stopped)
-				m_playerManager->onPlayerConnected( "ass" );
-			m_playerManager->onTrackEnded( "ass" );
+			switch (oldstate)
+			{
+				case Radio::Stopped:
+					m_playerManager->onPlaybackSessionStarted( "ass" );
+					break;
+				default:
+					m_playerManager->onTrackEnded( "ass" );
+					break;
+			}
 			onAppEvent( PlayerEvent::TuningIn, QVariant::fromValue( m_radio->station() ) );
 			break;
 			
@@ -233,6 +239,16 @@ App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
 			m_playerManager->onPlaybackPaused( "ass" );
 			break;
 	}
+}
+
+
+void
+App::onRadioTrackStarted( const Track& t )
+{
+	// state always changes before this slot will be called
+	
+	MutableTrack( t ).setPlayerId( "ass" );
+	m_playerManager->onTrackStarted( t );
 }
 
 
@@ -273,14 +289,6 @@ void
 App::open( const QUrl& url )
 {
     m_radio->play( RadioStation( url.toString() ) );
-}
-
-
-void
-App::onRadioTrackStarted( const Track& t )
-{
-	MutableTrack( t ).setPlayerId( "ass" );
-	m_playerManager->onTrackStarted( t );
 }
 
 

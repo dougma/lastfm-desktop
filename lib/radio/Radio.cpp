@@ -21,7 +21,12 @@
 #include "Tuner.h"
 #include "phonon"
 
-static bool eat_stop = false;
+//TODO make non singleton, the globals and statics break the pattern
+
+
+/** the only time we won't to tell the rest of the app about stop is when the
+  * stop() is called */
+static bool eat_stop = true;
 
 
 Radio::Radio( Phonon::AudioOutput* output )
@@ -45,9 +50,9 @@ Radio::play( const RadioStation& station )
 	m_mediaObject->blockSignals( true );
 	stop(); //don't emit stateChanged to Stopped
 	m_mediaObject->blockSignals( false );
-	delete m_tuner;
 
 	changeState( TuningIn );
+	delete m_tuner;
     m_tuner = new Tuner( station );
 	connect( m_tuner, SIGNAL(stationName( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
@@ -75,10 +80,8 @@ public:
 	
 	virtual void run()
 	{
-		eat_stop = true; //hack because threading it seems to break it a little
 		m_o->enqueue( m_urls );
 		m_o->play();
-		eat_stop = false;
 	}
 }; 
 
@@ -126,11 +129,9 @@ public:
 		Phonon::MediaSource source = q.front();
 		q.pop_front();
 	
-		eat_stop = true; //hack because threading it seems to break it a little
 		m_mediaObject->setCurrentSource( source );
 		m_mediaObject->setQueue( q );
 		m_mediaObject->play();
-		eat_stop = false;
 	}
 };
 
@@ -156,7 +157,8 @@ Radio::skip()
 		// we are still waiting for a playlist to come back from the tuner
 		
 		m_mediaObject->blockSignals( true ); //dont' tell outside world that we stopped
-		stop();
+		m_mediaObject->stop();
+		m_mediaObject->setCurrentSource( QUrl() );
 		m_mediaObject->blockSignals( false );
 		changeState( TuningIn );
 	}
@@ -177,24 +179,26 @@ Radio::onTunerError( Ws::Error e )
 void
 Radio::stop()
 {
+	eat_stop = false;
+	
+	delete m_tuner;
+	m_tuner = 0;
+	
 	m_mediaObject->stop();
 	m_mediaObject->clearQueue();
 	m_mediaObject->setCurrentSource( QUrl() );
 	
 	if (m_state == TuningIn)
 		changeState( Stopped );
+	
+	eat_stop = true;
 }
 
 
 void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
-	if (eat_stop && newstate == Phonon::StoppedState) {
-		qDebug() << "Eating Phonon's naughty stop";
-		return;
-	}
-	
-	qDebug() << newstate << "but was:" << oldstate;
+	static uint bites = 0;
 	
     switch (newstate)
     {
@@ -209,8 +213,15 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
             break;
 			
 		case Phonon::PausedState:
-			// if the phono play queue runs out we get this for some reason
+			// if the play queue runs out we get this for some reason
+			// this means we are fetching new tracks still, we should show a 
+			// tuning in state;
+			if (m_mediaObject->queue().size() == 0)
+				changeState( TuningIn );
+			break;
+			
         case Phonon::StoppedState:
+			if (eat_stop) goto eat;
 			changeState( Stopped );
             break;
 			
@@ -218,10 +229,19 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
             changeState( Rebuffering );
             break;
 
-		case Phonon::LoadingState:
 		case Phonon::PlayingState:
+			// sometimes phonon skips loading, presumably because it already
+			// finished loading because we took too long to call play()
+			// so fall through
+			
+		case Phonon::LoadingState:
 		{
 			QUrl const url = m_mediaObject->currentSource().url();
+
+			if (url == m_track.url())
+				// another bug in phonon and due to above fall through
+				goto eat;
+			
 			Track t = m_queue.take( url );
 			if (t.isNull())
 			{
@@ -233,12 +253,25 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 			m_track = t;
 			
 			if (m_queue.isEmpty() && m_tuner)
-				;//m_tuner->fetchFiveMoreTracks();
+				m_tuner->fetchFiveMoreTracks();
 			
 			changeState( Playing );
 			break;
 		}
     }
+
+	{
+		QDebug d = qDebug() << newstate << "but was:" << oldstate;
+		if (bites) {
+			d << ("(NomNom factor:" + QByteArray::number( bites ) + ")").data();
+			bites = 0;
+		}
+	}
+	
+	return;
+	
+eat:
+	++bites;
 }
 
 
@@ -268,5 +301,8 @@ Radio::changeState( Radio::State newstate )
 	emit stateChanged( oldstate, newstate );
 	
 	if (m_state == Playing)
+	{
+		qDebug() << "Playing:" << m_track;
 		emit trackStarted( m_track );
+	}
 }

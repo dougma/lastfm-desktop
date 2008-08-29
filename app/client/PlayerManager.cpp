@@ -39,6 +39,28 @@ PlayerManager::PlayerManager( PlayerListener* listener )
 #define ONE_PLAYER_HACK( id ) if (m_playerId.size() && m_playerId != id ) return;
 
 void
+PlayerManager::onPlaybackSessionStarted( const QString& id )
+{
+	Q_ASSERT( id.size() );
+	Q_ASSERT( m_track.isNull() );
+	ONE_PLAYER_HACK( id )
+	using namespace PlayerState;
+
+	switch (m_state)
+	{
+		case Stopped:
+			break;
+		default:
+			qWarning() << "Ignoring request by connected player to start already started session";
+			return;
+	}
+	
+	m_state = Playing;
+	emit event( PlayerEvent::PlaybackSessionStarted, id );
+}
+
+
+void
 PlayerManager::onTrackStarted( const Track& t )
 {   
 	ONE_PLAYER_HACK( t.playerId() )
@@ -46,20 +68,26 @@ PlayerManager::onTrackStarted( const Track& t )
 	
 	if (t.isNull() && (m_state == Stopped || m_state == Playing))
 	{
-		qWarning() << "Empty TrackInfo object presented for PlaybackStarted notification, this is wrong!";
+		qWarning() << "Empty TrackInfo object presented for TrackStarted notification, this is wrong!";
 		emit event( PlayerEvent::PlaybackSessionEnded );
 		return;
 	}
-
-	PlayerState::Enum oldState = m_state;
-	m_state = Playing;
 	
-	if (oldState == Stopped) {
-		Q_ASSERT( m_track.isNull() );
-		emit event( PlayerEvent::PlaybackSessionStarted, t.playerId() );
+	switch (m_state)
+	{
+		case Stopped:
+			onPlaybackSessionStarted( t.playerId() );
+			break;
+		case Paused:
+		case Stalled:
+			m_state = Playing;
+			// fall through
+		case Playing:
+			if (!m_track.isNull())
+				emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+			break;
 	}
-	else if (!m_track.isNull())
-		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+	
 	
     delete m_track.m_watch; //stuff is connected to it, break those connections
 
@@ -77,25 +105,26 @@ PlayerManager::onTrackEnded( const QString& id )
 	ONE_PLAYER_HACK( id )
 	using namespace PlayerState;
 
-	if (!m_track.isNull())
-	{
-		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
-		delete m_track.m_watch;
-		m_track = ObservedTrack();
+	if (m_track.isNull()) {
+		qWarning() << "Ignoring request by connected player to end null track";
+		return;
 	}
+
+	delete m_track.m_watch;
+	m_track = ObservedTrack();
 
 	switch (m_state)
 	{
 		case Stopped:
-			qWarning() << "Ignoring request by connected player to end null track";
-			return;
+			qWarning() << "Programmer Error: EndTrack requested for non-null track but state is stopped";
+			break;
 
 		case Playing:
 		case Paused:
 		case Stalled:
 			break;
 	}
-	
+
 	emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
 	
 	// indeed state remains playing, as playing refers to a session, where we
@@ -132,6 +161,8 @@ PlayerManager::onPlaybackEnded( const QString& id )
 void
 PlayerManager::onPlaybackPaused( const QString& id )
 {
+	Q_ASSERT( !m_track.isNull() );
+	Q_ASSERT( m_track.m_watch );
 	ONE_PLAYER_HACK( id )
 	using namespace PlayerState;
 	
@@ -140,17 +171,21 @@ PlayerManager::onPlaybackPaused( const QString& id )
 		case Paused:
 			qWarning() << "Ignoring request by connected player to set Paused state again";
 		case Stopped:
+			qWarning() << "Ignoring request to pause when in stopped state";
 			return;
-			
+
 		case Playing:
 		case Stalled:
+			if (m_track.isNull() || !m_track.m_watch)
+			{
+				qWarning() << "Programmer error, m_track is broken";
+				return;
+			}
 			break;
 	}
 
-	if (m_track.isNull())
+	if (m_track.isNull() || !m_track.m_watch)
 		return;
-	
-	Q_ASSERT( m_track.m_watch );
 	
 	m_track.m_watch->pause();
 	m_state = Paused;
@@ -162,6 +197,8 @@ PlayerManager::onPlaybackPaused( const QString& id )
 void
 PlayerManager::onPlaybackResumed( const QString& id )
 {
+	Q_ASSERT( !m_track.isNull() );
+	Q_ASSERT( m_track.m_watch );
 	ONE_PLAYER_HACK( id )
 	using namespace PlayerState;
 	
@@ -178,11 +215,13 @@ PlayerManager::onPlaybackResumed( const QString& id )
 
 		case Stalled:
 		case Paused:
+			if (m_track.isNull() || !m_track.m_watch)
+			{
+				qWarning() << "Programmer error, m_track is broken";
+				return;
+			}
 			break;
 	}
-	
-    Q_ASSERT( m_track.m_watch );
-	Q_ASSERT( !m_track.isNull() );
 	
 	m_state = Playing;
 	m_track.m_watch->resume();

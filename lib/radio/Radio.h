@@ -32,6 +32,7 @@ namespace Phonon
 	class AudioOutput;
 	class MediaSource;
 }
+class QAction;
 
 
 class RADIO_DLLEXPORT Radio : public QObject
@@ -49,6 +50,10 @@ public:
 		Stopped
 	};
 
+	/** we own these as we control whether or not they are enabled */
+	QAction* stopAction();
+	QAction* skipAction();
+	
 	State state() const { return m_state; }
 	RadioStation station() const { return m_station; }
 	Track track() const { return m_track; }

@@ -36,15 +36,17 @@ public:
 
 public slots:
     void onTrackStarted( const Track& );
-	/** this is optional, for the radio basically, as only that can have periods
-	  * inbetween tracks where a sesion is still active */
-	void onTrackEnded( const QString& playerId );
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );
     void onPlaybackResumed( const QString& playerId );
     void onPlayerConnected( const QString& playerId );
     void onPlayerDisconnected( const QString& playerId );
 
+	/** these are optional, and for the radio basically, as only that can have
+	  * periods inbetween tracks where a sesion is still active */
+	void onTrackEnded( const QString& playerId );
+	void onPlaybackSessionStarted( const QString& playerId );
+	
 signals:
     /** the int is a PlaybackEvent, @data is documented with the enum */
     void event( int, const QVariant& data = QVariant() );

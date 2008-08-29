@@ -38,7 +38,7 @@ Tuner::Tuner( const RadioStation& station )
      : m_retry_counter( 0 )
 {
     WsReply* reply = WsRequestBuilder( "radio.tune" )
-			.add( "station", station )
+			.add( "station", station.url() )
 			.post();
 	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onTuneReturn( WsReply* )) );
 }
