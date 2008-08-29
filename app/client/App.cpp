@@ -225,7 +225,7 @@ App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
 		case Radio::TuningIn:
 			if (oldstate == Radio::Stopped)
 				m_playerManager->onPlayerConnected( "ass" );
-			onAppEvent( PlayerEvent::TrackEnded, QVariant::fromValue( track() ) );
+			m_playerManager->onTrackEnded( "ass" );
 			onAppEvent( PlayerEvent::TuningIn, QVariant::fromValue( m_radio->station() ) );
 			break;
 			

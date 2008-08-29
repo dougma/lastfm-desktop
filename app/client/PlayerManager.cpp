@@ -72,10 +72,45 @@ PlayerManager::onTrackStarted( const Track& t )
 
 
 void
+PlayerManager::onTrackEnded( const QString& id )
+{
+	ONE_PLAYER_HACK( id )
+	using namespace PlayerState;
+
+	if (!m_track.isNull())
+	{
+		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+		delete m_track.m_watch;
+		m_track = ObservedTrack();
+	}
+
+	switch (m_state)
+	{
+		case Stopped:
+			qWarning() << "Ignoring request by connected player to end null track";
+			return;
+
+		case Playing:
+		case Paused:
+		case Stalled:
+			break;
+	}
+	
+	emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+	
+	// indeed state remains playing, as playing refers to a session, where we
+	// are actively trying to play something. We are no in a kind of loading
+	// state
+}
+
+
+void
 PlayerManager::onPlaybackEnded( const QString& id )
 {
 	ONE_PLAYER_HACK( id )
 	using namespace PlayerState;
+
+	onTrackEnded( id );
 	
 	switch (m_state)
 	{
@@ -88,16 +123,8 @@ PlayerManager::onPlaybackEnded( const QString& id )
 		case Stalled:
 			break;
 	}
-	
+		
 	m_state = Stopped;
-	
-	if (!m_track.isNull())
-	{
-		emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
-		delete m_track.m_watch;
-		m_track = ObservedTrack();
-	}
-	
 	emit event( PlayerEvent::PlaybackSessionEnded );
 }
 

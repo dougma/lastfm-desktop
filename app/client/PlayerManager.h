@@ -36,6 +36,9 @@ public:
 
 public slots:
     void onTrackStarted( const Track& );
+	/** this is optional, for the radio basically, as only that can have periods
+	  * inbetween tracks where a sesion is still active */
+	void onTrackEnded( const QString& playerId );
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );
     void onPlaybackResumed( const QString& playerId );

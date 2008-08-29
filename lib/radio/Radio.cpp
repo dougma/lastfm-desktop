@@ -180,6 +180,9 @@ Radio::stop()
 	m_mediaObject->stop();
 	m_mediaObject->clearQueue();
 	m_mediaObject->setCurrentSource( QUrl() );
+	
+	if (m_state == TuningIn)
+		changeState( Stopped );
 }
 
 
