@@ -21,6 +21,9 @@
 #define RADIO_STATION_H
 
 #include "lib/DllExportMacro.h"
+#include "lib/types/User.h"
+#include "lib/types/Tag.h"
+#include "lib/types/Artist.h"
 #include <QString>
 #include <QMetaType>
 
@@ -30,39 +33,44 @@
 class RADIO_DLLEXPORT RadioStation
 {
 public:
-	enum Type { SimilarArtist = 0, Recommendation, Library, Neighbourhood, Loved, Tag, Url, Invalid };
+	RadioStation()
+	{}
+    RadioStation( const QString& s ) : m_url( s )
+    {}
+    explicit RadioStation( const QUrl& u ) : m_url( u.toString() )
+    {}
 	
-	RadioStation() :m_type( Invalid ){};
-    RadioStation( QString s, Type t = Url, QString title = "" ) : m_station( s ), m_type( t ), m_title( title ){}
-	
-	operator const QString() const
-	{
-		Q_ASSERT( m_type != Invalid );
-		switch ( m_type ) 
-		{
-			case SimilarArtist:	return "lastfm://artist/" + m_station + "/similarartists";
-			case Recommendation: return "lastfm://user/" + m_station + "/recommended";
-			case Library: return "lastfm://user/" + m_station + "/personal";
-			case Neighbourhood: return "lastfm://user/" + m_station + "/neighbours";
-			case Loved: return "lastfm://user/" + m_station + "/loved";
-			case Tag: return "lastfm://globaltags/" + m_station;
-				
-			case Url: return m_station;
-			
-			default: Q_ASSERT( !"I can't generate station url string for an unknown station type:" + m_type ); return "";
-		}
-	}
-	
-	const QString& title() const{ Q_ASSERT( m_type != Invalid ); return m_title; }
+    static RadioStation library( const User& user )         { return "lastfm://user/" + QString(user) + "/personal"; }
+    static RadioStation recommendations( const User& user ) { return "lastfm://user/" + user + "/recommended"; }
+    static RadioStation neighbourhood( const User& user )   { return "lastfm://user/" + user + "/neighbours"; }
+    static RadioStation lovedTracks( const User& user )     { return "lastfm://user/" + user + "/loved"; }
+    static RadioStation globalTag( const Tag& tag )         { return "lastfm://globaltags/" + tag; }
+    static RadioStation similar( const Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
+
+    /** eg. "mxcl's Loved Tracks"
+ 	  * It is worth noting that the Radio doesn't set the title of RadioStation 
+	  * object until we have tuned to it, and then we only set the one we give 
+	  * you back.
+	  */	
+	QString title() const { return m_title; }
+	/** the Last.fm url, eg. lastfm://user/mxcl/loved */
+	QString url() const { return m_url; }
 	
 	void setTitle( const QString& s ) { m_title = s; }
 	
 private:
-	QString m_station;
-	Type m_type;
+	QString m_url;
 	QString m_title;
 };
 
+
 Q_DECLARE_METATYPE( RadioStation )
+
+
+#include <QDebug>
+inline QDebug operator<<( QDebug d, const RadioStation& station )
+{
+    return d << station.url();
+}
 
 #endif

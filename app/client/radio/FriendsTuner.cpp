@@ -65,9 +65,8 @@ FriendsTuner::onFetchedFriends( WsReply* r )
 void
 FriendsTuner::onFriendClicked( QListWidgetItem* i )
 {
-	const QString& username = i->data( Qt::DisplayRole ).toString();
-	RadioStation r( username, RadioStation::Library );
-	emit tune( r );
+	User user = i->data( Qt::DisplayRole ).toString();
+	emit tune( RadioStation::library( user ) );
 	i->setSelected( false );
 }
 

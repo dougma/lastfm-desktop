@@ -126,8 +126,8 @@ void
 NowPlayingTuner::onTagClicked( QListWidgetItem* i )
 {
 	i->setSelected( false );
-	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::Tag );
-	The::radio().play( r );
+	Tag tag = i->data( Qt::DisplayRole ).toString();
+	The::radio().play( RadioStation::globalTag( tag ) );
 }
 
 
@@ -135,6 +135,6 @@ void
 NowPlayingTuner::onArtistClicked( QListWidgetItem* i )
 {
 	i->setSelected( false );
-	RadioStation r( i->data( Qt::DisplayRole ).toString(), RadioStation::SimilarArtist );
-	The::radio().play( r );
+	Artist artist = i->data( Qt::DisplayRole ).toString(); 
+	The::radio().play( RadioStation::similar( artist ) );
 }

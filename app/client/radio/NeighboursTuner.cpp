@@ -71,9 +71,8 @@ NeighboursTuner::onFetchedNeighbours( WsReply* r )
 void
 NeighboursTuner::onUserClicked( QListWidgetItem* i )
 {
-	const QString& neighbour = i->data( Qt::DisplayRole ).toString();
-	RadioStation r( neighbour, RadioStation::Library );
-	emit tune( r );
+	QString neighbour = i->data( Qt::DisplayRole ).toString();
+	emit tune( RadioStation::library( neighbour ) );
 	i->setSelected( false );
 }
 

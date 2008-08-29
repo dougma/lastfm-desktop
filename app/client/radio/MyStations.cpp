@@ -28,13 +28,23 @@
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "MyStationsDelegate.h"
 
+
+RadioStation helper( RadioStation s, const QString& title )
+{
+	s.setTitle( title );
+	return s;
+}
+
+
 MyStations::MyStations()
 		   :m_searchResults( 0 )
 {
-	m_myStationList << RadioStation( The::settings().username(), RadioStation::Library, "My Library" );	
-	m_myStationList << RadioStation( The::settings().username(), RadioStation::Recommendation, "Recommended" );
-	m_myStationList << RadioStation( The::settings().username(), RadioStation::Loved, "My Loved Tracks" );
-	m_myStationList << RadioStation( The::settings().username(), RadioStation::Neighbourhood, "My Neighbourhood" );
+	User user( The::settings().username() );
+	
+	m_myStationList << helper( RadioStation::library( user ), "My Library" )
+                    << helper( RadioStation::recommendations( user ), "Recommended" )
+	                << helper( RadioStation::lovedTracks( user ), "My Loved Tracks" )
+	                << helper( RadioStation::neighbourhood( user ), "My Neighbourhood" );
 	
 	ui.setupUi( this );
 	
@@ -98,7 +108,7 @@ MyStations::onSearch()
 	
 	if( searchTerm.startsWith( "lastfm://", Qt::CaseInsensitive ))
 	{
-		The::radio().play( RadioStation( searchTerm, RadioStation::Url ));
+		The::radio().play( searchTerm );
 		return;
 	}
 	
