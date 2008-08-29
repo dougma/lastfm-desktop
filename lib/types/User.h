@@ -33,7 +33,7 @@ class TYPES_DLLEXPORT User
     QString m_name;
 	
 public:
-    explicit User( const QString& username ) : m_name( username ), m_match( -1.0f )
+    User( const QString& username ) : m_name( username ), m_match( -1.0f )
     {}
 
     operator QString() const { return m_name; }

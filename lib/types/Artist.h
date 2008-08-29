@@ -34,7 +34,7 @@ public:
     Artist()
     {}
 
-    explicit Artist( const QString& name ) : m_name( name )
+    Artist( const QString& name ) : m_name( name )
     {}
 
 	/** the url for this artist's page at www.last.fm */
