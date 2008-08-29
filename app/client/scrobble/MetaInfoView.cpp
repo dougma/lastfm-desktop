@@ -29,10 +29,19 @@
 #include <QWebView>
 
 
+class IPhoneWebView : public QWebView
+{
+	virtual QString userAgentForUrl( const QUrl& url ) const
+	{
+		return "iPhone";
+	}
+};
+
+
 MetaInfoView::MetaInfoView()
 {   
 	QVBoxLayout* v = new QVBoxLayout( this );
-	v->addWidget( ui.web = new QWebView );
+	v->addWidget( ui.web = new IPhoneWebView );
 	v->setSpacing( 0 );
 	v->setMargin( 0 );
 	
@@ -95,7 +104,7 @@ MetaInfoView::onLinkClicked( const QUrl& url )
 void
 MetaInfoView::resizeEvent( QResizeEvent* )
 {
-	ui.tabs->move( ui.web->width() - 24 - ui.tabs->sizeHint().width(), 4 );
+	ui.tabs->move( ui.web->width() - 24 - ui.tabs->sizeHint().width(), 12 );
 }
 
 

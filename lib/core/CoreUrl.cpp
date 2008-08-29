@@ -86,6 +86,8 @@ CoreUrl
 CoreUrl::mobilised() const
 {
 	CoreUrl url = *this;
-	url.setHost( host().replace( QRegExp("^(www.)?last"), "mdev.last" ) );
+	url.setHost( host().replace( QRegExp("^(www.)?last"), "tim.m.dev.last" ) );
+	url.setPort( 8090 );
+	url.setEncodedQuery( "mobilesafari" );
 	return url;
 }
