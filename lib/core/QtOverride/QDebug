@@ -104,13 +104,16 @@ public:
 	{
 		Q_UNUSED( line );
 	
-		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
+
 		QByteArray out;
 		out += QTime::currentTime().toString( "[hh:mm:ss] " );
+
+//		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
 //		out += filename + ":" + QString::number( line );
 
 		#if __GNUG__
-		int const n = function.indexOf( ' ' ) + 1;
+		int const m = function.indexOf( "::" ); // work with ctors and dtors
+		int const n = m == -1 ? 0 : function.lastIndexOf( ' ', m ) + 1;
 		function = function.mid( n, function.indexOf( '(' ) - n );
 		#endif
 
