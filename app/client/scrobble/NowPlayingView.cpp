@@ -78,7 +78,7 @@ NowPlayingView::setTrack( const Track& t )
 	m_track = t;
 
 	// TODO handle bad data
-	ui.text->setText( "<div style='margin-bottom:3px'><b>" + t.artist() + "</b></div>" + t.title() );
+	ui.text->setText( "<div style='margin-bottom:3px'>" + t.artist() + "</div><div><b>" + t.title() );
 }
 
 
