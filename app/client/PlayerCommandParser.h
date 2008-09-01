@@ -51,7 +51,10 @@ public:
     QString playerId() const { return m_playerId; }
     Track track() const { return m_track; }
     QString username() const { return m_username; }
-    QString filename() const { return m_filename; }
+	/** we use this to get a pretty name for the player, and its icon 
+	  * Use the full path for the .exe file on Windows and Linux, and the bundle
+	  * directory on Mac OS X */
+    QString applicationPath() const { return m_applicationPath; }
 
 private:
     Command extractCommand( QString& line );
@@ -63,7 +66,7 @@ private:
     QString m_playerId;
     Track m_track;
     QString m_username;
-    QString m_filename;
+    QString m_applicationPath;
 };
 
 #endif // PLAYERCOMMANDPARSER_H

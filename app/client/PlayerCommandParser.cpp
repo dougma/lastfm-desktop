@@ -54,7 +54,7 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
             m_username = args['u'];
             break;
         case Init:
-            m_filename = args['f'];
+            m_applicationPath = args['f'];
         default:
             break;
     }
@@ -87,8 +87,7 @@ PlayerCommandParser::extractCommand( QString& line )
 namespace mxcl
 {
     /** replaces '&&' and splits on remaining single '&' */
-    QStringList static
-    split( QString line )
+    QStringList static inline split( QString line )
     {
         QStringList parts;
         int start = 0, i = 0;
