@@ -34,7 +34,12 @@ public:
 
     ObservedTrack track() const { return m_track; }
 
+	/** disengages all other players, sets radio to current player
+	  * emits tuning in event. */
+	void tuneIn( const class RadioStation& );
+	
 public slots:
+	void onPreparingTrack( const Track& );
     void onTrackStarted( const Track& );
     void onPlaybackEnded( const QString& playerId );
     void onPlaybackPaused( const QString& playerId );

@@ -28,6 +28,9 @@
   * NOTE: some events will always follow each other, see each enum value  for 
   * specification */
 
+/** it may seem strange, to somewhat duplicate states, and that. But all these
+  * prove much more useful in practice. Sorry for the quantity though */
+
 namespace PlayerEvent
 {
     enum Enum
@@ -36,9 +39,12 @@ namespace PlayerEvent
 		  * music and either THE USER stopping the music, or a playlist coming
 		  * to a natural end, or playback halting due to some more serious 
 		  * issue.
+		  *
 		  * The point in having an overall PlaybackSession concept is so that
 		  * you can know to leave some stuff displayed, even if buffering or
-		  * other indeterminate time transitions are occurring
+		  * other indeterminate time transitions are occurring.
+		  *
+		  * Basically show everything until PlaybackSessionEnded happens.
           */
         PlaybackSessionStarted,
 
@@ -46,11 +52,22 @@ namespace PlayerEvent
 		  * player, etc. you get the idea I hope */
         PlaybackSessionEnded,		
 		
+		/** The next track is being loaded. You should reflect the new track,
+		  * although any playing-status-representations should be off.
+		  *
+		  * If preparing fails, you get a TrackEnded event.
+		  *
+		  * The track can be a Null track. Which means whatever playback system
+		  * we are observing doesn't know what's coming. You should make the GUI
+		  * look like it's getting ready to party.
+		  */
+		PreparingTrack,
+        TrackStarted,
+
 		/** You'll get this 30 seconds before the next track starts, if 
 		  * possible, you may not get it at all though, so don't depend on it */
 		PrepareNextTrack,
 		
-        TrackStarted,
 		TrackEnded,
 
         /** This will be followed by PlaybackUnpaused or TrackEnded */
@@ -59,8 +76,7 @@ namespace PlayerEvent
         PlaybackUnpaused,
 
         /** eg. Radio http buffer is empty, we are rebuffering 
-          * you'll either get Unstalled, TrackEnded after this
-          */
+          * you'll get either Unstalled or TrackEnded after this */
         PlaybackStalled,
         /** eg. Radio http rebuffering complete, playback has resumed */
         PlaybackUnstalled,

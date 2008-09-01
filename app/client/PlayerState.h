@@ -29,6 +29,7 @@ namespace PlayerState
     enum Enum
     {
         Stopped,
+		Loading,
         Playing,
         Paused,
 		Stalled,

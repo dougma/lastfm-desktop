@@ -82,6 +82,7 @@ ScrobbleViewWidget::onAppEvent( int e, const QVariant& v )
 {
 	switch (e)
 	{
+		case PlayerEvent::PreparingTrack:
 		case PlayerEvent::TrackStarted:
 			ui.cover->setTrack( v.value<ObservedTrack>() );
 			break;

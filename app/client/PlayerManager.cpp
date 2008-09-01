@@ -61,6 +61,38 @@ PlayerManager::onPlaybackSessionStarted( const QString& id )
 
 
 void
+PlayerManager::onPreparingTrack( const Track& t )
+{
+	ONE_PLAYER_HACK( t.playerId() );
+	using namespace PlayerState;
+	// if t is null, we continue to say we are preparing anyway
+
+	m_state = Loading;
+	
+	switch (m_state)
+	{
+		case Stopped:
+			onPlaybackSessionStarted( t.playerId() );
+			break;
+			
+		case Loading:
+			// valid, though bad user experience
+			// fall through
+		case Paused:
+		case Stalled:
+		case Playing:
+			if (!m_track.isNull())
+				onTrackEnded( t.playerId() );
+			break;
+	}
+	
+	m_track = t;
+	
+	emit event( PlayerEvent::PreparingTrack, QVariant::fromValue( t ) );
+}
+
+
+void
 PlayerManager::onTrackStarted( const Track& t )
 {   
 	ONE_PLAYER_HACK( t.playerId() )
@@ -78,19 +110,17 @@ PlayerManager::onTrackStarted( const Track& t )
 		case Stopped:
 			onPlaybackSessionStarted( t.playerId() );
 			break;
+		case Loading:
 		case Paused:
 		case Stalled:
 			m_state = Playing;
 			// fall through
 		case Playing:
 			if (!m_track.isNull())
-				emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+				onTrackEnded( t.playerId() );
 			break;
 	}
 	
-	
-    delete m_track.m_watch; //stuff is connected to it, break those connections
-
 	m_track = t;
 	m_track.m_watch = new StopWatch( t.duration() * The::settings().scrobblePoint() / 100 ); 
 	connect( m_track.m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) );
@@ -110,26 +140,29 @@ PlayerManager::onTrackEnded( const QString& id )
 		return;
 	}
 
-	delete m_track.m_watch;
-	m_track = ObservedTrack();
-
 	switch (m_state)
 	{
 		case Stopped:
 			qWarning() << "Programmer Error: EndTrack requested for non-null track but state is stopped";
 			break;
 
+		case Loading:
 		case Playing:
 		case Paused:
 		case Stalled:
 			break;
 	}
 
-	emit event( PlayerEvent::TrackEnded, QVariant::fromValue( m_track ) );
+	ObservedTrack const was = m_track;
 	
-	// indeed state remains playing, as playing refers to a session, where we
-	// are actively trying to play something. We are no in a kind of loading
-	// state
+	delete m_track.m_watch;
+	m_track = ObservedTrack();	
+	
+	emit event( PlayerEvent::TrackEnded, QVariant::fromValue( was ) );
+	
+	// indeed state remains playing/loading, as playing refers to a session,
+	// where we are actively trying to play something. We are no in a kind of
+	// loading state
 }
 
 
@@ -146,7 +179,8 @@ PlayerManager::onPlaybackEnded( const QString& id )
 		case Stopped:
 			qWarning() << "Ignoring request by connected player to set Stopped state again";
 			return;
-			
+		
+		case Loading:
 		case Playing:
 		case Paused:
 		case Stalled:
@@ -174,6 +208,7 @@ PlayerManager::onPlaybackPaused( const QString& id )
 			qWarning() << "Ignoring request to pause when in stopped state";
 			return;
 
+		case Loading:
 		case Playing:
 		case Stalled:
 			if (m_track.isNull() || !m_track.m_watch)
@@ -204,6 +239,7 @@ PlayerManager::onPlaybackResumed( const QString& id )
 	
 	switch (m_state)
 	{
+		case Loading:
 		case Playing:
 			// no point as nothing would change
 			qWarning() << "Ignoring request by connected player to resume playing track";
@@ -249,9 +285,7 @@ PlayerManager::onPlayerDisconnected( const QString &id )
 
     // Implicit PlayerEvent::PlaybackEnded to avoid crashing / buggy media
     // players leaving the scrobbler in a playing state
-#if 0
     onPlaybackEnded( id );
-#endif
 }
 
 
