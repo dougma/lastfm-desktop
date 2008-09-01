@@ -45,6 +45,7 @@ public:
 	enum State
 	{
 		TuningIn,     /** Tuning into station() */
+		Prebuffering,
 		Playing,
 		Rebuffering,
 		Stopped
