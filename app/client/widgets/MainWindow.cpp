@@ -158,6 +158,10 @@ MainWindow::setupUi()
 
 	ui.stack->addWidget( ui.np );
 	ui.stack->addWidget( ui.tuner = new RadioWidget );
+	
+#ifndef Q_WS_MAC
+	delete ui.windowMenu;
+#endif
 }
 
 
