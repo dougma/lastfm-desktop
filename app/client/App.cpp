@@ -213,6 +213,10 @@ App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
 	
 	switch (newstate)
 	{
+		case Radio::Prebuffering:
+			m_playerManager->onPreparingTrack( m_radio->track() );
+			break;
+			
 		case Radio::Playing:
 			if (oldstate == Radio::Rebuffering)
 				m_playerManager->onPlaybackResumed( "ass" );
