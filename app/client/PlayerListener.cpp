@@ -40,15 +40,16 @@ PlayerListener::onNewConnection()
     {
         QTcpSocket* socket = nextPendingConnection();
 
-        connect( socket, SIGNAL( readyRead()), SLOT( onDataReady()) );
-        connect( socket, SIGNAL( stateChanged( QAbstractSocket::SocketState )), 
-                         SLOT( onDisconnected( QAbstractSocket::SocketState)) );
+        connect( socket, SIGNAL(readyRead()), SLOT(onDataReady()) );
+        connect( socket, 
+				 SIGNAL(stateChanged( QAbstractSocket::SocketState )), 
+                 SLOT(onSocketStateChanged( QAbstractSocket::SocketState)) );
     }
 }
 
 
 void
-PlayerListener::onDisconnected( QAbstractSocket::SocketState state )
+PlayerListener::onSocketStateChanged( QAbstractSocket::SocketState state )
 {
     QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
 

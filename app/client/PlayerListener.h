@@ -57,7 +57,7 @@ signals:
 
 private slots:
     void onNewConnection();
-    void onDisconnected( QAbstractSocket::SocketState );
+    void onSocketStateChanged( QAbstractSocket::SocketState );
     void onDataReady();
 
 private:
