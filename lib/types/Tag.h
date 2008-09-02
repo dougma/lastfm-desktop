@@ -20,10 +20,11 @@
 #ifndef TAG_H
 #define TAG_H
 
+#include "lib/DllExportMacro.h"
 #include <QString>
 #include <QUrl>
 
-class Tag
+class TYPES_DLLEXPORT Tag
 {
 	QString m_name;
 	
