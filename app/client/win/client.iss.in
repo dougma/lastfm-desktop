@@ -1,0 +1,111 @@
+; maintainer <max@last.fm>
+
+[CustomMessages]
+Version=@VERSION@
+
+
+[Setup]
+OutputBaseFilename=Last.fm-@VERSION@
+VersionInfoVersion=@SHORT_VERSION@
+VersionInfoTextVersion=@SHORT_VERSION@
+AppName=Last.fm
+AppVerName=Last.fm {cm:Version}
+VersionInfoDescription=Last.fm Installer
+AppPublisher=Last.fm
+AppPublisherURL=http://www.last.fm
+AppSupportURL=http://www.last.fm
+AppUpdatesURL=http://www.last.fm/download/
+AppCopyright=Copyright @YEAR@ Last.fm Ltd.
+DefaultDirName={pf}\Last.fm
+UsePreviousAppDir=yes
+DefaultGroupName=Last.fm
+OutputDir=.
+AllowNoIcons=yes
+Compression=lzma
+SolidCompression=yes
+DisableReadyPage=yes
+DirExistsWarning=no
+DisableFinishedPage=yes
+ShowLanguageDialog=yes
+WizardImageFile=@ROOT_DIR@\common\dist\win\wizard.bmp
+WizardSmallImageFile=@ROOT_DIR@\common\dist\win\wizard_small.bmp
+SetupIconFile=@ROOT_DIR@\common\dist\win\installer.ico
+WizardImageBackColor=$ffffff
+WizardImageStretch=no
+AppMutex=Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F, Audioscrobbler-7BC5FBA0-A70A-406e-A50B-235D5AFE67FB
+
+; This should stay the same across versions for the installer to treat it as the
+; same program. It will then work to install however many updates and then run 
+; the uninstall script for the first version.
+; NOTE changed from LastFM to Last.fm for version 2
+AppId=Last.fm
+
+
+[Languages]
+; The first string is an internal code that we can set to whatever we feel like
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "fr"; MessagesFile: "win\French-15-5.1.11.isl"
+Name: "it"; MessagesFile: "win\Italian-14-5.1.11.isl"
+Name: "de"; MessagesFile: "win\German-2-5.1.11.isl"
+Name: "es"; MessagesFile: "win\SpanishStd-5-5.1.11.isl"
+Name: "pt"; MessagesFile: "win\BrazilianPortuguese-16-5.1.11.isl"
+Name: "pl"; MessagesFile: "win\Polish-8-5.1.11.isl"
+Name: "ru"; MessagesFile: "win\Russian-19-5.1.11.isl"
+Name: "jp"; MessagesFile: "win\Japanese-5-5.1.11.isl"
+Name: "cn"; MessagesFile: "win\ChineseSimp-12-5.1.11.isl"
+Name: "tr"; MessagesFile: "win\Turkish-3-5.1.11.isl"
+Name: "sv"; MessagesFile: "win\Swedish-10-5.1.12.isl"
+
+
+[Files]
+; Main files
+Source: "@BIN_DIR@\Last.fm.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\core.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\scrobble.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\radio.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\unicorn.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\ws.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\types.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\moose.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtCore4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtGui4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtNetwork4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtXml4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtSql4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\QtWebKit4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\bin\phonon4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\plugins\imageformats\qjpeg4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+Source: "@QT_DIR@\plugins\imageformats\qgif4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+Source: "@QT_DIR@\plugins\imageformats\qmng4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+
+
+[Registry]
+Root: HKLM; Subkey: "Software\Last.fm\Client"; ValueType: string; ValueName: "Version"; ValueData: "{cm:Version}"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Last.fm\Client"; ValueType: string; ValueName: "Path"; ValueData: "{app}\Last.fm.exe"; Flags: uninsdeletekey
+
+; Register last.fm protocol only if it isn't already
+Root: HKCR; Subkey: "lastfm"; ValueType: string; ValueName: ""; ValueData: "URL:lastfm"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "lastfm"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCR; Subkey: "lastfm\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Last.fm.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKCR; Subkey: "lastfm"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+
+; This is just for deleting keys at uninstall
+Root: HKCU; Subkey: "Software\Last.fm"; Flags: dontcreatekey uninsdeletekeyifempty
+Root: HKLM; Subkey: "Software\Last.fm"; Flags: dontcreatekey uninsdeletekeyifempty
+Root: HKCU; Subkey: "Software\Last.fm\Client"; Flags: dontcreatekey uninsdeletekey
+Root: HKLM; Subkey: "Software\Last.fm\Client"; Flags: dontcreatekey uninsdeletekey
+
+
+[INI]
+Filename: "{app}\Last.fm.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.last.fm"
+
+
+[Icons]
+Name: "{group}\Last.fm"; Filename: "{app}\Last.fm.exe"
+Name: "{group}\Go to www.last.fm"; Filename: "{app}\Last.fm.url"
+Name: "{group}\{cm:UninstallProgram,Last.fm}"; Filename: "{uninstallexe}"
+
+
+[Run]
+; Launch normally for pre-Vista versions, otherwise user has to do it themselves *shrug*
+Filename: "{app}\Last.fm.exe"; Description: "{cm:LaunchProgram,Last.fm}"; Flags: nowait postinstall; OnlyBelowVersion: 0,6

@@ -25,4 +25,17 @@ macx* {
 else {
 	SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
 	INCLUDEPATH += .
+    LIBS += -lshell32 -luser32
+}
+
+win32 {
+	root = $$system( cygpath -m '$$ROOT_DIR' )
+	qt = $$system( cygpath -m '$$QMAKE_LIBDIR_QT\\..' )
+
+	system( cp win/client.iss.in client.iss )
+	system( perl -pi -e       's!\@VERSION\@!$$VERSION!g' client.iss )
+	system( perl -pi -e 's!\@SHORT_VERSION\@!$$VERSION!g' client.iss )
+	system( perl -pi -e      's!\@ROOT_DIR\@!$$root!g' client.iss )
+	system( perl -pi -e        's!\@QT_DIR\@!$$qt!g' client.iss )
+	system( perl -pi -e       's!\@BIN_DIR\@!$$root/_bin!g' client.iss )
 }
