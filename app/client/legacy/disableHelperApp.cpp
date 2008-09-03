@@ -63,7 +63,7 @@ namespace Legacy
             }
             else
             {
-                qInfo() << "Helper shortcut removed from Startup";
+                qDebug() << "Helper shortcut removed from Startup";
             }
         }
     }

@@ -104,13 +104,9 @@ User::getNeighbours( WsReply* r )
 		{
 			User user( e["name"].text() );
 			user.m_match = e["match"].text().toFloat();
-			
-			#warning Have the user.getNeighbours webservice been fixed yet? \
-					 uncomment me if it has!
-			/*
 			user.m_smallImage = e["image size=small"].text();
 			user.m_mediumImage = e["image size=medium"].text();
-			user.m_largeImage = e["image size=large"].text(); */
+			user.m_largeImage = e["image size=large"].text();
 			neighbours << user;
 		}
 		

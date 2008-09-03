@@ -21,7 +21,7 @@
 #define PLAYLIST_H
 
 #include "lib/types/Track.h"
-#include "UnicornException.h"
+#include "lib/core/UnicornException.h"
 #include <QList>
 
 

@@ -46,7 +46,7 @@ else {
 			   app/client/appclient.pro
 
 	# make the app client the default project in visual studio
-	debug:win32 {
+	!contains( CONFIG, release ):win32 {
 		SUBDIRS -= app/client/appclient.pro
 		SUBDIRS = app/client/appclient.pro $$SUBDIRS
 	}

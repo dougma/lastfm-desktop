@@ -26,7 +26,7 @@
 #include <QStringList>
 
 
-class CORE_DLLEXPORT WeightedStringList : public QList<WeightedString>
+class WeightedStringList : public QList<WeightedString>
 {
 public:
     WeightedStringList() {}

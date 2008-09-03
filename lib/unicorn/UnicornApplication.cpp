@@ -105,7 +105,7 @@ Unicorn::Application::translate()
 #ifdef Q_WS_MAC
     QDir d = SystemDir::bundle().filePath( "Contents/Resources/qm" );
 #else
-    QDir d = qApp->applicationFolderPath() + "/i18n";
+    QDir d = qApp->applicationDirPath() + "/i18n";
 #endif
 
     //TODO need a unicorn/core/etc. translation, plus policy of no translations elsewhere or something!

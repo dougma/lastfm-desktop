@@ -17,22 +17,28 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef WEIGHTEDSTRING_H
-#define WEIGHTEDSTRING_H
+#ifndef WEIGHTED_STRING_H
+#define WEIGHTED_STRING_H
 
 #include "lib/DllExportMacro.h"
 #include <QStringList>
 
-class CORE_DLLEXPORT WeightedString : public QString
+
+class WeightedString : public QString
 {
     float m_weighting;
 
 public:
-    WeightedString() { m_weighting = -1.0f; }
+    WeightedString()
+	{
+		m_weighting = -1.0f;
+	}
     
-    explicit WeightedString( QString name, float w = -1.0f ) : QString( name ), m_weighting( w ) {};
+	explicit WeightedString( const QString& name, float w = -1.0f ) : QString( name ), m_weighting( w ) 
+	{}
+
     int weighting() const { return m_weighting; }
 };
 
 
-#endif // WEIGHTEDSTRING_H
+#endif
