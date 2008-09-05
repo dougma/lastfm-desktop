@@ -73,7 +73,7 @@ header 'Generating Build System'
 
 if [ $RELEASE ]
 then
-    qmake -config release
+    qmake -config release -recursive
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 
     case `uname` in
