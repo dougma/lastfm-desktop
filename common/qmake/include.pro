@@ -26,6 +26,7 @@ CONFIG( unicorn ):LIBS += -lunicorn
 CONFIG( moose ):LIBS += -lmoose
 CONFIG( radio ):LIBS += -lradio
 CONFIG( scrobble ):LIBS += -lscrobble
+CONFIG( fingerprint ):LIBS += -lfingerprint
 
 CONFIG( qtestlib ) {
     DESTDIR = $$DESTDIR/tests
@@ -37,8 +38,8 @@ CONFIG( taglib ) {
 }
 
 CONFIG( mad ) {
-    linux*: PKGCONFIG += mad
-    else: LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
+    win32: LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
+    else: PKGCONFIG += mad
 }
 
 
