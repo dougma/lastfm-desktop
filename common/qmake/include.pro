@@ -39,7 +39,28 @@ CONFIG( taglib ) {
 
 CONFIG( mad ) {
     win32: LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
-    else: PKGCONFIG += mad
+    else {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += mad
+    } 
+}
+
+
+CONFIG( fftw3f ) {
+    win32: LIBS += -L$$COMMON_LIBS_DIR/libfftw -lfftw3f
+    else {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += fftw3f
+    }
+}
+
+
+CONFIG( samplerate ) {
+    win32: LIBS += -L$$COMMON_LIBS_DIR/libsamplerate -lsamplerate
+    else: {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += samplerate
+    }
 }
 
 
