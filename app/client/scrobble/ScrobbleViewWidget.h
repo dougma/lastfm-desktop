@@ -16,63 +16,57 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef SCROBBLE_VIEW_WIDGET_H
+#define SCROBBLE_VIEW_WIDGET_H
 
-#include "ui_MainWindow.h"
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
+#include <QWidget>
+#include <QSplitter>
+#include <QPainter>
+#include <QPaintEvent>
 
-
-class MainWindow : public QMainWindow
+namespace Ui
 {
-    Q_OBJECT
+	struct MainWindow;
+}
 
+class ScrobbleViewWidget : public QWidget
+{
 public:
-    MainWindow();
+	ScrobbleViewWidget( Ui::MainWindow& m, QWidget* parent = 0 );
 
-    QSize sizeHint() const;
-	
-	struct Ui : ::Ui::MainWindow
-	{
-		class QTabBar* tabBar;
-		class QStackedWidget* stack;
-	    class RadioMiniControls* controls;
-		class RadioWidget* tuner;
-		class ScrobbleViewWidget* scrobbler;
-		class FriendsTuner* friendTuner;
-	};
-	
-	Ui ui;
-
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-	void showTagDialog();
-    void showMetaInfoView();
-
-	void setTunerToggled( bool );
-	void showTuner() { setTunerToggled( true ); }
-	void showNowPlaying() { setTunerToggled( false ); }
-
-signals:
-	void loved();
-	void banned();
-	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-	void onUserGetInfoReturn( class WsReply* );
-	void onStackIndexChanged( int );
-
-private:
-    void setupUi();
-	void addTab( QWidget* w, const QString& t );
-	
-	virtual void dragEnterEvent( QDragEnterEvent* );
-	virtual void dropEvent( QDropEvent* );
 };
+
+class PaintedSplitter : public QSplitter
+{
+public:
+	PaintedSplitter( Qt::Orientation o ): QSplitter( o ){};
+	
+protected:
+	QSplitterHandle* createHandle(){ return new PaintedSplitterHandle( orientation(), this ); }
+	
+private:
+	class PaintedSplitterHandle : public QSplitterHandle
+	{
+	public:
+		PaintedSplitterHandle( Qt::Orientation o, QSplitter* p ): QSplitterHandle( o, p ){};
+		
+		void paintEvent(QPaintEvent *event)
+		{
+			QLinearGradient gradient;
+			QPainter painter(this);
+			gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
+			gradient.setColorAt( 0.5f, QColor( 16, 16, 16 ) );
+			gradient.setColorAt( 1.0f, Qt::black );
+			
+			gradient.setStart(rect().width()/2, rect().top());
+			gradient.setFinalStop(rect().width()/2, rect().bottom());
+			
+			painter.fillRect(event->rect(), QBrush(gradient));
+			
+			painter.drawImage( (rect().width() / 2) - 7, -1, QImage( ":/splitter_handle.png" ));
+		}
+	};
+};
+
+#endif //SCROBBLE_VIEW_WIDGET_H

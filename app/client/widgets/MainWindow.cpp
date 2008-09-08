@@ -22,14 +22,13 @@
 #include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "scrobble/MetaInfoView.h"
-#include "scrobble/ScrobbleInfoWidget.h"
 #include "scrobble/ScrobbleViewWidget.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "widgets/RadioMiniControls.h"
 #include "radio/RadioWidget.h"
+#include "radio/FriendsTuner.h"
 #include "Settings.h"
 #include "version.h"
 #include "the/radio.h"
@@ -158,16 +157,17 @@ MainWindow::setupUi()
 	
 	setCentralWidget( mainWidget );
 
+	ui.tabBar->setDrawBase( false );
+	
 	//FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
 	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
 	//		 for now and nicely wraps the love / ban / tag / share actions together.
-	
-	ui.tabBar->setDrawBase( false );
-	
 	addTab( ui.scrobbler = new ScrobbleViewWidget( ui ), "Now Playing" );
-	addTab( new QWidget(), "Friends" );
+	addTab( ui.friendTuner = new FriendsTuner, "Friends" );
 	addTab( new QWidget(), "Library" );
-	addTab( ui.tuner = new RadioWidget, "Radio off");
+	addTab( ui.tuner = new RadioWidget, "Radio");
+	
+	connect( ui.friendTuner, SIGNAL( tune(RadioStation)), &The::radio(), SLOT( play( RadioStation)));
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif

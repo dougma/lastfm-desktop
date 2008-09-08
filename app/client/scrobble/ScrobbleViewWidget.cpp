@@ -17,62 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "ScrobbleViewWidget.h"
+#include "MetaInfoView.h"
+#include "ScrobbleInfoWidget.h"
+#include "widgets/ImageButton.h"
 #include "ui_MainWindow.h"
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
 
-
-class MainWindow : public QMainWindow
+ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& ui, QWidget* parent )
+				   :QWidget( parent )
 {
-    Q_OBJECT
 
-public:
-    MainWindow();
+	ScrobbleInfoWidget* w = new ScrobbleInfoWidget;
+	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
+    h->addStretch();
+    h->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ) );
+    h->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ) );
+    h->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ) );
+    h->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ) );
+ 
+	h->setSpacing( 0 );
+    h->setMargin( 0 );
 
-    QSize sizeHint() const;
+    h->setSizeConstraint( QLayout::SetFixedSize );
 	
-	struct Ui : ::Ui::MainWindow
-	{
-		class QTabBar* tabBar;
-		class QStackedWidget* stack;
-	    class RadioMiniControls* controls;
-		class RadioWidget* tuner;
-		class ScrobbleViewWidget* scrobbler;
-		class FriendsTuner* friendTuner;
-	};
+	QSplitter* s = new PaintedSplitter( Qt::Vertical );
+	s->addWidget( w );
+	s->addWidget( new MetaInfoView );
+	s->setSizes( QList<int>() << 80 << 80 );
+	s->setStretchFactor( 0, 0 );
+	s->setStretchFactor( 1, 1 );
+	s->setHandleWidth( 14 );
 	
-	Ui ui;
-
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-	void showTagDialog();
-    void showMetaInfoView();
-
-	void setTunerToggled( bool );
-	void showTuner() { setTunerToggled( true ); }
-	void showNowPlaying() { setTunerToggled( false ); }
-
-signals:
-	void loved();
-	void banned();
+	QHBoxLayout* l = new QHBoxLayout( this );
 	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
-	void onUserGetInfoReturn( class WsReply* );
-	void onStackIndexChanged( int );
-
-private:
-    void setupUi();
-	void addTab( QWidget* w, const QString& t );
+	l->setContentsMargins( 0, 0, 0, 0);
+	l->addWidget( s );
 	
-	virtual void dragEnterEvent( QDragEnterEvent* );
-	virtual void dropEvent( QDropEvent* );
-};
+}

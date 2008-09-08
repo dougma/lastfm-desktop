@@ -4,6 +4,7 @@
     <file>play.png</file>
     <file>skip.png</file>
     <file>stop.png</file>
+    <file>splitter_handle.png</file>
   </qresource>
   <qresource prefix="blank" >
     <file alias="user.png" >nouser_small.png</file>
