@@ -101,7 +101,7 @@ Filename: "{app}\Last.fm.url"; Section: "InternetShortcut"; Key: "URL"; String: 
 
 
 [Icons]
-Name: "{group}\Last.fm"; Filename: "{app}\Last.fm.exe"
+Name: "{group}\Last.fm Ultimate Version"; Filename: "{app}\Last.fm.exe"
 Name: "{group}\Go to www.last.fm"; Filename: "{app}\Last.fm.url"
 Name: "{group}\{cm:UninstallProgram,Last.fm}"; Filename: "{uninstallexe}"
 
