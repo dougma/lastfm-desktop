@@ -35,6 +35,7 @@ class IPhoneWebView : public QWebView
 	{
 		return "iPhone";
 	}
+	
 };
 
 
@@ -61,6 +62,7 @@ MetaInfoView::MetaInfoView()
 			 SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
 	
 	setBackgroundRole( QPalette::Base );
+
 }
 
 
@@ -88,7 +90,7 @@ MetaInfoView::onAppEvent( int e, const QVariant& d )
 
 		case PlayerEvent::PlaybackSessionEnded:
 			ui.tabs->hide();
-			ui.web->setHtml( "<html/>" ); //clear the web view
+			ui.web->load( QUrl("about:blank") ); //clear the web view
 			break;
     }
 }

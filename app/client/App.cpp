@@ -72,7 +72,14 @@ App::App( int argc, char** argv )
     DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
+	
+	QPalette p = palette();
+	p.setColor( QPalette::Window, Qt::black );
+	p.setColor( QPalette::Base, Qt::black );
 
+	setPalette( p );
+
+	
     //TODO do once?
 #ifdef WIN32
     Legacy::disableHelperApp();

@@ -17,14 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "NowPlayingView.h"
+#include "TrackInfoWidget.h"
 #include "ObservedTrack.h"
 #include "PlayerEvent.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QtGui>
 
 
-NowPlayingView::NowPlayingView()
+TrackInfoWidget::TrackInfoWidget()
 {
     QVBoxLayout* v = new QVBoxLayout( this );
     v->setMargin( 0 );
@@ -47,7 +47,7 @@ NowPlayingView::NowPlayingView()
 
 
 void
-NowPlayingView::clear()
+TrackInfoWidget::clear()
 {
 	m_track = Track();
 	m_cover = QImage();
@@ -59,7 +59,7 @@ NowPlayingView::clear()
 
 
 void
-NowPlayingView::setTrack( const Track& t )
+TrackInfoWidget::setTrack( const Track& t )
 {
 	//TODO for scrobbled tracks we should get the artwork out of the track
 	if (m_track.album() != t.album())
@@ -83,7 +83,7 @@ NowPlayingView::setTrack( const Track& t )
 
 
 void
-NowPlayingView::onAlbumImageDownloaded( const QByteArray& data )
+TrackInfoWidget::onAlbumImageDownloaded( const QByteArray& data )
 {
 	if (data.size())
 	{
@@ -103,7 +103,7 @@ NowPlayingView::onAlbumImageDownloaded( const QByteArray& data )
 
 
 void
-NowPlayingView::paintEvent( QPaintEvent* e )
+TrackInfoWidget::paintEvent( QPaintEvent* e )
 {
 #if 0
     QPainter p( this );
@@ -154,7 +154,7 @@ NowPlayingView::paintEvent( QPaintEvent* e )
 
 
 QImage //static
-NowPlayingView::addReflection( const QImage &in )
+TrackInfoWidget::addReflection( const QImage &in )
 {
     const uint H = qreal(in.height()) / 3;
 	

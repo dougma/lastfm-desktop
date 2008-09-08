@@ -23,6 +23,7 @@
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "scrobble/MetaInfoView.h"
+#include "scrobble/ScrobbleInfoWidget.h"
 #include "scrobble/ScrobbleViewWidget.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
@@ -36,10 +37,8 @@
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/ws/WsReply.h"
 #include <QCloseEvent>
-#include <QPointer>
 #include <QShortcut>
 #include <QStackedWidget>
-#include <QSplitter>
 #include <phonon/volumeslider.h>
 
 #ifdef Q_WS_X11
@@ -154,39 +153,15 @@ MainWindow::setupUi()
 	
 	setCentralWidget( mainWidget );
 
-    setupScrobbleView(); //TODO its own widget too
-
-	ui.stack->addWidget( ui.np );
+	//FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
+	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
+	//		 for now and nicely wraps the love / ban / tag / share actions together.
+	ui.stack->addWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
 	ui.stack->addWidget( ui.tuner = new RadioWidget );
 	
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif
-}
-
-
-void 
-MainWindow::setupScrobbleView()
-{
-    ScrobbleViewWidget* w = new ScrobbleViewWidget;
-	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
-    h->addStretch();
-    h->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ));
-    h->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ));
-    h->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ));
-    h->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ));
-    h->setSpacing( 0 );
-    h->setMargin( 0 );
-    h->setSizeConstraint( QLayout::SetFixedSize );
-	
-	QSplitter* s = new QSplitter( Qt::Vertical );
-	s->addWidget( w );
-	s->addWidget( new MetaInfoView );
-	s->setSizes( QList<int>() << 80 << 80 );
-	s->setStretchFactor( 0, 0 );
-	s->setStretchFactor( 1, 1 );
-
-	ui.np = s;
 }
 
 

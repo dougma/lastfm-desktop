@@ -17,43 +17,60 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef NOW_PLAYING_VIEW_H
-#define NOW_PLAYING_VIEW_H
+#ifndef SCROBBLE_INFO_WIDGET_H
+#define SCROBBLE_INFO_WIDGET_H
 
-#include <QImage>
 #include <QWidget>
-#include "lib/types/Track.h"
+#include <QAction>
 
 
-class NowPlayingView : public QWidget
+class ScrobbleInfoWidget : public QWidget
 {
-    Q_OBJECT
-
+	Q_OBJECT
+	
 public:
-    NowPlayingView();
-
-	void setTrack( const Track& );
-	void clear();
+	ScrobbleInfoWidget();
 	
-	struct Ui
+	virtual void resizeEvent( QResizeEvent* );
+	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
+	
+	//Most of the ui should only be touched by the Widget itself
+	//however the actionbar is created by the window so it can
+	//share QActions for use in the menus etc.
+	struct 
 	{
-		class QLabel* text;
-		class SpinnerLabel* spinner;
-		
-	};
+		friend class ScrobbleInfoWidget;
+		class QWidget* actionbar;
 	
-	Ui ui;
+	private:
+		class TrackInfoWidget* cover;
+		class ScrobbleProgressBar* progress;
+		class MediaPlayerIndicator* playerIndicator;
+	} 
+	ui;
 	
 private slots:
-	void onAlbumImageDownloaded( const QByteArray& );
-
-private:
-    void paintEvent( QPaintEvent* );
-
-    QImage m_cover;
-	Track m_track;
-	
-	static QImage addReflection( const QImage& );
+	void onAppEvent( int, const class QVariant& );
 };
 
-#endif // NOW_PLAYING_VIEW_H
+
+#include <QLabel>
+class SimpleButton : public QLabel
+{
+	QAction* const a;
+	
+	virtual void mouseReleaseEvent( QMouseEvent* ) 
+	{
+		if (a->isEnabled()) 
+			a->activate( QAction::Trigger );
+	}
+	
+public:
+	SimpleButton( const QString& icon, QAction* action ) : a( action )
+	{
+		setPixmap( QPixmap( icon ) );
+		setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+	}
+};
+
+#endif //SCROBBLE_INFO_WIDGET_H

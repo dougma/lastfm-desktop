@@ -17,9 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScrobbleViewWidget.h"
+#include "ScrobbleInfoWidget.h"
 #include "MediaPlayerIndicator.h"
-#include "NowPlayingView.h"
+#include "TrackInfoWidget.h"
 #include "PlayerEvent.h"
 #include "the/definitions.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
@@ -28,14 +28,14 @@
 #include <QVBoxLayout>
 
 
-ScrobbleViewWidget::ScrobbleViewWidget()
+ScrobbleInfoWidget::ScrobbleInfoWidget()
 {
 	ui.actionbar = new QWidget;
 	
 	QVBoxLayout* v = new QVBoxLayout( this );
 	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
 	v->addSpacing( 8 );
-    v->addWidget( ui.cover = new NowPlayingView );
+    v->addWidget( ui.cover = new TrackInfoWidget );
 	v->addSpacing( 4 );
     v->addWidget( ui.actionbar );
 	v->addSpacing( 12 );
@@ -61,7 +61,7 @@ ScrobbleViewWidget::ScrobbleViewWidget()
 
 
 void
-ScrobbleViewWidget::resizeEvent( QResizeEvent* )
+ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
 //	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
 	QLinearGradient g( 0, height() - 300, 0, height() );
@@ -78,7 +78,7 @@ ScrobbleViewWidget::resizeEvent( QResizeEvent* )
 
 
 void
-ScrobbleViewWidget::onAppEvent( int e, const QVariant& v )
+ScrobbleInfoWidget::onAppEvent( int e, const QVariant& v )
 {
 	switch (e)
 	{

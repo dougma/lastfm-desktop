@@ -17,60 +17,43 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SCROBBLE_VIEW_WIDGET_H
-#define SCROBBLE_VIEW_WIDGET_H
+#ifndef TRACK_INFO_WIDGET_H
+#define TRACK_INFO_WIDGET_H
 
+#include <QImage>
 #include <QWidget>
-#include <QAction>
+#include "lib/types/Track.h"
 
 
-class ScrobbleViewWidget : public QWidget
+class TrackInfoWidget : public QWidget
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+
 public:
-	ScrobbleViewWidget();
+    TrackInfoWidget();
+
+	void setTrack( const Track& );
+	void clear();
 	
-	virtual void resizeEvent( QResizeEvent* );
-	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
-	
-	//Most of the ui should only be touched by the Widget itself
-	//however the actionbar is created by the window so it can
-	//share QActions for use in the menus etc.
-	struct 
+	struct Ui
 	{
-		friend class ScrobbleViewWidget;
-		class QWidget* actionbar;
+		class QLabel* text;
+		class SpinnerLabel* spinner;
+		
+	};
 	
-	private:
-		class NowPlayingView* cover;
-		class ScrobbleProgressBar* progress;
-		class MediaPlayerIndicator* playerIndicator;
-	} 
-	ui;
+	Ui ui;
 	
 private slots:
-	void onAppEvent( int, const class QVariant& );
+	void onAlbumImageDownloaded( const QByteArray& );
+
+private:
+    void paintEvent( QPaintEvent* );
+
+    QImage m_cover;
+	Track m_track;
+	
+	static QImage addReflection( const QImage& );
 };
 
-
-#include <QLabel>
-class SimpleButton : public QLabel
-{
-	QAction* const a;
-	
-	virtual void mouseReleaseEvent( QMouseEvent* ) 
-	{
-		if (a->isEnabled()) 
-			a->activate( QAction::Trigger );
-	}
-	
-public:
-	SimpleButton( const QString& icon, QAction* action ) : a( action )
-	{
-		setPixmap( QPixmap( icon ) );
-		setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-	}
-};
-
-#endif
+#endif //TRACK_INFO_WIDGET_H

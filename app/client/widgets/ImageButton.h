@@ -19,6 +19,8 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QLayout>
+#include <qDebug>
 
 class ImageButton : public QPushButton
 {
@@ -27,6 +29,15 @@ class ImageButton : public QPushButton
 public:
 	ImageButton( QWidget* parent ) : QPushButton( parent )
 	{}
+	
+	ImageButton( const QString& image, QWidget* parent = 0, char* signal = 0 ) : QPushButton( parent )
+	{
+		
+		if( parent && signal )
+			connect( this, SIGNAL( clicked()), parent, signal);
+		
+		setIcon( QIcon( image ));
+	}
 	
 	void paintEvent ( QPaintEvent* event )
 	{
@@ -45,7 +56,7 @@ public:
 		else
 			i = icon();
 		
-		i.paint( &p, rect(), Qt::AlignTop, state );
+		i.paint( &p, rect(), Qt::AlignCenter, state );
 	}
 	
 	void setCheckedIcon( const QIcon& i ){ m_checkedIcon = i; }

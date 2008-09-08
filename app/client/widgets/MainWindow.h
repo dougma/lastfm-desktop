@@ -35,7 +35,7 @@ public:
 		class QStackedWidget* stack;
 	    class RadioMiniControls* controls;
 		class RadioWidget* tuner;
-		QWidget* np;
+		class ScrobbleViewWidget* scrobbler;
 	};
 	
 	Ui ui;
@@ -69,7 +69,6 @@ private slots:
 
 private:
     void setupUi();
-    void setupScrobbleView();
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
