@@ -84,13 +84,6 @@ App::App( int argc, char** argv )
 
     setQuitOnLastWindowClosed( false );
 	
-	QPalette p = palette();
-	p.setColor( QPalette::Window, Qt::black );
-	p.setColor( QPalette::Base, Qt::black );
-
-	setPalette( p );
-
-	
     //TODO do once?
 #ifdef WIN32
     Legacy::disableHelperApp();

@@ -27,14 +27,14 @@
 
 namespace Ui
 {
-	struct MainWindow;
+	class MainWindow;
 }
+
 
 class ScrobbleViewWidget : public QWidget
 {
 public:
-	ScrobbleViewWidget( Ui::MainWindow& m, QWidget* parent = 0 );
-
+	ScrobbleViewWidget( Ui::MainWindow&, QWidget* parent = 0 );
 };
 
 class PaintedSplitter : public QSplitter

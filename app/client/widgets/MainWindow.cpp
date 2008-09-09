@@ -96,11 +96,10 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.ban->setEnabled( false );
     }
         
-        
     #ifndef Q_WS_MAC
         setWindowTitle( t.isNull() 
                 ? qApp->applicationName()
-                : v.value<ObservedTrack>().prettyTitle() );
+                : t.prettyTitle() );
     #endif
 }
 
@@ -144,6 +143,7 @@ MainWindow::setupUi()
 	addTab( ui.tuner = new RadioWidget, "Radio");
 	
 	connect( ui.friendTuner, SIGNAL( tune(RadioStation)), &The::radio(), SLOT( play( RadioStation)));
+
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif
