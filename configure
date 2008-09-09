@@ -108,4 +108,3 @@ echo 'Good, your configure is finished!'
 echo "Now type '$BUILD_CMD' to complete the awesome cycle."
 
 rmdir _build build &> /dev/null
-rmdir _bin &> /dev/null

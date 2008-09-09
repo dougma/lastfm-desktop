@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "PlayerEvent.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
 #include "Settings.h"
@@ -48,14 +47,19 @@ App::App( int argc, char** argv )
     
     m_settings = new Settings( VERSION, applicationFilePath() );
 
-    m_playerListener = new PlayerListener( this );
-    connect( m_playerListener, SIGNAL(bootstrapCompleted( QString, QString )), SLOT(onBootstrapCompleted( QString, QString )) );
+    PlayerListener* listener = new PlayerListener( this );
+    connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
     
-    m_playerManager = new PlayerManager( m_playerListener );
-    connect( m_playerManager, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+    m_playerManager = new PlayerManager( listener );
+    connect( m_playerManager, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
+    connect( m_playerManager, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
+    connect( m_playerManager, SIGNAL(stopped()), SIGNAL(stopped()) );
+    connect( m_playerManager, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
+    connect( m_playerManager, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
+    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) );    
     
 #ifdef Q_WS_MAC
-    new ITunesListener( m_playerListener->port(), this );
+    new ITunesListener( listener->port(), this );
 #endif
     
     ScrobblerInit init;
@@ -64,11 +68,18 @@ App::App( int argc, char** argv )
     init.clientId = "ass";
     m_scrobbler = new Scrobbler( init );
     
+    connect( m_playerManager, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
+    connect( m_playerManager, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
+    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
+    
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
-	connect( m_radio, SIGNAL(stateChanged( Radio::State, Radio::State )), SLOT(onRadioStateChanged( Radio::State, Radio::State )) );
-    connect( m_radio, SIGNAL(trackStarted( Track )), SLOT(onRadioTrackStarted( Track )) );
-	
+
+	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerManager, SLOT(onRadioTuningIn( RadioStation )) );
+    connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerManager, SLOT(onRadioTrackSpooled( Track )) );
+    connect( m_radio, SIGNAL(trackStarted( Track )), m_playerManager, SLOT(onRadioTrackStarted( Track )) );
+    connect( m_radio, SIGNAL(stopped()), m_playerManager, SLOT(onRadioStopped()) );
+    
     DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
@@ -118,38 +129,6 @@ App::setMainWindow( MainWindow* window )
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 #endif
-}
-
-
-void
-App::onAppEvent( int e, const QVariant& d )
-{
-	qDebug() << (PlayerEvent::Enum)e << d;
-	
-    switch (e)
-    {
-        case PlayerEvent::TrackStarted:
-        {
-            Track t = d.value<ObservedTrack>();
-            m_scrobbler->nowPlaying( t );
-
-            // no tooltips on mac
-        #ifndef Q_WS_MAC
-            m_trayIcon->setToolTip( t.prettyTitle() );
-        #endif
-            break;
-        }
-
-		case PlayerEvent::TrackEnded:
-            m_scrobbler->submit();
-            break;
-			
-        case PlayerEvent::ScrobblePointReached:
-            m_scrobbler->cache( d.value<ObservedTrack>() );
-            break;
-    }
-
-    emit event( e, d );
 }
 
 
@@ -213,65 +192,15 @@ App::onScrobblerStatusChanged( int e )
 }
 
 
-void
-App::onRadioStateChanged( Radio::State oldstate, Radio::State newstate )
-{
-	qDebug() << newstate << "but was:" << oldstate;
-	
-	switch (newstate)
-	{
-		case Radio::Prebuffering:
-			m_playerManager->onPreparingTrack( m_radio->track() );
-			break;
-			
-		case Radio::Playing:
-			if (oldstate == Radio::Rebuffering)
-				m_playerManager->onPlaybackResumed( "ass" );
-			break;
-			
-		case Radio::Stopped:
-		    m_playerManager->onPlaybackEnded( "ass" );
-			break;
-			
-		case Radio::TuningIn:
-			switch (oldstate)
-			{
-				case Radio::Stopped:
-					m_playerManager->onPlaybackSessionStarted( "ass" );
-					break;
-				default:
-					m_playerManager->onTrackEnded( "ass" );
-					break;
-			}
-			onAppEvent( PlayerEvent::TuningIn, QVariant::fromValue( m_radio->station() ) );
-			break;
-			
-		case Radio::Rebuffering:
-			m_playerManager->onPlaybackPaused( "ass" );
-			break;
-	}
-}
-
-
-void
-App::onRadioTrackStarted( const Track& t )
-{
-	// state always changes before this slot will be called
-	
-	MutableTrack( t ).setPlayerId( "ass" );
-	m_playerManager->onTrackStarted( t );
-}
-
-
 void 
-App::onBootstrapCompleted( const QString& playerId, const QString& username )
+App::onBootstrapCompleted( const QString& playerId )
 {}
 
 
 void
 App::love()
 {
-	Track t = track();
+	Track t = m_playerManager->track();
 	MutableTrack( t ).upgradeRating( Track::Loved );
 	MessageBoxBuilder( m_mainWindow ).setText( "We need to set the love button to look loved or some other feedback!" ).exec();
 	t.love();
@@ -281,7 +210,7 @@ App::love()
 void
 App::ban()
 {
-	Track t = track();
+	Track t = m_playerManager->track();
 	MutableTrack( t ).upgradeRating( Track::Banned );
 	m_radio->skip();
 	t.ban();
@@ -300,13 +229,6 @@ void
 App::open( const QUrl& url )
 {
     m_radio->play( RadioStation( url.toString() ) );
-}
-
-
-Track
-App::track() const
-{
-    return m_playerManager->track();
 }
 
 

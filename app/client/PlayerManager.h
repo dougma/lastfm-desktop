@@ -18,11 +18,12 @@
  ***************************************************************************/
 
 #include "PlayerState.h"
-#include "ObservedTrack.h"
+#include "PlayerConnection.h"
+#include "PlayerCommandParser.h"
 #include "StopWatch.h"
-#include <QMutableVectorIterator>
-#include <QStack>
-#include <QVariant>
+#include "lib/types/Track.h"
+#include "lib/radio/Radio.h"
+#include <QPointer>
 
 
 class PlayerManager : public QObject
@@ -30,38 +31,55 @@ class PlayerManager : public QObject
     Q_OBJECT
 
 public:
-    PlayerManager( class PlayerListener* parent );
+    PlayerManager( PlayerListener* );
+    
+    Track track() const { return m_track; }
 
-    ObservedTrack track() const { return m_track; }
-
-	/** disengages all other players, sets radio to current player
-	  * emits tuning in event. */
-	void tuneIn( const class RadioStation& );
-	
 public slots:
-	void onPreparingTrack( const Track& );
-    void onTrackStarted( const Track& );
-    void onPlaybackEnded( const QString& playerId );
-    void onPlaybackPaused( const QString& playerId );
-    void onPlaybackResumed( const QString& playerId );
-    void onPlayerConnected( const QString& playerId );
-    void onPlayerDisconnected( const QString& playerId );
+    void onRadioTuningIn( const RadioStation& );
+    void onRadioTrackSpooled( const Track& );
+    void onRadioTrackStarted( const Track& );
+    void onRadioBuffering( int );
+    void onRadioStopped();
 
-	/** these are optional, and for the radio basically, as only that can have
-	  * periods inbetween tracks where a sesion is still active */
-	void onTrackEnded( const QString& playerId );
-	void onPlaybackSessionStarted( const QString& playerId );
-	
+private slots:
+    void onPlayerConnectionCommandReceived( const PlayerConnection& );
+
+private:
+    void changeState( State );
+    void endTrack();
+    void stop();
+    
+    /** replays the last command parsed by this connection, and the Init
+      * command first */ 
+    void replay( const PlayerConnection& );
+    
 signals:
-    /** the int is a PlaybackEvent, @data is documented with the enum */
-    void event( int, const QVariant& data = QVariant() );
+    void playerChanged( const QString& name );
+    /** you really only get this signal for state changes, so when a track was
+      * playing and a new track starts, you don't get this signal as that is
+      * Playing -> Playing! */
+    /** You get the stateChanged signal _last_, this is so you can get the 
+      * associated data for the state before you handle the state, eg TuningIn
+      * station, trackStarted track, etc. */
+    void stateChanged( State newstate, const Track& );
+    
+    void stopped();
+    /** @p t will be played soon. If the track isNull, state is no longer
+      * Playing. Note that a null track does not correspond with the Unspooled
+      * PlayingEvent. StopWatch is always valid unless track isNull()
+      * The default of 0 is there so your connect() calls are more concise */
+    void trackSpooled( const Track&, StopWatch* = 0 );
+    void trackUnspooled( const Track& );
+    void scrobblePointReached( const Track& );
 
 private slots:
     void onStopWatchTimedOut();
 
 private:
-    ObservedTrack m_track;
-    PlayerState::Enum m_state;
-	
-	QString m_playerId;
+    State m_state;  
+    QPointer<StopWatch> m_watch;
+    Track m_track;
+    bool m_radioIsActive;
+    PlayerConnection m_connection;
 };

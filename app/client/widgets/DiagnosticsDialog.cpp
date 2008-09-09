@@ -19,7 +19,6 @@
 
 #include "DiagnosticsDialog.h"
 #include "ObservedTrack.h"
-#include "PlayerEvent.h"
 #include "Settings.h"
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/scrobble/ScrobbleCache.h"
@@ -122,7 +121,7 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
         Qt::QueuedConnection );
 
 #endif
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+    connect( qApp, SIGNAL(scrobblePointReached( ScrobblePoint )), SLOT(onScrobblePointReached()) );
     connect( ui.copyToClipboardButton, SIGNAL( clicked() ), SLOT( onCopyToClipboard() ) );
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
     connect( ui.sendLogsButton, SIGNAL( clicked() ), SLOT( onSendLogsClicked() ) );
@@ -259,17 +258,9 @@ DiagnosticsDialog::onOutputBufferSizeChanged(int bufferSize)
 
 
 void
-DiagnosticsDialog::onAppEvent( int event, const QVariant& )
+DiagnosticsDialog::onScrobblePointReached()
 {
-    switch (event)
-    {
-    case PlayerEvent::ScrobblePointReached:
-        populateScrobbleCacheView();
-        break;
-
-    default:
-        break;
-    }
+    populateScrobbleCacheView();
 }
 
 

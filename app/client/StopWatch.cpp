@@ -21,12 +21,12 @@
 #include <QDebug>
 
 
-StopWatch::StopWatch( uint timeout ) : m_thread( 0 )
+StopWatch::StopWatch( const ScrobblePoint& timeout ) : m_thread( 0 ), m_point( timeout )
 {
     m_thread = new StopWatchThread;
     connect( m_thread, SIGNAL(tick( int )), SIGNAL(tick( int )) );
     connect( m_thread, SIGNAL(timeout()), SIGNAL(timeout()) );
-
+    
     m_thread->m_timeout = timeout * 1000;
     m_thread->start();
 }
@@ -35,6 +35,22 @@ StopWatch::StopWatch( uint timeout ) : m_thread( 0 )
 StopWatch::~StopWatch()
 {
     if (m_thread) m_thread->deleteLater();
+}
+
+
+void
+StopWatch::pause()
+{
+    m_thread->m_paused = true; 
+    emit paused(); 
+}
+
+void
+StopWatch::resume() 
+{
+    emit tick( m_thread->m_elapsed / 1000 );
+    m_thread->m_paused = false; 
+    emit resumed();
 }
 
 

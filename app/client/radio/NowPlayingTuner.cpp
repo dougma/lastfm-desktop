@@ -19,8 +19,6 @@
 
 #include "NowPlayingTuner.h"
 #include "StationDelegate.h"
-#include "PlayerEvent.h"
-#include "ObservedTrack.h"
 #include "the/radio.h"
 #include "lib/types/Track.h"
 #include <QVBoxLayout>
@@ -31,11 +29,10 @@
 NowPlayingTuner::NowPlayingTuner()
 {
 	ui.setupUi( this );
-	
 	ui.tagsTab->setItemDelegate( new StationDelegate( this ) );
 	ui.similarArtistsTab->setItemDelegate( new StationDelegate( this ) );
 
-	connect( qApp, SIGNAL(event( int, const QVariant& )), SLOT(onAppEvent( int, const QVariant& )) );
+	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	
 	connect( ui.tagsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onTagClicked( QListWidgetItem*)) );
 	connect( ui.similarArtistsTab, SIGNAL(itemClicked( QListWidgetItem*)), SLOT(onArtistClicked( QListWidgetItem*)) );
@@ -44,48 +41,40 @@ NowPlayingTuner::NowPlayingTuner()
 
 
 void
-NowPlayingTuner::onAppEvent( int e, const QVariant& d )
+NowPlayingTuner::onTrackSpooled( const Track& t )
 {
-	switch( e )
-	{
-		case PlayerEvent::TrackStarted:
-		{
-			Track t = d.value<ObservedTrack>();
-			
-			//Load Tags
-			ui.tagsTab->clear();
-			WsReply* r = t.getTopTags();
-			connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
-			
-			//Load Similar Artists
-			ui.similarArtistsTab->clear();
-			WsReply* similarReply = t.artist().getSimilar();
-			connect( similarReply, SIGNAL( finished( WsReply*)), SLOT( onFetchedSimilarArtists(WsReply*)) );
-			
-			delete ui.miniNowPlaying;
-			ui.miniNowPlaying = new MiniNowPlayingView( t );
-			static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
-			
-		}
-		break;
-
-		case PlayerEvent::PlaybackSessionEnded:
-			ui.tagsTab->clear();
-			ui.similarArtistsTab->clear();
-			
-			//Clear the minimetaview - 
-			//deleting the object and replacing it with a blank one will
-			//ensure that any pending albumArt does not get loaded.
-			delete ui.miniNowPlaying;
-			ui.miniNowPlaying = new MiniNowPlayingView;
-			static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
-		break;
+    if (!t.isNull())
+    {
+        //Load Tags
+        ui.tagsTab->clear();
+        WsReply* r = t.getTopTags();
+        connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
+        
+        //Load Similar Artists
+        ui.similarArtistsTab->clear();
+        WsReply* similarReply = t.artist().getSimilar();
+        connect( similarReply, SIGNAL( finished( WsReply*)), SLOT( onFetchedSimilarArtists(WsReply*)) );
+        
+        delete ui.miniNowPlaying;
+        ui.miniNowPlaying = new MiniNowPlayingView( t );
+        static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
+    }
+    else {
+        ui.tagsTab->clear();
+        ui.similarArtistsTab->clear();
+        
+        //Clear the minimetaview - 
+        //deleting the object and replacing it with a blank one will
+        //ensure that any pending albumArt does not get loaded.
+        delete ui.miniNowPlaying;
+        ui.miniNowPlaying = new MiniNowPlayingView;
+        static_cast<QBoxLayout*>(layout())->insertWidget( 0, ui.miniNowPlaying );
 	}
 }
 
 
 void 
-NowPlayingTuner::addWeightedStringsToList( WeightedStringList& stringList, QListWidget* list )
+NowPlayingTuner::addWeightedStringsToList( WeightedStringList stringList, QListWidget* list )
 {
 	if( stringList.isEmpty() )
 		return;

@@ -18,42 +18,51 @@
  ***************************************************************************/
 
 #include "RadioMiniControls.h"
-#include "PlayerEvent.h"
+#include "PlayerState.h"
 #include "ObservedTrack.h"
 #include <phonon/volumeslider.h>
 
 
 RadioMiniControls::RadioMiniControls()
 {
-    ui.setupUi(this);
-	
-	ui.play->setCheckedIcon( QIcon( ":/stop.png" ));
-	
-    layout()->addWidget( ui.volume = new Phonon::VolumeSlider );
-	
-	connect( qApp, SIGNAL(event( int, const QVariant&)), SLOT( onAppEvent( int, const QVariant&)) );
-	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
-	
+    ui.setupUi( this );
+    ui.play->setCheckedIcon( QIcon( ":/stop.png" ) );
+    ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
+	
+    layout()->addWidget( ui.volume );
+	
+	connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onStateChanged( State, Track )) );
+	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
+    
+    onStateChanged( Stopped, Track() );
 }
 
 
 void 
-RadioMiniControls::onAppEvent( int e, const QVariant& d )
+RadioMiniControls::onStateChanged( State state, const Track& t )
 {
-	switch ( e ) 
+	switch (state) 
 	{
-		case PlayerEvent::PlaybackSessionStarted:
-			if( d.toString() == "ass" )
-				ui.play->setChecked( true );
+		case Playing:
+            if (t.source() != Track::LastFmRadio)
+                return;
+        case TuningIn:
+            ui.play->show();
+            ui.skip->show();
+            ui.volume->show();            
+            ui.play->setChecked( true );
 			break;
 		
-		case PlayerEvent::PlaybackSessionEnded:
-		case PlayerEvent::PlaybackPaused:
+		case Stopped:
+            ui.play->hide();
+            ui.skip->hide();
+            ui.volume->hide();            
+            ui.play->setChecked( false );
 			break;
-
-		default:
-			break;
+            
+        default:
+            break;
 	}
 }
 
@@ -61,6 +70,6 @@ RadioMiniControls::onAppEvent( int e, const QVariant& d )
 void
 RadioMiniControls::onPlayClicked()
 {
-	if( !ui.play->isChecked() )
+	if (!ui.play->isChecked())
 		emit stop();
 }

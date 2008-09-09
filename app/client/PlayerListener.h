@@ -21,14 +21,14 @@
 #define PLAYER_LISTENER_H
 
 #include "common/HideStupidWarnings.h"
+#include "PlayerConnection.h"
 #include <QTcpServer>
-class Track;
+#include <QMap>
+class PlayerConnection;
 
 
-/** @author Erik Jaelevik, <erik@last.fm>
-  * @contributor Christian Muehlhaeuser <chris@last.fm>
-  * @rewrite Max Howell <max@last.fm> -- to Qt4
-  */
+/** listens to external clients via a TcpSocket and notifies a receiver to their
+  * commands */
 class PlayerListener : public QTcpServer
 {
     Q_OBJECT
@@ -41,27 +41,26 @@ public:
         
         QString what() const { return *this; }
     };
-
+    
     PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
-
+    
     uint port() const { return 33367; }
     
 signals:
-    void trackStarted( const Track& );
-    void playbackEnded( const QString& playerId );
-    void playbackPaused( const QString& playerId );
-    void playbackResumed( const QString& playerId );
-    void bootstrapCompleted( const QString& playerId, const QString& username );
-    void playerConnected( const QString& playerId );
-    void playerDisconnected( const QString& playerId );
+    void playerCommand( const PlayerConnection& );
+    void bootstrapCompleted( const QString& playerId );
 
 private slots:
     void onNewConnection();
-    void onSocketStateChanged( QAbstractSocket::SocketState );
+    void onDisconnection();
     void onDataReady();
 
 private:
-    QMap< QTcpSocket*, QString > m_socketMap;
+    /** handles the TERM command as conecerning this class */
+    void term( QTcpSocket* );
+    
+    QMap<QTcpSocket*, PlayerConnection> m_connections;
 };
+
 
 #endif

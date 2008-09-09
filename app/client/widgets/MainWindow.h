@@ -19,6 +19,8 @@
 
 #include "ui_MainWindow.h"
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
+#include "PlayerState.h"
+#include "lib/types/Track.h"
 
 
 class MainWindow : public QMainWindow
@@ -65,14 +67,16 @@ signals:
 	
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-    void onAppEvent( int, const QVariant& );
 	void onUserGetInfoReturn( class WsReply* );
 	void onStackIndexChanged( int );
-
+    void onTrackSpooled( const Track& );
+    
 private:
     void setupUi();
 	void addTab( QWidget* w, const QString& t );
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
+    
+    Track m_track;
 };

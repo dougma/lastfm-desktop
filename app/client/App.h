@@ -20,7 +20,6 @@
 #include "PlayerState.h"
 #include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
-#include "lib/radio/Radio.h" //for Radio::State FIXME
 #include "lib/ws/WsError.h"
 #include "the/definitions.h"
 
@@ -39,15 +38,21 @@ public:
 
     void setMainWindow( class MainWindow* ); //access via The::mainWindow()
 
-    /** the currently observed track */
-    Track track() const;
-    
 	/** if it isn't a lastfm url, we'll try to start it anyway, but it won't
 	  * work, and the user will get an error message */
     void open( const class QUrl& url );
 
+signals:
+    /** documented in PlayerManager */
+    void playerChanged( const QString& name );
+    void trackSpooled( const Track&, class StopWatch* = 0 );
+    void trackUnspooled( const Track& );
+    void stopped();
+    void stateChanged( State newstate, const Track& = Track() ); //convenience
+    void scrobblePointReached( const Track& );
+    
 public slots:
-    void onBootstrapCompleted( const QString& playerId, const QString& username );
+    void onBootstrapCompleted( const QString& playerId );
 
     /** all webservices connect to this and emit in the case of bad errors that
       * need to be handled at a higher level */
@@ -58,20 +63,11 @@ public slots:
 
 	void love();
 	void ban();
-	
-private slots:
-    void onAppEvent( int, const QVariant& );
 
+private slots:
 	void onScrobblerStatusChanged( int );
-	
-	void onRadioTrackStarted( const Track& );
-	void onRadioStateChanged( Radio::State, Radio::State );
-	
-signals:
-    void event( int, const QVariant& );
 
 private:
-    class PlayerListener* m_playerListener;
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;
     class DrWatson* m_watson;

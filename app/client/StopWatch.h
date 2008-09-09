@@ -20,6 +20,7 @@
 #ifndef STOP_WATCH_H
 #define STOP_WATCH_H
 
+#include "lib/scrobble/ScrobblePoint.h"
 #include <QThread>
 #include <QMutex>
 #include <QDateTime>
@@ -29,6 +30,8 @@
 // should stop waking every 250ms when the player is paused
 
 
+/** exists so we can destroy stop watches without blocking the GUI thread in
+  * wait() */
 class StopWatchThread : public QThread
 {
     Q_OBJECT
@@ -38,7 +41,7 @@ class StopWatchThread : public QThread
     bool m_done;
 
 public:
-    StopWatchThread() : m_done( false ), m_paused( false ), m_timeout( 0 ), m_elapsed( 0 )
+    StopWatchThread() : m_done( false ), m_paused( true ), m_timeout( 0 ), m_elapsed( 0 )
     {}
 
     virtual void run();
@@ -65,20 +68,26 @@ class StopWatch : public QObject
     Q_DISABLE_COPY( StopWatch )
 
 public:
-    StopWatch( uint timeout_in_seconds );
+    /** the StopWatch starts off paused, call resume() to start */
+    StopWatch( const ScrobblePoint& timeout_in_seconds );
     ~StopWatch();
-
-    void pause()  { m_thread->m_paused = true; }
-    void resume() { m_thread->m_paused = false; }
+    
+    void pause();
+    void resume();
 
     uint elapsed() { return m_thread->m_elapsed / 1000; }
+    
+    ScrobblePoint scrobblePoint() const { return m_point; }
 
 signals:
+    void resumed();
+    void paused();
     void tick( int );
     void timeout();
 
 private:
     StopWatchThread* m_thread;
+    ScrobblePoint m_point;
 };
 
 #endif

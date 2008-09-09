@@ -1,109 +1,100 @@
-#include "App.h"
+/***************************************************************************
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ ***************************************************************************/
+
 #include "MediaPlayerIndicator.h"
-#include "PlayerEvent.h"
-#include "Settings.h"
+#include "the/radio.h"
+#include "the/settings.h"
 #include "lib/radio/RadioStation.h"
 #include "lib/types/Track.h"
-#include <QVariant>
-#include <QLayout>
+#include <QCoreApplication>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QApplication>
+#define PRE "<b><font color=#343434>"
 
 
 MediaPlayerIndicator::MediaPlayerIndicator()
 {
-    setLayout( new QHBoxLayout );
-	layout()->setMargin( 0 );
-	layout()->addWidget( m_nowPlayingIndicator = new QLabel( "<b>" + The::settings().username() ) );
-	static_cast<QBoxLayout*>(layout())->addStretch();
-	layout()->addWidget( m_playerDescription = new QLabel );
-    connect( qApp, SIGNAL(event(int, QVariant)), SLOT(onAppEvent( int, QVariant )) );
+    QHBoxLayout* h = new QHBoxLayout( this );
+	h->setMargin( 0 );
+	h->addWidget( m_nowPlayingIndicator = new QLabel( "<b>" + The::settings().username() ) );
+	h->addStretch();
+	h->addWidget( m_playerDescription = new QLabel );
 
-	m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
-	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
-	
+    connect( qApp, SIGNAL(playerChanged( QString )), SLOT(onPlayerChanged( QString )) );
+    connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
+    connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(onTuningIn( RadioStation )) );
+    
 	// prevent the text length resizing the window!
 	m_nowPlayingIndicator->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-	
+    m_playerDescription->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+    
 #ifdef Q_WS_MAC
 	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
 	m_nowPlayingIndicator->setPalette( p );
 	m_playerDescription->setPalette( p );
-	mediaPlayerConnected( "osx" );
+
+    m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
+	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
 #endif
 }
 
 
 void
-MediaPlayerIndicator::onAppEvent( int e, const QVariant& v )
-{
-    switch( e )
-    { 
-		// we are guarenteed that the playerid will not change without a disconnected first
-        case PlayerEvent::PlayerDisconnected:
-		#ifndef Q_WS_MAC //FIXME
-			m_playerDescription->setText( tr("<b><font color=#343434>no player connection") );
-		#endif
-            break;
-
-		case PlayerEvent::PlaybackPaused:
-			if (m_playerName == "Last.fm")
-				m_playerDescription->setText( tr("<b>buffering...</font>").arg( m_playerName ) );
-			else
-				m_playerDescription->setText( tr("<b>%1 <font color=#343434>is paused</font>").arg( m_playerName ) );
-			break;
-
-		case PlayerEvent::PlaybackSessionEnded:
-            m_playerDescription->clear();
-            m_playbackCommencedString.clear();
-            break;
-            
-		case PlayerEvent::PlayerConnected:
-            mediaPlayerConnected( v.toString() );
-			// fall through
-
-		case PlayerEvent::TrackStarted:
-		case PlayerEvent::PlaybackUnpaused:
-			m_playerDescription->setText( m_playbackCommencedString );
-			break;
-			
-		case PlayerEvent::TuningIn:
-		{
-			RadioStation station = v.value<RadioStation>();
-			m_playerDescription->setText( tr("<b><font color=#343434>tuning in...") );
-			m_playbackCommencedString = tr( "<b><font color=#343434>%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( station.title() );
-			break;
-		}
-
-        default:
-            break;
-    }
+MediaPlayerIndicator::onPlayerChanged( const QString& name )
+{   
+    m_playerName = name;
+    
+    m_playbackCommencedString = !name.isEmpty()
+        ? m_playbackCommencedString = PRE + tr("listening to %1").arg( "</font>" + name )
+        : "";
 }
 
 
 void
-MediaPlayerIndicator::mediaPlayerConnected( const QString& id )
-{
-    QString playerName = "Unknown";
-	
-    if( id == "foo" )
-        playerName = "Foobar";
-	
-	else if( id == "osx" || id == "itw" )
-		playerName = "iTunes";
-	
-	else if( id == "wmp" )
-		playerName = "Windows Media Player";
-	
-	else if( id == "wa2" )
-		playerName = "Winamp";
-	
-	else if( id == "ass" )
-	{
-		playerName = "Last.fm";
-		return;
-	}
+MediaPlayerIndicator::onTuningIn( const RadioStation& station )
+{  
+    m_playerDescription->setText( PRE + tr( "tuning to %1").arg( station.url() ) );
+      
+    m_playbackCommencedString = station.title().isEmpty()
+        ? "Last.fm"
+        : PRE + tr( "%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( station.title() );
+}
 
-	m_playerName = playerName;
-	m_playbackCommencedString = tr("<b><font color=#343434>listening to</font> %1").arg( m_playerName );
+
+void
+MediaPlayerIndicator::onStateChanged( State state )
+{   
+    switch (state)
+    {
+        case Stopped:
+            m_playerDescription->clear();
+            break;
+            
+        case Playing:
+            m_playerDescription->setText( m_playbackCommencedString );
+            break;
+
+        case Paused:
+            m_playerDescription->setText( "<b>" + tr("%1 is paused").arg( m_playerName + PRE ) );
+            break;
+            
+        default:
+            break;
+    }
 }

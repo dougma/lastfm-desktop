@@ -22,7 +22,7 @@
 #include "User.h"
 #include "lib/core/CoreUrl.h"
 #include "lib/ws/WsRequestBuilder.h"
-#include <QEventLoop>
+#include <QTimer>
 
 
 WsReply*
@@ -60,6 +60,11 @@ AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size 
 				 : m_size( size ),
 				   m_manager( 0 )
 {	
+    if (album.isNull()) {
+        QTimer::singleShot( 0, this, SIGNAL(finished()) );
+        return;
+    }
+    
     WsReply* reply = album.getInfo();
 	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetInfoFinished( WsReply* )) );
 }

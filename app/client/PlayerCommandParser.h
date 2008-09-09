@@ -38,13 +38,14 @@ public:
 
     enum Command
     {
+        Init,
         Start,
         Stop,
         Pause,
         Resume,
-        Bootstrap,
-        Init,
-        Term
+        Term,
+        
+        Bootstrap
     };
 
     Command command() const { return m_command; }

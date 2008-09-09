@@ -37,6 +37,8 @@
 Tuner::Tuner( const RadioStation& station )
      : m_retry_counter( 0 )
 {
+    qDebug() << "radio.tune:" << station.url();
+    
     WsReply* reply = WsRequestBuilder( "radio.tune" )
 			.add( "station", station.url() )
 			.post();

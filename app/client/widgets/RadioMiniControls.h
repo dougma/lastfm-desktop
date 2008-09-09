@@ -23,11 +23,13 @@
 namespace Phonon{ class VolumeSlider; }
 
 #include "ui_RadioMiniControls.h"
+#include "PlayerState.h"
 
 
 class RadioMiniControls : public QFrame
 {
 	Q_OBJECT
+
 public:
     RadioMiniControls();
 
@@ -38,7 +40,7 @@ public:
 	ui;
 	
 private slots:
-	void onAppEvent( int, const QVariant&);
+	void onStateChanged( State, const class Track& );
 	void onPlayClicked();
 	
 signals:

@@ -108,6 +108,10 @@ public:
     {
         return this->d == that.d;
     }
+    bool operator!=( const Track& that ) const
+    {
+        return !operator==( that );
+    }
 
     /** not a great isEmpty check, but most services will complain if these two
       * are empty */
@@ -167,10 +171,6 @@ public:
     /** Works out if passed-in track can be scrobbled and returns the 
       * status. */
     ScrobblableStatus scrobblableStatus() const;
-
-    /** Returns the second at which passed-in track reached the scrobble 
-      * point. */
-    int scrobblePoint() const;
 
     /** used to sort tracks into chronological order, used by scrobbling */
     static bool lessThan( const Track &t1, const Track &t2)

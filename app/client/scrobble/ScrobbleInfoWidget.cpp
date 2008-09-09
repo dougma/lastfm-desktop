@@ -20,7 +20,6 @@
 #include "ScrobbleInfoWidget.h"
 #include "MediaPlayerIndicator.h"
 #include "TrackInfoWidget.h"
-#include "PlayerEvent.h"
 #include "the/definitions.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/ScrobbleProgressBar.h"
@@ -54,9 +53,8 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 	
 	setMinimumHeight( sizeHint().height() );
 	
-	connect( qApp,
-			 SIGNAL(event(int, QVariant )),
- 			 SLOT(onAppEvent( int, QVariant )) );
+	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
 }
 
 
@@ -77,24 +75,28 @@ ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 }
 
 
-void
-ScrobbleInfoWidget::onAppEvent( int e, const QVariant& v )
+void 
+ScrobbleInfoWidget::onTrackSpooled( const Track& t )
 {
-	switch (e)
-	{
-		case PlayerEvent::PreparingTrack:
-		case PlayerEvent::TrackStarted:
-			ui.cover->setTrack( v.value<ObservedTrack>() );
-			break;
-			
-		case PlayerEvent::TuningIn:
-			ui.cover->clear();
+    if (!t.isNull())
+    {
+        ui.cover->setTrack( t );
+    }
+    else
+        ui.cover->clear();
+}
+
+
+void
+ScrobbleInfoWidget::onStateChanged( State s )
+{
+	switch (s)
+	{            
+        case TuningIn:
 			ui.cover->ui.spinner->show();
 			break;
-
-		case PlayerEvent::PlaybackSessionEnded:
-			ui.cover->clear();
-			ui.cover->ui.spinner->hide();
-			break;
+            
+        default:
+            break;
 	}
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,20 +20,29 @@
 #ifndef PLAYER_STATE_H
 #define PLAYER_STATE_H
 
-namespace PlayerState
+enum State
 {
-    // All states can turn into other states
-    // This is KEY, there is no implied order
-    // Do not add a state if it may have some implied dependence or order
-    // instead make an Event
-    enum Enum
-    {
-        Stopped,
-		Loading,
-        Playing,
-        Paused,
-		Stalled,
-    };
+    Stopped,
+    TuningIn,
+    Buffering,
+    Playing,
+    Paused
+};
+
+
+#include <QDebug>
+inline QDebug operator<<( QDebug d, State state )
+{
+    #define _( x ) x: return d << #x
+	switch (state)
+	{
+		case _(Stopped);
+		case _(TuningIn);
+		case _(Playing);
+        case _(Buffering);
+        case _(Paused);
+	}
+    return d;
 }
 
 #endif

@@ -18,14 +18,15 @@
  ***************************************************************************/
 
 #include "ScrobbleProgressBar.h"
-#include "PlayerEvent.h"
+#include "StopWatch.h"
+#include "lib/scrobble/ScrobblePoint.h"
+#include "lib/types/Track.h"
 #include <QtGui>
 
 
 ScrobbleProgressBar::ScrobbleProgressBar()
                    : m_scrobbleProgressTick( 0 ),
-                     m_scrobblePoint( 0 ),
-					 m_playback( false )
+                     m_scrobblePoint( 0 )
 {
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.time = new QLabel );
@@ -35,21 +36,24 @@ ScrobbleProgressBar::ScrobbleProgressBar()
 	h->setSpacing( 0 );
     setLayout( h );
 
+#ifdef Q_WS_MAC
     ui.time->setAttribute( Qt::WA_MacMiniSize );
     ui.timeToGo->setAttribute( Qt::WA_MacMiniSize );
 
-#ifdef Q_WS_MAC
 	QPalette p( Qt::white, Qt::black );
 	ui.time->setPalette( p );
 	ui.timeToGo->setPalette( p );
 #endif
-	
+
+    ui.timeToGo->setMinimumWidth( ui.time->fontMetrics().width( "00:00" ) );
+    
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
     m_progressPaintTimer = new QTimer( this );
     connect( m_progressPaintTimer, SIGNAL(timeout()), SLOT(onProgressDisplayTick()) );
 
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
+    connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
+    connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled( Track, StopWatch* )) );
 }
 
 
@@ -61,10 +65,12 @@ ScrobbleProgressBar::progressBarWidth() const
 
 
 void
-ScrobbleProgressBar::paintEvent( QPaintEvent* )
+ScrobbleProgressBar::paintEvent( QPaintEvent* e )
 {
-    if (!m_playback)
+    if (ui.timeToGo->text().isEmpty())
+    {
         return;
+    }
 
 	uint const h = height();
 	
@@ -103,12 +109,12 @@ void
 ScrobbleProgressBar::onPlaybackTick( int s )
 {
 	QTime t( 0, 0 );
-	if (s > scrobblePoint())
+	if (s > m_scrobblePoint)
 		ui.timeToGo->setText( ":)" );
 	else {
-		t = t.addSecs( scrobblePoint() );
+		t = t.addSecs( m_scrobblePoint );
 		t = t.addSecs( -s );
-		ui.timeToGo->setText( t.toString( "-mm:ss" ) );
+		ui.timeToGo->setText( t.toString( "mm:ss" ) );
 	}
 
     t = QTime( 0, 0 );
@@ -120,13 +126,13 @@ ScrobbleProgressBar::onPlaybackTick( int s )
 void
 ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
 {
-    if (!scrobblePoint() || e->oldSize().width() == e->size().width())
+    if (!m_scrobblePoint || e->oldSize().width() == e->size().width())
         return;
 
     // this is as exact as we can get it in milliseconds
     uint exactElapsedScrobbleTime = m_scrobbleProgressTick * m_progressPaintTimer->interval();
 
-    determineProgressDisplayGranularity( scrobblePoint() );
+    determineProgressDisplayGranularity( m_scrobblePoint );
 
     if (e->oldSize().width() == 0)
     {
@@ -135,7 +141,7 @@ ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
     else
     {
         double f = exactElapsedScrobbleTime;
-        f /= scrobblePoint() * 1000;
+        f /= m_scrobblePoint * 1000;
         f *= progressBarWidth();
         m_scrobbleProgressTick = ceil( f );
     }
@@ -145,50 +151,43 @@ ScrobbleProgressBar::resizeEvent( QResizeEvent* e )
 
 
 void
-ScrobbleProgressBar::onAppEvent( int e, const QVariant& v )
+ScrobbleProgressBar::onTrackSpooled( const Track& t, StopWatch* watch )
 {
-    switch (e)
+    m_scrobbleProgressTick = 0;
+    ui.time->clear();
+    ui.timeToGo->clear();
+    
+    if (t.isNull())
     {
-    case PlayerEvent::TrackStarted:
-        {
-            onPlaybackTick( 0 );
-            m_scrobbleProgressTick = 0;
-            ObservedTrack t = v.value<ObservedTrack>();
-            determineProgressDisplayGranularity( t.scrobblePoint() );
-            m_scrobblePoint = t.scrobblePoint();
-            connect( t.watch(), SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
-            connect( t.watch(), SIGNAL(destroyed()), m_progressPaintTimer, SLOT(stop()) );
-            update();
-            break;
-        }
+        m_progressPaintTimer->stop();
     }
-
-    switch (e)
-    {
-		case PlayerEvent::PlaybackSessionStarted:
-			m_playback = true;
-			break;
-		case PlayerEvent::PlaybackSessionEnded:			
-			m_playback = false;
-			break;
-			
-        case PlayerEvent::TrackStarted:
-        case PlayerEvent::PlaybackUnstalled:
-        case PlayerEvent::PlaybackUnpaused:
-            m_progressPaintTimer->start();
-            break;
-
-        case PlayerEvent::PlaybackStalled:
-        case PlayerEvent::PlaybackPaused:
-            m_progressPaintTimer->stop();
-            break;
+    else {
+        m_scrobblePoint = ScrobblePoint( watch->scrobblePoint() );
         
-        case PlayerEvent::TrackEnded:
-			m_scrobbleProgressTick = 0;
-			m_progressPaintTimer->stop();
-			ui.time->clear();
-			ui.timeToGo->clear();
-			update();
+        determineProgressDisplayGranularity( m_scrobblePoint );
+        
+        connect( watch, SIGNAL(tick( int )), SLOT(onPlaybackTick( int )) );
+        connect( watch, SIGNAL(destroyed()), m_progressPaintTimer, SLOT(stop()) );
+        connect( watch, SIGNAL(paused()), m_progressPaintTimer, SLOT(stop()) );
+        connect( watch, SIGNAL(resumed()), m_progressPaintTimer, SLOT(start()) );
+        connect( watch, SIGNAL(resumed()), SLOT(update()) );
+    }
+    
+    update();
+}
+
+
+void
+ScrobbleProgressBar::onStateChanged( State state )
+{
+    switch (state)
+    {                  
+        case Buffering:
+            if (m_scrobbleProgressTick > 0)
+                ui.timeToGo->setText( "buffering..." );
+            break;
+
+        default:
             break;
     }
 }

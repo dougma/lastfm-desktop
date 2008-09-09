@@ -49,6 +49,7 @@ public:
     Scrobbler( const ScrobblerInit& );
     ~Scrobbler();
 
+public slots:
     /** will ask Last.fm to update the now playing information for username() */
     void nowPlaying( const class Track& );
     /** will cache the track, but we won't submit it until you call submit() */
@@ -56,6 +57,7 @@ public:
     /** will submit the ScrobbleCache for this user */
     void submit();
 
+public:
     QString username() const { return m_init.username; }
 
     enum Status

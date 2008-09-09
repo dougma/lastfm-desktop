@@ -20,6 +20,7 @@
 #ifndef SCROBBLE_INFO_WIDGET_H
 #define SCROBBLE_INFO_WIDGET_H
 
+#include "PlayerState.h"
 #include <QWidget>
 #include <QAction>
 
@@ -50,7 +51,8 @@ public:
 	ui;
 	
 private slots:
-	void onAppEvent( int, const class QVariant& );
+    void onTrackSpooled( const class Track& );
+    void onStateChanged( State );
 };
 
 

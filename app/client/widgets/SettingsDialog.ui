@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
-    <height>385</height>
+    <width>530</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -189,7 +189,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="accountPage" >
       <layout class="QVBoxLayout" >
@@ -543,6 +543,22 @@
         </layout>
        </item>
        <item>
+        <widget class="QLabel" name="label" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Ignored" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Please note that tracks longer than 4 minutes will still scrobble at 4 minutes.</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -607,12 +623,6 @@
           <bool>false</bool>
          </property>
          <layout class="QVBoxLayout" >
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <property name="margin" >
-           <number>9</number>
-          </property>
           <item>
            <widget class="QRadioButton" name="automaticProxyButton" >
             <property name="text" >
@@ -675,12 +685,6 @@
              </item>
              <item row="0" column="1" >
               <layout class="QHBoxLayout" >
-               <property name="spacing" >
-                <number>6</number>
-               </property>
-               <property name="margin" >
-                <number>0</number>
-               </property>
                <item>
                 <widget class="QLineEdit" name="proxyHostEdit" >
                  <property name="enabled" >

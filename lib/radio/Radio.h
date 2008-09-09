@@ -35,6 +35,13 @@ namespace Phonon
 class QAction;
 
 
+/** 
+  * TODO this documentation must be better!
+  * NOTE on error, you may get an unexpected Stopped
+  * NOTE currently stateChanged( Prebuffering, Prebuffering ) is possible
+  * NOTE currently stateChanged( TuningIn, TuningIn ) is possible
+ */
+ 
 class RADIO_DLLEXPORT Radio : public QObject
 {
     Q_OBJECT
@@ -44,11 +51,10 @@ public:
 	
 	enum State
 	{
-		TuningIn,     /** Tuning into station() */
-		Prebuffering,
-		Playing,
-		Rebuffering,
-		Stopped
+        Stopped,
+		TuningIn,
+        Buffering,
+		Playing
 	};
 
 	/** we own these as we control whether or not they are enabled */
@@ -69,9 +75,13 @@ public slots:
     void stop();
 
 signals:
-	void stateChanged( Radio::State from, Radio::State to );
-	/** state changes are always announced first with above signal */
-	void trackStarted( const Track& );
+    /** emitted up to twice, as first time may not have a title for the station
+      * but the second time will */
+    void tuningIn( const RadioStation& );
+    void trackSpooled( const Track& ); /** and we're now prebuffering */
+    void trackStarted( const Track& );
+    void buffering( int );
+    void stopped();
 	
 	/** playback may still be occuring, so you may want to hold the error
 	  * eg. NotEnoughContent mid-track means we can't get anymore tracks after
@@ -85,10 +95,18 @@ private slots:
 	void onTunerError( Ws::Error );
 
 	/** we get a "proper" station name from the tune webservice */
-	void setStationNameIfCurrentlyBlank( const QString& s ) { m_station.setTitle( s ); }
+	void setStationNameIfCurrentlyBlank( const QString& );
 	
 private:
-	/** emits stateChanged if appropriate */
+    /** resets internals to what Stopped means, used by changeState() */
+    void clear();
+    
+    /** @returns true if successfully spooled or already spooled
+      * spooling here basically means aligning m_track and m_mediaObjects 
+      * currentSource */
+    bool spoolNextTrack();
+    
+	/** emits signals if appropriate */
 	void changeState( State );
 	
 	class Tuner* m_tuner;
@@ -109,10 +127,11 @@ inline QDebug operator<<( QDebug d, Radio::State s )
 	switch (s)
 	{
 		CASE(Radio::TuningIn);
+        CASE(Radio::Buffering);
 		CASE(Radio::Playing);
-		CASE(Radio::Rebuffering);
 		CASE(Radio::Stopped);
 	}
+    return d;
 }
 
 inline QDebug operator<<( QDebug d, Phonon::State s )
@@ -126,6 +145,7 @@ inline QDebug operator<<( QDebug d, Phonon::State s )
 		CASE(Phonon::PausedState);
 		CASE(Phonon::ErrorState);
 	}
+    return d;
 }
 #undef CASE
 

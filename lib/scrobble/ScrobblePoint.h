@@ -27,8 +27,8 @@ class ScrobblePoint
 {
     uint i;
 
-public:
-    /** j is in seconds */
+public:   
+    /** j is in seconds, and should be 50% the duration of a track */
     explicit ScrobblePoint( uint j )
     {
         // we special case 0, returning kScrobbleTimeMax because we are

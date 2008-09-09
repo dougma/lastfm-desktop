@@ -29,7 +29,7 @@
 
 
 ITunesListener::ITunesListener( uint const port, QObject* parent )
-            : m_port( port )
+            : m_port( port ), m_socket( 0 )
 {
     // you can't child QThreads to other threads, so do this instead
     connect( parent, SIGNAL(destroyed()), SLOT(deleteLater()) );
@@ -40,6 +40,11 @@ ITunesListener::ITunesListener( uint const port, QObject* parent )
 void
 ITunesListener::run()
 {
+	m_socket = new QTcpSocket;
+    m_socket->connectToHost( QHostAddress::LocalHost, m_port );	
+	m_socket->waitForConnected( 1000 );
+	transmit( "INIT c=osx&f=/Applications/iTunes.app\n" ); //FIXME path of iTunes.app
+
     setupCurrentTrack();
 
     CFNotificationCenterAddObserver( CFNotificationCenterGetDistributedCenter(), 
@@ -49,6 +54,8 @@ ITunesListener::run()
                                      NULL, 
                                      CFNotificationSuspensionBehaviorDeliverImmediately );
     exec();
+
+	delete m_socket;
 }
 
     
@@ -206,19 +213,11 @@ ITunesListener::callback( CFDictionaryRef info )
 void
 ITunesListener::transmit( const QString& data )
 {
-    QTcpSocket socket;
-    socket.connectToHost( QHostAddress::LocalHost, m_port );
-    if (socket.waitForConnected( 1000 ))
-    {
-        int bytesWritten = socket.write( data.toUtf8() );
-        socket.flush();
-        socket.waitForDisconnected( 1000 );
+	int const n = m_socket->write( data.toUtf8() );
+	m_socket->flush();
 
-        if (bytesWritten == -1)
-        {
-            qCritical() << "Sending submission through socket failed.";
-        }
-    }
+	if (n == -1)
+		qCritical() << "Sending submission through socket failed.";
 }
 
 

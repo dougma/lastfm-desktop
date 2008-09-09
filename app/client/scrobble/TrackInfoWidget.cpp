@@ -19,7 +19,6 @@
 
 #include "TrackInfoWidget.h"
 #include "ObservedTrack.h"
-#include "PlayerEvent.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QtGui>
 

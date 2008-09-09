@@ -18,7 +18,8 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include "ObservedTrack.h" //FIXME move scrobblePoint
+#include "PlayerState.h"
+#include "lib/scrobble/ScrobblePoint.h"
 
 
 class ScrobbleProgressBar : public QWidget
@@ -32,34 +33,28 @@ public:
     {
         class QLabel* time;
         class QLabel* timeToGo;
-    };
 
-    Ui ui;
+    } ui;
 
 private:
     /** progress is updated every granularity, so if showing the progress todo
-    * scrobble point, pass the scrobble point in seconds, and the granularity
-    * will be based on the width of the mainwindow and the scrobble point */
+      * scrobble point, pass the scrobble point in seconds, and the granularity
+      * will be based on the width of the mainwindow and the scrobble point */
     void determineProgressDisplayGranularity( const class ScrobblePoint& );
 
     void resizeEvent( QResizeEvent* );
     void paintEvent( QPaintEvent* );
 
     class QTimer* m_progressPaintTimer;
-
     uint m_scrobbleProgressTick;
-
-    ScrobblePoint m_scrobblePoint;
-    ScrobblePoint scrobblePoint() const { return m_scrobblePoint; }
-
 	uint progressBarWidth() const;
-
-	bool m_playback;
 	
 private slots:
+    void onTrackSpooled( const class Track&, class StopWatch* );
+    void onStateChanged( State );
     void onPlaybackTick( int );
-    void onAppEvent( int, const QVariant& );
-
-private slots:
     void onProgressDisplayTick();
+
+private:
+    ScrobblePoint m_scrobblePoint;
 };

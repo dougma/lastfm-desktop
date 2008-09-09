@@ -68,6 +68,7 @@ private:
 
     State m_state;
     QString m_previousPid;
+	class QTcpSocket* m_socket;
 };
 
 #endif

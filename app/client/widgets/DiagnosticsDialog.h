@@ -78,7 +78,7 @@ private:
 
 private slots:
     void onScrobblerStatusChanged( int );
-    void onAppEvent( int event, const QVariant& );
+    void onScrobblePointReached();
 
     void onHttpBufferSizeChanged( int bufferSize );
     void onDecodedBufferSizeChanged( int bufferSize );

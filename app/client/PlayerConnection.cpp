@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,36 +17,18 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef NOW_PLAYING_TUNER_H
-#define NOW_PLAYING_TUNER_H
-
-#include "ui_NowPlayingTuner.h"
-#include "lib/core/WeightedStringList.h"
+#include "PlayerConnection.h"
+#include <QObject>
 
 
-class NowPlayingTuner : public QWidget
+QString
+PlayerConnection::determineName()
 {
-	Q_OBJECT
-	
-public:
-	NowPlayingTuner();
-	
-private:
-	Ui::NowPlayingTuner ui;
-	
-	/** Note the QListWidget must have a StationDelegate class set as the
-	  * delegate otherwise this will break. Should probably fix this at some
-      * point. */
-	void addWeightedStringsToList( WeightedStringList stringList, QListWidget* list );
-	
-private slots:
-    void onTrackSpooled( const class Track& );
-	
-	void onFetchedTopTags( class WsReply* );
-	void onFetchedSimilarArtists( WsReply* r );
-	
-	void onTagClicked( QListWidgetItem* );
-	void onArtistClicked( QListWidgetItem* );
-};
-
-#endif
+    if (id == "osx") return "iTunes";
+    if (id == "itw") return "iTunes";
+    if (id == "foo") return "FooBar";
+    if (id == "wa2") return "Winamp";
+    if (id == "wmp") return "Windows Media Player";
+    if (id == "ass") return "Last.fm";
+    return QObject::tr( "your media player" );
+}

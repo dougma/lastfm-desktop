@@ -44,6 +44,9 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
     }
 
     m_playerId = args['c'];
+    
+    if (m_playerId.isEmpty())
+        throw Exception( "Player ID cannot be zero length" );
 
     switch (m_command)
     {

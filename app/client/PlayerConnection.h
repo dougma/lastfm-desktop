@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,36 +17,45 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef NOW_PLAYING_TUNER_H
-#define NOW_PLAYING_TUNER_H
+#ifndef PLAYER_CONNECTION_H
+#define PLAYER_CONNECTION_H
 
-#include "ui_NowPlayingTuner.h"
-#include "lib/core/WeightedStringList.h"
+#include "lib/types/Track.h"
+#include "PlayerState.h"
+#include "PlayerCommandParser.h"
 
 
-class NowPlayingTuner : public QWidget
+class PlayerConnection
 {
-	Q_OBJECT
-	
+    friend class PlayerListener;
+
+    void clear()
+    {
+        track = Track();
+        state = Stopped;
+    }    
+    
+    QString determineName();
+
 public:
-	NowPlayingTuner();
-	
-private:
-	Ui::NowPlayingTuner ui;
-	
-	/** Note the QListWidget must have a StationDelegate class set as the
-	  * delegate otherwise this will break. Should probably fix this at some
-      * point. */
-	void addWeightedStringsToList( WeightedStringList stringList, QListWidget* list );
-	
-private slots:
-    void onTrackSpooled( const class Track& );
-	
-	void onFetchedTopTags( class WsReply* );
-	void onFetchedSimilarArtists( WsReply* r );
-	
-	void onTagClicked( QListWidgetItem* );
-	void onArtistClicked( QListWidgetItem* );
+    PlayerConnection() : state( Stopped ), command( PlayerCommandParser::Init )
+    {}
+    
+    bool isValid() const
+    {
+        return !id.isEmpty();
+    }
+    
+    bool operator==( const PlayerConnection& that ) const
+    {
+        return that.id == this->id;
+    }
+    
+    State state;
+    Track track;
+    QString id;
+    QString name;
+    PlayerCommandParser::Command command;
 };
 
 #endif

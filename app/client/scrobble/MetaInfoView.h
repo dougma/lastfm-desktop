@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QWidget>
+#include "PlayerState.h"
 #include "lib/types/Track.h"
 
 
@@ -38,7 +39,7 @@ public:
     MetaInfoView();
 
 public slots:
-    void onAppEvent( int, const class QVariant& );
+    void onTrackSpooled( const Track& );
 
 private slots:
     void onLinkClicked( const class QUrl& );

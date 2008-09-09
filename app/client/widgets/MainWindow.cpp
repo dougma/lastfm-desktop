@@ -19,7 +19,6 @@
 
 #include "MainWindow.h"
 #include "App.h"
-#include "PlayerEvent.h"
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "scrobble/ScrobbleViewWidget.h"
@@ -65,67 +64,44 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
     connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
 	connect( ui.stack, SIGNAL(currentChanged( int )), SLOT(onStackIndexChanged( int )) );
+
+    connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(showNowPlaying()) );
     
     // set up window in default state
-    onAppEvent( PlayerEvent::PlaybackSessionEnded, QVariant() );
+    onTrackSpooled( Track() );
 }
 
 
 void
-MainWindow::onAppEvent( int e, const QVariant& v )
-{
-    Q_UNUSED( v ); //--warning mac
+MainWindow::onTrackSpooled( const Track& t )
+{  
+    m_track = t;
     
-    switch (e)
+    if (!t.isNull())
     {
-		case PlayerEvent::PlaybackSessionStarted:
-		{
-            if (v.toString() == "ass")
-            {
-                ui.controls->ui.play->show();
-                ui.controls->ui.skip->show();
-                ui.controls->ui.volume->show();
-            }
-		#ifndef Q_WS_MAC
-            setWindowTitle( v.value<ObservedTrack>().prettyTitle() );
-		#endif
-			break;
-		}
-
-		case PlayerEvent::PlaybackSessionEnded:
-			ui.controls->ui.play->hide();
-			ui.controls->ui.skip->hide();
-			ui.controls->ui.volume->hide();
-
-		#ifndef Q_WS_MAC
-			setWindowTitle( qApp->applicationName() );
-		#endif
-
-			break;
-
-		case PlayerEvent::TrackStarted:
-        {
-            ui.share->setEnabled( true );
-            ui.tag->setEnabled( true );
-            ui.love->setEnabled( true );
+        ui.share->setEnabled( true );
+        ui.tag->setEnabled( true );
+        ui.love->setEnabled( true );
+        
+        if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
-			break;
-        }
-
-	case PlayerEvent::TuningIn:
-		showNowPlaying();
-		break;
-			
-    case PlayerEvent::TrackEnded:
+    }
+    else {
         ui.share->setEnabled( false );
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
-		break;
     }
+        
+        
+    #ifndef Q_WS_MAC
+        setWindowTitle( t.isNull() 
+                ? qApp->applicationName()
+                : v.value<ObservedTrack>().prettyTitle() );
+    #endif
 }
 
 
@@ -231,12 +207,11 @@ MainWindow::showShareDialog()
 	// As the user requests them anyway...
 	#define PER_TRACK_DIALOG( Type ) \
 		static QPointer<Type> d; \
-		Track t = The::app().track(); \
-		if (d && d->track() == t) \
+		if (d && d->track() == m_track) \
 			d->activateWindow(); \
 		else { \
 			THROW_AWAY_DIALOG( Type ) \
-			d->setTrack( t ); \
+			d->setTrack( m_track ); \
 		}
 	
 	PER_TRACK_DIALOG( ShareDialog )

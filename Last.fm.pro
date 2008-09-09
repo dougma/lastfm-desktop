@@ -7,14 +7,14 @@ debug:macx-xcode {
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 	
-    CONFIG += mad fftw3f samplerate
+#    CONFIG += mad fftw3f samplerate
 
     include( $$ROOT_DIR/common/qmake/include.pro )
 
 	generateVersionHeader()
 	system( mv version.h app/client )
 
-    DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble lib/fingerprint
+    DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )

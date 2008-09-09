@@ -84,7 +84,7 @@ public:
 signals:
 	/** you can init a QPixmap or QImage with this
 	  * if the image download fails, you'll get a null bytearray */
-	void finished( const QByteArray& );
+	void finished( const QByteArray& = QByteArray() );
 	
 private slots:
 	void onGetInfoFinished( WsReply* );

@@ -19,6 +19,7 @@
 
 #include "PlayerListener.h"
 #include "PlayerCommandParser.h"
+#include "PlayerConnection.h"
 #include <QTcpSocket>
 
 
@@ -27,7 +28,7 @@ PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketF
 {
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );
 
-    //TODO stepping
+    //TODO port stepping?
     if (!listen( QHostAddress::LocalHost, port() ))
         throw SocketFailure( errorString() );
 }
@@ -39,67 +40,89 @@ PlayerListener::onNewConnection()
     while (hasPendingConnections())
     {
         QTcpSocket* socket = nextPendingConnection();
-
         connect( socket, SIGNAL(readyRead()), SLOT(onDataReady()) );
-        connect( socket, 
-				 SIGNAL(stateChanged( QAbstractSocket::SocketState )), 
-                 SLOT(onSocketStateChanged( QAbstractSocket::SocketState)) );
+        connect( socket, SIGNAL(disconnected()), SLOT(onDisconnection()) );
     }
 }
 
 
 void
-PlayerListener::onSocketStateChanged( QAbstractSocket::SocketState state )
+PlayerListener::onDisconnection()
 {
-    QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
+    QTcpSocket* socket = (QTcpSocket*)sender();
+ 
+    if (!m_connections.contains( socket ))
+        // already handled
+        return;
+    
+    m_connections[socket].clear();
+    m_connections[socket].command = PlayerCommandParser::Term;
+    emit playerCommand( m_connections[socket] );
 
-    if (state != QAbstractSocket::ConnectedState && m_socketMap.contains( socket ))
-    {
-        emit playerDisconnected( m_socketMap[ socket ] );
-        m_socketMap.remove( socket );
-    }
+    term( socket );
 }
 
 
 void
 PlayerListener::onDataReady()
 {
-    QTcpSocket* socket = static_cast<QTcpSocket*>( sender() );
+    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+
     while (socket->canReadLine())
     {
-        try
+		try
         {
             PlayerCommandParser parser( QString::fromUtf8( socket->readLine() ) );
-
-            switch (parser.command())
+            PlayerConnection& connection = m_connections[socket];
+            connection.command = parser.command();
+            
+            switch ((int)connection.command)
             {
-                case PlayerCommandParser::Start:
-                    emit trackStarted( parser.track() );
-                    break;
-                case PlayerCommandParser::Stop:
-                    emit playbackEnded( parser.playerId() );
-                    break;
                 case PlayerCommandParser::Pause:
-                    emit playbackPaused( parser.playerId() );
-                    break;
                 case PlayerCommandParser::Resume:
-                    emit playbackResumed( parser.playerId() );
-                    break;
-                case PlayerCommandParser::Bootstrap:
-                    emit bootstrapCompleted( parser.playerId(), parser.username() );
-                    break;
+                    if (connection.track.isNull())
+                    {
+                        qWarning() << "Cannot pause or resume null track";
+                        connection.command = PlayerCommandParser::Stop;
+                    }
+            }
+            
+            switch (connection.command)
+            {
                 case PlayerCommandParser::Init:
-                    emit playerConnected( parser.playerId() );
+                    connection.id = parser.playerId();
+                    connection.name = connection.determineName();
+                    connection.clear();
                     break;
+                    
+                case PlayerCommandParser::Start:
+                    connection.state = Playing;
+                    connection.track = parser.track();
+                    break;
+                    
+                case PlayerCommandParser::Pause:
+                    connection.state = Paused;
+                    break;
+                    
                 case PlayerCommandParser::Term:
-                    m_socketMap.remove( socket );
-                    emit playerDisconnected( parser.playerId() );
+                    term( socket );
+                    // fall through
+                case PlayerCommandParser::Stop:
+                    connection.clear();
+                    break;
+                    
+                case PlayerCommandParser::Resume:
+                    connection.state = Playing;
+                    break;
+                    
+                case PlayerCommandParser::Bootstrap:
+                    emit bootstrapCompleted( parser.playerId() );
+                    socket->write( "OK\n" );
                     break;
             }
             
-            if( parser.command() != PlayerCommandParser::Term )
-                m_socketMap[ socket ] = parser.playerId();
-
+            emit playerCommand( connection );
             socket->write( "OK\n" );
         }
         catch (PlayerCommandParser::Exception& e)
@@ -109,4 +132,12 @@ PlayerListener::onDataReady()
             socket->write( s.toUtf8() );
         }
     }
+}
+
+
+void
+PlayerListener::term( QTcpSocket* socket )
+{
+    socket->deleteLater();
+    m_connections.remove( socket );
 }

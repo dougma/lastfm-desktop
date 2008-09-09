@@ -21,13 +21,6 @@
 #include "Tuner.h"
 #include "phonon"
 
-//TODO make non singleton, the globals and statics break the pattern
-
-
-/** the only time we won't to tell the rest of the app about stop is when the
-  * stop() is called */
-static bool eat_stop = true;
-
 
 Radio::Radio( Phonon::AudioOutput* output )
 			   : m_tuner( 0 ),
@@ -44,19 +37,25 @@ Radio::Radio( Phonon::AudioOutput* output )
 void
 Radio::play( const RadioStation& station )
 {
-	m_station = station;
-	qDebug() << "Tuning to:" << station;
-	
-	m_mediaObject->blockSignals( true );
-	stop(); //don't emit stateChanged to Stopped
-	m_mediaObject->blockSignals( false );
+    if (m_state != Stopped)
+    {
+        //FIXME filthy!
+        State oldstate = m_state;
+        m_state = Stopped;    //prevents stateChanged() doing anything
+        stop();
+        clear();
+        m_state = oldstate;
+    }
 
-	changeState( TuningIn );
+	m_station = station;
+    
 	delete m_tuner;
     m_tuner = new Tuner( station );
 	connect( m_tuner, SIGNAL(stationName( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
 	connect( m_tuner, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
+
+    changeState( TuningIn );
 }
 
 
@@ -88,7 +87,7 @@ public:
 
 void
 Radio::enqueue( const QList<Track>& tracks )
-{
+{   
 	if (tracks.isEmpty()) {
 		qWarning() << "Received blank playlist, Last.fm is b0rked";
 		stop();
@@ -168,9 +167,9 @@ Radio::skip()
 void
 Radio::onTunerError( Ws::Error e )
 {
-	if (m_mediaObject->state() == Phonon::StoppedState)
-		// we left the state set to TuningIn, see skip()
-		changeState( Stopped );
+    // otherwise leave things be, we'll stop when we run out of content
+    if (m_state == TuningIn)
+		stop();
 
 	emit error( e );
 }
@@ -179,27 +178,35 @@ Radio::onTunerError( Ws::Error e )
 void
 Radio::stop()
 {
-	eat_stop = false;
-	
-	delete m_tuner;
-	m_tuner = 0;
-	
+    m_mediaObject->blockSignals( true ); //prevent the error state due to setting current source to null
 	m_mediaObject->stop();
 	m_mediaObject->clearQueue();
 	m_mediaObject->setCurrentSource( QUrl() );
-	
-	if (m_state == TuningIn)
-		changeState( Stopped );
-	
-	eat_stop = true;
+    m_mediaObject->blockSignals( false );
+
+    clear();	
+    
+    changeState( Stopped );
+}
+
+
+void
+Radio::clear()
+{
+    m_queue.clear();
+    m_track = Track();
+    m_station = RadioStation();
+    
+    delete m_tuner;
+    m_tuner = 0;    
 }
 
 
 void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
-	static uint bites = 0;
-	
+    //qDebug().nospace() << newstate << " (was" << oldstate << ')';
+    
     switch (newstate)
     {
         case Phonon::ErrorState:
@@ -217,92 +224,98 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 			// this means we are fetching new tracks still, we should show a 
 			// tuning in state;
 			if (m_mediaObject->queue().size() == 0)
-				changeState( TuningIn );
+                changeState( TuningIn );
 			break;
 			
         case Phonon::StoppedState:
-			if (eat_stop) goto eat;
-			changeState( Stopped );
+            // yeah, really, we always ignore it
+            // we handle our own stop state, and in all other cases we go
+            // to TuningIn
             break;
 			
         case Phonon::BufferingState:
-            changeState( Rebuffering );
+            changeState( Buffering );
             break;
 
 		case Phonon::PlayingState:
-			// sometimes phonon skips loading, presumably because it already
-			// finished loading because we took too long to call play()
-			// so fall through
-			
+            if (spoolNextTrack())
+                changeState( Playing );
+            break;
+
 		case Phonon::LoadingState:
-		{
-			QUrl const url = m_mediaObject->currentSource().url();
-
-			if (url == m_track.url())
-				// another bug in phonon and due to above fall through
-				goto eat;
-			
-			Track t = m_queue.take( url );
-			if (t.isNull())
-			{
-				qWarning() << "Some bug as got null track for" << url;
-				return;
-			}
-			
-			MutableTrack( t ).stamp();
-			m_track = t;
-			
-			if (m_queue.isEmpty() && m_tuner)
-				m_tuner->fetchFiveMoreTracks();
-			
-			changeState( Playing );
+            spoolNextTrack();
 			break;
-		}
     }
+}
 
-	{
-		QDebug d = qDebug() << newstate << "but was:" << oldstate;
-		if (bites) {
-			d << ("(NomNom factor:" + QByteArray::number( bites ) + ")").data();
-			bites = 0;
-		}
-	}
-	
-	return;
-	
-eat:
-	++bites;
+
+bool
+Radio::spoolNextTrack()
+{
+    QUrl const url = m_mediaObject->currentSource().url();
+    
+    if (url == m_track.url())
+        return true;
+
+    Track t = m_queue.take( url );
+    if (t.isNull())
+    {
+        qWarning() << "Cannot find track for" << url;
+        return false;
+    }
+    
+    MutableTrack( t ).stamp();
+    m_track = t;
+    
+    if (m_queue.isEmpty() && m_tuner)
+        m_tuner->fetchFiveMoreTracks();
+    
+    changeState( Buffering );
+    emit trackSpooled( m_track );
+    return true;
 }
 
 
 void
-Radio::changeState( Radio::State newstate )
+Radio::changeState( Radio::State const newstate )
 {
+	State const oldstate = m_state;
+
+    if (oldstate == newstate) 
+        return;
+
+  qDebug().nospace() << newstate << " (was " << oldstate << ')';
+     
+    m_state = newstate; // always assign state properties before you tell other
+                        // objects about it
+    
 	switch (newstate)
 	{
+        case TuningIn:
+            qDebug() << "Tuning to:" << m_station;
+            emit tuningIn( m_station );
+            break;
+            
+        case Buffering:
+            break;
+            
 		case Playing:
-			break;
+            emit trackStarted( m_track );
+            break;
 
 		case Stopped:
-			m_station = RadioStation();
-			m_track = Track();
-			// fall through
-			
-		case TuningIn:
-		case Rebuffering:
-			if (m_state == newstate)
-				return;
-			break;	
+            emit stopped();
+            break;
 	}
-	
-	State oldstate = m_state;
-	m_state = newstate; // always assign state properties before you claim a new state
-	
-	emit stateChanged( oldstate, newstate );
-	
-	if (m_state == Playing)
-	{
-		qDebug() << "Playing:" << m_track;
-		emit trackStarted( m_track );
-	}
+}
+
+
+void
+Radio::setStationNameIfCurrentlyBlank( const QString& s )
+{
+    if (m_station.title().isEmpty())
+    {
+        m_station.setTitle( s );
+        emit tuningIn( m_station );
+    }
 }

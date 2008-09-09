@@ -21,6 +21,7 @@
 #define MEDIAPLAYERINDICATOR_H
 
 #include <QWidget>
+#include "PlayerState.h"
 class QLabel;
 
 
@@ -32,14 +33,16 @@ public:
     MediaPlayerIndicator();
 	
 private slots:
-    void onAppEvent( int e, const QVariant& v );
-    void mediaPlayerConnected( const QString& id );
+    void onPlayerChanged( const QString& name );
+    void onTuningIn( const class RadioStation& );
+    void onStateChanged( State );
 	
 private:
 	QLabel* m_playerDescription;
 	QLabel* m_nowPlayingIndicator;
-	QString m_playbackCommencedString;
-	QString m_playerName;
+    
+    QString m_playerName;
+    QString m_playbackCommencedString;
 };
 
 #endif // MEDIAPLAYERINDICATOR_H

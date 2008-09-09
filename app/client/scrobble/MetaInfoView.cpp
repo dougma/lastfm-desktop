@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include "MetaInfoView.h"
-#include "PlayerEvent.h"
-#include "ObservedTrack.h"
 #include "lib/core/CoreUrl.h"
 #include <QAuthenticator>
 #include <QCoreApplication>
@@ -31,7 +29,7 @@
 
 class IPhoneWebView : public QWebView
 {
-	virtual QString userAgentForUrl( const QUrl& url ) const
+	virtual QString userAgentForUrl( const QUrl& ) const
 	{
 		return "iPhone";
 	}
@@ -53,11 +51,12 @@ MetaInfoView::MetaInfoView()
 	ui.tabs->setDrawBase( false );
 	ui.tabs->hide();
 	connect( ui.tabs, SIGNAL(currentChanged( int )), SLOT(load()) );
-	
+
+    connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    
 	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
-    connect( qApp, SIGNAL(event( int, QVariant )), SLOT(onAppEvent( int, QVariant )) );
-	connect( ui.web->page()->networkAccessManager(), 
+ 	connect( ui.web->page()->networkAccessManager(), 
 			 SIGNAL(authenticationRequired ( QNetworkReply*, QAuthenticator* )), 
 			 SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
 	
@@ -75,23 +74,17 @@ MetaInfoView::onAuthenticationRequired( QNetworkReply*, QAuthenticator* a )
 
 
 void
-MetaInfoView::onAppEvent( int e, const QVariant& d )
+MetaInfoView::onTrackSpooled( const Track& t )
 {
-    switch (e)
+    if (t.isNull())
     {
-        case PlayerEvent::PlaybackSessionStarted:
-			ui.tabs->show();
-			break;
-		
-		case PlayerEvent::TrackStarted:
-			m_track = d.value<ObservedTrack>();
-			load();
-            break;
-
-		case PlayerEvent::PlaybackSessionEnded:
-			ui.tabs->hide();
-			ui.web->load( QUrl("about:blank") ); //clear the web view
-			break;
+        ui.tabs->hide();
+        ui.web->load( QUrl("about:blank") ); //clear the web view
+    }
+    else {
+        ui.tabs->show();
+        m_track = t;
+        load();
     }
 }
 
