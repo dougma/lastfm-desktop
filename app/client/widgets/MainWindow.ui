@@ -51,20 +51,8 @@
     <addaction name="separator" />
     <addaction name="settings" />
    </widget>
-   <widget class="QMenu" name="windowMenu" >
-    <property name="title" >
-     <string>Window</string>
-    </property>
-    <addaction name="minimise" />
-    <addaction name="zoom" />
-    <addaction name="separator" />
-    <addaction name="showMainWindow" />
-    <addaction name="separator" />
-    <addaction name="bringAllToFront" />
-   </widget>
    <addaction name="account" />
    <addaction name="view" />
-   <addaction name="menuWindow" />
    <addaction name="help" />
   </widget>
   <action name="settings" >
@@ -80,54 +68,6 @@
   <action name="quit" >
    <property name="text" >
     <string>E&amp;xit</string>
-   </property>
-  </action>
-  <action name="ban" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/ban.png</normaloff>:/MainWindow/ban.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Ban</string>
-   </property>
-  </action>
-  <action name="love" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/love.png</normaloff>:/MainWindow/love.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Love</string>
-   </property>
-  </action>
-  <action name="share" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/share.png</normaloff>:/MainWindow/share.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Share</string>
-   </property>
-  </action>
-  <action name="tag" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/tag.png</normaloff>:/MainWindow/tag.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Tag</string>
    </property>
   </action>
   <action name="diagnostics" >
@@ -194,6 +134,57 @@
   <action name="bringAllToFront" >
    <property name="text" >
     <string>Bring All to Front</string>
+   </property>
+  </action>
+  <action name="tag" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/tag.png</normaloff>:/MainWindow/tag.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Tag</string>
+   </property>
+  </action>
+  <action name="share" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/share.png</normaloff>:/MainWindow/share.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Share</string>
+   </property>
+  </action>
+  <action name="love" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/love.png</normaloff>:/MainWindow/love.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Love</string>
+   </property>
+  </action>
+  <action name="ban" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="MainWindow.qrc" >
+     <normaloff>:/MainWindow/ban.png</normaloff>:/MainWindow/ban.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Ban</string>
    </property>
   </action>
  </widget>

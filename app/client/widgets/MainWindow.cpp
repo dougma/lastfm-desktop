@@ -65,7 +65,6 @@ MainWindow::MainWindow()
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
     connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
-	connect( ui.stack, SIGNAL(currentChanged( int )), SLOT(onStackIndexChanged( int )) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(showNowPlaying()) );
@@ -85,6 +84,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.share->setEnabled( true );
         ui.tag->setEnabled( true );
         ui.love->setEnabled( true );
+		ui.love->setChecked( false );
         
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
@@ -127,7 +127,6 @@ MainWindow::setupUi()
 	connect( ui.stack, SIGNAL( currentChanged( int )), ui.tabBar, SLOT( setCurrentIndex( int )));
 	
     connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
-	connect( ui.controls->ui.toggle, SIGNAL(toggled( bool )), SLOT(setTunerToggled( bool )) );
 	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
 	
 	setCentralWidget( mainWidget );
@@ -321,24 +320,6 @@ void
 MainWindow::setTunerToggled( bool const show_tuner )
 {
 	ui.stack->setCurrentIndex( show_tuner ? 1 : 0 );
-}
-
-
-void
-MainWindow::onStackIndexChanged( int const page )
-{
-	QAbstractButton* o = ui.controls->ui.toggle;
-	o->blockSignals( true ); //avoid recursively calling this function
-	o->setChecked( page == 1 );
-	o->blockSignals( false );
-	
-#ifdef Q_WS_MAC
-	switch (page)
-	{
-		case 0: setWindowTitle( "Last.fm" ); break;
-		case 1: setWindowTitle( tr("Tuner" ) ); break;	
-	}
-#endif
 }
 
 

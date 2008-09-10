@@ -35,10 +35,10 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
 	v->addSpacing( 8 );
     v->addWidget( ui.cover = new TrackInfoWidget );
-	v->addSpacing( 4 );
-    v->addWidget( ui.actionbar );
 	v->addSpacing( 12 );
     v->addWidget( ui.progress = new ScrobbleProgressBar );
+	v->addSpacing( 4 );
+    v->addWidget( ui.actionbar );
 	v->setSpacing( 0 );
 
     v->setContentsMargins( 10, 8, 10, 14 );

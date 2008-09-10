@@ -35,6 +35,15 @@ class ScrobbleViewWidget : public QWidget
 {
 public:
 	ScrobbleViewWidget( Ui::MainWindow&, QWidget* parent = 0 );
+
+private:
+	struct {
+		class ImageButton* love;
+		class ImageButton* ban;
+		class ImageButton* tag;
+		class ImageButton* share;
+		class ImageButton* cog;
+	} ui;
 };
 
 class PaintedSplitter : public QSplitter
@@ -62,6 +71,9 @@ private:
 			gradient.setStart(rect().width()/2, rect().top());
 			gradient.setFinalStop(rect().width()/2, rect().bottom());
 			
+			
+			painter.setPen( Qt::black );
+			painter.drawLine( rect().translated( 0, 2 ).topLeft(), rect().translated( 0, 2 ).topRight());
 			painter.fillRect(event->rect(), QBrush(gradient));
 			
 			painter.drawImage( (rect().width() / 2) - 7, -1, QImage( ":/splitter_handle.png" ));

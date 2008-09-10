@@ -23,20 +23,22 @@
 #include "widgets/ImageButton.h"
 #include "ui_MainWindow.h"
 
-ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& ui, QWidget* parent )
+ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent )
 				   :QWidget( parent )
 {
 
 	ScrobbleInfoWidget* w = new ScrobbleInfoWidget;
 	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
-    h->addStretch();
-    h->addWidget( new SimpleButton( ":/MainWindow/love.png", ui.love ) );
-    h->addWidget( new SimpleButton( ":/MainWindow/ban.png", ui.ban ) );
-    h->addWidget( new SimpleButton( ":/MainWindow/tag.png", ui.tag ) );
-    h->addWidget( new SimpleButton( ":/MainWindow/share.png", ui.share ) );
+
+    h->addWidget( ui.love = new ImageButton( ":/MainWindow/love.png", mainUi.love) );
+	ui.love->setCheckedIcon( QIcon( ":/MainWindow/unlove.png" ));
+	ui.love->setCheckable( true );
+	h->addWidget( ui.ban = new ImageButton( ":/MainWindow/ban.png", mainUi.ban ));
+	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/cog_button.png"));
+    h->addWidget( ui.tag = new ImageButton( ":/MainWindow/tag.png", mainUi.tag ));
+    h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));
  
-	h->setSpacing( 0 );
-    h->setMargin( 0 );
+	h->setSpacing( 40 );
 
     h->setSizeConstraint( QLayout::SetFixedSize );
 	

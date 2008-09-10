@@ -40,33 +40,6 @@
       <number>0</number>
      </property>
      <property name="sizeConstraint" >
-      <enum>QLayout::SetMaximumSize</enum>
-     </property>
-     <item>
-      <widget class="QToolButton" name="toggle" >
-       <property name="focusPolicy" >
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="text" >
-        <string/>
-       </property>
-       <property name="icon" >
-        <iconset resource="../qrc/client.qrc" >
-         <normaloff>:/station.png</normaloff>:/station.png</iconset>
-       </property>
-       <property name="checkable" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>0</number>
-     </property>
-     <property name="sizeConstraint" >
       <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>

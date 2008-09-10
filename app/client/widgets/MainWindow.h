@@ -68,7 +68,6 @@ signals:
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 	void onUserGetInfoReturn( class WsReply* );
-	void onStackIndexChanged( int );
     void onTrackSpooled( const Track& );
     
 private:

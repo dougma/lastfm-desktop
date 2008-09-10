@@ -99,7 +99,7 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
     makeElement( "playerId", playerId() );
-	makeElement( "auth", d->extras["trackauth"] );
+	makeElement( "auth", d->extras[	"trackauth"] );
 
     return item;
 }
@@ -126,17 +126,21 @@ Track::prettyTitle( const QChar& separator ) const
 QString
 Track::ratingCharacter() const
 {
-	switch (d->rating)
-	{
-		case NotScrobbled: return "";
-		case Scrobbled: return "";
-		case Skipped: return "S";
-		case Loved: return "L";
-		case Banned: return "B";
-		default:
-			Q_ASSERT_X( 0, "ratingCharacter()", "Unhandled rating enum value" );
-			return "";
-	}
+	if( d->rating & Loved )
+		return "L";
+	
+	if( d->rating & Banned )
+		return "B";
+	
+	if( d->rating & Skipped )
+		return "S";
+
+	if( d->rating & Scrobbled ||
+	    d->rating & NotScrobbled )
+		 return "";
+
+	Q_ASSERT_X( 0, "ratingCharacter()", "Unhandled rating enum value" );
+	return "";
 }
 
 

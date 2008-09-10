@@ -56,7 +56,7 @@ App::App( int argc, char** argv )
     connect( m_playerManager, SIGNAL(stopped()), SIGNAL(stopped()) );
     connect( m_playerManager, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
     connect( m_playerManager, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
-    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) );    
+    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
     
 #ifdef Q_WS_MAC
     new ITunesListener( listener->port(), this );
@@ -193,10 +193,26 @@ App::onBootstrapCompleted( const QString& playerId )
 void
 App::love()
 {
+	QAction* action = dynamic_cast<QAction*>( sender());
+
+	bool love = true;
+	if( action )
+	{
+		love = action->isChecked();
+	}
+	
 	Track t = m_playerManager->track();
-	MutableTrack( t ).upgradeRating( Track::Loved );
-	MessageBoxBuilder( m_mainWindow ).setText( "We need to set the love button to look loved or some other feedback!" ).exec();
-	t.love();
+
+	if( love )
+	{
+		MutableTrack( t ).upgradeRating( Track::Loved );
+		t.love();
+	}
+	else
+	{
+		MutableTrack( t ).downgradeRating( Track::Loved );
+		//Need t.unlove() but waiting on webservice!
+	}
 }
 
 

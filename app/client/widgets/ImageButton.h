@@ -21,6 +21,7 @@
 #include <QPaintEvent>
 #include <QLayout>
 #include <qDebug>
+#include <QAction>
 
 class ImageButton : public QPushButton
 {
@@ -30,16 +31,21 @@ public:
 	ImageButton( QWidget* parent ) : QPushButton( parent )
 	{}
 	
-	ImageButton( const QString& image, QWidget* parent = 0, char* signal = 0 ) : QPushButton( parent )
+	ImageButton( const QString& image, QAction* action = 0, QWidget* parent = 0 ) : QPushButton( parent )
 	{
-		
-		if( parent && signal )
-			connect( this, SIGNAL( clicked()), parent, signal);
+		if( action )
+		{
+			connect( this, SIGNAL(clicked()), action, SLOT( trigger()));
+			connect( action, SIGNAL(changed()), SLOT( actionChanged()));
+			setEnabled( action->isEnabled());
+			setChecked( action->isChecked());
+		}
 		
 		setIcon( QIcon( image ));
+		setIconSize( QSize(150, 150));
 	}
 	
-	void paintEvent ( QPaintEvent* event )
+	virtual void paintEvent ( QPaintEvent* event )
 	{
 		QPainter p( this );
 		
@@ -57,10 +63,24 @@ public:
 			i = icon();
 		
 		i.paint( &p, rect(), Qt::AlignCenter, state );
+
+	}
+	
+	virtual QSize sizeHint() const
+	{
+		return icon().actualSize( iconSize());
 	}
 	
 	void setCheckedIcon( const QIcon& i ){ m_checkedIcon = i; }
 	
 private:
 	QIcon m_checkedIcon;
+	
+private slots:
+	virtual void actionChanged()
+	{
+		QAction* action = static_cast<QAction*> (sender());
+		setEnabled( action->isEnabled());
+		setChecked( action->isChecked());
+	}
 };

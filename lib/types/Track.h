@@ -77,12 +77,13 @@ public:
         // you will cause broken settings and b0rked scrobbler cache submissions
 		//NOTE sorted in precedence order
 
-		NotScrobbled,
-		Scrobbled,
-        Skipped,
-        Loved,
-        Banned,
+		NotScrobbled = 0x0001,
+		Scrobbled	 = 0x0002,
+        Loved		 = 0x0004,
+        Skipped		 = 0x0008,
+        Banned		 = 0x0018,	//Implied skip
     };
+	
 
     enum ScrobblableStatus
     {
@@ -138,29 +139,18 @@ public:
     QString playerId() const { return d->playerId; }
     QString fpId() const { return d->fpId; }
 
-    bool isLoved() const { return d->rating == Loved; }
-    bool isBanned() const { return d->rating == Banned; }
+    bool isLoved() const { return d->rating & Loved; }
+    bool isBanned() const { return d->rating & Banned; }
 	bool isSkipped() const 
 	{ 
-		switch (d->rating)
-		{
-			case Skipped:
-			case Banned:
-				return true;
-			default:
-				return false;
-		}
+		d->rating & Skipped;
 	}
 	bool isScrobbled() const
 	{ 
-		switch (d->rating)
-		{
-			case Scrobbled:
-			case Loved:
-				return true;
-			default:
-				return false;
-		}
+		if( isLoved() || d->rating & Scrobbled )
+			return true;
+		else
+			return false;
 	}
 
     QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
@@ -223,7 +213,13 @@ public:
     
 	void upgradeRating( Rating r )
 	{
-		d->rating = qMax( (short)r, d->rating );
+		d->rating |= r;
+	}
+	
+	void downgradeRating( Rating r )
+	{
+		Q_ASSERT_X( r == Loved, "track rating downgrade", "Should only downgrade love" );
+		d->rating ^= r;
 	}
 	
     void stamp() { d->time = QDateTime::currentDateTime(); }

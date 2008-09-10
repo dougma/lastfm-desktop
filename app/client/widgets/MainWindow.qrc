@@ -1,10 +1,17 @@
- <!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file>MainWindow/love.png</file>
-     <file>MainWindow/ban.png</file>
-     <file>MainWindow/share.png</file>
-     <file>MainWindow/tag.png</file>
-     <file>MainWindow/skip.png</file>
-     <file>MainWindow/stop.png</file>
- </qresource>
- </RCC> 
+<RCC>
+  <qresource>
+    <file>MainWindow/unlove.png</file>
+    <file>MainWindow/ban_inactive.png</file>
+    <file>MainWindow/cog_button.png</file>
+    <file>MainWindow/cog_button_inactive.png</file>
+    <file>MainWindow/love_inactive.png</file>
+    <file>MainWindow/share_inactive.png</file>
+    <file>MainWindow/tag_inactive.png</file>
+    <file>MainWindow/skip.png</file>
+    <file>MainWindow/ban.png</file>
+    <file>MainWindow/love.png</file>
+    <file>MainWindow/share.png</file>
+    <file>MainWindow/tag.png</file>
+    <file>MainWindow/stop.png</file>
+  </qresource>
+</RCC>
