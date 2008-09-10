@@ -55,24 +55,4 @@ private slots:
     void onStateChanged( State );
 };
 
-
-#include <QLabel>
-class SimpleButton : public QLabel
-{
-	QAction* const a;
-	
-	virtual void mouseReleaseEvent( QMouseEvent* ) 
-	{
-		if (a->isEnabled()) 
-			a->activate( QAction::Trigger );
-	}
-	
-public:
-	SimpleButton( const QString& icon, QAction* action ) : a( action )
-	{
-		setPixmap( QPixmap( icon ) );
-		setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-	}
-};
-
 #endif //SCROBBLE_INFO_WIDGET_H

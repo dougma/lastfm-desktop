@@ -61,10 +61,9 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 void
 ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
-//	QLinearGradient g( 0, ui.cover->height()*5/7 + 10 /*margin*/, 0, height() );
-	QLinearGradient g( 0, height() - 300, 0, height() );
-	g.setColorAt( 0, Qt::black );
-	g.setColorAt( 1, QColor( 0x30, 0x2e, 0x2e ) );
+	QRadialGradient g( width() / 2, height(), height()/1.1f, width() / 2, 180 );
+	g.setColorAt( 1, Qt::black );
+	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
 
 	QPalette p = palette();
 	p.setBrush( QPalette::Window, g );
