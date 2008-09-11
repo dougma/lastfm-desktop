@@ -45,7 +45,9 @@ ScrobbleProgressBar::ScrobbleProgressBar()
 	ui.timeToGo->setPalette( p );
 #endif
 
-    ui.timeToGo->setMinimumWidth( ui.time->fontMetrics().width( "00:00" ) );
+    const int N = ui.time->fontMetrics().width( "00:00" );
+    ui.timeToGo->setMinimumWidth( N );
+    ui.time->setMinimumWidth( N );
     
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
 
@@ -65,7 +67,7 @@ ScrobbleProgressBar::progressBarWidth() const
 
 
 void
-ScrobbleProgressBar::paintEvent( QPaintEvent* e )
+ScrobbleProgressBar::paintEvent( QPaintEvent* )
 {
     if (ui.timeToGo->text().isEmpty())
     {
@@ -78,10 +80,11 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* e )
 	uint w = progressBarWidth();
 	
     QPainter p( this );
-    p.fillRect( x1, 0, w, h-1, QColor( 0x23, 0x23, 0x23 ) );
+    p.setBackgroundMode( Qt::TransparentMode );
+    p.fillRect( x1, 0, w, h-1, QColor( 0x3D, 0x3D, 0x3E ) );
 	
     p.setPen( QColor( 174, 174, 174 ) );
-    p.setBrush( Qt::transparent );
+    p.setBrush( Qt::NoBrush );
     for (uint x = 0, n = qMin( m_scrobbleProgressTick, progressBarWidth() - 4 ); x < n; x += 2)
 	{
 		uint const i = x+x1+2;
@@ -109,7 +112,7 @@ void
 ScrobbleProgressBar::onPlaybackTick( int s )
 {
 	QTime t( 0, 0 );
-	if (s > m_scrobblePoint)
+	if (uint(s) > m_scrobblePoint)
 		ui.timeToGo->setText( ":)" );
 	else {
 		t = t.addSecs( m_scrobblePoint );
