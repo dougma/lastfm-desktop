@@ -1,8 +1,9 @@
 
-#include "lib/core/AppleScript.h"
+#include "Growl.h"
+#include "../AppleScript.h"
+#include "../Unicornutils.h"
 #include <QCoreApplication>
 #include <QFileInfo>
-#include "common/c++/mac/getBsdProcessList.c"
 
 
 Growl::Growl( const QString& name )
@@ -13,7 +14,7 @@ Growl::Growl( const QString& name )
 void
 Growl::notify()
 {
-    if (!isProcessRunning( "GrowlHelperApp" ))
+    if (!Unicorn::isProcessRunning( "GrowlHelperApp" ))
         return;
 
     AppleScript script;
