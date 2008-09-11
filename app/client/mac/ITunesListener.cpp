@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ITunesListener.h"
-#include "lib/core/AppleScript.h"
+#include "lib/core/mac/AppleScript.h"
 #include "lib/moose/MooseCommon.h"
 #include "lib/core/UnicornUtils.h"
 #include <QTcpSocket>
