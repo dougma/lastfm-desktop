@@ -103,7 +103,7 @@ App::setMainWindow( MainWindow* window )
 {
     m_mainWindow = window;
 
-    connect( window->ui.love, SIGNAL(triggered()), SLOT(love()) );
+    connect( window->ui.love, SIGNAL(triggered( bool )), SLOT(love( bool )) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
 	connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
@@ -191,19 +191,11 @@ App::onBootstrapCompleted( const QString& playerId )
 
 
 void
-App::love()
+App::love( bool b )
 {
-	QAction* action = dynamic_cast<QAction*>( sender());
-
-	bool love = true;
-	if( action )
-	{
-		love = action->isChecked();
-	}
-	
 	Track t = m_playerManager->track();
 
-	if( love )
+	if( b )
 	{
 		MutableTrack( t ).upgradeRating( Track::Loved );
 		t.love();

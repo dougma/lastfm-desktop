@@ -61,7 +61,7 @@ public slots:
     /** currently also quits, needs fixing! */
     void logout();
 
-	void love();
+	void love( bool loveOrUnlove );
 	void ban();
 
 private slots:
