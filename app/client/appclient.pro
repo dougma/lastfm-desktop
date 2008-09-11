@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = Last.fm
 CONFIG += unicorn moose radio core ws types scrobble
-QT = core gui xml network phonon webkit
+QT = core gui xml network phonon webkit svg
 VERSION = 2.0.0
 
 include( $$ROOT_DIR/common/qmake/include.pro )

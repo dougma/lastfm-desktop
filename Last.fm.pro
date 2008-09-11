@@ -1,5 +1,5 @@
 debug:macx-xcode {
-    QT = core gui network phonon xml webkit sql
+    QT = core gui network phonon xml webkit sql svg
 
     TEMPLATE = app
     TARGET = Last.fm
@@ -7,7 +7,7 @@ debug:macx-xcode {
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 	
-#    CONFIG += mad fftw3f samplerate
+    CONFIG += mad fftw3f samplerate
 
     include( $$ROOT_DIR/common/qmake/include.pro )
 
