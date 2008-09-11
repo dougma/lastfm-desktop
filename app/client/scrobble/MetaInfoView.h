@@ -17,12 +17,12 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QWidget>
+#include <QLabel>
 #include "PlayerState.h"
 #include "lib/types/Track.h"
 
 
-class MetaInfoView : public QWidget
+class MetaInfoView : public QLabel
 {
     Q_OBJECT
 	
@@ -48,4 +48,5 @@ private slots:
 
 private:
 	virtual void resizeEvent( QResizeEvent* );
+    QString cssPath();
 };

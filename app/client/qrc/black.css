@@ -1,0 +1,19 @@
+body{
+    background: #181819 !important;
+    color:#fff !important;
+	font-size:small !important;
+	font-family:"Lucida Grande" !important;
+}
+
+#content { background:inherit !important; }
+#footer { display:none; background:inherit !important;}
+img { border:1px solid #999 !important; -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5) !important; margin: 0 1em 1em 0 !important; padding: 0 !important; }
+a { color:#4C4E51 !important; }
+
+#header { display:none; }
+#content h1 { display:none; }
+form { display:none; }
+table { display:none; }
+div.module { display:none; }
+h2 { display:none; }
+ul { display:none; }

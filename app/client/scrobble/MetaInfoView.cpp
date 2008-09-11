@@ -23,27 +23,23 @@
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QTabBar>
+#include <QTemporaryFile>
 #include <QVBoxLayout>
+#include <QWebSettings>
 #include <QWebView>
 
 
-class IPhoneWebView : public QWebView
-{
-	virtual QString userAgentForUrl( const QUrl& ) const
-	{
-		return "iPhone";
-	}
-	
-};
-
-
-MetaInfoView::MetaInfoView()
+MetaInfoView::MetaInfoView() 
+            : QLabel(tr( "Play some music\nto start scrobbling.") )
 {   
 	QVBoxLayout* v = new QVBoxLayout( this );
-	v->addWidget( ui.web = new IPhoneWebView );
+	v->addWidget( ui.web = new QWebView );
 	v->setSpacing( 0 );
 	v->setMargin( 0 );
-	
+
+    ui.web->hide();
+    ui.web->settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( cssPath() ) );
+    
 	ui.tabs = new QTabBar( ui.web );
     ui.tabs->addTab( tr( "Artist" ) );
 	ui.tabs->addTab( tr( "Album" ) );
@@ -57,11 +53,27 @@ MetaInfoView::MetaInfoView()
 	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
  	connect( ui.web->page()->networkAccessManager(), 
-			 SIGNAL(authenticationRequired ( QNetworkReply*, QAuthenticator* )), 
+			 SIGNAL(authenticationRequired( QNetworkReply*, QAuthenticator* )), 
 			 SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
 	
 	setBackgroundRole( QPalette::Base );
+    
+    QPalette p = palette();
+    p.setBrush( QPalette::Base, QColor( 0x18, 0x18, 0x19 ) );
+    p.setBrush( QPalette::Text, QColor( 0xff, 0xff, 0xff, 40 ) );
+    setPalette( p );
 
+#ifdef Q_WS_MAC
+    // large fonts look stupid on Windows
+    QFont f = font();
+    f.setBold( true );
+    f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
+    setFont( f );
+#endif
+    
+    
+    setAutoFillBackground( true );
+    setAlignment( Qt::AlignCenter );
 }
 
 
@@ -79,10 +91,12 @@ MetaInfoView::onTrackSpooled( const Track& t )
     if (t.isNull())
     {
         ui.tabs->hide();
+        ui.web->hide();
         ui.web->load( QUrl("about:blank") ); //clear the web view
     }
     else {
-        ui.tabs->show();
+        //ui.tabs->show();
+        ui.web->show();
         m_track = t;
         load();
     }
@@ -117,4 +131,19 @@ MetaInfoView::load()
 	}
 
 	ui.web->load( CoreUrl( url ).mobilised() );
+    qDebug() << url;
+}
+
+
+QString
+MetaInfoView::cssPath()
+{
+    QTemporaryFile* tmp = new QTemporaryFile( this );
+    tmp->open();
+    
+    QFile f( ":/black.css" );
+    f.open( QFile::ReadOnly );
+    QTextStream( tmp ) << f.readAll();
+    
+    return tmp->fileName();
 }
