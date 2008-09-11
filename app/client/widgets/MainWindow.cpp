@@ -35,6 +35,7 @@
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/ws/WsReply.h"
 #include <QCloseEvent>
+#include <QDesktopServices>
 #include <QShortcut>
 #include <QStackedWidget>
 #include <phonon/volumeslider.h>
@@ -71,6 +72,7 @@ MainWindow::MainWindow()
     
     // set up window in default state
     onTrackSpooled( Track() );
+    resize( 0, height() + 150 );
 }
 
 
@@ -85,6 +87,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( true );
         ui.love->setEnabled( true );
 		ui.love->setChecked( false );
+        ui.scrobbler->ui.cog->setEnabled( true );
         
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
@@ -94,6 +97,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
+        ui.scrobbler->ui.cog->setEnabled( false );
     }
         
     #ifndef Q_WS_MAC

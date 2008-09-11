@@ -20,6 +20,7 @@
 #include "TrackInfoWidget.h"
 #include "ObservedTrack.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
+#include <QSvgRenderer>
 #include <QtGui>
 
 
@@ -42,6 +43,8 @@ TrackInfoWidget::TrackInfoWidget()
 	
 	ui.spinner = new SpinnerLabel( this );
 	ui.spinner->hide();
+
+    clear();
 }
 
 
@@ -49,11 +52,23 @@ void
 TrackInfoWidget::clear()
 {
 	m_track = Track();
-	m_cover = QImage();
 	ui.text->clear();
 	ui.spinner->hide();
-	qDeleteAll( findChildren<AlbumImageFetcher*>() );
-	update();
+	qDeleteAll( findChildren<AlbumImageFetcher*>() );   
+#if 0
+    QSvgRenderer svg( QString(":/MainWindow/as.svg") );
+    QSize s = svg.defaultSize() * 5;
+    m_cover = QImage( s * 5, QImage::Format_ARGB32_Premultiplied );
+    QPainter p( &m_cover );
+    p.setOpacity( qreal(40)/255 );
+
+    svg.render( &p );
+    p.end();
+    m_cover = addReflection( m_cover );
+#else 
+    m_cover = QImage();
+#endif
+    update();
 }
 
 
@@ -115,7 +130,8 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
     g.setColorAt( 1, QColor( 0x2b, 0x2b, 0x2b ) );
     p.fillRect( rect(), g );
 
-    if (m_cover.isNull()) return;
+    if (m_cover.isNull()) 
+        return;
 
     // determine rotated height
     QTransform trans;
@@ -131,13 +147,27 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
     p.setTransform( trans * QTransform().translate( height()/2, height()/3 + 10 ) );
     p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/3 ), m_cover );
 #endif
-
-    if (m_cover.isNull()) return;
-
+    
     QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
     p.setRenderHint( QPainter::SmoothPixmapTransform );
+    
+    if (m_cover.isNull())
+    {
+        QSvgRenderer svg( QString(":/MainWindow/as.svg") );
+        QSize s = svg.defaultSize() * 5;   
+        
+        s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );
+        
+        QRect r = QRect( rect().center() - QRect( QPoint(), s ).bottomRight() / 2, s );
+        r.translate( 0, 33 );
+        
+        p.setOpacity( qreal(40)/255 );
+        svg.render( &p, r );
+        return;
+    }
+    
     QTransform trans;
     qreal const scale = qreal(height()) / m_cover.height();
     trans.scale( scale, scale );

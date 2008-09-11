@@ -35,13 +35,13 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
 	v->addSpacing( 8 );
     v->addWidget( ui.cover = new TrackInfoWidget );
-	v->addSpacing( 12 );
-    v->addWidget( ui.progress = new ScrobbleProgressBar );
 	v->addSpacing( 4 );
+    v->addWidget( ui.progress = new ScrobbleProgressBar );
+	v->addSpacing( 0 );
     v->addWidget( ui.actionbar );
 	v->setSpacing( 0 );
 
-    v->setContentsMargins( 10, 8, 10, 14 );
+    v->setContentsMargins( 10, 8, 10, 5 );
     v->setAlignment( ui.actionbar, Qt::AlignCenter );
 	
 	uint const W = ui.actionbar->sizeHint().width() + 20;
@@ -61,7 +61,7 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 void
 ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
-	QRadialGradient g( width() / 2, height(), height()/1.1f, width() / 2, 180 );
+	QRadialGradient g( width() / 2, height(), float(width()) / 1.1f, width() / 2, 180 );
 	g.setColorAt( 1, Qt::black );
 	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
 

@@ -36,7 +36,6 @@ class ScrobbleViewWidget : public QWidget
 public:
 	ScrobbleViewWidget( Ui::MainWindow&, QWidget* parent = 0 );
 
-private:
 	struct {
 		class ImageButton* love;
 		class ImageButton* ban;
@@ -45,6 +44,7 @@ private:
 		class ImageButton* cog;
 	} ui;
 };
+
 
 class PaintedSplitter : public QSplitter
 {

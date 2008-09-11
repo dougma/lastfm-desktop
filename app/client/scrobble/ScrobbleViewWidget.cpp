@@ -28,20 +28,19 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 {
 
 	ScrobbleInfoWidget* w = new ScrobbleInfoWidget;
+    
 	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
-
     h->addWidget( ui.love = new ImageButton( ":/MainWindow/love.png", mainUi.love) );
-	ui.love->setCheckedIcon( QIcon( ":/MainWindow/unlove.png" ));
-	ui.love->setCheckable( true );
 	h->addWidget( ui.ban = new ImageButton( ":/MainWindow/ban.png", mainUi.ban ));
 	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/cog_button.png"));
     h->addWidget( ui.tag = new ImageButton( ":/MainWindow/tag.png", mainUi.tag ));
-    h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));
- 
+    h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));   
 	h->setSpacing( 40 );
-
     h->setSizeConstraint( QLayout::SetFixedSize );
 	
+    ui.love->setCheckedIcon( QIcon( ":/MainWindow/unlove.png" ));
+	ui.love->setCheckable( true );
+    
 	QSplitter* s = new PaintedSplitter( Qt::Vertical );
 	s->addWidget( w );
 	s->addWidget( new MetaInfoView );
@@ -51,8 +50,6 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 	s->setHandleWidth( 14 );
 	
 	QHBoxLayout* l = new QHBoxLayout( this );
-	
-	l->setContentsMargins( 0, 0, 0, 0);
+    l->setMargin( 0 );
 	l->addWidget( s );
-	
 }

@@ -13,5 +13,6 @@
     <file>MainWindow/share.png</file>
     <file>MainWindow/tag.png</file>
     <file>MainWindow/stop.png</file>
+    <file>MainWindow/as.svg</file>
   </qresource>
 </RCC>
