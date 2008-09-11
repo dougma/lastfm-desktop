@@ -103,7 +103,7 @@ Unicorn::Application::translate()
     QString const lang_code = CoreLocale::system().code();
 
 #ifdef Q_WS_MAC
-    QDir d = SystemDir::bundle().filePath( "Contents/Resources/qm" );
+    QDir d = CoreDir::bundle().filePath( "Contents/Resources/qm" );
 #else
     QDir d = qApp->applicationDirPath() + "/i18n";
 #endif

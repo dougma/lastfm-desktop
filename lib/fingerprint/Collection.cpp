@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "Collection.h"
-#include "lib/core/StoreDir.h"
+#include "lib/core/CoreDir.h"
 
 #include <QStringList>
 #include <QFileInfo>
@@ -72,7 +72,7 @@ Collection::initDatabase()
         m_db = QSqlDatabase::addDatabase( "QSQLITE", "collection" );
 
         if ( m_dbPath.isEmpty() )
-            m_db.setDatabaseName( StoreDir::data().path() + "/collection.db" );
+            m_db.setDatabaseName( CoreDir::data().filePath( "/collection.db" ) );
         else
             m_db.setDatabaseName( m_dbPath );
     }

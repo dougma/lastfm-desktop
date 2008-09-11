@@ -41,6 +41,7 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 	v->addSpacing( 0 );
     v->addWidget( ui.actionbar );
 	v->setSpacing( 0 );
+	v->setSizeConstraint( QLayout::SetMinimumSize );
 
     v->setContentsMargins( 10, 8, 10, 5 );
     v->setAlignment( ui.actionbar, Qt::AlignCenter );

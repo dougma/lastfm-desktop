@@ -334,7 +334,7 @@ MainWindow::dragEnterEvent( QDragEnterEvent* e )
 void
 MainWindow::dropEvent( QDropEvent* e )
 {
-	QList<QUrl> urls = lastfmUrls( e->mimeData()->urls() );
+	QList<QUrl> const urls = lastfmUrls( e->mimeData()->urls() );
 	
 	if (urls.count())
 		The::app().open( urls[0] );
