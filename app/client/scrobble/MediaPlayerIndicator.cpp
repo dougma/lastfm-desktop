@@ -25,14 +25,14 @@
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QLabel>
-#define PRE "<b><font color=#343434>"
+#define PRE "<b><font color=#5B5D5F>"
 
 
 MediaPlayerIndicator::MediaPlayerIndicator()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
 	h->setMargin( 0 );
-	h->addWidget( m_nowPlayingIndicator = new QLabel( "<b>" + The::settings().username() ) );
+	h->addWidget( m_nowPlayingIndicator = new QLabel( PRE + The::settings().username() ) );
 	h->addStretch();
 	h->addWidget( m_playerDescription = new QLabel );
 
