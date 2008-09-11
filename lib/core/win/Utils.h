@@ -17,34 +17,32 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Growl.h"
-#include "AppleScript.h"
-#include "../CoreProcess.h"
-#include <QCoreApplication>
-#include <QFileInfo>
+#ifndef UNICORN_COMMON_H
+#define UNICORN_COMMON_H
+#ifdef WIN32
+
+#include "lib/DllExportMacro.h"
+#include "windows.h"
 
 
-Growl::Growl( const QString& name )
-     : m_name( name )
-{}
-
-
-void
-Growl::notify()
+namespace Utils
 {
-    if (!CoreProcess::isRunning( "GrowlHelperApp" ))
-        return;
+    /** @returns true if we're running on a limited user account */
+    CORE_DLLEXPORT bool isLimitedUser();
 
-    AppleScript script;
-    script << "tell application 'GrowlHelperApp'"
-           <<     "register as application '" + qApp->applicationName() + "'"
-                          " all notifications {'" + m_name + "'}"
-                          " default notifications {'" + m_name + "'}"
-                          " icon of application 'Last.fm.app'"
-           <<     "notify with name '" + m_name + "'"
-                          " title " + AppleScript::asUnicodeText( m_title ) +
-                          " description " + AppleScript::asUnicodeText( m_description ) + 
-                          " application name '" + qApp->applicationName() + "'"
-           << "end tell";
-    script.exec();
+    /** Function......: CreateShortcut
+      * Parameters....: lpszFileName - string that specifies a valid file name
+      *                 lpszDesc - string that specifies a description for a 
+      *                            shortcut
+      *                 lpszShortcutPath - string that specifies a path and 
+      *                                    file name of a shortcut
+      * Returns.......: S_OK on success, error code on failure
+      * Description...: Creates a Shell link object (shortcut)
+      */
+    CORE_DLLEXPORT HRESULT createShortcut( /*in*/ LPCTSTR lpszFileName, 
+                                           /*in*/ LPCTSTR lpszDesc, 
+                                           /*in*/ LPCTSTR lpszShortcutPath );
 }
+
+#endif // WIN32
+#endif // header guard

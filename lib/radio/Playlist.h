@@ -21,7 +21,7 @@
 #define PLAYLIST_H
 
 #include "lib/types/Track.h"
-#include "lib/core/UnicornException.h"
+#include "lib/core/CoreException.h"
 #include <QList>
 
 
@@ -29,7 +29,7 @@ class Playlist
 {
 public:
 	/** not documented because we are deliberately trying to upset you */
-	Playlist( class WsReply* ) throw( UnicornException );
+	Playlist( class WsReply* ) throw( CoreException );
 
 	QList<Track> tracks() const { return m_tracks; }
 	QString title() const{ return m_title; }

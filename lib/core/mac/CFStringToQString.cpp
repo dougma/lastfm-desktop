@@ -17,34 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Growl.h"
-#include "AppleScript.h"
-#include "../CoreProcess.h"
-#include <QCoreApplication>
-#include <QFileInfo>
+#include "CFStringToQString.h"
+#include <QDebug>
 
 
-Growl::Growl( const QString& name )
-     : m_name( name )
-{}
-
-
-void
-Growl::notify()
+QByteArray
+CFStringToUtf8( CFStringRef s )
 {
-    if (!CoreProcess::isRunning( "GrowlHelperApp" ))
-        return;
+    QByteArray result;
 
-    AppleScript script;
-    script << "tell application 'GrowlHelperApp'"
-           <<     "register as application '" + qApp->applicationName() + "'"
-                          " all notifications {'" + m_name + "'}"
-                          " default notifications {'" + m_name + "'}"
-                          " icon of application 'Last.fm.app'"
-           <<     "notify with name '" + m_name + "'"
-                          " title " + AppleScript::asUnicodeText( m_title ) +
-                          " description " + AppleScript::asUnicodeText( m_description ) + 
-                          " application name '" + qApp->applicationName() + "'"
-           << "end tell";
-    script.exec();
+    if (s != NULL) 
+    {
+        CFIndex length;
+        length = CFStringGetLength( s );
+        length = CFStringGetMaximumSizeForEncoding( length, kCFStringEncodingUTF8 ) + 1;
+        char* buffer = new char[length];
+
+        if (CFStringGetCString( s, buffer, length, kCFStringEncodingUTF8 ))
+            result = QByteArray( buffer );
+        else
+            qWarning() << "CFString conversion failed.";
+
+        delete[] buffer;
+    }
+
+    return result;
 }

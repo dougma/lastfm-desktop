@@ -18,34 +18,8 @@
  ***************************************************************************/
 
 #include "UnicornUtils.h"
-#include <QCoreApplication>
-#include <QCryptographicHash>
-#include <QDir>
-#include <QMap>
-#include <QUrl>
-#include <QProcess>
-#ifdef WIN32
-    #include <windows.h>
-    #include <shlobj.h>
-#endif
-
-
-QStringList
-Unicorn::sortCaseInsensitively( QStringList input )
-{
-    // This cumbersome bit of code here is how the Qt docs suggests you sort
-    // a string list case-insensitively
-    QMap<QString, QString> map;
-    foreach (QString s, input)
-        map.insert( s.toLower(), s );
-
-    QStringList output;
-    QMapIterator<QString, QString> i( map );
-    while (i.hasNext())
-        output += i.next().value();
-
-    return output;
-}
+#include <QSysInfo>
+#include <QString>
 
 
 QString
@@ -90,27 +64,4 @@ Unicorn::verbosePlatformString()
     #else
     return "Unix";
     #endif
-}
-
-
-void
-Unicorn::msleep( int ms )
-{
-  #ifdef WIN32
-    Sleep( ms );
-  #else
-    ::usleep( ms * 1000 );
-  #endif
-}
-
-
-QString
-Unicorn::runCommand( const QString& command )
-{
-    QProcess p;
-    p.start( command );
-    p.closeWriteChannel();
-    p.waitForFinished();
-
-    return QString( p.readAll() );
 }

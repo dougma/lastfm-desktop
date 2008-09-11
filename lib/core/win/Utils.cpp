@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UnicornUtils.h"
-#include "lib/core/StoreDir.h"
+#include "../CoreDir.h"
 #include <QDebug>
 #include <QFile>
 #include <QIODevice>

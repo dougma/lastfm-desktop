@@ -17,34 +17,53 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Growl.h"
-#include "AppleScript.h"
-#include "../CoreProcess.h"
-#include <QCoreApplication>
-#include <QFileInfo>
+#include "CoreProcess.h"
+#include <QProcess>
+#include <QString>
+#include <cerrno>
+
+#include "common/c++/mac/getBsdProcessList.c"
 
 
-Growl::Growl( const QString& name )
-     : m_name( name )
-{}
-
-
-void
-Growl::notify()
+bool //static
+CoreProcess::isRunning( const QString& processName )
 {
-    if (!CoreProcess::isRunning( "GrowlHelperApp" ))
-        return;
+    bool found = false;
+    
+    kinfo_proc* processList = NULL;
+    size_t processCount = 0;
 
-    AppleScript script;
-    script << "tell application 'GrowlHelperApp'"
-           <<     "register as application '" + qApp->applicationName() + "'"
-                          " all notifications {'" + m_name + "'}"
-                          " default notifications {'" + m_name + "'}"
-                          " icon of application 'Last.fm.app'"
-           <<     "notify with name '" + m_name + "'"
-                          " title " + AppleScript::asUnicodeText( m_title ) +
-                          " description " + AppleScript::asUnicodeText( m_description ) + 
-                          " application name '" + qApp->applicationName() + "'"
-           << "end tell";
-    script.exec();
+    if ( getBsdProcessList( &processList, &processCount ) )
+    {
+        return false;
+    }
+
+    uint const uid = ::getuid();
+    for ( size_t processIndex = 0; processIndex < processCount; processIndex++ )
+    {
+        if ( processList[processIndex].kp_eproc.e_pcred.p_ruid == uid )
+        {
+            if ( strcmp( processList[processIndex].kp_proc.p_comm, 
+                         processName.toLocal8Bit() ) == 0 )
+            {
+                found = true;
+                break;
+            }
+        }
+    }
+
+    free( processList );
+    return found;
+}
+
+
+QString //static
+CoreProcess::exec( const QString& command )
+{
+    QProcess p;
+    p.start( command );
+    p.closeWriteChannel();
+    p.waitForFinished();
+
+    return QString( p.readAll() );
 }

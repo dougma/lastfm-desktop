@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "StoreDir.h"
+#include "CoreDir.h"
 #include <QDebug>
 #include <QDir>
 #ifdef WIN32
@@ -31,7 +31,7 @@
 
 #ifdef Q_WS_MAC
 QDir
-SystemDir::bundle()
+CoreDir::bundle()
 {
     return QDir( qApp->applicationDirPath() ).absoluteFilePath( "../.." );
 }
@@ -39,7 +39,7 @@ SystemDir::bundle()
 
 
 QDir
-StoreDir::dataDotDot()
+CoreDir::dataDotDot()
 {
 #ifdef WIN32
     if ((QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based) == 0)
@@ -100,7 +100,7 @@ StoreDir::dataDotDot()
 
 #ifdef WIN32
 QDir
-SystemDir::programFiles()
+CoreDir::programFiles()
 {
     char path[MAX_PATH];
 

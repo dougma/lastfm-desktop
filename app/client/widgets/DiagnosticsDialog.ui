@@ -59,7 +59,7 @@
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0" >
             <size>
              <width>20</width>
              <height>2</height>
@@ -322,7 +322,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0" >
           <size>
            <width>20</width>
            <height>40</height>
@@ -342,10 +342,7 @@
        </property>
        <item>
         <layout class="QGridLayout" >
-         <property name="horizontalSpacing" >
-          <number>6</number>
-         </property>
-         <property name="verticalSpacing" >
+         <property name="spacing" >
           <number>6</number>
          </property>
          <item row="0" column="0" >
@@ -525,29 +522,12 @@
    <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QPushButton" name="copyToClipboardButton" >
-       <property name="text" >
-        <string>Copy to Clipboard</string>
-       </property>
-       <property name="shortcut" >
-        <string>Ctrl+C</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="viewLogButton" >
        <property name="text" >
-        <string>View Log</string>
+        <string>Logs</string>
        </property>
        <property name="autoDefault" >
         <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="sendLogsButton" >
-       <property name="text" >
-        <string>Send Logs</string>
        </property>
       </widget>
      </item>
@@ -559,7 +539,7 @@
        <property name="sizeType" >
         <enum>QSizePolicy::Expanding</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>0</width>
          <height>0</height>

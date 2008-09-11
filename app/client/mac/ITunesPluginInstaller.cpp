@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 #include "ITunesPluginInstaller.h"
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/mac/CFStringToQString.h"
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
+
 
 static const char* kBundleName = "AudioScrobbler.bundle";
 static const char* kPListFile = "Contents/Info.plist";
@@ -225,7 +226,7 @@ ITunesPluginInstaller::disableLegacyHelperApp()
     for ( int i = CFArrayGetCount( prefCFArrayRef ) - 1; i >= 0 ; i-- )
     {
         CFDictionaryRef dict = (CFDictionaryRef)CFArrayGetValueAtIndex( prefCFArrayRef, i );
-        QString path = Unicorn::CFStringToQString( (CFStringRef) CFDictionaryGetValue( dict, CFSTR( "Path" ) ) );
+        QString path = CFStringToQString( (CFStringRef) CFDictionaryGetValue( dict, CFSTR( "Path" ) ) );
 
         if ( path.toLower().contains( "lastfmhelper" ) )
         {

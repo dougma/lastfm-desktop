@@ -17,8 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef CORE_DOM_ELEMENT_H
+#define CORE_DOM_ELEMENT_H
+
 #include "lib/DllExportMacro.h"
-#include "UnicornException.h"
+#include "CoreException.h"
 #include <QDebug>
 #include <QDomElement>
 #include <QList>
@@ -39,11 +42,11 @@ class CORE_DLLEXPORT EasyDomElement
 	friend QDebug operator<<( QDebug, const EasyDomElement& );
 	
 public:
-    class Exception : public UnicornException
+    class Exception : public CoreException
     {
         friend class EasyDomElement;
 
-        Exception( QString s ) : UnicornException( s )
+        Exception( QString s ) : CoreException( s )
         {}
 
     public:
@@ -78,3 +81,5 @@ inline QDebug operator<<( QDebug debug, const EasyDomElement& e )
 	e.e.save( t, 2 );
 	return debug << s;
 }
+
+#endif

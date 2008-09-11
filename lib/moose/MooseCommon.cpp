@@ -21,7 +21,7 @@
 #include "MooseSettings.h"
 
 #include "lib/core/UnicornUtils.h"
-#include "lib/core/MessageBoxBuilder.h"
+#include "lib/core/QMessageBoxBuilder.h"
 
 #include <QCoreApplication>
 #include <QDir>

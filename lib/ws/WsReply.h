@@ -21,8 +21,8 @@
 #define WS_REPLY_H
 
 #include "WsError.h"
-#include "lib/core/EasyDomElement.h"
 #include "lib/DllExportMacro.h"
+#include "lib/core/CoreDomElement.h"
 #include <QNetworkReply>
 
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2007-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -14,42 +14,31 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  021you10-1301, USA.       *
  ***************************************************************************/
 
-#include "MessageBoxBuilder.h"
-#include <QApplication>
+#include <QMap>
+#include <QStringList>
 
 
-MessageBoxBuilder&
-MessageBoxBuilder::setTitle( const QString& title )
+namespace Qt
 {
-#ifdef Q_WS_MAC
-    box.setText( title + "\t\t\t" );
-#else
-    box.setWindowTitle( title );
-#endif
-    return *this;
-}
+	QStringList sort( QStringList input, Qt::CaseSensitivity s )
+	{
+		if (sensitivity = Qt::CaseSensitive)
+			return input.sort();
+		
+	    // This cumbersome bit of code here is how the Qt docs suggests you sort
+	    // a string list case-insensitively
+	    QMap<QString, QString> map;
+	    foreach (QString s, input)
+	        map.insert( s.toLower(), s );
 
+	    QStringList output;
+	    QMapIterator<QString, QString> i( map );
+	    while (i.hasNext())
+	        output += i.next().value();
 
-MessageBoxBuilder&
-MessageBoxBuilder::setText( const QString& text )
-{
-#ifdef Q_WS_MAC
-    box.setInformativeText( text );
-#else
-    box.setText( text );
-#endif
-    return *this;
-}
-
-
-int
-MessageBoxBuilder::exec()
-{
-    QApplication::setOverrideCursor( Qt::ArrowCursor );
-    int const r = box.exec();
-    QApplication::restoreOverrideCursor();
-    return r;
+	    return output;
+	}	
 }

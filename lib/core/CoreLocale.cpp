@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "CoreLocale.h"
+#include "mac/CFStringToQString.h"
 #include "UnicornUtils.h"
 #include <QStringList>
 #include <QVariant>
@@ -71,7 +72,7 @@ CoreLocale::system()
 
 		CFStringRef uxstylelangs = CFStringCreateByCombiningStrings( kCFAllocatorDefault, languages, CFSTR( ":" ) );
 
-		QString const s = Unicorn::CFStringToQString( uxstylelangs ).split( ':' ).value( 0 );
+		QString const s = CFStringToQString( uxstylelangs ).split( ':' ).value( 0 );
 		return QLocale( s ).language();
 	#else
 		return QLocale::system().language();

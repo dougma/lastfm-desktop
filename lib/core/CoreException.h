@@ -23,16 +23,16 @@
 #include <QDebug>
 
 
-class UnicornException
+class CoreException
 {
     QString s;
 
 protected:
-    UnicornException( QString x ) : s( x )
+    CoreException( QString x ) : s( x )
     {}
 	
 	// objects that may be used polymorphically must have a virtual function!
-	virtual ~UnicornException()
+	virtual ~CoreException()
 	{}
 
 public:
@@ -40,7 +40,7 @@ public:
 };
 
 
-inline QDebug operator<<( QDebug d, const UnicornException& e )
+inline QDebug operator<<( QDebug d, const CoreException& e )
 {
     return d.operator<<( e.what() );
 }

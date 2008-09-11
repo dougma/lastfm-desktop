@@ -17,15 +17,15 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef STORE_DIR_H
-#define STORE_DIR_H
+#ifndef CORE_DIR_H
+#define CORE_DIR_H
 
 #include "lib/DllExportMacro.h"
 #include <QCoreApplication>
 #include <QDir>
 
 
-namespace StoreDir
+namespace CoreDir
 {
     /** @returns the path to the top-level Application Data folder
       * XP:    C:\Documents and Settings\user\Local Settings\Application Data.
@@ -94,20 +94,17 @@ namespace StoreDir
         data().mkpath( "." );
         logs().mkpath( "." );
     }
-}
 
-
-namespace SystemDir
-{
-    #ifdef WIN32
-        /** @returns the system's equivalent of c:\Program Files\ */
-        CORE_DLLEXPORT QDir programFiles();
-    #endif
-
-    #ifdef Q_WS_MAC
-        /** eg. /Applications/Last.fm.app/ */
-        QDir bundle();
-    #endif
+    
+#ifdef WIN32
+    /** @returns the system's equivalent of c:\Program Files\ */
+    CORE_DLLEXPORT QDir programFiles();
+#endif
+    
+#ifdef Q_WS_MAC
+    /** eg. /Applications/Last.fm.app/ */
+    QDir bundle();
+#endif
 }
 
 #endif

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ScrobbleCache.h"
-#include "lib/core/StoreDir.h"
+#include "lib/core/CoreDir.h"
 #include <QFile>
 #include <QDomElement>
 #include <QDomDocument>
@@ -29,7 +29,7 @@ ScrobbleCache::ScrobbleCache( const QString& username )
 {
     Q_ASSERT( username.length() );
 
-    m_path = StoreDir::data().filePath( username + "_subs_cache.xml" );
+    m_path = CoreDir::data().filePath( username + "_subs_cache.xml" );
     m_username = username;
     read();
 }

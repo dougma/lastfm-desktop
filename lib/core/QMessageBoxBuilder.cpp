@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2007-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,34 +17,39 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Growl.h"
-#include "AppleScript.h"
-#include "../CoreProcess.h"
-#include <QCoreApplication>
-#include <QFileInfo>
+#include "QMessageBoxBuilder.h"
+#include <QApplication>
 
 
-Growl::Growl( const QString& name )
-     : m_name( name )
-{}
-
-
-void
-Growl::notify()
+MessageBoxBuilder&
+MessageBoxBuilder::setTitle( const QString& title )
 {
-    if (!CoreProcess::isRunning( "GrowlHelperApp" ))
-        return;
+#ifdef Q_WS_MAC
+    box.setText( title + "\t\t\t" );
+#else
+    box.setWindowTitle( title );
+#endif
+    return *this;
+}
 
-    AppleScript script;
-    script << "tell application 'GrowlHelperApp'"
-           <<     "register as application '" + qApp->applicationName() + "'"
-                          " all notifications {'" + m_name + "'}"
-                          " default notifications {'" + m_name + "'}"
-                          " icon of application 'Last.fm.app'"
-           <<     "notify with name '" + m_name + "'"
-                          " title " + AppleScript::asUnicodeText( m_title ) +
-                          " description " + AppleScript::asUnicodeText( m_description ) + 
-                          " application name '" + qApp->applicationName() + "'"
-           << "end tell";
-    script.exec();
+
+MessageBoxBuilder&
+MessageBoxBuilder::setText( const QString& text )
+{
+#ifdef Q_WS_MAC
+    box.setInformativeText( text );
+#else
+    box.setText( text );
+#endif
+    return *this;
+}
+
+
+int
+MessageBoxBuilder::exec()
+{
+    QApplication::setOverrideCursor( Qt::ArrowCursor );
+    int const r = box.exec();
+    QApplication::restoreOverrideCursor();
+    return r;
 }

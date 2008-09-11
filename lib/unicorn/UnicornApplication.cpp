@@ -21,8 +21,8 @@
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
 #include "common/c++/Logger.h"
-#include "lib/core/MessageBoxBuilder.h"
-#include "lib/core/StoreDir.h"
+#include "lib/core/QMessageBoxBuilder.h"
+#include "lib/core/CoreDir.h"
 #include "lib/core/UnicornUtils.h"
 #include "lib/ws/WsKeys.h"
 #include <QDebug>
@@ -44,14 +44,14 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );    
 
-    StoreDir::mkpaths();
+    CoreDir::mkpaths();
 	
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
-    QString bytes = StoreDir::mainLog();
+    QString bytes = CoreDir::mainLog();
     const wchar_t* path = bytes.utf16();
 #else
-    QByteArray bytes = StoreDir::mainLog().toLocal8Bit();
+    QByteArray bytes = CoreDir::mainLog().toLocal8Bit();
     const char* path = bytes.data();
 #endif
     m_log = new Logger( path );

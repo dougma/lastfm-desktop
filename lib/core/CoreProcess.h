@@ -17,34 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Growl.h"
-#include "AppleScript.h"
-#include "../CoreProcess.h"
-#include <QCoreApplication>
-#include <QFileInfo>
+#ifndef CORE_PROCESS_H
+#define CORE_PROCESS_H
+
+#include "lib/DllExportMacro.h"
+#include <QString>
 
 
-Growl::Growl( const QString& name )
-     : m_name( name )
-{}
-
-
-void
-Growl::notify()
+class CORE_DLLEXPORT CoreProcess
 {
-    if (!CoreProcess::isRunning( "GrowlHelperApp" ))
-        return;
+    Q_DISABLE_COPY( CoreProcess )
+	
+	CoreProcess();
+	~CoreProcess();
 
-    AppleScript script;
-    script << "tell application 'GrowlHelperApp'"
-           <<     "register as application '" + qApp->applicationName() + "'"
-                          " all notifications {'" + m_name + "'}"
-                          " default notifications {'" + m_name + "'}"
-                          " icon of application 'Last.fm.app'"
-           <<     "notify with name '" + m_name + "'"
-                          " title " + AppleScript::asUnicodeText( m_title ) +
-                          " description " + AppleScript::asUnicodeText( m_description ) + 
-                          " application name '" + qApp->applicationName() + "'"
-           << "end tell";
-    script.exec();
-}
+public:
+	/** pass, eg. iTunes.exe, is case-sensitive */
+	static bool isRunning( const QString& );
+	
+    /** Runs a shell command, waits for the process to finish then return the
+      * stdout, so yes, it hangs the GUI! */
+    static QString exec( const QString& );
+};
+
+#endif

@@ -17,79 +17,16 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_COMMON_H
-#define UNICORN_COMMON_H
+#ifndef UNICORN_UTILS_H
+#define UNICORN_UTILS_H
 
 #include "lib/DllExportMacro.h"
 #include <QString>
-#include <QLocale>
-#include <QUrl>
-
-//FIXME sucks
-#ifdef WIN32
-#include "windows.h"
-#endif
-#ifdef Q_WS_MAC
-#include <Carbon/Carbon.h>
-#endif
 
 
-/** A very arbitrary bunch of utility functions gathered from various legacy
-  * classes. Intended to be used across applications so should have no
-  * dependencies on the moose layer.
-  *
-  * @author <erik@last.fm> 
-  */
 namespace Unicorn
 {
-    /** QStringList::sort() sorts with uppercase first */
-    UNICORN_DLLEXPORT QStringList sortCaseInsensitively( QStringList input );
-
-    UNICORN_DLLEXPORT QString verbosePlatformString();
-
-    UNICORN_DLLEXPORT void msleep( int );
-    
-    /** @returns information about the system. operating system, CPU, 
-      * memory, diskspace */ //TODO not in unicorn
-    UNICORN_DLLEXPORT QString systemInformation();
-    
-    /** Runs a shell command, waits for the process to finish then return the output */
-    UNICORN_DLLEXPORT QString runCommand( const QString& );
-
-#ifdef WIN32
-    /** @returns true if we're running on a limited user account */
-    UNICORN_DLLEXPORT bool isLimitedUser();
-
-	//TODO move to PlayerManager
-    /** @returns the name of the default player. "" if not found */
-    UNICORN_DLLEXPORT QString findDefaultPlayer();
-
-    /** Function......: CreateShortcut
-      * Parameters....: lpszFileName - string that specifies a valid file name
-      *                 lpszDesc - string that specifies a description for a 
-      *                            shortcut
-      *                 lpszShortcutPath - string that specifies a path and 
-      *                                    file name of a shortcut
-      * Returns.......: S_OK on success, error code on failure
-      * Description...: Creates a Shell link object (shortcut)
-      */
-    UNICORN_DLLEXPORT HRESULT createShortcut( /*in*/ LPCTSTR lpszFileName, 
-                                              /*in*/ LPCTSTR lpszDesc, 
-                                              /*in*/ LPCTSTR lpszShortcutPath );
-#endif
-
-#ifdef Q_WS_MAC
-    QByteArray CFStringToUtf8( CFStringRef );
-    inline QString CFStringToQString( CFStringRef s )
-    {
-        return QString::fromUtf8( CFStringToUtf8( s ) );
-    }
-    bool isProcessRunning( const QString& );
-    inline bool iTunesIsOpen()
-    { 
-        return isProcessRunning( "iTunes" ); 
-    }
-#endif
+    CORE_DLLEXPORT QString verbosePlatformString();
 }
 
-#endif // header guard
+#endif

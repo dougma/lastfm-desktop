@@ -10,9 +10,10 @@ HEADERS = $$findSources( h )
 DEFINES += _CORE_DLLEXPORT
 
 !macx {
-    SOURCES -= mac/AppleScript.cpp UnicornUtils_mac.cpp mac/Growl.cpp
+    SOURCES -= mac/AppleScript.cpp mac/Growl.cpp
 	HEADERS -= mac/AppleScript.h mac/Growl.h
 }
 !win32 {
-    SOURCES -= UnicornUtils_win.cpp
+    SOURCES -= win/Utils.cpp
+	HEADERS -= win/Utils.h
 }

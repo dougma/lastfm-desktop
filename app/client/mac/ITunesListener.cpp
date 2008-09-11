@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesListener.h"
+#include "lib/core/CoreProcess.h"
 #include "lib/core/mac/AppleScript.h"
-#include "lib/moose/MooseCommon.h"
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/mac/CFStringToQString.h"
 #include <QTcpSocket>
 #include <QThread>
 #include <QHostAddress>
@@ -29,7 +29,7 @@
 
 
 ITunesListener::ITunesListener( uint const port, QObject* parent )
-            : m_port( port ), m_socket( 0 )
+              : m_port( port ), m_socket( 0 )
 {
     // you can't child QThreads to other threads, so do this instead
     connect( parent, SIGNAL(destroyed()), SLOT(deleteLater()) );
@@ -115,7 +115,7 @@ template <> QString
 ITunesDictionaryHelper::token<QString>( CFStringRef t )
 {
     CFStringRef s = token<CFStringRef>( t );
-    return Unicorn::CFStringToQString( s );
+    return CFStringToQString( s );
 }   
 
 
@@ -139,7 +139,7 @@ ITunesDictionaryHelper::determineTrackInformation()
     
     // Get path decoded - iTunes encodes the file location as URL
     CFStringRef location = token<CFStringRef>( CFSTR("Location") );
-    QUrl url = QUrl::fromEncoded( Unicorn::CFStringToUtf8( location ) );
+    QUrl url = QUrl::fromEncoded( CFStringToUtf8( location ) );
     path = url.toString().remove( "file://localhost" );
     
     static AppleScript script( "tell application \"iTunes\" to return persistent ID of current track & player position" );
@@ -246,7 +246,7 @@ ITunesListener::iTunesIsPlaying()
 void
 ITunesListener::setupCurrentTrack()
 {
-    if (!Unicorn::iTunesIsOpen() || !iTunesIsPlaying() || !isMusic())
+    if (!CoreProcess::isRunning( "iTunes" ) || !iTunesIsPlaying() || !isMusic())
         return;
     
     #define ENDL " & \"\n\" & "

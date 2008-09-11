@@ -1,0 +1,2 @@
+Files the prefix with Core are basically extensions to fundamental Qt classes.
+Otherwise they are useful to liblastfm in general.

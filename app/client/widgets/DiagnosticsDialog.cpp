@@ -23,7 +23,7 @@
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/scrobble/ScrobbleCache.h"
 #include "widgets/SendLogsDialog.h"
-#include "lib/core/StoreDir.h"
+#include "lib/core/CoreDir.h"
 #include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
@@ -122,9 +122,7 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
 
 #endif
     connect( qApp, SIGNAL(scrobblePointReached( ScrobblePoint )), SLOT(onScrobblePointReached()) );
-    connect( ui.copyToClipboardButton, SIGNAL( clicked() ), SLOT( onCopyToClipboard() ) );
     connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
-    connect( ui.sendLogsButton, SIGNAL( clicked() ), SLOT( onSendLogsClicked() ) );
 
     m_logTimer = new QTimer( this );
     connect( m_logTimer, SIGNAL(timeout()), SLOT(onLogPoll()) );
@@ -426,7 +424,7 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 
     if (!m_logFile.is_open())
     {
-        m_logFile.open( StoreDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
+        m_logFile.open( CoreDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
     }

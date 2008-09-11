@@ -58,7 +58,7 @@ Tuner::onTuneReturn( WsReply* reply )
 		m_stationName = reply->lfm()["station"]["name"].text();
 		emit stationName( m_stationName );
 	}
-	catch (UnicornException&)
+	catch (CoreException&)
 	{}
 	
 	fetchFiveMoreTracks();

@@ -22,7 +22,7 @@
 #include <QUrl>
 
 
-Playlist::Playlist( WsReply* reply ) throw( UnicornException )
+Playlist::Playlist( WsReply* reply ) throw( CoreException )
 {
 	m_title = reply->lfm()["playlist"]["title"].text();
 		

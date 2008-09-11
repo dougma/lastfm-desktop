@@ -20,8 +20,9 @@
 #include "SendLogsDialog.h"
 #include "SendLogsRequest.h"
 #include "Settings.h"
-#include "lib/core/MessageBoxBuilder.h"
-#include "lib/core/StoreDir.h"
+#include "lib/core/QMessageBoxBuilder.h"
+#include "lib/core/CoreDir.h"
+#include "lib/core/CoreProcess.h"
 #include "lib/core/UnicornUtils.h"
 #include <QDir>
 #include <QFileInfo>
@@ -138,11 +139,11 @@ static QString systemInformationString()
 
 #elif defined Q_WS_MAC
     s += "CPU and Memory: \n";
-    s += Unicorn::runCommand( "hostinfo" );
+    s += CoreProcess::exec( "hostinfo" );
     s += "\n";
 
     s += "Diskspace: \n";
-    s += Unicorn::runCommand( "df -h" );
+    s += CoreProcess::exec( "df -h" );
     s += "\n";
 
 #endif
@@ -158,7 +159,7 @@ SendLogsDialog::onSendClicked()
     connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
     connect( request, SIGNAL( error() ), SLOT( onError() ) );
 
-    QDir logDir = StoreDir::logs();
+    QDir logDir = CoreDir::logs();
     QStringList logExt( "*.log" );
         
     // find logs
