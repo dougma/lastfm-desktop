@@ -21,6 +21,7 @@
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include "PlayerState.h"
 #include "lib/types/Track.h"
+#include "widgets/Launcher.h"
 
 
 class MainWindow : public QMainWindow
@@ -34,7 +35,7 @@ public:
 	
 	struct Ui : ::Ui::MainWindow
 	{
-		class QTabBar* tabBar;
+		class Launcher* launcher;
 		class QStackedWidget* stack;
 	    class RadioMiniControls* controls;
 		class RadioWidget* tuner;
@@ -56,10 +57,6 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showMetaInfoView();
-
-	void setTunerToggled( bool );
-	void showTuner() { setTunerToggled( true ); }
-	void showNowPlaying() { setTunerToggled( false ); }
 
 signals:
 	void loved();

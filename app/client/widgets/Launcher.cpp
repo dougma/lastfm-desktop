@@ -17,43 +17,55 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SCROBBLE_INFO_WIDGET_H
-#define SCROBBLE_INFO_WIDGET_H
+#include "Launcher.h"
+#include "the/mainWindow.h"
+#include "radio/RadioWidget.h"
+#include <QPainter>
 
-#include "PlayerState.h"
-#include <QWidget>
-#include <QAction>
-
-
-class ScrobbleInfoWidget : public QWidget
+Launcher::Launcher( QWidget* parent )
+		 :QWidget( parent )
 {
-	Q_OBJECT
+	ui.setupUi( this );
+	connect( ui.radio, SIGNAL( clicked()), SLOT( onRadioToggle()));
+	ui.radio->setIcon( ":/MainWindow/radio_rest.png" );
+	ui.friends->setIcon( ":/MainWindow/friends_rest.png" );
+	ui.library->setIcon( ":/MainWindow/library_rest.png" );
 	
-public:
-	ScrobbleInfoWidget();
-	
-	virtual void resizeEvent( QResizeEvent* );
-	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
-	virtual void paintEvent( class QPaintEvent* );
-	
-	//Most of the ui should only be touched by the Widget itself
-	//however the actionbar is created by the window so it can
-	//share QActions for use in the menus etc.
-	struct 
-	{
-		friend class ScrobbleInfoWidget;
-		class QWidget* actionbar;
-	
-	private:
-		class TrackInfoWidget* cover;
-		class ScrobbleProgressBar* progress;
-		class MediaPlayerIndicator* playerIndicator;
-	} 
-	ui;
-	
-private slots:
-    void onTrackSpooled( const class Track& );
-    void onStateChanged( State );
-};
+	ui.scrobble->setCheckable( true );
+	ui.scrobble->setIcon( ":/MainWindow/scrobbling_on.png" );
+	ui.scrobble->setCheckedIcon( ":MainWindow/scrobbling_off.png" );
+}
 
-#endif //SCROBBLE_INFO_WIDGET_H
+
+void 
+Launcher::onRadioToggle()
+{
+	RadioWidget& tuner = *The::mainWindow().ui.tuner;
+	if( tuner.isVisible())
+	{
+	    tuner.hide();
+	}
+	else
+	{
+		tuner.move( The::mainWindow().pos().x() + The::mainWindow().width(), 
+					The::mainWindow().pos().y());
+	    tuner.show();
+	}
+}
+
+
+void
+Launcher::paintEvent( QPaintEvent* e )
+{
+	QLinearGradient gradient;
+	gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
+//	gradient.setColorAt( 0.5f, QColor( 16, 16, 16 ) );
+	gradient.setColorAt( 1.0f, QColor( 26, 26, 26 ));
+	
+	gradient.setStart(rect().width()/2, rect().top());
+	gradient.setFinalStop(rect().width()/2, rect().bottom());
+	
+	QPainter p( this );
+	
+	p.fillRect( rect(), gradient);
+}

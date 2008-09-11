@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,30 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef RADIO_WIDGET_H
-#define RADIO_WIDGET_H
+#ifndef LAUNCHER_H
+#define LAUNCHER_H
 
-#include <QMainWindow>
+#include <QWidget>
+#include "ui_Launcher.h"
 
-
-class RadioWidget : public QMainWindow
+class Launcher : public QWidget
 {
-    Q_OBJECT
-	
+	Q_OBJECT
 public:
-    RadioWidget( QWidget* parent = 0 );
-	
-private:
-	struct 
-	{
-		class QTabWidget* tabWidget;
-	} ui;
+	Launcher( QWidget* parent = 0 );
+
+	virtual void paintEvent( QPaintEvent* );
 	
 private slots:
-    void onTune( const class RadioStation& );
+	void onRadioToggle();
 
-public slots:
-	void addTab( QWidget*, const QString );
+protected:
+	Ui::Launcher ui;
+	
 };
 
-#endif //RADIO_WIDGET_H
+#endif //LAUNCHER_H

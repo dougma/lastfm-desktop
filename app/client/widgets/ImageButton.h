@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef IMAGE_BUTTON_H
+#define IMAGE_BUTTON_H
+
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
@@ -24,7 +27,7 @@
 #include <QAction>
 #include <QPixmap>
 #include <QIcon>
-
+#include <QString>
 
 class ImageButton : public QPushButton
 {
@@ -32,7 +35,9 @@ class ImageButton : public QPushButton
 	
 public:
 	ImageButton( QWidget* parent ) : QPushButton( parent )
-	{}
+	{
+			setIconSize( QSize(150, 150) );
+	}
 	
 	ImageButton( const QString& path, QAction* action = 0 )
 	{
@@ -51,7 +56,7 @@ public:
             QPixmap p( path );
             QIcon i( p );
             i.addPixmap( disabled, QIcon::Disabled );
-            setIcon( i );
+			setIcon( i );
         }
         
 		setIconSize( QSize(150, 150) );
@@ -61,8 +66,8 @@ public:
 	{
 		QPainter p( this );
 		
-		if( isDown() )
-			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
+//		if( isDown() )
+//			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
 		
 		QIcon::Mode state = isEnabled() ? QIcon::Normal : QIcon::Disabled;
 		
@@ -83,7 +88,23 @@ public:
 		return icon().actualSize( iconSize());
 	}
 	
+	void setIcon( const QString s )
+	{
+		QIcon icon;
+		icon.addPixmap(QPixmap(s), QIcon::Normal, QIcon::Off);
+		setIcon( icon );
+	}
+	
+	void setIcon( const QIcon i ){ QPushButton::setIcon( i ); }
+	
+	
 	void setCheckedIcon( const QIcon& i ){ m_checkedIcon = i; }
+	void setCheckedIcon( const QString& s )
+	{
+ 		QIcon icon;
+		icon.addPixmap(QPixmap(s), QIcon::Normal, QIcon::Off);
+		setCheckedIcon( icon ); 
+	}
 	
 private:
 	QIcon m_checkedIcon;
@@ -96,3 +117,5 @@ private slots:
 		setChecked( action->isChecked());
 	}
 };
+
+#endif //IMAGE_BUTTON_H

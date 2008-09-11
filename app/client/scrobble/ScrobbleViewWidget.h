@@ -68,8 +68,8 @@ private:
 			gradient.setColorAt( 0.5f, QColor( 16, 16, 16 ) );
 			gradient.setColorAt( 1.0f, Qt::black );
 			
-			gradient.setStart(rect().width()/2, rect().top());
-			gradient.setFinalStop(rect().width()/2, rect().bottom());
+			gradient.setStart(rect().width(), rect().top());
+			gradient.setFinalStop(rect().width(), rect().bottom());
 			
 			
 			painter.setPen( Qt::black );

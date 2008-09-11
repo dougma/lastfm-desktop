@@ -74,7 +74,13 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
     
     QUrl queryUrl( "http://www.last.fm/fingerprint/query/" );
     
-    #define QUERYLIST QList<QPair<QString, QString> >()
+
+	//Parameters understood by the server according to the MIR team: 
+	//{ "trackid", "recordingid", "artist", "album", "track", "duration", 
+	//  "tracknum", "username", "sha256", "ip", "fpversion", "mbid", 
+	//  "filename", "genre", "year", "samplerate", "noupdate", "fulldump" }
+	
+	#define QUERYLIST QList<QPair<QString, QString> >()
     #define QUERYITEM( X, Y ) QPair<QString, QString>( #X, Y )
     #define QUERYITEMENCODED( X, Y ) QUERYITEM( X, QUrl::toPercentEncoding( Y ))
     queryUrl.setQueryItems( QUERYLIST <<
@@ -85,12 +91,8 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
                             QUERYITEM(        mbid,          m_track.mbId() ) <<
                             QUERYITEMENCODED( filename,      QFileInfo( m_track.url().toLocalFile() ).completeBaseName() ) <<
                             QUERYITEM(        tracknum,      QString::number( m_track.trackNumber() ) ) <<
-//FIXME: don't you dare send my top secret details!
-                            QUERYITEM(        username,      "jonocole" ) <<
                             QUERYITEM(        sha256,        fingerprinter->sha256() ) <<
                             QUERYITEM(        time,          time ) <<
-                            QUERYITEM(        auth,          "911592528a4e0f60e577eb1e356659f4" ) <<
-                            QUERYITEM(        authlower,     "911592528a4e0f60e577eb1e356659f4" ) <<
                             QUERYITEMENCODED( fpversion,     QString::number( fingerprint::FingerprintExtractor::getVersion() ) ) <<
                             QUERYITEM(        fulldump,      "false" ) <<
 //FIXME: this should prolly be changed to send a fplibversion

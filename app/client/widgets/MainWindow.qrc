@@ -14,5 +14,10 @@
     <file>MainWindow/tag.png</file>
     <file>MainWindow/stop.png</file>
     <file>MainWindow/as.svg</file>
+    <file>MainWindow/radio_rest.png</file>
+    <file>MainWindow/friends_rest.png</file>
+    <file>MainWindow/library_rest.png</file>
+    <file>MainWindow/scrobbling_on.png</file>
+    <file>MainWindow/scrobbling_off.png</file>
   </qresource>
 </RCC>

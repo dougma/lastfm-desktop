@@ -121,43 +121,25 @@ MainWindow::setupUi()
     mainLayout->setSpacing( 0 );
     mainLayout->setMargin( 0 );
 	
-	mainLayout->addWidget( ui.tabBar = new QTabBar );
-    mainLayout->addWidget( ui.stack = new QStackedWidget );
+	//FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
+	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
+	//		 for now and nicely wraps the love / ban / tag / share actions together.
+	mainLayout->addWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
 	mainLayout->addWidget( ui.controls = new RadioMiniControls );
+	mainLayout->addWidget( ui.launcher = new Launcher );
 
 	ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
-	
-	connect( ui.tabBar, SIGNAL( currentChanged( int )), ui.stack, SLOT( setCurrentIndex( int )));
-	connect( ui.stack, SIGNAL( currentChanged( int )), ui.tabBar, SLOT( setCurrentIndex( int )));
 	
     connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
 	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
 	
 	setCentralWidget( mainWidget );
 
-	ui.tabBar->setDrawBase( false );
+	ui.tuner = new RadioWidget( this );
 	
-	//FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
-	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
-	//		 for now and nicely wraps the love / ban / tag / share actions together.
-	addTab( ui.scrobbler = new ScrobbleViewWidget( ui ), "Now Playing" );
-	addTab( ui.friendTuner = new FriendsTuner, "Friends" );
-	addTab( new QWidget(), "Library" );
-	addTab( ui.tuner = new RadioWidget, "Radio");
-	
-	connect( ui.friendTuner, SIGNAL( tune(RadioStation)), &The::radio(), SLOT( play( RadioStation)));
-
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif
-}
-
-
-void 
-MainWindow::addTab( QWidget* w, const QString& t )
-{
-	ui.tabBar->addTab( t );
-	ui.stack->addWidget( w );
 }
 
 
@@ -319,12 +301,6 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
     }
 }
 
-
-void
-MainWindow::setTunerToggled( bool const show_tuner )
-{
-	ui.stack->setCurrentIndex( show_tuner ? 1 : 0 );
-}
 
 
 QSize

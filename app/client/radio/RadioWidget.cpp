@@ -35,9 +35,12 @@
 #include <QTabWidget>
 
 
-RadioWidget::RadioWidget()
+RadioWidget::RadioWidget( QWidget* parent )
+			:QMainWindow( parent )
 {
-	setLayout( new QHBoxLayout );
+	QWidget* w = new QWidget( this );
+	setCentralWidget( w );
+	w->setLayout( new QHBoxLayout(this) );
 	
 	ui.tabWidget = new QTabWidget;
 	
@@ -65,7 +68,7 @@ RadioWidget::RadioWidget()
 	//		 sizing policies working right now!
 	s->setSizes( QList<int>() << 373 << 98 );
 
-	layout()->addWidget( s );
+	w->layout()->addWidget( s );
 	
     setWindowTitle( tr("Last.fm Radio") );
 
