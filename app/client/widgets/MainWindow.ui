@@ -51,8 +51,20 @@
     <addaction name="separator" />
     <addaction name="settings" />
    </widget>
+   <widget class="QMenu" name="windowMenu" >
+    <property name="title" >
+     <string>Window</string>
+    </property>
+    <addaction name="minimise" />
+    <addaction name="zoom" />
+    <addaction name="separator" />
+    <addaction name="showMainWindow" />
+    <addaction name="separator" />
+    <addaction name="bringAllToFront" />
+   </widget>
    <addaction name="account" />
    <addaction name="view" />
+   <addaction name="windowMenu" />
    <addaction name="help" />
   </widget>
   <action name="settings" >
@@ -73,6 +85,9 @@
   <action name="diagnostics" >
    <property name="text" >
     <string>Diagnostics</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="skip" >
