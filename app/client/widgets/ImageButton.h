@@ -16,12 +16,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+
 #include <QPushButton>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QLayout>
-#include <qDebug>
 #include <QAction>
+#include <QPixmap>
+#include <QIcon>
+
 
 class ImageButton : public QPushButton
 {
@@ -31,18 +34,27 @@ public:
 	ImageButton( QWidget* parent ) : QPushButton( parent )
 	{}
 	
-	ImageButton( const QString& image, QAction* action = 0, QWidget* parent = 0 ) : QPushButton( parent )
+	ImageButton( const QString& path, QAction* action = 0 )
 	{
 		if( action )
 		{
-			connect( this, SIGNAL(clicked()), action, SLOT( trigger()));
-			connect( action, SIGNAL(changed()), SLOT( actionChanged()));
-			setEnabled( action->isEnabled());
-			setChecked( action->isChecked());
+			connect( this, SIGNAL(clicked()), action, SLOT( trigger()) );
+			connect( action, SIGNAL(changed()), SLOT( actionChanged()) );
+			setEnabled( action->isEnabled() );
+			setChecked( action->isChecked() );
 		}
 		
-		setIcon( QIcon( image ));
-		setIconSize( QSize(150, 150));
+        QPixmap disabled( path.left( path.length() - 4 ) + "_inactive.png" );
+        
+        if (!disabled.isNull())
+        {
+            QPixmap p( path );
+            QIcon i( p );
+            i.addPixmap( disabled, QIcon::Disabled );
+            setIcon( i );
+        }
+        
+		setIconSize( QSize(150, 150) );
 	}
 	
 	virtual void paintEvent ( QPaintEvent* event )
