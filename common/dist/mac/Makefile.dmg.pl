@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 # Author: max@last.fm
-# Usage: Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT $$LIBS
+# Usage: export QT from your QMake project
+# Usage: export QMAKE_LIBDIR_QT from your QMake project
+# Usage: Makefile.dmg.pl $$DESTDIR $$VERSION $$LIBS
 # You must include this from within an app target qmake pro file for it to work!
 # the above usage refers to the QMAKE variables
 
@@ -9,7 +11,7 @@ use File::Basename;
 
 $DESTDIR = shift;
 $VERSION = shift;
-$QT_FRAMEWORKS_DIR = shift;
+$QT_FRAMEWORKS_DIR = $ENV{'QMAKE_LIBDIR_QT'};
 $REVISION = `svn info | grep "Last Changed Rev" | cut -d' ' -f4`;
 
 while( my $v = shift )
@@ -20,13 +22,14 @@ while( my $v = shift )
 	}
 }
 
-@QT_MODULES = ("QtCore", "QtGui", "QtWebKit", "QtXml", "QtNetwork", "QtOpenGL", "phonon");
 $plist = "\$(CONTENTS)/Info.plist";
 $root = abs_path( dirname( $0 ) . "/../../../" );
 
-foreach my $x (@QT_MODULES)
+foreach my $x (split( ' ', $ENV{'QT'} ))
 {
+    $x = 'Qt'.ucfirst( $x ) unless $x eq "phonon";
 	$bundle_frameworks .= "\$(CONTENTS)/Frameworks/$x.framework ";
+    push( @QT_MODULES, $x );
 }
 foreach my $x (@DYLIBS)
 {

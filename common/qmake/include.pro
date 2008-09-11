@@ -82,7 +82,7 @@ defineTest( generateVersionHeader ) {
 # you also need to QMAKE_EXTRA_INCLUDES += Makefile.dmg sadly
 defineReplace( generateInstallerMakefile ) {
 	macx*:!macx-xcode:release:contains( TEMPLATE, app ) {
-		system( $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION $$QMAKE_LIBDIR_QT $$LIBS > Makefile.dmg )
+		system( QT=\'$$QT\' QMAKE_LIBDIR_QT=\'$$QMAKE_LIBDIR_QT\' $$ROOT_DIR/common/dist/mac/Makefile.dmg.pl $$DESTDIR $$VERSION > Makefile.dmg )
 		return( Makefile.dmg )
 	}
 }
