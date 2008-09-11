@@ -45,19 +45,15 @@ RadioMiniControls::onStateChanged( State state, const Track& t )
 	switch (state) 
 	{
 		case Playing:
-            if (t.source() != Track::LastFmRadio)
-                return;
+            break;
+
         case TuningIn:
-            ui.play->show();
-            ui.skip->show();
-            ui.volume->show();            
+            show();
             ui.play->setChecked( true );
 			break;
 		
 		case Stopped:
-            ui.play->hide();
-            ui.skip->hide();
-            ui.volume->hide();            
+            hide();
             ui.play->setChecked( false );
 			break;
             
