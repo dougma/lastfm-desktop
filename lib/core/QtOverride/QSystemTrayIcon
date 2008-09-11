@@ -1,3 +1,0 @@
-// We have a separate QSystemTrayIcon.h to work around a bug in QMake that
-// generated bad Makefiles, bug found Qt-4.4.0 by Max
-#include "./QSystemTrayIcon.h"

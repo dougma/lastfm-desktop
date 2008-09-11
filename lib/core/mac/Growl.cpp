@@ -1,6 +1,6 @@
 
 #include "Growl.h"
-#include "../AppleScript.h"
+#include "AppleScript.h"
 #include "../Unicornutils.h"
 #include <QCoreApplication>
 #include <QFileInfo>
