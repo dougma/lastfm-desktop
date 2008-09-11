@@ -91,4 +91,42 @@ inline QDebug operator<<( QDebug d, WsReply* r )
 			 << r->data().trimmed();
 }
 
+
+inline QDebug operator<<( QDebug d, QNetworkReply::NetworkError e )
+{    
+#define CASE( x ) case x: return d << #x;
+    
+    switch (e)
+    {
+            CASE( QNetworkReply::NoError )
+            CASE( QNetworkReply::ConnectionRefusedError )
+            CASE( QNetworkReply::RemoteHostClosedError )
+            CASE( QNetworkReply::HostNotFoundError )
+            CASE( QNetworkReply::TimeoutError )
+            CASE( QNetworkReply::OperationCanceledError )
+            CASE( QNetworkReply::SslHandshakeFailedError )
+            CASE( QNetworkReply::ProxyConnectionRefusedError )
+            CASE( QNetworkReply::ProxyConnectionClosedError )
+            CASE( QNetworkReply::ProxyNotFoundError )
+            CASE( QNetworkReply::ProxyTimeoutError )
+            CASE( QNetworkReply::ProxyAuthenticationRequiredError )
+            CASE( QNetworkReply::ContentAccessDenied )
+            CASE( QNetworkReply::ContentOperationNotPermittedError )
+            CASE( QNetworkReply::ContentNotFoundError )
+            CASE( QNetworkReply::AuthenticationRequiredError )
+            CASE( QNetworkReply::ProtocolUnknownError )
+            CASE( QNetworkReply::ProtocolInvalidOperationError )
+            CASE( QNetworkReply::UnknownNetworkError )
+            CASE( QNetworkReply::UnknownProxyError )
+            CASE( QNetworkReply::UnknownContentError )
+            CASE( QNetworkReply::ProtocolFailure )
+            
+        default:
+            return d << "Unknown error";
+    }
+    
+#undef CASE
+}
+
+
 #endif

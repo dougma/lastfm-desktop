@@ -90,7 +90,7 @@ WsReply::onFinished()
             case QNetworkReply::UnknownContentError:
             case QNetworkReply::ProtocolInvalidOperationError:
             case QNetworkReply::ProtocolFailure:
-                qDebug() << networkErrorString( m_reply->error() );
+                qDebug() << m_reply->error();
                 throw Ws::TryAgainLater;
 
             case QNetworkReply::HostNotFoundError:
@@ -137,47 +137,6 @@ WsReply::onFinished()
 
     // prevents memory leaks, but I don't like it anyway
     deleteLater();
-}
-
-
-QString 
-WsReply::networkErrorString( QNetworkReply::NetworkError e )
-{
-    // I didn't translate these because, they are more useful to us, and they 
-    // are easy to google. Hate me if you must --mxcl
-
-    #define CASE( x ) case x: return #x;
-
-    switch (e)
-    {
-        CASE( QNetworkReply::NoError )
-        CASE( QNetworkReply::ConnectionRefusedError )
-        CASE( QNetworkReply::RemoteHostClosedError )
-        CASE( QNetworkReply::HostNotFoundError )
-        CASE( QNetworkReply::TimeoutError )
-        CASE( QNetworkReply::OperationCanceledError )
-        CASE( QNetworkReply::SslHandshakeFailedError )
-        CASE( QNetworkReply::ProxyConnectionRefusedError )
-        CASE( QNetworkReply::ProxyConnectionClosedError )
-        CASE( QNetworkReply::ProxyNotFoundError )
-        CASE( QNetworkReply::ProxyTimeoutError )
-        CASE( QNetworkReply::ProxyAuthenticationRequiredError )
-        CASE( QNetworkReply::ContentAccessDenied )
-        CASE( QNetworkReply::ContentOperationNotPermittedError )
-        CASE( QNetworkReply::ContentNotFoundError )
-        CASE( QNetworkReply::AuthenticationRequiredError )
-        CASE( QNetworkReply::ProtocolUnknownError )
-        CASE( QNetworkReply::ProtocolInvalidOperationError )
-        CASE( QNetworkReply::UnknownNetworkError )
-        CASE( QNetworkReply::UnknownProxyError )
-        CASE( QNetworkReply::UnknownContentError )
-        CASE( QNetworkReply::ProtocolFailure )
-    
-        default:
-            return "Unknown error";
-    }
-
-    #undef CASE
 }
 
 
