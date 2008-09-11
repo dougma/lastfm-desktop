@@ -141,17 +141,8 @@ public:
 
     bool isLoved() const { return d->rating & Loved; }
     bool isBanned() const { return d->rating & Banned; }
-	bool isSkipped() const 
-	{ 
-		d->rating & Skipped;
-	}
-	bool isScrobbled() const
-	{ 
-		if( isLoved() || d->rating & Scrobbled )
-			return true;
-		else
-			return false;
-	}
+	bool isSkipped() const { return d->rating & Skipped; }
+	bool isScrobbled() const { return isLoved() || d->rating & Scrobbled; }
 
     QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
 
