@@ -126,18 +126,12 @@ Track::prettyTitle( const QChar& separator ) const
 QString
 Track::ratingCharacter() const
 {
-	if( d->rating & Loved )
-		return "L";
-	
-	if( d->rating & Banned )
-		return "B";
-	
-	if( d->rating & Skipped )
-		return "S";
-
-	if( d->rating & Scrobbled ||
-	    d->rating & NotScrobbled )
-		 return "";
+	// handled in priority order
+	if( d->rating & Banned ) return "B"; //banning takes priority, as it implies a skip, so unbanning is impossible
+	if( d->rating & Loved ) return "L";
+	if( d->rating & Scrobbled ) return "";
+	if( d->rating & Skipped ) return "S"; //if we skip after the scrobble point, ignore the skip
+	if( d->rating & NotScrobbled ) return "";
 
 	Q_ASSERT_X( 0, "ratingCharacter()", "Unhandled rating enum value" );
 	return "";

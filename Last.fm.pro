@@ -47,8 +47,10 @@ else {
 			   app/client/appclient.pro
 
 	# make the app client the default project in visual studio
-	!contains( CONFIG, release ):win32 {
+	win32:CONFIG( debug, debug|release ) {
 		SUBDIRS -= app/client/appclient.pro
 		SUBDIRS = app/client/appclient.pro $$SUBDIRS
 	}
+	
+	win32:SUBDIRS -= lib/fingerprint/libfingerprint.pro
 }

@@ -111,6 +111,7 @@ App::setMainWindow( MainWindow* window )
     m_trayIcon->show();
 
     QMenu* menu = new QMenu;
+	menu->addAction( tr( "Open" ), window, SLOT(show()) );
     menu->addAction( window->ui.quit );
     m_trayIcon->setContextMenu( menu );
     connect( m_trayIcon, 

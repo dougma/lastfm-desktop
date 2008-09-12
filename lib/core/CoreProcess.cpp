@@ -19,11 +19,10 @@
 
 #include "CoreProcess.h"
 #include <QProcess>
-#include <QString>
-#include <cerrno>
 
+#ifdef Q_WS_MAC
 #include "common/c++/mac/getBsdProcessList.c"
-
+#include <cerrno>
 
 bool //static
 CoreProcess::isRunning( const QString& processName )
@@ -55,6 +54,7 @@ CoreProcess::isRunning( const QString& processName )
     free( processList );
     return found;
 }
+#endif
 
 
 QString //static

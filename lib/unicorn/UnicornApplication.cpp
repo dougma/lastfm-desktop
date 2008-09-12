@@ -45,6 +45,9 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     QCoreApplication::setOrganizationDomain( "last.fm" );    
 
     CoreDir::mkpaths();
+
+	qDebug() << "test";
+	qDebug() << CoreDir::mainLog();
 	
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
@@ -141,37 +144,23 @@ Unicorn::Application::~Application()
 void
 Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
 {
-    Logger::Severity level;
-    switch (type)
-    {
-        case QtDebugMsg: 
-            level = Logger::Debug; 
-            break;
-        case QtWarningMsg: 
-            level = Logger::Warning; 
-            break;
-        case QtFatalMsg:
-        case QtCriticalMsg: 
-            level = Logger::Critical; 
-            break;
-        default:
-            level = Logger::Info;
-            break;
-    }
-
     Logger::the().log( msg );
 
 	// it crashes on mac if you call arguments()! Qt 4.4.1 --mxcl	
-#ifndef Q_WS_MAC && defined NDEBUG
+#ifndef Q_WS_MAC
+#ifdef NDEBUG
 	#if QT_VERSION > 0x00040401
 		#error check if the next bit works yet
 	#endif
-    if (arguments().contains( "--debug" ))
+	if (arguments().contains( "--debug" ))
 #endif
+#endif
+	{
 #ifdef WIN32
-        qWinMsgHandler( type, msg );
+		qWinMsgHandler( type, msg );
 #else
-        fprintf( stderr, "%s\n", msg );
+		fprintf( stderr, "%s\n", msg );
         fflush( stderr );
 #endif
+	}
 }

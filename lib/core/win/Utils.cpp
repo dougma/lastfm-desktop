@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornUtils.h"
+#include "Utils.h"
 #include "../CoreDir.h"
 #include <QDebug>
 #include <QFile>
@@ -33,10 +33,10 @@ using std::vector;
 
 
 bool
-Unicorn::isLimitedUser()
+Utils::isLimitedUser()
 {
     // If we can write to Program Files we aren't limited
-    QFile f( SystemDir::programFiles().filePath( "dummy" ) );
+    QFile f( CoreDir::programFiles().filePath( "dummy" ) );
     if (!f.open( QIODevice::WriteOnly ))
     {
         qWarning() << "Couldn't open test file, it's a limited user";
@@ -52,7 +52,7 @@ Unicorn::isLimitedUser()
 
 #if 0
 QString
-Unicorn::findDefaultPlayer()
+Utils::findDefaultPlayer()
 {
     // Get mp3 progID
     QSettings regKey( "HKEY_LOCAL_MACHINE\\Software\\Classes\\.mp3", QSettings::NativeFormat );
@@ -75,7 +75,7 @@ Unicorn::findDefaultPlayer()
 
 
 HRESULT
-Unicorn::createShortcut( LPCTSTR lpszFileName, 
+Utils::createShortcut( LPCTSTR lpszFileName, 
                 LPCTSTR lpszDesc, 
                 LPCTSTR lpszShortcutPath )
 {

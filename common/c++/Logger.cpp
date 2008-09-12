@@ -78,7 +78,12 @@ Logger::Logger( const LOGGER_CHAR* path, Severity severity )
 
     if (!mFileOut)
     {
-        cerr << "Could not open log file" << path;
+	#ifdef WIN32
+		OutputDebugStringA( "Could not open log file:" );
+		OutputDebugStringW( path );
+	#else
+		cerr << "Could not open log file" << path;
+	#endif
         return;
     }
 

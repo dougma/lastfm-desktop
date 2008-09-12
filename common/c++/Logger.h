@@ -57,7 +57,7 @@ public:
     void log( Severity level, const std::string& message, const char* function, int line );
     void log( Severity level, const std::wstring& message, const char* function, int line );
 
-    /** time stamps message and writes to the log file */
+    /** plain write + flush */
     void log( const char* message );
 
 private:

@@ -95,6 +95,7 @@ private:
 	{
 		switch (m_size)
 		{
+			default:
 			case Album::Small:return"small";
 			case Album::Medium:return"medium";
 			case Album::Large:return"large";

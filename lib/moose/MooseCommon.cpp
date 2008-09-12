@@ -32,6 +32,10 @@
 #include <QProcess>
 #include <QTcpSocket>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 
 #if 0
 QString

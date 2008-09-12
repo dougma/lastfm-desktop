@@ -32,8 +32,10 @@ win32 {
 	root = $$system( cygpath -m '$$ROOT_DIR' )
 	qt = $$system( cygpath -m '$$QMAKE_LIBDIR_QT\\..' )
 
+	LONG_VERSION = $$VERSION-$$system( sh $$ROOT_DIR/common/bash/svn_revision.sh )
+	
 	system( cp win/client.iss.in client.iss )
-	system( perl -pi -e       's!\@VERSION\@!$$VERSION!g' client.iss )
+	system( perl -pi -e       's!\@VERSION\@!$$LONG_VERSION!g' client.iss )
 	system( perl -pi -e 's!\@SHORT_VERSION\@!$$VERSION!g' client.iss )
 	system( perl -pi -e      's!\@ROOT_DIR\@!$$root!g' client.iss )
 	system( perl -pi -e        's!\@QT_DIR\@!$$qt!g' client.iss )
