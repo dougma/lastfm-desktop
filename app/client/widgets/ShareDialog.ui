@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>324</width>
-    <height>304</height>
+    <height>314</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -35,7 +35,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout" >
      <property name="spacing" >
-      <number>-1</number>
+      <number>8</number>
      </property>
      <property name="leftMargin" >
       <number>9</number>
@@ -54,16 +54,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="album" >
+      <widget class="QRadioButton" name="artist" >
        <property name="text" >
-        <string>Album</string>
+        <string>Artist</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="artist" >
+      <widget class="QRadioButton" name="album" >
        <property name="text" >
-        <string>Artist</string>
+        <string>Album</string>
        </property>
       </widget>
      </item>

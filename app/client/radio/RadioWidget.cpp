@@ -22,8 +22,9 @@
 #include "FriendsTuner.h"
 #include "MyTagsTuner.h"
 #include "NeighboursTuner.h"
-#include "the/radio.h"
 #include "MyStations.h"
+#include "widgets/RadioMiniControls.h"
+#include "the/radio.h"
 #include <QAction>
 #include <QEvent>
 #include <QLabel>
@@ -33,14 +34,13 @@
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QTabWidget>
+#include <phonon/volumeslider.h>
 
 
 RadioWidget::RadioWidget( QWidget* parent )
-			:QMainWindow( parent )
+		   : QMainWindow( parent )
 {
-	QWidget* w = new QWidget( this );
-	setCentralWidget( w );
-	w->setLayout( new QHBoxLayout(this) );
+	QWidget* centralwidget = new QWidget;
 	
 	ui.tabWidget = new QTabWidget;
 	
@@ -60,7 +60,7 @@ RadioWidget::RadioWidget( QWidget* parent )
 	s->addWidget( ui.tabWidget );
 
 	MyStations* myStations = new MyStations;
-	connect( myStations, SIGNAL(searchResultComplete( QWidget*, const QString )), SLOT( addTab( QWidget*, const QString )));
+	connect( myStations, SIGNAL(searchResultComplete( QWidget*, const QString )), SLOT(addTab( QWidget*, const QString )) );
 	s->addWidget( myStations );
 	
 	//FIXME: should not rely on hard coded sizes
@@ -68,10 +68,17 @@ RadioWidget::RadioWidget( QWidget* parent )
 	//		 sizing policies working right now!
 	s->setSizes( QList<int>() << 373 << 98 );
 
-	w->layout()->addWidget( s );
+    QVBoxLayout* v = new QVBoxLayout( centralwidget );
+	v->addWidget( s );
+    v->addWidget( ui.controls = new RadioMiniControls );
 	
-    setWindowTitle( tr("Last.fm Radio") );
+    ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
 
+	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
+    connect( ui.controls->ui.skip, SIGNAL(skip()), &The::radio(), SLOT(skip()) );
+    
+    setWindowTitle( tr("Last.fm Radio") );
+	setCentralWidget( centralwidget );
 }
 
 

@@ -49,9 +49,9 @@ void
 ShareDialog::setTrack( const Track& t )
 {
     m_track = t;
-    ui.artist->setText( t.artist() );
-    ui.album->setText( t.album() );
-    ui.track->setText( t.prettyTitle() );
+    ui.artist->setText( tr("The artist, %1").arg( t.artist() ) );
+    ui.album->setText( tr("The album, %1").arg( t.album() ) );
+    ui.track->setText( tr("The track, %1").arg( t.title() ) );
 }
 
 

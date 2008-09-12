@@ -30,10 +30,10 @@ class RadioWidget : public QMainWindow
 public:
     RadioWidget( QWidget* parent = 0 );
 	
-private:
 	struct 
 	{
 		class QTabWidget* tabWidget;
+        class RadioMiniControls* controls;
 	} ui;
 	
 private slots:

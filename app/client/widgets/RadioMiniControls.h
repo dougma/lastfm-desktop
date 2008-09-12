@@ -20,13 +20,13 @@
 #ifndef RADIO_MINI_CONTROLS_H
 #define RADIO_MINI_CONTROLS_H
 
-namespace Phonon{ class VolumeSlider; }
+namespace Phonon { class VolumeSlider; }
 
 #include "ui_RadioMiniControls.h"
 #include "PlayerState.h"
 
 
-class RadioMiniControls : public QFrame
+class RadioMiniControls : public QWidget
 {
 	Q_OBJECT
 

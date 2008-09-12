@@ -37,7 +37,6 @@ public:
 	{
 		class Launcher* launcher;
 		class QStackedWidget* stack;
-	    class RadioMiniControls* controls;
 		class RadioWidget* tuner;
 		class ScrobbleViewWidget* scrobbler;
 		class FriendsTuner* friendTuner;

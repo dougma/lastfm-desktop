@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>RadioMiniControls</class>
- <widget class="QFrame" name="RadioMiniControls" >
+ <widget class="QWidget" name="RadioMiniControls" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -12,27 +12,9 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <property name="frameShape" >
-   <enum>QFrame::Panel</enum>
-  </property>
-  <property name="frameShadow" >
-   <enum>QFrame::Sunken</enum>
-  </property>
-  <property name="midLineWidth" >
-   <number>0</number>
-  </property>
   <layout class="QHBoxLayout" >
-   <property name="leftMargin" >
-    <number>6</number>
-   </property>
-   <property name="topMargin" >
-    <number>8</number>
-   </property>
-   <property name="rightMargin" >
-    <number>6</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>8</number>
+   <property name="margin" >
+    <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" >

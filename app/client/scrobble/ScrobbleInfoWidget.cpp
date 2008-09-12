@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 
+
 ScrobbleInfoWidget::ScrobbleInfoWidget()
 {
 	ui.actionbar = new QWidget;

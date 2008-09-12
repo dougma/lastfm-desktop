@@ -25,7 +25,6 @@
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
-#include "widgets/RadioMiniControls.h"
 #include "radio/RadioWidget.h"
 #include "radio/FriendsTuner.h"
 #include "Settings.h"
@@ -38,7 +37,6 @@
 #include <QDesktopServices>
 #include <QShortcut>
 #include <QStackedWidget>
-#include <phonon/volumeslider.h>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -125,18 +123,12 @@ MainWindow::setupUi()
 	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
 	//		 for now and nicely wraps the love / ban / tag / share actions together.
 	mainLayout->addWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
-	mainLayout->addWidget( ui.controls = new RadioMiniControls );
 	mainLayout->addWidget( ui.launcher = new Launcher );
-
-	ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
-	
-    connect( ui.controls->ui.skip, SIGNAL(clicked()), ui.skip, SLOT(trigger()) );
-	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
 	
 	setCentralWidget( mainWidget );
 
 	ui.tuner = new RadioWidget( this );
-	
+    
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif
