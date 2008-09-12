@@ -2,6 +2,7 @@
 // http://developer.apple.com/qa/qa2001/qa1123.html
 
 #include <sys/sysctl.h>
+#include <cerrno>
 
 
 /** Returns a list of all BSD processes on the system.  This routine
