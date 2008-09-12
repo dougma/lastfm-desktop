@@ -22,17 +22,17 @@
 #include "ScrobbleCache.h"
 #include "ScrobblerHandshake.h"
 #include "ScrobblerSubmission.h"
+#include "lib/ws/WsKeys.h"
 
 
-Scrobbler::Scrobbler( const ScrobblerInit& init )
-        : m_init( init ),
+Scrobbler::Scrobbler( const QString& clientId )
+        : m_clientId( clientId ),
           m_handshake( 0 ), 
           m_np( 0 ), 
           m_submitter( 0 ),
           m_hard_failures( 0 )
 {
-    m_cache = new ScrobbleCache( init.username );
-
+    m_cache = new ScrobbleCache( Ws::Username );
     handshake();
     submit(); // will submit what's there once the handshake completes
 }
@@ -59,7 +59,7 @@ Scrobbler::handshake()
     delete m_np;
     delete m_submitter;
     
-    m_handshake = new ScrobblerHandshake( m_init );
+    m_handshake = new ScrobblerHandshake( m_clientId );
     connect( m_handshake, SIGNAL(done( QByteArray )), SLOT(onHandshakeReturn( QByteArray )), Qt::QueuedConnection );
     connect( m_handshake, SIGNAL(responseHeaderReceived( QHttpResponseHeader )), SLOT(onHandshakeHeaderReceived( QHttpResponseHeader )) );
     m_np = new NowPlaying( np_data );
@@ -134,7 +134,7 @@ Scrobbler::onHandshakeReturn( const QByteArray& result ) //TODO trim before pass
         m_submitter->setSession( results[1] );
         m_submitter->setUrl( QString::fromUtf8( results[3] ) );
 
-        emit status( Scrobbler::Handshaken, m_init.username );
+        emit status( Scrobbler::Handshaken );
 
         // submit any queued work
         m_np->request();

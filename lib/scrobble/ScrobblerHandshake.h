@@ -18,16 +18,15 @@
  ***************************************************************************/
 
 #include "ScrobblerHttp.h"
-#include "ScrobblerInit.h"
 #include <QString>
 
 
 class ScrobblerHandshake : public ScrobblerHttp
 {
-    ScrobblerInit const m_init;
+	QString const m_clientId;
 
 public:
-    ScrobblerHandshake( const ScrobblerInit& );
+    ScrobblerHandshake( const QString& clientId );
 
     virtual void request();
 };

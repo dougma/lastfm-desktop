@@ -66,4 +66,5 @@ namespace Ws
     const char* SessionKey = "";
     const char* SharedSecret = "";
     const char* ApiKey = "";
+    const char* Username = "";
 }

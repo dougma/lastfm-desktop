@@ -28,4 +28,5 @@ namespace Ws
     WS_DLLEXPORT extern const char* SessionKey;
     WS_DLLEXPORT extern const char* SharedSecret;
     WS_DLLEXPORT extern const char* ApiKey;
+	WS_DLLEXPORT extern const char* Username;
 }

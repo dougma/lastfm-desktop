@@ -62,11 +62,7 @@ App::App( int argc, char** argv )
     new ITunesListener( listener->port(), this );
 #endif
     
-    ScrobblerInit init;
-    init.username = The::settings().username();
-    init.sessionKey = The::settings().sessionKey();
-    init.clientId = "ass";
-    m_scrobbler = new Scrobbler( init );
+    m_scrobbler = new Scrobbler( "ass" );
     
     connect( m_playerManager, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
     connect( m_playerManager, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );

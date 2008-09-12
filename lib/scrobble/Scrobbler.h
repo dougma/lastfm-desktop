@@ -21,7 +21,6 @@
 #define SCROBBLER_H
 
 #include "lib/DllExportMacro.h"
-#include "ScrobblerInit.h"
 #include <QByteArray>
 #include <QList>
 #include <QString>
@@ -37,8 +36,7 @@ class SCROBBLE_DLLEXPORT Scrobbler : public QObject
 {
     Q_OBJECT
 
-    ScrobblerInit const m_init;
-
+	const QString& m_clientId;
     class ScrobblerHandshake* m_handshake;
     class NowPlaying* m_np;
     class ScrobblerSubmission* m_submitter;
@@ -46,7 +44,7 @@ class SCROBBLE_DLLEXPORT Scrobbler : public QObject
     uint m_hard_failures;
 
 public:
-    Scrobbler( const ScrobblerInit& );
+    Scrobbler( const QString& clientId );
     ~Scrobbler();
 
 public slots:
@@ -58,8 +56,6 @@ public slots:
     void submit();
 
 public:
-    QString username() const { return m_init.username; }
-
     enum Status
     {
         Connecting,

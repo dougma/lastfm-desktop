@@ -25,8 +25,8 @@
 #include <QDebug>
 
 
-ScrobblerHandshake::ScrobblerHandshake( const ScrobblerInit& init )
-                  : m_init( init )
+ScrobblerHandshake::ScrobblerHandshake( const QString& clientId )
+                  : m_clientId( clientId )
 {
     setHost( "post.audioscrobbler.com" );
     request();
@@ -42,13 +42,13 @@ ScrobblerHandshake::request()
     QString query_string = QString() +
         "?hs=true" +
         "&p=1.2.1"
-        "&c=" + m_init.clientId +
+        "&c=" + m_clientId +
         "&v=" + qApp->applicationVersion() +
-        "&u=" + QString(QUrl::toPercentEncoding( m_init.username )) +
+        "&u=" + QString(QUrl::toPercentEncoding( Ws::Username )) +
         "&t=" + timestamp +
         "&a=" + auth_token +
         "&api_key=" + Ws::ApiKey +
-        "&sk=" + m_init.sessionKey;
+        "&sk=" + Ws::SessionKey;
 
     m_id = get( '/' + query_string );
 
