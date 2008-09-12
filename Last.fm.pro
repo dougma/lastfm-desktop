@@ -6,7 +6,7 @@ debug:macx-xcode {
     ICON = app/client/mac/client.icns
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
-	
+
     CONFIG += mad fftw3f samplerate
 
     include( $$ROOT_DIR/common/qmake/include.pro )
@@ -20,7 +20,7 @@ debug:macx-xcode {
         SOURCES += $$findSources( cpp, $$dir )
         HEADERS += $$findSources( h, $$dir )
         FORMS += $$findSources( ui, $$dir )
-		RESOURCES += $$findSources( qrc, $$dir )	
+		RESOURCES += $$findSources( qrc, $$dir )
     }
 
     SOURCES += common/c++/Logger.cpp
@@ -32,14 +32,14 @@ debug:macx-xcode {
 else {
     TEMPLATE = subdirs
 
-	# QMake is broken on OSX and doesn't figure out the intra-project 
+	# QMake is broken on OSX and doesn't figure out the intra-project
 	# dependencies
-	
-	CONFIG += ordered
+
+    CONFIG += ordered
     SUBDIRS += lib/core/libcore.pro \
                lib/ws/libws.pro \
                lib/types/libtypes.pro \
-               lib/unicorn/libunicorn.pro \               
+               lib/unicorn/libunicorn.pro \
                lib/moose/libmoose.pro \
                lib/radio/libradio.pro \
                lib/scrobble/libscrobble.pro \
