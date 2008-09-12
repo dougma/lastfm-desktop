@@ -2,6 +2,8 @@ TEMPLATE = app
 TARGET = Last.fm
 CONFIG += unicorn moose radio core ws types scrobble
 QT = core gui xml network phonon webkit svg
+# Qt is broken and phonon requires openGL! I emailed them for fix0rs
+QT += opengl
 VERSION = 2.0.0
 
 include( $$ROOT_DIR/common/qmake/include.pro )
