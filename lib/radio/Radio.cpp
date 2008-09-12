@@ -205,8 +205,6 @@ Radio::clear()
 void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
-    //qDebug().nospace() << newstate << " (was" << oldstate << ')';
-    
     switch (newstate)
     {
         case Phonon::ErrorState:
