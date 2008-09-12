@@ -75,7 +75,7 @@ RadioWidget::RadioWidget( QWidget* parent )
     ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
 
 	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
-    connect( ui.controls->ui.skip, SIGNAL(skip()), &The::radio(), SLOT(skip()) );
+    connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
     
     setWindowTitle( tr("Last.fm Radio") );
 	setCentralWidget( centralwidget );

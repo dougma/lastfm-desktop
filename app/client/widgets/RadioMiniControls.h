@@ -40,7 +40,7 @@ public:
 	ui;
 	
 private slots:
-	void onStateChanged( State, const class Track& );
+	void onStateChanged( State );
 	void onPlayClicked();
 	
 signals:

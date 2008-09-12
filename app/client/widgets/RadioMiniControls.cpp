@@ -32,15 +32,15 @@ RadioMiniControls::RadioMiniControls()
 	
     layout()->addWidget( ui.volume );
 	
-	connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onStateChanged( State, Track )) );
+	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
 	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
     
-    onStateChanged( Stopped, Track() );
+    onStateChanged( Stopped );
 }
 
 
-void 
-RadioMiniControls::onStateChanged( State state, const Track& t )
+void
+RadioMiniControls::onStateChanged( State state )
 {
 	switch (state) 
 	{
