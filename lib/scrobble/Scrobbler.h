@@ -36,13 +36,6 @@ class SCROBBLE_DLLEXPORT Scrobbler : public QObject
 {
     Q_OBJECT
 
-	const QString& m_clientId;
-    class ScrobblerHandshake* m_handshake;
-    class NowPlaying* m_np;
-    class ScrobblerSubmission* m_submitter;
-    class ScrobbleCache* m_cache;
-    uint m_hard_failures;
-
 public:
     Scrobbler( const QString& clientId );
     ~Scrobbler();
@@ -82,16 +75,24 @@ signals:
     /** the controller should show status in an appropriate manner */
     void status( int code, QVariant data = QVariant() );
 
-private:
-    void handshake();
-    void onError( Scrobbler::Error );
-
 private slots:
     void onHandshakeReturn( const QByteArray& );
     void onNowPlayingReturn( const QByteArray& );
     void onSubmissionReturn( const QByteArray& );
     void onSubmissionStarted( int );
     void onHandshakeHeaderReceived( const class QHttpResponseHeader& );
+
+private:
+    void handshake();
+    void onError( Scrobbler::Error );
+
+private:
+	const QString& m_clientId;
+    class ScrobblerHandshake* m_handshake;
+    class NowPlaying* m_np;
+    class ScrobblerSubmission* m_submitter;
+    class ScrobbleCache* m_cache;
+    uint m_hard_failures;
 };
 
 #endif /* SCROBBLER_H */
