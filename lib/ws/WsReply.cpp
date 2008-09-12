@@ -33,7 +33,8 @@ WsReply::WsReply( QNetworkReply* r )
 }
 
 
-#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH && !defined NDEBUG
+#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH
+#ifndef NDEBUG
 void
 WsReply::finish()
 {
@@ -42,12 +43,13 @@ WsReply::finish()
     eventLoop.exec();
 }
 #endif
+#endif
 
 
 void
 WsReply::onFinished()
 {
-    try 
+    try
     {
         m_data = m_reply->readAll();
 
