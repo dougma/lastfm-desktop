@@ -143,24 +143,16 @@ public:
     bool isBanned() const { return d->rating & Banned; }
 	bool isSkipped() const { return d->rating & Skipped; }
 	bool isScrobbled() const { return isLoved() || d->rating & Scrobbled; }
+	/** only one rating is possible, we have to figure out which from various flags applied */
+	QString ratingCharacter() const;
 
     QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
-
-    /** only one rating is possible, we have to figure out which from various flags applied */
-    QString ratingCharacter() const;
-    
-    /** Works out if passed-in track can be scrobbled and returns the 
-      * status. */
-    ScrobblableStatus scrobblableStatus() const;
 
     /** used to sort tracks into chronological order, used by scrobbling */
     static bool lessThan( const Track &t1, const Track &t2)
     {
         return t1.timeStamp() < t2.timeStamp();
     }
-
-    // TODO not asyncronous! return a WsReply object!
-    QStringList topTags() const;
 
 	/** See last.fm/api Track section */
     WsReply* share( const class User& recipient, const QString& message = "" );
@@ -207,6 +199,7 @@ public:
 		d->rating |= r;
 	}
 	
+	/** Unloving is the only valid downgrade */
 	void downgradeRating( Rating r )
 	{
 		Q_ASSERT_X( r == Loved, "track rating downgrade", "Should only downgrade love" );
