@@ -111,6 +111,8 @@ END
 	opendir( DIR, $from );
 	foreach my $name (grep( /\.dylib$/, readdir( DIR ) ))
 	{
+		next if ($name =~ /_debug\.dylib$/);
+
 		print <<END;
 $to/$name: $from/$name |$to
 	cp $from/$name \$\@
