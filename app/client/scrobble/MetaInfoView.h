@@ -38,10 +38,9 @@ class MetaInfoView : public QLabel
 public:
     MetaInfoView();
 
-public slots:
-    void onTrackSpooled( const Track& );
-
 private slots:
+    void onTrackSpooled( const Track& );
+    void onStateChanged( State );
     void onLinkClicked( const class QUrl& );
 	void onAuthenticationRequired( class QNetworkReply*, class QAuthenticator* );
 	void load();

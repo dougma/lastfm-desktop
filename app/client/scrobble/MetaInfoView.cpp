@@ -49,6 +49,7 @@ MetaInfoView::MetaInfoView()
 	connect( ui.tabs, SIGNAL(currentChanged( int )), SLOT(load()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
     
 	ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
     connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
@@ -71,7 +72,6 @@ MetaInfoView::MetaInfoView()
     setFont( f );
 #endif
     
-    
     setAutoFillBackground( true );
     setAlignment( Qt::AlignCenter );
 }
@@ -88,17 +88,28 @@ MetaInfoView::onAuthenticationRequired( QNetworkReply*, QAuthenticator* a )
 void
 MetaInfoView::onTrackSpooled( const Track& t )
 {
-    if (t.isNull())
+    m_track = t;
+    load();
+}
+
+
+void
+MetaInfoView::onStateChanged( State state )
+{
+    switch (state)
     {
-        ui.tabs->hide();
-        ui.web->hide();
-        ui.web->load( QUrl("about:blank") ); //clear the web view
-    }
-    else {
-        //ui.tabs->show();
-        ui.web->show();
-        m_track = t;
-        load();
+        case Stopped:
+            ui.web->hide();
+            break;
+            
+        case TuningIn:
+            ui.web->show();
+            ui.web->load( QUrl("about:blank") );
+            break;
+            
+        default:
+            ui.web->show();
+            break;
     }
 }
 
@@ -119,8 +130,11 @@ MetaInfoView::resizeEvent( QResizeEvent* )
 
 void
 MetaInfoView::load()
-{
+{   
 	ui.web->load( QUrl("about:blank") ); //clear the web view first
+
+    if (m_track.isNull())
+        return;
 	
 	QUrl url;
 	switch (ui.tabs->currentIndex())

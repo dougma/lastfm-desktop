@@ -63,6 +63,7 @@ private:
 		void paintEvent(QPaintEvent *event)
 		{
 			QLinearGradient gradient;
+
 			QPainter painter(this);
 			gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
 			gradient.setColorAt( 0.5f, QColor( 16, 16, 16 ) );

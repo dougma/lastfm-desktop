@@ -26,7 +26,6 @@
 ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent )
 				   :QWidget( parent )
 {
-
 	ScrobbleInfoWidget* w = new ScrobbleInfoWidget;
     
 	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
@@ -35,7 +34,7 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/cog_button.png"));
     h->addWidget( ui.tag = new ImageButton( ":/MainWindow/tag.png", mainUi.tag ));
     h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));   
-	h->setSpacing( 40 );
+	h->setSpacing( 35 );
     h->setSizeConstraint( QLayout::SetFixedSize );
 	
     ui.love->setPixmap( ":/MainWindow/unlove.png", QIcon::On );
@@ -44,7 +43,6 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 	QSplitter* s = new PaintedSplitter( Qt::Vertical );
 	s->addWidget( w );
 	s->addWidget( new MetaInfoView );
-	s->setSizes( QList<int>() << 80 << 80 );
 	s->setStretchFactor( 0, 0 );
 	s->setStretchFactor( 1, 1 );
 	s->setHandleWidth( 14 );

@@ -32,21 +32,36 @@
 ScrobbleInfoWidget::ScrobbleInfoWidget()
 {
 	ui.actionbar = new QWidget;
-	
+	   
 	QVBoxLayout* v = new QVBoxLayout( this );
 	v->addWidget( ui.playerIndicator = new MediaPlayerIndicator );
-	v->addSpacing( 8 );
+	v->addSpacing( 10 );
     v->addWidget( ui.cover = new TrackInfoWidget );
-	v->addSpacing( 4 );
-    v->addWidget( ui.progress = new ScrobbleProgressBar );
-	v->addSpacing( 0 );
-    v->addWidget( ui.actionbar );
-	v->setSpacing( 0 );
-	v->setSizeConstraint( QLayout::SetMinimumSize );
+    v->setStretchFactor( ui.cover, 1 );
+    v->setContentsMargins( 9, 9, 9, 0 );
+    v->setSpacing( 0 );
+    v->setSizeConstraint( QLayout::SetMinimumSize ); //apparently necessary because QSplitter is ghae
+    
+    QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
+	v2->addStretch();
+    v2->addWidget( ui.text = new QLabel );
+    v2->addSpacing( 10 );
+    v2->addWidget( ui.progress = new ScrobbleProgressBar );
+	v2->addSpacing( 4 );
+    v2->addWidget( ui.actionbar );
+	v2->addSpacing( 5 );
+	v2->setSizeConstraint( QLayout::SetMinimumSize ); //apparently necessary because QSplitter is ghae
+    v2->setAlignment( ui.actionbar, Qt::AlignCenter );    
+    v2->setMargin( 0 );
+    v2->setSpacing( 0 );
 
-    v->setContentsMargins( 10, 8, 10, 5 );
-    v->setAlignment( ui.actionbar, Qt::AlignCenter );
-	
+#ifdef Q_WS_MAC
+    ui.text->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
+    ui.text->setAttribute( Qt::WA_MacSmallSize );
+#endif    
+    ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    ui.text->setTextFormat( Qt::RichText );    
+    
 	uint const W = ui.actionbar->sizeHint().width() + 20;
     setMinimumWidth( W );
 	
@@ -54,7 +69,8 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     setPalette( p );
     setAutoFillBackground( true );
 	
-	setMinimumHeight( sizeHint().height() );
+    setMinimumWidth( 298 ); //as per mattb mockup
+	setMinimumHeight( 325 );
 	
 	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
@@ -64,6 +80,7 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 void
 ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
+
 	QRadialGradient g( width() / 2, 326, 326 / 1.1f, width() / 2, 180 );
 	g.setColorAt( 1, Qt::black );
 	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
@@ -110,10 +127,15 @@ ScrobbleInfoWidget::onTrackSpooled( const Track& t )
 {
     if (!t.isNull())
     {
+        //TODO handle bad data! eg no artist, no track
+        ui.text->setText( "<div style='margin-bottom:3px'>" + t.artist() + "</div><div><b>" + t.title() );
         ui.cover->setTrack( t );
     }
     else
-        ui.cover->clear();
+    {
+        ui.text->clear();
+        ui.cover->clear();        
+    }
 }
 
 

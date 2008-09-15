@@ -80,15 +80,17 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
 	uint w = progressBarWidth();
 	
     QPainter p( this );
+    p.setCompositionMode( QPainter::CompositionMode_Overlay );
     p.setBackgroundMode( Qt::TransparentMode );
-    p.fillRect( x1, 0, w, h-1, QColor( 0x3D, 0x3D, 0x3E ) );
-	
+    p.fillRect( x1, 1, w, h-2, QColor( 0xff, 0xff, 0xff ) );
+
+    p.setCompositionMode( QPainter::CompositionMode_SourceOver );	
     p.setPen( QColor( 174, 174, 174 ) );
     p.setBrush( Qt::NoBrush );
     for (uint x = 0, n = qMin( m_scrobbleProgressTick, progressBarWidth() - 4 ); x < n; x += 2)
 	{
 		uint const i = x+x1+2;
-        p.drawLine( i, 2, i, h-4 );
+        p.drawLine( i, 3, i, h-4 );
 	}
 }
 

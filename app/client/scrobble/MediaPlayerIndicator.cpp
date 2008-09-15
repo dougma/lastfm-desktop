@@ -68,7 +68,7 @@ MediaPlayerIndicator::onPlayerChanged( const QString& name )
 
 void
 MediaPlayerIndicator::onTuningIn( const RadioStation& station )
-{  
+{
     m_playerDescription->setText( PRE + tr( "tuning to %1").arg( station.url() ) );
       
     m_playbackCommencedString = station.title().isEmpty()

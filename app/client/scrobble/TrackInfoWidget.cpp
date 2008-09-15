@@ -26,21 +26,6 @@
 
 TrackInfoWidget::TrackInfoWidget()
 {
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->setMargin( 0 );
-    v->addStretch();
-    v->addWidget( ui.text = new QLabel );
-#ifdef Q_WS_MAC
-    v->addSpacing( 11 );
-    ui.text->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
-    ui.text->setAttribute( Qt::WA_MacSmallSize );
-#else
-    v->addSpacing( 4 );
-#endif
-    
-    ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
-    ui.text->setTextFormat( Qt::RichText );
-	
 	ui.spinner = new SpinnerLabel( this );
 	ui.spinner->hide();
 
@@ -52,7 +37,6 @@ void
 TrackInfoWidget::clear()
 {
 	m_track = Track();
-	ui.text->clear();
 	ui.spinner->hide();
 	qDeleteAll( findChildren<AlbumImageFetcher*>() );   
 #if 0
@@ -90,9 +74,6 @@ TrackInfoWidget::setTrack( const Track& t )
 	}
 
 	m_track = t;
-
-	// TODO handle bad data
-	ui.text->setText( "<div style='margin-bottom:3px'>" + t.artist() + "</div><div><b>" + t.title() );
 }
 
 
@@ -155,6 +136,9 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
     
     if (m_cover.isNull())
     {
+        if (!m_track.isNull())
+            return;
+        
         QSvgRenderer svg( QString(":/MainWindow/as.svg") );
         QSize s = svg.defaultSize() * 5;   
         
@@ -185,7 +169,7 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
 QImage //static
 TrackInfoWidget::addReflection( const QImage &in )
 {
-    const uint H = qreal(in.height()) / 3;
+    const uint H = 5 * in.height() / 7;
 	
     QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
     QPainter p( &out );

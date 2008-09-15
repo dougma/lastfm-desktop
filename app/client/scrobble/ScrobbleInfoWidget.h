@@ -45,6 +45,7 @@ public:
 		class QWidget* actionbar;
 	
 	private:
+        class QLabel* text;
 		class TrackInfoWidget* cover;
 		class ScrobbleProgressBar* progress;
 		class MediaPlayerIndicator* playerIndicator;
