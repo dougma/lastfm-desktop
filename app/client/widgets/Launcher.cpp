@@ -34,6 +34,7 @@ Launcher::Launcher( QWidget* parent )
 	ui.radio->setPixmap( ":/MainWindow/radio_off.png" );
 	ui.radio->setPixmap( ":/MainWindow/radio_on.png", QIcon::On );
 	ui.radio->moveIcon( 1, 0 );
+	ui.radio->moveIcon( 1, 1, QIcon::Active );
 	
 	ui.friends->setCheckable( true );
 	ui.friends->setBackgroundPixmap( ":/MainWindow/launcher_button_centre_rest.png" );
@@ -41,6 +42,7 @@ Launcher::Launcher( QWidget* parent )
 	ui.friends->setPixmap( ":/MainWindow/friends_off.png" );
 	ui.friends->setPixmap( ":/MainWindow/friends_on.png", QIcon::On );
 	ui.friends->moveIcon( 0, -1 );
+	ui.friends->moveIcon( 0, 1, QIcon::Active );
 	
 	ui.library->setCheckable( true );
 	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_rest.png" );
@@ -48,6 +50,7 @@ Launcher::Launcher( QWidget* parent )
 	ui.library->setPixmap( ":/MainWindow/library_off.png" );
 	ui.library->setPixmap( ":/MainWindow/library_on.png", QIcon::On );
 	ui.library->moveIcon( -1, 0 );
+	ui.library->moveIcon( -1, 1, QIcon::Active );
 	
 	ui.scrobble->setCheckable( true );
 	ui.scrobble->setPixmap( ":/MainWindow/scrobbling_on.png" );

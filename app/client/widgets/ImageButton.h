@@ -78,8 +78,11 @@ public:
 		m_backgroundIcon.paint( &p, rect(), Qt::AlignCenter, mode, state );
 
 		QRect iconRect = rect();
-		iconRect.setLeft( iconRect.left() + iconX );
-		iconRect.setBottom( iconRect.bottom() + iconY - 3 );
+		if( m_iconOffsets.contains( mode ) )
+		{
+			iconRect.setLeft( iconRect.left() + m_iconOffsets[ mode ].x() );
+			iconRect.setBottom( iconRect.bottom() + m_iconOffsets[ mode ].y() - 3 );
+		}
 		icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
 
 	}
@@ -103,11 +106,12 @@ public:
 		m_backgroundIcon.addPixmap( p, m );
 	}
 	
-	void moveIcon( int x, int y ){ iconX += x; iconY += y; }
+	void moveIcon( int x, int y, QIcon::Mode m = QIcon::Normal ){ m_iconOffsets.insert( m, QPoint( x, y )); }
 	
 private:
 	QIcon m_backgroundIcon;
 	int iconX, iconY;
+	QMap< QIcon::Mode, QPoint > m_iconOffsets;
 	
 private slots:
 	virtual void actionChanged()

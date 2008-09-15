@@ -93,11 +93,11 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
                             QUERYITEM(        tracknum,      QString::number( m_track.trackNumber() ) ) <<
                             QUERYITEM(        sha256,        fingerprinter->sha256() ) <<
                             QUERYITEM(        time,          time ) <<
-                            QUERYITEMENCODED( fpversion,     QString::number( fingerprint::FingerprintExtractor::getVersion() ) ) <<
+							
+						    QUERYITEMENCODED( fpversion,     QString::number( fingerprint::FingerprintExtractor::getVersion() ) ) <<
                             QUERYITEM(        fulldump,      "false" ) <<
-//FIXME: this should prolly be changed to send a fplibversion
-//                            QUERYITEM(        clientversion, m_version ) <<
                             QUERYITEM(        noupdate,      "true" ));
+	//FIXME: talk to mir about submitting fplibversion
                             
     #undef QUERYITEMENCODED
     #undef QUERYITEM

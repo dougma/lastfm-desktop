@@ -58,7 +58,7 @@ private:
 	class PaintedSplitterHandle : public QSplitterHandle
 	{
 	public:
-		PaintedSplitterHandle( Qt::Orientation o, QSplitter* p ): QSplitterHandle( o, p ){};
+		PaintedSplitterHandle( Qt::Orientation o, QSplitter* p ): QSplitterHandle( o, p ), m_handlePixmap( ":/splitter_handle.png" ){};
 		
 		void paintEvent(QPaintEvent *event)
 		{
@@ -73,12 +73,14 @@ private:
 			gradient.setFinalStop(rect().width(), rect().bottom());
 			
 			
-			painter.setPen( Qt::black );
 			painter.drawLine( rect().translated( 0, 2 ).topLeft(), rect().translated( 0, 2 ).topRight());
 			painter.fillRect(event->rect(), QBrush(gradient));
 			
-			painter.drawImage( (rect().width() / 2) - 7, -1, QImage( ":/splitter_handle.png" ));
+			painter.drawPixmap( (rect().width() / 2) - 7, -1, m_handlePixmap );
 		}
+		
+	private:
+		QPixmap m_handlePixmap;
 	};
 };
 
