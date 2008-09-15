@@ -65,7 +65,6 @@ void
 ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
 	QRadialGradient g( width() / 2, 326, 326 / 1.1f, width() / 2, 180 );
-	qDebug() << height();
 	g.setColorAt( 1, Qt::black );
 	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
 
