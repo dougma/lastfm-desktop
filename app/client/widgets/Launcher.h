@@ -33,6 +33,7 @@ public:
 	
 private slots:
 	void onRadioToggle();
+	void onTunerHidden();
 
 protected:
 	Ui::Launcher ui;

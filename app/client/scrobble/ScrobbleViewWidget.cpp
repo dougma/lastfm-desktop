@@ -38,7 +38,7 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 	h->setSpacing( 40 );
     h->setSizeConstraint( QLayout::SetFixedSize );
 	
-    ui.love->setCheckedIcon( QIcon( ":/MainWindow/unlove.png" ));
+    ui.love->setPixmap( ":/MainWindow/unlove.png", QIcon::On );
 	ui.love->setCheckable( true );
     
 	QSplitter* s = new PaintedSplitter( Qt::Vertical );

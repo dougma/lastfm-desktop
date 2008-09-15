@@ -7,16 +7,23 @@
     <file>MainWindow/love_inactive.png</file>
     <file>MainWindow/share_inactive.png</file>
     <file>MainWindow/tag_inactive.png</file>
-    <file>MainWindow/skip.png</file>
     <file>MainWindow/ban.png</file>
     <file>MainWindow/love.png</file>
     <file>MainWindow/share.png</file>
     <file>MainWindow/tag.png</file>
-    <file>MainWindow/stop.png</file>
     <file>MainWindow/as.svg</file>
-    <file>MainWindow/radio_rest.png</file>
-    <file>MainWindow/friends_rest.png</file>
-    <file>MainWindow/library_rest.png</file>
+    <file>MainWindow/launcher_button_left_pressed.png</file>
+    <file>MainWindow/launcher_button_left_rest.png</file>
+    <file>MainWindow/launcher_button_centre_pressed.png</file>
+    <file>MainWindow/launcher_button_centre_rest.png</file>
+    <file>MainWindow/launcher_button_right_pressed.png</file>
+    <file>MainWindow/launcher_button_right_rest.png</file>
+    <file>MainWindow/friends_on.png</file>
+    <file>MainWindow/friends_off.png</file>
+    <file>MainWindow/radio_on.png</file>
+    <file>MainWindow/radio_off.png</file>
+    <file>MainWindow/library_on.png</file>
+    <file>MainWindow/library_off.png</file>
     <file>MainWindow/scrobbling_on.png</file>
     <file>MainWindow/scrobbling_off.png</file>
   </qresource>

@@ -28,18 +28,19 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QString>
+#include <QDebug>
 
 class ImageButton : public QPushButton
 {
 	Q_OBJECT
 	
 public:
-	ImageButton( QWidget* parent ) : QPushButton( parent )
+	ImageButton( QWidget* parent ) : QPushButton( parent ), iconX( 0 ), iconY( 0 )
 	{
 			setIconSize( QSize(150, 150) );
 	}
 	
-	ImageButton( const QString& path, QAction* action = 0 )
+	ImageButton( const QString& path, QAction* action = 0 ) : iconX( 0 ), iconY( 0 )
 	{
 		if( action )
 		{
@@ -66,48 +67,47 @@ public:
 	{
 		QPainter p( this );
 		
-//		if( isDown() )
-//			p.setCompositionMode( QPainter::CompositionMode_Exclusion );
+		QIcon::Mode mode = isEnabled() ? QIcon::Normal : QIcon::Disabled;
+		if( isDown() )
+			mode = QIcon::Active;
 		
-		QIcon::Mode state = isEnabled() ? QIcon::Normal : QIcon::Disabled;
+		QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
 		
 		p.setClipRect( event->rect() );
 		
-		QIcon i;
-		if( isChecked() && !m_checkedIcon.isNull() )
-			i = m_checkedIcon;
-		else
-			i = icon();
-		
-		i.paint( &p, rect(), Qt::AlignCenter, state );
+		m_backgroundIcon.paint( &p, rect(), Qt::AlignCenter, mode, state );
+
+		QRect iconRect = rect();
+		iconRect.setLeft( iconRect.left() + iconX );
+		iconRect.setBottom( iconRect.bottom() + iconY - 3 );
+		icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
 
 	}
 	
 	virtual QSize sizeHint() const
 	{
-		return icon().actualSize( iconSize());
+		return icon().actualSize( iconSize()).expandedTo( m_backgroundIcon.actualSize(iconSize()));
 	}
 	
-	void setIcon( const QString s )
+	void setPixmap( const QString& s, const QIcon::State st = QIcon::Off ){ setPixmap( QPixmap( s ), st ); }
+	void setPixmap( const QPixmap& p, const QIcon::State s = QIcon::Off )
 	{
-		QIcon icon;
-		icon.addPixmap(QPixmap(s), QIcon::Normal, QIcon::Off);
-		setIcon( icon );
+		QIcon i = icon();
+		i.addPixmap( p, QIcon::Normal, s );
+		setIcon( i );
 	}
 	
-	void setIcon( const QIcon i ){ QPushButton::setIcon( i ); }
-	
-	
-	void setCheckedIcon( const QIcon& i ){ m_checkedIcon = i; }
-	void setCheckedIcon( const QString& s )
+	void setBackgroundPixmap( const QString& s, const QIcon::Mode m = QIcon::Normal ){ setBackgroundPixmap( QPixmap( s ), m ); }
+	void setBackgroundPixmap( const QPixmap& p, const QIcon::Mode m = QIcon::Normal )
 	{
- 		QIcon icon;
-		icon.addPixmap(QPixmap(s), QIcon::Normal, QIcon::Off);
-		setCheckedIcon( icon ); 
+		m_backgroundIcon.addPixmap( p, m );
 	}
+	
+	void moveIcon( int x, int y ){ iconX += x; iconY += y; }
 	
 private:
-	QIcon m_checkedIcon;
+	QIcon m_backgroundIcon;
+	int iconX, iconY;
 	
 private slots:
 	virtual void actionChanged()

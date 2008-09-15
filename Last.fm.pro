@@ -14,7 +14,7 @@ debug:macx-xcode {
 	generateVersionHeader()
 	system( mv version.h app/client )
 
-    DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble
+    DIRS = app/client lib/core lib/ws lib/unicorn lib/moose lib/radio lib/types lib/scrobble lib/fingerprint
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )

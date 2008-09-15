@@ -36,6 +36,15 @@ public:
         class RadioMiniControls* controls;
 	} ui;
 	
+protected:
+	virtual void hideEvent( QHideEvent* )
+	{
+		emit hideEvent();
+	}
+	
+signals:
+	void hideEvent();
+	
 private slots:
     void onTune( const class RadioStation& );
 

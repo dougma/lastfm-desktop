@@ -64,7 +64,7 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 void
 ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 {
-	QRadialGradient g( width() / 2, 326, float(width()) / 1.1f, width() / 2, 180 );
+	QRadialGradient g( width() / 2, 326, 326 / 1.1f, width() / 2, 180 );
 	qDebug() << height();
 	g.setColorAt( 1, Qt::black );
 	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
@@ -81,21 +81,28 @@ ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
 void
 ScrobbleInfoWidget::paintEvent( QPaintEvent* e )
 {
-	QPainter p( this );
-	p.setClipRect( e->rect() );
-	QRect radialRect = rect();
-	radialRect.setHeight( 326 );
+//	QPainter p( this );
+//	QPixmap bottomGradient(rect().width(), 1 );
+//	QPainter gp( &bottomGradient );
+//	
+//	QRect gpRect( rect().left(), 0, rect().right(), 1 );
+//	gp.setClipRect( gpRect );
+//	
+//	p.setClipRect( e->rect() );
+//
+//
+//	p.fillRect( rect(), palette().brush( QPalette::Window));
+//	QTransform t;
+//	t.translate(0, -179);
+//	QBrush brush = palette().brush(QPalette::Window );
+//	brush.setTransform( t );
+//	
+//	gp.fillRect( rect(), brush );
+//	
+//	QRect bottomRect( rect().left(), rect().top() + 180, rect().right(), rect().bottom());
+//	
+//	p.drawPixmap( bottomRect, bottomGradient );
 	
-	p.fillRect( radialRect, palette().brush( QPalette::Window));
-	
-	QLinearGradient lgradient;
-	lgradient.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e) );
-	lgradient.setColorAt( 1, Qt::black );
-
-	radialRect.setTop( rect().top() + 326 );
-	radialRect.setHeight( rect().height() - 326 );
-
-	p.fillRect( radialRect, lgradient );
 }
 
 

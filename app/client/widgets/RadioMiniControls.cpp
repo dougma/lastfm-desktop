@@ -26,7 +26,7 @@
 RadioMiniControls::RadioMiniControls()
 {
     ui.setupUi( this );
-    ui.play->setCheckedIcon( QIcon( ":/stop.png" ) );
+    ui.play->setPixmap( ":/stop.png", QIcon::On );
     ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
 	

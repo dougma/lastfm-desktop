@@ -26,14 +26,32 @@ Launcher::Launcher( QWidget* parent )
 		 :QWidget( parent )
 {
 	ui.setupUi( this );
+	
 	connect( ui.radio, SIGNAL( clicked()), SLOT( onRadioToggle()));
-	ui.radio->setIcon( ":/MainWindow/radio_rest.png" );
-	ui.friends->setIcon( ":/MainWindow/friends_rest.png" );
-	ui.library->setIcon( ":/MainWindow/library_rest.png" );
+	ui.radio->setCheckable( true );
+	ui.radio->setBackgroundPixmap( ":/MainWindow/launcher_button_left_rest.png" );
+	ui.radio->setBackgroundPixmap( ":/MainWindow/launcher_button_left_pressed.png", QIcon::Active );
+	ui.radio->setPixmap( ":/MainWindow/radio_off.png" );
+	ui.radio->setPixmap( ":/MainWindow/radio_on.png", QIcon::On );
+	ui.radio->moveIcon( 1, 0 );
+	
+	ui.friends->setCheckable( true );
+	ui.friends->setBackgroundPixmap( ":/MainWindow/launcher_button_centre_rest.png" );
+	ui.friends->setBackgroundPixmap( ":/MainWindow/launcher_button_centre_pressed.png", QIcon::Active );
+	ui.friends->setPixmap( ":/MainWindow/friends_off.png" );
+	ui.friends->setPixmap( ":/MainWindow/friends_on.png", QIcon::On );
+	ui.friends->moveIcon( 0, -1 );
+	
+	ui.library->setCheckable( true );
+	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_rest.png" );
+	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_pressed.png", QIcon::Active );
+	ui.library->setPixmap( ":/MainWindow/library_off.png" );
+	ui.library->setPixmap( ":/MainWindow/library_on.png", QIcon::On );
+	ui.library->moveIcon( -1, 0 );
 	
 	ui.scrobble->setCheckable( true );
-	ui.scrobble->setIcon( ":/MainWindow/scrobbling_on.png" );
-	ui.scrobble->setCheckedIcon( ":MainWindow/scrobbling_off.png" );
+	ui.scrobble->setPixmap( ":/MainWindow/scrobbling_on.png" );
+	ui.scrobble->setPixmap( ":/MainWindow/scrobbling_off.png", QIcon::On );
 }
 
 
@@ -41,16 +59,31 @@ void
 Launcher::onRadioToggle()
 {
 	RadioWidget& tuner = *The::mainWindow().ui.tuner;
+	
+	static bool firstTime = true;
+	if( firstTime )
+	{
+		firstTime = false;
+		connect( &tuner, SIGNAL( hideEvent()), SLOT( onTunerHidden()));
+	}
+
 	if( tuner.isVisible())
 	{
 	    tuner.hide();
 	}
 	else
 	{
-		tuner.move( The::mainWindow().pos().x() + The::mainWindow().width(), 
+		tuner.move( The::mainWindow().pos().x() + The::mainWindow().width() + 10, 
 					The::mainWindow().pos().y());
 	    tuner.show();
 	}
+}
+
+
+void
+Launcher::onTunerHidden()
+{
+	ui.radio->setChecked( false );
 }
 
 
@@ -59,7 +92,6 @@ Launcher::paintEvent( QPaintEvent* e )
 {
 	QLinearGradient gradient;
 	gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
-//	gradient.setColorAt( 0.5f, QColor( 16, 16, 16 ) );
 	gradient.setColorAt( 1.0f, QColor( 26, 26, 26 ));
 	
 	gradient.setStart(rect().width()/2, rect().top());
