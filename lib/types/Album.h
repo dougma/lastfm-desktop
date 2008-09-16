@@ -63,9 +63,10 @@ public:
 	
 	enum ImageSize
 	{
-		Small,
-		Medium,
-		Large /** seemingly 300x300 */
+		Small = 0,
+		Medium = 1,
+		Large = 2, /** seemingly 174x174 */
+        ExtraLarge = 3
 	};
 };
 
@@ -99,6 +100,7 @@ private:
 			case Album::Small:return"small";
 			case Album::Medium:return"medium";
 			case Album::Large:return"large";
+            case Album::ExtraLarge:return"extralarge";
 		}
 	}
 };

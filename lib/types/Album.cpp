@@ -75,25 +75,29 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 {
 	if (reply->failed()) {
 		// we output a qWarning at a higher level
-		emit finished( QByteArray() );
+		emit finished();
 		return;
 	}
 	
-    try
+    for (;m_size; --int(m_size))
     {
-        QUrl url = reply->lfm()["album"]["image size="+size()].text();
-		
-		m_manager = new QNetworkAccessManager( this );
-		
-        QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
-		connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
-	}
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
-		qWarning() << reply->lfm();
-		emit finished( QByteArray() );
+        try
+        {
+            QUrl const url = reply->lfm()["album"]["image size="+size()].text();
+
+            m_manager = new QNetworkAccessManager( this );
+
+            QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
+            connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
+            return;
+        }
+        catch (EasyDomElement::Exception& e)
+        {}
     }
+    
+    qWarning() << "Apparently there is no cover art for this album:";
+    qDebug() << reply->lfm();
+    emit finished();
 }
 
 
