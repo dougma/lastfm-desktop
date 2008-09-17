@@ -66,7 +66,7 @@ TrackInfoWidget::setTrack( const Track& t )
 		update();
 		
 		qDeleteAll( findChildren<AlbumImageFetcher*>() );
-		QObject* o = new AlbumImageFetcher( t.album(), Album::Large );
+		QObject* o = new AlbumImageFetcher( t.album(), Album::ExtraLarge );
 		connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
 		o->setParent( this );
 		
@@ -140,13 +140,11 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
             return;
         
         QSvgRenderer svg( QString(":/MainWindow/as.svg") );
-        QSize s = svg.defaultSize() * 5;   
         
+        QSize s = svg.defaultSize() * 5;
         s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );
-        
         QRect r = QRect( rect().center() - QRect( QPoint(), s ).bottomRight() / 2, s );
-        r.translate( 0, 33 );
-        
+
         p.setOpacity( qreal(40)/255 );
         svg.render( &p, r );
         return;
