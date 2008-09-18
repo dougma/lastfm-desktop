@@ -22,6 +22,7 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/core/QMessageBoxBuilder.h"
+#include "lib/core/UniqueApplication.h"
 #include <QDir>
 #include <QTimer>
 
