@@ -53,9 +53,14 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
+    UniqueApplication uapp( "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F" );
+    if (uapp.forward( argc, argv ))
+        return 0;
+    
     try
     {
         App app( argc, argv );
+        app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
 
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );

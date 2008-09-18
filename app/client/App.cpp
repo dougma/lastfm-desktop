@@ -84,6 +84,10 @@ App::App( int argc, char** argv )
 #ifdef WIN32
     Legacy::disableHelperApp();
 #endif
+
+    qDebug() << argv[0];
+
+    parseArguments( arguments() );
 }
 
 
@@ -213,7 +217,7 @@ App::ban()
 	m_radio->skip();
 	t.ban();
 }
- 
+
 
 void
 App::logout()
@@ -227,6 +231,56 @@ void
 App::open( const QUrl& url )
 {
     m_radio->play( RadioStation( url.toString() ) );
+}
+
+
+namespace  //anonymous namespace, keep to this file
+{
+    enum Argument
+    {
+        LastFmUrl,
+        Pause, //toggles pause
+        Skip,
+        Unknown
+    };
+    
+    Argument argument( const QString& arg )
+    {
+        if (arg == "--pause") return Pause;
+        if (arg == "--skip") return Skip;
+        
+        QUrl url( arg );
+        if (url.isValid() && url.scheme() == "lastfm") return LastFmUrl;
+
+        return Unknown;
+    }
+}
+
+
+void
+App::parseArguments( const QStringList& args )
+{  
+    if (args.size() == 1)
+        return;
+    
+    qDebug() << args;
+    
+    foreach (QString const arg, args.mid( 1 ))
+        switch (argument( arg ))
+        {
+            case LastFmUrl:
+                open( QUrl( arg ) );
+                break;
+                
+            case Skip:
+            case Pause:
+                qDebug() << "Unimplemented:" << arg;
+                break;
+                
+            case Unknown:
+                qDebug() << "Unknown argument:" << arg;
+                break;
+        }
 }
 
 

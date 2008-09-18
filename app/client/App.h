@@ -52,8 +52,6 @@ signals:
     void scrobblePointReached( const Track& );
     
 public slots:
-    void onBootstrapCompleted( const QString& playerId );
-
     /** all webservices connect to this and emit in the case of bad errors that
       * need to be handled at a higher level */
     void onWsError( Ws::Error );
@@ -64,9 +62,12 @@ public slots:
 	void love( bool loveOrUnlove );
 	void ban();
 
+    void parseArguments( const QStringList& );
+    
 private slots:
 	void onScrobblerStatusChanged( int );
-
+    void onBootstrapCompleted( const QString& playerId );
+    
 private:
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;

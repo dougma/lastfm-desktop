@@ -17,29 +17,53 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CFSTRING_TO_QSTRING_H
-#define CFSTRING_TO_QSTRING_H
-#ifdef __APPLE__
+#ifndef UNIQUE_APPLICATION_H
+#define UNIQUE_APPLICATION_H
 
+#include <QObject>
+#ifdef Q_WS_MAC
 #include <Carbon/Carbon.h>
-#include <QByteArray>
-#include <QString>
-
-
-QByteArray CFStringToUtf8( CFStringRef );
-
-
-inline QString CFStringToQString( CFStringRef s )
-{
-    return QString::fromUtf8( CFStringToUtf8( s ) );
-}
-
-
-inline CFStringRef QStringToCFString( const QString &s )
-{
-    return CFStringCreateWithCharacters( 0, (UniChar*)s.unicode(), s.length() );
-}
-
-
 #endif
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+
+/** This is a stub because on OS X, making it derive QApplication causes the 
+  * dock icon to flash up temporarily, so you have to do more work as a 
+  * consequence. Prolly the same on Windows.
+  *
+  * Basically, make a unique app, try to forward the command line arguments
+  * over, if that fails, continue, otherwise exit( 0 )
+  */
+class UniqueApplication : public QObject
+{
+    Q_OBJECT
+    
+public:
+    UniqueApplication( const char* id );
+
+    bool isAlreadyOpen() const { return m_alreadyRunning; }
+    
+    /** forwards arguments to the running instance, @returns success 
+      * we convert using QString::fromLocal8Bit() */
+    bool forward( int argc, char** argv );
+    bool forward( const class QStringList& );
+
+signals:
+    /** the first one is argv[0] ie. the application path */
+    void arguments( const class QStringList& );
+    
+private:
+    bool m_alreadyRunning;
+
+#ifdef Q_WS_MAC
+    static CFDataRef MacCallBack( CFMessagePortRef, SInt32, CFDataRef data, void* info );
+    CFMessagePortRef m_port;
+#endif
+#ifdef WIN32
+    HWND m_hwnd;
+#endif
+};
+
 #endif

@@ -43,3 +43,22 @@ CFStringToUtf8( CFStringRef s )
 
     return result;
 }
+
+
+#if 0
+// this is a Qt implementation I found
+QString cfstring2qstring(CFStringRef str)
+{
+    if(!str)
+        return QString();
+    
+    CFIndex length = CFStringGetLength(str);
+    if(const UniChar *chars = CFStringGetCharactersPtr(str))
+        return QString((QChar *)chars, length);
+    UniChar *buffer = (UniChar*)malloc(length * sizeof(UniChar));
+    CFStringGetCharacters(str, CFRangeMake(0, length), buffer);
+    QString ret((QChar *)buffer, length);
+    free(buffer);
+    return ret;
+}
+#endif
