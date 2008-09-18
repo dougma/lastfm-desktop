@@ -158,9 +158,10 @@ public:
     WsReply* share( const class User& recipient, const QString& message = "" );
 	WsReply* love();
 	WsReply* ban();
+
+    /** you can get any WsReply TagList using Tag::list( WsReply* ) */
 	WsReply* getTags() const; // for the logged in user
 	WsReply* getTopTags() const;
-	static WeightedStringList getTopTags( WsReply* );
 
 	/** the url for this track's page at last.fm */
 	QUrl www() const;

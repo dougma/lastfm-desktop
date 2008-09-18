@@ -36,7 +36,7 @@ MyTagsTuner::MyTagsTuner()
 void
 MyTagsTuner::onFetchedTags( WsReply* r )
 {
-	const WeightedStringList& tags = User::getTopTags( r );
+	const WeightedStringList& tags = Tag::list( r );
 	
 	if( tags.isEmpty() ) 
 		return;

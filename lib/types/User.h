@@ -26,38 +26,32 @@
 #include "lib/ws/WsReply.h" //convenience
 
 
-typedef QList<class User> UserList;
-
 class TYPES_DLLEXPORT User
 {
     QString m_name;
 	
-public:
-    User( const QString& username ) : m_name( username ), m_match( -1.0f )
+public:    
+    User( const QString& name ) : m_name( name ), m_match( -1.0f )
     {}
 
     operator QString() const { return m_name; }
 
     WsReply* getFriends();
-    static UserList getFriends( WsReply* );
+    static QList<User> getFriends( WsReply* );
 	
-	/** you can only get information about the autheticated user */
-	static WsReply* getInfo();
-
+    /** You can get a WeightedStringList using Tag::getTopTags() */
 	WsReply* getTopTags();
-	static WeightedStringList getTopTags( WsReply* );
 	
 	WsReply* getNeighbours();
-	static UserList getNeighbours( WsReply* );
+	static QList<User> getNeighbours( WsReply* );
 	
 	QUrl smallImageUrl() const{ return m_smallImage; }
 	QUrl mediumImageUrl() const{ return m_mediumImage; }
 	QUrl largeImageUrl() const{ return m_largeImage; }
 	
-	/** Returns the match between the logged in user
-		and the user which this object represents
-		( if < 0.0f then not set ) */
-	float match() const{ return m_match; }
+	/** Returns the match between the logged in user and the user which this
+	  *	object represents (if < 0.0f then not set) */
+	float match() const { return m_match; }
 	
 private:
 	QUrl m_smallImage;
@@ -65,6 +59,23 @@ private:
 	QUrl m_largeImage;
 	
 	float m_match;
+};
+
+
+
+#include "lib/ws/WsKeys.h"
+/** The authenticated user is special, as some webservices only work for him */
+class AuthenticatedUser : public User
+{
+    using User::match;
+    
+public:
+    /** the authenticated User */
+    AuthenticatedUser() : User( Ws::Username )
+    {}
+
+	/** you can only get information about the autheticated user */
+	static WsReply* getInfo();       
 };
 
 #endif

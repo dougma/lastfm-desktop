@@ -58,7 +58,11 @@ public:
     /** Album.getInfo WebService */
     WsReply* getInfo() const;
     WsReply* share( const class User& recipient, const QString& message = "" );
-	
+
+    /** use Tag::list to get the tag list out of the finished reply */
+    WsReply* getTags() const;
+
+    /** the Last.fm website url for this album */
 	QUrl www() const;
 	
 	enum ImageSize

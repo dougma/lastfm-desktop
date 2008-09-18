@@ -41,7 +41,7 @@ NeighboursTuner::NeighboursTuner()
 void
 NeighboursTuner::onFetchedNeighbours( WsReply* r )
 {
-	const UserList& neighbours = User::getNeighbours( r );
+	QList<User> neighbours = User::getNeighbours( r );
 	
 	if( neighbours.isEmpty() ) 
 		return;

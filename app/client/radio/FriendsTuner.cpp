@@ -40,10 +40,8 @@ FriendsTuner::FriendsTuner()
 
 void
 FriendsTuner::onFetchedFriends( WsReply* r )
-{
-	const UserList& friends = User::getFriends( r );
-	
-	foreach( const User& user, friends )
+{	
+	foreach( const User& user, User::getFriends( r ) )
 	{
 		QListWidgetItem* item = new QListWidgetItem( user );
 		item->setData( Qt::DecorationRole, QImage( ":/blank/user.png" ));

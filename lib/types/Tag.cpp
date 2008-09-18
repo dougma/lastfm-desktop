@@ -39,7 +39,7 @@ Tag::url( const User& user ) const
 WsReply*
 Tag::search() const
 {
-	return WsRequestBuilder( "tag.search" ).add( "tag", *this ).get();
+	return WsRequestBuilder( "tag.search" ).add( "tag", m_name ).get();
 }
 
 
@@ -47,16 +47,38 @@ QStringList /* static */
 Tag::search( WsReply* r )
 {
 	QStringList tags;
-	try
-	{
-		foreach( EasyDomElement e, r->lfm().children( "tag" ))
-		{
+    foreach( EasyDomElement e, r->lfm().children( "tag" ))
+    {
+        try
+        {
 			tags += e["name"].text();
 		}
-	}
-	catch( EasyDomElement::Exception& e )
-	{
-		qWarning() << e;
-	}
+        catch( EasyDomElement::Exception& e )
+        {
+            qWarning() << e;
+        }
+    }
 	return tags;
+}
+
+
+WeightedStringList //static
+Tag::list( WsReply* r )
+{
+	WeightedStringList tags;
+    foreach (EasyDomElement e, r->lfm().children( "tag" ))
+    {
+        try
+        {
+            // we toLower always as otherwise it is ugly mixed case, as first
+            // ever tag decides case, and Last.fm is case insensitive about it 
+            // anyway
+            tags += WeightedString( e["name"].text().toLower(), e["count"].text().toInt() );
+        }
+        catch( EasyDomElement::Exception& e)
+        {
+            qWarning() << e;
+        }
+    }
+    return tags;
 }

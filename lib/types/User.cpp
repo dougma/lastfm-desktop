@@ -42,78 +42,55 @@ User::getNeighbours()
 }
 
 
-UserList
+QList<User>
 User::getFriends( WsReply* r )
 {
-	UserList users;
-    try
+	QList<User> users;
+    foreach (EasyDomElement e, r->lfm().children( "user" ))
     {
-        foreach (EasyDomElement e, r->lfm().children( "user" ))
-		{
+        try
+        {
             User user( e["name"].text() );
 			user.m_smallImage = e["image size=small"].text();
 			user.m_mediumImage = e["image size=medium"].text();
 			user.m_largeImage = e["image size=large"].text();
 			users += user;
-		}
-    }
-    catch (EasyDomElement::Exception& e)
-    {
-        qWarning() << e;
+        }
+        catch (EasyDomElement::Exception& e)
+        {
+            qWarning() << e;
+        }
     }
     return users;
 }
 
 
 WsReply*
-User::getInfo()
+AuthenticatedUser::getInfo()
 {
 	return WsRequestBuilder( "user.getInfo" ).get();
 }
 
 
-WeightedStringList //static
-User::getTopTags( WsReply* r )
-{
-	WeightedStringList tags;
-	try
-	{
-		foreach (EasyDomElement e, r->lfm().children( "tag" ))
-		{
-			QString tagname = e["name"].text();
-			int count = e["count"].text().toInt();
-			tags.push_back( WeightedString( tagname, count ));
-		}
-		
-	}
-	catch( EasyDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
-	return tags;
-}
-
-
-UserList //static
+QList<User> //static
 User::getNeighbours( WsReply* r )
 {
-	UserList neighbours;
-	try
-	{
-		foreach (EasyDomElement e, r->lfm().children( "user" ))
-		{
+	QList<User> neighbours;
+    foreach (EasyDomElement e, r->lfm().children( "user" ))
+    {
+        try
+        {
 			User user( e["name"].text() );
 			user.m_match = e["match"].text().toFloat();
 			user.m_smallImage = e["image size=small"].text();
 			user.m_mediumImage = e["image size=medium"].text();
 			user.m_largeImage = e["image size=large"].text();
 			neighbours << user;
-		}
-		
-	}
-	catch( EasyDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
+        }
+        catch( EasyDomElement::Exception& e)
+        {
+            qWarning() << e;
+        }
+    }
 	return neighbours;
 }

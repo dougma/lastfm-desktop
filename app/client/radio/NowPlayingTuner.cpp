@@ -98,7 +98,7 @@ NowPlayingTuner::addWeightedStringsToList( WeightedStringList stringList, QListW
 void
 NowPlayingTuner::onFetchedTopTags( WsReply* r )
 {
-	WeightedStringList tags = Track::getTopTags( r );
+	WeightedStringList tags = Tag::list( r );
 	addWeightedStringsToList( tags, ui.tagsTab );
 }
 

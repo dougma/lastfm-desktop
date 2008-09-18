@@ -43,16 +43,23 @@ Artist::www() const
 
 
 WsReply* 
-Artist::getSimilar()
+Artist::getTags() const
 {
-	return WsRequestBuilder( "artist.getSimilar" ).add( "artist", *this ).get();
+	return WsRequestBuilder( "artist.getTags" ).add( "artist", m_name ).get();
 }
 
 
 WsReply* 
-Artist::search()
+Artist::getSimilar() const
 {
-	return WsRequestBuilder( "artist.search" ).add( "artist", *this ).get();
+	return WsRequestBuilder( "artist.getSimilar" ).add( "artist", m_name ).get();
+}
+
+
+WsReply* 
+Artist::search() const
+{
+	return WsRequestBuilder( "artist.search" ).add( "artist", m_name ).get();
 }
 
 

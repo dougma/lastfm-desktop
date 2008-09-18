@@ -293,28 +293,6 @@ Track::getTopTags() const
 }
 
 
-WeightedStringList /* static */
-Track::getTopTags( WsReply* r )
-{
-	WeightedStringList tags;
-	try
-	{
-		foreach (EasyDomElement e, r->lfm().children( "tag" ))
-		{
-			QString tagname = e["name"].text();
-			int count = e["count"].text().toInt();
-			tags.push_back( WeightedString( tagname, count ));
-		}
-			
-	}
-	catch( EasyDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
-	return tags;
-}
-
-
 WsReply*
 Track::getTags() const
 {

@@ -47,10 +47,13 @@ public:
 
     WsReply* share( const class User& recipient, const QString& message = "" );
 	
-	WsReply* getSimilar();
+	WsReply* getSimilar() const;
 	static WeightedStringList getSimilar( WsReply* );
+    
+    /** use Tag::list to get the tag list out of the finished reply */
+    WsReply* getTags() const;
 	
-	WsReply* search();
+	WsReply* search() const;
 	static QStringList search( WsReply* );
 };
 

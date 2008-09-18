@@ -21,6 +21,7 @@
 #define TAG_H
 
 #include "lib/DllExportMacro.h"
+#include "lib/core/WeightedStringList.h"
 #include <QString>
 #include <QUrl>
 
@@ -42,6 +43,9 @@ public:
 	
 	class WsReply* search() const;
 	static QStringList search( WsReply* );
+    
+    /** you can in fact pass any *.getTopTags result to this */
+    static WeightedStringList list( WsReply* );
 };
 
 #endif

@@ -35,6 +35,17 @@ Album::getInfo() const
 }
 
 
+
+WsReply*
+Album::getTags() const
+{
+	return WsRequestBuilder( "album.getTags" )
+            .add( "artist", m_artist )
+            .add( "album", m_title )
+            .get();
+}
+
+
 WsReply*
 Album::share( const User& recipient, const QString& message )
 {
