@@ -271,15 +271,15 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 	TrackWsRequestBuilder( const char* p ) : WsRequestBuilder( p )
 	{}
 	
-	TrackWsRequestBuilder& add( const Track& t )
+	TrackWsRequestBuilder& add( Track const * const t )
 	{
-		if (t.mbId().isEmpty()) 
+		if (t->mbId().isEmpty()) 
 		{
-			WsRequestBuilder::add( "artist", t.artist() );
-			WsRequestBuilder::add( "track", t.title() );
+			WsRequestBuilder::add( "artist", t->artist() );
+			WsRequestBuilder::add( "track", t->title() );
 		}
 		else
-			WsRequestBuilder::add( "mbid", t.mbId() );
+			WsRequestBuilder::add( "mbid", t->mbId() );
 
 		return *this;
 	}
@@ -289,14 +289,32 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 WsReply*
 Track::getTopTags() const
 {
-	return TrackWsRequestBuilder( "track.getTopTags" ).add( *this ).get();
+	return TrackWsRequestBuilder( "track.getTopTags" ).add( this ).get();
 }
 
 
 WsReply*
 Track::getTags() const
 {
-	return TrackWsRequestBuilder( "track.getTags" ).add( *this ).get();
+	return TrackWsRequestBuilder( "track.getTags" ).add( this ).get();
+}
+
+
+WsReply*
+Track::addTags( const QStringList& tags ) const
+{
+    if (tags.isEmpty())
+        return 0;
+    
+    QString comma_separated_tags;
+    foreach( QString const tag, tags)
+        comma_separated_tags += tag;
+    
+    return WsRequestBuilder( "track.addTags" )
+            .add( "artist", d->artist )
+            .add( "track", d->title )
+            .add( "tags", comma_separated_tags )
+            .post();
 }
 
 

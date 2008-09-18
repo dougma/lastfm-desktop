@@ -17,35 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAG_H
-#define TAG_H
+#ifndef UNICORN_TAB_WIDGET_H
+#define UNICORN_TAB_WIDGET_H
 
-#include "lib/DllExportMacro.h"
-#include "lib/core/WeightedStringList.h"
-#include <QString>
-#include <QUrl>
+#include <QStackedWidget>
 
-class TYPES_DLLEXPORT Tag
+
+namespace Unicorn
 {
-	QString m_name;
-	
-public:
-	Tag( const QString& name ) : m_name( name )
-	{}
-	
-	operator QString() const { return m_name; }
-	
-	/** the global tag page at www.last.fm */
-	QUrl www() const;
-	/** the tag page for user @p user at www.last.fm */
-	QUrl www( const class User& user ) const;
-	
-	class WsReply* search() const;
-	static QStringList search( WsReply* );
+    class TabBar;
     
-    /** you can in fact pass any *.get*Tags result to this
-      * though you must be aware, the weighting may be empty */
-    static WeightedStringList list( WsReply* );
-};
+    class TabWidget : public QWidget
+    {
+        QStackedWidget* stack;
+        TabBar* bar;
+        
+    public:
+        TabWidget();
+        
+        void addTab( const QString& title, QWidget* );
+        QWidget* currentWidget() const { return stack->currentWidget(); }
+        
+        void setTabEnabled( int index, bool );
+    };
+}
 
 #endif

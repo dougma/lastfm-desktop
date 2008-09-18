@@ -162,6 +162,10 @@ public:
     /** you can get any WsReply TagList using Tag::list( WsReply* ) */
 	WsReply* getTags() const; // for the logged in user
 	WsReply* getTopTags() const;
+    
+    /** you can only add 10 tags, we submit everything you give us, but the
+      * docs state, 10 only */
+    WsReply* addTags( const QStringList& ) const;
 
 	/** the url for this track's page at last.fm */
 	QUrl www() const;

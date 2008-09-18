@@ -23,7 +23,7 @@
 #include "lib/types/Track.h"
 #include <QDialog>
 
-namespace Moose 
+namespace Unicorn 
 {
     class TabWidget;
 }
@@ -42,17 +42,14 @@ public:
 	void setTrack( const Track& t );
 
 private slots:
-    void onAccepted();
     void onWsFinished( WsReply* );
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
-    void onCoverDownloaded( const QByteArray& );
 
 private:
     struct Ui
     {
-        class QLabel* cover;
-        class QLabel* track;
+        class TrackWidget* track;
         class SpinnerLabel* spinner;
         class QLineEdit* edit;
         class QPushButton* add;
@@ -62,15 +59,17 @@ private:
         class TagListWidget* suggestedTags;
         class TagListWidget* yourTags;
         class QDialogButtonBox* buttons;
-        Moose::TabWidget* tabs1;
-        Moose::TabWidget* tabs2;
+        Unicorn::TabWidget* tabs1;
+        Unicorn::TabWidget* tabs2;
         
         void setupUi( QWidget* parent );
     } ui;
 
     void setupUi();
     void follow( WsReply* );
-    TagListWidget* currentTagListWidget() const;    
+    TagListWidget* currentTagListWidget() const;
+    
+    virtual void accept();
     
     Track m_track;
     QStringList m_originalTags;

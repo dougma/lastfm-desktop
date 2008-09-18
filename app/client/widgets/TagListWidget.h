@@ -31,17 +31,19 @@ class TagListWidget : public QTreeWidget
 public:
     TagListWidget( QWidget* parent = 0 );
     
-    void add( const QString& );
+    /** we won't add the tag if we already have it, and in that case we 
+      * return false */
+    bool add( QString );
     void setTagsRequest( class WsReply* );
-
+    QStringList newTags() const { return m_newTags; }
+    
 private slots:
     void onTagsRequestFinished( WsReply* );
     
 private:
     class QMenu* m_menu;
- 
-    virtual int sizeHintForRow( int r ) const { return QTreeWidget::sizeHintForRow( r ) + 10; }
-    
+    QStringList m_newTags;
+
 private slots:
     void showMenu( const QPoint& );
     

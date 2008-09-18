@@ -67,6 +67,26 @@ Album::www() const
 }
 
 
+WsReply*
+Album::addTags( const QStringList& tags ) const
+{
+    if (tags.isEmpty())
+        return 0;
+    
+    QString comma_separated_tags;
+    foreach( QString const tag, tags)
+        comma_separated_tags += tag;
+    
+    return WsRequestBuilder( "album.addTags" )
+            .add( "artist", m_artist )
+            .add( "album", m_title )
+            .add( "tags", comma_separated_tags )
+            .post();
+}
+
+
+
+
 AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
 				 : m_size( (int)size ),
 				   m_manager( 0 )

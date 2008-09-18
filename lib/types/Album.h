@@ -61,7 +61,8 @@ public:
 
     /** use Tag::list to get the tag list out of the finished reply */
     WsReply* getTags() const;
-
+    WsReply* addTags( const QStringList& ) const;
+    
     /** the Last.fm website url for this album */
 	QUrl www() const;
 	

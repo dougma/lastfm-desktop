@@ -21,13 +21,21 @@
 #define SHARE_DIALOG_H
 
 #include "lib/types/Track.h"
-#include "ui_ShareDialog.h"
+#include <QDialogButtonBox>
+#include <QDialog>
 
 
 class ShareDialog : public QDialog
 {
     Q_OBJECT
 
+    struct {
+        QDialogButtonBox* buttons;
+        class TrackWidget* track;
+        class QLineEdit* friends;
+        class QTextEdit* message;
+    } ui;
+    
 public:
     ShareDialog( QWidget* parent );
 
@@ -35,7 +43,7 @@ public:
     void setTrack( const Track& );
 	Track track() const { return m_track; }
 
-    Ui::ShareDialog ui;
+    void setupUi();
 
 private slots:
     void onFriendsReturn( class WsReply* );
@@ -43,8 +51,6 @@ private slots:
 
 private:
     class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-
-    virtual bool eventFilter( QObject*, QEvent* );
     virtual void accept();
 
     Track m_track;

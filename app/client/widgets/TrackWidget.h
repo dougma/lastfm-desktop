@@ -17,35 +17,28 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAG_H
-#define TAG_H
+#ifndef TRACK_WIDGET_H
+#define TRACK_WIDGET_H
 
-#include "lib/DllExportMacro.h"
-#include "lib/core/WeightedStringList.h"
-#include <QString>
-#include <QUrl>
+#include <QWidget>
 
-class TYPES_DLLEXPORT Tag
+
+class TrackWidget : public QWidget
 {
-	QString m_name;
-	
-public:
-	Tag( const QString& name ) : m_name( name )
-	{}
-	
-	operator QString() const { return m_name; }
-	
-	/** the global tag page at www.last.fm */
-	QUrl www() const;
-	/** the tag page for user @p user at www.last.fm */
-	QUrl www( const class User& user ) const;
-	
-	class WsReply* search() const;
-	static QStringList search( WsReply* );
+    Q_OBJECT
     
-    /** you can in fact pass any *.get*Tags result to this
-      * though you must be aware, the weighting may be empty */
-    static WeightedStringList list( WsReply* );
+    struct {
+        class QLabel* cover;
+        class QLabel* track;
+    } ui;    
+    
+public:
+    TrackWidget();
+
+    void setTrack( const class Track& );
+    
+private slots:
+    void onCoverDownloaded( const QByteArray& );
 };
 
 #endif

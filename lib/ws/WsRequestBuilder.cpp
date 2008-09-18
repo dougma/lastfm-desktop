@@ -38,6 +38,7 @@ WsReply*
 WsRequestBuilder::start()
 {
 #ifndef Q_WS_MAC
+    // we don't do this on mac because it was inexplicably crashing! -- Qt 4.4.1
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
@@ -54,17 +55,20 @@ WsRequestBuilder::start()
 
     switch (request_method)
     {
-        case GET:  return new WsReply( nam->get( request ) );
+        case GET:
+            return new WsReply( nam->get( request ) );
+
         case POST: 
 		{
 			//Build encoded query for use in the POST Content
 			QByteArray query;
-			QList<QPair<QString, QString> > paramList = params;
-			for( int i = 0; i < paramList.count(); i++ )
+            typedef QPair<QString, QString> Pair;
+            QList<Pair> params = this->params;
+			foreach (Pair param, params)
 			{
-				query += QUrl::toPercentEncoding( paramList[ i ].first, "!$&'()*+,;=:@/?" )
+				query += QUrl::toPercentEncoding( param.first, "!$&'()*+,;=:@/?" )
 					  + "="
-					  + QUrl::toPercentEncoding( paramList[ i ].second, "!$&'()*+,;=:@/?" )
+					  + QUrl::toPercentEncoding( param.second, "!$&'()*+,;=:@/?" )
 					  + "&";
 			}
 			

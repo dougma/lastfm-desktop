@@ -19,11 +19,17 @@
 
 #include "ShareDialog.h"
 #include "Settings.h"
+#include "widgets/TrackWidget.h"
 #include "lib/types/User.h"
 #include <QLineEdit>
 #include <QPainter>
 #include <QTimer>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QTextEdit>
+#include <QEvent>
 
 static const char* kHintText = QT_TR_NOOP( "Type friends' names or emails, comma separated" );
 
@@ -31,92 +37,96 @@ static const char* kHintText = QT_TR_NOOP( "Type friends' names or emails, comma
 ShareDialog::ShareDialog( QWidget* parent )
         : QDialog( parent )
 {
-    ui.setupUi( this );
-    connect( ui.friends, SIGNAL(editTextChanged( QString )), SLOT(enableDisableOk()) );
-    ok()->setText( tr("Share") );
-	ok()->setEnabled( false );
+    setupUi();
+    setWindowTitle( tr("Share") );    
+    enableDisableOk();
+    
+    connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
+    connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
+}
 
-    WsReply* r = User( The::settings().username() ).getFriends();
-    connect( r, SIGNAL(finished( WsReply* )), SLOT(onFriendsReturn( WsReply* )) );
 
-    ui.friends->lineEdit()->installEventFilter( this );
-	
-	ui.friends->setFocus();
+void
+ShareDialog::setupUi()
+{
+    //FIXME duplication in various places, eg TagDialog
+    QPalette p = palette();
+    p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
+    p.setBrush( QPalette::WindowText, QColor( 0xff, 0xff, 0xff, 40 ) );
+    setPalette( p );
+    
+    QHBoxLayout* h = new QHBoxLayout;
+    h->addWidget( ui.friends = new QLineEdit );
+    h->addWidget( new QPushButton( tr("Browse Friends") ) );
+    h->setSpacing( 12 );
+    
+    QVBoxLayout* v1 = new QVBoxLayout;
+    v1->addWidget( new QLabel( tr("To") ) );
+    v1->addLayout( h );
+    v1->setSpacing( 0 );
+
+    QVBoxLayout* v2 = new QVBoxLayout;
+    v2->addWidget( new QLabel( tr("Message (optional)") ) );
+    v2->addWidget( ui.message = new QTextEdit );
+    v2->setSpacing( 4 );
+    
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addWidget( ui.track = new TrackWidget );
+    v->addLayout( v1 );
+    v->addLayout( v2 );
+    v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
+    
+    ui.message->setFrameStyle( QFrame::NoFrame );
+    
+    ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Share") );
+    
+#ifdef Q_WS_MAC
+    foreach (QLabel* l, findChildren<QLabel*>())
+    {
+        l->setPalette( p );
+        l->setAttribute( Qt::WA_MacSmallSize );
+    }
+#endif
 }
 
 
 void
 ShareDialog::setTrack( const Track& t )
 {
-    m_track = t;
-    ui.artist->setText( tr("The artist, %1").arg( t.artist() ) );
-    ui.album->setText( tr("The album, %1").arg( t.album() ) );
-    ui.track->setText( tr("The track, %1").arg( t.title() ) );
+    ui.track->setTrack( t );
 }
 
 
 void
 ShareDialog::onFriendsReturn( WsReply* r )
 {
+#if 0
     QString const edit_text = ui.friends->currentText();
     ui.friends->clear();
 
 	foreach( User user, User::getFriends( r ))
 		ui.friends->addItem( user );
     ui.friends->setEditText( edit_text );
+#endif
 }
 
 
 void
 ShareDialog::enableDisableOk()
 {
-    ok()->setEnabled( ui.friends->currentText().size() );
+    ok()->setEnabled( ui.friends->text().size() );
 }
 
 
 void
 ShareDialog::accept()
 {
-    WsReply* r;
-
-    User recipient( ui.friends->currentText() );
+    User recipient( ui.friends->text() );
     QString const message = ui.message->toPlainText();
 
-    if (ui.artist->isChecked()) r = m_track.artist().share( recipient, message );
-    if (ui.track->isChecked()) r = m_track.share( recipient, message );
-    if (ui.album->isChecked()) r = m_track.album().share( recipient, message );
+    m_track.share( recipient, message );
 
     //TODO feedback on success etc, do via that bar thing you planned
 
     QDialog::accept();
-}
-
-
-bool
-ShareDialog::eventFilter( QObject* o, QEvent* e )
-{
-    if (e->type() != QEvent::Paint)
-        return false;
-	
-	QLineEdit *w = (QLineEdit*)o;
-    if (w->hasFocus() || w->text().size()) 
-		return false;
-    
-    w->event( e );
-    
-    QString const text = tr( kHintText );
-    QPainter p( w );
-    p.setPen( Qt::darkGray );	
-#ifdef Q_WS_MAC
-	QFont f = font();
-	f.setPixelSize( 10 );
-	p.setFont( f );
-    QRect r = w->rect().adjusted( 5, 0, -5, -2 );
-#else
-	QRect r = w->rect().adjusted( 5, 2, -5, 0 );
-#endif
-	
-    p.drawText( r, Qt::AlignVCenter, text );
-
-    return true; //eat event
 }

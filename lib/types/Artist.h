@@ -37,6 +37,8 @@ public:
     Artist( const QString& name ) : m_name( name )
     {}
 
+    bool isNull() const { return m_name.isEmpty(); }
+    
 	/** the url for this artist's page at www.last.fm */
 	QUrl www() const;
 	
@@ -52,6 +54,9 @@ public:
     
     /** use Tag::list to get the tag list out of the finished reply */
     WsReply* getTags() const;
+    
+    /** Last.fm dictates that you may submit at most 10 of these */
+    WsReply* addTags( const QStringList& ) const;
 	
 	WsReply* search() const;
 	static QStringList search( WsReply* );

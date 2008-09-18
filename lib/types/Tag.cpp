@@ -23,14 +23,14 @@
 #include "lib/ws/WsRequestBuilder.h"
 
 QUrl
-Tag::url() const
+Tag::www() const
 {
 	return CoreUrl( "http://www.last.fm/tag/" + CoreUrl::encode( m_name ) ).localised();
 }
 
 
 QUrl
-Tag::url( const User& user ) const
+Tag::www( const User& user ) const
 {
 	return CoreUrl( "http://www.last.fm/" + CoreUrl::encode( user ) + "/tags/" + CoreUrl::encode( m_name ) ).localised();
 }
@@ -70,14 +70,24 @@ Tag::list( WsReply* r )
     {
         try
         {
+            int weight = 0;
+
+            //TODO non throwing version of EasyDomElement!
+            try 
+            {
+                weight = e["count"].text().toInt();
+            }
+            catch( EasyDomElement::Exception& ex)
+            {}
+            
             // we toLower always as otherwise it is ugly mixed case, as first
             // ever tag decides case, and Last.fm is case insensitive about it 
             // anyway
-            tags += WeightedString( e["name"].text().toLower(), e["count"].text().toInt() );
+            tags += WeightedString( e["name"].text().toLower(), weight );
         }
-        catch( EasyDomElement::Exception& e)
+        catch( EasyDomElement::Exception& ex)
         {
-            qWarning() << e;
+            qWarning() << ex << '\n' << e;
         }
     }
     return tags;
