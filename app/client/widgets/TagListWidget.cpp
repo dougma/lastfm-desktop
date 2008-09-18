@@ -122,17 +122,12 @@ TagListWidget::setTagsRequest( WsReply* r )
     connect( (QObject*)r, SIGNAL(finished( WsReply* )), SLOT(onTagsRequestFinished( WsReply* )) );
 }
 
-#include <QDebug>
-#include "WsReply.h"
+
 void
 TagListWidget::onTagsRequestFinished( WsReply* r )
-{
-    qDebug() << r->method();
-    
+{    
     foreach (WeightedString tag, Tag::list( r ))
     {
-        qDebug() << tag;
-        
         QTreeWidgetItem *entry = new QTreeWidgetItem;
         entry->setText( 0, tag );
         // I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!

@@ -22,7 +22,7 @@
 
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/TagListWidget.h"
-#include "widgets/MooseTabWidget.h"
+#include "widgets/UnicornTabWidget.h"
 #include "widgets/TrackWidget.h"
 
 #include <QtCore>
