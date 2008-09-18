@@ -56,6 +56,7 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showMetaInfoView();
+    void closeActiveWindow();
 
 signals:
 	void loved();

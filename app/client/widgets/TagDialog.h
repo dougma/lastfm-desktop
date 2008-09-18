@@ -21,7 +21,12 @@
 #define TAG_DIALOG_H
 
 #include "lib/types/Track.h"
-#include "ui_tagdialog.h"
+#include <QDialog>
+
+namespace Moose 
+{
+    class TabWidget;
+}
 
 
 class TagDialog : public QDialog
@@ -35,27 +40,38 @@ public:
 	
 	/** you can only call this once, and you must call it before you show or exec() */
 	void setTrack( const Track& t );
-	
-    void setTaggingType( int i ) { ui.tagTypeBox->setCurrentIndex( i ); }
 
 private slots:
-    void searchAsYouType( const QString& );
-
     void onAccepted();
-    void onTagTypeChanged( int type );
     void onWsFinished( WsReply* );
-    void onTagActivated( QTreeWidgetItem *item );
-    void onTagEditChanged();
-
-    void saveSettings();
+    void onTagActivated( class QTreeWidgetItem *item );
+    void onAddClicked();
+    void onCoverDownloaded( const QByteArray& );
 
 private:
+    struct Ui
+    {
+        class QLabel* cover;
+        class QLabel* track;
+        class SpinnerLabel* spinner;
+        class QLineEdit* edit;
+        class QPushButton* add;
+        class TagListWidget* artistTags;
+        class TagListWidget* albumTags;
+        class TagListWidget* trackTags;
+        class TagListWidget* suggestedTags;
+        class TagListWidget* yourTags;
+        class QDialogButtonBox* buttons;
+        Moose::TabWidget* tabs1;
+        Moose::TabWidget* tabs2;
+        
+        void setupUi( QWidget* parent );
+    } ui;
+
+    void setupUi();
     void follow( WsReply* );
-    virtual bool eventFilter( QObject*, QEvent* );
-
-private:
-    Ui::TagDialog ui;
-
+    TagListWidget* currentTagListWidget() const;    
+    
     Track m_track;
     QStringList m_originalTags;
     QStringList m_publicTags;

@@ -22,17 +22,6 @@
 #define TAGLISTWIDGET_H
 
 #include <QTreeWidget>
-#include <QMenu>
-
-namespace Tags
-{
-    enum SortOrder
-    {
-        MostPopularOrder,
-        AscendingOrder,
-        DescendingOrder
-    };
-}
 
 
 class TagListWidget : public QTreeWidget
@@ -41,31 +30,33 @@ class TagListWidget : public QTreeWidget
 
 public:
     TagListWidget( QWidget* parent = 0 );
-
-    void setSortOrder( Tags::SortOrder sortOrder );
-    Tags::SortOrder sortOrder() { return m_sortOrder; }
-
-    void sort();
-
-    QTreeWidgetItem* addItem( QString tag );
-    void addItems( const QStringList& labels );
-
-private:
-    QMenu m_sortTagsMenu;
-    Tags::SortOrder m_sortOrder;
-
-    QAction* m_actionSortMostPopular;
-    QAction* m_actionSortAZ;
-    QAction* m_actionSortZA;
+    
+    void add( const QString& );
+    void setTagsRequest( class WsReply* );
 
 private slots:
-    void showSortContextMenu( const QPoint& point );
+    void onTagsRequestFinished( WsReply* );
     
+private:
+    class QMenu* m_menu;
+ 
+    virtual int sizeHintForRow( int r ) const { return QTreeWidget::sizeHintForRow( r ) + 10; }
+    
+private slots:
+    void showMenu( const QPoint& );
+    
+    void sortByPopularity();
+    void sortAlphabetically();
     void openTagPageForCurrentItem();
+};
 
-    void sortAZ();
-    void sortZA();
-    void sortMostPopular();
+
+class TagIconView : public TagListWidget
+{
+    virtual void paintEvent( QPaintEvent* );
+
+public:
+    TagIconView();
 };
 
 #endif // TAGLISTWIDGET_H

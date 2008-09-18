@@ -18,50 +18,143 @@
  ***************************************************************************/
 
 #include "TagDialog.h"
-#include "Settings.h"
 #include "lib/types/User.h"
 
-#include <QTimer>
-#include <QPushButton>
-#include <QDebug>
-#include <QCompleter>
-#include <QPainter>
-#include <QKeyEvent>
+#include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "widgets/TagListWidget.h"
 
+#include <QtCore>
+#include <QtGui>
 
 
 TagDialog::TagDialog( QWidget *parent )
         : QDialog( parent, Qt::Dialog )
 {
-    ui.setupUi( this );
-    ui.tagEdit->setFocus();
-    ui.tagEdit->installEventFilter( this );
+    setupUi();
+    setWindowTitle( tr("Tag") );
 
-#if 0 //TODO
-    ui.tagTypeBox->setCurrentIndex( user.lastTagType( 1 ) );
-    ui.personalTagsList->setSortOrder( (Tags::SortOrder) user.personalTagsListSortOrder() );
-    ui.publicTagsList->setSortOrder( (Tags::SortOrder) user.publicTagsListSortOrder() );
-#endif
+    WsReply* r = AuthenticatedUser().getTopTags();
+    ui.yourTags->setTagsRequest( r );
+    follow( r );
 	
     QRegExp rx( "[a-zA-Z0-9\\-:,' ]{1,255}" );
-    ui.tagEdit->setValidator( new QRegExpValidator( rx, this ) );
+    ui.edit->setValidator( new QRegExpValidator( rx, this ) );
+    ui.edit->setCompleter( new QCompleter( ui.suggestedTags->model() ) );
 
-    ui.buttonBox->button( QDialogButtonBox::Ok )->setText( tr("Tag") );
-    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( false );
+    ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Tag") );
+    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( false );
 
-    connect( ui.tagTypeBox, SIGNAL( currentIndexChanged( int ) ), SLOT( onTagTypeChanged( int ) ) );
-    connect( ui.personalTagsList, SIGNAL( itemActivated( QTreeWidgetItem*, int ) ), SLOT( onTagActivated( QTreeWidgetItem* ) ) );
-    connect( ui.publicTagsList, SIGNAL( itemActivated( QTreeWidgetItem*, int ) ), SLOT( onTagActivated( QTreeWidgetItem* ) ) );
-    connect( this, SIGNAL( accepted() ), SLOT( onAccepted() ) );
+    connect( ui.edit, SIGNAL(returnPressed()), ui.add, SLOT(animateClick()) );
+    connect( ui.add, SIGNAL(clicked()), SLOT(onAddClicked()) );
 
-    connect( ui.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
-    connect( ui.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
+    connect( ui.suggestedTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
+    connect( ui.yourTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
+    
+    connect( this, SIGNAL(accepted()), SLOT(onAccepted()) );
+    connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
+    connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
+}
 
-    //needs to stay textEdited() not textChanged() or the completion breaks the filtering
-    connect( ui.tagEdit, SIGNAL( textEdited( QString ) ), SLOT( onTagEditChanged() ) );
 
-//////
-    follow( User( The::settings().username() ).getTopTags() );
+namespace Moose
+{
+    class TabBar : public QTabBar
+    {
+    public:
+        TabBar()
+        {
+        #ifdef Q_WS_MAC
+            QFont f = font();
+            f.setPixelSize( 11 );
+            setFont( f );
+        #endif
+        }
+        
+    protected:
+        virtual void paintEvent( QPaintEvent* e )
+        {
+            QPainter p( this );
+            p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
+            
+            int w = width() / count();
+            for (int i = 0; i < count(); ++i)
+            {
+                int const x = i*w;
+                
+                if (i == count() - 1)
+                    w += width() % w;
+                
+                if (currentIndex() == i)
+                    p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
+                
+                p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
+            }
+        }
+    };
+    
+    class TabWidget : public QWidget
+    {
+        QStackedWidget* stack;
+        Moose::TabBar* bar;
+
+    public:
+        TabWidget()
+        {
+            QVBoxLayout* v = new QVBoxLayout( this );
+            v->addWidget( bar = new TabBar );
+            v->addWidget( stack = new QStackedWidget );
+            v->setSpacing( 0 );
+            v->setMargin( 0 );
+            connect( bar, SIGNAL(currentChanged( int )), stack, SLOT(setCurrentIndex( int )) );
+        }
+        
+        void addTab( const QString& title, QWidget* w )
+        {
+            bar->addTab( title );
+            stack->addWidget( w );
+        }
+        
+        QWidget* currentWidget() const { return stack->currentWidget(); }
+    };
+}
+
+
+void
+TagDialog::setupUi()
+{
+    QPalette p = palette();
+    p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
+    p.setBrush( QPalette::WindowText, QColor( 0xff, 0xff, 0xff, 40 ) );
+    setPalette( p );
+    
+    ui.tabs1 = new Moose::TabWidget;
+    ui.tabs1->addTab( tr("Track"), ui.trackTags = new TagIconView );
+    ui.tabs1->addTab( tr("Artist"), ui.artistTags = new TagIconView );
+    ui.tabs1->addTab( tr("Album"), ui.albumTags = new TagIconView );
+    
+    ui.tabs2 = new Moose::TabWidget;
+    ui.tabs2->addTab( tr("Suggested Tags"), ui.suggestedTags = new TagListWidget );
+    ui.tabs2->addTab( tr("Your Tags"), ui.yourTags = new TagListWidget );
+        
+    QHBoxLayout* h1 = new QHBoxLayout;
+    h1->addWidget( ui.cover = new QLabel );
+    h1->addWidget( ui.track = new QLabel );
+    h1->addWidget( ui.spinner = new SpinnerLabel );
+    
+    ui.cover->setScaledContents( true );
+    ui.spinner->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Maximum );
+    ui.track->setTextFormat( Qt::RichText );
+    
+    QHBoxLayout* h2 = new QHBoxLayout;
+    h2->addWidget( ui.edit = new QLineEdit );
+    h2->addWidget( ui.add = new QPushButton( tr("Add") ) );
+    
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addLayout( h1 );
+    v->addLayout( h2 );
+    v->addWidget( ui.tabs1 );
+    v->addWidget( ui.tabs2 );
+    v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
 }
 
 
@@ -71,6 +164,7 @@ TagDialog::follow( WsReply* r )
     r->setParent( this );
     connect( r, SIGNAL(finished( WsReply* )), SLOT(onWsFinished( WsReply* )) );
     m_activeRequests += r;
+    ui.spinner->show();
 }
 
 
@@ -78,13 +172,46 @@ void
 TagDialog::setTrack( const Track& track )
 {
     m_track = track;
-    onTagTypeChanged( ui.tagTypeBox->currentIndex() );
+
+    QString title = track.title();
+    QString artist = track.artist();
+    QString album = track.album();
+    if (title.isEmpty()) title = '[' + tr("Unknown Track") + ']';
+    if (track.duration()) title += " </b>(" + track.durationString() + ')';
+    if (album.size()) album = tr("from %1").arg( "<span style='color:#fff'>" + album );
+    if (artist.isEmpty()) artist = '[' + tr("Unknown Artist") + ']';
+    artist = tr("by %1").arg( "<span style='color:#fff'>" + artist + "</span>" );
+    
+    ui.track->setText( QString("<div style='color:#fff;margin-bottom:2px'><b>") + 
+                #ifdef Q_WS_MAC
+                      "<span style='font-size:15pt'>" + 
+                #endif
+                       title + "</b></div>"
+                #ifdef Q_WS_MAC
+                      "<span style='font-size:10pt'>" + 
+                #endif
+                      "<span style='color:#999'><div style='margin-bottom:3px'>" + artist + "</div><div>" + album );
 
     // We can't tag album if there isn't one
-    if ( track.album().isNull() )
-        ui.tagTypeBox->removeItem( 2 );
-
-    ui.spinner->show();
+    if (track.album().isNull())
+//        ui.albumTags->setEnabled( false );
+        ;
+    
+    int const h = ui.track->sizeHint().height();
+    ui.cover->setFixedSize( h, h );
+    
+    WsReply* r;
+    
+    follow( r = track.getTopTags() );
+    ui.suggestedTags->setTagsRequest( r );
+    follow( r = track.getTags() );
+    ui.trackTags->setTagsRequest( r );
+    follow( r = track.artist().getTags() );
+    ui.artistTags->setTagsRequest( r );
+    follow( r = track.album().getTags() );
+    ui.albumTags->setTagsRequest( r );
+    
+    connect( new AlbumImageFetcher( track.album(), Album::Medium ), SIGNAL(finished( QByteArray )), SLOT(onCoverDownloaded( QByteArray )) );
 }
 
 
@@ -93,7 +220,7 @@ TagDialog::onAccepted()
 {
 #if 0
     SetTagRequest *request = new SetTagRequest;
-    request->setTag( ui.tagEdit->text() );
+    request->setTag( ui.edit->text() );
     request->setArtist( m_track.artist() );
 
     // we do this because if the originaltags haven't loaded yet we will
@@ -125,27 +252,13 @@ TagDialog::onAccepted()
 
     request->start();
 #endif
-
-    saveSettings();
 }
 
 
-void
-TagDialog::saveSettings()
-{
 #if 0
-    LastFmUserSettings &user = The::settings().currentUser();
-    user.setPersonalTagsListSortOrder( (int)ui.personalTagsList->sortOrder() );
-    user.setPublicTagsListSortOrder( (int)ui.publicTagsList->sortOrder() );
-    user.setLastTagType( ui.tagTypeBox->currentIndex() );
-#endif
-}
-
-
 void
 TagDialog::onTagTypeChanged( int type )
 {
-#if 0
     // cancel any pending requests
     foreach (WsReply* r, m_activeRequests)
         switch (r->type())
@@ -208,65 +321,23 @@ TagDialog::onTagTypeChanged( int type )
     publictags->start();
 
     // keep what only what the user has typed in themselves
-    QStringList tags = ui.tagEdit->text().split( QRegExp( "\\s*,\\s*" ), QString::SkipEmptyParts );
+    QStringList tags = ui.edit->text().split( QRegExp( "\\s*,\\s*" ), QString::SkipEmptyParts );
     foreach ( QString const tag, m_originalTags )
         tags.removeAll( tag );
 
-    ui.tagEdit->setText( tags.join( ", " ) );
+    ui.edit->setText( tags.join( ", " ) );
     m_originalTags.clear();
     ui.publicTagsList->clear();
     ui.spinner->show();
-#endif
 }
+#endif
 
 
 void
-TagDialog::onWsFinished( WsReply *request )
+TagDialog::onWsFinished( WsReply *r )
 {
-#if 0
-    if ( request->succeeded() )
-    {
-        TagsRequest *tags = static_cast<TagsRequest*>( request );
-        switch ( tags->type() )
-        {
-            case TypeAlbumTags:
-            case TypeArtistTags:
-            case TypeTrackTags:
-            {
-                m_publicTags = tags->tags();
-                ui.publicTagsList->addItems( tags->tags() );
-            }
-            break;
-
-            case TypeUserTags:
-            {
-                m_userTags = tags->tags();
-                ui.personalTagsList->addItems( tags->tags() );
-            }
-            break;
-
-            case TypeUserArtistTags:
-            case TypeUserAlbumTags:
-            case TypeUserTrackTags:
-            {
-                QString current_text = ui.tagEdit->text().trimmed();
-                m_originalTags = tags->tags();
-                ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( !current_text.isEmpty() );
-                QStringList tag_edit_tags = QStringList() << m_originalTags << current_text;
-                ui.tagEdit->setText( tag_edit_tags.join( ", " ) );
-                break;
-            }
-
-            default:
-                break;
-        }
-    }
-
-    m_activeRequests.removeAll( request );
-
-    if ( m_activeRequests.isEmpty() )
-        ui.spinner->hide();
-#endif
+    m_activeRequests.removeAll( r );
+    ui.spinner->setVisible( m_activeRequests.size() );
 }
 
 
@@ -274,147 +345,28 @@ void
 TagDialog::onTagActivated( QTreeWidgetItem *item )
 {
     QString const newtag = item->text( 0 ).trimmed();
-    QString text = ui.tagEdit->text().trimmed();
-    QStringList tags = text.split( QRegExp( "\\s*,\\s*" ), QString::SkipEmptyParts );
+    currentTagListWidget()->add( newtag );
+}
 
-    if ( tags.count() && !text.endsWith( ',' ) ) //mxcl knows why
-        tags.pop_back();
+void
+TagDialog::onAddClicked()
+{
+    currentTagListWidget()->add( ui.edit->text() );
+    ui.edit->clear();
+}
 
-    tags << newtag << ""; // adds a trailing ", "
 
-    text = tags.join( ", " );
-    ui.tagEdit->setText( text );
-
-    onTagEditChanged(); //reset filtering
+TagListWidget*
+TagDialog::currentTagListWidget() const
+{
+    return static_cast<TagListWidget*>(ui.tabs1->currentWidget());
 }
 
 
 void
-TagDialog::onTagEditChanged()
+TagDialog::onCoverDownloaded( const QByteArray& data )
 {
-    QStringList l1 = m_originalTags;
-    QStringList l2 = ui.tagEdit->text().split( QRegExp( "\\s*,\\s*" ), QString::SkipEmptyParts );
-
-    l1.sort();
-    l2.sort();
-
-    ui.buttonBox->button( QDialogButtonBox::Ok )->setEnabled( l1 != l2 );
-    searchAsYouType( ui.tagEdit->text() );
-}
-
-
-static inline QStringList filterView( TagListWidget* view, const QStringList& tags,
-                                      const QString& base, const QString& term )
-{
-    QRegExp const rx_filter( "*" + term + "*", Qt::CaseInsensitive, QRegExp::Wildcard );
-    QRegExp const rx_completion( term + "*", Qt::CaseInsensitive, QRegExp::Wildcard );
-
-    QStringList comps;
-    QTreeWidgetItem* current_item = view->currentItem();
-    QString current_text;
-    if (current_item)
-        current_text = current_item->text( 0 );
-    current_item = 0;
-    view->clear();
-    foreach (QString const tag, tags)
-    {
-        if (rx_filter.exactMatch( tag ))
-        {
-            //NOTE hiding items would be nicer, but it's reaaally slow
-            QTreeWidgetItem* item = view->addItem( tag );
-            if (tag == current_text)
-                current_item = item;
-        }
-        if (rx_completion.exactMatch( tag ))
-            comps << base + tag;
-    }
-    view->sort(); //applies user selected custom sorting
-    if (current_item)
-        view->setCurrentItem( current_item );
-    return comps;
-}
-
-
-void
-TagDialog::searchAsYouType( const QString& text )
-{
-    QStringList const tags = text.split( QRegExp( "\\s*,\\s*" ) );
-    QString const term = tags.count() ? tags.back().toLower() : "";
-    QString const base = text.left( text.length() - term.length() );
-    QStringList comps;
-
-    setUpdatesEnabled( false );
-    comps += filterView( ui.publicTagsList, m_publicTags, base, term );
-    comps += filterView( ui.personalTagsList, m_userTags, base, term );
-    setUpdatesEnabled( true );
-
-    if ( term.size() )
-    {
-        QCompleter *completer = new QCompleter( comps );
-        completer->setCaseSensitivity( Qt::CaseInsensitive );
-        completer->setCompletionMode( QCompleter::InlineCompletion );
-        ui.tagEdit->setCompleter( completer );
-    }
-}
-
-
-bool
-TagDialog::eventFilter( QObject* o, QEvent* e )
-{
-    /** used to put the greyed-out help-text in the tagEdit */
-
-    if ( o == ui.tagEdit )
-    {
-        switch ( e->type() )
-        {
-            case QEvent::FocusIn:
-            {
-                QString const text = ui.tagEdit->text();
-                if ( text.size() )
-                {
-                    QRegExp rx( "^.*\\s*,\\s*$" );
-                    if ( !rx.exactMatch( text ) )
-                        ui.tagEdit->setText( text + ", " );
-                }
-            }
-            break;
-
-            case QEvent::Paint:
-                if ( ui.tagEdit->text().isEmpty() )
-                {
-                    QString const k_text = tr( "Enter comma-separated tags here" );
-
-                    ui.tagEdit->event( e );
-
-                    QRect r = ui.tagEdit->rect().adjusted( 5, 2, -5, 0 );
-                    QPainter p( ui.tagEdit );
-                    p.setPen( Qt::gray );
-                    p.setFont( ui.tagEdit->font() );
-                    p.drawText( r, Qt::AlignVCenter, k_text );
-                    ui.tagEdit->setMinimumWidth( p.fontMetrics().width( k_text ) + 12 );
-
-                    return true; //eat event
-                }
-                break;
-
-            case QEvent::KeyPress:
-                if ( static_cast<QKeyEvent*>(e)->key() == Qt::Key_Tab )
-                {
-                    QString text = ui.tagEdit->text().trimmed();
-                    if ( text.size() && !text.endsWith( ',' ) )
-                    {
-                        text += ", ";
-                        ui.tagEdit->setText( text );
-                        searchAsYouType( text );
-                        return true; //eat event if we did some completion
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    return QWidget::eventFilter( o, e );
+    QPixmap p;
+    p.loadFromData( data );
+    ui.cover->setPixmap( p );
 }

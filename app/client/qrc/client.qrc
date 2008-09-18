@@ -7,6 +7,10 @@
     <file>splitter_handle.png</file>
     <file>black.css</file>
   </qresource>
+  <qresource prefix="controls">
+    <file>active/tab.png</file>
+    <file>inactive/tab.png</file>
+  </qresource>
   <qresource prefix="blank">
     <file alias="user.png" >nouser_small.png</file>
     <file alias="cover.png" >blank_cover.png</file>

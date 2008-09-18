@@ -54,7 +54,8 @@ MainWindow::MainWindow()
     setupUi();
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
-    connect( close, SIGNAL(activated()), SLOT(close()) );
+    close->setContext( Qt::ApplicationShortcut );
+    connect( close, SIGNAL(activated()), SLOT(closeActiveWindow()) );
    
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
@@ -112,7 +113,7 @@ MainWindow::setupUi()
     ui.setupUi( this );
 	
 	ui.account->setTitle( The::settings().username() );
-   	connect( User::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
+   	connect( AuthenticatedUser::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
 	
 	QWidget* mainWidget = new QWidget;
 	QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
@@ -142,13 +143,13 @@ MainWindow::showSettingsDialog()
 		d = new Type( this ); \
 		d->setAttribute( Qt::WA_DeleteOnClose ); \
 		d->setWindowFlags( Qt::Dialog ); \
-		d->setModal( false ); \
-		d->show(); \
+		d->setModal( false );
 	
     #define NON_MODAL_MACRO( Type ) \
         static QPointer<Type> d; \
         if (!d) { \
 			THROW_AWAY_DIALOG( Type ); \
+            d->show(); \
         } else \
             d->activateWindow();
 
@@ -189,6 +190,7 @@ MainWindow::showShareDialog()
 		else { \
 			THROW_AWAY_DIALOG( Type ) \
 			d->setTrack( m_track ); \
+            d->show(); \
 		}
 	
 	PER_TRACK_DIALOG( ShareDialog )
@@ -355,4 +357,15 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 	}
 	catch (EasyDomElement::Exception&)
 	{}
+}
+
+
+void
+MainWindow::closeActiveWindow()
+{
+    // I hummed and haaa'd about putting this here or in App.cpp, but it seems
+    // like if I was a n00b, I'd look here first, so I put it here
+    
+    QWidget* w = qApp->activeWindow();
+    if (w) w->close();
 }

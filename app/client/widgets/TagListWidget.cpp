@@ -24,132 +24,81 @@
 #include "lib/types/Tag.h"
 #include <QDesktopServices>
 #include <QHeaderView>
+#include <QItemDelegate>
+#include <QMenu>
 #include <QUrl>
 
 
 TagListWidget::TagListWidget( QWidget* parent ) 
-        : QTreeWidget( parent )
+             : QTreeWidget( parent )
 {
-    QTreeWidget::setColumnCount( 3 );
+    setColumnCount( 2 );
+    setRootIsDecorated( false );
+    setContextMenuPolicy( Qt::CustomContextMenu );
+    setFrameStyle( NoFrame );
+    setAlternatingRowColors( true );
+
+    class TallerRowDelegate : public QItemDelegate
+    {
+        virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+        {
+            return QItemDelegate::sizeHint( option, index ) + QSize( 0, 4 );
+        }
+    };
+
+    setItemDelegate( new TallerRowDelegate );
+    
     QTreeWidget::hideColumn( 1 );
-    QTreeWidget::hideColumn( 2 );
-    QTreeWidget::setRootIsDecorated( false );
     QTreeWidget::header()->hide();
-
-    m_sortOrder = Tags::MostPopularOrder;
-
-    m_actionSortMostPopular = m_sortTagsMenu.addAction( tr( "Sort by Popularity" ) );
-    m_actionSortMostPopular->setCheckable( true );
-
-    m_actionSortAZ = m_sortTagsMenu.addAction( tr( "Sort Tags A-Z" ) );
-    m_actionSortAZ->setCheckable( true );
-
-    m_actionSortZA = m_sortTagsMenu.addAction( tr( "Sort Tags Z-A" ) );
-    m_actionSortZA->setCheckable( true );
     
-    m_sortTagsMenu.addSeparator();
-    QAction* a = m_sortTagsMenu.addAction( tr("Open Last.fm Page for this Tag") );
+    m_menu = new QMenu( this );
+    QActionGroup* group = new QActionGroup( this );
+    
+    QAction* a = m_menu->addAction( tr( "Sort by Popularity" ) );
+    connect( a, SIGNAL(triggered()), SLOT(sortByPopularity()) );
+    group->addAction( a );
+    a->setCheckable( true );
+    a->setChecked( true );
+
+    a = m_menu->addAction( tr( "Sort Alphabetically" ) );
+    connect( a, SIGNAL(triggered()), SLOT(sortAlphabetically()) );
+    group->addAction( a );
+    a->setCheckable( true );
+    
+    m_menu->addSeparator();
+    a = m_menu->addAction( tr("Open Last.fm Page for this Tag") );
     connect( a, SIGNAL(triggered()), SLOT(openTagPageForCurrentItem()) );
-
-    QActionGroup* sortActions = new QActionGroup( this );
-    sortActions->addAction( m_actionSortMostPopular );
-    sortActions->addAction( m_actionSortAZ );
-    sortActions->addAction( m_actionSortZA );
-
-    m_actionSortMostPopular->setChecked( true );
-
-    connect( this,                      SIGNAL( customContextMenuRequested( const QPoint& ) ),
-             this,                        SLOT( showSortContextMenu( const QPoint& ) ) );
-    connect( m_actionSortAZ,            SIGNAL( triggered() ),
-             this,                        SLOT( sortAZ() ) );
-    connect( m_actionSortZA,            SIGNAL( triggered() ),
-             this,                        SLOT( sortZA() ) );
-    connect( m_actionSortMostPopular,   SIGNAL( triggered() ),
-             this,                        SLOT( sortMostPopular() ) );
-}
-
-
-void
-TagListWidget::showSortContextMenu( const QPoint& point )
-{
-    m_sortTagsMenu.exec( mapToGlobal( point ) );
-}
-
-
-void
-TagListWidget::sortAZ()
-{
-    sortItems( 1, Qt::AscendingOrder );
-    update();
-
-    m_sortOrder = Tags::AscendingOrder;
-    m_actionSortAZ->setChecked( true );
-}
-
-
-void
-TagListWidget::sortZA()
-{
-    sortItems( 1, Qt::DescendingOrder );
-    update();
-
-    m_sortOrder = Tags::DescendingOrder;
-    m_actionSortZA->setChecked( true );
-}
-
-
-void
-TagListWidget::sortMostPopular()
-{
-    sortByColumn( 2, Qt::AscendingOrder );
-    update();
-
-    m_sortOrder = Tags::MostPopularOrder;
-    m_actionSortMostPopular->setChecked( true );
-}
-
-
-QTreeWidgetItem*
-TagListWidget::addItem( QString label )
-{
-    label = label.toLower();
     
-    QTreeWidgetItem *entry = new QTreeWidgetItem;
-    entry->setText( 0, label );
-    entry->setText( 1, label.toLower() );
-    // I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
-    entry->setText( 2, QString::number( 10 * 1000 + topLevelItemCount() ) );
-    addTopLevelItem( entry );
-
-    return entry;
+    connect( this, SIGNAL(customContextMenuRequested( QPoint )), SLOT(showMenu( QPoint )) );
 }
 
 
 void
-TagListWidget::addItems( const QStringList& labels )
+TagListWidget::add( const QString& tag )
 {
-    foreach (QString const label, labels)
-        addItem( label );
-    sort();
+    addTopLevelItem( new QTreeWidgetItem( QStringList() << tag ) );
 }
 
 
 void
-TagListWidget::sort()
+TagListWidget::showMenu( const QPoint& point )
 {
-    setSortOrder( m_sortOrder );
+    m_menu->exec( mapToGlobal( point ) );
 }
 
 
 void
-TagListWidget::setSortOrder( Tags::SortOrder sortOrder )
+TagListWidget::sortAlphabetically()
 {
-    if ( sortOrder == Tags::AscendingOrder )
-        sortAZ();
-    else if ( sortOrder == Tags::DescendingOrder )
-        sortZA();
-    else if ( sortOrder == Tags::MostPopularOrder )
-        sortMostPopular();
+    sortItems( 0, Qt::AscendingOrder );
+}
+
+
+void
+TagListWidget::sortByPopularity()
+{
+    //I got here and wasn't sure if sortItems() should be used instead either --mxcl
+    sortByColumn( 1, Qt::DescendingOrder );
 }
 
 
@@ -157,4 +106,53 @@ void
 TagListWidget::openTagPageForCurrentItem()
 {
 	QDesktopServices::openUrl( Tag( currentItem()->text( 0 ) ).url() );
+}
+
+
+void
+TagListWidget::setTagsRequest( WsReply* r )
+{
+    clear();
+    connect( (QObject*)r, SIGNAL(finished( WsReply* )), SLOT(onTagsRequestFinished( WsReply* )) );
+}
+
+
+void
+TagListWidget::onTagsRequestFinished( WsReply* r )
+{
+    foreach (WeightedString tag, Tag::list( r ))
+    {
+        QTreeWidgetItem *entry = new QTreeWidgetItem;
+        entry->setText( 0, tag );
+        // I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
+        entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
+        addTopLevelItem( entry );
+    }
+}
+
+
+#include <QPainter>
+TagIconView::TagIconView()
+{
+    setAlternatingRowColors( false );
+    disconnect( this, SIGNAL(customContextMenuRequested( QPoint )), 0, 0 );
+}
+
+
+void
+TagIconView::paintEvent( QPaintEvent* e )
+{    
+    TagListWidget::paintEvent( e );
+
+    if (topLevelItemCount()) 
+        return;
+    
+    QPainter p( viewport() );
+    p.setPen( Qt::lightGray );
+#ifndef WIN32
+    QFont f = p.font();
+    f.setPointSize( 15 );
+    p.setFont( f );
+#endif
+    p.drawText( viewport()->rect(), Qt::AlignCenter, tr("Type a tag above,\nor choose from below") );
 }

@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>586</width>
-    <height>518</height>
+    <width>395</width>
+    <height>613</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -24,199 +24,96 @@
   <property name="modal" >
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
-    <number>16</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
-    <layout class="QVBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
-     </property>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
      <item>
-      <layout class="QHBoxLayout" >
-       <property name="spacing" >
-        <number>12</number>
+      <widget class="QLabel" name="cover" >
+       <property name="text" >
+        <string/>
        </property>
-       <item>
-        <widget class="QComboBox" name="tagTypeBox" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <item>
-          <property name="text" >
-           <string>Tag the artist</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Tag the track</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Tag the album</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="metadataLabel" >
-         <property name="enabled" >
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text" >
-          <string/>
-         </property>
-         <property name="textInteractionFlags" >
-          <set>Qt::LinksAccessibleByMouse|Qt::NoTextInteraction|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="SpinnerLabel" name="spinner" >
-         <property name="minimumSize" >
-          <size>
-           <width>10</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text" >
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="tagEdit" />
+      <widget class="QLabel" name="label_2" >
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="SpinnerLabel" name="spinner" >
+       <property name="text" >
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" >
-     <property name="horizontalSpacing" >
-      <number>4</number>
-     </property>
-     <property name="verticalSpacing" >
-      <number>4</number>
-     </property>
-     <item row="1" column="2" >
-      <widget class="TagListWidget" name="publicTagsList" >
-       <property name="contextMenuPolicy" >
-        <enum>Qt::CustomContextMenu</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy" >
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="uniformRowHeights" >
-        <bool>true</bool>
-       </property>
-       <property name="itemsExpandable" >
-        <bool>false</bool>
-       </property>
-       <column>
-        <property name="text" >
-         <string>1</string>
-        </property>
-       </column>
-      </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2" >
+     <item>
+      <widget class="QLineEdit" name="tagEdit" />
      </item>
-     <item row="1" column="0" >
-      <widget class="TagListWidget" name="personalTagsList" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="contextMenuPolicy" >
-        <enum>Qt::CustomContextMenu</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy" >
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="uniformRowHeights" >
-        <bool>true</bool>
-       </property>
-       <property name="itemsExpandable" >
-        <bool>false</bool>
-       </property>
-       <column>
-        <property name="text" >
-         <string>1</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-     <item row="0" column="0" >
-      <widget class="QLabel" name="personalTags" >
-       <property name="font" >
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
+     <item>
+      <widget class="QPushButton" name="pushButton" >
        <property name="text" >
-        <string>Your Tags</string>
+        <string>Add</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="2" >
-      <widget class="QLabel" name="publicTags" >
-       <property name="font" >
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text" >
-        <string>Popular Tags for this Artist</string>
-       </property>
-      </widget>
-     </item>
-     <item rowspan="2" row="0" column="1" >
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType" >
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>8</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget" >
+     <widget class="QWidget" name="artist" >
+      <attribute name="title" >
+       <string>Tab 1</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3" />
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>Tab 2</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>Page</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget_2" >
+     <property name="tabPosition" >
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape" >
+      <enum>QTabWidget::Rounded</enum>
+     </property>
+     <property name="elideMode" >
+      <enum>Qt::ElideRight</enum>
+     </property>
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
+       <string>Tab 1</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2" />
+     </widget>
+     <widget class="QWidget" name="tab_4" >
+      <attribute name="title" >
+       <string>Tab 2</string>
+      </attribute>
+     </widget>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >
      <property name="spacing" >
       <number>12</number>
      </property>
-     <property name="leftMargin" >
-      <number>0</number>
-     </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
+     <property name="margin" >
       <number>0</number>
      </property>
      <item>
@@ -224,7 +121,7 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0" >
         <size>
          <width>285</width>
          <height>5</height>
@@ -235,7 +132,7 @@
      <item>
       <widget class="QDialogButtonBox" name="buttonBox" >
        <property name="standardButtons" >
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
       </widget>
      </item>
@@ -245,22 +142,11 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TagListWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>widgets/TagListWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>SpinnerLabel</class>
    <extends>QLabel</extends>
    <header>lib/unicorn/widgets/SpinnerLabel.h</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>tagTypeBox</tabstop>
-  <tabstop>tagEdit</tabstop>
-  <tabstop>personalTagsList</tabstop>
-  <tabstop>publicTagsList</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
