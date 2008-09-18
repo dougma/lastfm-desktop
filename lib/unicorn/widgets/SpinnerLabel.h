@@ -31,7 +31,7 @@ class SpinnerLabel : public QLabel
         switch ((int)e->type())
         {
         case QEvent::Hide:
-            m_movie->setPaused( true );
+            m_movie->stop();
             break;
         case QEvent::Show:
             m_movie->start();
