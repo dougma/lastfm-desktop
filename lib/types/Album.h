@@ -76,7 +76,7 @@ class TYPES_DLLEXPORT AlbumImageFetcher : public QObject
 {
 	Q_OBJECT
 	
-	Album::ImageSize m_size;
+	int m_size;
 	class QNetworkAccessManager* m_manager;
 	
 public:
@@ -94,7 +94,7 @@ private slots:
 private:
 	QString size() const
 	{
-		switch (m_size)
+		switch ((Album::ImageSize) m_size)
 		{
 			default:
 			case Album::Small:return"small";

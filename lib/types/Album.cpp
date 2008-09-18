@@ -57,7 +57,7 @@ Album::www() const
 
 
 AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
-				 : m_size( size ),
+				 : m_size( (int)size ),
 				   m_manager( 0 )
 {	
     if (album.isNull()) {
@@ -79,7 +79,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 		return;
 	}
 	
-    for (;m_size; --int(m_size))
+    for (; m_size >= 0; --m_size)
     {
         try
         {
