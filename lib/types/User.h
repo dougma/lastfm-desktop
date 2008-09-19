@@ -65,7 +65,7 @@ private:
 
 #include "lib/ws/WsKeys.h"
 /** The authenticated user is special, as some webservices only work for him */
-class AuthenticatedUser : public User
+class TYPES_DLLEXPORT AuthenticatedUser : public User
 {
     using User::match;
     

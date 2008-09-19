@@ -20,10 +20,14 @@
 #include "UniqueApplication.h"
 #include <QDebug>
 #include <QStringList>
+#include <QWidget>
+
 
 #ifdef WIN32
 class UniqueApplicationWidget : public QWidget
-{    
+{
+	friend class UniqueApplication;
+
     UniqueApplication* app;
     
     bool winEvent( MSG *msg, long *result )
@@ -35,7 +39,7 @@ class UniqueApplicationWidget : public QWidget
         COPYDATASTRUCT *data = (COPYDATASTRUCT*)msg->lParam;
         QString message = QString::fromLatin1( (char*)data->lpData, data->cbData / 2 );
         
-        emit app->messageReceived( message.split( '\0' ) );
+        emit app->arguments( message.split( QChar('\0') ) );
         
         if (result)
             *result = 0;
@@ -48,6 +52,8 @@ class UniqueApplicationWidget : public QWidget
 
 
 UniqueApplication::UniqueApplication( const char* id )
+			     : m_id( id ),
+				   m_alreadyRunning( false )
 {
 #ifdef WIN32
     ::CreateMutexA( NULL, false, id ); //extern const char*
@@ -57,29 +63,16 @@ UniqueApplication::UniqueApplication( const char* id )
     // NULL for the SECURITY_ATTRIBUTES on Mutex creation);
     m_alreadyRunning = ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED;
     
-    QString const wid = QString(id) + "_UniqueApplicationWidget";
-
-    if (!m_alreadyRunning)
-    {
-        UniqueApplicationWidget* w = new UniqueApplicationWidget;
-        w->setParent( this ); //autodelete
-        w->app = this;
-        w->setWindowTitle( wid );
-        m_hwnd = w->winId();
-    }
-    else
-    {
-        m_hwnd = ::FindWindow( L"QWidget", (TCHAR*)wid.utf16() );        
-    }
+	m_hwnd = m_alreadyRunning
+			? ::FindWindow( L"QWidget", (TCHAR*)winId().utf16() )
+			: 0;
 #endif
     
 #ifdef Q_WS_MAC
     CFStringRef cfid = CFStringCreateWithCString( NULL, id, kCFStringEncodingISOLatin1 );
     m_port = CFMessagePortCreateRemote( kCFAllocatorDefault, cfid );
 
-    m_alreadyRunning = m_port != 0;
-
-    if (!m_alreadyRunning)
+    if (m_port == 0)
     {
         CFMessagePortContext context;
         context.version = 0;
@@ -110,6 +103,26 @@ UniqueApplication::UniqueApplication( const char* id )
 }
 
 
+// we force passing qApp to force people to create the QApplication
+// instance before calling this function
+void
+UniqueApplication::init( const QApplication& )
+{
+	if (m_alreadyRunning)
+		return;
+
+#ifdef WIN32
+	// sadly we can't do this any earlier, so on Windows, there's a fair amount of time
+	// where arguments will be lost. Perhaps we could make a win32 window? Then we don't
+	// need to wait for the QApplication to be initialised
+	UniqueApplicationWidget* w = new UniqueApplicationWidget;
+	w->app = this;
+	w->setWindowTitle( winId() );
+	m_hwnd = w->winId();
+#endif
+}
+
+
 bool
 UniqueApplication::forward( int argc, char** argv )
 {
@@ -127,18 +140,18 @@ UniqueApplication::forward( const QStringList& args )
         return false;
     
     const uint timeout = 5000; //milliseconds    
-    
+
+	QByteArray message;
+	foreach (QString const arg, args)
+	{
+		message += arg.toLatin1();
+		message += '\0';
+	}
+
 #ifdef Q_WS_MAC
     if (!m_port) {
         qWarning() << "No CFMessagePort available";
         return false;
-    }
-    
-    QByteArray message;
-    foreach (QString const arg, args)
-    {
-        message += arg.toLatin1();
-        message += '\0';
     }
         
     static SInt32 msgid = 0;
@@ -154,20 +167,13 @@ UniqueApplication::forward( const QStringList& args )
 #ifdef WIN32
     if (!m_hwnd) {
         qDebug() << "No previous instance found";
-        return;
-    }
-
-    QString message;
-    foreach (QString const arg, args)
-    {
-        message += arg();
-        message += '\0';
+        return false;
     }
     
     COPYDATASTRUCT data;
     data.dwData = 0;
-    data.cbData = (message.length()+1) * sizeof(QChar);
-    data.lpData = (void*)message.utf16();
+    data.cbData = message.length()+1;
+    data.lpData = message.data();
     DWORD result;
     LRESULT res = SendMessageTimeoutA( m_hwnd, 
                                        WM_COPYDATA, 

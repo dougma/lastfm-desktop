@@ -55,12 +55,13 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
     UniqueApplication uapp( "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F" );
-    if (uapp.forward( argc, argv ))
-        return 0;
+    if (uapp.isAlreadyRunning())
+		return uapp.forward( argc, argv ) ? 0 : 1;
     
     try
     {
         App app( argc, argv );
+		uapp.init( app );
         app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
 
       #ifdef Q_WS_MAC

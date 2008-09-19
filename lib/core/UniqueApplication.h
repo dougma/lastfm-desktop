@@ -20,7 +20,9 @@
 #ifndef UNIQUE_APPLICATION_H
 #define UNIQUE_APPLICATION_H
 
+#include "lib/DllExportMacro.h"
 #include <QObject>
+#include <QString>
 #ifdef Q_WS_MAC
 #include <Carbon/Carbon.h>
 #endif
@@ -36,14 +38,17 @@
   * Basically, make a unique app, try to forward the command line arguments
   * over, if that fails, continue, otherwise exit( 0 )
   */
-class UniqueApplication : public QObject
+class CORE_DLLEXPORT UniqueApplication : public QObject
 {
     Q_OBJECT
     
 public:
     UniqueApplication( const char* id );
 
-    bool isAlreadyOpen() const { return m_alreadyRunning; }
+	/** if !isAlreadyOpen(), you'll need to do this too */
+	void init( const class QApplication& );
+
+	bool isAlreadyRunning() const { return m_alreadyRunning; }
     
     /** forwards arguments to the running instance, @returns success 
       * we convert using QString::fromLocal8Bit() */
@@ -55,14 +60,18 @@ signals:
     void arguments( const class QStringList& );
     
 private:
-    bool m_alreadyRunning;
+	const char* m_id;
+	bool m_alreadyRunning;
 
 #ifdef Q_WS_MAC
     static CFDataRef MacCallBack( CFMessagePortRef, SInt32, CFDataRef data, void* info );
     CFMessagePortRef m_port;
 #endif
 #ifdef WIN32
+	friend class UniqueApplicationWidget;
     HWND m_hwnd;
+
+	QString winId() const { return QString(m_id) + "_UniqueApplicationWidget"; }
 #endif
 };
 
