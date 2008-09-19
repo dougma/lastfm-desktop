@@ -58,7 +58,7 @@ TrackWidget::setTrack( const Track& track )
                 #ifdef Q_WS_MAC
                       "<span style='font-size:10pt'>" + 
                 #endif
-                      "<span style='color:#999'><div style='margin-bottom:3px'>" + artist + "</div><div>" + album );
+                      "<span style='color:#878787'><div style='margin-bottom:3px'>" + artist + "</div><div>" + album );
     
     int const h = ui.track->sizeHint().height();
     ui.cover->setFixedSize( h, h );

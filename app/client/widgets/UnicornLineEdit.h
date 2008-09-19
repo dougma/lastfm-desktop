@@ -17,44 +17,24 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SHARE_DIALOG_H
-#define SHARE_DIALOG_H
+#ifndef UNICORN_LINE_EDIT_H
+#define UNICORN_LINE_EDIT_H
 
-#include "lib/types/Track.h"
-#include <QDialogButtonBox>
-#include <QDialog>
+#include <QLineEdit>
 
 
-class ShareDialog : public QDialog
+namespace Unicorn 
 {
-    Q_OBJECT
+    class LineEdit : public QLineEdit
+    {
+        QString const m_text;
 
-    struct {
-        QDialogButtonBox* buttons;
-        class TrackWidget* track;
-        class QLineEdit* edit;
-        class QTextEdit* message;
-        class QPushButton* browseFriends;
-    } ui;
-    
-public:
-    ShareDialog( QWidget* parent );
-
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
-	Track track() const { return m_track; }
-
-    void setupUi();
-
-private slots:
-    void browseFriends();
-    void enableDisableOk();
-
-private:
-    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-    virtual void accept();
-
-    Track m_track;
-};
+    public:
+        LineEdit( const QString& helpText = "" );
+        
+    protected:
+        virtual void paintEvent( QPaintEvent* );
+    };
+}
 
 #endif

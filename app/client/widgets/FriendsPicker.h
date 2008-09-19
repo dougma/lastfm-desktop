@@ -17,44 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SHARE_DIALOG_H
-#define SHARE_DIALOG_H
+#ifndef FRIENDS_PICKER_H
+#define FRIENDS_PICKER_H
 
-#include "lib/types/Track.h"
-#include <QDialogButtonBox>
 #include <QDialog>
+#include "lib/types/User.h"
 
 
-class ShareDialog : public QDialog
+class FriendsPicker : public QDialog
 {
     Q_OBJECT
 
-    struct {
-        QDialogButtonBox* buttons;
-        class TrackWidget* track;
-        class QLineEdit* edit;
-        class QTextEdit* message;
-        class QPushButton* browseFriends;
+    struct
+    {
+        class QDialogButtonBox* buttons;
     } ui;
     
 public:
-    ShareDialog( QWidget* parent );
-
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
-	Track track() const { return m_track; }
-
-    void setupUi();
+    FriendsPicker( const User& = AuthenticatedUser() );
+    
+    QList<User> selection() const;
 
 private slots:
-    void browseFriends();
-    void enableDisableOk();
-
-private:
-    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-    virtual void accept();
-
-    Track m_track;
+    void onGetFriendsReturn( WsReply* );
 };
 
 #endif

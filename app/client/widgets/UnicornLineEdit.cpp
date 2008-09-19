@@ -17,44 +17,27 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SHARE_DIALOG_H
-#define SHARE_DIALOG_H
-
-#include "lib/types/Track.h"
-#include <QDialogButtonBox>
-#include <QDialog>
+#include "UnicornLineEdit.h"
+#include <QPainter>
 
 
-class ShareDialog : public QDialog
+Unicorn::LineEdit::LineEdit( const QString& text )
+                 : m_text( text )
 {
-    Q_OBJECT
+    setMinimumWidth( fontMetrics().width( m_text ) + 12 );
+}
 
-    struct {
-        QDialogButtonBox* buttons;
-        class TrackWidget* track;
-        class QLineEdit* edit;
-        class QTextEdit* message;
-        class QPushButton* browseFriends;
-    } ui;
+
+void
+Unicorn::LineEdit::paintEvent( QPaintEvent* e )
+{
+    QLineEdit::paintEvent( e );
     
-public:
-    ShareDialog( QWidget* parent );
-
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
-	Track track() const { return m_track; }
-
-    void setupUi();
-
-private slots:
-    void browseFriends();
-    void enableDisableOk();
-
-private:
-    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-    virtual void accept();
-
-    Track m_track;
-};
-
-#endif
+    if (text().isEmpty())
+    {
+        QRect r = rect().adjusted( 5, 2, -5, 0 );
+        QPainter p( this );
+        p.setPen( Qt::gray );
+        p.drawText( r, Qt::AlignVCenter, m_text );
+    }
+}

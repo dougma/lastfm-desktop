@@ -105,8 +105,6 @@ AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size 
 void
 AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 {
-    qDebug() << reply;
-    
 	if (!reply->failed())
 	    for (; m_size >= 0; --m_size)
         {

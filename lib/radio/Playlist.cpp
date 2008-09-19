@@ -23,7 +23,7 @@
 
 
 Playlist::Playlist( WsReply* reply ) throw( CoreException )
-{
+{    
 	m_title = reply->lfm()["playlist"]["title"].text();
 		
 	//FIXME should we use UnicornUtils::urlDecode()?

@@ -19,10 +19,10 @@
 
 #include "TagDialog.h"
 #include "lib/types/User.h"
-
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/TagListWidget.h"
 #include "widgets/UnicornTabWidget.h"
+#include "widgets/UnicornWidget.h"
 #include "widgets/TrackWidget.h"
 
 #include <QtCore>
@@ -34,7 +34,8 @@ TagDialog::TagDialog( QWidget *parent )
 {
     setupUi();
     setWindowTitle( tr("Tag") );
-
+    UnicornWidget::paintItBlack( this );
+    
     WsReply* r = AuthenticatedUser().getTopTags();
     ui.yourTags->setTagsRequest( r );
     follow( r );
@@ -60,11 +61,6 @@ TagDialog::TagDialog( QWidget *parent )
 void
 TagDialog::setupUi()
 {
-    QPalette p = palette();
-    p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
-    p.setBrush( QPalette::WindowText, QColor( 0xff, 0xff, 0xff, 40 ) );
-    setPalette( p );
-    
     ui.tabs1 = new Unicorn::TabWidget;
     ui.tabs1->addTab( tr("Track"), ui.trackTags = new TagIconView );
     ui.tabs1->addTab( tr("Artist"), ui.artistTags = new TagIconView );

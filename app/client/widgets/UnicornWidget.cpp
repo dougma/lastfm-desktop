@@ -17,44 +17,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SHARE_DIALOG_H
-#define SHARE_DIALOG_H
+#include "UnicornWidget.h"
+#include <QPalette>
+#include <QWidget>
+#include <QAbstractScrollArea>
+#include <QLabel>
+#include <QPushButton>
 
-#include "lib/types/Track.h"
-#include <QDialogButtonBox>
-#include <QDialog>
-
-
-class ShareDialog : public QDialog
+#include <QApplication>
+void //static
+UnicornWidget::paintItBlack( QWidget* w )
 {
-    Q_OBJECT
-
-    struct {
-        QDialogButtonBox* buttons;
-        class TrackWidget* track;
-        class QLineEdit* edit;
-        class QTextEdit* message;
-        class QPushButton* browseFriends;
-    } ui;
+    QPalette p = w->palette();
+    p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
+    p.setBrush( QPalette::WindowText, QColor( 0x87, 0x87, 0x87 ) );
+    w->setPalette( p );
     
-public:
-    ShareDialog( QWidget* parent );
+    foreach (QAbstractScrollArea* a, w->findChildren<QAbstractScrollArea*>())
+        a->setFrameStyle( QFrame::NoFrame );
 
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
-	Track track() const { return m_track; }
-
-    void setupUi();
-
-private slots:
-    void browseFriends();
-    void enableDisableOk();
-
-private:
-    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-    virtual void accept();
-
-    Track m_track;
-};
-
+#ifdef Q_WS_MAC
+    // Qt 4.4.1 on OS X is rubbish
+    foreach (QLabel* l, w->findChildren<QLabel*>())
+        l->setPalette( p );
+    // unset palette for the aqua buttons, as otherwise when they are disabled
+    // they are illegible
+    foreach (QPushButton* b, w->findChildren<QPushButton*>())
+    {
+        // the following is documented to work
+//        b->setPalette( QPalette() );
+//        b->setAttribute( Qt::WA_SetPalette, false );
+        // but only this works :(
+        b->setPalette( qApp->palette() );
+    }
 #endif
+}

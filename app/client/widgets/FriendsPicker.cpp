@@ -17,44 +17,46 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SHARE_DIALOG_H
-#define SHARE_DIALOG_H
-
-#include "lib/types/Track.h"
+#include "FriendsPicker.h"
+#include "widgets/UnicornLineEdit.h"
+#include "widgets/UnicornWidget.h"
+#include "lib/types/User.h"
 #include <QDialogButtonBox>
-#include <QDialog>
+#include <QListWidget>
+#include <QVBoxLayout>
 
 
-class ShareDialog : public QDialog
-{
-    Q_OBJECT
-
-    struct {
-        QDialogButtonBox* buttons;
-        class TrackWidget* track;
-        class QLineEdit* edit;
-        class QTextEdit* message;
-        class QPushButton* browseFriends;
-    } ui;
+FriendsPicker::FriendsPicker( const User& user )
+{    
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addWidget( new Unicorn::LineEdit( tr("Search") ) );
+    v->addWidget( new QListWidget );
+    v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
+ 
+    UnicornWidget::paintItBlack( this );    
     
-public:
-    ShareDialog( QWidget* parent );
+    setWindowTitle( tr("Browse Friends") );
+    
+    WsReply* r = user.getFriends();
+    connect( r, SIGNAL(finished( WsReply* )), SLOT(onGetFriendsReturn( WsReply* )) );
+    
+    connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
+    connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
+}
 
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
-	Track track() const { return m_track; }
 
-    void setupUi();
+void
+FriendsPicker::onGetFriendsReturn( WsReply* r )
+{
+    foreach (User u, User::getFriends( r ))
+    {
+        qDebug() << u;
+    }
+}
 
-private slots:
-    void browseFriends();
-    void enableDisableOk();
 
-private:
-    class QPushButton* ok() { return ui.buttons->button( QDialogButtonBox::Ok ); }
-    virtual void accept();
-
-    Track m_track;
-};
-
-#endif
+QList<User>
+FriendsPicker::selection() const
+{
+    return QList<User>();
+}
