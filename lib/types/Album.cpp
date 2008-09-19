@@ -86,13 +86,14 @@ Album::addTags( const QStringList& tags ) const
 
 
 
-
+#include <QFile>
 AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
 				 : m_size( (int)size ),
-				   m_manager( 0 )
+				   m_manager( 0 ),
+                   m_nocover( false )
 {	
     if (album.isNull()) {
-        QTimer::singleShot( 0, this, SIGNAL(finished()) );
+        QTimer::singleShot( 0, this, SLOT(fail()) );
         return;
     }
     
@@ -104,31 +105,31 @@ AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size 
 void
 AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
 {
-	if (reply->failed()) {
-		// we output a qWarning at a higher level
-		emit finished();
-		return;
-	}
-	
-    for (; m_size >= 0; --m_size)
-    {
-        try
-        {
-            QUrl const url = reply->lfm()["album"]["image size="+size()].text();
-
-            m_manager = new QNetworkAccessManager( this );
-
-            QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
-            connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
-            return;
-        }
-        catch (EasyDomElement::Exception& e)
-        {}
-    }
+    qDebug() << reply;
     
-    qWarning() << "Apparently there is no cover art for this album:";
-    qDebug() << reply->lfm();
-    emit finished();
+	if (!reply->failed())
+	    for (; m_size >= 0; --m_size)
+        {
+            try
+            {
+                QUrl const url = reply->lfm()["album"]["image size="+size()].text();
+                
+                // we seem to get a load of album.getInfos where the node exists
+                // but the value is ""
+                if (!url.isValid())
+                    continue;
+
+                m_manager = new QNetworkAccessManager( this );
+
+                QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
+                connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
+                return;
+            }
+            catch (EasyDomElement::Exception& e)
+            {}
+        }
+
+    fail();
 }
 
 
@@ -136,7 +137,22 @@ void
 AlbumImageFetcher::onImageDataDownloaded()
 {
 	QNetworkReply* reply = (QNetworkReply*)sender();
-	emit finished( reply->readAll() );
+    QByteArray const data = reply->readAll();
+    if (data.isEmpty())
+        fail();
+    else
+        emit finished( data );
+    
 	reply->deleteLater(); //never delete an object in a slot connected to it
 						  //always call deleteLater _after_ emit
+}
+
+
+void
+AlbumImageFetcher::fail()
+{
+    m_nocover = true;
+    QFile f( ":/blank/cover.png" );
+    f.open( QFile::ReadOnly );
+    emit finished( f.readAll() );
 }

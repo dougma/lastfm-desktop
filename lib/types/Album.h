@@ -80,21 +80,27 @@ public:
 class TYPES_DLLEXPORT AlbumImageFetcher : public QObject
 {
 	Q_OBJECT
-	
+
+    bool m_nocover;
 	int m_size;
 	class QNetworkAccessManager* m_manager;
-	
+
 public:
 	AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
 	
+    /** if Last.fm doesn't know the album, or has no cover, this @returns false */
+    bool isValid() const;
+    
 signals:
-	/** you can init a QPixmap or QImage with this
-	  * if the image download fails, you'll get a null bytearray */
-	void finished( const QByteArray& = QByteArray() );
+	/** you can init a QPixmap or QImage with this 
+      * if the image download fails, you get our default cover image 
+      * so this is guarenteed to provide an image */
+	void finished( const QByteArray& );
 	
 private slots:
 	void onGetInfoFinished( WsReply* );
 	void onImageDataDownloaded();
+    void fail();
 	
 private:
 	QString size() const

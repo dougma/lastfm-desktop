@@ -80,13 +80,8 @@ TrackInfoWidget::setTrack( const Track& t )
 void
 TrackInfoWidget::onAlbumImageDownloaded( const QByteArray& data )
 {
-	if (data.size())
-	{
-		m_cover.loadFromData( data );
-	    qDebug() << "Image dimensions:" << m_cover.size();
-	}
-	else
-		m_cover = QImage( ":/blank/cover.png" ); //TODO blank cover in unicorn
+    m_cover.loadFromData( data );
+    qDebug() << "Image dimensions:" << m_cover.size();
 
 	m_cover = addReflection( m_cover );
 	update();
