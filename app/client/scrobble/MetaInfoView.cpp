@@ -131,10 +131,11 @@ MetaInfoView::resizeEvent( QResizeEvent* )
 void
 MetaInfoView::load()
 {   
-	ui.web->load( QUrl("about:blank") ); //clear the web view first
-
     if (m_track.isNull())
         return;
+
+    ui.web->show();
+	ui.web->load( QUrl("about:blank") ); //clear the web view first
 	
 	QUrl url;
 	switch (ui.tabs->currentIndex())
