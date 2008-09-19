@@ -110,25 +110,37 @@ namespace mxcl
 }
 
 
+struct Pair
+{
+    Pair( const QString& s )
+    {
+        if (s[1] == '=')
+        {
+            key = s[0];
+            value = s.mid( 2 );
+        }
+    }
+    
+    QChar key;
+    QString value;
+};
+
+
 QMap<QChar, QString>
 PlayerCommandParser::extractArgs( const QString& line )
 {
     QMap<QChar, QString> map;
 
     // split by single & only, doubles are in fact &
-    foreach (QString pair, mxcl::split( line ))
+    foreach (Pair pair, mxcl::split( line ))
     {
-        QStringList parts = pair.split( '=' );
+        if (pair.key == QChar()) 
+            throw Exception( "Invalid pair: " + QString(pair.key) + '=' + pair.value );
 
-        if (parts.count() != 2 || parts[0].length() > 1) 
-            throw Exception( "Invalid pair: " + pair );
-                
-        QChar id = parts[0][0];
+        if (map.contains( pair.key ))
+            throw Exception( "Field identifier occurred twice in request: " + QString(pair.key) );
 
-        if (map.contains( id ))
-            throw Exception( "Field identifier occurred twice in request: " + QString(id) );
-
-        map[id] = parts[1].trimmed();
+        map[pair.key] = pair.value.trimmed();
     }
 
     return map;
