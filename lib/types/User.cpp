@@ -22,21 +22,21 @@
 
 
 WsReply*
-User::getFriends()
+User::getFriends() const
 {
     return WsRequestBuilder( "user.getFriends" ).add( "user", m_name ).get();
 }
 
 
 WsReply*
-User::getTopTags()
+User::getTopTags() const
 {
     return WsRequestBuilder( "user.getTopTags" ).add( "user", m_name ).get();
 }
 
 
 WsReply* 
-User::getNeighbours()
+User::getNeighbours() const
 {
 	return WsRequestBuilder( "user.getNeighbours" ).add( "user", m_name ).get();
 }

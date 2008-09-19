@@ -36,13 +36,13 @@ public:
 
     operator QString() const { return m_name; }
 
-    WsReply* getFriends();
+    WsReply* getFriends() const;
     static QList<User> getFriends( WsReply* );
 	
     /** You can get a WeightedStringList using Tag::getTopTags() */
-	WsReply* getTopTags();
+	WsReply* getTopTags() const;
 	
-	WsReply* getNeighbours();
+	WsReply* getNeighbours() const;
 	static QList<User> getNeighbours( WsReply* );
 	
 	QUrl smallImageUrl() const{ return m_smallImage; }

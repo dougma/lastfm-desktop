@@ -152,7 +152,7 @@ void
 AlbumImageFetcher::fail()
 {
     m_nocover = true;
-    QFile f( ":/blank/cover.png" );
+    QFile f( ":/lastfm/no/cover.png" );
     f.open( QFile::ReadOnly );
     emit finished( f.readAll() );
 }
