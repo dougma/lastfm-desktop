@@ -35,12 +35,12 @@ class ImageButton : public QPushButton
 	Q_OBJECT
 	
 public:
-	ImageButton( QWidget* parent ) : QPushButton( parent ), iconX( 0 ), iconY( 0 )
+	ImageButton( QWidget* parent ) : QPushButton( parent )
 	{
 			setIconSize( QSize(150, 150) );
 	}
 	
-	ImageButton( const QString& path, QAction* action = 0 ) : iconX( 0 ), iconY( 0 )
+	ImageButton( const QString& path, QAction* action = 0 )
 	{
 		if( action )
 		{
@@ -52,14 +52,16 @@ public:
 		
         QPixmap disabled( path.left( path.length() - 4 ) + "_inactive.png" );
         
+        QPixmap p( path );
+		QIcon i;
+		i.addPixmap( path, QIcon::Normal);
+		
         if (!disabled.isNull())
         {
-            QPixmap p( path );
-            QIcon i( p );
             i.addPixmap( disabled, QIcon::Disabled );
-			setIcon( i );
         }
-        
+		setIcon( i );
+		
 		setIconSize( QSize(150, 150) );
 	}
 	
@@ -110,7 +112,6 @@ public:
 	
 private:
 	QIcon m_backgroundIcon;
-	int iconX, iconY;
 	QMap< QIcon::Mode, QPoint > m_iconOffsets;
 	
 private slots:

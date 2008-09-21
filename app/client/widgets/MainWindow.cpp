@@ -27,6 +27,7 @@
 #include "widgets/TagDialog.h"
 #include "radio/RadioWidget.h"
 #include "radio/FriendsTuner.h"
+#include "radio/buckets/PrimaryBucket.h"
 #include "Settings.h"
 #include "version.h"
 #include "the/radio.h"
@@ -125,10 +126,14 @@ MainWindow::setupUi()
 	//		 for now and nicely wraps the love / ban / tag / share actions together.
 	mainLayout->addWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
 	mainLayout->addWidget( ui.launcher = new Launcher );
-	
+		
 	setCentralWidget( mainWidget );
 
 	ui.tuner = new RadioWidget( this );
+	ui.primaryBucket = new PrimaryBucket( this );
+
+	ui.primaryBucket->move( this->pos().x() - (ui.primaryBucket->width()*3), this->pos().y());
+	ui.primaryBucket->show();
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;

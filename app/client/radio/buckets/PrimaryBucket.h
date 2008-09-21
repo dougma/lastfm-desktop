@@ -16,64 +16,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef PRIMARY_BUCKET_H
+#define PRIMARY_BUCKET_H
 
-#include "ui_MainWindow.h"
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include "PlayerState.h"
-#include "lib/types/Track.h"
-#include "widgets/Launcher.h"
+#include <QMainWindow>
+#include <QListWidget>
 
-
-class MainWindow : public QMainWindow
+class PrimaryBucket : public QMainWindow
 {
-    Q_OBJECT
-
+	Q_OBJECT
 public:
-    MainWindow();
+	PrimaryBucket( QWidget* w = 0 );
 
-    QSize sizeHint() const;
-	
-	struct Ui : ::Ui::MainWindow
-	{
-		class Launcher* launcher;
-		class QStackedWidget* stack;
-		class RadioWidget* tuner;
-		class ScrobbleViewWidget* scrobbler;
-		class FriendsTuner* friendTuner;
-		class PrimaryBucket* primaryBucket;
-		};
-	
-	Ui ui;
-
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-	void showTagDialog();
-    void showMetaInfoView();
-    void closeActiveWindow();
-
-signals:
-	void loved();
-	void banned();
-	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-	void onUserGetInfoReturn( class WsReply* );
-    void onTrackSpooled( const Track& );
-    
 private:
-    void setupUi();
-	void addTab( QWidget* w, const QString& t );
 	
-	virtual void dragEnterEvent( QDragEnterEvent* );
-	virtual void dropEvent( QDropEvent* );
-    
-    Track m_track;
+	struct {
+		class QTabWidget* tabWidget;
+		class PrimaryListView* friendsBucket;
+		class PrimaryListView* tagsBucket;
+	} ui;
+
 };
+
+
+#include <QMouseEvent>
+#include <QModelIndex>
+#include <QDebug>
+class PrimaryListView : public QListWidget
+{
+	Q_OBJECT
+public:
+	PrimaryListView( QWidget* parent ): QListWidget( parent ){};
+
+	void mousePressEvent(QMouseEvent *event)
+	{
+		QModelIndex i = indexAt( event->pos());
+		if (event->button() == Qt::LeftButton
+			&& i.isValid() && i.flags() & Qt::ItemIsDragEnabled ) 
+		{
+			
+			QString text = i.data( Qt::DisplayRole ).toString();
+			QIcon icon = i.data( Qt::DecorationRole ).value<QIcon>();
+			QDrag *drag = new QDrag( this );
+			QMimeData *mimeData = new QMimeData;
+			
+			mimeData->setText( text );
+			mimeData->setImageData( icon.pixmap( 50 ).toImage() );
+			
+			drag->setMimeData( mimeData );
+			drag->setPixmap(icon.pixmap(50 ));
+			drag->setHotSpot(QPoint(drag->pixmap().width()/2,
+									drag->pixmap().height()));
+			
+			Qt::DropAction dropAction = drag->exec( Qt::CopyAction );
+
+			if( dropAction != Qt::IgnoreAction )
+				itemFromIndex( i )->setFlags( Qt::NoItemFlags );
+		}
+	}
+	
+};
+
+#endif
