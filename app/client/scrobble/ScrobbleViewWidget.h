@@ -25,18 +25,13 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-namespace Ui
-{
-	class MainWindow;
-}
-
 
 class ScrobbleViewWidget : public QWidget
 {
     Q_OBJECT
     
 public:
-	ScrobbleViewWidget( Ui::MainWindow& );
+	ScrobbleViewWidget();
 
 	struct {
 		class ImageButton* love;

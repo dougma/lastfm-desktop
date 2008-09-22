@@ -88,7 +88,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
                 accept();
                 break;
             }
-            catch (EasyDomElement::Exception& e)
+            catch (CoreDomElement::Exception& e)
             {
                 qWarning() << e;
             }

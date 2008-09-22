@@ -19,16 +19,22 @@
 
 #include "RadioMiniControls.h"
 #include "PlayerState.h"
-#include "ObservedTrack.h"
+#include  "widgets/ImageButton.h"
+#include <QApplication>
+#include <QHBoxLayout>
 #include <phonon/volumeslider.h>
 
 
 RadioMiniControls::RadioMiniControls()
 {
-    ui.setupUi( this );
+    QHBoxLayout* h = new QHBoxLayout( this );
+    h->addWidget( ui.play = new ImageButton( ":/play.png" ) );
+    h->addWidget( ui.skip = new ImageButton( ":/skip.png" ) );
+    h->setSpacing( 0 );
+
     ui.play->setPixmap( ":/stop.png", QIcon::On );
     ui.volume = new Phonon::VolumeSlider;
-	ui.volume->setMinimumWidth( ui.play->width() + ui.skip->width() );
+	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
 	
     layout()->addWidget( ui.volume );
 	

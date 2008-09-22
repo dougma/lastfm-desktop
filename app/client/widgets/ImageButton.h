@@ -20,107 +20,40 @@
 #ifndef IMAGE_BUTTON_H
 #define IMAGE_BUTTON_H
 
-#include <QPushButton>
-#include <QPainter>
-#include <QPaintEvent>
-#include <QLayout>
+#include <QAbstractButton>
 #include <QAction>
-#include <QPixmap>
 #include <QIcon>
-#include <QString>
-#include <QDebug>
+#include <QMap>
 
-class ImageButton : public QPushButton
+
+class ImageButton : public QAbstractButton
 {
 	Q_OBJECT
 	
 public:
-	ImageButton( QWidget* parent ) : QPushButton( parent )
-	{
-			setIconSize( QSize(150, 150) );
-	}
-	
-	ImageButton( const QString& path, QAction* action = 0 )
-	{
-		if( action )
-		{
-			connect( this, SIGNAL(clicked()), action, SLOT( trigger()) );
-			connect( action, SIGNAL(changed()), SLOT( actionChanged()) );
-			setEnabled( action->isEnabled() );
-			setChecked( action->isChecked() );
-		}
-		
-        QPixmap disabled( path.left( path.length() - 4 ) + "_inactive.png" );
-        
-        QPixmap p( path );
-		QIcon i;
-		i.addPixmap( path, QIcon::Normal);
-		
-        if (!disabled.isNull())
-        {
-            i.addPixmap( disabled, QIcon::Disabled );
-        }
-		setIcon( i );
-		
-		setIconSize( QSize(150, 150) );
-	}
-	
-	virtual void paintEvent ( QPaintEvent* event )
-	{
-		QPainter p( this );
-		
-		QIcon::Mode mode = isEnabled() ? QIcon::Normal : QIcon::Disabled;
-		if( isDown() )
-			mode = QIcon::Active;
-		
-		QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
-		
-		p.setClipRect( event->rect() );
-		
-		m_backgroundIcon.paint( &p, rect(), Qt::AlignCenter, mode, state );
+    ImageButton( QWidget* parent = 0 );
+	ImageButton( const QString& path );
 
-		QRect iconRect = rect();
-		if( m_iconOffsets.contains( mode ) )
-		{
-			iconRect.setLeft( iconRect.left() + m_iconOffsets[ mode ].x() );
-			iconRect.setBottom( iconRect.bottom() + m_iconOffsets[ mode ].y() - 3 );
-		}
-		icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
-
-	}
+	void setAction( class QAction* );
+    
+	virtual void paintEvent ( QPaintEvent* event );
 	
-	virtual QSize sizeHint() const
-	{
-		return icon().actualSize( iconSize()).expandedTo( m_backgroundIcon.actualSize(iconSize()));
-	}
-	
-	void setPixmap( const QString& s, const QIcon::State st = QIcon::Off ){ setPixmap( QPixmap( s ), st ); }
-	void setPixmap( const QPixmap& p, const QIcon::State s = QIcon::Off )
-	{
-		QIcon i = icon();
-		i.addPixmap( p, QIcon::Normal, s );
-		setIcon( i );
-	}
-	
-	void setBackgroundPixmap( const QString& s, const QIcon::Mode m = QIcon::Normal ){ setBackgroundPixmap( QPixmap( s ), m ); }
-	void setBackgroundPixmap( const QPixmap& p, const QIcon::Mode m = QIcon::Normal )
-	{
-		m_backgroundIcon.addPixmap( p, m );
-	}
-	
-	void moveIcon( int x, int y, QIcon::Mode m = QIcon::Normal ){ m_iconOffsets.insert( m, QPoint( x, y )); }
-	
+	virtual QSize sizeHint() const;
+	void setPixmap( const QString&, const QIcon::State = QIcon::Off );
+	void setBackgroundPixmap( const QString&, const QIcon::Mode = QIcon::Normal );
+	void moveIcon( int x, int y, QIcon::Mode = QIcon::Normal );
+    
 private:
 	QIcon m_backgroundIcon;
 	QMap< QIcon::Mode, QPoint > m_iconOffsets;
 	
+    void setIconSize( const QSize& s )
+    {
+        setProperty( "iconSize", s );
+    }    
+    
 private slots:
-	virtual void actionChanged()
-	{
-		QAction* action = static_cast<QAction*> (sender());
-		setEnabled( action->isEnabled());
-		setChecked( action->isChecked());
-	}
+	void actionChanged();
 };
 
 #endif //IMAGE_BUTTON_H

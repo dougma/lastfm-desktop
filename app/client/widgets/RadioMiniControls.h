@@ -20,10 +20,10 @@
 #ifndef RADIO_MINI_CONTROLS_H
 #define RADIO_MINI_CONTROLS_H
 
-namespace Phonon { class VolumeSlider; }
-
-#include "ui_RadioMiniControls.h"
 #include "PlayerState.h"
+#include <QWidget>
+namespace Phonon { class VolumeSlider; }
+class ImageButton;
 
 
 class RadioMiniControls : public QWidget
@@ -33,8 +33,10 @@ class RadioMiniControls : public QWidget
 public:
     RadioMiniControls();
 
-	struct Ui : ::Ui::RadioMiniControls
+	struct Ui
     {
+        ImageButton* play;
+        ImageButton* skip;
         Phonon::VolumeSlider* volume;
     } 
 	ui;

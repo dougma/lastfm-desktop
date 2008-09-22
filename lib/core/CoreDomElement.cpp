@@ -20,8 +20,8 @@
 #include "CoreDomElement.h"
 
 
-EasyDomElement
-EasyDomElement::operator[]( const QString& name ) const
+CoreDomElement
+CoreDomElement::operator[]( const QString& name ) const
 {
     QStringList parts = name.split( ' ' );
     if (parts.size() >= 2)
@@ -31,16 +31,16 @@ EasyDomElement::operator[]( const QString& name ) const
         QString attributeName = parts.value( 0 );
         QString attributeValue = parts.value( 1 );
 
-        foreach (EasyDomElement e, children( tagName ))
+        foreach (CoreDomElement e, children( tagName ))
             if (e.e.attribute( attributeName ) == attributeValue)
                 return e;
     }
-    return EasyDomElement( e.firstChildElement( name ) );
+    return CoreDomElement( e.firstChildElement( name ) );
 }
 
 
 QString
-EasyDomElement::nonEmptyText() const 
+CoreDomElement::nonEmptyText() const 
 {
     QString const s = e.text();
     if (s.isEmpty())
@@ -49,12 +49,12 @@ EasyDomElement::nonEmptyText() const
 }
 
 
-QList<EasyDomElement>
-EasyDomElement::children( const QString& named ) const
+QList<CoreDomElement>
+CoreDomElement::children( const QString& named ) const
 {
-    QList<EasyDomElement> elements;
+    QList<CoreDomElement> elements;
     QDomNodeList nodes = e.elementsByTagName( named );
     for (int x = 0; x < nodes.count(); ++x)
-        elements += EasyDomElement( nodes.at( x ).toElement() );
+        elements += CoreDomElement( nodes.at( x ).toElement() );
     return elements;
 }

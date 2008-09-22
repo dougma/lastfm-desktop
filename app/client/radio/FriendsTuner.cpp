@@ -41,7 +41,7 @@ FriendsTuner::FriendsTuner()
 void
 FriendsTuner::onFetchedFriends( WsReply* r )
 {	
-	foreach( const User& user, User::getFriends( r ) )
+	foreach( const User& user, User::list( r ) )
 	{
 		QListWidgetItem* item = new QListWidgetItem( user );
 		item->setData( Qt::DecorationRole, QImage( ":/lastfm/no/user.png" ));

@@ -42,21 +42,22 @@ User::getNeighbours() const
 }
 
 
-QList<User>
-User::getFriends( WsReply* r )
+QList<User> //static
+User::list( WsReply* r )
 {
 	QList<User> users;
-    foreach (EasyDomElement e, r->lfm().children( "user" ))
+    foreach (CoreDomElement e, r->lfm().children( "user" ))
     {
         try
         {
-            User user( e["name"].text() );
-			user.m_smallImage = e["image size=small"].text();
-			user.m_mediumImage = e["image size=medium"].text();
-			user.m_largeImage = e["image size=large"].text();
-			users += user;
+            User u( e["name"].text() );
+            u.m_smallImage = e["image size=small"].text();
+            u.m_mediumImage = e["image size=medium"].text();
+            u.m_largeImage = e["image size=large"].text();
+            u.m_realName = e.optional( "realname" ).text();
+			users += u;
         }
-        catch (EasyDomElement::Exception& e)
+        catch (CoreDomElement::Exception& e)
         {
             qWarning() << e;
         }
@@ -69,28 +70,4 @@ WsReply*
 AuthenticatedUser::getInfo()
 {
 	return WsRequestBuilder( "user.getInfo" ).get();
-}
-
-
-QList<User> //static
-User::getNeighbours( WsReply* r )
-{
-	QList<User> neighbours;
-    foreach (EasyDomElement e, r->lfm().children( "user" ))
-    {
-        try
-        {
-			User user( e["name"].text() );
-			user.m_match = e["match"].text().toFloat();
-			user.m_smallImage = e["image size=small"].text();
-			user.m_mediumImage = e["image size=medium"].text();
-			user.m_largeImage = e["image size=large"].text();
-			neighbours << user;
-        }
-        catch( EasyDomElement::Exception& e)
-        {
-            qWarning() << e;
-        }
-    }
-	return neighbours;
 }

@@ -21,11 +21,13 @@
 #define LAUNCHER_H
 
 #include <QWidget>
-#include "ui_Launcher.h"
+class ImageButton;
+
 
 class Launcher : public QWidget
 {
 	Q_OBJECT
+
 public:
 	Launcher( QWidget* parent = 0 );
 
@@ -36,7 +38,12 @@ private slots:
 	void onTunerHidden();
 
 protected:
-	Ui::Launcher ui;
+    struct {
+        ImageButton* radio;
+        ImageButton* friends;
+        ImageButton* library;
+        ImageButton* scrobble;
+    } ui;
 	
 };
 

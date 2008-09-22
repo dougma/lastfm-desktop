@@ -23,6 +23,7 @@
 #include "MyTagsTuner.h"
 #include "NeighboursTuner.h"
 #include "MyStations.h"
+#include "widgets/ImageButton.h"
 #include "widgets/RadioMiniControls.h"
 #include "the/radio.h"
 #include <QAction>

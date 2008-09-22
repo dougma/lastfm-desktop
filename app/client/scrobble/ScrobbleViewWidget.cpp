@@ -23,17 +23,17 @@
 #include "widgets/ImageButton.h"
 #include "ui_MainWindow.h"
 
-ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi )
+ScrobbleViewWidget::ScrobbleViewWidget()
 {
 	ScrobbleInfoWidget* w = ui.siw = new ScrobbleInfoWidget;
     
 	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
-    h->addWidget( ui.love = new ImageButton( ":/MainWindow/love.png", mainUi.love) );
-	h->addWidget( ui.ban = new ImageButton( ":/MainWindow/ban.png", mainUi.ban ));
-	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/cog_button.png"));
-    h->addWidget( ui.tag = new ImageButton( ":/MainWindow/tag.png", mainUi.tag ));
-    h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));   
-	h->setSpacing( 35 );
+    h->addWidget( ui.love = new ImageButton( ":/MainWindow/love.png" ) );
+	h->addWidget( ui.ban = new ImageButton( ":/MainWindow/ban.png" ) );
+	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/cog_button.png") );
+    h->addWidget( ui.tag = new ImageButton( ":/MainWindow/tag.png" ) );
+    h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png" ) );   
+	h->setSpacing( 24 );
     h->setSizeConstraint( QLayout::SetFixedSize );
     
     connect( ui.cog, SIGNAL(clicked()), SLOT(popupMultiButtonWidget()) );

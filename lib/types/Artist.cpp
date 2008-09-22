@@ -69,7 +69,7 @@ Artist::getSimilar( WsReply* r )
 	WeightedStringList artists;
 	try
 	{
-		foreach (EasyDomElement e, r->lfm().children( "artist" ))
+		foreach (CoreDomElement e, r->lfm().children( "artist" ))
 		{
 			QString artistName = e["name"].text();
 			float match = e["match"].text().toFloat();
@@ -77,7 +77,7 @@ Artist::getSimilar( WsReply* r )
 		}
 		
 	}
-	catch( EasyDomElement::Exception& e)
+	catch( CoreDomElement::Exception& e)
 	{
 		qWarning() << e;
 	}
@@ -91,12 +91,12 @@ Artist::search( WsReply* r )
 	QStringList results;
 	try
 	{
-		foreach( EasyDomElement e, r->lfm().children( "artist" ))
+		foreach( CoreDomElement e, r->lfm().children( "artist" ))
 		{
 			results += e["name"].text();
 		}
 	}
-	catch( EasyDomElement::Exception& e)
+	catch( CoreDomElement::Exception& e)
 	{
 		qWarning() << e;
 	}

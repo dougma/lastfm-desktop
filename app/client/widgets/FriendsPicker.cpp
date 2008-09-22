@@ -28,9 +28,11 @@
 
 FriendsPicker::FriendsPicker( const User& user )
 {    
+    qDebug() << user;
+    
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( new Unicorn::LineEdit( tr("Search") ) );
-    v->addWidget( new QListWidget );
+    v->addWidget( ui.list = new QListWidget );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
  
     UnicornWidget::paintItBlack( this );    
@@ -48,9 +50,11 @@ FriendsPicker::FriendsPicker( const User& user )
 void
 FriendsPicker::onGetFriendsReturn( WsReply* r )
 {
-    foreach (User u, User::getFriends( r ))
+    qDebug() << r;
+    
+    foreach (User u, User::list( r ))
     {
-        qDebug() << u;
+        ui.list->addItem( u );
     }
 }
 

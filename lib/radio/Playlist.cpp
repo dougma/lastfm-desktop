@@ -33,7 +33,7 @@ Playlist::Playlist( WsReply* reply ) throw( CoreException )
 	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
 	m_title = m_title.trimmed();
 	
-	foreach (EasyDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
+	foreach (CoreDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
 	{
 		MutableTrack t;
 		try
@@ -48,7 +48,7 @@ Playlist::Playlist( WsReply* reply ) throw( CoreException )
 			t.setDuration( e[ "duration" ].text().toInt() / 1000 );
 			t.setSource( Track::LastFmRadio );
 		}
-		catch (EasyDomElement::Exception& exception)
+		catch (CoreDomElement::Exception& exception)
 		{
 			qWarning() << exception << e;
 		}

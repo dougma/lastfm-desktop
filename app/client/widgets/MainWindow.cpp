@@ -22,6 +22,7 @@
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "scrobble/ScrobbleViewWidget.h"
+#include "widgets/ImageButton.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
@@ -121,16 +122,17 @@ MainWindow::setupUi()
     QDockWidget* bottom = new QDockWidget( tr("Track Information") );
     bottom->setWidget( new MetaInfoView );
 
-    //FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
-	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
-	//		 for now and nicely wraps the love / ban / tag / share actions together.
-    
     /** hah! works :) But I'm sure is hideously dangerous, etc. */
     setStatusBar( (QStatusBar*) (ui.launcher = new Launcher) );
     
     addDockWidget( Qt::BottomDockWidgetArea, bottom );
-	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
+	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget );
 
+    ui.scrobbler->ui.love->setAction( ui.love );
+    ui.scrobbler->ui.ban->setAction( ui.ban );
+    ui.scrobbler->ui.tag->setAction( ui.tag );
+    ui.scrobbler->ui.share->setAction( ui.share );
+    
 	ui.tuner = new RadioWidget( this );
 	ui.primaryBucket = new PrimaryBucket( this );
 
@@ -350,7 +352,7 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 {
 	try
 	{
-		EasyDomElement e = reply->lfm()["user"];
+		CoreDomElement e = reply->lfm()["user"];
 		QString gender = e["gender"].text();
 		QString age = e["age"].text();
 		uint scrobbles = e["playcount"].text().toUInt();
@@ -367,7 +369,7 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 			ui.account->addAction( tr("%L1 scrobbles").arg( scrobbles ) )->setEnabled( false );			
 		}
 	}
-	catch (EasyDomElement::Exception&)
+	catch (CoreDomElement::Exception&)
 	{}
 }
 

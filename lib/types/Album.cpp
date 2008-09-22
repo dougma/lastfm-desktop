@@ -124,7 +124,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
                 connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
                 return;
             }
-            catch (EasyDomElement::Exception& e)
+            catch (CoreDomElement::Exception& e)
             {}
         }
 

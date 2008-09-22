@@ -27,24 +27,28 @@
 #include <QList>
 #include <QStringList>
 
+
 /** @author <max@last.fm>
   * @brief facade pattern for QDomElement, throwing exceptions in situations that we must handle
   *
   * QDomElement dome;
-  * EasyDomElement( dome )["album"]["image size=small"].text();
-  * foreach (EasyDomElement e, EasyDomElement( dome )["album"].children( "image" ))
+  * CoreDomElement( dome )["album"]["image size=small"].text();
+  * foreach (CoreDomElement e, CoreDomElement( dome )["album"].children( "image" ))
   *     qDebug() << e.text();
   */
-class CORE_DLLEXPORT EasyDomElement
+class CORE_DLLEXPORT CoreDomElement
 {
     QDomElement e;
 
-	friend QDebug operator<<( QDebug, const EasyDomElement& );
-	
+	friend QDebug operator<<( QDebug, const CoreDomElement& );
+    
+    CoreDomElement()
+    {}
+    
 public:
     class Exception : public CoreException
     {
-        friend class EasyDomElement;
+        friend class CoreDomElement;
 
         Exception( QString s ) : CoreException( s )
         {}
@@ -55,26 +59,40 @@ public:
     };
 
 
-    EasyDomElement( const QDomElement& x ) : e( x )
+    CoreDomElement( const QDomElement& x ) : e( x )
     {
         if (e.isNull()) throw Exception::nullNode();
     }
 
+    /** returns a null element unless the node @p name exists */
+    CoreDomElement optional( const QString& name ) const
+    {
+        try
+        {
+            return this->operator[]( name );
+        }
+        catch (Exception&)
+        {
+            return CoreDomElement();
+        }
+    }
+    
     /** Selects a child element, you can specify attributes like so:
       *
       * e["element"]["element attribute=value"].text();
       */
-    EasyDomElement operator[]( const QString& name ) const;
+    CoreDomElement operator[]( const QString& name ) const;
     
-    /** use in all cases where empty would be an error, it throws if empty */
+    /** use in all cases where empty would be an error, it throws if empty,
+      * ignores optional() since you are explicitly asking for a throw! */
     QString nonEmptyText() const;
 
     QString text() const { return e.text(); }
-    QList<EasyDomElement> children( const QString& named ) const;
+    QList<CoreDomElement> children( const QString& named ) const;
 };
 
 
-inline QDebug operator<<( QDebug debug, const EasyDomElement& e )
+inline QDebug operator<<( QDebug debug, const CoreDomElement& e )
 {
 	QString s;
 	QTextStream t( &s, QIODevice::WriteOnly );

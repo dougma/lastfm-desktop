@@ -19,13 +19,22 @@
 
 #include "Launcher.h"
 #include "the/mainWindow.h"
+#include "widgets/ImageButton.h"
 #include "radio/RadioWidget.h"
 #include <QPainter>
 
 Launcher::Launcher( QWidget* parent )
 		 :QWidget( parent )
 {
-	ui.setupUi( this );
+    QHBoxLayout* h = new QHBoxLayout( this );
+    h->addWidget( ui.radio = new ImageButton );
+    h->addWidget( ui.friends = new ImageButton );
+    h->addWidget( ui.library = new ImageButton );
+    h->addSpacing( 12 );
+    h->addStretch();
+    h->addWidget( ui.scrobble = new ImageButton );
+    h->setSpacing( 0 );
+    h->setContentsMargins( 8, 8, 8, 9 );
 	
 	connect( ui.radio, SIGNAL( clicked()), SLOT( onRadioToggle()));
 	ui.radio->setCheckable( true );

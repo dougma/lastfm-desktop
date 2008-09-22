@@ -70,7 +70,7 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     setAutoFillBackground( true );
 	
     setMinimumWidth( 298 ); //as per mattb mockup
-	setMinimumHeight( 325 );
+//	setMinimumHeight( 325 );
 	
 	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );

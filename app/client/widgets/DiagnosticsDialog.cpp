@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-#include "ObservedTrack.h"
 #include "Settings.h"
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/scrobble/ScrobbleCache.h"

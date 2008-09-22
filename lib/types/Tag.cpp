@@ -47,13 +47,13 @@ QStringList /* static */
 Tag::search( WsReply* r )
 {
 	QStringList tags;
-    foreach( EasyDomElement e, r->lfm().children( "tag" ))
+    foreach( CoreDomElement e, r->lfm().children( "tag" ))
     {
         try
         {
 			tags += e["name"].text();
 		}
-        catch( EasyDomElement::Exception& e )
+        catch( CoreDomElement::Exception& e )
         {
             qWarning() << e;
         }
@@ -66,18 +66,18 @@ WeightedStringList //static
 Tag::list( WsReply* r )
 {
 	WeightedStringList tags;
-    foreach (EasyDomElement e, r->lfm().children( "tag" ))
+    foreach (CoreDomElement e, r->lfm().children( "tag" ))
     {
         try
         {
             int weight = 0;
 
-            //TODO non throwing version of EasyDomElement!
+            //TODO non throwing version of CoreDomElement!
             try 
             {
                 weight = e["count"].text().toInt();
             }
-            catch( EasyDomElement::Exception& ex)
+            catch( CoreDomElement::Exception& ex)
             {}
             
             // we toLower always as otherwise it is ugly mixed case, as first
@@ -85,7 +85,7 @@ Tag::list( WsReply* r )
             // anyway
             tags += WeightedString( e["name"].text().toLower(), weight );
         }
-        catch( EasyDomElement::Exception& ex)
+        catch( CoreDomElement::Exception& ex)
         {
             qWarning() << ex << '\n' << e;
         }

@@ -35,20 +35,23 @@ public:
     {}
 
     operator QString() const { return m_name; }
-
-    WsReply* getFriends() const;
-    static QList<User> getFriends( WsReply* );
 	
     /** You can get a WeightedStringList using Tag::getTopTags() */
 	WsReply* getTopTags() const;
-	
+
+    /** get a QList<User> from User::list() */
+    WsReply* getFriends() const;
 	WsReply* getNeighbours() const;
-	static QList<User> getNeighbours( WsReply* );
+    
+    static QList<User> list( WsReply* );
+    
+//////
+	QUrl smallImageUrl() const { return m_smallImage; }
+	QUrl mediumImageUrl() const { return m_mediumImage; }
+	QUrl largeImageUrl() const { return m_largeImage; }
 	
-	QUrl smallImageUrl() const{ return m_smallImage; }
-	QUrl mediumImageUrl() const{ return m_mediumImage; }
-	QUrl largeImageUrl() const{ return m_largeImage; }
-	
+    QString realName() const { return m_realName; }
+    
 	/** Returns the match between the logged in user and the user which this
 	  *	object represents (if < 0.0f then not set) */
 	float match() const { return m_match; }
@@ -59,6 +62,8 @@ private:
 	QUrl m_largeImage;
 	
 	float m_match;
+    
+    QString m_realName;
 };
 
 

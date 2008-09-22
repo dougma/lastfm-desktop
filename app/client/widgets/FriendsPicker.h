@@ -31,6 +31,7 @@ class FriendsPicker : public QDialog
     struct
     {
         class QDialogButtonBox* buttons;
+        class QListWidget* list;
     } ui;
     
 public:

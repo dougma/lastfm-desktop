@@ -53,7 +53,7 @@ class WS_DLLEXPORT WsReply : public QObject
 
 public:
     /** the <lfm> element from the XML response, see http://last.fm/api */
-    EasyDomElement lfm() const { return EasyDomElement( m_lfm ); }
+    CoreDomElement lfm() const { return CoreDomElement( m_lfm ); }
     Ws::Error error() const { return m_error; }
     QNetworkReply::NetworkError networkError() const { return m_reply->error(); }
     static QString networkErrorString( QNetworkReply::NetworkError );
