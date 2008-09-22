@@ -107,7 +107,9 @@ MainWindow::onTrackSpooled( const Track& t )
     #endif
 }
 
-
+#include <QDockWidget>
+#include <QToolBar>
+#include "scrobble/MetaInfoView.h"
 void
 MainWindow::setupUi()
 {
@@ -115,19 +117,19 @@ MainWindow::setupUi()
 	
 	ui.account->setTitle( The::settings().username() );
    	connect( AuthenticatedUser::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
-	
-	QWidget* mainWidget = new QWidget;
-	QVBoxLayout* mainLayout = new QVBoxLayout( mainWidget );
-    mainLayout->setSpacing( 0 );
-    mainLayout->setMargin( 0 );
-	
-	//FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
+
+    QDockWidget* bottom = new QDockWidget( "Track Information" );
+    bottom->setWidget( new MetaInfoView );
+
+    //FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow
 	//		 by requiring the Ui object to be passed into the ScrobbleViewWidget but it works
 	//		 for now and nicely wraps the love / ban / tag / share actions together.
-	mainLayout->addWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
-	mainLayout->addWidget( ui.launcher = new Launcher );
-		
-	setCentralWidget( mainWidget );
+    
+    /** hah! works :) But I'm sure is hideously dangerous, etc. */
+    setStatusBar( (QStatusBar*) (ui.launcher = new Launcher) );
+    
+    addDockWidget( Qt::BottomDockWidgetArea, bottom );
+	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget( ui ) );
 
 	ui.tuner = new RadioWidget( this );
 	ui.primaryBucket = new PrimaryBucket( this );
@@ -141,6 +143,7 @@ MainWindow::setupUi()
 }
 
 
+#include <Carbon/Carbon.h>
 void
 MainWindow::showSettingsDialog()
 {
@@ -148,7 +151,8 @@ MainWindow::showSettingsDialog()
 		d = new Type( this ); \
 		d->setAttribute( Qt::WA_DeleteOnClose ); \
 		d->setWindowFlags( Qt::Dialog ); \
-		d->setModal( false );
+		d->setModal( false ); \
+        ChangeWindowAttributes( (WindowRef)d->winId(), kWindowCloseBoxAttribute | kWindowFullZoomAttribute, 0 );
 	
     #define NON_MODAL_MACRO( Type ) \
         static QPointer<Type> d; \

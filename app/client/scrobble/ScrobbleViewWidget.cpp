@@ -40,6 +40,7 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
     ui.love->setPixmap( ":/MainWindow/unlove.png", QIcon::On );
 	ui.love->setCheckable( true );
     
+#if 0
 	QSplitter* s = new PaintedSplitter( Qt::Vertical );
 	s->addWidget( w );
 	s->addWidget( new MetaInfoView );
@@ -50,4 +51,9 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 	QHBoxLayout* l = new QHBoxLayout( this );
     l->setMargin( 0 );
 	l->addWidget( s );
+#endif
+
+	QHBoxLayout* l = new QHBoxLayout( this );
+    l->setMargin( 0 );
+	l->addWidget( w );    
 }
