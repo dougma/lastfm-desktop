@@ -27,6 +27,7 @@
 
 
 SendLogsRequest::SendLogsRequest( QString clientname, QString clientversion, QString usernotes )
+:m_networkAccessManager(qApp)
 {
     m_clientname = clientname;
     m_clientversion = clientversion;

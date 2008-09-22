@@ -35,7 +35,7 @@ private slots:
 	void onImageDownloaded();
 	
 private:
-	class QNetworkAccessManager* m_networkManager;
+	class WsAccessManager* m_networkManager;
 	
 signals:
 	void tune( const class RadioStation& );

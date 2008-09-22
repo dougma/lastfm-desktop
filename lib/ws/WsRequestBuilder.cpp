@@ -19,16 +19,16 @@
 
 #include "WsRequestBuilder.h"
 #include "WsReply.h"
+#include "WsAccessManager.h"
 #include <QCoreApplication>
-#include <QNetworkAccessManager>
 #include <QEventLoop>
 
-QNetworkAccessManager* WsRequestBuilder::nam = 0;
+WsAccessManager* WsRequestBuilder::nam = 0;
 
 
 WsRequestBuilder::WsRequestBuilder( const QString& method )
 {
-    if (!nam) nam = new QNetworkAccessManager( qApp );
+    if (!nam) nam = new WsAccessManager( qApp );
     
     params.add( "method", method );
 }
@@ -75,6 +75,7 @@ WsRequestBuilder::start()
 			return new WsReply( nam->post( request, query ) );
 		}
     }
+	return 0;
 }
 
 

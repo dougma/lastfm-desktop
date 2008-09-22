@@ -23,7 +23,7 @@
 #include <QString>
 #include <QStringList>
 #include <QByteArray>
-#include <QNetworkAccessManager>
+#include "lib/ws/WsAccessManager.h"
 #include <QNetworkReply>
 #include "lib/DllExportMacro.h"
 
@@ -48,7 +48,7 @@ class SendLogsRequest : public QObject
         QString escapeString( QString );
         QByteArray postData( QString name, QByteArray data );
         
-        QNetworkAccessManager m_networkAccessManager; //FIXME: this should be shared
+        WsAccessManager m_networkAccessManager;
         QByteArray m_data;
         QStringList m_logs;
         QString m_clientname, m_clientversion, m_usernotes;

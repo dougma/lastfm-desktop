@@ -14,33 +14,42 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
- 
-#ifndef FREINDS_TUNER_H
-#define FRIENDS_TUNER_H
 
-#include <QListWidget>
+#ifndef WS_ACCESS_MANAGER_H
+#define WS_ACCESS_MANAGER_H
+
+#include "lib/DllExportMacro.h"
+#include <QtNetwork>
 
 
-class FriendsTuner : public QListWidget
+class WsProxy;
+
+
+class WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
 {
-	Q_OBJECT
-	
 public:
-	FriendsTuner();
 
 private:
-	class WsAccessManager* m_networkManager;
-	
-private slots:
-	void onFetchedFriends( class WsReply* );
-	void onFriendClicked( class QListWidgetItem* );
-	
-	void onImageDownloaded();
+	Q_OBJECT;
 
-signals:
-	void tune( const class RadioStation& );
+	static WsProxy *m_proxy;
+
+	void setProxy(const QNetworkRequest &);
+	QNetworkReply *monitor(QNetworkReply *);
+
+public:
+	WsAccessManager(QObject *parent = 0);
+
+    QNetworkReply *head(const QNetworkRequest &request);
+    QNetworkReply *get(const QNetworkRequest &request);
+    QNetworkReply *post(const QNetworkRequest &request, QIODevice *data);
+    QNetworkReply *post(const QNetworkRequest &request, const QByteArray &data);
+    QNetworkReply *put(const QNetworkRequest &request, QIODevice *data);
+    QNetworkReply *put(const QNetworkRequest &request, const QByteArray &data);
+
 };
 
-#endif //FRIENDS_TUNER_H
+
+#endif

@@ -14,33 +14,35 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
- 
-#ifndef FREINDS_TUNER_H
-#define FRIENDS_TUNER_H
 
-#include <QListWidget>
+#ifndef WS_AUTOPROXY_H
+#define WS_AUTOPROXY_H
+
+#include <QCoreApplication>
+#include <QNetworkProxy>
+#ifdef WIN32
+#include <windows.h>
+#include <winhttp.h>
+#endif
 
 
-class FriendsTuner : public QListWidget
+/** @brief simple wrapper to do per url automatic proxy detection 
+  * @author <doug@last.fm>
+  *
+  */
+class WsAutoProxy
 {
-	Q_OBJECT
-	
+#ifdef WIN32
+	HINTERNET m_hSession;
+#endif
+
 public:
-	FriendsTuner();
+	WsAutoProxy();
+	~WsAutoProxy();
 
-private:
-	class WsAccessManager* m_networkManager;
-	
-private slots:
-	void onFetchedFriends( class WsReply* );
-	void onFriendClicked( class QListWidgetItem* );
-	
-	void onImageDownloaded();
-
-signals:
-	void tune( const class RadioStation& );
+	bool getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out, const QString &pacUrl);
 };
 
-#endif //FRIENDS_TUNER_H
+#endif 

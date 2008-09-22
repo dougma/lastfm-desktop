@@ -22,14 +22,14 @@
 #include "lib/types/User.h"
 #include "Settings.h"
 #include "lib/radio/RadioStation.h"
-#include <QNetworkAccessManager>
+#include "lib/ws/WsAccessManager.h"
 
 Q_DECLARE_METATYPE(QListWidgetItem*);
 
 
 NeighboursTuner::NeighboursTuner()
 {
-	m_networkManager = new QNetworkAccessManager( this );
+	m_networkManager = new WsAccessManager( this );
 	setItemDelegate( new StationDelegate );
 	User u( The::settings().username() );
 	WsReply* reply = u.getNeighbours();

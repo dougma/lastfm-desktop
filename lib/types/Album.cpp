@@ -21,6 +21,7 @@
 #include "Artist.h"
 #include "User.h"
 #include "lib/core/CoreUrl.h"
+#include "lib/ws/WsAccessManager.h"
 #include "lib/ws/WsRequestBuilder.h"
 #include <QTimer>
 
@@ -117,7 +118,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
                 if (!url.isValid())
                     continue;
 
-                m_manager = new QNetworkAccessManager( this );
+            m_manager = new WsAccessManager( this );
 
                 QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
                 connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );

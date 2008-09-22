@@ -19,7 +19,7 @@
 
 #include "PlayerBucket.h"
 #include "QListView.h"
-#include "ImageButton.h"
+#include "widgets/ImageButton.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>

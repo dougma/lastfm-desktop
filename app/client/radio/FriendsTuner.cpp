@@ -22,13 +22,13 @@
 #include "Settings.h"
 #include "StationDelegate.h"
 #include "lib/radio/RadioStation.h"
-#include <QNetworkAccessManager>
+#include "lib/ws/WsAccessManager.h"
 
 Q_DECLARE_METATYPE( QListWidgetItem* );
 
 FriendsTuner::FriendsTuner()
 {
-	m_networkManager = new QNetworkAccessManager( this );
+	m_networkManager = new WsAccessManager( this );
 	setItemDelegate( new StationDelegate );
 	setSortingEnabled( true );
 	User u( The::settings().username() );

@@ -142,8 +142,10 @@ MainWindow::setupUi()
 #endif
 }
 
-
+#ifdef Q_WS_MAC
 #include <Carbon/Carbon.h>
+#endif
+
 void
 MainWindow::showSettingsDialog()
 {
@@ -151,8 +153,7 @@ MainWindow::showSettingsDialog()
 		d = new Type( this ); \
 		d->setAttribute( Qt::WA_DeleteOnClose ); \
 		d->setWindowFlags( Qt::Dialog ); \
-		d->setModal( false ); \
-        ChangeWindowAttributes( (WindowRef)d->winId(), kWindowCloseBoxAttribute | kWindowFullZoomAttribute, 0 );
+		d->setModal( false ); 
 	
     #define NON_MODAL_MACRO( Type ) \
         static QPointer<Type> d; \

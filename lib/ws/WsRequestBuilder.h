@@ -21,9 +21,9 @@
 #define WS_REQUEST_MANAGER_H
 
 #include "lib/DllExportMacro.h"
-#include "WsReply.h" //conveience
+#include "WsReply.h" //convenience
 #include "WsRequestParameters.h"
-
+#include "WsAccessManager.h"
    
 class WS_DLLEXPORT WsRequestBuilder
 {
@@ -35,7 +35,7 @@ class WS_DLLEXPORT WsRequestBuilder
 
     /** DO NOT MAKE THIS ACCESSIBLE TO OTHER PARTS OF THE APPLICATION 
       * Talk to max if you wanted to */
-    static class QNetworkAccessManager* nam;
+    static class WsAccessManager* nam;
 
     RequestMethod request_method;
     WsRequestParameters params;
