@@ -37,6 +37,8 @@ class MetaInfoView : public QLabel
 	
 public:
     MetaInfoView();
+    
+    virtual QSize sizeHint() const;
 
 private slots:
     void onTrackSpooled( const Track& );

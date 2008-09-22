@@ -23,10 +23,9 @@
 #include "widgets/ImageButton.h"
 #include "ui_MainWindow.h"
 
-ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent )
-				   :QWidget( parent )
+ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi )
 {
-	ScrobbleInfoWidget* w = new ScrobbleInfoWidget;
+	ScrobbleInfoWidget* w = ui.siw = new ScrobbleInfoWidget;
     
 	QHBoxLayout* h = new QHBoxLayout( w->ui.actionbar );
     h->addWidget( ui.love = new ImageButton( ":/MainWindow/love.png", mainUi.love) );
@@ -36,6 +35,8 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
     h->addWidget( ui.share = new ImageButton( ":/MainWindow/share.png", mainUi.share));   
 	h->setSpacing( 35 );
     h->setSizeConstraint( QLayout::SetFixedSize );
+    
+    connect( ui.cog, SIGNAL(clicked()), SLOT(popupMultiButtonWidget()) );
 	
     ui.love->setPixmap( ":/MainWindow/unlove.png", QIcon::On );
 	ui.love->setCheckable( true );
@@ -55,5 +56,70 @@ ScrobbleViewWidget::ScrobbleViewWidget( Ui::MainWindow& mainUi, QWidget* parent 
 
 	QHBoxLayout* l = new QHBoxLayout( this );
     l->setMargin( 0 );
-	l->addWidget( w );    
+	l->addWidget( w );
+}
+
+
+void
+ScrobbleViewWidget::popupMultiButtonWidget()
+{
+    qDebug() << "hi";
+    (new MultiButtonPopup( ui.siw->sizeHint().width(), this ))->show();
+}
+
+
+#include <QTimeLine>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include "widgets/UnicornWidget.h"
+
+MultiButtonPopup::MultiButtonPopup( int width, QWidget* parent ) : QWidget( parent )
+{
+    QPushButton* cancel;
+    
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addWidget( new QPushButton( tr("Add to Playlist") ) );
+    v->addWidget( new QPushButton( tr("Praise the Client Team") ) );
+    v->addSpacing( 8 );
+    v->addWidget( cancel = new QPushButton( tr("Cancel") ) );
+    
+    connect( cancel, SIGNAL(clicked()), SLOT(bye()) );
+    
+    
+    // because the actionbar doesn't set its width correctly
+    width = 270;
+    
+    adjustSize();
+    resize( width, height() );
+    QWidget::move( parent->rect().center().x() - width/2, 0 );
+    move( 0 );
+    
+    m_timeline = new QTimeLine( 300, this );
+    m_timeline->setCurveShape( QTimeLine::EaseInOutCurve );
+    m_timeline->setFrameRange( 0, height() + 9 );
+    connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(move( int )) );
+    m_timeline->start();
+}
+
+
+void
+MultiButtonPopup::bye()
+{
+    m_timeline->setFrameRange( m_timeline->currentFrame(), 0 );
+    m_timeline->start();
+    connect( m_timeline, SIGNAL(finished()), SLOT(deleteLater()) );
+}
+
+
+void 
+MultiButtonPopup::paintEvent( QPaintEvent* )
+{
+    QColor c( Qt::black );
+    c.setAlphaF( 0.87 );
+
+    QPainter p( this );
+    p.setPen( Qt::NoPen );
+    p.setBrush( c );
+    p.setRenderHint( QPainter::Antialiasing );
+    p.drawRoundedRect( rect(), 6, 6 );
 }

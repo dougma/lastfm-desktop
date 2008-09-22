@@ -162,3 +162,10 @@ MetaInfoView::cssPath()
     
     return tmp->fileName();
 }
+
+
+QSize
+MetaInfoView::sizeHint() const
+{
+    return QSize( QLabel::sizeHint().width(), 330 );
+}

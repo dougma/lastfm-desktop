@@ -118,7 +118,7 @@ MainWindow::setupUi()
 	ui.account->setTitle( The::settings().username() );
    	connect( AuthenticatedUser::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
 
-    QDockWidget* bottom = new QDockWidget( "Track Information" );
+    QDockWidget* bottom = new QDockWidget( tr("Track Information") );
     bottom->setWidget( new MetaInfoView );
 
     //FIXME: I'm not entirely happy with coupling the ScrobbleViewWidget with the MainWindow

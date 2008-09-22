@@ -33,8 +33,10 @@ namespace Ui
 
 class ScrobbleViewWidget : public QWidget
 {
+    Q_OBJECT
+    
 public:
-	ScrobbleViewWidget( Ui::MainWindow&, QWidget* parent = 0 );
+	ScrobbleViewWidget( Ui::MainWindow& );
 
 	struct {
 		class ImageButton* love;
@@ -42,7 +44,12 @@ public:
 		class ImageButton* tag;
 		class ImageButton* share;
 		class ImageButton* cog;
+        
+        class ScrobbleInfoWidget* siw;
 	} ui;
+    
+private slots:
+    void popupMultiButtonWidget();
 };
 
 
@@ -82,6 +89,28 @@ private:
 	private:
 		QPixmap m_handlePixmap;
 	};
+};
+
+
+#include <QWidget>
+class MultiButtonPopup : public QWidget
+{
+    Q_OBJECT
+    
+    class QTimeLine* m_timeline;
+    
+public:
+    MultiButtonPopup( const int width, QWidget* parent );
+
+public slots:
+    void move( int i )
+    {
+        QWidget::move( x(), parentWidget()->height() - i );
+    }
+    
+    void bye();
+    
+    virtual void paintEvent( QPaintEvent* );
 };
 
 #endif //SCROBBLE_VIEW_WIDGET_H
