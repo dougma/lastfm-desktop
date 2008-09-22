@@ -356,8 +356,10 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 		uint scrobbles = e["playcount"].text().toUInt();
 		if (gender.size() && gender.size() && scrobbles > 0)
 		{
-			gender = (gender == "m") ? "boy" : "girl";
-			QString text = tr("A %1, %2 years of age with %L3 scrobbles").arg( gender ).arg( age ).arg( scrobbles );
+			gender = (gender == "m") ? tr("boy") : tr("girl");
+			if (age != "") age = tr(", %1 years of age").arg( age );
+			QString text = tr("A %1%2 with %L3 scrobbles").arg( gender ).arg( age ).arg( scrobbles );
+
 			ui.account->addAction( text )->setEnabled( false );
 		}
 		else if (scrobbles > 0)
