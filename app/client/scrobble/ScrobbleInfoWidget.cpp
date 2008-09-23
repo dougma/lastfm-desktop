@@ -54,6 +54,8 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     v2->setAlignment( ui.actionbar, Qt::AlignCenter );    
     v2->setMargin( 0 );
     v2->setSpacing( 0 );
+    
+    ui.text->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
 
 #ifdef Q_WS_MAC
     ui.text->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
