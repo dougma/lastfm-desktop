@@ -22,6 +22,7 @@
 #include "PlayerManager.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "scrobble/ScrobbleViewWidget.h"
+#include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
@@ -127,6 +128,7 @@ MainWindow::setupUi()
     
     addDockWidget( Qt::BottomDockWidgetArea, bottom );
 	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget );
+    setDockOptions( AnimatedDocks | AllowNestedDocks );
 
     ui.scrobbler->ui.love->setAction( ui.love );
     ui.scrobbler->ui.ban->setAction( ui.ban );
@@ -138,6 +140,8 @@ MainWindow::setupUi()
 
 	ui.primaryBucket->move( this->pos().x() - (ui.primaryBucket->width()*3), this->pos().y());
 	ui.primaryBucket->show();
+    
+    (new Firehose)->show();
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
