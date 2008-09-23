@@ -27,4 +27,15 @@
     <file>MainWindow/scrobbling_on.png</file>
     <file>MainWindow/scrobbling_off.png</file>
   </qresource>
+  <qresource>
+      <file>SettingsDialog/account.png</file>
+      <file>SettingsDialog/radio.png</file>
+      <file>SettingsDialog/scrobbling.png</file>
+      <file>SettingsDialog/connection.png</file>
+      <file>SettingsDialog/ipod.png</file>
+  </qresource>
+  <qresource>
+      <file>ScrobbleButton/glow.mng</file>
+      <file>ScrobbleButton/progress.mng</file>
+  </qresource>
 </RCC>

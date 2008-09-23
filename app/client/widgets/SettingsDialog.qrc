@@ -1,9 +1,0 @@
- <!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file>SettingsDialog/account.png</file>
-     <file>SettingsDialog/radio.png</file>
-     <file>SettingsDialog/scrobbling.png</file>
-     <file>SettingsDialog/connection.png</file>
-     <file>SettingsDialog/ipod.png</file>
- </qresource>
- </RCC> 

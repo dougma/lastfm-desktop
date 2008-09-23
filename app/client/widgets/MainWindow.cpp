@@ -144,9 +144,6 @@ MainWindow::setupUi()
 #endif
 }
 
-#ifdef Q_WS_MAC
-#include <Carbon/Carbon.h>
-#endif
 
 void
 MainWindow::showSettingsDialog()
@@ -355,12 +352,13 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 		CoreDomElement e = reply->lfm()["user"];
 		QString gender = e["gender"].text();
 		QString age = e["age"].text();
-		uint scrobbles = e["playcount"].text().toUInt();
-		if (gender.size() && gender.size() && scrobbles > 0)
+		uint const scrobbles = e["playcount"].text().toUInt();
+		if (gender.size() && age.size() && scrobbles > 0)
 		{
-			gender = (gender == "m") ? tr("boy") : tr("girl");
-			if (age != "") age = tr(", %1 years of age").arg( age );
-			QString text = tr("A %1%2 with %L3 scrobbles").arg( gender ).arg( age ).arg( scrobbles );
+			QString text = tr("A %1, %2 years of age with %L3 scrobbles")
+					.arg( gender == "m" ? tr("boy") : tr("girl") )
+					.arg( age )
+					.arg( scrobbles );
 
 			ui.account->addAction( text )->setEnabled( false );
 		}

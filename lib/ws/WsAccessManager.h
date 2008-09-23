@@ -21,18 +21,14 @@
 #define WS_ACCESS_MANAGER_H
 
 #include "lib/DllExportMacro.h"
-#include <QtNetwork>
-
+#include <QtNetwork/QNetworkAccessManager>
 
 class WsProxy;
 
 
 class WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
 {
-public:
-
-private:
-	Q_OBJECT;
+    Q_OBJECT
 
 	static WsProxy *m_proxy;
 
@@ -48,8 +44,6 @@ public:
     QNetworkReply *post(const QNetworkRequest &request, const QByteArray &data);
     QNetworkReply *put(const QNetworkRequest &request, QIODevice *data);
     QNetworkReply *put(const QNetworkRequest &request, const QByteArray &data);
-
 };
-
 
 #endif

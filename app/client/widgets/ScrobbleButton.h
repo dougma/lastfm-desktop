@@ -17,34 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LAUNCHER_H
-#define LAUNCHER_H
+#ifndef SCROBBLE_BUTTON_H
+#define SCROBBLE_BUTTON_H
 
-#include <QWidget>
-class ImageButton;
+#include <QAbstractButton>
+#include <QPointer>
+class QMovie;
+class QTimer;
 
 
-class Launcher : public QWidget
+class ScrobbleButton : public QAbstractButton
 {
-	Q_OBJECT
+    Q_OBJECT
+
+    QMovie* m_progressMovie;
+    QMovie* m_glowMovie;
+    QMovie* m_movie;
+    QPointer<QTimer> m_timer;
 
 public:
-	Launcher( QWidget* parent = 0 );
-
-	virtual void paintEvent( QPaintEvent* );
-	
-private slots:
-	void onRadioToggle();
-	void onTunerHidden();
+    ScrobbleButton();
 
 protected:
-    struct {
-        ImageButton* radio;
-        ImageButton* friends;
-        ImageButton* library;
-        class ScrobbleButton* scrobble;
-    } ui;
-	
+    virtual void paintEvent( QPaintEvent* );
+    
+private slots:
+    void onTrackSpooled( const class Track&, class StopWatch* );
+    void onScrobbled();
+    void advanceFrame();
+    void updateToolTip( int );
 };
 
-#endif //LAUNCHER_H
+#endif

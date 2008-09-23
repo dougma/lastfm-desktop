@@ -1,1 +1,1 @@
-#error Deprecated. #include "lib/unicorn/MessageBoxBuilder.h" instead.
+#error Use lib/core/QMessageBoxBuilder.h instead.

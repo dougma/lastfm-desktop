@@ -20,12 +20,13 @@
 
 #include "WsAccessManager.h"
 #include "WsProxy.h"
+#include <QtNetwork>
 
 WsProxy *WsAccessManager::m_proxy = 0;
 
 
 WsAccessManager::WsAccessManager(QObject *parent)
-: QNetworkAccessManager(parent)
+               : QNetworkAccessManager(parent)
 {
 	if (!m_proxy) m_proxy = new WsProxy(qApp);
 }

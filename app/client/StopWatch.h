@@ -51,7 +51,7 @@ public:
     /** all in units of milliseconds */
     uint m_timeout;
     uint m_elapsed;
-
+    
 signals:
     void tick( int ); // int is the usual signal/slot parameter, uint breaks
     void timeout();

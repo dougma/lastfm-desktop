@@ -20,6 +20,7 @@
 #include "Launcher.h"
 #include "the/mainWindow.h"
 #include "widgets/ImageButton.h"
+#include "widgets/ScrobbleButton.h"
 #include "radio/RadioWidget.h"
 #include <QPainter>
 
@@ -32,7 +33,7 @@ Launcher::Launcher( QWidget* parent )
     h->addWidget( ui.library = new ImageButton );
     h->addSpacing( 12 );
     h->addStretch();
-    h->addWidget( ui.scrobble = new ImageButton );
+    h->addWidget( ui.scrobble = new ScrobbleButton );
     h->setSpacing( 0 );
     h->setContentsMargins( 8, 8, 8, 9 );
 	
@@ -60,10 +61,6 @@ Launcher::Launcher( QWidget* parent )
 	ui.library->setPixmap( ":/MainWindow/library_on.png", QIcon::On );
 	ui.library->moveIcon( -1, 0 );
 	ui.library->moveIcon( -1, 1, QIcon::Active );
-	
-	ui.scrobble->setCheckable( true );
-	ui.scrobble->setPixmap( ":/MainWindow/scrobbling_on.png" );
-	ui.scrobble->setPixmap( ":/MainWindow/scrobbling_off.png", QIcon::On );
 }
 
 

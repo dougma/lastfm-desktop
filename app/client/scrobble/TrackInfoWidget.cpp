@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "TrackInfoWidget.h"
-#include "ObservedTrack.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QSvgRenderer>
 #include <QtGui>

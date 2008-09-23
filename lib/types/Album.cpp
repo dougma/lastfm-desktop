@@ -23,6 +23,7 @@
 #include "lib/core/CoreUrl.h"
 #include "lib/ws/WsAccessManager.h"
 #include "lib/ws/WsRequestBuilder.h"
+#include <QFile>
 #include <QTimer>
 
 
@@ -87,7 +88,9 @@ Album::addTags( const QStringList& tags ) const
 
 
 
-#include <QFile>
+/** @author <max@last.fm> 
+  */
+
 AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
 				 : m_size( (int)size ),
 				   m_manager( 0 ),
@@ -118,7 +121,7 @@ AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
                 if (!url.isValid())
                     continue;
 
-            m_manager = new WsAccessManager( this );
+                m_manager = new WsAccessManager( this );
 
                 QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
                 connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );

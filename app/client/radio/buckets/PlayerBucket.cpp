@@ -20,7 +20,7 @@
 #include "PlayerBucket.h"
 #include "QListView.h"
 #include "widgets/ImageButton.h"
-#include <QNetworkAccessManager>
+#include <lib/ws/WsAccessManager.h>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QStyledItemDelegate>
@@ -36,7 +36,7 @@ PlayerBucket::PlayerBucket( QWidget* w )
 	ui.previewList = new QListWidget;
 	ui.previewList->show();
 	
-	m_networkManager = new QNetworkAccessManager( this );
+	m_networkManager = new WsAccessManager( this );
 	
 	setItemDelegate( new PlayerBucketDelegate( this ));
 	setAcceptDrops( true );

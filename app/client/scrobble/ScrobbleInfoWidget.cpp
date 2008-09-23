@@ -45,8 +45,8 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
 	v2->addStretch();
     v2->addWidget( ui.text = new QLabel );
-    v2->addSpacing( 10 );
-    v2->addWidget( ui.progress = new ScrobbleProgressBar );
+//    v2->addSpacing( 10 );
+//    v2->addWidget( ui.progress = new ScrobbleProgressBar );
 	v2->addSpacing( 4 );
     v2->addWidget( ui.actionbar );
 	v2->addSpacing( 5 );

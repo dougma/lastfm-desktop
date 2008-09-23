@@ -27,7 +27,6 @@
 
 
 SendLogsRequest::SendLogsRequest( QString clientname, QString clientversion, QString usernotes )
-:m_networkAccessManager(qApp)
 {
     m_clientname = clientname;
     m_clientversion = clientversion;
@@ -85,7 +84,7 @@ SendLogsRequest::send()
     m_data.append( "--8e61d618ca16--" ); // close the post request
     
     m_error = false;
-    QNetworkReply *reply = m_networkAccessManager.post( request, m_data );
+    QNetworkReply *reply = (new WsAccessManager( this ))->post( request, m_data );
     
     connect( reply, SIGNAL( finished() ),
              this, SLOT( onFinished() ) );
