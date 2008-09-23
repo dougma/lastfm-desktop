@@ -155,7 +155,7 @@ MainWindow::showSettingsDialog()
 	#define THROW_AWAY_DIALOG( Type ) \
 		d = new Type( this ); \
 		d->setAttribute( Qt::WA_DeleteOnClose ); \
-		d->setWindowFlags( Qt::Dialog ); \
+		d->setWindowFlags( Qt::Dialog | Qt::WindowMinimizeButtonHint ); \
 		d->setModal( false ); 
 	
     #define NON_MODAL_MACRO( Type ) \
