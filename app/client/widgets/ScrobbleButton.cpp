@@ -19,11 +19,10 @@
 
 #include "ScrobbleButton.h"
 #include "StopWatch.h"
-#include "lib/types/Track.h"
 #include <QApplication>
 #include <QPainter>
 #include <QMovie>
-#include <QTimer>
+#include <QTimeLine>
 
 
 class ScrobbleButtonToolTip : public QWidget
@@ -33,15 +32,14 @@ class ScrobbleButtonToolTip : public QWidget
 
 
 ScrobbleButton::ScrobbleButton()
-              : m_movie( new QMovie(":/ScrobbleButton.mng") ),
-                m_timer( 0 )
+              : m_movie( new QMovie( this ) )
 {
+    m_timer = 0;
+    
     setCheckable( true );
     setChecked( true );
-    setFixedSize( 45, 31 );
+    setFixedSize( 51, 37 );
     connect( m_movie, SIGNAL(frameChanged( int )), SLOT(update()) );
-
-    onTrackSpooled( Track(), 0 );
     
     connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled( Track, StopWatch* )) );
 }
@@ -50,30 +48,35 @@ ScrobbleButton::ScrobbleButton()
 void
 ScrobbleButton::paintEvent( QPaintEvent* )
 {
-    QRect r;
     QPixmap p;
     
-    if (isChecked())
-    {
+    if (m_track.isNull()) {
+        p = QPixmap( ":/ScrobbleButton/scrobbling_on.png" );
+    }
+    else if (!m_track.isValid()) {
+        p = QPixmap( ":/ScrobbleButton/cant_scrobble.png" );
+    }
+    else if (isChecked()) {
         p = m_movie->currentPixmap();
-        r = rect();
     }
     else
-    {
-        p = QPixmap( ":/MainWindow/scrobbling_off.png" );
-        r = QRect( 2, 3, 41, 25 );
-    }
+        p = QPixmap( ":/ScrobbleButton/scrobbling_off.png" );
 
-    QPainter( this ).drawPixmap( r, p );
+    QPainter( this ).drawPixmap( rect(), p );
 }
 
 
 void
 ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 {
+    m_track = t;
+    
     delete m_timer;
-
-    m_movie->stop();    
+    m_timer = 0;
+    
+    //only way to make the movie restart with Qt 4.4.2
+    //TODO optimise, this can't be cheap to do if unecessary
+    m_movie->setFileName( ":/ScrobbleButton.mng" );
     m_movie->start();
     m_movie->setPaused( true );
     m_movie->jumpToFrame( 0 );
@@ -82,15 +85,18 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
     {
         setToolTip( "" );
     }
-    else
+    else if (m_track.isValid())
     {
-        m_timer = new QTimer( watch );
-        connect( m_timer, SIGNAL(timeout()), SLOT(advanceFrame()) );
-        m_timer->setInterval( watch->scrobblePoint() * 1000 / 24 );
+        m_timer = new QTimeLine;
+        m_timer->setParent( this );
+        m_timer->setCurveShape( QTimeLine::LinearCurve );
+        connect( m_timer, SIGNAL(frameChanged( int )), SLOT(setFrame( int )) );
+        
+        m_timer->setFrameRange( 0, 23 );
+        m_timer->setDuration( watch->scrobblePoint() * 1000 );
         m_timer->start();
 
-        connect( watch, SIGNAL(paused()), m_timer, SLOT(stop()) );
-        connect( watch, SIGNAL(resumed()), m_timer, SLOT(start()) );
+        connect( watch, SIGNAL(paused( bool )), m_timer, SLOT(setPaused( bool )) );
         connect( watch, SIGNAL(tick( int )), SLOT(updateToolTip( int )) );
         connect( watch, SIGNAL(timeout()), SLOT(onScrobbled()) );
     }
@@ -99,29 +105,23 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 
 void
 ScrobbleButton::onScrobbled()
-{
-    m_timer->stop();
-    m_movie->setPaused( false );
+{    
+    delete m_timer;
+    m_movie->start();
 }
 
 
 void
-ScrobbleButton::advanceFrame()
+ScrobbleButton::setFrame( int i )
 {
-    int const i = m_movie->currentFrameNumber();
-    Q_ASSERT( i < 25 ); //after 24 we start to glow
-    
-    m_movie->jumpToFrame( i + 1 );
+    m_movie->jumpToFrame( i );
 }
 
 
 void
-ScrobbleButton::updateToolTip( int s )
+ScrobbleButton::updateToolTip( int const s )
 {
-    int m = s / 60;
-    s = s % 60;
-    
-    #define f( x ) QString::number( x ).leftJustified( 2, '0' )
-    setToolTip( f( m ) + ':' + f( s ) );
-    #undef f
+    setToolTip( QString::number( s / 60 ) +
+                ':' +
+                QString::number( s % 60 ).rightJustified( 2, '0' ) );
 }

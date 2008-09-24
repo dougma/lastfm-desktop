@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "lib/DllExportMacro.h"
-#include "lib/types/Track.h"
+#include "Scrobble.h"
 #include <QList>
 #include <QString>
 
@@ -42,7 +42,7 @@ public:
 
     /** note this is unique for Track::sameAs() and equal timestamps 
       * obviously playcounts will not be increased for the same timestamp */
-    void add( const Track& );
+    void add( const Scrobble& );
     void add( const QList<Track>& );
 
     /** returns the number of tracks left in the queue */

@@ -25,6 +25,9 @@
 
 struct Scrobble : Track
 {
+    Scrobble()
+    {}
+    
     Scrobble( const Track& that ) : Track( that )
     {}
     

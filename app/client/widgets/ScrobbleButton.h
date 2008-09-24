@@ -22,8 +22,9 @@
 
 #include <QAbstractButton>
 #include <QPointer>
+#include "lib/scrobble/Scrobble.h"
 class QMovie;
-class QTimer;
+class QTimeLine;
 
 
 class ScrobbleButton : public QAbstractButton
@@ -31,7 +32,8 @@ class ScrobbleButton : public QAbstractButton
     Q_OBJECT
 
     QMovie* m_movie;
-    QPointer<QTimer> m_timer;
+    QPointer<QTimeLine> m_timer;
+    Scrobble m_track;
 
 public:
     ScrobbleButton();
@@ -42,7 +44,7 @@ protected:
 private slots:
     void onTrackSpooled( const class Track&, class StopWatch* );
     void onScrobbled();
-    void advanceFrame();
+    void setFrame( int );
     void updateToolTip( int );
 };
 

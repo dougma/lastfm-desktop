@@ -84,9 +84,10 @@ ScrobbleCache::write()
 
 
 void
-ScrobbleCache::add( const Track& track )
+ScrobbleCache::add( const Scrobble& track )
 {
-    add( QList<Track>() << track );
+    if (track.isValid())
+        add( QList<Track>() << track );
 }
 
 

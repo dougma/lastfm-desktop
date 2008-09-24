@@ -35,7 +35,7 @@ Launcher::Launcher( QWidget* parent )
     h->addStretch();
     h->addWidget( ui.scrobble = new ScrobbleButton );
     h->setSpacing( 0 );
-    h->setContentsMargins( 8, 8, 8, 9 );
+    h->setContentsMargins( 8, 3, 4, 4 );
 	
 	connect( ui.radio, SIGNAL( clicked()), SLOT( onRadioToggle()));
 	ui.radio->setCheckable( true );
