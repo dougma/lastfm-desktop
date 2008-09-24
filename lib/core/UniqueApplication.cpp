@@ -64,7 +64,7 @@ UniqueApplication::UniqueApplication( const char* id )
     m_alreadyRunning = ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED;
     
 	m_hwnd = m_alreadyRunning
-			? ::FindWindow( L"QWidget", (TCHAR*)winId().utf16() )
+			? ::FindWindow( L"QWidget", (TCHAR*)windowTitle().utf16() )
 			: 0;
 #endif
     
@@ -98,7 +98,6 @@ UniqueApplication::UniqueApplication( const char* id )
     
 #ifdef Q_WS_X11
     qWarning() << "Single application instance code still unwritten!";
-    bool const up = false;
 #endif
 }
 
@@ -117,7 +116,7 @@ UniqueApplication::init( const QApplication& )
 	// need to wait for the QApplication to be initialised
 	UniqueApplicationWidget* w = new UniqueApplicationWidget;
 	w->app = this;
-	w->setWindowTitle( winId() );
+	w->setWindowTitle( windowTitle() );
 	m_hwnd = w->winId();
 #endif
 }

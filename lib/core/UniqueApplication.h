@@ -71,7 +71,7 @@ private:
 	friend class UniqueApplicationWidget;
     HWND m_hwnd;
 
-	QString winId() const { return QString(m_id) + "_UniqueApplicationWidget"; }
+	QString windowTitle() const { return QString(m_id) + "_UniqueApplicationWidget"; }
 #endif
 };
 

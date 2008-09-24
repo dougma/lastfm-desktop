@@ -79,7 +79,7 @@ Source: "@QT_DIR@\bin\QtOpenGL4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qjpeg4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qgif4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qmng4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
-Source: "@QT_DIR@\plugins\phonon_backend\phonon_ds94.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
+Source: "@QT_DIR@\plugins\phonon_backend\phonon_ds94.dll"; DestDir: "{app}\phonon_backend"; Flags: ignoreversion
 
 
 [Registry]
