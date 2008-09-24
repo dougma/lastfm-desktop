@@ -73,6 +73,7 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 {
     delete m_timer;
 
+    m_movie->stop();    
     m_movie->start();
     m_movie->setPaused( true );
     m_movie->jumpToFrame( 0 );
@@ -100,7 +101,7 @@ void
 ScrobbleButton::onScrobbled()
 {
     m_timer->stop();
-    m_movie->start();
+    m_movie->setPaused( false );
 }
 
 
