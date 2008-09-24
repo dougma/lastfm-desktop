@@ -80,6 +80,8 @@ signals:
 class WsNetEventAdapter:
 	public QObject
 {
+	Q_OBJECT
+
 public:
 	WsNetEventAdapter(QObject *parent = 0)
 		:QObject(parent)
