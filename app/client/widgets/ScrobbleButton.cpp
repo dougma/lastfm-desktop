@@ -26,19 +26,22 @@
 #include <QTimer>
 
 
+class ScrobbleButtonToolTip : public QWidget
+{
+
+};
+
+
 ScrobbleButton::ScrobbleButton()
-              : m_progressMovie( new QMovie(":/ScrobbleButton/progress.mng") ),
-                m_glowMovie( new QMovie(":/ScrobbleButton/glow.mng") ),
+              : m_movie( new QMovie(":/ScrobbleButton.mng") ),
                 m_timer( 0 )
 {
     setCheckable( true );
     setChecked( true );
     setFixedSize( 45, 31 );
-    m_progressMovie->start();
-    m_progressMovie->setPaused( true );
-    connect( m_progressMovie, SIGNAL(frameChanged( int )), SLOT(update()) );
-    connect( m_glowMovie, SIGNAL(frameChanged( int )), SLOT(update()) );
-    m_movie = m_progressMovie;
+    connect( m_movie, SIGNAL(frameChanged( int )), SLOT(update()) );
+
+    onTrackSpooled( Track(), 0 );
     
     connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled( Track, StopWatch* )) );
 }
@@ -70,9 +73,9 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 {
     delete m_timer;
 
-    m_movie = m_progressMovie;
-    m_progressMovie->jumpToFrame( 0 );
-    m_glowMovie->stop();
+    m_movie->start();
+    m_movie->setPaused( true );
+    m_movie->jumpToFrame( 0 );
     
     if (t.isNull())
     {
@@ -84,7 +87,9 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
         connect( m_timer, SIGNAL(timeout()), SLOT(advanceFrame()) );
         m_timer->setInterval( watch->scrobblePoint() * 1000 / 24 );
         m_timer->start();
-        
+
+        connect( watch, SIGNAL(paused()), m_timer, SLOT(stop()) );
+        connect( watch, SIGNAL(resumed()), m_timer, SLOT(start()) );
         connect( watch, SIGNAL(tick( int )), SLOT(updateToolTip( int )) );
         connect( watch, SIGNAL(timeout()), SLOT(onScrobbled()) );
     }
@@ -94,15 +99,18 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 void
 ScrobbleButton::onScrobbled()
 {
-    m_movie = m_glowMovie;
-    m_glowMovie->start();
+    m_timer->stop();
+    m_movie->start();
 }
 
 
 void
 ScrobbleButton::advanceFrame()
 {
-    m_movie->jumpToFrame( m_movie->currentFrameNumber() + 1 );
+    int const i = m_movie->currentFrameNumber();
+    Q_ASSERT( i < 25 ); //after 24 we start to glow
+    
+    m_movie->jumpToFrame( i + 1 );
 }
 
 

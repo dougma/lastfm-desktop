@@ -30,8 +30,6 @@ class ScrobbleButton : public QAbstractButton
 {
     Q_OBJECT
 
-    QMovie* m_progressMovie;
-    QMovie* m_glowMovie;
     QMovie* m_movie;
     QPointer<QTimer> m_timer;
 

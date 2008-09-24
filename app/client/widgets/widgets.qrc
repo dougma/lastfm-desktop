@@ -35,7 +35,6 @@
       <file>SettingsDialog/ipod.png</file>
   </qresource>
   <qresource>
-      <file>ScrobbleButton/glow.mng</file>
-      <file>ScrobbleButton/progress.mng</file>
+      <file>ScrobbleButton.mng</file>
   </qresource>
 </RCC>
