@@ -91,10 +91,6 @@
    </property>
   </action>
   <action name="skip" >
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/skip.png</normaloff>:/MainWindow/skip.png</iconset>
-   </property>
    <property name="text" >
     <string>Skip</string>
    </property>
@@ -155,10 +151,6 @@
    <property name="enabled" >
     <bool>false</bool>
    </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/tag.png</normaloff>:/MainWindow/tag.png</iconset>
-   </property>
    <property name="text" >
     <string>Tag</string>
    </property>
@@ -166,10 +158,6 @@
   <action name="share" >
    <property name="enabled" >
     <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/share.png</normaloff>:/MainWindow/share.png</iconset>
    </property>
    <property name="text" >
     <string>Share</string>
@@ -182,10 +170,6 @@
    <property name="enabled" >
     <bool>false</bool>
    </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/love.png</normaloff>:/MainWindow/love.png</iconset>
-   </property>
    <property name="text" >
     <string>Love</string>
    </property>
@@ -194,17 +178,10 @@
    <property name="enabled" >
     <bool>false</bool>
    </property>
-   <property name="icon" >
-    <iconset resource="MainWindow.qrc" >
-     <normaloff>:/MainWindow/ban.png</normaloff>:/MainWindow/ban.png</iconset>
-   </property>
    <property name="text" >
     <string>Ban</string>
    </property>
   </action>
  </widget>
- <resources>
-  <include location="MainWindow.qrc" />
- </resources>
  <connections/>
 </ui>
