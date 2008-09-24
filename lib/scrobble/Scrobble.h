@@ -20,10 +20,11 @@
 #ifndef SCROBBLE_H
 #define SCROBBLE_H
 
+#include "lib/DllExportMacro.h"
 #include "lib/types/Track.h"
 
 
-struct Scrobble : Track
+struct SCROBBLE_DLLEXPORT Scrobble : Track
 {
     Scrobble()
     {}

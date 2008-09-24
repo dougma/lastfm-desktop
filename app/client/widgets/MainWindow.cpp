@@ -105,7 +105,7 @@ MainWindow::onTrackSpooled( const Track& t )
     #ifndef Q_WS_MAC
         setWindowTitle( t.isNull() 
                 ? qApp->applicationName()
-                : t.prettyTitle() );
+                : t.toString() );
     #endif
 }
 
