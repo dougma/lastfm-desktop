@@ -20,6 +20,7 @@
 #include "ScrobblerSubmission.h"
 #include "ScrobbleCache.h"
 #include "Scrobbler.h"
+#include "Scrobble.h"
 
 
 void
@@ -27,7 +28,7 @@ ScrobblerSubmission::setTracks( const QList<Track>& tracks )
 {
     m_tracks = tracks;
     // submit in chronological order
-    qSort( m_tracks.begin(), m_tracks.end(), Track::lessThan );
+    qSort( m_tracks.begin(), m_tracks.end() );
 }
 
 
@@ -49,13 +50,13 @@ ScrobblerSubmission::submitNextBatch()
     bool portable = false;
     for (int i = 0; i < 50 && !m_tracks.isEmpty(); ++i)
     {
-        Track t = m_tracks.takeFirst();
+        Scrobble t = m_tracks.takeFirst();
 
         QByteArray const N = QByteArray::number( i );
         #define e( x ) QUrl::toPercentEncoding( x )
         m_data += "&a[" + N + "]=" + e(t.artist()) +
                   "&t[" + N + "]=" + e(t.title()) +
-                  "&i[" + N + "]=" + QByteArray::number( t.timeStamp().toTime_t() ) +
+                  "&i[" + N + "]=" + QByteArray::number( t.timestamp().toTime_t() ) +
                   "&o[" + N + "]=" + t.sourceString() +
                   "&r[" + N + "]=" + t.ratingCharacter() +
                   "&l[" + N + "]=" + QByteArray::number( t.duration() ) +

@@ -23,6 +23,7 @@
 #include "lib/scrobble/ScrobbleCache.h"
 #include "widgets/SendLogsDialog.h"
 #include "lib/core/CoreDir.h"
+#include "lib/scrobble/Scrobble.h"
 #include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
@@ -283,8 +284,8 @@ DiagnosticsDialog::populateScrobbleCacheView()
     ScrobbleCache cache( The::settings().username() );
 
     QList<QTreeWidgetItem *> items;
-    foreach (Track t, cache.tracks())
-        if ( t.isScrobbled() )
+    foreach (Scrobble t, cache.tracks())
+        if (t.isNotLovedSkippedOrBanned())
             items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.title() << t.album() ) );
 
     ui.cachedTracksList->clear();

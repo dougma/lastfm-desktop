@@ -194,28 +194,21 @@ App::onBootstrapCompleted( const QString& playerId )
 void
 App::love( bool b )
 {
-	Track t = m_playerManager->track();
+	MutableTrack t = m_playerManager->track();
 
-	if( b )
-	{
-		MutableTrack( t ).upgradeRating( Track::Loved );
+	if (b)
 		t.love();
-	}
 	else
-	{
-		MutableTrack( t ).downgradeRating( Track::Loved );
-		//Need t.unlove() but waiting on webservice!
-	}
+		t.unlove();
 }
 
 
 void
 App::ban()
 {
-	Track t = m_playerManager->track();
-	MutableTrack( t ).upgradeRating( Track::Banned );
-	m_radio->skip();
+	MutableTrack t = m_playerManager->track();
 	t.ban();
+	m_radio->skip();
 }
 
 

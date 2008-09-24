@@ -24,8 +24,6 @@
     <file>MainWindow/radio_off.png</file>
     <file>MainWindow/library_on.png</file>
     <file>MainWindow/library_off.png</file>
-    <file>MainWindow/scrobbling_on.png</file>
-    <file>MainWindow/scrobbling_off.png</file>
   </qresource>
   <qresource>
       <file>SettingsDialog/account.png</file>
@@ -36,5 +34,8 @@
   </qresource>
   <qresource>
       <file>ScrobbleButton.mng</file>
+      <file>ScrobbleButton/scrobbling_on.png</file>
+      <file>ScrobbleButton/scrobbling_off.png</file>
+      <file>ScrobbleButton/cant_scrobble.png</file>
   </qresource>
 </RCC>

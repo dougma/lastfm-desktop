@@ -40,11 +40,9 @@ struct TrackData : QSharedData
     QString album;
     QString title;
     int trackNumber;
-    int playCount;
     int duration;
     short source;
     short rating;
-    QString playerId;
     QString mbId; /// musicbrainz id
     QString fpId; /// fingerprint id
     QUrl url;
@@ -71,35 +69,8 @@ public:
 		PersonalisedRecommendation, // eg Pandora, but not Last.fm
     };
 
-    enum Rating
-    {
-        // DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OR VALUES OF THIS ENUM!
-        // you will cause broken settings and b0rked scrobbler cache submissions
-		//NOTE sorted in precedence order
-
-		NotScrobbled = 0x0001,
-		Scrobbled	 = 0x0002,
-        Loved		 = 0x0004,
-        Skipped		 = 0x0008,
-        Banned		 = 0x0018,	//Implied skip
-    };
-	
-
-    enum ScrobblableStatus
-    {
-        OkToScrobble,
-        NoTimeStamp,
-        TooShort,
-        ArtistNameMissing,
-        TrackNameMissing,
-        ExcludedDir,
-        ArtistInvalid,
-        FromTheFuture,
-        FromTheDistantPast
-    };
-
     Track();
-    Track( const QDomElement& );
+    explicit Track( const QDomElement& );
 
     /** this track and that track point to the same object, so they are the same
       * in fact. This doesn't do a deep data comparison. So even if all the 
@@ -118,60 +89,49 @@ public:
       * are empty */
     bool isNull() const { return d->artist.isEmpty() && d->title.isEmpty(); }
 
-    /** the standard representation of this object as an XML node */
-    QDomElement toDomElement( class QDomDocument& ) const;
 
     Artist artist() const { return Artist( d->artist ); }
     Album album() const { return Album( artist(), d->album ); }
     QString title() const { return d->title; }
     int trackNumber() const { return d->trackNumber; }
-    int playCount() const { return d->playCount; }
     int duration() const { return d->duration; }
-    QString durationString() const;
     QString mbId() const { return d->mbId; }
     QUrl url() const { return d->url; }
-    QDateTime timeStamp() const { return d->time; }
-    QDateTime dateTime() const { return d->time; }
+    QDateTime timestamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
-
-    /** scrobbler submission source string code */
-    QString sourceString() const;
-    QString playerId() const { return d->playerId; }
     QString fpId() const { return d->fpId; }
 
-    bool isLoved() const { return d->rating & Loved; }
-    bool isBanned() const { return d->rating & Banned; }
-	bool isSkipped() const { return d->rating & Skipped; }
-	bool isScrobbled() const { return isLoved() || d->rating & Scrobbled; }
-	/** only one rating is possible, we have to figure out which from various flags applied */
-	QString ratingCharacter() const;
+    QString durationString() const;
 
-    QString prettyTitle( const QChar& separator = QChar(8211) /*en dash*/ ) const;
+    /** default separator is an en-dash */
+    QString toString( const QChar& separator = QChar(8211) ) const;
+    /** the standard representation of this object as an XML node */
+    QDomElement toDomElement( class QDomDocument& ) const;
 
-    /** used to sort tracks into chronological order, used by scrobbling */
-    static bool lessThan( const Track &t1, const Track &t2)
+    
+//////////// TODO move to class Scrobble
+    bool operator<( const Track &that ) const
     {
-        return t1.timeStamp() < t2.timeStamp();
+        return this->d->time < that.d->time;
     }
-
+    
+//////////// lastfm::Ws
+    
 	/** See last.fm/api Track section */
     WsReply* share( const class User& recipient, const QString& message = "" );
-	WsReply* love();
-	WsReply* ban();
 
     /** you can get any WsReply TagList using Tag::list( WsReply* ) */
 	WsReply* getTags() const; // for the logged in user
 	WsReply* getTopTags() const;
     
     /** you can only add 10 tags, we submit everything you give us, but the
-      * docs state, 10 only */
+      * docs state 10 only */
     WsReply* addTags( const QStringList& ) const;
 
 	/** the url for this track's page at last.fm */
 	QUrl www() const;
 	
 protected:
-    friend class MutableTrack; //FIXME wtf? but compiler error otherwise
     QExplicitlySharedDataPointer<TrackData> d;
 };
 
@@ -182,34 +142,25 @@ public:
     MutableTrack()
     {}
 
-    MutableTrack( const Track& that )
-    {
-        this->d = that.d;
-    }
+    MutableTrack( const Track& that ) : Track( that )
+    {}
 
     void setArtist( QString artist ) { d->artist = artist.trimmed(); }
     void setAlbum( QString album ) { d->album = album.trimmed(); }
     void setTitle( QString title ) { d->title = title.trimmed(); }
     void setTrackNumber( int n ) { d->trackNumber = n; }
-    void setPlayCount( int playCount ) { d->playCount = playCount; }
     void setDuration( int duration ) { d->duration = duration; }
-    void setMbId( QString mbId ) { d->mbId = mbId; }
     void setUrl( QUrl url ) { d->url = url; }
     void setSource( Source s ) { d->source = s; }
-    void setPlayerId( QString id ) { d->playerId = id; }
+    
+    void setMbId( QString mbId ) { d->mbId = mbId; }
     void setFpId( QString id ) { d->fpId = id; }
     
-	void upgradeRating( Rating r )
-	{
-		d->rating |= r;
-	}
-	
-	/** Unloving is the only valid downgrade */
-	void downgradeRating( Rating r )
-	{
-		Q_ASSERT_X( r == Loved, "track rating downgrade", "Should only downgrade love" );
-		d->rating ^= r;
-	}
+    WsReply* love();
+    WsReply* ban();
+
+    /** currently doesn't work, as there is no webservice */
+    void unlove();
 	
     void stamp() { d->time = QDateTime::currentDateTime(); }
 
@@ -220,7 +171,6 @@ public:
 inline 
 TrackData::TrackData() 
              : trackNumber( 0 ),
-               playCount( 0 ),
                duration( 0 ),
                source( Track::Unknown ),
                rating( 0 )
@@ -230,7 +180,7 @@ TrackData::TrackData()
 #include <QDebug>
 inline QDebug operator<<( QDebug d, const Track& t )
 {
-    return d << t.prettyTitle( '-' ) << t.album();
+    return d << t.toString( '-' ) << t.album();
 }
 
 

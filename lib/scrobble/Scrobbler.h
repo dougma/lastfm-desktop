@@ -41,13 +41,14 @@ public:
     ~Scrobbler();
 
 public slots:
-    /** will ask Last.fm to update the now playing information for username() */
+    /** will ask Last.fm to update the now playing information for the 
+      * authenticated user */
     void nowPlaying( const class Track& );
     /** will cache the track, but we won't submit it until you call submit() */
     void cache( const Track& );
-    /** will submit the ScrobbleCache for this user */
+    /** will submit the submission cache for this user */
     void submit();
-
+    
 public:
     enum Status
     {

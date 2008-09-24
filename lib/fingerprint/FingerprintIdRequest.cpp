@@ -39,7 +39,7 @@ FingerprintIdRequest::FingerprintIdRequest( const Track& track, QObject* parent 
     
     if ( !fpId.isEmpty() )
     {
-        qDebug() << "Fingerprint found in cache for" << track.prettyTitle();
+        qDebug() << "Fingerprint found in cache for" << track;
         emit cachedFpIDFound( fpId );
         return;
     }

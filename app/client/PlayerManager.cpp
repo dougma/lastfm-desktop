@@ -197,7 +197,6 @@ PlayerManager::endTrack()
 void
 PlayerManager::onStopWatchTimedOut()
 {
-    MutableTrack( m_track ).upgradeRating( Track::Scrobbled );
     emit scrobblePointReached( m_track );
 }
 

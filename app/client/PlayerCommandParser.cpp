@@ -179,7 +179,7 @@ PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
     track.setDuration( args['l'].toInt() );
     track.setUrl( QUrl::fromLocalFile( QUrl::fromPercentEncoding( args['p'].toUtf8() ) ) );
     track.setSource( Track::Player );
-    track.setPlayerId( args['c'] );
+    track.setExtra( "playerId", args['c'] );
 
     //TODO should be done earlier, NOTE don't get the plugin to send a stamp 
     // time as this is prolly unecessary, and I bet you get new bugs!

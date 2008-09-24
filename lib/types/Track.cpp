@@ -20,10 +20,9 @@
 #include "Track.h"
 #include "User.h"
 #include "lib/core/CoreUrl.h"
-#include "lib/unicorn/UnicornSettings.h" //FIXME
 #include "lib/ws/WsRequestBuilder.h"
 #include "lib/ws/WsReply.h"
-#include <QDir>
+#include <QFileInfo>
 
 
 Track::Track()
@@ -41,7 +40,6 @@ Track::Track( const QDomElement& e )
     d->title = e.namedItem( "track" ).toElement().text();
     d->trackNumber = 0;
     d->duration = e.namedItem( "duration" ).toElement().text().toInt();
-    d->playCount = e.namedItem( "playcount" ).toElement().text().toInt();
     d->url = e.namedItem( "url" ).toElement().text();
     d->rating = e.namedItem( "rating" ).toElement().text().toUInt();
 	d->extras["trackauth"] = e.namedItem( "auth" ).toElement().text();
@@ -92,13 +90,11 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "track", d->title );
     makeElement( "duration", QString::number( d->duration ) );
     makeElement( "timestamp", QString::number( d->time.toTime_t() ) );
-    makeElement( "playcount", QString::number( d->playCount ) );
     makeElement( "url", d->url.toString() );
     makeElement( "source", QString::number( d->source ) );
     makeElement( "rating", QString::number(d->rating) );
     makeElement( "fpId", fpId() );
     makeElement( "mbId", mbId() );
-    makeElement( "playerId", playerId() );
 	makeElement( "auth", d->extras[	"trackauth"] );
 
     return item;
@@ -106,7 +102,7 @@ Track::toDomElement( QDomDocument& document ) const
 
 
 QString
-Track::prettyTitle( const QChar& separator ) const
+Track::toString( const QChar& separator ) const
 {
     if ( d->artist.isEmpty() )
     {
@@ -124,36 +120,6 @@ Track::prettyTitle( const QChar& separator ) const
 
 
 QString
-Track::ratingCharacter() const
-{
-	// handled in priority order
-	if( d->rating & Banned ) return "B"; //banning takes priority, as it implies a skip, so unbanning is impossible
-	if( d->rating & Loved ) return "L";
-	if( d->rating & Scrobbled ) return "";
-	if( d->rating & Skipped ) return "S"; //if we skip after the scrobble point, ignore the skip
-	if( d->rating & NotScrobbled ) return "";
-
-	Q_ASSERT_X( 0, "ratingCharacter()", "Unhandled rating enum value" );
-	return "";
-}
-
-
-QString
-Track::sourceString() const
-{
-    switch (d->source)
-    {
-        case LastFmRadio: return "L" + d->extras["trackauth"];
-        case Player: return "P" /*+ playerId()*/;
-        case MediaDevice: return "P" /*+ mediaDeviceId()*/;
-		case NonPersonalisedBroadcast: return "R";
-		case PersonalisedRecommendation: return "E";
-        default: return "U";
-    }
-}
-
-
-QString
 Track::durationString() const
 {
     QTime t = QTime().addSecs( d->duration );
@@ -162,76 +128,6 @@ Track::durationString() const
     else
         return t.toString( "hh:mm:ss" );
 }
-
-
-#if 0 
-Track::ScrobblableStatus
-Track::scrobblableStatus() const
-{
-    if ( duration() < ScrobblePoint::kScrobbleMinLength )
-    {
-        LOGL( 3, "Duration is too short (" << duration() << "s), will not submit.\n" );
-        return TooShort;
-    }
-
-    // Radio tracks above preview length always scrobble
-    if ( source() == Track::Radio )
-    {
-        return OkToScrobble;
-    }
-
-    if ( !timeStamp().isValid() )
-    {
-        LOGL( 3, "Invalid timestamp, will not submit" );
-        return NoTimeStamp;
-    }
-
-    // actual spam prevention is something like 12 hours, but we are only
-    // trying to weed out obviously bad data, server side criteria for
-    // "the future" may change, so we should let the server decide, not us
-    if ( timeStamp() > QDateTime::currentDateTime().addMonths( 1 ) )
-    {
-        LOGL( 3, "Track is more than a month in the future, will not submit" );
-        return FromTheFuture;
-    }
-
-    if ( timeStamp() < QDateTime::fromString( "2003-01-01", Qt::ISODate ) )
-    {
-        LOGL( 3, "Track was played before the Audioscrobbler project was founded! Will not submit" );
-        return FromTheDistantPast;
-    }
-
-    // Check if any required fields are empty
-    if ( d->artist.isEmpty() )
-    {
-        LOGL( 3, "Artist was missing, will not submit" );
-        return ArtistNameMissing;
-    }
-    if ( d->title.isEmpty() )
-    {
-        LOGL( 3, "Artist, track or duration was missing, will not submit" );
-        return TrackNameMissing;
-    }
-
-    QStringList invalidList;
-    invalidList << "unknown artist"
-                << "unknown"
-                << "[unknown]"
-                << "[unknown artist]";
-
-    foreach( QString invalid, invalidList )
-    {
-        if ( d->artist.toLower() == invalid )
-        {
-            LOG( 3, "Artist '" << d->artist << "' is an invalid artist name, will not submit.\n" );
-            return ArtistInvalid;
-        }
-    }
-
-    // All tests passed!
-    return OkToScrobble;
-}
-#endif
 
 
 WsReply*
@@ -247,8 +143,13 @@ Track::share( const User& recipient, const QString& message )
 
 
 WsReply*
-Track::love()
+MutableTrack::love()
 {
+    if (d->extras.value("rating").size())
+        return 0;
+    
+    d->extras["rating"] = "L";
+    
 	return WsRequestBuilder( "track.love" )
 		.add( "artist", d->artist )
 		.add( "track", d->title )
@@ -257,12 +158,22 @@ Track::love()
 
 
 WsReply*
-Track::ban()
+MutableTrack::ban()
 {
+    d->extras["rating"] = "B";
+    
 	return WsRequestBuilder( "track.ban" )
 		.add( "artist", d->artist )
 		.add( "track", d->title )
 		.post();
+}
+
+
+void
+MutableTrack::unlove()
+{
+    QString& r = d->extras["rating"];
+    if (r == "L") r = "";
 }
 
 

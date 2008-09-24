@@ -63,7 +63,7 @@ Firehose::onData()
         CoreDomElement e( xml.documentElement() );
         
         html += "<a href='" + e["user"]["url"].text() + "'><img src='" + e["user"]["image"].text() + "'>" + e["user"]["name"].text() + "</a><br>";
-        html += e["track"]["artist"]["name"].text() + " &#151; " + e["track"]["name"].text();
+        html += e["track"]["artist"]["name"].text() + " &ndash; " + e["track"]["name"].text();
         
         QWebView* web = new QWebView;
         layout()->addWidget( web );
