@@ -27,7 +27,7 @@ macx* {
 else {
 	SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
 	INCLUDEPATH += .
-    LIBS += -lshell32 -luser32
+    win32:LIBS += -lshell32 -luser32
 }
 
 win32 {
