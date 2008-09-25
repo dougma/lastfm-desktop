@@ -21,6 +21,7 @@
 #define WS_NET_EVENTS_H
 
 #include <QtCore>
+#include "lib/DllExportMacro.h"
 
 
 #ifdef WIN32
@@ -97,7 +98,7 @@ signals:
 
 
 
-class WsNetEvent : 
+class WS_DLLEXPORT WsNetEvent : 
 	public QObject
 {
 	Q_OBJECT

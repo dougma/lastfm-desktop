@@ -71,6 +71,7 @@ private slots:
 private:
     class PlayerManager* m_playerManager;
     class Scrobbler* m_scrobbler;
+	class WsNetEvent* m_netEvent;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
     class Radio* m_radio;

@@ -17,7 +17,7 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#include "WsNetEvents.h"
+#include "WsNetEvent.h"
 
 
 WsNetEvent::WsNetEvent(QObject *parent) :
@@ -25,6 +25,7 @@ WsNetEvent::WsNetEvent(QObject *parent) :
 	m_adapter(0)
 {
 	m_adapter = new WsNetEventAdapter(parent);
-	connect(m_adapter, SIGNAL(connectionUp(QString, bool)), this, SIGNAL(connectionUp(QString, bool)));
+	connect(m_adapter, SIGNAL(connectionUp(QString, bool)), this, SIGNAL(connectionUp(QString, bool)) );
+	connect(m_adapter, SIGNAL(connectionDown(QString, bool)), this, SIGNAL(connectionDown(QString, bool)) );
 }
 

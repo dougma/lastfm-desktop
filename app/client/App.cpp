@@ -29,6 +29,7 @@
 #include "lib/core/QMessageBoxBuilder.h"
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/radio/Radio.h"
+#include "lib/ws/WsNetEvent.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include "phonon/audiooutput.h"
@@ -63,11 +64,13 @@ App::App( int argc, char** argv )
 #endif
     
     m_scrobbler = new Scrobbler( "ass" );
-    
     connect( m_playerManager, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
     connect( m_playerManager, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
-    
+
+	m_netEvent = new WsNetEvent( this );
+	connect( m_netEvent, SIGNAL(connectionUp(QString, bool)), m_scrobbler, SLOT(submit()) );
+
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 

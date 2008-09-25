@@ -91,7 +91,6 @@ WsAutoProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetwo
 #ifdef WIN32
 	if (!m_hSession)
 	{
-		//QByteArray userAgentWide = QTextCodec::codecForMib(1015)->toUnicode(userAgent);  // 1015 = UTF-16 mib enum
 		m_hSession = WinHttpOpen(CA2W(userAgent), WINHTTP_ACCESS_TYPE_NO_PROXY, 0, 0, 0/*|WINHTTP_FLAG_ASYNC*/);
 	}
 	if (m_hSession)
