@@ -31,10 +31,8 @@ WsAccessManager::WsAccessManager(QObject *parent)
 	if (!m_proxy) m_proxy = new WsProxy(qApp);
 }
 
-// prolly we should name this applyProxy, since setProxy generally means
-// we are setting the proxy object of this object in Qt-style
 void
-WsAccessManager::setProxy(const QNetworkRequest &request)
+WsAccessManager::applyProxy(const QNetworkRequest &request)
 {
 	if (m_proxy)
 	{
@@ -57,41 +55,41 @@ WsAccessManager::monitor(QNetworkReply *reply)
 QNetworkReply *
 WsAccessManager::head(const QNetworkRequest &request)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::head(request));
 }
 
 QNetworkReply *
 WsAccessManager::get(const QNetworkRequest &request)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::get(request));
 }
 
 QNetworkReply *
 WsAccessManager::post(const QNetworkRequest &request, QIODevice *data)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::post(request, data));
 }
 
 QNetworkReply *
 WsAccessManager::post(const QNetworkRequest &request, const QByteArray &data)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::post(request, data));
 }
 
 QNetworkReply *
 WsAccessManager::put(const QNetworkRequest &request, QIODevice *data)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::put(request, data));
 }
 
 QNetworkReply *
 WsAccessManager::put(const QNetworkRequest &request, const QByteArray &data)
 {
-	setProxy(request);
+	applyProxy(request);
 	return monitor(QNetworkAccessManager::put(request, data));
 }

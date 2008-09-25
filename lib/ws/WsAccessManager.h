@@ -32,7 +32,7 @@ class WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
 
  	/** called for every request since we support PAC, it's worth noting that 
 	  * this function calls QNetworkAccessManager::setProxy */
-	void setProxy(const QNetworkRequest &);
+	void applyProxy(const QNetworkRequest &);
 	QNetworkReply *monitor(QNetworkReply *);
 
 public:
