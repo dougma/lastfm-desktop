@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerBucket.h"
-#include "QListView.h"
+#include <QListView>
 #include "widgets/ImageButton.h"
 #include <lib/ws/WsAccessManager.h>
 #include <QNetworkRequest>

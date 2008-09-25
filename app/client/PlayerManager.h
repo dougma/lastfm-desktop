@@ -25,6 +25,7 @@
 #include "lib/radio/Radio.h"
 #include <QPointer>
 
+class PlayerListener;
 
 class PlayerManager : public QObject
 {
