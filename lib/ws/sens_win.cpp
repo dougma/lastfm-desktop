@@ -29,8 +29,11 @@ Sens::init()
 	hr = CoInitialize(0);
 
 	hr.trying("getting collection");
-	hr = m_pComAdmin.CoCreateInstance(CLSID_COMAdminCatalog);
-	hr = m_pComAdmin->GetCollection(CComBSTR("TransientSubscriptions"), (IDispatch**)&m_pCatColl);
+	{
+		CComPtr<ICOMAdminCatalog> pComAdmin;
+		hr = pComAdmin.CoCreateInstance(CLSID_COMAdminCatalog);
+		hr = pComAdmin->GetCollection(CComBSTR("TransientSubscriptions"), (IDispatch**)&m_pCatColl);
+	}
 
 	hr.trying("subscribing to ConnectionMade");
 	hr = addEvent(m_pCatColl, "ConnectionMade", 0);
@@ -72,6 +75,7 @@ Sens::uninit()
 			LONG cChanges = 0;
 			hr = m_pCatColl->SaveChanges(&cChanges);
 		}
+		m_pCatColl.Release(); // release before COM goes away!
 		CoUninitialize();
 	}
 }

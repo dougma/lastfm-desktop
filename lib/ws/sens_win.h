@@ -36,7 +36,6 @@
 class Sens : 
 	public IDispatchImpl<ISensNetwork, &IID_ISensNetwork, &LIBID_SensEvents>
 {
-	CComPtr<ICOMAdminCatalog> m_pComAdmin;
 	CComPtr<ICatalogCollection> m_pCatColl;
 	CComVariant m_keys[SENS_SUBSCRIPTIONS];
 
