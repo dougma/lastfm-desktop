@@ -30,9 +30,8 @@
 
 
 /** @brief memory managing wrapper for WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
-* @author <doug@last.fm>
-*
-*/
+  * @author <doug@last.fm>
+  */
 
 class IeSettings : public WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
 {
@@ -62,9 +61,8 @@ public:
 
 
 /** @brief useful proxy functions
-* @author <doug@last.fm>
-*
-*/
+  * @author <doug@last.fm>
+  */
 class WsProxy : QObject
 {
 	Q_OBJECT
@@ -76,9 +74,9 @@ class WsProxy : QObject
 
 public:
 	WsProxy(QObject *parent = 0);
+
 	bool getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out);
 	void openSettingsWindow();
 };
 
-
-#endif 
+#endif

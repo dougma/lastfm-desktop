@@ -20,8 +20,6 @@
 #ifndef WS_AUTOPROXY_H
 #define WS_AUTOPROXY_H
 
-#include <QCoreApplication>
-#include <QNetworkProxy>
 #ifdef WIN32
 #include <windows.h>
 #include <winhttp.h>
@@ -30,7 +28,6 @@
 
 /** @brief simple wrapper to do per url automatic proxy detection 
   * @author <doug@last.fm>
-  *
   */
 class WsAutoProxy
 {
@@ -42,7 +39,10 @@ public:
 	WsAutoProxy();
 	~WsAutoProxy();
 
-	bool getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out, const QString &pacUrl);
+	bool getProxyFor( const class QString &url, 
+                      const class QByteArray &userAgent, 
+                      class QNetworkProxy &out,
+                      const QString &pacUrl);
 };
 
 #endif 

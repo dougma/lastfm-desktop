@@ -17,7 +17,6 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-
 #include "WsAccessManager.h"
 #include "WsProxy.h"
 #include <QtNetwork>
@@ -28,10 +27,12 @@ WsProxy *WsAccessManager::m_proxy = 0;
 WsAccessManager::WsAccessManager(QObject *parent)
                : QNetworkAccessManager(parent)
 {
+    // parented to qApplication as this is a application-lifetime object
 	if (!m_proxy) m_proxy = new WsProxy(qApp);
 }
 
-
+// prolly we should name this applyProxy, since setProxy generally means
+// we are setting the proxy object of this object in Qt-style
 void
 WsAccessManager::setProxy(const QNetworkRequest &request)
 {

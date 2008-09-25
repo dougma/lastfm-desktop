@@ -23,15 +23,15 @@
 #include "lib/DllExportMacro.h"
 #include <QtNetwork/QNetworkAccessManager>
 
-class WsProxy;
-
 
 class WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
 {
     Q_OBJECT
 
-	static WsProxy *m_proxy;
+	static class WsProxy *m_proxy;
 
+ 	/** called for every request since we support PAC, it's worth noting that 
+	  * this function calls QNetworkAccessManager::setProxy */
 	void setProxy(const QNetworkRequest &);
 	QNetworkReply *monitor(QNetworkReply *);
 

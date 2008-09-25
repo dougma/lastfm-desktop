@@ -20,7 +20,7 @@
 #include "WsAutoProxy.h"
 #include "WsRequestBuilder.h"
 #include <QNetworkProxy>
-#include <QtCore>
+#include <QString>
 
 #ifdef WIN32
 #include <AtlBase.h>
@@ -28,7 +28,7 @@
 #endif
 
 
-bool
+static bool
 parsePacServer(const QString &s, QNetworkProxy &p)
 {
 	// remove optional leading "scheme=" portion
@@ -45,7 +45,7 @@ parsePacServer(const QString &s, QNetworkProxy &p)
 }
 
 
-QList<QNetworkProxy>
+static QList<QNetworkProxy>
 parsePacResult(const QString &pacResult)
 {
 	// msdn says: "The proxy server list contains one or more of the 
