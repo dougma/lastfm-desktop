@@ -14,12 +14,12 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
 #include "RadioMiniControls.h"
 #include "PlayerState.h"
-#include  "widgets/ImageButton.h"
+#include "widgets/ImageButton.h"
 #include <QApplication>
 #include <QHBoxLayout>
 #include <phonon/volumeslider.h>
@@ -27,6 +27,8 @@
 
 RadioMiniControls::RadioMiniControls()
 {
+	resize(430, 112);
+
     QHBoxLayout* h = new QHBoxLayout( this );
     h->addWidget( ui.play = new ImageButton( ":/play.png" ) );
     h->addWidget( ui.skip = new ImageButton( ":/skip.png" ) );

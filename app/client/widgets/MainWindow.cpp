@@ -74,7 +74,7 @@ MainWindow::MainWindow()
     
     // set up window in default state
     onTrackSpooled( Track() );
-    resize( 0, height() + 150 );
+    resize( 150, height() + 150 );
 }
 
 
