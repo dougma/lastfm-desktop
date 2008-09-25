@@ -25,12 +25,23 @@ while( my $v = shift )
 $plist = "\$(CONTENTS)/Info.plist";
 $root = abs_path( dirname( $0 ) . "/../../../" );
 
-foreach my $x (split( ' ', $ENV{'QT'} ))
+sub getQtModules()
 {
-    $x = 'Qt'.ucfirst( $x ) unless $x eq "phonon";
-	$bundle_frameworks .= "\$(CONTENTS)/Frameworks/$x.framework ";
-    push( @QT_MODULES, $x );
+	my %saw;
+	my @in = split( ' ', $ENV{'QT'} );
+	@saw{@in} = ();
+	my @out = keys %saw;
+
+	foreach my $x (@out)
+	{
+	    $x = 'Qt'.ucfirst( $x ) unless $x eq "phonon";
+		$bundle_frameworks .= "\$(CONTENTS)/Frameworks/$x.framework ";
+	    push( @QT_MODULES, $x );
+	}
 }
+
+getQtModules();
+
 foreach my $x (@DYLIBS)
 {
 	$bundle_macos .= "\$(CONTENTS)/MacOS/$x ";
