@@ -103,6 +103,7 @@ public slots:
         QWidget::move( x(), parentWidget()->height() - i );
     }
     
+    void praise();
     void bye();
     
     virtual void paintEvent( QPaintEvent* );
