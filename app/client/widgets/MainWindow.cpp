@@ -152,28 +152,14 @@ MainWindow::setupUi()
 void
 MainWindow::showSettingsDialog()
 {
-	#define THROW_AWAY_DIALOG( Type ) \
-		d = new Type( this ); \
-		d->setAttribute( Qt::WA_DeleteOnClose ); \
-		d->setWindowFlags( Qt::Dialog | Qt::WindowMinimizeButtonHint ); \
-		d->setModal( false ); 
-	
-    #define NON_MODAL_MACRO( Type ) \
-        static QPointer<Type> d; \
-        if (!d) { \
-			THROW_AWAY_DIALOG( Type ); \
-            d->show(); \
-        } else \
-            d->activateWindow();
-
-    NON_MODAL_MACRO( SettingsDialog )
+    UNICORN_UNIQUE_DIALOG( SettingsDialog )
 }
 
 
 void
 MainWindow::showDiagnosticsDialog()
 {
-    NON_MODAL_MACRO( DiagnosticsDialog )
+    UNICORN_UNIQUE_DIALOG( DiagnosticsDialog )
 }
 
 
@@ -194,26 +180,14 @@ MainWindow::showMetaInfoView()
 void
 MainWindow::showShareDialog()
 {
-	// Show non modal ShareDialogs, one for every track played
-	// As the user requests them anyway...
-	#define PER_TRACK_DIALOG( Type ) \
-		static QPointer<Type> d; \
-		if (d && d->track() == m_track) \
-			d->activateWindow(); \
-		else { \
-			THROW_AWAY_DIALOG( Type ) \
-			d->setTrack( m_track ); \
-            d->show(); \
-		}
-	
-	PER_TRACK_DIALOG( ShareDialog )
+	UNICORN_UNIQUE_PER_TRACK_DIALOG( ShareDialog, m_track )
 }
 
 
 void
 MainWindow::showTagDialog()
 {
-	PER_TRACK_DIALOG( TagDialog )
+	UNICORN_UNIQUE_PER_TRACK_DIALOG( TagDialog, m_track )
 }
 
 

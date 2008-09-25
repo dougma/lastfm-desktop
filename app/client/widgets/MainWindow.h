@@ -19,9 +19,16 @@
 
 #include "ui_MainWindow.h"
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
+#include <QPointer>
 #include "PlayerState.h"
 #include "lib/types/Track.h"
 #include "widgets/Launcher.h"
+#include "widgets/UnicornWidget.h"
+
+class ShareDialog;
+class TagDialog;
+class SettingsDialog;
+class DiagnosticsDialog;
 
 
 class MainWindow : public QMainWindow
@@ -76,4 +83,9 @@ private:
 	virtual void dropEvent( QDropEvent* );
     
     Track m_track;
+	
+	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
+	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
+	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
+	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
 };

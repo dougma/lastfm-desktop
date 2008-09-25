@@ -21,7 +21,8 @@
 #include "MetaInfoView.h"
 #include "ScrobbleInfoWidget.h"
 #include "widgets/ImageButton.h"
-#include "ui_MainWindow.h"
+#include <QHBoxLayout>
+
 
 ScrobbleViewWidget::ScrobbleViewWidget()
 {
@@ -75,10 +76,10 @@ ScrobbleViewWidget::popupMultiButtonWidget()
 
 MultiButtonPopup::MultiButtonPopup( int width, QWidget* parent ) : QWidget( parent )
 {
-    QPushButton* cancel;
+    QPushButton* cancel, *p;
     
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new QPushButton( tr("Add to Playlist") ) );
+    v->addWidget( p = new QPushButton( tr("Add to Playlist") ) );
     v->addWidget( new QPushButton( tr("Praise the Client Team") ) );
     v->addSpacing( 8 );
     v->addWidget( cancel = new QPushButton( tr("Cancel") ) );
@@ -86,6 +87,8 @@ MultiButtonPopup::MultiButtonPopup( int width, QWidget* parent ) : QWidget( pare
     connect( cancel, SIGNAL(clicked()), SLOT(bye()) );
     
     
+	connect( p, SIGNAL(clicked()), SLOT(praise()) );
+
     // because the actionbar doesn't set its width correctly
     width = 270;
     
@@ -122,4 +125,14 @@ MultiButtonPopup::paintEvent( QPaintEvent* )
     p.setBrush( c );
     p.setRenderHint( QPainter::Antialiasing );
     p.drawRoundedRect( rect(), 6, 6 );
+}
+
+
+#include <QtNetwork>
+#include "the/settings.h"
+void
+MultiButtonPopup::praise()
+{
+	QUrl url = "http://oops.last.fm/talk/" + The::settings().username() + " praises y'all";
+	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }

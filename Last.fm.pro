@@ -25,6 +25,7 @@ debug:macx-xcode {
 
     SOURCES += common/c++/Logger.cpp
     SOURCES -= lib/core/win/Utils.cpp
+	SOURCES -= lib/ws/sens_win.cpp
 
     INCLUDEPATH += app/client
     LIBS += -framework SystemConfiguration -framework CoreServices
