@@ -27,8 +27,6 @@
 
 RadioMiniControls::RadioMiniControls()
 {
-	resize(430, 112);
-
     QHBoxLayout* h = new QHBoxLayout( this );
     h->addWidget( ui.play = new ImageButton( ":/play.png" ) );
     h->addWidget( ui.skip = new ImageButton( ":/skip.png" ) );

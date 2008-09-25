@@ -27,8 +27,6 @@
 Launcher::Launcher( QWidget* parent )
 		 :QWidget( parent )
 {
-	resize(410, 56);
-
     QHBoxLayout* h = new QHBoxLayout( this );
     h->addWidget( ui.radio = new ImageButton );
     h->addWidget( ui.friends = new ImageButton );
