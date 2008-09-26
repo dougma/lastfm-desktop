@@ -32,7 +32,8 @@ namespace Unicorn
         TabBar();
         
     protected:
-        virtual void paintEvent( QPaintEvent* e );
+        virtual void mousePressEvent( QMouseEvent* );
+        virtual void paintEvent( QPaintEvent* );
     };
 
     

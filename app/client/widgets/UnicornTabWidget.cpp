@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "UnicornTabWidget.h"
+#include <QMouseEvent>
 #include <QPainter>
 #include <QTabBar>
 #include <QVBoxLayout>
@@ -34,7 +35,19 @@ Unicorn::TabBar::TabBar()
 
 
 void
-Unicorn::TabBar::paintEvent( QPaintEvent* e )
+Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
+{
+    if (e->button() != Qt::LeftButton) {
+        e->ignore();
+        return;
+    }
+    
+    setCurrentIndex( e->pos().x() / (width() / count()) );
+}
+
+
+void
+Unicorn::TabBar::paintEvent( QPaintEvent* )
 {
     QPainter p( this );
     p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
