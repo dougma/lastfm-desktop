@@ -27,7 +27,7 @@ $root = abs_path( dirname( $0 ) . "/../../../" );
 
 sub getQtModules()
 {
-	// these 4 lines de-dupe $QT
+	# these 4 lines de-dupe $QT
 	my %saw;
 	my @in = split( ' ', $ENV{'QT'} );
 	@saw{@in} = ();
