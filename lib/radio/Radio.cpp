@@ -30,6 +30,7 @@ Radio::Radio( Phonon::AudioOutput* output )
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
+	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
@@ -244,6 +245,13 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
             spoolNextTrack();
 			break;
     }
+}
+
+
+void
+Radio::onPhononCurrentSourceChanged(const Phonon::MediaSource &)
+{
+	spoolNextTrack();
 }
 
 

@@ -92,6 +92,7 @@ signals:
 private slots:
     void enqueue( const QList<Track>& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
+	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
 	void onTunerError( Ws::Error );
 
 	/** we get a "proper" station name from the tune webservice */
