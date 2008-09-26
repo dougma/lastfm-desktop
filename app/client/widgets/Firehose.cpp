@@ -104,7 +104,6 @@ class FirehoseDelegate : public QAbstractItemDelegate
 };
 
 
-
 Firehose::Firehose()
 {
     if (!nam) nam = new WsAccessManager;
@@ -119,10 +118,7 @@ Firehose::Firehose()
     v->addWidget( view = new QListView );
     v->setMargin( 0 );
     v->setSpacing( 0 );
-    
-    tabs->addTab( tr("Last.fm Staff") );
-    tabs->addTab( tr("All your Friends") );
-    
+        
     view->setModel( new FirehoseModel );
     delete view->itemDelegate();
     view->setItemDelegate( new FirehoseDelegate );
@@ -130,6 +126,15 @@ Firehose::Firehose()
     view->itemDelegate()->setParent( this );
     view->setAttribute( Qt::WA_MacShowFocusRect, false );
 
+    CoreSignalMapper* mapper = new CoreSignalMapper( this );
+    mapper->setMapping( 0, "user/1000002?rt=xml&special=staffmembers" );
+    mapper->setMapping( 1, "user/2113030?rt=xml" );
+    connect( tabs, SIGNAL(currentChanged( int )), mapper, SLOT(map( int )) );
+    connect( mapper, SIGNAL(mapped( QString )), view->model(), SLOT(setNozzle( QString )) );
+    
+    tabs->addTab( tr("Last.fm Staff") );
+    tabs->addTab( tr("All your Friends") );    
+    
     // mxcl's awesome protected hack (tm)
     struct ProtectionHack : QAbstractScrollArea { using QAbstractScrollArea::setViewportMargins; };
     reinterpret_cast<ProtectionHack*>(view)->setViewportMargins( 4, 4, 4, 4 );
@@ -159,33 +164,37 @@ Firehose::sizeHint() const
 
 #include <QTcpSocket>
 FirehoseModel::FirehoseModel()
+             : m_socket( 0 )
+{}
+
+
+void
+FirehoseModel::setNozzle( const QString& nozzle )
 {
+    m_tracks.clear();
+    m_avatars.clear();
+    m_users.clear();
+    reset();
+    
+    delete m_socket;
+    
     // using a socket as WsAccessManager stopped after the HEADERS were returned
     // for some reason
-    QTcpSocket* socket = new QTcpSocket( this );
-    socket->connectToHost( "87.117.229.70", 8001 );
-    socket->waitForConnected( 1000 );
+    m_socket = new QTcpSocket( this );
+    m_socket->connectToHost( "firehose.last.fm", 80 );
+    m_socket->waitForConnected( 1000 ); //FIXME
     
     QByteArray headers = 
-    "GET /firehose/user/1000002?rt=xml&special=staffmembers\r\n"
-    "Host: 87.117.229.70\r\n"
+    "GET /stream/"+nozzle.toUtf8()+"\r\n"
+    "Host: firehose.last.fm\r\n"
     "Connection: keep-alive\r\n\r\n";
     
-    socket->write( headers );
-    socket->flush();
-
-#if 0
-    // set to RJ's user id for the moment
-    QUrl url( "http://87.117.229.70/firehose/artist/979?rt=xml" );
-    QNetworkRequest request( url );
+    m_socket->write( headers );
+    m_socket->flush();
     
-    QNetworkReply* r = m_nam->get( request );
-#endif
-    QTcpSocket* r = socket;
-    connect( r, SIGNAL(readyRead()), SLOT(onData()) );
-    connect( r, SIGNAL(aboutToClose()), SLOT(onFinished()) );
+    connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
+    connect( m_socket, SIGNAL(aboutToClose()), SLOT(onFinished()) );    
 }
-
 
 void
 FirehoseModel::onData()
@@ -239,15 +248,13 @@ FirehoseModel::onItemReady( FirehoseItem* item )
 {
     int n = m_tracks.count();
     
-    if (n > 20)
+    if (n-- > 20)
     {
-        --n;
         beginRemoveRows( QModelIndex(), n, n );
         m_tracks.pop_back();
         m_avatars.pop_back();
         m_users.pop_back();
         endRemoveRows();
-        n--;
     }
     
     beginInsertRows( QModelIndex(), 0, 0 );

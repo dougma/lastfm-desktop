@@ -29,8 +29,6 @@
 
 class Firehose : public QWidget
 {
-    Q_OBJECT
-
 public:
     Firehose();
     
@@ -58,7 +56,12 @@ class FirehoseModel : public QAbstractItemModel
     QList<QString> m_users;
     QList<QPixmap> m_avatars;
     QList<Track> m_tracks;
+    
+    class QTcpSocket* m_socket;
 
+public slots:
+    void setNozzle( const QString& );
+    
 private slots:
     void onData();
     void onFinished();
@@ -90,6 +93,36 @@ private slots:
     
 signals:
     void finished( FirehoseItem* );
+};
+
+
+
+#include <QMap>
+/** QSignalMapper is annoyingly limited */
+class CoreSignalMapper : public QObject
+{
+    Q_OBJECT
+    
+    QMap<int, QString> m_map;
+    
+public:
+    CoreSignalMapper( QObject* parent ) : QObject( parent )
+    {}
+    
+    void setMapping( int i, const QString& s )
+    {
+        m_map[i] = s;
+    }
+    
+public slots:
+    void map( int i )
+    {
+        if (m_map.contains( i ))
+            emit mapped( m_map[i] );
+    }
+    
+signals:
+    void mapped( const QString& );
 };
 
 #endif

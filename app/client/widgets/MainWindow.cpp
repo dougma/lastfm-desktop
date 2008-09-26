@@ -138,19 +138,19 @@ MainWindow::setupUi()
     dw = new QDockWidget;
     dw->setWindowTitle( tr("Radio") );
     dw->setWidget( new RadioWidget );
-    addDockWidget( Qt::LeftDockWidgetArea, dw );
+    addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
     ui.launcher->ui.radio->setWidget( dw );
     dw->hide();
     dw = new QDockWidget;
     dw->setWindowTitle( "Scrobbling Now" );
     dw->setWidget( new Firehose );
-    addDockWidget( Qt::RightDockWidgetArea, dw );
+    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.launcher->ui.friends->setWidget( dw );
     dw->hide();
     dw = new QDockWidget;
     dw->setWindowTitle( "Track Information" );
     dw->setWidget( new MetaInfoView );
-    addDockWidget( Qt::BottomDockWidgetArea, dw );
+    addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
     ui.launcher->ui.library->setWidget( dw );
     dw->hide();
     
