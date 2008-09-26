@@ -21,30 +21,43 @@
 #define LAUNCHER_H
 
 #include <QWidget>
-class ImageButton;
+#include "widgets/ImageButton.h"
+class LauncherButton;
+class ScrobbleButton;
 
 
 class Launcher : public QWidget
 {
-	Q_OBJECT
-
 public:
-	Launcher( QWidget* parent = 0 );
+	Launcher();
 
-	virtual void paintEvent( QPaintEvent* );
-	
-private slots:
-	void onRadioToggle();
-	void onTunerHidden();
-
-protected:
     struct {
-        ImageButton* radio;
-        ImageButton* friends;
-        ImageButton* library;
-        class ScrobbleButton* scrobble;
-    } ui;
-	
+        LauncherButton* radio;
+        LauncherButton* friends;
+        LauncherButton* library;
+        ScrobbleButton* scrobble;
+    } ui;    
+    
+	virtual void paintEvent( QPaintEvent* );
+};
+
+
+class LauncherButton : public ImageButton
+{
+    Q_OBJECT
+    
+    QWidget* m_widget;
+    
+public:    
+    LauncherButton();
+    
+    void setWidget( QWidget* );
+    
+private slots:
+    void onToggled( bool );
+    
+private:
+    bool eventFilter( QObject*, QEvent* );
 };
 
 #endif //LAUNCHER_H

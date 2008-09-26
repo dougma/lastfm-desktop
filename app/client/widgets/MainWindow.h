@@ -22,7 +22,6 @@
 #include <QPointer>
 #include "PlayerState.h"
 #include "lib/types/Track.h"
-#include "widgets/Launcher.h"
 #include "widgets/UnicornWidget.h"
 
 class ShareDialog;
@@ -44,10 +43,10 @@ public:
 	{
 		class Launcher* launcher;
 		class QStackedWidget* stack;
-		class RadioWidget* tuner;
 		class ScrobbleViewWidget* scrobbler;
 		class FriendsTuner* friendTuner;
 		class PrimaryBucket* primaryBucket;
+        class Firehose* firehose;
 		};
 	
 	Ui ui;

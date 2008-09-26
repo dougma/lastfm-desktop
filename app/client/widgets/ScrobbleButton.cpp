@@ -50,17 +50,17 @@ ScrobbleButton::paintEvent( QPaintEvent* )
 {
     QPixmap p;
     
-    if (m_track.isNull()) {
+    if (!isChecked()) {
+        p = QPixmap( ":/ScrobbleButton/scrobbling_off.png" );
+    }
+    else if (m_track.isNull()) { //no track playing
         p = QPixmap( ":/ScrobbleButton/scrobbling_on.png" );
     }
-    else if (!m_track.isValid()) {
+    else if (!m_track.isValid()) { // not a valid scrobble that is
         p = QPixmap( ":/ScrobbleButton/cant_scrobble.png" );
     }
-    else if (isChecked()) {
-        p = m_movie->currentPixmap();
-    }
     else
-        p = QPixmap( ":/ScrobbleButton/scrobbling_off.png" );
+        p = m_movie->currentPixmap();
 
     QPainter( this ).drawPixmap( rect(), p );
 }

@@ -21,11 +21,20 @@
 #define UNICORN_TAB_WIDGET_H
 
 #include <QStackedWidget>
+#include <QTabBar>
 
 
 namespace Unicorn
 {
-    class TabBar;
+    class TabBar : public QTabBar
+    {
+    public:
+        TabBar();
+        
+    protected:
+        virtual void paintEvent( QPaintEvent* e );
+    };
+
     
     class TabWidget : public QWidget
     {

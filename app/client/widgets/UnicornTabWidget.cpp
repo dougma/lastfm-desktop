@@ -23,41 +23,44 @@
 #include <QVBoxLayout>
 
 
-namespace Unicorn 
+Unicorn::TabBar::TabBar()
 {
-    class TabBar : public QTabBar
+#ifdef Q_WS_MAC
+    QFont f = font();
+    f.setPixelSize( 11 );
+    setFont( f );
+#endif
+}
+
+
+void
+Unicorn::TabBar::paintEvent( QPaintEvent* e )
+{
+    QPainter p( this );
+    p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
+
+    QFont f = p.font();
+    f.setBold( true );
+    p.setFont( f );
+    
+    int w = width() / count();
+    for (int i = 0; i < count(); ++i)
     {
-    public:
-        TabBar()
-        {
-        #ifdef Q_WS_MAC
-            QFont f = font();
-            f.setPixelSize( 11 );
-            setFont( f );
-        #endif
-        }
+        int const x = i*w;
         
-    protected:
-        virtual void paintEvent( QPaintEvent* e )
+        if (i == count() - 1)
+            w += width() % w;
+        
+        if (currentIndex() == i)
         {
-            QPainter p( this );
-            p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
-            
-            int w = width() / count();
-            for (int i = 0; i < count(); ++i)
-            {
-                int const x = i*w;
-                
-                if (i == count() - 1)
-                    w += width() % w;
-                
-                if (currentIndex() == i)
-                    p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
-                
-                p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
-            }
+            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
+            p.setPen( Qt::white );
         }
-    };
+        else
+            p.setPen( QColor( 42, 42, 42 ) );
+        
+        p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
+    }
 }
 
 

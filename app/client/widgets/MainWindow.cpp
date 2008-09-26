@@ -24,12 +24,14 @@
 #include "scrobble/ScrobbleViewWidget.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
+#include "widgets/Launcher.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "radio/RadioWidget.h"
 #include "radio/FriendsTuner.h"
 #include "radio/buckets/PrimaryBucket.h"
+#include "scrobble/MetaInfoView.h"
 #include "Settings.h"
 #include "version.h"
 #include "the/radio.h"
@@ -38,6 +40,7 @@
 #include "lib/ws/WsReply.h"
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDockWidget>
 #include <QShortcut>
 #include <QStackedWidget>
 
@@ -74,7 +77,6 @@ MainWindow::MainWindow()
     
     // set up window in default state
     onTrackSpooled( Track() );
-    resize( 150, height() + 150 );
 }
 
 
@@ -103,30 +105,27 @@ MainWindow::onTrackSpooled( const Track& t )
     }
         
     #ifndef Q_WS_MAC
+        // it's ugly on any platform, but useful on non-mac as the taskbar
+        // shows the track that is playing
         setWindowTitle( t.isNull() 
                 ? qApp->applicationName()
                 : t.toString() );
     #endif
 }
 
-#include <QDockWidget>
-#include <QToolBar>
-#include "scrobble/MetaInfoView.h"
+
 void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
 	
-	ui.account->setTitle( The::settings().username() );
-   	connect( AuthenticatedUser::getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
-
-    QDockWidget* bottom = new QDockWidget( tr("Track Information") );
-    bottom->setWidget( new MetaInfoView );
+    AuthenticatedUser user;
+	ui.account->setTitle( user );
+   	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
 
     /** hah! works :) But I'm sure is hideously dangerous, etc. */
     setStatusBar( (QStatusBar*) (ui.launcher = new Launcher) );
     
-    addDockWidget( Qt::BottomDockWidgetArea, bottom );
 	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget );
     setDockOptions( AnimatedDocks | AllowNestedDocks );
 
@@ -134,14 +133,26 @@ MainWindow::setupUi()
     ui.scrobbler->ui.ban->setAction( ui.ban );
     ui.scrobbler->ui.tag->setAction( ui.tag );
     ui.scrobbler->ui.share->setAction( ui.share );
-    
-	ui.tuner = new RadioWidget( this );
-	ui.primaryBucket = new PrimaryBucket( this );
 
-	ui.primaryBucket->move( this->pos().x() - (ui.primaryBucket->width()*3), this->pos().y());
-	ui.primaryBucket->show();
-    
-    (new Firehose)->show();
+    QDockWidget* dw;
+    dw = new QDockWidget;
+    dw->setWindowTitle( tr("Radio") );
+    dw->setWidget( new RadioWidget );
+    addDockWidget( Qt::LeftDockWidgetArea, dw );
+    ui.launcher->ui.radio->setWidget( dw );
+    dw->hide();
+    dw = new QDockWidget;
+    dw->setWindowTitle( "Scrobbling Now" );
+    dw->setWidget( new Firehose );
+    addDockWidget( Qt::RightDockWidgetArea, dw );
+    ui.launcher->ui.friends->setWidget( dw );
+    dw->hide();
+    dw = new QDockWidget;
+    dw->setWindowTitle( "Track Information" );
+    dw->setWidget( new MetaInfoView );
+    addDockWidget( Qt::BottomDockWidgetArea, dw );
+    ui.launcher->ui.library->setWidget( dw );
+    dw->hide();
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;

@@ -31,6 +31,7 @@ UnicornWidget::paintItBlack( QWidget* w )
     QPalette p = w->palette();
     p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
     p.setBrush( QPalette::WindowText, QColor( 0x87, 0x87, 0x87 ) );
+    p.setBrush( QPalette::AlternateBase, QColor( 31, 30, 30 ) );
     w->setPalette( p );
     
     foreach (QAbstractScrollArea* a, w->findChildren<QAbstractScrollArea*>())

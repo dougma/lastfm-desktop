@@ -18,19 +18,19 @@
  ***************************************************************************/
 
 #include "Launcher.h"
-#include "the/mainWindow.h"
 #include "widgets/ImageButton.h"
 #include "widgets/ScrobbleButton.h"
-#include "radio/RadioWidget.h"
+#include <QEvent>
+#include <QHBoxLayout>
 #include <QPainter>
 
-Launcher::Launcher( QWidget* parent )
-		 :QWidget( parent )
+
+Launcher::Launcher()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
-    h->addWidget( ui.radio = new ImageButton );
-    h->addWidget( ui.friends = new ImageButton );
-    h->addWidget( ui.library = new ImageButton );
+    h->addWidget( ui.radio = new LauncherButton );
+    h->addWidget( ui.friends = new LauncherButton );
+    h->addWidget( ui.library = new LauncherButton );
     h->addSpacing( 12 );
     h->addStretch();
     h->addWidget( ui.scrobble = new ScrobbleButton );
@@ -64,40 +64,8 @@ Launcher::Launcher( QWidget* parent )
 }
 
 
-void 
-Launcher::onRadioToggle()
-{
-	RadioWidget& tuner = *The::mainWindow().ui.tuner;
-	
-	static bool firstTime = true;
-	if( firstTime )
-	{
-		firstTime = false;
-		connect( &tuner, SIGNAL( hideEvent()), SLOT( onTunerHidden()));
-	}
-
-	if( tuner.isVisible())
-	{
-	    tuner.hide();
-	}
-	else
-	{
-		tuner.move( The::mainWindow().pos().x() + The::mainWindow().width() + 10, 
-					The::mainWindow().pos().y());
-	    tuner.show();
-	}
-}
-
-
 void
-Launcher::onTunerHidden()
-{
-	ui.radio->setChecked( false );
-}
-
-
-void
-Launcher::paintEvent( QPaintEvent* e )
+Launcher::paintEvent( QPaintEvent* )
 {
 	QLinearGradient gradient;
 	gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
@@ -109,4 +77,43 @@ Launcher::paintEvent( QPaintEvent* e )
 	QPainter p( this );
 	
 	p.fillRect( rect(), gradient);
+}
+
+
+LauncherButton::LauncherButton()
+{
+    connect( this, SIGNAL(toggled( bool )), SLOT(onToggled( bool )) );
+}
+
+
+void
+LauncherButton::onToggled( bool b )
+{   
+    m_widget->setVisible( b );
+}
+
+
+void
+LauncherButton::setWidget( QWidget* w )
+{
+    m_widget = w;
+    w->installEventFilter( this );
+}
+
+
+bool
+LauncherButton::eventFilter( QObject* o, QEvent* e )
+{
+    if (o == m_widget)
+        switch ((int)e->type())
+        {
+            case QEvent::Show:
+                setChecked( true );
+                break;
+            case QEvent::Hide:
+                setChecked( false );
+                break;
+        }
+    
+    return false;
 }
