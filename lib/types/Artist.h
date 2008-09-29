@@ -48,7 +48,7 @@ public:
     operator QString() const { return m_name; }
 
     WsReply* share( const class User& recipient, const QString& message = "" );
-	
+	WsReply* getInfo() const;	
 	WsReply* getSimilar() const;
 	static WeightedStringList getSimilar( WsReply* );
     
