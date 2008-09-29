@@ -57,8 +57,8 @@ Launcher::Launcher()
 	ui.library->setCheckable( true );
 	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_rest.png" );
 	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_pressed.png", QIcon::Active );
-	ui.library->setPixmap( ":/MainWindow/library_off.png" );
-	ui.library->setPixmap( ":/MainWindow/library_on.png", QIcon::On );
+	ui.library->setPixmap( ":/MainWindow/info_off.png" );
+	ui.library->setPixmap( ":/MainWindow/info_on.png", QIcon::On );
 	ui.library->moveIcon( -1, 0 );
 	ui.library->moveIcon( -1, 1, QIcon::Active );
 }

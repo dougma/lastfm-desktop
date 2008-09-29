@@ -31,6 +31,8 @@ namespace Unicorn
     public:
         TabBar();
         
+        virtual QSize sizeHint() const;
+        
     protected:
         virtual void mousePressEvent( QMouseEvent* );
         virtual void paintEvent( QPaintEvent* );

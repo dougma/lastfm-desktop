@@ -39,9 +39,44 @@
 #endif
 
 
+#ifdef Q_WS_MAC
+#include <QMacStyle>
+#include <QPainter>
+class UnicornMacStyle : public QMacStyle
+{
+//    virtual void drawPrimitive( PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const 
+//    {
+        
+//    }
+    
+    virtual void drawControl( ControlElement element, const QStyleOption* opt, QPainter* p, const QWidget* widget ) const
+    {
+        if (element == CE_DockWidgetTitle)
+        {
+            p->setPen( QColor( 35, 35, 35 ) );
+            p->drawRect( opt->rect );
+            p->drawPixmap( opt->rect, QPixmap(":/MainWindow/dock_widget_title_bar.png") );
+            p->setPen( QColor(Qt::darkGray).darker() );
+            QFont f = p->font();
+            f.setBold( true );
+            f.setPointSize( 11 );
+            p->setFont( f );
+            p->drawText( opt->rect, Qt::AlignCenter, widget->windowTitle() );
+        }
+        else
+            QMacStyle::drawControl( element, opt, p, widget );
+    }
+};
+#endif
+
+
 App::App( int argc, char** argv ) 
    : Unicorn::Application( argc, argv )
 {
+#ifdef Q_WS_MAC
+    setStyle( new UnicornMacStyle );
+#endif
+    
     // IMPORTANT don't allow any GUI thread message loops to run during this
     // ctor! Things will crash in interesting ways!
     //TODO bootstrapping

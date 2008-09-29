@@ -34,6 +34,12 @@ Unicorn::TabBar::TabBar()
 }
 
 
+QSize
+Unicorn::TabBar::sizeHint() const
+{
+    return QSize( QTabBar::sizeHint().width(), QPixmap(":/MainWindow/dock_tab_unselected.png").height() );
+}
+
 void
 Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 {
@@ -50,10 +56,11 @@ void
 Unicorn::TabBar::paintEvent( QPaintEvent* )
 {
     QPainter p( this );
-    p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
-
+//    p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
+    p.fillRect( rect(), QBrush( QPixmap(":/MainWindow/dock_tab_unselected.png") ) );
+    
     QFont f = p.font();
-    f.setBold( true );
+    f.setPointSize( 12 );
     p.setFont( f );
     
     int w = width() / count();
@@ -63,14 +70,17 @@ Unicorn::TabBar::paintEvent( QPaintEvent* )
         
         if (i == count() - 1)
             w += width() % w;
+
+        p.setPen( Qt::white );        
         
         if (currentIndex() == i)
         {
-            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
-            p.setPen( Qt::white );
+//            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
+            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/MainWindow/dock_tab_selected.png") ) );
+//            p.setPen( Qt::white );
         }
-        else
-            p.setPen( QColor( 42, 42, 42 ) );
+//        else
+//            p.setPen( QColor( 42, 42, 42 ) );
         
         p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
     }

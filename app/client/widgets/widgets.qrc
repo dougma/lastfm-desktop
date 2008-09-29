@@ -24,6 +24,11 @@
     <file>MainWindow/radio_off.png</file>
     <file>MainWindow/library_on.png</file>
     <file>MainWindow/library_off.png</file>
+    <file>MainWindow/info_on.png</file>
+    <file>MainWindow/info_off.png</file>
+    <file>MainWindow/dock_widget_title_bar.png</file>
+    <file>MainWindow/dock_tab_unselected.png</file>
+    <file>MainWindow/dock_tab_selected.png</file>
   </qresource>
   <qresource>
       <file>SettingsDialog/account.png</file>
