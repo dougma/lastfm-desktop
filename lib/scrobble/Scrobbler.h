@@ -88,7 +88,7 @@ private:
     void onError( Scrobbler::Error );
 
 private:
-	const QString& m_clientId;
+	const QString m_clientId;
     class ScrobblerHandshake* m_handshake;
     class NowPlaying* m_np;
     class ScrobblerSubmission* m_submitter;
