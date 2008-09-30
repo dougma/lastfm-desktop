@@ -14,12 +14,38 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
 #include <QLabel>
+#include <QWebView>
+#include <QListWidget>
+#include <QSignalMapper>
 #include "PlayerState.h"
 #include "lib/types/Track.h"
+#include "lib/core/CoreDomElement.h"
+#include "lib/ws/WsAccessManager.h"
+
+namespace Unicorn 
+{
+	class TabWidget;
+}
+
+
+class Bio : public QWebView
+{
+	Q_OBJECT
+
+public:
+	Bio(QWidget *parent = 0);
+	void setContent(CoreDomElement &lfm);
+
+private slots:
+	void onLinkClicked(const QUrl &);
+
+private:
+	QString cssPath();
+};
 
 
 class MetaInfoView : public QLabel
@@ -28,8 +54,10 @@ class MetaInfoView : public QLabel
 	
 	struct
 	{
-		class QTabBar* tabs;
-		class QWebView* web;
+		Unicorn::TabWidget* infoTabs;
+		class TagListWidget* artistTags;
+		class Bio* bio;
+		class SimilarArtists* similar;
 	}
 	ui;
 	
@@ -45,6 +73,8 @@ private slots:
     void onStateChanged( State );
     void onLinkClicked( const class QUrl& );
 	void onAuthenticationRequired( class QNetworkReply*, class QAuthenticator* );
+	void onArtistInfo(WsReply *);
+	void onSimilar(WsReply *);
 	void load();
 
 private:
