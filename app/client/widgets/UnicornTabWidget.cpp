@@ -37,7 +37,7 @@ Unicorn::TabBar::TabBar()
 QSize
 Unicorn::TabBar::sizeHint() const
 {
-    return QSize( QTabBar::sizeHint().width(), QPixmap(":/MainWindow/dock_tab_unselected.png").height() );
+    return QSize( QTabBar::sizeHint().width(), QPixmap(":/MainWindow/dock_tab_unselected.png").height() - 2 );
 }
 
 void
@@ -60,7 +60,8 @@ Unicorn::TabBar::paintEvent( QPaintEvent* )
     p.fillRect( rect(), QBrush( QPixmap(":/MainWindow/dock_tab_unselected.png") ) );
     
     QFont f = p.font();
-    f.setPointSize( 12 );
+    f.setPointSize( 11 );
+    f.setBold( false );
     p.setFont( f );
     
     int w = width() / count();

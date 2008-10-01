@@ -29,9 +29,9 @@ void //static
 UnicornWidget::paintItBlack( QWidget* w )
 {
     QPalette p = w->palette();
-    p.setBrush( QPalette::Window, QColor( 0x18, 0x18, 0x19 ) );
-    p.setBrush( QPalette::WindowText, QColor( 0x87, 0x87, 0x87 ) );
-    p.setBrush( QPalette::AlternateBase, QColor( 31, 30, 30 ) );
+    p.setBrush( QPalette::Window, QColor( 35, 35, 35 ) );
+    p.setBrush( QPalette::WindowText, QColor( 84, 84, 84 ) );
+    p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
     w->setPalette( p );
     
     foreach (QAbstractScrollArea* a, w->findChildren<QAbstractScrollArea*>())

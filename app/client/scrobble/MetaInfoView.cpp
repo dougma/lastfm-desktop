@@ -126,7 +126,7 @@ MetaInfoView::MetaInfoView()
 	setBackgroundRole( QPalette::Base );
     
     QPalette p = palette();
-    p.setBrush( QPalette::Base, QColor( 0x18, 0x18, 0x19 ) );
+    p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
     p.setBrush( QPalette::Text, QColor( 0xff, 0xff, 0xff, 40 ) );
     setPalette( p );
 

@@ -65,21 +65,12 @@ Firehose::Firehose()
     tabs->addTab( tr("Last.fm Staff") );
     tabs->addTab( tr("All your Friends") );    
     
-    // mxcl's awesome protected hack (tm)
-    struct ProtectionHack : QAbstractScrollArea { using QAbstractScrollArea::setViewportMargins; };
-    reinterpret_cast<ProtectionHack*>(view)->setViewportMargins( 4, 4, 4, 4 );
-
     UnicornWidget::paintItBlack( this );
-    
-    QLinearGradient g( QPointF(), QPointF( 0, 656 ) );
-    g.setColorAt( 0, Qt::black );
-    g.setColorAt( 1, QColor( 25, 24, 24 ) );
-
-    QPalette p = palette();    
-    p.setBrush( QPalette::Base, g );
-    p.setBrush( QPalette::Text, Qt::white );
-    
-    view->setPalette( p );
+    QPalette p = palette();
+    p.setBrush( QPalette::Base, p.window() );
+    p.setBrush( QPalette::Text, p.windowText() );
+    setPalette( p );
+    view->setPalette( palette() );
     view->setAutoFillBackground( true );
 }
 

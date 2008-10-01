@@ -23,6 +23,7 @@
 #include "the/definitions.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/ScrobbleProgressBar.h"
+#include "widgets/UnicornWidget.h"
 #include <QCoreApplication>
 #include <QVBoxLayout>
 #include <QPainter>
@@ -45,8 +46,6 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
 	v2->addStretch();
     v2->addWidget( ui.text = new QLabel );
-//    v2->addSpacing( 10 );
-//    v2->addWidget( ui.progress = new ScrobbleProgressBar );
 	v2->addSpacing( 4 );
     v2->addWidget( ui.actionbar );
 	v2->addSpacing( 5 );
@@ -66,33 +65,14 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     
 	uint const W = ui.actionbar->sizeHint().width() + 20;
     setMinimumWidth( W );
-	
-	QPalette p( Qt::white, Qt::black );
-    setPalette( p );
+
+    UnicornWidget::paintItBlack( this );
     setAutoFillBackground( true );
 	
     setMinimumWidth( 298 ); //as per mattb mockup
-//	setMinimumHeight( 325 );
 	
 	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
-}
-
-
-void
-ScrobbleInfoWidget::resizeEvent( QResizeEvent* )
-{
-
-	QRadialGradient g( width() / 2, 326, 326 / 1.1f, width() / 2, 180 );
-	g.setColorAt( 1, Qt::black );
-	g.setColorAt( 0, QColor( 0x30, 0x2e, 0x2e ) );
-
-	QPalette p = palette();
-	p.setBrush( QPalette::Window, g );
-	
-	//inefficient as sets recursively on child widgets? 
-	//may be better to just paintEvent it
-	setPalette( p );
 }
 
 

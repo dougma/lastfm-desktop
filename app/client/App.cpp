@@ -44,22 +44,54 @@
 #include <QPainter>
 class UnicornMacStyle : public QMacStyle
 {
-//    virtual void drawPrimitive( PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget ) const 
-//    {
-        
-//    }
+    virtual int pixelMetric( PixelMetric metric, const QStyleOption* option, const QWidget* widget ) const
+    {
+        if (metric == PM_DockWidgetSeparatorExtent)
+        {
+            return QPixmap( ":/MainWindow/dock_splitter_handle.png" ).height();
+        }
+        else
+            return QMacStyle::pixelMetric( metric, option, widget );
+    }
+    
+    virtual void drawPrimitive( PrimitiveElement element, const QStyleOption* opt, QPainter* p, const QWidget* widget ) const 
+    {
+        if (element == QStyle::PE_IndicatorDockWidgetResizeHandle)
+        {
+            if (opt->state & QStyle::State_Horizontal)
+            {
+                p->drawPixmap( opt->rect, QPixmap( ":/MainWindow/dock_splitter.png" ) );
+                QPixmap px( ":/MainWindow/dock_splitter_handle.png" );
+                int const x = opt->rect.center().x() - px.width()/2;
+                p->drawPixmap( x, opt->rect.top(), px );
+            }
+            else
+            {
+                p->fillRect( opt->rect, QColor( 35, 35, 35 ) );
+                p->setPen( QColor( 24, 23, 23 ) );
+                int x = opt->rect.right() - 1;
+                int const h = opt->rect.height();
+                p->drawLine( x, 0, x, h );
+                p->setPen( QColor( 57, 57, 57 ) );
+                ++x;
+                p->drawLine( x, 0, x, h );                
+            }
+        }
+        else
+            QMacStyle::drawPrimitive( element, opt, p, widget );
+    }
     
     virtual void drawControl( ControlElement element, const QStyleOption* opt, QPainter* p, const QWidget* widget ) const
     {
         if (element == CE_DockWidgetTitle)
         {
             p->setPen( QColor( 35, 35, 35 ) );
-            p->drawRect( opt->rect );
+            p->drawRect( opt->rect.adjusted( 0, 1, 0, 0 ) );
             p->drawPixmap( opt->rect, QPixmap(":/MainWindow/dock_widget_title_bar.png") );
             p->setPen( QColor(Qt::darkGray).darker() );
             QFont f = p->font();
-            f.setBold( true );
-            f.setPointSize( 11 );
+            f.setBold( false );
+            f.setPointSize( 10 );
             p->setFont( f );
             p->drawText( opt->rect, Qt::AlignCenter, widget->windowTitle() );
         }
@@ -118,8 +150,8 @@ App::App( int argc, char** argv )
 
     setQuitOnLastWindowClosed( false );
 	
-    //TODO do once?
 #ifdef WIN32
+    //TODO do only once?
     Legacy::disableHelperApp();
 #endif
 

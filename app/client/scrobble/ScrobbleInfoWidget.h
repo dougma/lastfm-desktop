@@ -32,7 +32,6 @@ class ScrobbleInfoWidget : public QWidget
 public:
 	ScrobbleInfoWidget();
 	
-	virtual void resizeEvent( QResizeEvent* );
 	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
 	virtual void paintEvent( class QPaintEvent* );
 	

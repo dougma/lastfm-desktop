@@ -29,6 +29,8 @@
     <file>MainWindow/dock_widget_title_bar.png</file>
     <file>MainWindow/dock_tab_unselected.png</file>
     <file>MainWindow/dock_tab_selected.png</file>
+    <file>MainWindow/dock_splitter.png</file>
+    <file>MainWindow/dock_splitter_handle.png</file>
   </qresource>
   <qresource>
       <file>SettingsDialog/account.png</file>
