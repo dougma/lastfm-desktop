@@ -31,14 +31,23 @@ Unicorn::TabBar::TabBar()
     f.setPixelSize( 11 );
     setFont( f );
 #endif
+
+    m_inactive = QPixmap(":/controls/inactive/tab.png");
+    m_active = QPixmap(":/controls/active/tab.png");
+
+    QPalette p = palette();
+    p.setColor( QPalette::Active, QPalette::Text, Qt::black );
+    p.setColor( QPalette::Inactive, QPalette::Text, QColor( 42, 42, 42 ) );
+    setPalette( p );
 }
 
 
 QSize
 Unicorn::TabBar::sizeHint() const
 {
-    return QSize( QTabBar::sizeHint().width(), QPixmap(":/MainWindow/dock_tab_unselected.png").height() - 2 );
+    return QSize( QTabBar::sizeHint().width(), m_active.height() - 2 );
 }
+
 
 void
 Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
@@ -52,12 +61,25 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 }
 
 
+
+void
+Unicorn::TabBar::succombToTheDarkSide()
+{
+    m_inactive = QPixmap(":/MainWindow/dock_tab_unselected.png");
+    m_active = QPixmap(":/MainWindow/dock_tab_selected.png");
+    
+    QPalette p = palette();
+    p.setColor( QPalette::Active, QPalette::Text, Qt::white );
+    p.setColor( QPalette::Inactive, QPalette::Text, Qt::white );
+    setPalette( p );
+}
+
+
 void
 Unicorn::TabBar::paintEvent( QPaintEvent* )
 {
     QPainter p( this );
-//    p.fillRect( rect(), QBrush( QPixmap(":/controls/inactive/tab.png") ) );
-    p.fillRect( rect(), QBrush( QPixmap(":/MainWindow/dock_tab_unselected.png") ) );
+    p.fillRect( rect(), m_inactive );
     
     QFont f = p.font();
     f.setPointSize( 11 );
@@ -71,44 +93,46 @@ Unicorn::TabBar::paintEvent( QPaintEvent* )
         
         if (i == count() - 1)
             w += width() % w;
-
-        p.setPen( Qt::white );        
         
         if (currentIndex() == i)
         {
-//            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/controls/active/tab.png") ) );
-            p.fillRect( x, 0, w, height(), QBrush( QPixmap(":/MainWindow/dock_tab_selected.png") ) );
-//            p.setPen( Qt::white );
+            p.fillRect( x, 0, w, height(), m_active );
+            p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
         }
-//        else
-//            p.setPen( QColor( 42, 42, 42 ) );
+        else
+            p.setPen( palette().color( QPalette::Inactive, QPalette::Text ) );
         
         p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
     }
+    
+    const int h = height() - 1;
+    p.setPen( QColor( 29, 28, 28 ) );
+    p.drawLine( 0, h, width(), h );    
 }
 
 
 Unicorn::TabWidget::TabWidget()
 {
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( bar = new TabBar );
-    v->addWidget( stack = new QStackedWidget );
+    v->addWidget( m_bar = new TabBar );
+    v->addWidget( m_stack = new QStackedWidget );
     v->setSpacing( 0 );
     v->setMargin( 0 );
-    connect( bar, SIGNAL(currentChanged( int )), stack, SLOT(setCurrentIndex( int )) );
+    connect( m_bar, SIGNAL(currentChanged( int )), m_stack, SLOT(setCurrentIndex( int )) );
 }
 
 
 void
 Unicorn::TabWidget::addTab( const QString& title, QWidget* w )
 {
-    bar->addTab( title );
-    stack->addWidget( w );
+    m_bar->addTab( title );
+    m_stack->addWidget( w );
+    w->setAttribute( Qt::WA_MacShowFocusRect, false );
 }
 
 
 void 
 Unicorn::TabWidget::setTabEnabled( int index, bool b )
 {
-    bar->setTabEnabled( index, b );
+    m_bar->setTabEnabled( index, b );
 }

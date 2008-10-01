@@ -20,6 +20,7 @@
 #ifndef UNICORN_TAB_WIDGET_H
 #define UNICORN_TAB_WIDGET_H
 
+#include <QPixmap>
 #include <QStackedWidget>
 #include <QTabBar>
 
@@ -28,27 +29,34 @@ namespace Unicorn
 {
     class TabBar : public QTabBar
     {
+        QPixmap m_active;
+        QPixmap m_inactive;
+        
     public:
         TabBar();
         
         virtual QSize sizeHint() const;
         
+        void succombToTheDarkSide();
+        
     protected:
         virtual void mousePressEvent( QMouseEvent* );
         virtual void paintEvent( QPaintEvent* );
     };
-
+    
     
     class TabWidget : public QWidget
     {
-        QStackedWidget* stack;
-        TabBar* bar;
+        QStackedWidget* m_stack;
+        TabBar* m_bar;
         
     public:
         TabWidget();
         
+        TabBar* bar() const { return m_bar; }
+        
         void addTab( const QString& title, QWidget* );
-        QWidget* currentWidget() const { return stack->currentWidget(); }
+        QWidget* currentWidget() const { return m_stack->currentWidget(); }
         
         void setTabEnabled( int index, bool );
     };

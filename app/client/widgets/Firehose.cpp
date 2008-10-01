@@ -72,6 +72,8 @@ Firehose::Firehose()
     setPalette( p );
     view->setPalette( palette() );
     view->setAutoFillBackground( true );
+    
+    tabs->succombToTheDarkSide();
 }
 
 
@@ -116,6 +118,7 @@ FirehoseModel::setNozzle( const QString& nozzle )
     connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
     connect( m_socket, SIGNAL(aboutToClose()), SLOT(onFinished()) );    
 }
+
 
 void
 FirehoseModel::onData()

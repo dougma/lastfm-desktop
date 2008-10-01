@@ -36,12 +36,6 @@ public:
 };
 
 
-enum
-{
-    TrackRole = Qt::UserRole
-};
-
-
 class FirehoseModel : public QAbstractItemModel
 {
     Q_OBJECT

@@ -88,10 +88,10 @@ class UnicornMacStyle : public QMacStyle
             p->setPen( QColor( 35, 35, 35 ) );
             p->drawRect( opt->rect.adjusted( 0, 1, 0, 0 ) );
             p->drawPixmap( opt->rect, QPixmap(":/MainWindow/dock_widget_title_bar.png") );
-            p->setPen( QColor(Qt::darkGray).darker() );
+            p->setPen( QColor( 54, 53, 53 ) );
             QFont f = p->font();
             f.setBold( false );
-            f.setPointSize( 10 );
+            f.setPointSize( 11 );
             p->setFont( f );
             p->drawText( opt->rect, Qt::AlignCenter, widget->windowTitle() );
         }

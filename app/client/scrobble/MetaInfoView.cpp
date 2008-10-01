@@ -101,8 +101,9 @@ MetaInfoView::MetaInfoView()
 	ui.infoTabs->addTab( tr("Bio"), ui.bio = new Bio(ui.infoTabs) );
 	ui.infoTabs->addTab( tr("Tags"), ui.artistTags = new TagIconView );
 	ui.infoTabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists() );
-
+    
     ui.infoTabs->hide();
+    ui.infoTabs->bar()->succombToTheDarkSide();
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
@@ -120,8 +121,6 @@ MetaInfoView::MetaInfoView()
     f.setBold( true );
     f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
     setFont( f );
-
-    ui.artistTags->setAttribute( Qt::WA_MacShowFocusRect, false );
 #endif
     
     setAutoFillBackground( true );
