@@ -26,76 +26,52 @@
 
 #ifdef WIN32
 
-#include "sens_win.h"
+#include "NdisEvents_win.h"
 
-// adapts windows-specific class to QT
-
-class WsNetEventAdapter : 
-	public QObject,
-	public Sens			// the windows class
+class WsNetEventAdapter : public QObject, public NdisEvents
 {
-	Q_OBJECT
+	Q_OBJECT;
+
+	// WmiSink callbacks:
+	virtual void onConnectionUp(BSTR name)
+	{
+		emit connectionUp(QString::fromUtf16(name));
+	}
+
+	virtual void onConnectionDown(BSTR name)
+	{
+		emit connectionDown(QString::fromUtf16(name));
+	}
 
 public:
-	WsNetEventAdapter(QObject *parent = 0)
+	WsNetEventAdapter(QObject *parent)
 		:QObject(parent)
 	{
-		try
-		{
-			init();
-		}
-		catch (const HResult &hr)
-		{
-			qDebug() << "error " << hr.m_hr << " trying " << hr.m_trying << " in WsNetEventAdapter::init()";
-		}
-		catch (...)
-		{
-			qDebug() << "unhandled exception in WsNetEventAdapter::init()";
-		}
-	}
-
-	~WsNetEventAdapter()
-	{
-		uninit();
-	}
-
-	HRESULT STDMETHODCALLTYPE ConnectionMade(BSTR bstrConnection, ULONG ulType, LPSENS_QOCINFO)
-	{
-		emit connectionUp(QString::fromUtf16(bstrConnection), ulType == 1);
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE ConnectionLost(BSTR bstrConnection, ULONG ulType)
-	{
-		emit connectionDown(QString::fromUtf16(bstrConnection), ulType == 1);
-		return S_OK;
+		registerForNdisEvents();
 	}
 
 signals:
-	void connectionUp(QString connectionName, bool isWan);
-	void connectionDown(QString connectionName, bool isWan);
+	void connectionUp(QString connectionName);
+	void connectionDown(QString connectionName);
 };
 
 #else
 
-class WsNetEventAdapter:
-	public QObject
+class WsNetEventAdapter : public QObject
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 public:
-	WsNetEventAdapter(QObject *parent = 0)
+	WsNetEventAdapter(QObject *parent)
 		:QObject(parent)
-	{
-	}
+	{}
 
 signals:
-	void connectionUp(QString connectionName, bool isWan);
-	void connectionDown(QString connectionName, bool isWan);
+	void connectionUp(QString connectionName);
+	void connectionDown(QString connectionName);
 };
 
 #endif
-
 
 
 class WS_DLLEXPORT WsNetEvent : 

@@ -10,8 +10,8 @@ HEADERS = $$findSources( h )
 
 DEFINES += _WS_DLLEXPORT
 
-!win32:SOURCES -= sens_win.cpp
-!win32:HEADERS -= sens_win.h
+!win32:SOURCES -= NdisEvents_win.cpp WmiSink_win.cpp
+!win32:HEADERS -= NdisEvents_win.h WmiSink_win.h
 win32:DEFINES += _ATL_DLL
 
-win32:LIBS += winhttp.lib
+win32:LIBS += winhttp.lib wbemuuid.lib

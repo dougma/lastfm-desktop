@@ -93,6 +93,7 @@ private:
     class NowPlaying* m_np;
     class ScrobblerSubmission* m_submitter;
     class ScrobbleCache* m_cache;
+	class WsNetEvent* m_netEvent;
     uint m_hard_failures;
 };
 
