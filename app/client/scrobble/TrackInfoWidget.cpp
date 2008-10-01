@@ -28,7 +28,7 @@ TrackInfoWidget::TrackInfoWidget()
 	ui.spinner = new SpinnerLabel( this );
 	ui.spinner->hide();
 
-    clear();
+    clear();    
 }
 
 

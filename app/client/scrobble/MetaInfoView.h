@@ -72,12 +72,9 @@ private slots:
     void onTrackSpooled( const Track& );
     void onStateChanged( State );
     void onLinkClicked( const class QUrl& );
-	void onAuthenticationRequired( class QNetworkReply*, class QAuthenticator* );
-	void onArtistInfo(WsReply *);
-	void onSimilar(WsReply *);
-	void load();
+	void onArtistInfo( WsReply* );
+	void onSimilar( WsReply* );
 
 private:
-	virtual void resizeEvent( QResizeEvent* );
     QString cssPath();
 };

@@ -106,9 +106,12 @@ App::App( int argc, char** argv )
    : Unicorn::Application( argc, argv )
 {
 #ifdef Q_WS_MAC
+    // I have to set it on the whole application as QMainWindow grabs some
+    // pixelmetrics when it is created, which means a post setStyle doesn't
+    // work
     setStyle( new UnicornMacStyle );
 #endif
-    
+
     // IMPORTANT don't allow any GUI thread message loops to run during this
     // ctor! Things will crash in interesting ways!
     //TODO bootstrapping

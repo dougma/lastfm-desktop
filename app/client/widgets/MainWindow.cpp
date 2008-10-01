@@ -56,7 +56,7 @@
 
 
 MainWindow::MainWindow()
-{
+{    
     setupUi();
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );

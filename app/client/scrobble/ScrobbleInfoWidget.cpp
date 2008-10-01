@@ -56,10 +56,6 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
     
     ui.text->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
 
-#ifdef Q_WS_MAC
-    ui.text->setPalette( QPalette( Qt::white, Qt::black ) ); //Qt bug, it should inherit! TODO report bug
-    ui.text->setAttribute( Qt::WA_MacSmallSize );
-#endif    
     ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     ui.text->setTextFormat( Qt::RichText );    
     
@@ -68,7 +64,19 @@ ScrobbleInfoWidget::ScrobbleInfoWidget()
 
     UnicornWidget::paintItBlack( this );
     setAutoFillBackground( true );
-	
+
+#ifdef Q_WS_MAC
+    QPalette p = palette();
+    p.setColor( QPalette::Text, Qt::white );
+    p.setColor( QPalette::WindowText, Qt::white );
+    ui.text->setPalette( p ); //Qt bug, it should inherit! TODO report bug
+    ui.text->setAttribute( Qt::WA_MacSmallSize );
+    
+    //Qt-mac bug, again
+    foreach (QLabel* l, ui.playerIndicator->findChildren<QLabel*>())
+        l->setPalette( p );
+#endif	
+    
     setMinimumWidth( 298 ); //as per mattb mockup
 	
 	connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );

@@ -29,8 +29,9 @@
 #include "widgets/TagListWidget.h"
 #include "widgets/SimilarArtists.h"
 
+
 Bio::Bio(QWidget *parent)
-: QWebView(parent)
+   : QWebView(parent)
 {
 	settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( cssPath() ) );
 	page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -101,27 +102,10 @@ MetaInfoView::MetaInfoView()
 	ui.infoTabs->addTab( tr("Tags"), ui.artistTags = new TagIconView );
 	ui.infoTabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists() );
 
-	//v->addWidget( ui.web = new QWebView );
-
     ui.infoTabs->hide();
-    //ui.bio->
-    
-	//ui.tabs = new QTabBar( ui.web );
- //   ui.tabs->addTab( tr( "Artist" ) );
-	//ui.tabs->addTab( tr( "Album" ) );
-	//ui.tabs->addTab( tr( "Track" ) );
-	//ui.tabs->setDrawBase( false );
-	//ui.tabs->hide();
-	//connect( ui.tabs, SIGNAL(currentChanged( int )), SLOT(load()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
-    
-	//ui.web->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
- //   connect( ui.web->page(), SIGNAL(linkClicked( QUrl )), SLOT(onLinkClicked( QUrl )) );
- //	connect( ui.web->page()->networkAccessManager(), 
-	//		 SIGNAL(authenticationRequired( QNetworkReply*, QAuthenticator* )), 
-	//		 SLOT(onAuthenticationRequired( QNetworkReply*, QAuthenticator* )) );
 	
 	setBackgroundRole( QPalette::Base );
     
@@ -136,18 +120,12 @@ MetaInfoView::MetaInfoView()
     f.setBold( true );
     f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
     setFont( f );
+
+    ui.artistTags->setAttribute( Qt::WA_MacShowFocusRect, false );
 #endif
     
     setAutoFillBackground( true );
     setAlignment( Qt::AlignCenter );
-}
-
-
-void 
-MetaInfoView::onAuthenticationRequired( QNetworkReply*, QAuthenticator* a )
-{
-	a->setUser( "tester" );
-	a->setPassword( "futureofmusic" );
 }
 
 
@@ -157,12 +135,12 @@ MetaInfoView::onTrackSpooled( const Track& t )
 	if (t.artist() != m_track.artist())
 	{
 		ui.similar->clear();
-		connect(t.artist().getInfo(), SIGNAL(finished(WsReply*)), this, SLOT(onArtistInfo(WsReply*)) );
-		connect(t.artist().getSimilar(), SIGNAL(finished(WsReply*)), this, SLOT(onSimilar(WsReply*)) );
+		connect( t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
+		connect( t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
 	}
     m_track = t;
-    load();
 }
+
 
 void 
 MetaInfoView::onArtistInfo(WsReply *reply)
@@ -170,6 +148,7 @@ MetaInfoView::onArtistInfo(WsReply *reply)
 	CoreDomElement r = reply->lfm();
 	ui.bio->setContent(r);
 }
+
 
 void 
 MetaInfoView::onSimilar(WsReply *reply)
@@ -187,11 +166,6 @@ MetaInfoView::onStateChanged( State state )
             ui.infoTabs->hide();
             break;
             
-        case TuningIn:
-            ui.infoTabs->show();
-            //ui.web->load( QUrl("about:blank") );
-            break;
-            
         default:
             ui.infoTabs->show();
             break;
@@ -204,37 +178,6 @@ MetaInfoView::onLinkClicked( const QUrl& url )
 {
     QDesktopServices::openUrl( url );
 }
-
-
-void
-MetaInfoView::resizeEvent( QResizeEvent* )
-{
-	//ui.tabs->move( ui.web->width() - 24 - ui.tabs->sizeHint().width(), 12 );
-}
-
-
-void
-MetaInfoView::load()
-{   
-    if (m_track.isNull())
-        return;
-
-    ui.infoTabs->show();
-	//ui.web->load( QUrl("about:blank") ); //clear the web view first
-	
-	//QUrl url;
-	//switch (ui.tabs->currentIndex())
-	//{
-	//	case 0: url = m_track.artist().www(); break;
-	//	case 1: url = m_track.album().www(); break;
-	//	case 2: url = m_track.www(); break;
-	//}
-
-	//ui.web->load( CoreUrl( url ).mobilised() );
-//    qDebug() << url;
-}
-
-
 
 
 QSize
