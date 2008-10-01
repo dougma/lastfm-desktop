@@ -84,6 +84,7 @@ dmg-clean: bundle-clean
 	rm -f $dmg
 
 $dmg: bundle
+	rm -f '\$\@'
 	hdiutil create -srcfolder '\$(DESTDIR)\$(QMAKE_TARGET).app' -format UDZO -imagekey zlib-level=9 -scrub '\$\@'
 
 \$(CONTENTS)/Resources/qt.conf:
