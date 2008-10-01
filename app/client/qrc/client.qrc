@@ -10,7 +10,5 @@
   <qresource prefix="controls">
     <file>active/tab.png</file>
     <file>inactive/tab.png</file>
-    <file>splitter.png</file>
-    <file>splitter_handle.png</file>
   </qresource>
 </RCC>
