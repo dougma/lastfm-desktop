@@ -47,17 +47,14 @@ QStringList /* static */
 Tag::search( WsReply* r )
 {
 	QStringList tags;
-    foreach( CoreDomElement e, r->lfm().children( "tag" ))
-    {
-        try
-        {
-			tags += e["name"].text();
-		}
-        catch( CoreDomElement::Exception& e )
-        {
-            qWarning() << e;
-        }
+    try {
+        foreach( CoreDomElement e, r->lfm().children( "tag" ))
+            tags += e["name"].text();
     }
+    catch( CoreDomElement::Exception& e )
+    {
+        qWarning() << e;
+    }    
 	return tags;
 }
 
@@ -66,29 +63,21 @@ WeightedStringList //static
 Tag::list( WsReply* r )
 {
 	WeightedStringList tags;
-    foreach (CoreDomElement e, r->lfm().children( "tag" ))
+    try
     {
-        try
+        foreach (CoreDomElement e, r->lfm().children( "tag" ))
         {
-            int weight = 0;
-
-            //TODO non throwing version of CoreDomElement!
-            try 
-            {
-                weight = e["count"].text().toInt();
-            }
-            catch( CoreDomElement::Exception& ex)
-            {}
+            int const weight = e.optional("count").text().toInt();
             
             // we toLower always as otherwise it is ugly mixed case, as first
             // ever tag decides case, and Last.fm is case insensitive about it 
             // anyway
             tags += WeightedString( e["name"].text().toLower(), weight );
         }
-        catch( CoreDomElement::Exception& ex)
-        {
-            qWarning() << ex << '\n' << e;
-        }
+    }
+    catch( CoreDomElement::Exception& e)
+    {
+        qWarning() << e;
     }
     return tags;
 }

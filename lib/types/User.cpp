@@ -46,22 +46,22 @@ QList<User> //static
 User::list( WsReply* r )
 {
 	QList<User> users;
-    foreach (CoreDomElement e, r->lfm().children( "user" ))
+    try
     {
-        try
+        foreach (CoreDomElement e, r->lfm().children( "user" ))
         {
             User u( e["name"].text() );
             u.m_smallImage = e["image size=small"].text();
             u.m_mediumImage = e["image size=medium"].text();
             u.m_largeImage = e["image size=large"].text();
             u.m_realName = e.optional( "realname" ).text();
-			users += u;
-        }
-        catch (CoreDomElement::Exception& e)
-        {
-            qWarning() << e;
+            users += u;
         }
     }
+    catch (CoreDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }    
     return users;
 }
 
