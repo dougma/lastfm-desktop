@@ -48,26 +48,15 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
     
     painter->save();
     
-    QColor bg = option.palette.color( QPalette::Base );
-    if (isSelected)
-    {
-        QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-        ? QPalette::Normal
-        : QPalette::Disabled;
-        
-        if (cg == QPalette::Normal && !isActive)
-            cg = QPalette::Inactive;
-        
-        bg = option.palette.color( cg, QPalette::Highlight );
-        painter->fillRect( option.rect, bg );
-    } 
-    else if (index.row() % 2 != index.model()->rowCount() % 2)
+    QColor bg;
+    if (index.data( CumulativeCountRole ).toInt() % 2 != index.row() % 2)
     {
         bg = option.palette.color( QPalette::AlternateBase );
         painter->fillRect( option.rect, bg );
     }
+    else
+        bg = option.palette.color( QPalette::Base );
 
-    
     QTransform t;
     QPoint p = option.rect.topLeft();
     t.translate( p.x(), p.y() );

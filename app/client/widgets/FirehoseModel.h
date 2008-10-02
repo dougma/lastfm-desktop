@@ -31,7 +31,8 @@
 enum
 {
     TrackRole = Qt::UserRole,
-    TimestampRole
+    TimestampRole,
+    CumulativeCountRole
 };
 
 
@@ -53,8 +54,12 @@ class FirehoseModel : public QAbstractItemModel
     
     class QTcpSocket* m_socket;
     
+    /** used to figure out the zebra stripe */
+    uint m_cumulative_count;
+    
 public slots:
     void setNozzle( const QString& );
+    void prune(); //prunes the list to 20
     
 private slots:
     void onData();

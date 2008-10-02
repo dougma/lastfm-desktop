@@ -40,6 +40,7 @@ FirehoseView::setModel( QAbstractItemModel* p )
     model->setParent( this );
     connect( model, SIGNAL(rowsInserted( QModelIndex, int, int )), SLOT(onRowInserted()) );
     connect( model, SIGNAL(modelReset()), SLOT(onModelReset()) );
+    connect( timer, SIGNAL(finished()), model, SLOT(prune()) );
 }
 
 
@@ -73,7 +74,8 @@ FirehoseView::onRowInserted()
 }
 
 
-#define SET_MAXIMUM bar()->setMaximum( qMax( 0, model->rowCount()*h + offset - bar()->pageStep() ) )
+// don't let the scrollbar get larger than 20, or less than 0
+#define SET_MAXIMUM bar()->setMaximum( qBound( 0, model->rowCount()*h + offset -bar()->pageStep(), h*20 - bar()->pageStep() ) )
 void
 FirehoseView::onFrameChange( int i )
 {
@@ -104,7 +106,9 @@ FirehoseView::paintEvent( QPaintEvent* )
         f.setBold( true );
         f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
         p.setFont( f );
-        p.drawText( rect().adjusted( 5, 5, -5, -5 ), Qt::AlignCenter, QString::fromUtf8("Empty View Helper Text™") );
+        p.drawText( rect().adjusted( 5, 5, -5, -5 ),
+                    Qt::AlignCenter, 
+                    QString::fromUtf8("Empty View Text™") );
     }
     
     QStyleOptionViewItem opt;

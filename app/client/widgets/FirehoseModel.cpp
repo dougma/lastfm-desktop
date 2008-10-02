@@ -26,7 +26,7 @@
 
 
 FirehoseModel::FirehoseModel()
-             : m_socket( 0 )
+             : m_socket( 0 ), m_cumulative_count( 0 )
 {}
 
 
@@ -117,26 +117,13 @@ FirehoseItem::onAvatarDownloaded()
 
 void
 FirehoseModel::onItemReady( FirehoseItem* item )
-{
-    int n = m_tracks.count();
-    
-    if (n-- > 20)
-    {
-        beginRemoveRows( QModelIndex(), n, n );
-        m_tracks.pop_back();
-        m_avatars.pop_back();
-        m_users.pop_back();
-        m_timestamps.pop_back();
-        endRemoveRows();
-    }
-    
+{   
     beginInsertRows( QModelIndex(), 0, 0 );
-    
     m_tracks.prepend( item->track() );
     m_avatars.prepend( item->avatar() );
     m_users.prepend( item->user() );
     m_timestamps.prepend( QDateTime::currentDateTime() );
-    
+    m_cumulative_count++;
     endInsertRows();
 }
 
@@ -162,7 +149,26 @@ FirehoseModel::data(const QModelIndex &index, int role) const
         case Qt::DecorationRole: return m_avatars[row];
         case TrackRole: return QVariant::fromValue( m_tracks[row] );
         case TimestampRole: return m_timestamps[row];
+        case CumulativeCountRole: return m_cumulative_count;
     }
     
     return QVariant();
+}
+
+
+void
+FirehoseModel::prune()
+{
+    if (m_tracks.count() <= 20)
+        return;
+    
+    beginRemoveRows( QModelIndex(), 20, m_tracks.count() - 1 );
+    while (m_tracks.count() > 20)
+    {
+        m_tracks.pop_back();
+        m_avatars.pop_back();
+        m_users.pop_back();
+        m_timestamps.pop_back();
+    }
+    endRemoveRows();
 }
