@@ -28,7 +28,7 @@ Unicorn::TabBar::TabBar()
 {
 #ifdef Q_WS_MAC
     QFont f = font();
-    f.setPixelSize( 11 );
+    f.setPointSize( 11 );
     setFont( f );
 #endif
 
@@ -61,6 +61,22 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 }
 
 
+void
+Unicorn::TabBar::tabInserted( int )
+{
+    int w = 0;
+    for (int i = 0; i < count(); ++i)
+        w = qMax( fontMetrics().width( tabText( i ) ), w );
+    setMinimumWidth( (w+10) * count() );
+}
+
+
+void
+Unicorn::TabBar::tabRemoved( int i )
+{
+    tabInserted( i );
+}
+
 
 void
 Unicorn::TabBar::succombToTheDarkSide()
@@ -80,12 +96,7 @@ Unicorn::TabBar::paintEvent( QPaintEvent* )
 {
     QPainter p( this );
     p.fillRect( rect(), m_inactive );
-    
-    QFont f = p.font();
-    f.setPointSize( 11 );
-    f.setBold( false );
-    p.setFont( f );
-    
+        
     int w = width() / count();
     for (int i = 0; i < count(); ++i)
     {

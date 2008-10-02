@@ -42,6 +42,8 @@ namespace Unicorn
     protected:
         virtual void mousePressEvent( QMouseEvent* );
         virtual void paintEvent( QPaintEvent* );
+        virtual void tabInserted( int );
+        virtual void tabRemoved( int );
     };
     
     
