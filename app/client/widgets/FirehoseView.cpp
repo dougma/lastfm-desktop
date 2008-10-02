@@ -87,8 +87,9 @@ void
 FirehoseView::onModelReset()
 {
     bar()->setRange( 0, 0 );
+    viewport()->update();
 }
-        
+
 
 void
 FirehoseView::paintEvent( QPaintEvent* )
