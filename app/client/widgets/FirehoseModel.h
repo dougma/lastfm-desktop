@@ -89,35 +89,4 @@ signals:
 };
 
 
-
-#include <QMap>
-/** QSignalMapper is annoyingly limited */
-class CoreSignalMapper : public QObject
-{
-    Q_OBJECT
-    
-    QMap<int, QString> m_map;
-    
-public:
-    CoreSignalMapper( QObject* parent ) : QObject( parent )
-    {}
-    
-    void setMapping( int i, const QString& s )
-    {
-        m_map[i] = s;
-    }
-    
-public slots:
-    void map( int i )
-    {
-        if (m_map.contains( i ))
-            emit mapped( m_map[i] );
-    }
-    
-signals:
-    void mapped( const QString& );
-};
-
-
-
 #endif

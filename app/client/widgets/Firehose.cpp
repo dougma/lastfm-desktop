@@ -32,15 +32,16 @@ Firehose::Firehose()
     class FirehoseView* view;
     
     QVBoxLayout *v = new QVBoxLayout( this );
-    v->addWidget( tabs = new Unicorn::TabBar );
+    //v->addWidget( tabs = new Unicorn::TabBar );
     v->addWidget( view = new FirehoseView );
     v->setMargin( 0 );
     v->setSpacing( 0 );
     
-    QAbstractItemModel* model;
+    FirehoseModel* model;
     view->setModel( model = new FirehoseModel );
     view->setDelegate( new FirehoseDelegate );
 
+#if 0
     CoreSignalMapper* mapper = new CoreSignalMapper( this );
     mapper->setMapping( 0, "user/1000002?rt=xml&special=staffmembers" );
     mapper->setMapping( 1, "user/2113030?rt=xml" );
@@ -49,7 +50,11 @@ Firehose::Firehose()
     
     tabs->addTab( tr("Last.fm Staff") );
     tabs->addTab( tr("All your Friends") );    
-    
+#else
+    model->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
+    setMinimumWidth( 250 );
+#endif
+
     UnicornWidget::paintItBlack( this );
     QPalette p = palette();
     p.setBrush( QPalette::Base, p.window() );
@@ -58,7 +63,7 @@ Firehose::Firehose()
     view->setPalette( palette() );
     view->setAutoFillBackground( true );
     
-    tabs->succombToTheDarkSide();
+//    tabs->succombToTheDarkSide();
 }
 
 
