@@ -24,7 +24,7 @@
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
-    timer = new QTimeLine( 1000, this );
+    timer = new QTimeLine( 1200, this );
     connect( timer, SIGNAL(frameChanged( int )), SLOT(onFrameChange( int )) );
     
     setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -97,6 +97,15 @@ FirehoseView::paintEvent( QPaintEvent* )
     //TODO cliprect or not paint stuff not visible?
     
     QPainter p( viewport() );
+    
+    if (model->rowCount() == 0)
+    {    
+        QFont f = p.font();
+        f.setBold( true );
+        f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
+        p.setFont( f );
+        p.drawText( rect().adjusted( 5, 5, -5, -5 ), Qt::AlignCenter, QString::fromUtf8("Empty View Helper Text™") );
+    }
     
     QStyleOptionViewItem opt;
     opt.font = font();
