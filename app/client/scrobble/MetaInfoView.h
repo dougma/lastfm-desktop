@@ -38,6 +38,7 @@ class Bio : public QWebView
 
 public:
 	Bio(QWidget *parent = 0);
+	void clearContent();
 	void setContent(CoreDomElement &lfm);
 
 private slots:
@@ -55,8 +56,8 @@ class MetaInfoView : public QLabel
 	struct
 	{
 		Unicorn::TabWidget* infoTabs;
-		class TagListWidget* artistTags;
 		class Bio* bio;
+		class TagListWidget* trackTags;
 		class SimilarArtists* similar;
 	}
 	ui;

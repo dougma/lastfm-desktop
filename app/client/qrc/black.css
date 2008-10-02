@@ -1,16 +1,18 @@
 body{
-    background: #181819 !important;
-    color:#fff !important;
-	font-size:small !important;
-	font-family:"Lucida Grande" !important;
+    background: #181819;
+    color:#fff;
+	font-size:small;
+	font-family:"Lucida Grande";
 }
 
-p.artist { font-size: large; margin-bottom: 0px; }
-p.plays { color:#999; margin-top: 0px; }
-#content { background:inherit !important; }
-#footer { display:none; background:inherit !important;}
+a { color:#bbb }
+.artist:link { color:#fff }
+.artist:visited { color:#fff }
+.artist { text-decoration:none; color:#fff; font-size: large; margin-bottom: 0px; }
+.plays { color:#999; margin-top: 0px; }
+.content { background:inherit }
+.footer { display:none; background:inherit }
 img { border:1px solid #999 !important; -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5) !important; margin: 0 1em 1em 0 !important; padding: 0 !important; }
-a { color:#4C4E51 !important; }
 
 #header { display:none; }
 #content h1 { display:none; }

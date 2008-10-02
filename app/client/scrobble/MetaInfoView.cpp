@@ -38,6 +38,10 @@ Bio::Bio(QWidget *parent)
 	connect(this, SIGNAL(linkClicked(const QUrl &)), SLOT(onLinkClicked(const QUrl &)) );
 }
 
+void Bio::clearContent()
+{
+	setHtml("");
+}
 
 void 
 Bio::setContent(CoreDomElement &lfm)
@@ -45,21 +49,24 @@ Bio::setContent(CoreDomElement &lfm)
 #define ARTIST_CLASS "artist"
 #define PLAYS_CLASS "plays"
 #define CONTENT_CLASS "content"
+#define EDITME_CLASS "editme"
 
 	try {
 		CoreDomElement a = lfm["artist"];
 		QString name = a["name"].text();
+		QString url = a["url"].text();
 		QString	plays = a["stats"]["playcount"].text();
 		QString listeners = a["stats"]["listeners"].text();
 		QString content = a["bio"]["content"].text();
+		QString editmessage = tr("edit this online");
 
-		QStringList html;
-		html <<	
-			"<p class=\""ARTIST_CLASS"\">" << name << "</p>" <<
+		QString html;
+		QTextStream(&html) <<
+			"<a class=\""ARTIST_CLASS"\" href=\"" << url << "\">" << name << "</a>" <<
 			"<p class=\""PLAYS_CLASS"\">" << tr("%L1 plays (%L2 listeners)").arg(plays.toInt()).arg(listeners.toInt()) << "</p>" <<
-			"<p class=\""CONTENT_CLASS"\">" << content << "</p>";
-
-		setHtml(html.join(""));
+			"<p class=\""CONTENT_CLASS"\">" << content.replace("\r", "<br>") << "</p>" <<
+			"<a class=\""EDITME_CLASS"\" href=\"" << url << "/+wiki/edit" << "\"><img src= />" << editmessage << "</a>";
+		setHtml(html);
 	}
 	catch (...)
 	{
@@ -99,8 +106,8 @@ MetaInfoView::MetaInfoView()
 	v->setMargin( 0 );
 	v->addWidget(ui.infoTabs = new Unicorn::TabWidget);
 	ui.infoTabs->addTab( tr("Bio"), ui.bio = new Bio(ui.infoTabs) );
-	ui.infoTabs->addTab( tr("Tags"), ui.artistTags = new TagIconView );
-	ui.infoTabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists() );
+	ui.infoTabs->addTab( tr("Tags"), ui.trackTags = new TagListWidget );
+	ui.infoTabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists );
     
     ui.infoTabs->hide();
     ui.infoTabs->bar()->succombToTheDarkSide();
@@ -133,9 +140,11 @@ MetaInfoView::onTrackSpooled( const Track& t )
 {
 	if (t.artist() != m_track.artist())
 	{
+		ui.bio->clearContent();
 		ui.similar->clear();
 		connect( t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
 		connect( t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
+		connect(t.getTopTags(), SIGNAL(finished(WsReply*)), ui.trackTags, SLOT(onTagsRequestFinished(WsReply*)) );
 	}
     m_track = t;
 }
@@ -145,14 +154,20 @@ void
 MetaInfoView::onArtistInfo(WsReply *reply)
 {
 	CoreDomElement r = reply->lfm();
-	ui.bio->setContent(r);
+	bool bSameArtist = true;		// todo: check this properly
+	if (bSameArtist) {
+		ui.bio->setContent(r);
+	}
 }
 
 
 void 
 MetaInfoView::onSimilar(WsReply *reply)
 {
-	ui.similar->setContent(reply->lfm());
+	bool bSameArtist = true;		// todo: check this properly
+	if (bSameArtist) {
+		ui.similar->setContent(reply->lfm());
+	}
 }
 
 
