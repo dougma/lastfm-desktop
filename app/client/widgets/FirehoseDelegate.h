@@ -23,22 +23,16 @@
 #include <QAbstractItemDelegate>
 
 
-enum
-{
-    TrackRole = Qt::UserRole
-};
-
-
 class FirehoseDelegate : public QAbstractItemDelegate
 {
-	static int& metric()
-	{
-		static int metric;
-		return metric;
-	}
-
+    mutable int m_metric;
+    
 	virtual void paint( QPainter*, const QStyleOptionViewItem&, const QModelIndex& ) const;
 	virtual QSize sizeHint( const QStyleOptionViewItem&, const QModelIndex& ) const;
+
+public:
+    FirehoseDelegate() : m_metric( 0 )
+    {}
 };
 
 #endif

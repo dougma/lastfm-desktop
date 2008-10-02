@@ -17,20 +17,48 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef FIREHOSE_H
-#define FIREHOSE_H
+#ifndef FIREHOSE_VIEW_H
+#define FIREHOSE_VIEW_H
 
-#include <QWidget>
+#include <QAbstractScrollArea>
 
 
-class Firehose : public QWidget
+/** view that can only do minimal things, hence we don't even derive
+  * QAbstractItemView as that was way more work than we required 
+  * 
+  * @author <max@last.fm> 
+  */
+class FirehoseView : public QAbstractScrollArea
 {
-public:
-    Firehose();
+    Q_OBJECT
     
-    virtual QSize sizeHint() const;
+    class QAbstractItemDelegate* delegate;
+    class QTimeLine* timer;
+    class QAbstractItemModel* model;
+
+    int h;
+    int offset;
+
+public:
+    FirehoseView();
+
+    /** you can set any model you like, but it prolly won't work as expected,
+      * also, if you don't set this, we crash :P */
+    void setModel( QAbstractItemModel* );
+    /** as above */
+    void setDelegate( QAbstractItemDelegate* );
+
+private slots:
+    void onRowInserted();
+    void onModelReset();
+    void onFrameChange( int );
+
+protected:
+    virtual void paintEvent( QPaintEvent* );
+    virtual void resizeEvent( QResizeEvent* );
+    virtual void scrollContentsBy( int, int );
+    
+    QScrollBar* bar() const { return verticalScrollBar(); }
 };
 
 #endif
-
-

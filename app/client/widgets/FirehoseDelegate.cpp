@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include "FirehoseDelegate.h"
+#include "FirehoseModel.h" //for our custom ModelRoles
+#include "lib/core/CoreLocale.h"
 #include "lib/types/Track.h"
 #include <QPainter>
 
@@ -46,6 +48,7 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
     
     painter->save();
     
+    QColor bg = option.palette.color( QPalette::Base );
     if (isSelected)
     {
         QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
@@ -55,12 +58,15 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
         if (cg == QPalette::Normal && !isActive)
             cg = QPalette::Inactive;
         
-        painter->fillRect( option.rect, option.palette.brush(cg, QPalette::Highlight));
+        bg = option.palette.color( cg, QPalette::Highlight );
+        painter->fillRect( option.rect, bg );
     } 
     else if (index.row() % 2 != index.model()->rowCount() % 2)
     {
-        painter->fillRect(option.rect, option.palette.brush( QPalette::AlternateBase ) );
+        bg = option.palette.color( QPalette::AlternateBase );
+        painter->fillRect( option.rect, bg );
     }
+
     
     QTransform t;
     QPoint p = option.rect.topLeft();
@@ -78,19 +84,60 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
     painter->drawRect( 10, 10, n, n );
     
     // keep text within the rects we drew
-    painter->setClipRect( 5, 5, option.rect.width() - 10, option.rect.height() - 10 );
+    QRect r( 5, 5, option.rect.width() - 10, option.rect.height() - 10 );
+    //painter->setClipRect( r );
     
     QColor primary = isSelected ? (isActive ? Qt::white : Qt::darkGray) : Qt::white;
     QColor secondary = isSelected && isActive ? Qt::white : Qt::darkGray; 
     
     painter->setPen( secondary );
-    painter->drawText( metric() , 5 + S + 2 + S, index.data( TrackRole ).value<Track>().toString() );
+    painter->drawText( m_metric, 5 + S + 2 + S, index.data( TrackRole ).value<Track>().toString() );
     
     QFont f = painter->font();
     f.setBold( true );
     painter->setFont( f );
     painter->setPen( primary );
-    painter->drawText( metric() , 5 + S, index.data().toString() );
+    painter->drawText( m_metric, 5 + S, index.data().toString() );
+    
+    QDateTime timestamp = index.data( TimestampRole ).toDateTime();
+    if (timestamp.isValid())
+    {
+        int const h = painter->fontMetrics().height();
+        int const w_name = painter->fontMetrics().width( index.data().toString() );
+        
+        QString const s = timestamp.toString( CoreLocale::system().qlocale().timeFormat( QLocale::ShortFormat ) );        
+
+        f.setPointSize( 8 );
+        f.setBold( false );
+        painter->setFont( f );
+        int const w = painter->fontMetrics().width( s );
+        
+        QRect const r_text_bounds( option.rect.width() - 5 - w, 10, w, h );
+        QRect const r_text = r_text_bounds.adjusted( -5, 0, 0, 0 );
+        QRect r_g = r_text;
+        r_g.translate( -10, 0 );
+        r_g.setWidth( 10 );
+        
+        if (m_metric + w_name > r_text.left())
+        {
+            QLinearGradient g( r_g.topLeft(), r_g.topRight() );
+            g.setColorAt( 0, Qt::transparent );
+            g.setColorAt( 1, bg );
+            
+            painter->fillRect( r_text, bg );
+            painter->fillRect( r_g, g );
+
+        }
+
+        painter->setPen( secondary );        
+        painter->drawText( r_text_bounds, Qt::AlignVCenter | Qt::AlignRight, s );
+    }
+    
+    QRect r3( option.rect.right() - 14, 5 + S + 2, 15, 2*S );
+    QLinearGradient g( r3.topLeft(), r3.topRight() );
+    g.setColorAt( 0, Qt::transparent );
+    g.setColorAt( 0.9, bg );
+    painter->fillRect( r3, g );
     
     painter->restore();
 }
@@ -99,6 +146,6 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
 QSize
 FirehoseDelegate::sizeHint( const QStyleOptionViewItem& o, const QModelIndex& ) const
 {
-    if (metric() == 0) metric() = 1 /*top margin*/ + QFontMetrics( o.font ).lineSpacing() * 3 + 2 /*text spacing*/ + 4 /*bottom margin*/;
-    return QSize( metric() + 150, metric() );
+    if (m_metric == 0) m_metric = 1 /*top margin*/ + QFontMetrics( o.font ).lineSpacing() * 3 + 2 /*text spacing*/ + 4 /*bottom margin*/;
+    return QSize( m_metric + 150, m_metric );
 }
