@@ -94,35 +94,6 @@ TrackInfoWidget::onAlbumImageDownloaded( const QByteArray& data )
 void
 TrackInfoWidget::paintEvent( QPaintEvent* e )
 {
-#if 0
-    QPainter p( this );
-    p.setClipRect( e->rect() );
-    p.setRenderHint( QPainter::Antialiasing );
-    p.setRenderHint( QPainter::SmoothPixmapTransform );
-
-    QLinearGradient g( QPoint(), QPoint( width(), height() ) );
-    g.setColorAt( 0, Qt::transparent );
-    g.setColorAt( 1, QColor( 0x2b, 0x2b, 0x2b ) );
-    p.fillRect( rect(), g );
-
-    if (m_cover.isNull()) 
-        return;
-
-    // determine rotated height
-    QTransform trans;
-    trans.rotate( -27, Qt::YAxis );
-    QRectF r1 = rect().translated( -width()/2, -height()/2 );
-    qreal const h = trans.inverted().map( QLineF( r1.topLeft(), r1.bottomLeft() ) ).dy();
-
-    // calculate scaling factor
-    qreal const scale = h / m_cover.height();
-    trans.scale( scale, scale );
-
-    // draw
-    p.setTransform( trans * QTransform().translate( height()/2, height()/3 + 10 ) );
-    p.drawImage( QPoint( -m_cover.height()/2, -m_cover.height()/3 ), m_cover );
-#endif
-    
     QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
@@ -137,24 +108,25 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
         
         QSize s = svg.defaultSize() * 5;
         s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );
-        QRect r = QRect( rect().center() - QRect( QPoint(), s ).bottomRight() / 2, s );
+        QRect r = QRect( rect().center() - QRect( QPoint(), s ).center(), s );
 
         p.setOpacity( qreal(40)/255 );
         svg.render( &p, r );
-        return;
     }
-    
-    QTransform trans;
-    qreal const scale = qreal(height()) / m_cover.height();
-    trans.scale( scale, scale );
-    p.setTransform( trans );
+    else {
+        
+        QTransform trans;
+        qreal const scale = qreal(height()) / m_cover.height();
+        trans.scale( scale, scale );
+        p.setTransform( trans );
 
-    QPointF f = trans.inverted().map( QPointF( width(), 0 ) );
+        QPointF f = trans.inverted().map( QPointF( width(), 0 ) );
 
-    f.rx() -= m_cover.width();
-    f.rx() /= 2;
+        f.rx() -= m_cover.width();
+        f.rx() /= 2;
 
-    p.drawImage( f, m_cover );
+        p.drawImage( f, m_cover );
+    }
 }
 
 
