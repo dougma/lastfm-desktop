@@ -43,6 +43,7 @@ private slots:
 private:
     class QMenu* m_menu;
     QStringList m_newTags;
+	WsReply *m_currentReply;
 
 private slots:
     void showMenu( const QPoint& );

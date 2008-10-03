@@ -119,6 +119,7 @@ void
 TagListWidget::setTagsRequest( WsReply* r )
 {
     clear();
+	m_currentReply = r;
     connect( (QObject*)r, SIGNAL(finished( WsReply* )), SLOT(onTagsRequestFinished( WsReply* )) );
 }
 
@@ -126,14 +127,17 @@ TagListWidget::setTagsRequest( WsReply* r )
 void
 TagListWidget::onTagsRequestFinished( WsReply* r )
 {    
-    foreach (WeightedString tag, Tag::list( r ))
-    {
-        QTreeWidgetItem *entry = new QTreeWidgetItem;
-        entry->setText( 0, tag );
-        // I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
-        entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
-        addTopLevelItem( entry );
-    }
+	if (m_currentReply == r)
+	{
+		foreach (WeightedString tag, Tag::list( r ))
+		{
+			QTreeWidgetItem *entry = new QTreeWidgetItem;
+			entry->setText( 0, tag );
+			// I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
+			entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
+			addTopLevelItem( entry );
+		}
+	}
 }
 
 

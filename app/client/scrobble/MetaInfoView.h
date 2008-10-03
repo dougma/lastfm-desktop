@@ -32,6 +32,7 @@ namespace Unicorn
 }
 
 
+
 class Bio : public QWebView
 {
 	Q_OBJECT
@@ -63,6 +64,10 @@ class MetaInfoView : public QLabel
 	ui;
 	
 	Track m_track;
+
+	// the most recent requests (so we don't act on delayed replies)
+	WsReply *m_artistInfoReply;
+	WsReply *m_artistSimilarReply;
 	
 public:
     MetaInfoView();
@@ -73,6 +78,7 @@ private slots:
     void onTrackSpooled( const Track& );
     void onStateChanged( State );
     void onLinkClicked( const class QUrl& );
+
 	void onArtistInfo( WsReply* );
 	void onSimilar( WsReply* );
 

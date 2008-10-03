@@ -142,9 +142,10 @@ MetaInfoView::onTrackSpooled( const Track& t )
 	{
 		ui.bio->clearContent();
 		ui.similar->clear();
-		connect( t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
-		connect( t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
-		connect(t.getTopTags(), SIGNAL(finished(WsReply*)), ui.trackTags, SLOT(onTagsRequestFinished(WsReply*)) );
+		connect( m_artistInfoReply = t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
+		connect( m_artistSimilarReply = t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
+
+		ui.trackTags->setTagsRequest( t.getTopTags() );
 	}
     m_track = t;
 }
@@ -153,10 +154,8 @@ MetaInfoView::onTrackSpooled( const Track& t )
 void 
 MetaInfoView::onArtistInfo(WsReply *reply)
 {
-	CoreDomElement r = reply->lfm();
-	bool bSameArtist = true;		// todo: check this properly
-	if (bSameArtist) {
-		ui.bio->setContent(r);
+	if (m_artistInfoReply == reply) {
+		ui.bio->setContent(reply->lfm());
 	}
 }
 
@@ -164,8 +163,7 @@ MetaInfoView::onArtistInfo(WsReply *reply)
 void 
 MetaInfoView::onSimilar(WsReply *reply)
 {
-	bool bSameArtist = true;		// todo: check this properly
-	if (bSameArtist) {
+	if (m_artistSimilarReply == reply) {
 		ui.similar->setContent(reply->lfm());
 	}
 }
