@@ -234,18 +234,19 @@ MainWindow::setupCentralWidget()
     UnicornWidget::paintItBlack( centralWidget() );
     centralWidget()->setAutoFillBackground( true );
 
-#ifdef Q_WS_MAC
     QPalette p = centralWidget()->palette();
     p.setColor( QPalette::Text, Qt::white );
     p.setColor( QPalette::WindowText, Qt::white );
-    ui.text->setPalette( p ); //Qt bug, it should inherit! TODO report bug
+    ui.text->setPalette( p );
+
+#ifdef Q_WS_MAC
     ui.text->setAttribute( Qt::WA_MacSmallSize );
     
-    //Qt-mac bug, again
+    // Qt-mac sucks for some reason
     foreach (QLabel* l, indicator->findChildren<QLabel*>())
         l->setPalette( p );
 #else
-    Q_UNUSED( indicator );
+    indicator->setPalette( p );
 #endif
 }
 
