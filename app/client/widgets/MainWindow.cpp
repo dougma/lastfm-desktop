@@ -20,16 +20,17 @@
 #include "MainWindow.h"
 #include "App.h"
 #include "PlayerManager.h"
-#include "MainWindow/PrettyCoverWidget.h"
+#include "MainWindow/CogButtonPopup.h"
+#include "MainWindow/Launcher.h"
 #include "MainWindow/MediaPlayerIndicator.h"
-#include "MainWindow/MultiButtonPopup.h"
+#include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "Settings.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
-#include "widgets/Launcher.h"
+
 #include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
@@ -191,7 +192,7 @@ MainWindow::setupCentralWidget()
 	QVBoxLayout* v = new QVBoxLayout( centralWidget() );
 	v->addWidget( indicator = new MediaPlayerIndicator );
 	v->addSpacing( 10 );
-    v->addWidget( ui.cover = new TrackInfoWidget );
+    v->addWidget( ui.cover = new PrettyCoverWidget );
     v->setStretchFactor( ui.cover, 1 );
     v->setContentsMargins( 9, 9, 9, 0 );
     v->setSpacing( 0 );
@@ -252,7 +253,7 @@ MainWindow::setupCentralWidget()
 void
 MainWindow::showCogMenu()
 {
-    (new MultiButtonPopup( centralWidget()->sizeHint().width(), centralWidget() ))->show();
+    (new CogButtonPopup( centralWidget()->sizeHint().width(), centralWidget() ))->show();
 }
 
 

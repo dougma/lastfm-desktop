@@ -17,45 +17,32 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TRACK_INFO_WIDGET_H
-#define TRACK_INFO_WIDGET_H
+#ifndef MULTI_BUTTON_POPUP_H
+#define MULTI_BUTTON_POPUP_H
 
-#include <QImage>
 #include <QWidget>
-#include "lib/types/Track.h"
 
 
-class PrettyCoverWidget : public QWidget
+class CogButtonPopup : public QWidget
 {
     Q_OBJECT
-
-public:
-    PrettyCoverWidget();
-
-	void setTrack( const Track& );
-	void clear();
-	
-	struct Ui
-	{
-		class SpinnerLabel* spinner;
-	};
-	
-	Ui ui;
     
-    virtual QSize sizeHInt() const {
-        return QSize( 280, 298 );
+    class QTimeLine* m_timeline;
+    
+public:
+    CogButtonPopup( const int width, QWidget* parent );
+    
+public slots:
+    void move( int i )
+    {
+        QWidget::move( x(), parentWidget()->height() - i );
     }
-	
-private slots:
-	void onAlbumImageDownloaded( const QByteArray& );
+    
+    void praise();
+    void bye();
 
 private:
-    void paintEvent( QPaintEvent* );
-
-    QImage m_cover;
-	Track m_track;
-	
-	static QImage addReflection( const QImage& );
+    virtual void paintEvent( QPaintEvent* );
 };
 
-#endif //TRACK_INFO_WIDGET_H
+#endif

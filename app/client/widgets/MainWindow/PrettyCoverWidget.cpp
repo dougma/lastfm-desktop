@@ -23,7 +23,7 @@
 #include <QtGui>
 
 
-TrackInfoWidget::TrackInfoWidget()
+PrettyCoverWidget::PrettyCoverWidget()
 {
 	ui.spinner = new SpinnerLabel( this );
 	ui.spinner->hide();
@@ -33,7 +33,7 @@ TrackInfoWidget::TrackInfoWidget()
 
 
 void
-TrackInfoWidget::clear()
+PrettyCoverWidget::clear()
 {
 	m_track = Track();
 	ui.spinner->hide();
@@ -44,7 +44,7 @@ TrackInfoWidget::clear()
 
 
 void
-TrackInfoWidget::setTrack( const Track& t )
+PrettyCoverWidget::setTrack( const Track& t )
 {
 	//TODO for scrobbled tracks we should get the artwork out of the track
 	if (m_track.album() != t.album())
@@ -65,7 +65,7 @@ TrackInfoWidget::setTrack( const Track& t )
 
 
 void
-TrackInfoWidget::onAlbumImageDownloaded( const QByteArray& data )
+PrettyCoverWidget::onAlbumImageDownloaded( const QByteArray& data )
 {
     m_cover.loadFromData( data );
     qDebug() << "Image dimensions:" << m_cover.size();
@@ -80,7 +80,7 @@ TrackInfoWidget::onAlbumImageDownloaded( const QByteArray& data )
 
 
 void
-TrackInfoWidget::paintEvent( QPaintEvent* e )
+PrettyCoverWidget::paintEvent( QPaintEvent* e )
 {
     QPainter p( this );
     p.setClipRect( e->rect() );
@@ -119,7 +119,7 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
 
 
 QImage //static
-TrackInfoWidget::addReflection( const QImage &in )
+PrettyCoverWidget::addReflection( const QImage &in )
 {
     const uint H = 5 * in.height() / 7;
 	

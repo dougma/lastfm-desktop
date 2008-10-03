@@ -46,7 +46,7 @@ public:
         class Firehose* firehose;
 		class ImageButton* cog;        
         class QLabel* text;
-		class TrackInfoWidget* cover;
+		class PrettyCoverWidget* cover;
     } ui;
 
 protected:
