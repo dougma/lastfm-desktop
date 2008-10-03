@@ -135,7 +135,14 @@ WsReply::onFinished()
         }
     }
 
-    emit finished( this );
+    try
+    {
+        emit finished( this );
+    }
+    catch (CoreDomElement::Exception& e)
+    {
+        qWarning() << "Naughty programmer! Unhandled exception:" << e;
+    }
 
     // prevents memory leaks, but I don't like it anyway
     deleteLater();
