@@ -37,7 +37,7 @@ ImageButton::ImageButton( const QString& path )
 {   
     setPixmap( path );
     
-    QPixmap disabled( path.left( path.length() - 4 ) + "_inactive.png" );
+    QPixmap disabled( path.left( path.length() - 6 ) + "disabled.png" );
     if (!disabled.isNull())
     {
         QIcon i = icon();

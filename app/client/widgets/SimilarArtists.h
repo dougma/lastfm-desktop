@@ -17,8 +17,8 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#ifndef SIMILARARTISTS_H
-#define SIMILARARTISTS_H
+#ifndef SIMILAR_ARTISTS_H
+#define SIMILAR_ARTISTS_H
 
 #include <QAbstractItemModel>
 #include <QList>

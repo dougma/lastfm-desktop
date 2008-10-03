@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "TrackInfoWidget.h"
+#include "PrettyCoverWidget.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QSvgRenderer>
 #include <QtGui>
@@ -38,19 +38,7 @@ TrackInfoWidget::clear()
 	m_track = Track();
 	ui.spinner->hide();
 	qDeleteAll( findChildren<AlbumImageFetcher*>() );   
-#if 0
-    QSvgRenderer svg( QString(":/MainWindow/as.svg") );
-    QSize s = svg.defaultSize() * 5;
-    m_cover = QImage( s * 5, QImage::Format_ARGB32_Premultiplied );
-    QPainter p( &m_cover );
-    p.setOpacity( qreal(40)/255 );
-
-    svg.render( &p );
-    p.end();
-    m_cover = addReflection( m_cover );
-#else 
     m_cover = QImage();
-#endif
     update();
 }
 
@@ -104,7 +92,7 @@ TrackInfoWidget::paintEvent( QPaintEvent* e )
         if (!m_track.isNull())
             return;
         
-        QSvgRenderer svg( QString(":/MainWindow/as.svg") );
+        QSvgRenderer svg( QString(":/lastfm/as.svg") );
         
         QSize s = svg.defaultSize() * 5;
         s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );

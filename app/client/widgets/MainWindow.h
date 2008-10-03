@@ -42,14 +42,12 @@ public:
 	struct Ui : ::Ui::MainWindow
 	{
 		class Launcher* launcher;
-		class QStackedWidget* stack;
-		class ScrobbleViewWidget* scrobbler;
-		class FriendsTuner* friendTuner;
 		class PrimaryBucket* primaryBucket;
         class Firehose* firehose;
-		};
-	
-	Ui ui;
+		class ImageButton* cog;        
+        class QLabel* text;
+		class TrackInfoWidget* cover;
+    } ui;
 
 protected:
 #ifdef WIN32
@@ -63,6 +61,7 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showMetaInfoView();
+    void showCogMenu();
     void closeActiveWindow();
 
 signals:
@@ -73,10 +72,11 @@ private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
 	void onUserGetInfoReturn( class WsReply* );
     void onTrackSpooled( const Track& );
+    void onStateChanged( State );
     
 private:
     void setupUi();
-	void addTab( QWidget* w, const QString& t );
+    void setupCentralWidget();
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );

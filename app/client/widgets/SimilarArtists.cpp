@@ -57,7 +57,7 @@ SimilarArtists::SimilarArtists()
 	view->setPalette( p );
 	view->setAutoFillBackground( true );
 
-	connect(view, SIGNAL(doubleClicked(const QModelIndex &)), this, SIGNAL(onDoubleClicked(const QModelIndex &)) );
+	connect( view, SIGNAL(doubleClicked( QModelIndex )), SLOT(onDoubleClicked( QModelIndex )) );
 }
 
 
@@ -78,23 +78,23 @@ SimilarArtists::clear()
 void 
 SimilarArtists::setContent(const class CoreDomElement &e)
 {
-	m_model->setContent(e);
+	m_model->setContent( e );
 }
 
 ///////////////////////////////////////////
 
 
 SimilarArtistsModel::SimilarArtistsModel(QObject *parent)
-: QAbstractItemModel(parent)
-, m_wam(0)
-{
-}
+                   : QAbstractItemModel(parent)
+                   , m_wam(0)
+{}
 
 
 SimilarArtistsModel::~SimilarArtistsModel()
 {
 	delete m_wam;
 }
+
 
 void
 SimilarArtistsModel::clear()
@@ -111,9 +111,6 @@ SimilarArtistsModel::clear()
 	}
 }
 
-#ifndef min
-#define min(a, b) ((a)<(b)?(a):(b))
-#endif
 
 void
 SimilarArtistsModel::setContent(const CoreDomElement &lfm)
@@ -124,7 +121,7 @@ SimilarArtistsModel::setContent(const CoreDomElement &lfm)
 
 	if (!artists.isEmpty()) {
 		int limit = 20;
-		beginInsertRows(QModelIndex(), 0, min(limit, artists.count()) - 1 );
+		beginInsertRows(QModelIndex(), 0, qMin( limit, artists.count()) - 1 );
 		foreach (CoreDomElement a, artists) {
 			SimilarArtistsItem *item = new SimilarArtistsItem(a, m_wam);
 			connect( item, SIGNAL(imageAvailable()), SLOT(onImageAvailable()) );
@@ -136,6 +133,7 @@ SimilarArtistsModel::setContent(const CoreDomElement &lfm)
 		endInsertRows();
 	}
 }
+
 
 void
 SimilarArtistsModel::onImageAvailable()

@@ -27,18 +27,21 @@
 class NowPlayingTuner : public QWidget
 {
 	Q_OBJECT
-	
+
 public:
 	NowPlayingTuner();
-	
+
 private:
 	Ui::NowPlayingTuner ui;
-	
+
 	/** Note the QListWidget must have a StationDelegate class set as the
 	  * delegate otherwise this will break. Should probably fix this at some
       * point. */
 	void addWeightedStringsToList( WeightedStringList stringList, QListWidget* list );
-	
+
+signals:
+    void tune( const class RadioStation& );
+
 private slots:
     void onTrackSpooled( const class Track& );
 	

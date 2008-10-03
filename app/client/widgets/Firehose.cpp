@@ -49,7 +49,9 @@ Firehose::Firehose()
     connect( mapper, SIGNAL(mapped( QString )), model, SLOT(setNozzle( QString )) );
     
     tabs->addTab( tr("Last.fm Staff") );
-    tabs->addTab( tr("All your Friends") );    
+    tabs->addTab( tr("All your Friends") );
+    
+    //tabs->succombToTheDarkSide();
 #else
     model->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
     setMinimumWidth( 250 );
@@ -62,8 +64,6 @@ Firehose::Firehose()
     setPalette( p );
     view->setPalette( palette() );
     view->setAutoFillBackground( true );
-    
-//    tabs->succombToTheDarkSide();
 }
 
 

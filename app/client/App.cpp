@@ -47,7 +47,7 @@ class UnicornMacStyle : public QMacStyle
     {
         if (metric == PM_DockWidgetSeparatorExtent)
         {
-            return QPixmap( ":/MainWindow/dock_splitter_handle.png" ).height();
+            return QPixmap( ":/DockWindow/splitter/knob.png" ).height();
         }
         else
             return QMacStyle::pixelMetric( metric, option, widget );
@@ -59,8 +59,8 @@ class UnicornMacStyle : public QMacStyle
         {
             if (opt->state & QStyle::State_Horizontal)
             {
-                p->drawPixmap( opt->rect, QPixmap( ":/MainWindow/dock_splitter.png" ) );
-                QPixmap px( ":/MainWindow/dock_splitter_handle.png" );
+                p->drawPixmap( opt->rect, QPixmap( ":/DockWindow/splitter/base.png" ) );
+                QPixmap px( ":/DockWindow/splitter/knob.png" );
                 int const x = opt->rect.center().x() - px.width()/2;
                 p->drawPixmap( x, opt->rect.top(), px );
             }
@@ -86,7 +86,7 @@ class UnicornMacStyle : public QMacStyle
         {
             p->setPen( QColor( 35, 35, 35 ) );
             p->drawRect( opt->rect.adjusted( 0, 1, 0, 0 ) );
-            p->drawPixmap( opt->rect, QPixmap(":/MainWindow/dock_widget_title_bar.png") );
+            p->drawPixmap( opt->rect, QPixmap(":/DockWindow/title_bar.png") );
             p->setPen( QColor( 54, 53, 53 ) );
             QFont f = p->font();
             f.setBold( false );

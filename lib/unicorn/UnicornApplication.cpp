@@ -42,12 +42,9 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     Ws::ApiKey = "c8c7b163b11f92ef2d33ba6cd3c2c3c3";
 
     QCoreApplication::setOrganizationName( "Last.fm" );
-    QCoreApplication::setOrganizationDomain( "last.fm" );    
+    QCoreApplication::setOrganizationDomain( "last.fm" );
 
     CoreDir::mkpaths();
-
-	qDebug() << "test";
-	qDebug() << CoreDir::mainLog();
 	
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32

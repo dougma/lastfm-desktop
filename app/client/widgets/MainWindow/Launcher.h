@@ -37,8 +37,6 @@ public:
         LauncherButton* library;
         ScrobbleButton* scrobble;
     } ui;    
-    
-	virtual void paintEvent( QPaintEvent* );
 };
 
 

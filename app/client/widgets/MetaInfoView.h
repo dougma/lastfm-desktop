@@ -14,46 +14,69 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef SCROBBLE_INFO_WIDGET_H
-#define SCROBBLE_INFO_WIDGET_H
-
+#include <QLabel>
+#include <QWebView>
 #include "PlayerState.h"
-#include <QWidget>
-#include <QAction>
+#include "lib/types/Track.h"
+
+namespace Unicorn 
+{
+	class TabWidget;
+}
 
 
-class ScrobbleInfoWidget : public QWidget
+class Bio : public QWebView
 {
 	Q_OBJECT
-	
+
 public:
-	ScrobbleInfoWidget();
-	
-	virtual QSize sizeHint() const { return QSize( 362, 326 ); }
-	virtual void paintEvent( class QPaintEvent* );
-	
-	//Most of the ui should only be touched by the Widget itself
-	//however the actionbar is created by the window so it can
-	//share QActions for use in the menus etc.
-	struct 
-	{
-		friend class ScrobbleInfoWidget;
-		class QWidget* actionbar;
-	
-	private:
-        class QLabel* text;
-		class TrackInfoWidget* cover;
-		class ScrobbleProgressBar* progress;
-		class MediaPlayerIndicator* playerIndicator;
-	} 
-	ui;
-	
+	Bio(QWidget *parent = 0);
+	void clearContent();
+	void setContent(const class CoreDomElement&);
+
 private slots:
-    void onTrackSpooled( const class Track& );
-    void onStateChanged( State );
+	void onLinkClicked(const QUrl&);
+
+private:
+	QString cssPath();
 };
 
-#endif //SCROBBLE_INFO_WIDGET_H
+
+class MetaInfoView : public QLabel
+{
+    Q_OBJECT
+	
+	struct
+	{
+		Unicorn::TabWidget* infoTabs;
+		class Bio* bio;
+		class TagListWidget* trackTags;
+		class SimilarArtists* similar;
+	}
+	ui;
+	
+	Track m_track;
+
+	// the most recent requests (so we don't act on delayed replies)
+	WsReply *m_artistInfoReply;
+	WsReply *m_artistSimilarReply;
+	
+public:
+    MetaInfoView();
+    
+    virtual QSize sizeHint() const;
+
+private slots:
+    void onTrackSpooled( const Track& );
+    void onStateChanged( State );
+    void onLinkClicked( const class QUrl& );
+
+	void onArtistInfo( WsReply* );
+	void onSimilar( WsReply* );
+
+private:
+    QString cssPath();
+};

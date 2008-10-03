@@ -46,7 +46,7 @@ class SpinnerLabel : public QLabel
 public:
     SpinnerLabel( QWidget* parent = 0 ) : QLabel( parent )
     {
-        setMovie( m_movie = new QMovie( ":/spinner.mng" ) );
+        setMovie( m_movie = new QMovie( ":/lastfm/spinner.mng" ) );
         m_movie->setParent( this );
     }
 };

@@ -1,36 +1,39 @@
 <RCC>
   <qresource>
-    <file>MainWindow/unlove.png</file>
-    <file>MainWindow/ban_inactive.png</file>
-    <file>MainWindow/cog_button.png</file>
-    <file>MainWindow/cog_button_inactive.png</file>
-    <file>MainWindow/love_inactive.png</file>
-    <file>MainWindow/share_inactive.png</file>
-    <file>MainWindow/tag_inactive.png</file>
-    <file>MainWindow/ban.png</file>
-    <file>MainWindow/love.png</file>
-    <file>MainWindow/share.png</file>
-    <file>MainWindow/tag.png</file>
-    <file>MainWindow/as.svg</file>
-    <file>MainWindow/launcher_button_left_pressed.png</file>
-    <file>MainWindow/launcher_button_left_rest.png</file>
-    <file>MainWindow/launcher_button_centre_pressed.png</file>
-    <file>MainWindow/launcher_button_centre_rest.png</file>
-    <file>MainWindow/launcher_button_right_pressed.png</file>
-    <file>MainWindow/launcher_button_right_rest.png</file>
-    <file>MainWindow/friends_on.png</file>
-    <file>MainWindow/friends_off.png</file>
-    <file>MainWindow/radio_on.png</file>
-    <file>MainWindow/radio_off.png</file>
-    <file>MainWindow/library_on.png</file>
-    <file>MainWindow/library_off.png</file>
-    <file>MainWindow/info_on.png</file>
-    <file>MainWindow/info_off.png</file>
-    <file>MainWindow/dock_widget_title_bar.png</file>
-    <file>MainWindow/dock_tab_unselected.png</file>
-    <file>MainWindow/dock_tab_selected.png</file>
-    <file>MainWindow/dock_splitter.png</file>
-    <file>MainWindow/dock_splitter_handle.png</file>
+    <file>MainWindow/button/love/checked.png</file>
+    <file>MainWindow/button/ban/disabled.png</file>
+    <file>MainWindow/button/cog/up.png</file>
+    <file>MainWindow/button/cog/disabled.png</file>
+    <file>MainWindow/button/love/disabled.png</file>
+    <file>MainWindow/button/share/disabled.png</file>
+    <file>MainWindow/button/tag/disabled.png</file>
+    <file>MainWindow/button/ban/up.png</file>
+    <file>MainWindow/button/love/up.png</file>
+    <file>MainWindow/button/share/up.png</file>
+    <file>MainWindow/button/tag/up.png</file>
+  </qresource>
+  <qresource>
+    <file>DockWindow/title_bar.png</file>
+    <file>DockWindow/tab/inactive.png</file>
+    <file>DockWindow/tab/active.png</file>
+    <file>DockWindow/splitter/base.png</file>
+    <file>DockWindow/splitter/knob.png</file>
+  </qresource>
+  <qresource>
+    <file>BottomBar/button/left/down.png</file>
+    <file>BottomBar/button/left/up.png</file>
+    <file>BottomBar/button/middle/down.png</file>
+    <file>BottomBar/button/middle/up.png</file>
+    <file>BottomBar/button/right/down.png</file>
+    <file>BottomBar/button/right/up.png</file>
+    <file>BottomBar/icon/friends/on.png</file>
+    <file>BottomBar/icon/friends/off.png</file>
+    <file>BottomBar/icon/info/on.png</file>
+    <file>BottomBar/icon/info/off.png</file>
+    <file>BottomBar/icon/library/on.png</file>
+    <file>BottomBar/icon/library/off.png</file>
+    <file>BottomBar/icon/radio/on.png</file>
+    <file>BottomBar/icon/radio/off.png</file>
   </qresource>
   <qresource>
       <file>SettingsDialog/account.png</file>
@@ -41,8 +44,8 @@
   </qresource>
   <qresource>
       <file>ScrobbleButton.mng</file>
-      <file>ScrobbleButton/scrobbling_on.png</file>
-      <file>ScrobbleButton/scrobbling_off.png</file>
-      <file>ScrobbleButton/cant_scrobble.png</file>
+      <file>ScrobbleButton/on.png</file>
+      <file>ScrobbleButton/off.png</file>
+      <file>ScrobbleButton/SADFACE.png</file>
   </qresource>
 </RCC>

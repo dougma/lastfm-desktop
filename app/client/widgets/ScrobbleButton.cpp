@@ -51,13 +51,13 @@ ScrobbleButton::paintEvent( QPaintEvent* )
     QPixmap p;
     
     if (!isChecked()) {
-        p = QPixmap( ":/ScrobbleButton/scrobbling_off.png" );
+        p = QPixmap( ":/ScrobbleButton/off.png" );
     }
     else if (m_track.isNull()) { //no track playing
-        p = QPixmap( ":/ScrobbleButton/scrobbling_on.png" );
+        p = QPixmap( ":/ScrobbleButton/on.png" );
     }
     else if (!m_track.isValid()) { // not a valid scrobble that is
-        p = QPixmap( ":/ScrobbleButton/cant_scrobble.png" );
+        p = QPixmap( ":/ScrobbleButton/SADFACE.png" );
     }
     else
         p = m_movie->currentPixmap();

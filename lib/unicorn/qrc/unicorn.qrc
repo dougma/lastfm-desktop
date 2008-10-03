@@ -1,5 +1,6 @@
  <!DOCTYPE RCC><RCC version="1.0">
- <qresource>
+ <qresource prefix="lastfm">
      <file>spinner.mng</file>
+     <file>as.svg</file>
  </qresource>
  </RCC> 

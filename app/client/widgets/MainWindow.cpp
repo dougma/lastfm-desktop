@@ -20,29 +20,29 @@
 #include "MainWindow.h"
 #include "App.h"
 #include "PlayerManager.h"
+#include "MainWindow/PrettyCoverWidget.h"
+#include "MainWindow/MediaPlayerIndicator.h"
+#include "MainWindow/MultiButtonPopup.h"
+#include "radio/RadioWidget.h"
+#include "radio/buckets/PrimaryBucket.h"
+#include "Settings.h"
 #include "widgets/DiagnosticsDialog.h"
-#include "scrobble/ScrobbleViewWidget.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
 #include "widgets/Launcher.h"
+#include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
-#include "radio/RadioWidget.h"
-#include "radio/FriendsTuner.h"
-#include "radio/buckets/PrimaryBucket.h"
-#include "scrobble/MetaInfoView.h"
-#include "Settings.h"
 #include "version.h"
-#include "the/radio.h"
 #include "lib/types/User.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/ws/WsReply.h"
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDockWidget>
 #include <QShortcut>
-#include <QStackedWidget>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -70,11 +70,11 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
-    connect( ui.viewTuner, SIGNAL(triggered()), SLOT(showTuner()) );
+    connect( ui.cog, SIGNAL(clicked()), SLOT(showCogMenu()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
-    connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(showNowPlaying()) );
-    
+	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
+
     // set up window in default state
     onTrackSpooled( Track() );
 }
@@ -91,7 +91,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( true );
         ui.love->setEnabled( true );
 		ui.love->setChecked( false );
-        ui.scrobbler->ui.cog->setEnabled( true );
+        ui.cog->setEnabled( true );
         
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
@@ -101,7 +101,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
-        ui.scrobbler->ui.cog->setEnabled( false );
+        ui.cog->setEnabled( false );
     }
         
     #ifndef Q_WS_MAC
@@ -111,6 +111,32 @@ MainWindow::onTrackSpooled( const Track& t )
                 ? qApp->applicationName()
                 : t.toString() );
     #endif
+
+    if (!t.isNull())
+    {
+        //TODO handle bad data! eg no artist, no track
+        ui.text->setText( "<div style='margin-bottom:3px'>" + t.artist() + "</div><div><b>" + t.title() );
+        ui.cover->setTrack( t );
+    }
+    else {
+        ui.text->clear();
+        ui.cover->clear();        
+    }    
+}
+
+
+void
+MainWindow::onStateChanged( State s )
+{
+	switch (s)
+	{            
+        case TuningIn:
+			ui.cover->ui.spinner->show();
+			break;
+            
+        default:
+            break;
+	}
 }
 
 
@@ -122,17 +148,11 @@ MainWindow::setupUi()
     AuthenticatedUser user;
 	ui.account->setTitle( user );
    	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
-
+    
+	setupCentralWidget();
+    setDockOptions( AnimatedDocks | AllowNestedDocks );
     /** hah! works :) But I'm sure is hideously dangerous, etc. */
     setStatusBar( (QStatusBar*) (ui.launcher = new Launcher) );
-    
-	setCentralWidget( ui.scrobbler = new ScrobbleViewWidget );
-    setDockOptions( AnimatedDocks | AllowNestedDocks );
-
-    ui.scrobbler->ui.love->setAction( ui.love );
-    ui.scrobbler->ui.ban->setAction( ui.ban );
-    ui.scrobbler->ui.tag->setAction( ui.tag );
-    ui.scrobbler->ui.share->setAction( ui.share );
 
     QDockWidget* dw;
     dw = new QDockWidget;
@@ -157,6 +177,82 @@ MainWindow::setupUi()
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif
+}
+
+
+void
+MainWindow::setupCentralWidget()
+{    
+    QWidget* actionbar, *indicator;
+    ImageButton* love, *ban, *share, *tag;
+
+    setCentralWidget( new QWidget );
+    
+	QVBoxLayout* v = new QVBoxLayout( centralWidget() );
+	v->addWidget( indicator = new MediaPlayerIndicator );
+	v->addSpacing( 10 );
+    v->addWidget( ui.cover = new TrackInfoWidget );
+    v->setStretchFactor( ui.cover, 1 );
+    v->setContentsMargins( 9, 9, 9, 0 );
+    v->setSpacing( 0 );
+    
+    QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
+	v2->addStretch();
+    v2->addWidget( ui.text = new QLabel );
+	v2->addSpacing( 4 );
+    v2->addWidget( actionbar = new QWidget );
+	v2->addSpacing( 5 );
+    v2->setAlignment( actionbar, Qt::AlignCenter );    
+    v2->setMargin( 0 );
+    v2->setSpacing( 0 );
+
+	QHBoxLayout* h = new QHBoxLayout( actionbar );
+    h->addWidget( love = new ImageButton( ":/MainWindow/button/love/up.png" ) );
+	h->addWidget( ban = new ImageButton( ":/MainWindow/button/ban/up.png" ) );
+	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/button/cog/up.png") );
+    h->addWidget( tag = new ImageButton( ":/MainWindow/button/tag/up.png" ) );
+    h->addWidget( share = new ImageButton( ":/MainWindow/button/share/up.png" ) );   
+	h->setSpacing( 24 );
+    h->setSizeConstraint( QLayout::SetFixedSize );
+    
+    ban->moveIcon( 0, 1, QIcon::Active );
+    ban->setAction( ui.ban );
+    tag->moveIcon( 0, 1, QIcon::Active );
+    tag->setAction( ui.tag );
+    love->moveIcon( 0, 1, QIcon::Active );
+    love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
+	love->setCheckable( true );
+    love->setAction( ui.love );
+    share->moveIcon( 0, 1, QIcon::Active );
+    share->setAction( ui.share );
+
+    ui.text->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
+    ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    ui.text->setTextFormat( Qt::RichText );            
+    
+    UnicornWidget::paintItBlack( centralWidget() );
+    centralWidget()->setAutoFillBackground( true );
+
+#ifdef Q_WS_MAC
+    QPalette p = centralWidget()->palette();
+    p.setColor( QPalette::Text, Qt::white );
+    p.setColor( QPalette::WindowText, Qt::white );
+    ui.text->setPalette( p ); //Qt bug, it should inherit! TODO report bug
+    ui.text->setAttribute( Qt::WA_MacSmallSize );
+    
+    //Qt-mac bug, again
+    foreach (QLabel* l, indicator->findChildren<QLabel*>())
+        l->setPalette( p );
+#else
+    Q_UNUSED( indicator );
+#endif
+}
+
+
+void
+MainWindow::showCogMenu()
+{
+    (new MultiButtonPopup( centralWidget()->sizeHint().width(), centralWidget() ))->show();
 }
 
 

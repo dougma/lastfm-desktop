@@ -36,47 +36,43 @@ Launcher::Launcher()
     h->addWidget( ui.scrobble = new ScrobbleButton );
     h->setSpacing( 0 );
     h->setContentsMargins( 8, 3, 4, 4 );
-	
-	connect( ui.radio, SIGNAL( clicked()), SLOT( onRadioToggle()));
+    
+    setFixedHeight( sizeHint().height() );
+
 	ui.radio->setCheckable( true );
-	ui.radio->setBackgroundPixmap( ":/MainWindow/launcher_button_left_rest.png" );
-	ui.radio->setBackgroundPixmap( ":/MainWindow/launcher_button_left_pressed.png", QIcon::Active );
-	ui.radio->setPixmap( ":/MainWindow/radio_off.png" );
-	ui.radio->setPixmap( ":/MainWindow/radio_on.png", QIcon::On );
+	ui.radio->setBackgroundPixmap( ":/BottomBar/button/left/up.png" );
+	ui.radio->setBackgroundPixmap( ":/BottomBar/button/left/down.png", QIcon::Active );
+	ui.radio->setPixmap( ":/BottomBar/icon/radio/off.png" );
+	ui.radio->setPixmap( ":/BottomBar/icon/radio/on.png", QIcon::On );
 	ui.radio->moveIcon( 1, 0 );
 	ui.radio->moveIcon( 1, 1, QIcon::Active );
 	
 	ui.friends->setCheckable( true );
-	ui.friends->setBackgroundPixmap( ":/MainWindow/launcher_button_centre_rest.png" );
-	ui.friends->setBackgroundPixmap( ":/MainWindow/launcher_button_centre_pressed.png", QIcon::Active );
-	ui.friends->setPixmap( ":/MainWindow/friends_off.png" );
-	ui.friends->setPixmap( ":/MainWindow/friends_on.png", QIcon::On );
+	ui.friends->setBackgroundPixmap( ":/BottomBar/button/middle/up.png" );
+	ui.friends->setBackgroundPixmap( ":/BottomBar/button/middle/down.png", QIcon::Active );
+	ui.friends->setPixmap( ":/BottomBar/icon/friends/off.png" );
+	ui.friends->setPixmap( ":/BottomBar/icon/friends/on.png", QIcon::On );
 	ui.friends->moveIcon( 0, -1 );
 	ui.friends->moveIcon( 0, 1, QIcon::Active );
 	
 	ui.library->setCheckable( true );
-	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_rest.png" );
-	ui.library->setBackgroundPixmap( ":/MainWindow/launcher_button_right_pressed.png", QIcon::Active );
-	ui.library->setPixmap( ":/MainWindow/info_off.png" );
-	ui.library->setPixmap( ":/MainWindow/info_on.png", QIcon::On );
+	ui.library->setBackgroundPixmap( ":/BottomBar/button/right/up.png" );
+	ui.library->setBackgroundPixmap( ":/BottomBar/button/right/down.png", QIcon::Active );
+	ui.library->setPixmap( ":/BottomBar/icon/info/off.png" );
+	ui.library->setPixmap( ":/BottomBar/icon/info/on.png", QIcon::On );
 	ui.library->moveIcon( -1, 0 );
 	ui.library->moveIcon( -1, 1, QIcon::Active );
-}
 
+	QLinearGradient g;
+	g.setColorAt( 0.0f, QColor( 47, 47, 47 ));
+	g.setColorAt( 1.0f, QColor( 26, 26, 26 ));
+	g.setStart( 0, 0 );
+	g.setFinalStop( 0, height() );
 
-void
-Launcher::paintEvent( QPaintEvent* )
-{
-	QLinearGradient gradient;
-	gradient.setColorAt( 0.0f, QColor( 47, 47, 47 ));
-	gradient.setColorAt( 1.0f, QColor( 26, 26, 26 ));
-	
-	gradient.setStart(rect().width()/2, rect().top());
-	gradient.setFinalStop(rect().width()/2, rect().bottom());
-	
-	QPainter p( this );
-	
-	p.fillRect( rect(), gradient);
+    QPalette p = palette();
+    p.setBrush( QPalette::Window, g );
+    setPalette( p );
+    setAutoFillBackground( true );
 }
 
 

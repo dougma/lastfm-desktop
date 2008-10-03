@@ -18,9 +18,6 @@
  ***************************************************************************/
 
 #include "MetaInfoView.h"
-#include "lib/core/CoreUrl.h"
-#include "lib/ws/WsAccessManager.h"
-#include <QAuthenticator>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QTemporaryFile>
@@ -28,6 +25,9 @@
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/TagListWidget.h"
 #include "widgets/SimilarArtists.h"
+#include "lib/core/CoreUrl.h"
+#include "lib/core/CoreDomElement.h"
+#include "lib/ws/WsAccessManager.h"
 
 
 Bio::Bio(QWidget *parent)
@@ -38,20 +38,24 @@ Bio::Bio(QWidget *parent)
 	connect(this, SIGNAL(linkClicked(const QUrl &)), SLOT(onLinkClicked(const QUrl &)) );
 }
 
-void Bio::clearContent()
+
+void
+Bio::clearContent()
 {
 	setHtml("");
 }
 
+
 void 
-Bio::setContent(CoreDomElement &lfm)
+Bio::setContent( const CoreDomElement &lfm )
 {
 #define ARTIST_CLASS "artist"
 #define PLAYS_CLASS "plays"
 #define CONTENT_CLASS "content"
 #define EDITME_CLASS "editme"
 
-	try {
+	try 
+    {
 		CoreDomElement a = lfm["artist"];
 		QString name = a["name"].text();
 		QString url = a["url"].text();
@@ -68,13 +72,14 @@ Bio::setContent(CoreDomElement &lfm)
 			"<a class=\""EDITME_CLASS"\" href=\"" << url << "/+wiki/edit" << "\"><img src= />" << editmessage << "</a>";
 		setHtml(html);
 	}
-	catch (...)
+	catch (CoreDomElement::Exception& e)
 	{
-		qDebug() << "unhandled exception processing artist.getInfo response";
+		qWarning() << e;
 	}
 }
 
-void 
+
+void
 Bio::onLinkClicked(const QUrl &url)
 {
 	QDesktopServices::openUrl(url);
@@ -141,6 +146,9 @@ MetaInfoView::MetaInfoView()
 void
 MetaInfoView::onTrackSpooled( const Track& t )
 {
+    if (t.isNull()) // null track means playback ended
+        return;
+    
 	if (t.artist() != m_track.artist())
 	{
 		// clear the ui and cancel the previous requests.
