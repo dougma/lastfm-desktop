@@ -99,7 +99,10 @@ Bio::cssPath()
 ///////////////////
 
 MetaInfoView::MetaInfoView() 
-            : QLabel(tr( "Play some music\nto start scrobbling.") )
+            : QLabel( tr("Play some music\nto start scrobbling.") )
+			, m_artistInfoReply( 0 )
+			, m_artistSimilarReply( 0 )
+
 {   
 	QVBoxLayout* v = new QVBoxLayout( this );
 	v->setSpacing( 0 );
@@ -140,11 +143,16 @@ MetaInfoView::onTrackSpooled( const Track& t )
 {
 	if (t.artist() != m_track.artist())
 	{
+		// clear the ui and cancel the previous requests.
 		ui.bio->clearContent();
 		ui.similar->clear();
+		delete m_artistInfoReply;
+		delete m_artistSimilarReply;
+		// issue the new requests and connect them up
 		connect( m_artistInfoReply = t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
 		connect( m_artistSimilarReply = t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
 
+		// TagListWidget internalises the pattern:
 		ui.trackTags->setTagsRequest( t.getTopTags() );
 	}
     m_track = t;
@@ -154,18 +162,16 @@ MetaInfoView::onTrackSpooled( const Track& t )
 void 
 MetaInfoView::onArtistInfo(WsReply *reply)
 {
-	if (m_artistInfoReply == reply) {
-		ui.bio->setContent(reply->lfm());
-	}
+	ui.bio->setContent(reply->lfm());
+	m_artistInfoReply = 0;
 }
 
 
 void 
 MetaInfoView::onSimilar(WsReply *reply)
 {
-	if (m_artistSimilarReply == reply) {
-		ui.similar->setContent(reply->lfm());
-	}
+	ui.similar->setContent(reply->lfm());
+	m_artistSimilarReply = 0;
 }
 
 

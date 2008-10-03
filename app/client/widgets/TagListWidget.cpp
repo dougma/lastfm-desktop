@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "lib/core/UnicornUtils.h"
 #include "lib/types/Tag.h"
+#include "lib/ws/WsReply.h"
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -31,6 +32,7 @@
 
 TagListWidget::TagListWidget( QWidget* parent ) 
              : QTreeWidget( parent )
+			 , m_currentReply( 0 )
 {
     setColumnCount( 2 );
     setRootIsDecorated( false );
@@ -119,6 +121,7 @@ void
 TagListWidget::setTagsRequest( WsReply* r )
 {
     clear();
+	delete m_currentReply;
 	m_currentReply = r;
     connect( (QObject*)r, SIGNAL(finished( WsReply* )), SLOT(onTagsRequestFinished( WsReply* )) );
 }
@@ -127,17 +130,15 @@ TagListWidget::setTagsRequest( WsReply* r )
 void
 TagListWidget::onTagsRequestFinished( WsReply* r )
 {    
-	if (m_currentReply == r)
+	foreach (WeightedString tag, Tag::list( r ))
 	{
-		foreach (WeightedString tag, Tag::list( r ))
-		{
-			QTreeWidgetItem *entry = new QTreeWidgetItem;
-			entry->setText( 0, tag );
-			// I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
-			entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
-			addTopLevelItem( entry );
-		}
+		QTreeWidgetItem *entry = new QTreeWidgetItem;
+		entry->setText( 0, tag );
+		// I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
+		entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
+		addTopLevelItem( entry );
 	}
+	m_currentReply = 0;
 }
 
 
