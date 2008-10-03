@@ -81,8 +81,8 @@ Unicorn::TabBar::tabRemoved( int i )
 void
 Unicorn::TabBar::succombToTheDarkSide()
 {
-    m_inactive = QPixmap(":/MainWindow/dock_tab_unselected.png");
-    m_active = QPixmap(":/MainWindow/dock_tab_selected.png");
+    m_inactive = QPixmap(":/DockWindow/tab/inactive.png");
+    m_active = QPixmap(":/DockWindow/tab/active.png");
     
     QPalette p = palette();
     p.setColor( QPalette::Active, QPalette::Text, Qt::white );
