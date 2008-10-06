@@ -21,37 +21,39 @@ done
 
 
 header "Configuring Last.fm"
-middle "Checking for qmake..."
 
-qmake-qt4 -v &> /dev/null
-if [[ $? == 127 ]]
-then
-    qmake -v &> /dev/null
-    if [[ $? == 0 ]]
-    then
-        QMAKE=qmake
-    fi
-else
-    QMAKE=qmake-qt4
-fi
+qCheck()
+{
+    while [ $# -gt 0 ]
+    do
+        $1 -v &> /dev/null
+        if [[ $? != 127 ]]
+        then
+            # valid qmake output
+            # QMake version 2.01a
+            # Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
 
-if [[ $? == 127 ]]
-then
-          ##########################################################################80-->
-	echo "Sorry, qmake was not found, is Qt4 installed?"
-	exit
-fi
+            middle "Checking if $1 is the right version..."
 
-middle "Checking the installed version of Qt is correct..."
+            min=4
+            $1 -v 2> /dev/null | grep -q "^Using Qt version 4.[$min-9]"
+            
+            if [[ $? == 0 ]]
+            then
+                QMAKE=$1
+            else
+                QMAKE='toolow'
+            fi
+        fi
+        shift
+    done
+}
 
-# valid qmake output
-# QMake version 2.01a
-# Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
 
-min=4
-$QMAKE -v 2> /dev/null | grep -q "^Using Qt version 4.[$min-9]"
+qCheck qmake qmake-qt4
 
-if [[ $? > 0 ]]
+
+if [[ $QMAKE == 'toolow' ]]
 then
 	      ##########################################################################80-->
 	echo "Your version of Qt seems to be too old, we require Qt 4.$min or above."
@@ -65,7 +67,11 @@ then
 	echo "Try typing the following, perhaps it will build for you :)"
 	echo
 	echo "	qmake -config release && make"
-	exit
+	exit 1
+elif [[ $QMAKE == '' ]]
+then
+    echo "Sorry, qmake was not found, is Qt4 installed?"
+    exit 2
 fi
 
 
