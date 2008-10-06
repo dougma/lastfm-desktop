@@ -19,8 +19,6 @@
 
 #include "MooseCommon.h"
 #include "MooseSettings.h"
-
-#include "lib/core/UnicornUtils.h"
 #include "lib/core/QMessageBoxBuilder.h"
 
 #include <QCoreApplication>

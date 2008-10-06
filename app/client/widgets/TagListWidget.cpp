@@ -20,7 +20,6 @@
 
 #include "TagListWidget.h"
 #include "Settings.h"
-#include "lib/core/UnicornUtils.h"
 #include "lib/types/Tag.h"
 #include "lib/ws/WsReply.h"
 #include <QDesktopServices>

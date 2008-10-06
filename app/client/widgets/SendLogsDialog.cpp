@@ -23,7 +23,7 @@
 #include "lib/core/QMessageBoxBuilder.h"
 #include "lib/core/CoreDir.h"
 #include "lib/core/CoreProcess.h"
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/CoreSysInfo.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>
@@ -86,7 +86,7 @@ static QString systemInformationString()
 {
     QString s;
 
-    s += "Operating system: " + Unicorn::verbosePlatformString() + "\n\n";
+    s += "Operating system: " + CoreSysInfo::platform() + "\n\n";
 
 #ifdef Q_WS_X11
     s += "CPU: \n";

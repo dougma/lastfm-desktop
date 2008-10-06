@@ -23,7 +23,7 @@
 #include "common/c++/Logger.h"
 #include "lib/core/QMessageBoxBuilder.h"
 #include "lib/core/CoreDir.h"
-#include "lib/core/UnicornUtils.h"
+#include "lib/core/CoreSysInfo.h"
 #include "lib/ws/WsKeys.h"
 #include <QDebug>
 #include <QTranslator>
@@ -56,7 +56,7 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 #endif
     m_log = new Logger( path );
     qDebug() << "Introducing" << applicationName()+'-'+applicationVersion();
-    qDebug() << "Directed by" << Unicorn::verbosePlatformString();
+    qDebug() << "Directed by" << CoreSysInfo::platform();
 
     translate();
 

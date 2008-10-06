@@ -24,9 +24,9 @@
 #include <QString>
 
 
-namespace Unicorn
+struct CORE_DLLEXPORT CoreSysInfo
 {
-    CORE_DLLEXPORT QString verbosePlatformString();
-}
+     static QString platform();
+};
 
 #endif

@@ -17,13 +17,13 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  021you10-1301, USA.       *
  ***************************************************************************/
 
-#include "UnicornUtils.h"
+#include "CoreSysInfo.h"
 #include <QSysInfo>
 #include <QString>
 
 
 QString
-Unicorn::verbosePlatformString()
+CoreSysInfo::platform()
 {
     #ifdef Q_WS_WIN
     switch (QSysInfo::WindowsVersion)
