@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include "PlayerState.h"
+#include "State.h"
 #include "lib/scrobble/ScrobblePoint.h"
 
 

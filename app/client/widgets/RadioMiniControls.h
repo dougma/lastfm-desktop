@@ -20,7 +20,7 @@
 #ifndef RADIO_MINI_CONTROLS_H
 #define RADIO_MINI_CONTROLS_H
 
-#include "PlayerState.h"
+#include "State.h"
 #include <QWidget>
 namespace Phonon { class VolumeSlider; }
 class ImageButton;

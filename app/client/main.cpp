@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "PlayerListener.h"
+#include "player/PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/core/QMessageBoxBuilder.h"

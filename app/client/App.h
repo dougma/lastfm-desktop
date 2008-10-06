@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef CLIENT_APP_H
+#define CLIENT_APP_H
+
 #include "State.h"
 #include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
@@ -80,3 +83,5 @@ private:
 
     class QSystemTrayIcon* m_trayIcon;
 };
+
+#endif

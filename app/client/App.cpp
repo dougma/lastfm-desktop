@@ -362,7 +362,7 @@ App::parseArguments( const QStringList& args )
         }
 }
 
-
+#include "the/app.h"
 namespace The
 {
     Radio& radio() { return *app().m_radio; }

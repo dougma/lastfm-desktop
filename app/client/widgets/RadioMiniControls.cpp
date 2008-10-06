@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "RadioMiniControls.h"
-#include "PlayerState.h"
 #include "widgets/ImageButton.h"
 #include <QApplication>
 #include <QHBoxLayout>
