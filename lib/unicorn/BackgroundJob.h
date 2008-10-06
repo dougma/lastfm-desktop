@@ -29,6 +29,11 @@ class BackgroundJob : public QObject
     friend class BackgroundJobQueue;
 
 protected:
+    /** reimplement if you want to prevent jobs running if certain criteria
+      * are not met, you will be deleted in the GUI thread immediately if you 
+      * return false */
+    virtual bool isValid() const { return true; }
+    /** do the work here, it will be called from teh queue thread */
     virtual void run() = 0;
 
 signals:

@@ -25,7 +25,7 @@
 
 Mbid //static
 Mbid::fromLocalFile( const QString& path )
-{
+{   
     char out[MBID_BUFFER_SIZE];
     QByteArray const bytes = QFile::encodeName( path );
     qDebug() << getMP3_MBID( bytes.data(), out );

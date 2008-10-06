@@ -29,6 +29,7 @@ class MbidJob : public BackgroundJob
     Track m_track;
     Mbid m_mbid;
 
+    virtual bool isValid() const;
     virtual void run();
     virtual void onFinished();
     

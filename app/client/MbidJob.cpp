@@ -24,10 +24,8 @@
 void
 MbidJob::run()
 {
-    if (m_track.url().scheme() != "file" )
-        return;
-    
-    m_mbid = Mbid::fromLocalFile( m_track.url().path() );
+    if (isValid())
+        m_mbid = Mbid::fromLocalFile( m_track.url().path() );
 }
 
 
@@ -41,4 +39,13 @@ MbidJob::onFinished()
     }
     else
         qDebug() << "No MBID found for" << m_track;    
+}
+
+
+bool
+MbidJob::isValid() const
+{
+    //FIXME really we should check the file header?
+    return m_track.url().scheme() == "file" &&
+           m_track.url().path().endsWith( ".mp3", Qt::CaseInsensitive );
 }

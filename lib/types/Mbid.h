@@ -33,9 +33,10 @@ public:
     {}
     
 	bool isNull() const { return id.isNull(); }
-	
     operator QString() const { return id; }
-    
+
+    /** if this is not an mp3 file you will be wasting time, as it won't work
+      * but we will do what you say anyway because you are the boss */ 
     static Mbid fromLocalFile( const QString& path );
 };
 

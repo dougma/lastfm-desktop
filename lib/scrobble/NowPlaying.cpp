@@ -29,7 +29,7 @@ NowPlaying::NowPlaying( const QByteArray& data )
     // will be submitted after the handshake, if there is some data that is
     m_data = data;
 
-    // we wait 5 seconds to prevent the server paniking when people skip a lot
+    // we wait 5 seconds to prevent the server panicking when people skip a lot
     // tracks in succession
     m_timer = new QTimer( this );
     m_timer->setInterval( 5000 );

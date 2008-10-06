@@ -23,9 +23,15 @@
 void
 BackgroundJobQueue::enqueue( BackgroundJob* job )
 {
+    if (!job->isValid()) {
+        delete job;
+        return;
+    }
+
     QMutexLocker locker( &mutex );
     q.enqueue( job );
     connect( job, SIGNAL(finished()), job, SLOT(onFinished()) );
+    connect( job, SIGNAL(finished()), job, SLOT(deleteLater()) );
     locker.unlock();
     start();
 }
