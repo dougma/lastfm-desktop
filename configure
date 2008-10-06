@@ -41,6 +41,7 @@ qCheck()
             if [[ $? == 0 ]]
             then
                 QMAKE=$1
+                return 0
             else
                 QMAKE='toolow'
             fi
@@ -79,7 +80,7 @@ header 'Generating Build System'
 
 if [ $RELEASE ]
 then
-    qmake -config release -recursive
+    qmake -config release -recursive Last.fm.pro
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 
     case `uname` in
@@ -100,7 +101,7 @@ else
             gen_xcodeproj || die "Configure failed."
             BUILD_CMD='open Last.fm.xcodeproj';;
         Linux)
-            qmake -config debug || die "Configure failed."
+            qmake -config debug -recursive Last.fm.pro || die "Configure failed."
             BUILD_CMD='make'
             middle "Configured to produce a debug build.";;
         *)      
