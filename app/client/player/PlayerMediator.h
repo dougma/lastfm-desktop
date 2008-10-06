@@ -19,7 +19,7 @@
 
 #include "State.h"
 #include "StopWatch.h"
-#include "listener/PlayerConnection.h"
+#include "PlayerConnection.h"
 #include "lib/types/Track.h"
 #include <QPointer>
 

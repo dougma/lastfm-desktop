@@ -19,10 +19,10 @@
 
 #include "App.h"
 #include "MbidJob.h"
-#include "PlayerMediator.h"
 #include "Settings.h"
 #include "version.h"
-#include "listener/PlayerListener.h"
+#include "player/PlayerListener.h"
+#include "player/PlayerMediator.h"
 #include "mac/ITunesListener.h"
 #include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
