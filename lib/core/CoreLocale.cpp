@@ -19,7 +19,6 @@
 
 #include "CoreLocale.h"
 #include "mac/CFStringToQString.h"
-#include "UnicornUtils.h"
 #include <QStringList>
 #include <QVariant>
 

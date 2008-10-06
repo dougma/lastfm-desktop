@@ -44,8 +44,7 @@ else {
                lib/moose/libmoose.pro \
                lib/radio/libradio.pro \
                lib/scrobble/libscrobble.pro \
-               lib/fingerprint/libfingerprint.pro \
-			   app/client/appclient.pro
+	       app/client/appclient.pro
 
 	# make the app client the default project in visual studio
 	win32:CONFIG( debug, debug|release ) {
