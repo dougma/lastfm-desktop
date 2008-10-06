@@ -19,12 +19,10 @@
 
 #include "Tuner.h"
 #include "Playlist.h"
-#include "lib/unicorn/UnicornSettings.h"
 #include <QBuffer>
 #include <QDebug>
 #include "lib/ws/WsRequestBuilder.h"
 #include "lib/ws/WsReply.h"
-#include <QtNetwork/QHttp> //TODO use our override
 #include <QtXml>
 
 

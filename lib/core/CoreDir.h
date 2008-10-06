@@ -70,9 +70,9 @@ namespace CoreDir
     CORE_DLLEXPORT inline QString mainLog()
     {
     #ifdef NDEBUG
-        return logs().filePath( qApp->applicationName() + ".log" );
+        return logs().filePath( QCoreApplication::applicationName() + ".log" );
     #else
-        return logs().filePath( qApp->applicationName() + ".debug.log" );
+        return logs().filePath( QCoreApplication::applicationName() + ".debug.log" );
     #endif
     }
 
