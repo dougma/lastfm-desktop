@@ -17,27 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayerState.h"
-#include "PlayerConnection.h"
-#include "PlayerCommandParser.h"
+#include "State.h"
 #include "StopWatch.h"
+#include "listener/PlayerConnection.h"
 #include "lib/types/Track.h"
-#include "lib/radio/Radio.h"
 #include <QPointer>
 
-class PlayerListener;
 
-class PlayerManager : public QObject
+/** mediates a single source of music from many inputs */
+class PlayerMediator : public QObject
 {
     Q_OBJECT
 
 public:
-    PlayerManager( PlayerListener* );
+    PlayerMediator( class PlayerListener* );
     
     Track track() const { return m_track; }
 
 public slots:
-    void onRadioTuningIn( const RadioStation& );
+    void onRadioTuningIn( const class RadioStation& );
     void onRadioTrackSpooled( const Track& );
     void onRadioTrackStarted( const Track& );
     void onRadioBuffering( int );

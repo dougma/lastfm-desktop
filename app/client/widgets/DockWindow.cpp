@@ -14,69 +14,9 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QLabel>
-#include <QWebView>
-#include "State.h"
-#include "lib/types/Track.h"
-
-namespace Unicorn 
-{
-	class TabWidget;
-}
+#include "DockWindow.h"
 
 
-class Bio : public QWebView
-{
-	Q_OBJECT
-
-public:
-	Bio();
-	void clearContent();
-	void setContent(const class CoreDomElement&);
-
-private slots:
-	void onLinkClicked(const QUrl&);
-
-private:
-	QString cssPath();
-};
-
-
-class MetaInfoView : public QLabel
-{
-    Q_OBJECT
-	
-	struct
-	{
-		Unicorn::TabWidget* tabs;
-		class Bio* bio;
-		class TagListWidget* tags;
-		class SimilarArtists* similar;
-	}
-	ui;
-	
-	Track m_track;
-
-	// the most recent requests (so we don't act on delayed replies)
-	WsReply *m_artistInfoReply;
-	WsReply *m_artistSimilarReply;
-	
-public:
-    MetaInfoView();
-    
-    virtual QSize sizeHint() const;
-
-private slots:
-    void onTrackSpooled( const Track& );
-    void onStateChanged( State );
-    void onLinkClicked( const class QUrl& );
-
-	void onArtistInfo( WsReply* );
-	void onSimilar( WsReply* );
-
-private:
-    QString cssPath();
-};

@@ -21,7 +21,7 @@
 #define MEDIAPLAYERINDICATOR_H
 
 #include <QWidget>
-#include "PlayerState.h"
+#include "State.h"
 class QLabel;
 
 

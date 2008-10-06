@@ -19,10 +19,10 @@
 
 #include "App.h"
 #include "MbidJob.h"
-#include "PlayerListener.h"
-#include "PlayerManager.h"
+#include "PlayerMediator.h"
 #include "Settings.h"
 #include "version.h"
+#include "listener/PlayerListener.h"
 #include "mac/ITunesListener.h"
 #include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
@@ -123,32 +123,32 @@ App::App( int argc, char** argv )
     PlayerListener* listener = new PlayerListener( this );
     connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
     
-    m_playerManager = new PlayerManager( listener );
-    connect( m_playerManager, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
-    connect( m_playerManager, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
-    connect( m_playerManager, SIGNAL(stopped()), SIGNAL(stopped()) );
-    connect( m_playerManager, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
-    connect( m_playerManager, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
-    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
+    m_playerMediator = new PlayerMediator( listener );
+    connect( m_playerMediator, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
+    connect( m_playerMediator, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
+    connect( m_playerMediator, SIGNAL(stopped()), SIGNAL(stopped()) );
+    connect( m_playerMediator, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
+    connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
+    connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
 
-    connect( m_playerManager, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    connect( m_playerMediator, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
 #ifdef Q_WS_MAC
     new ITunesListener( listener->port(), this );
 #endif
     
     m_scrobbler = new Scrobbler( "ass" );
-    connect( m_playerManager, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
-    connect( m_playerManager, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
-    connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
+    connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
+    connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
+    connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
-	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerManager, SLOT(onRadioTuningIn( RadioStation )) );
-    connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerManager, SLOT(onRadioTrackSpooled( Track )) );
-    connect( m_radio, SIGNAL(trackStarted( Track )), m_playerManager, SLOT(onRadioTrackStarted( Track )) );
-    connect( m_radio, SIGNAL(stopped()), m_playerManager, SLOT(onRadioStopped()) );
+	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
+    connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
+    connect( m_radio, SIGNAL(trackStarted( Track )), m_playerMediator, SLOT(onRadioTrackStarted( Track )) );
+    connect( m_radio, SIGNAL(stopped()), m_playerMediator, SLOT(onRadioStopped()) );
     
     DiagnosticsDialog::observe( m_scrobbler );
 
@@ -280,7 +280,7 @@ App::onTrackSpooled( const Track& t )
 void
 App::love( bool b )
 {
-	MutableTrack t = m_playerManager->track();
+	MutableTrack t = m_playerMediator->track();
 
 	if (b)
 		t.love();
@@ -292,7 +292,7 @@ App::love( bool b )
 void
 App::ban()
 {
-	MutableTrack t = m_playerManager->track();
+	MutableTrack t = m_playerMediator->track();
 	t.ban();
 	m_radio->skip();
 }

@@ -17,11 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ui_MainWindow.h"
+#include "lib/types/Track.h"
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include <QPointer>
-#include "PlayerState.h"
-#include "lib/types/Track.h"
+#include "State.h"
+#include "ui_MainWindow.h"
 #include "widgets/UnicornWidget.h"
 
 class ShareDialog;

@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayerState.h"
+#include "State.h"
 #include "lib/types/Track.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/ws/WsError.h"
@@ -70,7 +70,7 @@ private slots:
     void onTrackSpooled( const Track& t );
 
 private:
-    class PlayerManager* m_playerManager;
+    class PlayerMediator* m_playerMediator;
     class Scrobbler* m_scrobbler;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
@@ -80,9 +80,3 @@ private:
 
     class QSystemTrayIcon* m_trayIcon;
 };
-
-
-namespace The
-{
-    inline App& app() { return *(App*)qApp; }
-}

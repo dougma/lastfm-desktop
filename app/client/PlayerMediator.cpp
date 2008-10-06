@@ -17,8 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayerManager.h"
-#include "PlayerState.h"
+#include "PlayerMediator.h"
 #include "Settings.h"
 
 #define NEW_STOP_WATCH_MACRO() { \
@@ -27,7 +26,7 @@
     connect( m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) ); }
 
 
-PlayerManager::PlayerManager( PlayerListener* listener )
+PlayerMediator::PlayerMediator( PlayerListener* listener )
              : QObject( (QObject*)listener ),
                m_state( Stopped ),
                m_radioIsActive( false )
@@ -37,7 +36,7 @@ PlayerManager::PlayerManager( PlayerListener* listener )
 
 
 void
-PlayerManager::onPlayerConnectionCommandReceived( const PlayerConnection& connection )
+PlayerMediator::onPlayerConnectionCommandReceived( const PlayerConnection& connection )
 {
     m_connection = connection;
     
@@ -88,7 +87,7 @@ PlayerManager::onPlayerConnectionCommandReceived( const PlayerConnection& connec
 
 
 void
-PlayerManager::onRadioTuningIn( const RadioStation& station )
+PlayerMediator::onRadioTuningIn( const RadioStation& station )
 {    
     m_radioIsActive = true;
 
@@ -100,7 +99,7 @@ PlayerManager::onRadioTuningIn( const RadioStation& station )
 
 
 void
-PlayerManager::onRadioTrackSpooled( const Track& newtrack )
+PlayerMediator::onRadioTrackSpooled( const Track& newtrack )
 {
     m_radioIsActive = true;
     
@@ -113,7 +112,7 @@ PlayerManager::onRadioTrackSpooled( const Track& newtrack )
 
 
 void
-PlayerManager::onRadioTrackStarted( const Track& newtrack )
+PlayerMediator::onRadioTrackStarted( const Track& newtrack )
 {
     m_radioIsActive = true;
     
@@ -132,7 +131,7 @@ PlayerManager::onRadioTrackStarted( const Track& newtrack )
 
 
 void
-PlayerManager::onRadioBuffering( int pc )
+PlayerMediator::onRadioBuffering( int pc )
 {
     //TODO
     qDebug() << "Buffer status" << pc << "%";
@@ -140,7 +139,7 @@ PlayerManager::onRadioBuffering( int pc )
 
 
 void
-PlayerManager::onRadioStopped()
+PlayerMediator::onRadioStopped()
 {
     m_radioIsActive = false;
     stop();
@@ -149,7 +148,7 @@ PlayerManager::onRadioStopped()
 
 
 void
-PlayerManager::replay( const PlayerConnection& connection )
+PlayerMediator::replay( const PlayerConnection& connection )
 {   
     if (!connection.id.size())
     {
@@ -177,7 +176,7 @@ PlayerManager::replay( const PlayerConnection& connection )
 
 
 void
-PlayerManager::endTrack()
+PlayerMediator::endTrack()
 {
     delete m_watch; //do always just in case
     
@@ -195,14 +194,14 @@ PlayerManager::endTrack()
 
 
 void
-PlayerManager::onStopWatchTimedOut()
+PlayerMediator::onStopWatchTimedOut()
 {
     emit scrobblePointReached( m_track );
 }
 
 
 void
-PlayerManager::changeState( State newstate )
+PlayerMediator::changeState( State newstate )
 {
     State oldstate = m_state;    
     
@@ -231,7 +230,7 @@ PlayerManager::changeState( State newstate )
 
 
 void
-PlayerManager::stop()
+PlayerMediator::stop()
 {
     endTrack();
     emit trackSpooled( m_track /** will be a null track */, m_watch /** will be 0 */ );

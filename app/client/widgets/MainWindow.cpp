@@ -18,14 +18,13 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "App.h"
-#include "PlayerManager.h"
 #include "MainWindow/CogButtonPopup.h"
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "Settings.h"
+#include "the/app.h"
 #include "widgets/BottomBar.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"

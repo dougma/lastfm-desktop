@@ -17,45 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_CONNECTION_H
-#define PLAYER_CONNECTION_H
+#ifndef DOCK_WINDOW_H
+#define DOCK_WINDOW_H
 
-#include "lib/types/Track.h"
-#include "PlayerState.h"
-#include "PlayerCommandParser.h"
+#include <QWidget>
 
-
-class PlayerConnection
+class DockWindow : public QWidget
 {
-    friend class PlayerListener;
-
-    void clear()
-    {
-        track = Track();
-        state = Stopped;
-    }    
+    Q_OBJECT
     
-    QString determineName();
-
+    QList<QWidget*> m_docks;
+    
 public:
-    PlayerConnection() : state( Stopped ), command( PlayerCommandParser::Init )
-    {}
+    DockWindow();
     
-    bool isValid() const
-    {
-        return !id.isEmpty();
-    }
+    void addWidget( QWidget* );
     
-    bool operator==( const PlayerConnection& that ) const
-    {
-        return that.id == this->id;
-    }
+protected:
     
-    State state;
-    Track track;
-    QString id;
-    QString name;
-    PlayerCommandParser::Command command;
+    
 };
 
 #endif

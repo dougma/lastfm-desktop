@@ -14,69 +14,48 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QLabel>
-#include <QWebView>
+#ifndef PLAYER_CONNECTION_H
+#define PLAYER_CONNECTION_H
+
 #include "State.h"
+#include "PlayerCommandParser.h"
 #include "lib/types/Track.h"
 
-namespace Unicorn 
+
+class PlayerConnection
 {
-	class TabWidget;
-}
+    friend class PlayerListener;
 
-
-class Bio : public QWebView
-{
-	Q_OBJECT
-
-public:
-	Bio();
-	void clearContent();
-	void setContent(const class CoreDomElement&);
-
-private slots:
-	void onLinkClicked(const QUrl&);
-
-private:
-	QString cssPath();
-};
-
-
-class MetaInfoView : public QLabel
-{
-    Q_OBJECT
-	
-	struct
-	{
-		Unicorn::TabWidget* tabs;
-		class Bio* bio;
-		class TagListWidget* tags;
-		class SimilarArtists* similar;
-	}
-	ui;
-	
-	Track m_track;
-
-	// the most recent requests (so we don't act on delayed replies)
-	WsReply *m_artistInfoReply;
-	WsReply *m_artistSimilarReply;
-	
-public:
-    MetaInfoView();
+    void clear()
+    {
+        track = Track();
+        state = Stopped;
+    }    
     
-    virtual QSize sizeHint() const;
+    QString determineName();
 
-private slots:
-    void onTrackSpooled( const Track& );
-    void onStateChanged( State );
-    void onLinkClicked( const class QUrl& );
-
-	void onArtistInfo( WsReply* );
-	void onSimilar( WsReply* );
-
-private:
-    QString cssPath();
+public:
+    PlayerConnection() : state( Stopped ), command( PlayerCommandParser::Init )
+    {}
+    
+    bool isValid() const
+    {
+        return !id.isEmpty();
+    }
+    
+    bool operator==( const PlayerConnection& that ) const
+    {
+        return that.id == this->id;
+    }
+    
+    State state;
+    Track track;
+    QString id;
+    QString name;
+    PlayerCommandParser::Command command;
 };
+
+#endif
