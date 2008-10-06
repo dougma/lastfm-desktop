@@ -17,7 +17,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "Launcher.h"
+#include "BottomBar.h"
 #include "widgets/ImageButton.h"
 #include "widgets/ScrobbleButton.h"
 #include <QEvent>
@@ -25,12 +25,12 @@
 #include <QPainter>
 
 
-Launcher::Launcher()
+BottomBar::BottomBar()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
-    h->addWidget( ui.radio = new LauncherButton );
-    h->addWidget( ui.friends = new LauncherButton );
-    h->addWidget( ui.library = new LauncherButton );
+    h->addWidget( ui.radio = new BottomBarButton );
+    h->addWidget( ui.friends = new BottomBarButton );
+    h->addWidget( ui.library = new BottomBarButton );
     h->addSpacing( 12 );
     h->addStretch();
     h->addWidget( ui.scrobble = new ScrobbleButton );
@@ -76,21 +76,21 @@ Launcher::Launcher()
 }
 
 
-LauncherButton::LauncherButton()
+BottomBarButton::BottomBarButton()
 {
     connect( this, SIGNAL(toggled( bool )), SLOT(onToggled( bool )) );
 }
 
 
 void
-LauncherButton::onToggled( bool b )
+BottomBarButton::onToggled( bool b )
 {   
     m_widget->setVisible( b );
 }
 
 
 void
-LauncherButton::setWidget( QWidget* w )
+BottomBarButton::setWidget( QWidget* w )
 {
     m_widget = w;
     w->installEventFilter( this );
@@ -98,7 +98,7 @@ LauncherButton::setWidget( QWidget* w )
 
 
 bool
-LauncherButton::eventFilter( QObject* o, QEvent* e )
+BottomBarButton::eventFilter( QObject* o, QEvent* e )
 {
     if (o == m_widget)
         switch ((int)e->type())

@@ -22,32 +22,32 @@
 
 #include <QWidget>
 #include "widgets/ImageButton.h"
-class LauncherButton;
+class BottomBarButton;
 class ScrobbleButton;
 
 
-class Launcher : public QWidget
+class BottomBar : public QWidget
 {
 public:
-	Launcher();
+	BottomBar();
 
     struct {
-        LauncherButton* radio;
-        LauncherButton* friends;
-        LauncherButton* library;
+        BottomBarButton* radio;
+        BottomBarButton* friends;
+        BottomBarButton* library;
         ScrobbleButton* scrobble;
     } ui;    
 };
 
 
-class LauncherButton : public ImageButton
+class BottomBarButton : public ImageButton
 {
     Q_OBJECT
     
     QWidget* m_widget;
     
 public:    
-    LauncherButton();
+    BottomBarButton();
     
     void setWidget( QWidget* );
     

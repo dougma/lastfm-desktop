@@ -41,7 +41,7 @@ public:
 	
 	struct Ui : ::Ui::MainWindow
 	{
-		class Launcher* launcher;
+		class BottomBar* bottombar;
 		class PrimaryBucket* primaryBucket;
         class Firehose* firehose;
 		class ImageButton* cog;        

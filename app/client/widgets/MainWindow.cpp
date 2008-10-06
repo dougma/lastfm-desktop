@@ -21,16 +21,15 @@
 #include "App.h"
 #include "PlayerManager.h"
 #include "MainWindow/CogButtonPopup.h"
-#include "MainWindow/Launcher.h"
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "Settings.h"
+#include "widgets/BottomBar.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
-
 #include "widgets/MetaInfoView.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
@@ -153,28 +152,28 @@ MainWindow::setupUi()
 	setupCentralWidget();
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     /** hah! works :) But I'm sure is hideously dangerous, etc. */
-    setStatusBar( (QStatusBar*) (ui.launcher = new Launcher) );
+    setStatusBar( (QStatusBar*) (ui.bottombar = new BottomBar) );
 
     QDockWidget* dw;
     dw = new QDockWidget;
     dw->setWindowTitle( tr("Radio") );
     dw->setWidget( new RadioWidget );
     addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
-    ui.launcher->ui.radio->setWidget( dw );
+    ui.bottombar->ui.radio->setWidget( dw );
     dw->hide();
     dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
-    ui.launcher->ui.friends->setWidget( dw );
+    ui.bottombar->ui.friends->setWidget( dw );
     dw->hide();
     dw = new QDockWidget;
     dw->setWindowTitle( "Info" );
     dw->setWidget( new MetaInfoView );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
-    ui.launcher->ui.library->setWidget( dw );
+    ui.bottombar->ui.library->setWidget( dw );
     dw->hide();
-    
+
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif

@@ -28,7 +28,7 @@ PrettyCoverWidget::PrettyCoverWidget()
 	ui.spinner = new SpinnerLabel( this );
 	ui.spinner->hide();
 
-    clear();    
+    clear();
 }
 
 
@@ -96,7 +96,7 @@ PrettyCoverWidget::paintEvent( QPaintEvent* e )
         
         QSize s = svg.defaultSize() * 5;
         s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );
-        QRect r = QRect( rect().center() - QRect( QPoint(), s ).center(), s );
+        QRect r = QRect( rect().center() - QRect( QPoint(), s ).center() - QPoint( 0, 20 ), s );
 
         p.setOpacity( qreal(40)/255 );
         svg.render( &p, r );
