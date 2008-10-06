@@ -42,7 +42,7 @@ void
 StopWatch::pause()
 {
     m_thread->m_paused = true; 
-    emit paused(); 
+    emit paused( true );
 }
 
 void
@@ -50,7 +50,7 @@ StopWatch::resume()
 {
     emit tick( m_thread->m_elapsed / 1000 );
     m_thread->m_paused = false; 
-    emit resumed();
+    emit paused( false );
 }
 
 

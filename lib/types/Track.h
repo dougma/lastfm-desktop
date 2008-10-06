@@ -43,8 +43,8 @@ struct TrackData : QSharedData
     int duration;
     short source;
     short rating;
-    QString mbId; /// musicbrainz id
-    QString fpId; /// fingerprint id
+    QString mbid; /// musicbrainz id
+    QString fingerprintId;
     QUrl url;
     QDateTime time; /// the time the track was started at
 
@@ -95,11 +95,11 @@ public:
     QString title() const { return d->title; }
     int trackNumber() const { return d->trackNumber; }
     int duration() const { return d->duration; }
-    QString mbId() const { return d->mbId; }
+    QString mbid() const { return d->mbid; }
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
-    QString fpId() const { return d->fpId; }
+    QString fingerprintId() const { return d->fingerprintId; }
 
     QString durationString() const;
 
@@ -153,8 +153,8 @@ public:
     void setUrl( QUrl url ) { d->url = url; }
     void setSource( Source s ) { d->source = s; }
     
-    void setMbId( QString mbId ) { d->mbId = mbId; }
-    void setFpId( QString id ) { d->fpId = id; }
+    void setMbid( Mbid id ) { d->mbid = id; }
+    void setFingerprintId( QString id ) { d->fingerprintId = id; }
     
     WsReply* love();
     WsReply* ban();

@@ -80,8 +80,7 @@ public:
     ScrobblePoint scrobblePoint() const { return m_point; }
 
 signals:
-    void resumed();
-    void paused();
+    void paused( bool );
     void tick( int );
     void timeout();
 

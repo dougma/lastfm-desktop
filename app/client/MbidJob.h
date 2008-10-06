@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,49 +17,24 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "NowPlaying.h"
-#include "Scrobbler.h"
+#ifndef MBID_JOB_H
+#define MBID_JOB_H
+
 #include "lib/types/Track.h"
-#include <QDebug>
-#include <QTimer>
+#include "lib/unicorn/BackgroundJob.h"
 
 
-NowPlaying::NowPlaying( const QByteArray& data )
+class MbidJob : public BackgroundJob
 {
-    // will be submitted after the handshake, if there is some data that is
-    m_data = data;
+    Track m_track;
+    Mbid m_mbid;
 
-    // we wait 5 seconds to prevent the server paniking when people skip a lot
-    // tracks in succession
-    m_timer = new QTimer( this );
-    m_timer->setInterval( 5000 );
-    m_timer->setSingleShot( true );
-    connect( m_timer, SIGNAL(timeout()), SLOT(request()) );
-}
+    virtual void run();
+    virtual void onFinished();
+    
+public:
+    MbidJob( const Track& t ) : m_track( t )
+    {}
+};
 
-
-void
-NowPlaying::reset()
-{
-    m_timer->stop();
-    m_data.clear();
-}
-
-
-void
-NowPlaying::submit( const Track& track )
-{
-    if (track.isNull())
-        return;
-
-    #define e( x ) QUrl::toPercentEncoding( x )
-    m_data = "&a=" + e(track.artist()) +
-             "&t=" + e(track.title()) +
-             "&b=" + e(track.album()) +
-             "&l=" + QByteArray::number( track.duration() ) +
-             "&n=" + QByteArray::number( track.trackNumber() ) +
-             "&m=" + e(track.mbid());
-    #undef e
-
-    m_timer->start();
-}
+#endif

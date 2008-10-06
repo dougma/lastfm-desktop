@@ -62,7 +62,7 @@ ScrobblerSubmission::submitNextBatch()
                   "&l[" + N + "]=" + QByteArray::number( t.duration() ) +
                   "&b[" + N + "]=" + e(t.album()) +
                   "&n[" + N + "]=" + QByteArray::number( t.trackNumber() ) +
-                  "&m[" + N + "]=" + e(t.mbId());
+                  "&m[" + N + "]=" + e(t.mbid());
         #undef e
 
         if (t.source() == Track::MediaDevice)

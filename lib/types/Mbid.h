@@ -24,12 +24,19 @@
 #include <QString>
 
 
-class TYPES_DLLEXPORT Mbid : private QString
+class TYPES_DLLEXPORT Mbid
 {
+    QString id;
+    
 public:
-	bool isNull() const { return QString::isNull(); }
+    explicit Mbid( const QString& p = "" ) : id( p )
+    {}
+    
+	bool isNull() const { return id.isNull(); }
 	
-    operator QString() const { return *this; }
+    operator QString() const { return id; }
+    
+    static Mbid fromLocalFile( const QString& path );
 };
 
 #endif

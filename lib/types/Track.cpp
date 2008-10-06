@@ -93,8 +93,8 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "url", d->url.toString() );
     makeElement( "source", QString::number( d->source ) );
     makeElement( "rating", QString::number(d->rating) );
-    makeElement( "fpId", fpId() );
-    makeElement( "mbId", mbId() );
+    makeElement( "fpId", fingerprintId() );
+    makeElement( "mbId", mbid() );
 	makeElement( "auth", d->extras[	"trackauth"] );
 
     return item;
@@ -184,13 +184,13 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 	
 	TrackWsRequestBuilder& add( Track const * const t )
 	{
-		if (t->mbId().isEmpty()) 
+		if (t->mbid().isEmpty()) 
 		{
 			WsRequestBuilder::add( "artist", t->artist() );
 			WsRequestBuilder::add( "track", t->title() );
 		}
 		else
-			WsRequestBuilder::add( "mbid", t->mbId() );
+			WsRequestBuilder::add( "mbid", t->mbid() );
 
 		return *this;
 	}

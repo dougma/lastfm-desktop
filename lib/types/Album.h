@@ -81,10 +81,10 @@ class TYPES_DLLEXPORT AlbumImageFetcher : public QObject
 {
 	Q_OBJECT
 
-    bool m_nocover;
 	int m_size;
 	class WsAccessManager* m_manager;
-
+    bool m_nocover;
+    
 public:
 	AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
 	

@@ -175,7 +175,7 @@ PlayerCommandParser::extractTrack( const QMap<QChar, QString>& args )
     track.setArtist( args['a'] );
     track.setTitle( args['t'] );
     track.setAlbum( args['b'] );
-    track.setMbId( args['m'] );
+    track.setMbid( Mbid( args['m'] ) );
     track.setDuration( args['l'].toInt() );
     track.setUrl( QUrl::fromLocalFile( QUrl::fromPercentEncoding( args['p'].toUtf8() ) ) );
     track.setSource( Track::Player );

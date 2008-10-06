@@ -88,7 +88,7 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
                             QUERYITEMENCODED( album,         m_track.album() ) <<
                             QUERYITEMENCODED( track,         m_track.title() ) <<
                             QUERYITEM(        duration,      QString::number( m_track.duration()) ) <<
-                            QUERYITEM(        mbid,          m_track.mbId() ) <<
+                            QUERYITEM(        mbid,          m_track.mbid() ) <<
                             QUERYITEMENCODED( filename,      QFileInfo( m_track.url().toLocalFile() ).completeBaseName() ) <<
                             QUERYITEM(        tracknum,      QString::number( m_track.trackNumber() ) ) <<
                             QUERYITEM(        sha256,        fingerprinter->sha256() ) <<

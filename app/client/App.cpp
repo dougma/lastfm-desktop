@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "App.h"
+#include "MbidJob.h"
 #include "PlayerListener.h"
 #include "PlayerManager.h"
 #include "Settings.h"
@@ -29,9 +30,10 @@
 #include "lib/core/QMessageBoxBuilder.h"
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/radio/Radio.h"
+#include "lib/unicorn/BackgroundJobQueue.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
-#include "phonon/audiooutput.h"
+#include <phonon/audiooutput.h>
 
 #ifdef WIN32
     #include "legacy/disableHelperApp.cpp"
@@ -116,7 +118,8 @@ App::App( int argc, char** argv )
     //TODO bootstrapping
     
     m_settings = new Settings( VERSION, applicationFilePath() );
-
+    m_q = new BackgroundJobQueue;
+    
     PlayerListener* listener = new PlayerListener( this );
     connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
     
@@ -127,6 +130,8 @@ App::App( int argc, char** argv )
     connect( m_playerManager, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
     connect( m_playerManager, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
     connect( m_playerManager, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
+
+    connect( m_playerManager, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
 #ifdef Q_WS_MAC
     new ITunesListener( listener->port(), this );
@@ -153,7 +158,8 @@ App::App( int argc, char** argv )
     //TODO do only once?
     Legacy::disableHelperApp();
 #endif
-
+    
+    // if you don't do this, mac and Linux crash amazingly
     qDebug() << argv[0];
 
     parseArguments( arguments() );
@@ -164,6 +170,7 @@ App::~App()
 {
     delete m_scrobbler;
     delete Settings::instance;
+    delete m_q;
 }
 
 
@@ -258,6 +265,16 @@ App::onScrobblerStatusChanged( int e )
 void 
 App::onBootstrapCompleted( const QString& playerId )
 {}
+
+
+void
+App::onTrackSpooled( const Track& t )
+{
+    if (!t.isNull() && t.mbid().isNull())
+    {
+        m_q->enqueue( new MbidJob( t ) );
+    }
+}
 
 
 void
