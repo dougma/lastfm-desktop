@@ -33,7 +33,7 @@ class Bio : public QWebView
 	Q_OBJECT
 
 public:
-	Bio(QWidget *parent = 0);
+	Bio();
 	void clearContent();
 	void setContent(const class CoreDomElement&);
 
@@ -51,9 +51,9 @@ class MetaInfoView : public QLabel
 	
 	struct
 	{
-		Unicorn::TabWidget* infoTabs;
+		Unicorn::TabWidget* tabs;
 		class Bio* bio;
-		class TagListWidget* trackTags;
+		class TagListWidget* tags;
 		class SimilarArtists* similar;
 	}
 	ui;

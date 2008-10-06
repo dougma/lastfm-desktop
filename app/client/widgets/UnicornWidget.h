@@ -29,7 +29,9 @@ class UnicornWidget
     //</undefined>
     
 public:
-    /** applies our custom palette */
+    /** applies our custom palette, if you want item-views to have the black
+      * look you must call this function on them explicitly, we don't recurse 
+      * children in *that* case */
     static void paintItBlack( class QWidget* );
 };
 

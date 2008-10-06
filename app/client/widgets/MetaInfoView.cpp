@@ -22,16 +22,16 @@
 #include <QDesktopServices>
 #include <QTemporaryFile>
 #include <QVBoxLayout>
-#include "widgets/UnicornTabWidget.h"
-#include "widgets/TagListWidget.h"
 #include "widgets/SimilarArtists.h"
+#include "widgets/TagListWidget.h"
+#include "widgets/UnicornTabWidget.h"
+#include "widgets/UnicornWidget.h"
 #include "lib/core/CoreUrl.h"
 #include "lib/core/CoreDomElement.h"
 #include "lib/ws/WsAccessManager.h"
 
 
-Bio::Bio(QWidget *parent)
-   : QWebView(parent)
+Bio::Bio()
 {
 	settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( cssPath() ) );
 	page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -104,40 +104,28 @@ Bio::cssPath()
 ///////////////////
 
 MetaInfoView::MetaInfoView() 
-            : QLabel( tr("Play some music\nto start scrobbling.") )
+            : QLabel( tr("<b style='font-size:16pt'>Play some music<br>to start scrobbling.") )
 			, m_artistInfoReply( 0 )
 			, m_artistSimilarReply( 0 )
-
 {   
 	QVBoxLayout* v = new QVBoxLayout( this );
 	v->setSpacing( 0 );
 	v->setMargin( 0 );
-	v->addWidget(ui.infoTabs = new Unicorn::TabWidget);
-	ui.infoTabs->addTab( tr("Bio"), ui.bio = new Bio(ui.infoTabs) );
-	ui.infoTabs->addTab( tr("Tags"), ui.trackTags = new TagListWidget );
-	ui.infoTabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists );
+	v->addWidget( ui.tabs = new Unicorn::TabWidget );
+	ui.tabs->addTab( tr("Bio"), ui.bio = new Bio );
+	ui.tabs->addTab( tr("Tags"), ui.tags = new TagListWidget );
+	ui.tabs->addTab( tr("Similar Artists"), ui.similar = new SimilarArtists );
     
-    ui.infoTabs->hide();
-    ui.infoTabs->bar()->succombToTheDarkSide();
-
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
-	
-	setBackgroundRole( QPalette::Base );
-    
-    QPalette p = palette();
-    p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
-    p.setBrush( QPalette::Text, QColor( 0xff, 0xff, 0xff, 40 ) );
-    setPalette( p );
+	    
+    UnicornWidget::paintItBlack( this );
+    UnicornWidget::paintItBlack( ui.tags ); // you have to explicitly set
+    UnicornWidget::paintItBlack( ui.similar ); // item views, or they stay white
 
-#ifdef Q_WS_MAC
-    // large fonts look stupid on Windows
-    QFont f = font();
-    f.setBold( true );
-    f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
-    setFont( f );
-#endif
-    
+    ui.tabs->hide();
+    ui.tabs->bar()->succombToTheDarkSide();
+
     setAutoFillBackground( true );
     setAlignment( Qt::AlignCenter );
 }
@@ -161,7 +149,7 @@ MetaInfoView::onTrackSpooled( const Track& t )
 		connect( m_artistSimilarReply = t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
 
 		// TagListWidget internalises the pattern:
-		ui.trackTags->setTagsRequest( t.getTopTags() );
+		ui.tags->setTagsRequest( t.getTopTags() );
 	}
     m_track = t;
 }
@@ -189,11 +177,11 @@ MetaInfoView::onStateChanged( State state )
     switch (state)
     {
         case Stopped:
-            ui.infoTabs->hide();
+            ui.tabs->hide();
             break;
             
         default:
-            ui.infoTabs->show();
+            ui.tabs->show();
             break;
     }
 }

@@ -18,20 +18,30 @@
  ***************************************************************************/
 
 #include "UnicornWidget.h"
-#include <QPalette>
-#include <QWidget>
 #include <QAbstractScrollArea>
-#include <QLabel>
-#include <QPushButton>
-
 #include <QApplication>
+#include <QLabel>
+#include <QPalette>
+#include <QPushButton>
+#include <QWidget>
+
+class QAbstractItemView;
+
+
 void //static
 UnicornWidget::paintItBlack( QWidget* w )
 {
     QPalette p = w->palette();
     p.setBrush( QPalette::Window, QColor( 35, 35, 35 ) );
     p.setBrush( QPalette::WindowText, QColor( 84, 84, 84 ) );
-    p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
+    p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );   
+    
+    if (reinterpret_cast<QAbstractItemView*>(w))
+    {
+        p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
+        p.setBrush( QPalette::Text, Qt::white );
+    }
+
     w->setPalette( p );
     
     foreach (QAbstractScrollArea* a, w->findChildren<QAbstractScrollArea*>())
