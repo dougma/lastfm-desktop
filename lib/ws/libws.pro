@@ -15,3 +15,5 @@ DEFINES += _WS_DLLEXPORT
 win32:DEFINES += _ATL_DLL
 
 win32:LIBS += winhttp.lib wbemuuid.lib
+
+INSTALLS = HEADERS TARGET

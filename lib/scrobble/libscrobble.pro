@@ -9,3 +9,5 @@ SOURCES = $$findSources( cpp )
 HEADERS = $$findSources( h )
 
 DEFINES += _SCROBBLE_DLLEXPORT
+
+INSTALLS = HEADERS TARGET

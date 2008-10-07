@@ -10,3 +10,5 @@ HEADERS = $$findSources( h )
 RESOURCES = qrc/types.qrc
 
 DEFINES += _TYPES_DLLEXPORT
+
+INSTALLS = HEADERS TARGET

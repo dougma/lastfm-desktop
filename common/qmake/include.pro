@@ -86,3 +86,6 @@ defineReplace( generateInstallerMakefile ) {
 		return( Makefile.dmg )
 	}
 }
+
+
+unix:HEADERS.path = /usr/include/lastfm

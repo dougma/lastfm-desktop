@@ -17,3 +17,5 @@ DEFINES += _CORE_DLLEXPORT
     SOURCES -= win/Utils.cpp
 	HEADERS -= win/Utils.h
 }
+
+INSTALLS = HEADERS TARGET
