@@ -42,6 +42,13 @@ User::getNeighbours() const
 }
 
 
+QUrl 
+User::www() const
+{ 
+	return "http://www.last.fm/user/" + CoreUrl::encode( m_name ); 
+}
+
+
 QList<User> //static
 User::list( WsReply* r )
 {

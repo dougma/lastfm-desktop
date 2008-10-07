@@ -21,6 +21,7 @@
 #define UNICORN_USER_H
 
 #include <QString>
+#include "lib/core/CoreUrl.h"
 #include "lib/DllExportMacro.h"
 #include "lib/core/WeightedStringList.h"
 #include "lib/ws/WsReply.h" //convenience
@@ -49,6 +50,8 @@ public:
 	QUrl smallImageUrl() const { return m_smallImage; }
 	QUrl mediumImageUrl() const { return m_mediumImage; }
 	QUrl largeImageUrl() const { return m_largeImage; }
+	
+	QUrl www() const;
 	
     QString realName() const { return m_realName; }
     
