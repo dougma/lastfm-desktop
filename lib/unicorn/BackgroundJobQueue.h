@@ -24,11 +24,12 @@
 #include <QMutex>
 #include <QQueue>
 #include "BackgroundJob.h"
+#include "lib/DllExportMacro.h"
 
 
 /** simple work thread, hardly any features, but it does delete the job for
   * you when it's done. Only one thread is spawned at this time */
-class BackgroundJobQueue : public QThread
+class UNICORN_DLLEXPORT BackgroundJobQueue : public QThread
 {
     Q_OBJECT
     

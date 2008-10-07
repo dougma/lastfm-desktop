@@ -21,9 +21,10 @@
 #define BACKGROUND_JOB_H
 
 #include <QObject>
+#include "lib/DllExportMacro.h"
 
 
-class BackgroundJob : public QObject
+class UNICORN_DLLEXPORT BackgroundJob : public QObject
 {
     Q_OBJECT
     friend class BackgroundJobQueue;
