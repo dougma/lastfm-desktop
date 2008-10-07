@@ -21,14 +21,14 @@
 #include "ScrobblePoint.h"
 
 
-QString
+QByteArray
 Scrobble::sourceString() const
 {
     switch (d->source)
     {
-        case LastFmRadio: return "L" + d->extras["trackauth"];
-        case Player: return "P" + d->extras["playerId"];
-        case MediaDevice: return "P" + d->extras["mediaDeviceId"];
+        case LastFmRadio: return "L" + d->extras["trackauth"].toAscii();
+        case Player: return "P" + d->extras["playerId"].toUtf8();
+        case MediaDevice: return "P" + d->extras["mediaDeviceId"].toUtf8();
         case NonPersonalisedBroadcast: return "R";
         case PersonalisedRecommendation: return "E";
         default: return "U";

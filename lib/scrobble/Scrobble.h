@@ -32,11 +32,11 @@ struct SCROBBLE_DLLEXPORT Scrobble : Track
     Scrobble( const Track& that ) : Track( that )
     {}
     
-    QString sourceString() const;
+    QByteArray sourceString() const;
     
-    QString ratingCharacter() const
+    QByteArray ratingCharacter() const
     {
-        return d->extras["rating"];
+        return d->extras["rating"].toAscii();
     }
     
     bool isNotLovedSkippedOrBanned() const
