@@ -25,3 +25,5 @@ macx* {
 }
 
 COMMON_LIBS_DIR = /svn/libs/cpp
+
+INSTALL_DIR = /usr/local
