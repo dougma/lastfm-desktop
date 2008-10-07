@@ -37,7 +37,7 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 WsReply*
 WsRequestBuilder::start()
 {
-#ifndef Q_WS_MAC
+#ifdef WIN32
     // we don't do this on mac because it was inexplicably crashing! -- Qt 4.4.1
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"

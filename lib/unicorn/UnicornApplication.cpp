@@ -149,7 +149,6 @@ Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
 	#if QT_VERSION > 0x00040401
 		#error check if the next bit works yet
 	#endif
-	if (arguments().contains( "--debug" ))
 #endif
 #endif
 	{
