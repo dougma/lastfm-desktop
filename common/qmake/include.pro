@@ -88,10 +88,6 @@ defineReplace( generateInstallerMakefile ) {
 }
 
 
-defineReplace( defaultInstallTargets ) {
-    headers.path = /usr/local/include/lastfm
-    headers.files = $$HEADERS
-    target.path = /usr/local/lib
-    target.files = $$BIN_DIR/$$TARGET
-    return( headers target )
-}
+# for install stuff
+target.path = $$INSTALL_DIR/lib
+target.files = $$BIN_DIR/$$TARGET

@@ -9,4 +9,6 @@ SOURCES += $$findSources( cpp )
 HEADERS += $$findSources( h )
 DEFINES += _RADIO_DLLEXPORT
 
-INSTALLS = $$defaultInstallTargets()
+headers.files = $$HEADERS
+headers.path = $$INSTALL_DIR/include/lastfm/radio
+INSTALLS += target headers

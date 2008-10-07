@@ -18,4 +18,6 @@ DEFINES += _CORE_DLLEXPORT
 	HEADERS -= win/Utils.h
 }
 
-INSTALLS = $$defaultInstallTargets()
+headers.files = $$HEADERS
+headers.path = $$INSTALL_DIR/include/lastfm/core
+INSTALLS += target headers

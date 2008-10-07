@@ -10,4 +10,6 @@ HEADERS = $$findSources( h )
 
 DEFINES += _SCROBBLE_DLLEXPORT
 
-INSTALLS = $$defaultInstallTargets()
+headers.files = $$HEADERS
+headers.path = $$INSTALL_DIR/include/lastfm/scrobble
+INSTALLS += target headers

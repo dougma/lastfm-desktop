@@ -11,4 +11,6 @@ RESOURCES = qrc/types.qrc
 
 DEFINES += _TYPES_DLLEXPORT
 
-INSTALLS = $$defaultInstallTargets()
+headers.files = $$HEADERS
+headers.path = $$INSTALL_DIR/include/lastfm/types
+INSTALLS += target headers
