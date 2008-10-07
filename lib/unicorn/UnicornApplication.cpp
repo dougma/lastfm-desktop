@@ -45,7 +45,7 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
     CoreDir::mkpaths();
-	
+
     qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
     QString bytes = CoreDir::mainLog();
@@ -139,24 +139,16 @@ Unicorn::Application::~Application()
 
 
 void
-Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
+Unicorn::Application::qMsgHandler( QtMsgType, const char* msg )
 {
     Logger::the().log( msg );
 
-	// it crashes on mac if you call arguments()! Qt 4.4.1 --mxcl	
-#ifndef Q_WS_MAC
-#ifdef NDEBUG
-	#if QT_VERSION > 0x00040401
-		#error check if the next bit works yet
-	#endif
-#endif
-#endif
-	{
+#ifndef NDEBUG
 #ifdef WIN32
-		qWinMsgHandler( type, msg );
+    qWinMsgHandler( type, msg );
 #else
-		fprintf( stderr, "%s\n", msg );
-        fflush( stderr );
+    fprintf( stderr, "%s\n", msg );
+    fflush( stderr );
 #endif
-	}
+#endif
 }
