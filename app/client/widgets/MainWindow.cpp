@@ -160,6 +160,7 @@ MainWindow::setupUi()
     addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.radio->setWidget( dw );
     dw->hide();
+    dw->setFloating( true );
     dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
