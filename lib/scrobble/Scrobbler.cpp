@@ -35,7 +35,7 @@ Scrobbler::Scrobbler( const QString& clientId )
 {
     m_cache = new ScrobbleCache( Ws::Username );
 	m_netEvent = new WsNetEvent( this );
-	connect( m_netEvent, SIGNAL(connectionUp(QString, bool)), SLOT(submit()) );
+	connect( m_netEvent, SIGNAL(connectionUp(QString)), SLOT(submit()) );
 
     handshake();
     submit(); // will submit what's there once the handshake completes

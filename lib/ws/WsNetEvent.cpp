@@ -24,7 +24,7 @@ WsNetEvent::WsNetEvent(QObject *parent) :
 	QObject(parent)
 {
 	m_adapter = new WsNetEventAdapter(parent);
-	connect(m_adapter, SIGNAL(connectionUp(QString, bool)), this, SIGNAL(connectionUp(QString, bool)) );
-	connect(m_adapter, SIGNAL(connectionDown(QString, bool)), this, SIGNAL(connectionDown(QString, bool)) );
+	connect(m_adapter, SIGNAL(connectionUp(QString)), this, SIGNAL(connectionUp(QString)) );
+	connect(m_adapter, SIGNAL(connectionDown(QString)), this, SIGNAL(connectionDown(QString)) );
 }
 

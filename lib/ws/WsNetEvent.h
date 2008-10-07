@@ -85,8 +85,8 @@ public:
 	WsNetEvent(QObject *parent = 0);
 
 signals:
-	void connectionUp(QString connectionName, bool isWan);
-	void connectionDown(QString connectionName, bool isWan);
+	void connectionUp(QString connectionName);
+	void connectionDown(QString connectionName);
 };
 
 #endif
