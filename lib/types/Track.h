@@ -39,8 +39,8 @@ struct TrackData : QSharedData
     QString artist;
     QString album;
     QString title;
-    int trackNumber;
-    int duration;
+    uint trackNumber;
+    uint duration;
     short source;
     short rating;
     QString mbid; /// musicbrainz id
@@ -93,8 +93,8 @@ public:
     Artist artist() const { return Artist( d->artist ); }
     Album album() const { return Album( artist(), d->album ); }
     QString title() const { return d->title; }
-    int trackNumber() const { return d->trackNumber; }
-    int duration() const { return d->duration; }
+    uint trackNumber() const { return d->trackNumber; }
+    uint duration() const { return d->duration; }
     QString mbid() const { return d->mbid; }
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
@@ -148,8 +148,8 @@ public:
     void setArtist( QString artist ) { d->artist = artist.trimmed(); }
     void setAlbum( QString album ) { d->album = album.trimmed(); }
     void setTitle( QString title ) { d->title = title.trimmed(); }
-    void setTrackNumber( int n ) { d->trackNumber = n; }
-    void setDuration( int duration ) { d->duration = duration; }
+    void setTrackNumber( uint n ) { d->trackNumber = n; }
+    void setDuration( uint duration ) { d->duration = duration; }
     void setUrl( QUrl url ) { d->url = url; }
     void setSource( Source s ) { d->source = s; }
     
