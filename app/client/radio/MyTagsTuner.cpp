@@ -21,7 +21,7 @@
 #include "StationDelegate.h"
 #include "lib/types/User.h"
 #include "lib/radio/RadioStation.h"
-#include "Settings.h"
+#include "the/settings.h"
 
 MyTagsTuner::MyTagsTuner()
 {

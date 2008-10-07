@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SettingsDialog.h"
-#include "Settings.h"
+#include "the/settings.h"
 #include "lib/core/CoreLocale.h"
 
 // Visual Studio sucks, thus we do this

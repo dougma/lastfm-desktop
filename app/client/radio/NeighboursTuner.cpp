@@ -20,7 +20,7 @@
 #include "NeighboursTuner.h"
 #include "StationDelegate.h"
 #include "lib/types/User.h"
-#include "Settings.h"
+#include "the/settings.h"
 #include "lib/radio/RadioStation.h"
 #include "lib/ws/WsAccessManager.h"
 

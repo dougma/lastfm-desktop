@@ -19,7 +19,7 @@
 
 #include "SendLogsRequest.h"
 
-#include "Settings.h"
+#include "the/settings.h"
 
 #include <QFile>
 #include <QTextDocument>

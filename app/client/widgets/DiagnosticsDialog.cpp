@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-#include "Settings.h"
+#include "the/settings.h"
+#include "widgets/SendLogsDialog.h"
 #include "lib/scrobble/Scrobbler.h"
 #include "lib/scrobble/ScrobbleCache.h"
-#include "widgets/SendLogsDialog.h"
 #include "lib/core/CoreDir.h"
 #include "lib/scrobble/Scrobble.h"
 #include "common/FileLocations.h"

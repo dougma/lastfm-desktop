@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerMediator.h"
-#include "Settings.h"
+#include "the/settings.h"
 
 #define NEW_STOP_WATCH_MACRO() { \
     ScrobblePoint sp( m_track.duration() * The::settings().scrobblePoint() / 100 ); \

@@ -17,13 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef AUDIOSCROBBLER_SETTINGS_H
-#define AUDIOSCROBBLER_SETTINGS_H
+#ifndef CLIENT_SETTINGS_H
+#define CLIENT_SETTINGS_H
 
 #include "lib/moose/MooseSettings.h"
-
-class Settings;
-namespace The { Settings& settings(); }
 
 
 /** usage, only put interesting settings in here, which mostly means ones set in
@@ -33,9 +30,7 @@ class Settings : public Moose::Settings
 {
     Settings( const QString& version, const QString& path );
 
-    static Settings* instance;
     friend class App;
-    friend Settings& The::settings();
 
 private:
     bool m_weWereJustUpgraded;

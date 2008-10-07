@@ -169,7 +169,7 @@ App::App( int argc, char** argv )
 App::~App()
 {
     delete m_scrobbler;
-    delete Settings::instance;
+    delete m_settings;
     delete m_q;
     delete m_radio;
 }
