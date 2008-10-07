@@ -19,7 +19,8 @@
 
 #include "Radio.h"
 #include "Tuner.h"
-#include "phonon"
+#include <phonon>
+#include <cmath>
 
 
 Radio::Radio( Phonon::AudioOutput* output )
@@ -34,6 +35,37 @@ Radio::Radio( Phonon::AudioOutput* output )
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
+
+Radio::~Radio()
+{
+    if (m_mediaObject->state() == Phonon::PlayingState)
+    {
+#if 0
+        // don't blast out the ears of our users, max it to 100 just in case!
+        int const start = qMin( int(std::pow( 10, m_audioOutput->volume() ) * 10), 100 );
+
+        //logarythmic curve
+        for (int x = start; x >= 10; --x)
+        {
+            qreal y = x;
+            y /= 10;
+            m_audioOutput->setVolume( std::log10( y ) );
+            usleep( 15 * 1000 );
+        }
+#endif
+        qreal starting_volume = m_audioOutput->volume();
+        //sigmoid curve
+        for (int x = 60; x >= -60; --x)
+        {
+            qreal y = x;
+            y /= 10;
+            y = qreal(1) / (qreal(1) + std::exp( -y ));
+            y *= starting_volume;
+            m_audioOutput->setVolume( y );
+            usleep( 10 * 1000 );
+        } 
+    }
+}
 
 void
 Radio::play( const RadioStation& station )

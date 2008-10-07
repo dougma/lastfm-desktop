@@ -48,6 +48,7 @@ class RADIO_DLLEXPORT Radio : public QObject
 
 public:
     Radio( Phonon::AudioOutput* );
+    ~Radio();
 	
 	enum State
 	{

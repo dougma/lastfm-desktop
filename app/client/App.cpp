@@ -171,6 +171,7 @@ App::~App()
     delete m_scrobbler;
     delete Settings::instance;
     delete m_q;
+    delete m_radio;
 }
 
 
