@@ -55,6 +55,7 @@ Firehose::Firehose()
 #else
     model->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
     setMinimumWidth( 250 );
+    Q_UNUSED( tabs );
 #endif
 
     UnicornWidget::paintItBlack( this );
