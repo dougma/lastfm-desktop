@@ -119,7 +119,7 @@ Artist::addTags( const QStringList& tags ) const
     foreach( QString const tag, tags)
         comma_separated_tags += tag;
     
-    WsReply* r = WsRequestBuilder( "artist.addTags" )
+    return WsRequestBuilder( "artist.addTags" )
             .add( "artist", m_name )
             .add( "tags", comma_separated_tags )
             .post();
