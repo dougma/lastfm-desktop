@@ -18,4 +18,4 @@ DEFINES += _CORE_DLLEXPORT
 	HEADERS -= win/Utils.h
 }
 
-INSTALLS = HEADERS TARGET
+INSTALLS = $$defaultInstallTargets()

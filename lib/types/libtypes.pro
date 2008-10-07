@@ -11,4 +11,4 @@ RESOURCES = qrc/types.qrc
 
 DEFINES += _TYPES_DLLEXPORT
 
-INSTALLS = HEADERS TARGET
+INSTALLS = $$defaultInstallTargets()

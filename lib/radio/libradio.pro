@@ -9,4 +9,4 @@ SOURCES += $$findSources( cpp )
 HEADERS += $$findSources( h )
 DEFINES += _RADIO_DLLEXPORT
 
-INSTALLS = HEADERS TARGET
+INSTALLS = $$defaultInstallTargets()
