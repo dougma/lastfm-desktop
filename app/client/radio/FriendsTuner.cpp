@@ -23,7 +23,7 @@
 #include "StationDelegate.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/Ws/WsReply.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QNetworkRequest>
 
 
