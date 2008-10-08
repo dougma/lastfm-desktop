@@ -27,6 +27,7 @@
 class NdisEvents
 {
 public:
+    NdisEvents();
     ~NdisEvents();
     HRESULT registerForNdisEvents();
 

@@ -35,10 +35,14 @@
 #include <objbase.h>
 #include <crtdbg.h>
 
+NdisEvents::NdisEvents()
+    : m_pSink(0)
+{}
 
-NdisEvents::~NdisEvents ()
+NdisEvents::~NdisEvents()
 {
-	m_pSink->disconnect();
+    if (m_pSink)
+	    m_pSink->disconnect();
 	if (m_pServices && m_pSink)
 		m_pServices->CancelAsyncCall(m_pSink);
 	// and reference counting will take care of the WmiSink object
