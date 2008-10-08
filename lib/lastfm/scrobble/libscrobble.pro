@@ -12,4 +12,4 @@ DEFINES += _SCROBBLE_DLLEXPORT
 
 headers.files = Scrobbler.h Scrobble.h ScrobblePoint.h
 headers.path = $$INSTALL_DIR/include/lastfm
-INSTALLS += target headers
+INSTALLS = target headers

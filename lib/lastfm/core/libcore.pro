@@ -21,4 +21,4 @@ DEFINES += _CORE_DLLEXPORT
 headers.files = $$HEADERS
 headers.files -= CoreSettings.h
 headers.path = $$INSTALL_DIR/include/lastfm/core
-INSTALLS += target headers
+INSTALLS = target headers

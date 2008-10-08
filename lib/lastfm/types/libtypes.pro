@@ -13,4 +13,4 @@ DEFINES += _TYPES_DLLEXPORT
 
 headers.files = $$HEADERS
 headers.path = $$INSTALL_DIR/include/lastfm/types
-INSTALLS += target headers
+INSTALLS = target headers

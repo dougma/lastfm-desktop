@@ -17,4 +17,4 @@ win32:LIBS += winhttp.lib wbemuuid.lib
 
 headers.files = WsAccessManager.h WsError.h WsKeys.h WsRequestBuilder.h WsRequestParameters.h WsReply.h
 headers.path = $$INSTALL_DIR/include/lastfm/ws
-INSTALLS += target headers
+INSTALLS = target headers
