@@ -22,7 +22,7 @@
 
 #include <QImage>
 #include <QWidget>
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 
 
 class PrettyCoverWidget : public QWidget

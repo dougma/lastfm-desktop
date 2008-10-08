@@ -19,8 +19,8 @@
 
 #include "FirehoseDelegate.h"
 #include "FirehoseModel.h" //for our custom ModelRoles
-#include "lib/core/CoreLocale.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/core/CoreLocale.h"
+#include "lib/lastfm/types/Track.h"
 #include <QPainter>
 
 

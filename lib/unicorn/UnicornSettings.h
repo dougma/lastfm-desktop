@@ -21,10 +21,10 @@
 #define UNICORN_SETTINGS_H
 
 #include "lib/DllExportMacro.h"
+#include "lib/lastfm/core/CoreSettings.h" //CORE_ORGANISATION_DOMAIN
+#include "app/client/version.h"    //PRODUCT_NAME
 #include <QSettings>
 #include <QString>
-#include "lib/core/CoreSettings.h" //CORE_ORGANISATION_DOMAIN
-#include "app/client/version.h"    //PRODUCT_NAME
 
 
 namespace Unicorn

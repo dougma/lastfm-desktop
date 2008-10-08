@@ -34,10 +34,10 @@
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "version.h"
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "lib/ws/WsReply.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDockWidget>

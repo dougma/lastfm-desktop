@@ -22,7 +22,7 @@
 
 #include <QAbstractButton>
 #include <QPointer>
-#include "lib/scrobble/Scrobble.h"
+#include "lib/lastfm/scrobble/Scrobble.h"
 class QMovie;
 class QTimeLine;
 

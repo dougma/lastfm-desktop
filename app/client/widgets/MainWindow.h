@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include <QPointer>
 #include "State.h"

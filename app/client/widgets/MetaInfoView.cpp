@@ -26,9 +26,10 @@
 #include "widgets/TagListWidget.h"
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
-#include "lib/core/CoreUrl.h"
-#include "lib/core/CoreDomElement.h"
-#include "lib/ws/WsAccessManager.h"
+#include "lib/lastfm/core/CoreUrl.h"
+#include "lib/lastfm/core/CoreDomElement.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
+#include "lib/lastfm/ws/WsReply.h"
 
 
 Bio::Bio()

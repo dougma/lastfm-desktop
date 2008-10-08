@@ -27,9 +27,9 @@
 #include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
-#include "lib/core/QMessageBoxBuilder.h"
-#include "lib/scrobble/Scrobbler.h"
-#include "lib/radio/Radio.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/scrobble/Scrobbler.h"
+#include "lib/lastfm/radio/Radio.h"
 #include "lib/unicorn/BackgroundJobQueue.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
@@ -112,7 +112,16 @@ App::App( int argc, char** argv )
     // work
     setStyle( new UnicornMacStyle );
 #endif
-
+    
+    // ATTENTION! Under no circumstance change these strings! --mxcl
+#ifdef WIN32
+    Ws::UserAgent = "Last.fm Client (Windows)";
+#elif defined (Q_WS_MAC)
+    Ws::UserAgent = "Last.fm Client (OS X)";
+#elif defined (Q_WS_X11)
+    Ws::UserAgent = "Last.fm Client (X11)";
+#endif
+    
     // IMPORTANT don't allow any GUI thread message loops to run during this
     // ctor! Things will crash in interesting ways!
     //TODO bootstrapping

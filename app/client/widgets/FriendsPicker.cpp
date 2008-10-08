@@ -20,7 +20,9 @@
 #include "FriendsPicker.h"
 #include "widgets/UnicornLineEdit.h"
 #include "widgets/UnicornWidget.h"
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
+#include "lib/lastfm/ws/WsReply.h"
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QListWidget>
 #include <QVBoxLayout>

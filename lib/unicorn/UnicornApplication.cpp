@@ -21,10 +21,10 @@
 #include "UnicornSettings.h"
 #include "widgets/LoginDialog.h"
 #include "common/c++/Logger.h"
-#include "lib/core/QMessageBoxBuilder.h"
-#include "lib/core/CoreDir.h"
-#include "lib/core/CoreSysInfo.h"
-#include "lib/ws/WsKeys.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/core/CoreDir.h"
+#include "lib/lastfm/core/CoreSysInfo.h"
+#include "lib/lastfm/ws/WsKeys.h"
 #include <QDebug>
 #include <QTranslator>
 

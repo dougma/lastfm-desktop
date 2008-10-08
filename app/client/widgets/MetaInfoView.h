@@ -20,7 +20,7 @@
 #include <QLabel>
 #include <QWebView>
 #include "State.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 
 namespace Unicorn 
 {

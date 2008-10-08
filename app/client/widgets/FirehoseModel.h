@@ -25,7 +25,7 @@
 #include <QList>
 #include <QPixmap>
 #include <QVariant>
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 
 
 enum

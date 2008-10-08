@@ -19,8 +19,9 @@
 
 #include "MyTagsTuner.h"
 #include "StationDelegate.h"
-#include "lib/types/User.h"
-#include "lib/radio/RadioStation.h"
+#include "lib/lastfm/types/User.h"
+#include "lib/lastfm/radio/RadioStation.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include "the/settings.h"
 
 MyTagsTuner::MyTagsTuner()

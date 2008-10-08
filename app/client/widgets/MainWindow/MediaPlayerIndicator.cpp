@@ -20,8 +20,8 @@
 #include "MediaPlayerIndicator.h"
 #include "the/radio.h"
 #include "the/settings.h"
-#include "lib/radio/RadioStation.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/radio/RadioStation.h"
+#include "lib/lastfm/types/Track.h"
 #include <QCoreApplication>
 #include <QHBoxLayout>
 #include <QLabel>

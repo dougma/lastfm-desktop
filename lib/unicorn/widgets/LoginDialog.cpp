@@ -19,9 +19,9 @@
 
 #include "LoginDialog.h"
 #include "common/qt/md5.cpp"
-#include "lib/core/QMessageBoxBuilder.h"
-#include "lib/ws/WsRequestBuilder.h"
-#include "lib/ws/WsReply.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/ws/WsRequestBuilder.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QMovie>
 #include <QPushButton>
 

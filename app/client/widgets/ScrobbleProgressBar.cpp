@@ -19,8 +19,8 @@
 
 #include "ScrobbleProgressBar.h"
 #include "StopWatch.h"
-#include "lib/scrobble/ScrobblePoint.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
+#include "lib/lastfm/types/Track.h"
 #include <QtGui>
 
 

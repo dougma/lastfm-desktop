@@ -21,8 +21,8 @@
 #include "FirehoseDelegate.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
-#include "lib/core/CoreDomElement.h"
-#include "lib/ws/WsAccessManager.h"
+#include "lib/lastfm/core/CoreDomElement.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 #include <QDebug>
 #include <QNetworkReply>
 #include <QNetworkRequest>

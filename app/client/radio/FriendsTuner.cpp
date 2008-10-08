@@ -18,13 +18,17 @@
  ***************************************************************************/
 
 #include "FriendsTuner.h"
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
 #include "the/settings.h"
 #include "StationDelegate.h"
-#include "lib/radio/RadioStation.h"
-#include "lib/ws/WsAccessManager.h"
+#include "lib/lastfm/radio/RadioStation.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
+#include "lib/lastfm/Ws/WsReply.h"
+#include <QNetworkRequest>
+
 
 Q_DECLARE_METATYPE( QListWidgetItem* );
+
 
 FriendsTuner::FriendsTuner()
 {

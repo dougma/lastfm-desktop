@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesListener.h"
-#include "lib/core/CoreProcess.h"
-#include "lib/core/mac/AppleScript.h"
-#include "lib/core/mac/CFStringToQString.h"
+#include "lib/lastfm/core/CoreProcess.h"
+#include "lib/lastfm/core/mac/AppleScript.h"
+#include "lib/lastfm/core/mac/CFStringToQString.h"
 #include <QTcpSocket>
 #include <QThread>
 #include <QHostAddress>

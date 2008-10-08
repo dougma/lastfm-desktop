@@ -22,7 +22,7 @@
 
 #include "State.h"
 #include "PlayerCommandParser.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 
 
 class PlayerConnection

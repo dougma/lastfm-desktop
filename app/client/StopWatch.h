@@ -20,7 +20,7 @@
 #ifndef STOP_WATCH_H
 #define STOP_WATCH_H
 
-#include "lib/scrobble/ScrobblePoint.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
 #include <QThread>
 #include <QMutex>
 #include <QDateTime>

@@ -20,7 +20,7 @@
 #ifndef MBID_JOB_H
 #define MBID_JOB_H
 
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 #include "lib/unicorn/BackgroundJob.h"
 
 

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ITunesPluginInstaller.h"
-#include "lib/core/mac/CFStringToQString.h"
+#include "lib/lastfm/core/mac/CFStringToQString.h"
 #include <QDebug>
 #include <QDir>
 #include <QProcess>

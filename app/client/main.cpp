@@ -21,8 +21,8 @@
 #include "player/PlayerListener.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
-#include "lib/core/QMessageBoxBuilder.h"
-#include "lib/core/UniqueApplication.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/core/UniqueApplication.h"
 #include <QDir>
 #include <QTimer>
 

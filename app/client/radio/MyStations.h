@@ -22,7 +22,7 @@
 
 #include <QList>
 #include "ui_MyStations.h"
-#include "lib/radio/RadioStation.h"
+#include "lib/lastfm/radio/RadioStation.h"
 
 class WsReply;
 

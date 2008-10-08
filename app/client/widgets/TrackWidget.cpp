@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "TrackWidget.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 #include <QHBoxLayout>
 #include <QLabel>
 

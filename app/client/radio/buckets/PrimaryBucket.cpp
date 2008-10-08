@@ -27,7 +27,7 @@
 #include <QStringListModel>
 #include "PrimaryBucket.h"
 #include "PlayerBucket.h"
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
 
 
 PrimaryBucket::PrimaryBucket( QWidget* w )

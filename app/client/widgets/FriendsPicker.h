@@ -21,7 +21,7 @@
 #define FRIENDS_PICKER_H
 
 #include <QDialog>
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
 
 
 class FriendsPicker : public QDialog

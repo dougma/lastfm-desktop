@@ -21,7 +21,7 @@
 #define NOW_PLAYING_TUNER_H
 
 #include "ui_NowPlayingTuner.h"
-#include "lib/core/WeightedStringList.h"
+#include "lib/lastfm/core/WeightedStringList.h"
 
 
 class NowPlayingTuner : public QWidget

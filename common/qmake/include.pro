@@ -4,6 +4,9 @@ include( debug.pro.inc )
 #win32:include( manifest.pro.inc )
 include( QtOverride.pro.inc )
 
+# for #include <lastfm/*.h>
+INCLUDEPATH += $$ROOT_DIR/lib
+
 linux*:CONFIG += link_pkgconfig
 
 CONFIG( service ) {

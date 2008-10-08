@@ -21,7 +21,7 @@
 #define MOOSE_SETTINGS_H
 
 #include "lib/DllExportMacro.h"
-#include "lib/scrobble/ScrobblePoint.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include <QStringList>
 

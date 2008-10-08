@@ -20,7 +20,8 @@
 #include "NowPlayingTuner.h"
 #include "StationDelegate.h"
 #include "the/radio.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QVBoxLayout>
 #include <QToolBar>
 #include <QLineEdit>
@@ -48,7 +49,7 @@ NowPlayingTuner::onTrackSpooled( const Track& t )
         //Load Tags
         ui.tagsTab->clear();
         WsReply* r = t.getTopTags();
-        connect( r, SIGNAL( finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
+        connect( r, SIGNAL(finished( WsReply*)), SLOT(onFetchedTopTags(WsReply*)) );
         
         //Load Similar Artists
         ui.similarArtistsTab->clear();
@@ -79,7 +80,7 @@ NowPlayingTuner::addWeightedStringsToList( WeightedStringList stringList, QListW
 	if( stringList.isEmpty() )
 		return;
 
-	stringList.sortWeightingDescending();
+	stringList.weightedSort( Qt::DescendingOrder );
 	
 	float maxTagCount = stringList.first().weighting();
 

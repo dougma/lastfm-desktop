@@ -21,8 +21,8 @@
 #define PLAYER_COMMAND_PARSER_H
 
 #include "common/HideStupidWarnings.h"
-#include "lib/core/CoreException.h"
-#include "lib/types/Track.h"
+#include "lib/lastfm/core/CoreException.h"
+#include "lib/lastfm/types/Track.h"
 
 
 class PlayerCommandParser

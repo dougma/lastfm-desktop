@@ -22,7 +22,7 @@
 #include "widgets/FriendsPicker.h"
 #include "widgets/TrackWidget.h"
 #include "widgets/UnicornWidget.h"
-#include "lib/types/User.h"
+#include "lib/lastfm/types/User.h"
 #include <QLineEdit>
 #include <QPainter>
 #include <QTimer>

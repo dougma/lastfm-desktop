@@ -18,15 +18,16 @@
  ***************************************************************************/
 
 #include "MyStations.h"
+#include "MyStationsDelegate.h"
+#include "SearchResultsTuner.h"
 #include "the/radio.h"
 #include "the/settings.h"
 #include "the/mainWindow.h"
+#include "lib/lastfm/types/Tag.h"
+#include "lib/lastfm/ws/WsReply.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QListWidgetItem>
 #include <QDebug>
-#include "lib/types/Tag.h"
-#include "SearchResultsTuner.h"
-#include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "MyStationsDelegate.h"
 
 
 RadioStation helper( RadioStation s, const QString& title )

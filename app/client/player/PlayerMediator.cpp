@@ -87,7 +87,7 @@ PlayerMediator::onPlayerConnectionCommandReceived( const PlayerConnection& conne
 
 
 void
-PlayerMediator::onRadioTuningIn( const RadioStation& station )
+PlayerMediator::onRadioTuningIn( const RadioStation& )
 {    
     m_radioIsActive = true;
 

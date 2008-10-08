@@ -18,16 +18,17 @@
  ***************************************************************************/
 
 #include "PlayerBucket.h"
-#include <QListView>
 #include "widgets/ImageButton.h"
-#include <lib/ws/WsAccessManager.h>
+#include "lib/lastfm/ws/WsAccessManager.h"
+#include <QListView>
+#include <QMenu>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
-#include <QMenu>
 
 const QString PlayerBucket::k_dropText  = tr( "Drag something in here to play it." );
+
 
 PlayerBucket::PlayerBucket( QWidget* w )
 			 :QListWidget( w ),

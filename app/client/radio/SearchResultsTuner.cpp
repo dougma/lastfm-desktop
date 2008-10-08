@@ -20,7 +20,7 @@
 #include "SearchResultsTuner.h"
 #include <QListWidget>
 #include "StationDelegate.h"
-#include "lib/radio/RadioStation.h"
+#include "lib/lastfm/radio/RadioStation.h"
 #include "the/radio.h"
 #include <QListWidgetItem>
 

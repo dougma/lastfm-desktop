@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "FirehoseModel.h"
-#include "lib/core/CoreDomElement.h"
-#include "lib/ws/WsAccessManager.h"
+#include "lib/lastfm/core/CoreDomElement.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTcpSocket>

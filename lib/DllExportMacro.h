@@ -20,67 +20,23 @@
 #ifndef DLL_EXPORT_MACRO_H
 #define DLL_EXPORT_MACRO_H
 
-/** Exports symbols when compiled as part of libunicorn, imports when included
-  * from some external target. */
+/** Exports symbols when compiled as part of the lib
+  * Imports when included from some other target */
 #if defined(_WIN32) || defined(WIN32)
-    #ifdef _MOOSE_DLLEXPORT
-        #define MOOSE_DLLEXPORT __declspec(dllexport)
-    #else
-        #define MOOSE_DLLEXPORT __declspec(dllimport)
-    #endif
+	#ifdef _MOOSE_DLLEXPORT
+	    #define MOOSE_DLLEXPORT __declspec(dllexport)
+	#else
+	    #define MOOSE_DLLEXPORT __declspec(dllimport)
+	#endif
 
-    #ifdef _UNICORN_DLLEXPORT
-        #define UNICORN_DLLEXPORT __declspec(dllexport)
-    #else
-        #define UNICORN_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    #ifdef _RADIO_DLLEXPORT
-        #define RADIO_DLLEXPORT __declspec(dllexport)
-    #else
-        #define RADIO_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    #ifdef _FINGERPRINT_DLLEXPORT
-        #define FINGERPRINT_DLLEXPORT __declspec(dllexport)
-    #else
-        #define FINGERPRINT_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    #ifdef _WS_DLLEXPORT
-        #define WS_DLLEXPORT __declspec(dllexport)
-    #else
-        #define WS_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    #ifdef _TYPES_DLLEXPORT
-        #define TYPES_DLLEXPORT __declspec(dllexport)
-    #else
-        #define TYPES_DLLEXPORT __declspec(dllimport)
-    #endif
-    
-    #ifdef _CORE_DLLEXPORT
-        #define CORE_DLLEXPORT __declspec(dllexport)
-    #else
-        #define CORE_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    #ifdef _SCROBBLE_DLLEXPORT
-        #define SCROBBLE_DLLEXPORT __declspec(dllexport)
-    #else
-        #define SCROBBLE_DLLEXPORT __declspec(dllimport)
-    #endif
-
-    
+	#ifdef _UNICORN_DLLEXPORT
+	    #define UNICORN_DLLEXPORT __declspec(dllexport)
+	#else
+	    #define UNICORN_DLLEXPORT __declspec(dllimport)
+	#endif
 #else
     #define MOOSE_DLLEXPORT
     #define UNICORN_DLLEXPORT
-    #define RADIO_DLLEXPORT
-    #define FINGERPRINT_DLLEXPORT
-    #define WS_DLLEXPORT
-    #define CORE_DLLEXPORT
-    #define TYPES_DLLEXPORT
-    #define SCROBBLE_DLLEXPORT
 #endif
 
 #endif

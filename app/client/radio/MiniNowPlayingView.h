@@ -21,7 +21,7 @@
 #define MINI_NOW_PLAYING_VIEW_H
 
 #include <QWidget>
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
 class QLabel;
 
 

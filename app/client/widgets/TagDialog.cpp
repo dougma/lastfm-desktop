@@ -18,13 +18,13 @@
  ***************************************************************************/
 
 #include "TagDialog.h"
-#include "lib/types/User.h"
-#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "widgets/TagListWidget.h"
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/TrackWidget.h"
-
+#include "lib/lastfm/types/User.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QtCore>
 #include <QtGui>
 

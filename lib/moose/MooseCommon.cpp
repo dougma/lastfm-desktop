@@ -19,7 +19,7 @@
 
 #include "MooseCommon.h"
 #include "MooseSettings.h"
-#include "lib/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
 
 #include <QCoreApplication>
 #include <QDir>

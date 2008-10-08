@@ -19,7 +19,7 @@
 
 #include <QWidget>
 #include "State.h"
-#include "lib/scrobble/ScrobblePoint.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
 
 
 class ScrobbleProgressBar : public QWidget

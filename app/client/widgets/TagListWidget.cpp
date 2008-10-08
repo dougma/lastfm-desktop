@@ -20,8 +20,8 @@
 
 #include "TagListWidget.h"
 #include "Settings.h"
-#include "lib/types/Tag.h"
-#include "lib/ws/WsReply.h"
+#include "lib/lastfm/types/Tag.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QItemDelegate>
