@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS += lib/core/libcore.pro \
-           lib/ws/libws.pro \
-           lib/types/libtypes.pro \
-           lib/scrobble/libscrobble.pro \
-           lib/radio/libradio.pro
+SUBDIRS += lastfm/core/libcore.pro \
+           lastfm/ws/libws.pro \
+           lastfm/types/libtypes.pro \
+           lastfm/scrobble/libscrobble.pro \
+           lastfm/radio/libradio.pro
