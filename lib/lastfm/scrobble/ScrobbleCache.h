@@ -24,7 +24,7 @@
 
 
 /** absolutely not thread-safe */
-class ScrobbleCache
+class LASTFM_SCROBBLE_DLLEXPORT ScrobbleCache
 {
     QString m_path;
     QString m_username;

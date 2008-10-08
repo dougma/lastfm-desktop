@@ -7,7 +7,7 @@ include( $$ROOT_DIR/common/qmake/include.pro )
 SOURCES = $$findSources( cpp )
 HEADERS = $$findSources( h )
 
-DEFINES += _LASTFM_CORE_DLLEXPORT
+DEFINES += _CORE_DLLEXPORT
 
 !macx {
     SOURCES -= mac/AppleScript.cpp mac/Growl.cpp mac/CFStringToQString.cpp

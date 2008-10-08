@@ -19,6 +19,7 @@
 
 #include "Radio.h"
 #include "Tuner.h"
+#include <QThread>
 #include <phonon>
 #include <cmath>
 
@@ -38,22 +39,10 @@ Radio::Radio( Phonon::AudioOutput* output )
 
 Radio::~Radio()
 {
-    if (m_mediaObject->state() != Phonon::PlayingState)
+#ifndef WIN32 //for now I'm scared on Windows
+	if (m_mediaObject->state() != Phonon::PlayingState)
         return;
 
-#if 0
-    // don't blast out the ears of our users, max it to 100 just in case!
-    int const start = qMin( int(std::pow( 10, m_audioOutput->volume() ) * 10), 100 );
-
-    //logarythmic curve
-    for (int x = start; x >= 10; --x)
-    {
-        qreal y = x;
-        y /= 10;
-        m_audioOutput->setVolume( std::log10( y ) );
-        usleep( 15 * 1000 );
-    }
-#endif
     qreal starting_volume = m_audioOutput->volume();
     //sigmoid curve
     for (int x = 18; x >= -60; --x)
@@ -63,8 +52,11 @@ Radio::~Radio()
         y = qreal(1) / (qreal(1) + std::exp( -y ));
         y *= starting_volume;
         m_audioOutput->setVolume( y );
-        usleep( 7 * 1000 );
+
+		struct Thread : QThread { using QThread::msleep; };
+		Thread::msleep( 7 );
     } 
+#endif
 }
 
 

@@ -139,7 +139,7 @@ Unicorn::Application::~Application()
 
 
 void
-Unicorn::Application::qMsgHandler( QtMsgType, const char* msg )
+Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
 {
     Logger::the().log( msg );
 
@@ -147,6 +147,7 @@ Unicorn::Application::qMsgHandler( QtMsgType, const char* msg )
 #ifdef WIN32
     qWinMsgHandler( type, msg );
 #else
+	Q_UNUSED( type );
     fprintf( stderr, "%s\n", msg );
     fflush( stderr );
 #endif
