@@ -24,7 +24,7 @@
 #include <lastfm/types/Track.h>
 #include <lastfm/radio/RadioStation.h>
 #include <lastfm/ws/WsError.h>
-#include <phononnamespace.h>
+#include <phonon/phononnamespace.h>
 #include <QList>
 #include <QObject>
 

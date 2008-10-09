@@ -20,14 +20,15 @@
 #include "Radio.h"
 #include "Tuner.h"
 #include <QThread>
-#include <phonon>
+#include <phonon/mediaobject.h>
+#include <phonon/audiooutput.h>
 #include <cmath>
 
 
 Radio::Radio( Phonon::AudioOutput* output )
-			   : m_tuner( 0 ),
-			     m_audioOutput( output ),
-			     m_state( Radio::Stopped )
+     : m_tuner( 0 ),
+       m_audioOutput( output ),
+       m_state( Radio::Stopped )
 {
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
