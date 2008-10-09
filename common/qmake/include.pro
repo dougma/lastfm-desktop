@@ -93,3 +93,9 @@ defineReplace( generateInstallerMakefile ) {
 
 # for install stuff
 target.path = $$INSTALL_DIR/lib
+
+
+linux*:contains( QT, phonon ) {
+    # use KDE phonon if installed in preference
+    LIBS += -L$$system( kde4-config --prefix )/lib
+}
