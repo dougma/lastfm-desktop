@@ -19,10 +19,10 @@
 
 #include <QListWidget>
 #include <QSplitter>
-#include "UnicornTabWidget.h"
 #include <QStackedWidget>
 #include <QStackedLayout>
 #include "widgets/ImageButton.h"
+#include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
 #include "PrimaryBucket.h"
