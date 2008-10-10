@@ -10,7 +10,8 @@ then
     rm -rf AudioScrobbler.bundle
 fi
 
-cd ~/Library/Application\ Support/Last.fm
+cd ~/Library/Application\ Support/Last.fm || exit 1
+
 # automatic iPod database
 rm iTunesPlays.db
 # manual iPod databases
