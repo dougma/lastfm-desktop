@@ -208,6 +208,6 @@ initLogger()
     QByteArray bytes = CoreDir::mainLog().toLocal8Bit();
     const char* path = bytes.data();
 #endif
-    Logger logger( path );
+    new Logger( path );
     qInstallMsgHandler( qMsgHandler );
 }
