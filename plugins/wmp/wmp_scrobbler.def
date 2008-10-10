@@ -1,0 +1,9 @@
+; wmp_scrobbler.def : Declares the module parameters.
+
+LIBRARY      "WMP_SCROBBLER.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

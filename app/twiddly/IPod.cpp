@@ -18,20 +18,17 @@
  ***************************************************************************/
 
 #include "IPod.h"
-
+#include "IPodScrobble.h"
 #include "ITunesLibrary.h"
 #include "PlayCountsDatabase.h"
-#include "common/logger.h"
+#include "common/qt/msleep.cpp"
 #include "common/ITunesExceptions.h"
-
-#include "libMoose/MooseCommon.h"
-#include "libUnicorn/AppleScript.h"
-#include "libUnicorn/TrackInfo.h"
-
-#include <iostream>
-
+#include "lib/lastfm/core/CoreDir.h"
+#include "lib/lastfm/core/mac/AppleScript.h"
+#include "lib/lastfm/types/Track.h"
 #include <QtCore>
 #include <QtXml>
+#include <iostream>
 
 
 IPod* //static
@@ -93,7 +90,7 @@ IPod::scrobbleId() const
 QDir
 IPod::saveDir() const 
 {
-    QDir d = Moose::savePath( "devices/" + device + '/' + serial );
+    QDir d = CoreDir::data().filePath( "devices/" + device + '/' + serial );
     d.mkpath( "." );
     return d;
 }
@@ -106,7 +103,7 @@ IPod::ScrobbleList::xml() const
     QDomElement root = xml.createElement( "submissions" );
     root.setAttribute( "product", "Twiddly" );
     
-    QListIterator<TrackInfo> i( *this );
+    QListIterator<Track> i( *this );
     while (i.hasNext())
         root.appendChild( i.next().toDomElement( xml ) );
     
@@ -142,8 +139,8 @@ IPod::twiddle()
 
             if ( track.isNull() )
             {
-                LOGL( 2, "Failed to read current iTunes track. Either something went wrong, "
-                         "or the track was not found on the disk despite being in the iTunes library." );
+                qWarning() << "Failed to read current iTunes track. Either something went wrong, "
+                              "or the track was not found on the disk despite being in the iTunes library.";
                 continue;
             }
 
@@ -156,7 +153,7 @@ IPod::twiddle()
 
                     m_scrobbles.removeAllWithUniqueId( track.uniqueId() );
                     db.remove( track );
-                    LOGL( 3, "Multiple tracks were found with the same unique id / path, this track won't be scrobbled from the iPod: " << track.uniqueId() );
+                    LOG( 3, "Multiple tracks were found with the same unique id / path, this track won't be scrobbled from the iPod: " << track.uniqueId() );
                     continue;
                 }
                 diffedTrackPaths.insert( track.uniqueId() );
@@ -182,22 +179,22 @@ IPod::twiddle()
         
             if ( diff > 0 )
             {
-                TrackInfo t = track.trackInfo(); // can throw
+                ::Track t = track.lastfmTrack(); // can throw
 
-                if ( !t.isEmpty() )
+                if (!t.isNull())
                 {
-                    t.setPlayCount( diff );
-                    t.setMediaDeviceId( scrobbleId() );
-                    t.setRatingFlag( TrackInfo::Scrobbled );
-                    t.setUniqueID( track.uniqueId() );
-                    m_scrobbles += t;
-                    LOGL( 3, diff << " scrobbles found for " << t.toString() );
+                    IPodScrobble t2( t );
+                    t2.setPlayCount( diff );
+                    t2.setMediaDeviceId( scrobbleId() );
+                    t2.setUniqueId( track.uniqueId() );
+                    m_scrobbles += t2;
+                    qDebug() << diff << "scrobbles found for" << t;
                 }
                 else
                 {
-                    LOGL( 2, "Couldn't get TrackInfo for " << id );
+                    qWarning() << "Couldn't get Track for" << id;
                     
-                    // We get here if COM fails to populate the TrackInfo for whatever reason.
+                    // We get here if COM fails to populate the Track for whatever reason.
                     // Therefore we continue and don't let the local db update. That way we
                     // maintain the diff and we should be picking up on it next time twiddly
                     // runs.
@@ -242,7 +239,7 @@ IPod::twiddle()
         QString pid;
         for( int x = 0; x < 20 && (pid = script.exec()).isEmpty(); ++x )
         {
-            UnicornUtils::msleep( 500 );
+            Qt::msleep( 500 );
         }
                 
         return pid;

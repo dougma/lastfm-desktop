@@ -1,0 +1,396 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6303C7B10DAD03EA001F707C /* iTunesAPI.c in Sources */ = {isa = PBXBuildFile; fileRef = 01285C0900CC3A4A7F000001 /* iTunesAPI.c */; };
+		63233BAF0D7491470009EC65 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63233BAD0D7491470009EC65 /* logger.cpp */; };
+		632E70550DD9FF0200A16D88 /* playCountForDatabaseId.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 632E70520DD9FEF900A16D88 /* playCountForDatabaseId.scpt */; };
+		633C62970D6CA1DD00B609B9 /* iTunesPlugin_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 633C62960D6CA1DD00B609B9 /* iTunesPlugin_mac.cpp */; };
+		634E6EF50D3FBA7D00E16E0D /* currentTrackLocation.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 638053560D3E95A10003DB13 /* currentTrackLocation.scpt */; };
+		634E6EF60D3FBA7D00E16E0D /* currentTrackPersistentId.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 638053570D3E95A10003DB13 /* currentTrackPersistentId.scpt */; };
+		634E6EF70D3FBA7D00E16E0D /* playCountForPersistentId.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 638053580D3E95A10003DB13 /* playCountForPersistentId.scpt */; };
+		637452E10D58B02B00429514 /* Moose_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 637452E00D58B02B00429514 /* Moose_mac.cpp */; };
+		637A231E0DAA9B1C004590E1 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 637A231D0DAA9B1C004590E1 /* uninstall.sh */; };
+		638052470D3E53940003DB13 /* changelog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 638052460D3E53940003DB13 /* changelog.txt */; };
+		6392AF640D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6392AF620D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp */; };
+		63E5E4770D6B51C500774857 /* IPodDetector_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */; };
+		63ED46C20DD8D52900F6FBE0 /* currentTrack.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 63ED46BF0DD8D51D00F6FBE0 /* currentTrack.scpt */; };
+		DC26679C0BD9410900B4ED68 /* iTunesPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01285C0700CC38597F000001 /* iTunesPlugin.cpp */; };
+		DC26679F0BD9410900B4ED68 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
+		FB0C1E670D9919CD004820B9 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0C1E660D9919CD004820B9 /* CoreServices.framework */; };
+		FB0C20D00D9922CD004820B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0C20CF0D9922CD004820B9 /* Carbon.framework */; };
+		FB3EA6B90D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */; };
+		FB3EA6C90D587677003DC14E /* ITunesTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */; };
+		FB4ED6F30D6B00CE00F243B8 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB4ED6F20D6B00CE00F243B8 /* IOKit.framework */; };
+		FB6471A70D80643A007006E4 /* IPod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6471A40D806439007006E4 /* IPod.cpp */; };
+		FB6471A90D80643A007006E4 /* IPod_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6471A60D80643A007006E4 /* IPod_mac.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		01285C0200CC31B17F000001 /* iTunesAPI.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iTunesAPI.h; sourceTree = "<group>"; };
+		01285C0300CC31B17F000001 /* iTunesVisualAPI.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iTunesVisualAPI.h; sourceTree = "<group>"; };
+		01285C0700CC38597F000001 /* iTunesPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = iTunesPlugin.cpp; sourceTree = "<group>"; };
+		01285C0900CC3A4A7F000001 /* iTunesAPI.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = iTunesAPI.c; sourceTree = "<group>"; };
+		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		63233BAD0D7491470009EC65 /* logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = logger.cpp; path = common/logger.cpp; sourceTree = "<group>"; };
+		63233BAE0D7491470009EC65 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logger.h; path = common/logger.h; sourceTree = "<group>"; };
+		632E70520DD9FEF900A16D88 /* playCountForDatabaseId.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = playCountForDatabaseId.scpt; path = scripts/playCountForDatabaseId.scpt; sourceTree = "<group>"; };
+		633C62960D6CA1DD00B609B9 /* iTunesPlugin_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = iTunesPlugin_mac.cpp; sourceTree = "<group>"; };
+		637452E00D58B02B00429514 /* Moose_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Moose_mac.cpp; sourceTree = "<group>"; };
+		637A1ED30D4FCA15004FA19F /* Moose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Moose.h; sourceTree = "<group>"; };
+		637A231D0DAA9B1C004590E1 /* uninstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = uninstall.sh; path = scripts/uninstall.sh; sourceTree = "<group>"; };
+		638052460D3E53940003DB13 /* changelog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = changelog.txt; sourceTree = "<group>"; };
+		638053560D3E95A10003DB13 /* currentTrackLocation.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = currentTrackLocation.scpt; path = scripts/currentTrackLocation.scpt; sourceTree = "<group>"; };
+		638053570D3E95A10003DB13 /* currentTrackPersistentId.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = currentTrackPersistentId.scpt; path = scripts/currentTrackPersistentId.scpt; sourceTree = "<group>"; };
+		638053580D3E95A10003DB13 /* playCountForPersistentId.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = playCountForPersistentId.scpt; path = scripts/playCountForPersistentId.scpt; sourceTree = "<group>"; };
+		6392AF620D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ITunesPlaysDatabase.cpp; sourceTree = "<group>"; };
+		6392AF630D788A2D00E1B4F6 /* ITunesPlaysDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITunesPlaysDatabase.h; sourceTree = "<group>"; };
+		63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IPodDetector_mac.cpp; sourceTree = "<group>"; };
+		63ED46BF0DD8D51D00F6FBE0 /* currentTrack.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = currentTrack.scpt; path = scripts/currentTrack.scpt; sourceTree = "<group>"; };
+		AF289ABC0CDFDCF200C8C0B4 /* iTunes Scrobbler.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "iTunes Scrobbler.plist"; sourceTree = "<group>"; };
+		DC2667A60BD9410900B4ED68 /* AudioScrobbler.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioScrobbler.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB0C1E660D9919CD004820B9 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
+		FB0C20CF0D9922CD004820B9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ITunesPlaysDatabase_mac.cpp; sourceTree = "<group>"; };
+		FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ITunesTrack.cpp; path = common/ITunesTrack.cpp; sourceTree = "<group>"; };
+		FB3EA6C80D587677003DC14E /* ITunesTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITunesTrack.h; path = common/ITunesTrack.h; sourceTree = "<group>"; };
+		FB4ED6F20D6B00CE00F243B8 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		FB5345DE0D4A060200BD9819 /* iTunesPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunesPlugin.h; sourceTree = "<group>"; };
+		FB6471A40D806439007006E4 /* IPod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IPod.cpp; sourceTree = "<group>"; };
+		FB6471A50D80643A007006E4 /* IPod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPod.h; sourceTree = "<group>"; };
+		FB6471A60D80643A007006E4 /* IPod_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IPod_mac.cpp; sourceTree = "<group>"; };
+		FBAF702D0D7496B000A4919B /* IPodDetector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPodDetector.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DC26679E0BD9410900B4ED68 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC26679F0BD9410900B4ED68 /* CoreFoundation.framework in Frameworks */,
+				FB4ED6F30D6B00CE00F243B8 /* IOKit.framework in Frameworks */,
+				FB0C1E670D9919CD004820B9 /* CoreServices.framework in Frameworks */,
+				FB0C20D00D9922CD004820B9 /* Carbon.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01285C0000CC31B17F000001 /* iTunesVisualAPI */ = {
+			isa = PBXGroup;
+			children = (
+				01285C0900CC3A4A7F000001 /* iTunesAPI.c */,
+				01285C0200CC31B17F000001 /* iTunesAPI.h */,
+				01285C0300CC31B17F000001 /* iTunesVisualAPI.h */,
+			);
+			path = iTunesVisualAPI;
+			sourceTree = "<group>";
+		};
+		089C166AFE841209C02AAC07 /* iTunesPlugIn */ = {
+			isa = PBXGroup;
+			children = (
+				638053590D3E95AF0003DB13 /* Scripts */,
+				08FB77AFFE84173DC02AAC07 /* Source */,
+				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
+				19C28FB6FE9D52B211CA2CBB /* Products */,
+				638052460D3E53940003DB13 /* changelog.txt */,
+				AF289ABC0CDFDCF200C8C0B4 /* iTunes Scrobbler.plist */,
+			);
+			name = iTunesPlugIn;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				FB0C20CF0D9922CD004820B9 /* Carbon.framework */,
+				FB0C1E660D9919CD004820B9 /* CoreServices.framework */,
+				FB4ED6F20D6B00CE00F243B8 /* IOKit.framework */,
+				0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		08FB77AFFE84173DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				FB6471A40D806439007006E4 /* IPod.cpp */,
+				FB6471A60D80643A007006E4 /* IPod_mac.cpp */,
+				FB6471A50D80643A007006E4 /* IPod.h */,
+				6392AF620D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp */,
+				6392AF630D788A2D00E1B4F6 /* ITunesPlaysDatabase.h */,
+				63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */,
+				FBAF702D0D7496B000A4919B /* IPodDetector.h */,
+				63233BAD0D7491470009EC65 /* logger.cpp */,
+				63233BAE0D7491470009EC65 /* logger.h */,
+				FB5345DE0D4A060200BD9819 /* iTunesPlugin.h */,
+				01285C0700CC38597F000001 /* iTunesPlugin.cpp */,
+				633C62960D6CA1DD00B609B9 /* iTunesPlugin_mac.cpp */,
+				FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */,
+				FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */,
+				FB3EA6C80D587677003DC14E /* ITunesTrack.h */,
+				637A1ED30D4FCA15004FA19F /* Moose.h */,
+				637452E00D58B02B00429514 /* Moose_mac.cpp */,
+				01285C0000CC31B17F000001 /* iTunesVisualAPI */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		19C28FB6FE9D52B211CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DC2667A60BD9410900B4ED68 /* AudioScrobbler.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		638053590D3E95AF0003DB13 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				632E70520DD9FEF900A16D88 /* playCountForDatabaseId.scpt */,
+				63ED46BF0DD8D51D00F6FBE0 /* currentTrack.scpt */,
+				637A231D0DAA9B1C004590E1 /* uninstall.sh */,
+				638053560D3E95A10003DB13 /* currentTrackLocation.scpt */,
+				638053570D3E95A10003DB13 /* currentTrackPersistentId.scpt */,
+				638053580D3E95A10003DB13 /* playCountForPersistentId.scpt */,
+			);
+			name = Scripts;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DC2667930BD9410900B4ED68 /* iTunes Scrobbler */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC2667A10BD9410900B4ED68 /* Build configuration list for PBXNativeTarget "iTunes Scrobbler" */;
+			buildPhases = (
+				DC2667970BD9410900B4ED68 /* Resources */,
+				DC26679B0BD9410900B4ED68 /* Sources */,
+				DC26679E0BD9410900B4ED68 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "iTunes Scrobbler";
+			productInstallPath = "/Users/guillerm/Library/iTunes/iTunes Plug-ins";
+			productName = iTunesPlugIn;
+			productReference = DC2667A60BD9410900B4ED68 /* AudioScrobbler.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "iTunes Scrobbler" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 089C166AFE841209C02AAC07 /* iTunesPlugIn */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DC2667930BD9410900B4ED68 /* iTunes Scrobbler */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DC2667970BD9410900B4ED68 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				632E70550DD9FF0200A16D88 /* playCountForDatabaseId.scpt in Resources */,
+				63ED46C20DD8D52900F6FBE0 /* currentTrack.scpt in Resources */,
+				634E6EF50D3FBA7D00E16E0D /* currentTrackLocation.scpt in Resources */,
+				634E6EF60D3FBA7D00E16E0D /* currentTrackPersistentId.scpt in Resources */,
+				634E6EF70D3FBA7D00E16E0D /* playCountForPersistentId.scpt in Resources */,
+				638052470D3E53940003DB13 /* changelog.txt in Resources */,
+				637A231E0DAA9B1C004590E1 /* uninstall.sh in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DC26679B0BD9410900B4ED68 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC26679C0BD9410900B4ED68 /* iTunesPlugin.cpp in Sources */,
+				FB3EA6B90D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp in Sources */,
+				FB3EA6C90D587677003DC14E /* ITunesTrack.cpp in Sources */,
+				637452E10D58B02B00429514 /* Moose_mac.cpp in Sources */,
+				63E5E4770D6B51C500774857 /* IPodDetector_mac.cpp in Sources */,
+				633C62970D6CA1DD00B609B9 /* iTunesPlugin_mac.cpp in Sources */,
+				63233BAF0D7491470009EC65 /* logger.cpp in Sources */,
+				6392AF640D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp in Sources */,
+				FB6471A70D80643A007006E4 /* IPod.cpp in Sources */,
+				FB6471A90D80643A007006E4 /* IPod_mac.cpp in Sources */,
+				6303C7B10DAD03EA001F707C /* iTunesAPI.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AF2F40460BD811FE009D75EB /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+			};
+			name = Development;
+		};
+		AF2F40470BD811FE009D75EB /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				DEAD_CODE_STRIPPING = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+			};
+			name = Deployment;
+		};
+		AF2F40480BD811FE009D75EB /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+			};
+			name = Default;
+		};
+		DC2667A20BD9410900B4ED68 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/CoreServices.framework/Frameworks\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "iTunes Scrobbler.plist";
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-lsqlite3";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = AudioScrobbler;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				STRIP_INSTALLED_PRODUCT = NO;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		DC2667A30BD9410900B4ED68 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/CoreServices.framework/Frameworks\"",
+				);
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "iTunes Scrobbler.plist";
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-lsqlite3";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = AudioScrobbler;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				STRIP_STYLE = all;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = bundle;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		DC2667A40BD9410900B4ED68 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/Frameworks/CoreServices.framework/Frameworks\"",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "iTunes Scrobbler.plist";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-lsqlite3";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = AudioScrobbler;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "iTunes Scrobbler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF2F40460BD811FE009D75EB /* Development */,
+				AF2F40470BD811FE009D75EB /* Deployment */,
+				AF2F40480BD811FE009D75EB /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		DC2667A10BD9410900B4ED68 /* Build configuration list for PBXNativeTarget "iTunes Scrobbler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC2667A20BD9410900B4ED68 /* Development */,
+				DC2667A30BD9410900B4ED68 /* Deployment */,
+				DC2667A40BD9410900B4ED68 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}

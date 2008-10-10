@@ -29,7 +29,7 @@
 #include <QTranslator>
 
 #ifdef WIN32
-extern void qWinMsgHandler(QtMsgType t, const char* str);
+extern void qWinMsgHandler( QtMsgType t, const char* msg );
 #endif
 
 
@@ -46,7 +46,6 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
 
     CoreDir::mkpaths();
 
-    qInstallMsgHandler( qMsgHandler );
 #ifdef WIN32
     QString bytes = CoreDir::mainLog();
     const wchar_t* path = bytes.utf16();
@@ -55,6 +54,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     const char* path = bytes.data();
 #endif
     m_log = new Logger( path );
+
+    qInstallMsgHandler( qMsgHandler );
     qDebug() << "Introducing" << applicationName()+'-'+applicationVersion();
     qDebug() << "Directed by" << CoreSysInfo::platform();
 
@@ -81,9 +82,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             // if LogOutOnExit is enabled, really, we shouldn't store these,
             // but it means other Unicorn apps can log in while the client is 
             // loaded, and we delete the settings on exit if logOut is on
-            Unicorn::QSettings().setValue( "Username", d.username() );
-            Unicorn::UserQSettings s;
-            s.setValue( "Username", d.username() );
+            CoreSettings().setValue( "Username", d.username() );
+            Unicorn::UserSettings s;
             s.setValue( "SessionKey", d.sessionKey() );
         }
         else
@@ -128,10 +128,10 @@ Unicorn::Application::~Application()
     // did it then the user would be unable to change their mind
     if (Unicorn::Settings().logOutOnExit() || m_logoutAtQuit)
     {
-        Unicorn::UserQSettings s;
+        Unicorn::UserSettings s;
         s.remove( "Password" );
         s.remove( "SessionKey" );
-        Unicorn::QSettings().remove( "Username" ); // do after the UserQSettings or it doesn't work!
+        CoreSettings().remove( "Username" ); // do after the UserQSettings or it doesn't work!
     }
 
     delete m_log;

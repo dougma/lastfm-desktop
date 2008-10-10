@@ -19,7 +19,7 @@
 
 #include "SendLogsDialog.h"
 #include "SendLogsRequest.h"
-#include "Settings.h"
+#include "the/settings.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/CoreProcess.h"
@@ -34,18 +34,12 @@
 #include <stdio.h>
 #endif
 
-#include "version.h"
-
 
 SendLogsDialog::SendLogsDialog( QWidget *parent )
               : QDialog( parent )
 {
     ui.setupUi( this );
-    
-    ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
-    ui.spinner->movie()->setParent( this );
     ui.spinner->hide();
-    
     ui.buttonBox->addButton( "Send", QDialogButtonBox::AcceptRole );
 
     connect( ui.buttonBox, SIGNAL( accepted() ), SLOT( onSendClicked() ) );
@@ -54,26 +48,13 @@ SendLogsDialog::SendLogsDialog( QWidget *parent )
 
 static QString clientInformationString()
 {
-    Moose::Settings settings;
     QString s;
 
-    s += "User: " + settings.username() + "\n";
-    s += "Is using proxy: " + QString::number( settings.isUseProxy() ) + "\n";
-    if ( settings.isUseProxy() )
-    {
-        s += "Proxy Host: " + settings.proxyHost() + "\n";
-        s += "Proxy Port: " + QString::number( settings.proxyPort() ) + "\n";
-    }
-    s += "Path: " + settings.path() + "\n";
-    s += "Version: " + settings.version() + "\n";
-    s += "Scrobble Point: " + QString::number( settings.scrobblePoint() ) + "\n";
-    s += "Control Port: " + QString::number( settings.controlPort() ) + "\n";
-    if ( !settings.excludedDirs().isEmpty() )
-    {
-        s += "Excluded dirs:\n";
-        foreach( QString dir, settings.excludedDirs() )
-            s += "    " + dir + "\n";
-    }
+    s += "User: " + The::settings().username() + "\n";
+    s += "Path: " + QCoreApplication::applicationFilePath() + "\n";
+    s += "Version: " + QCoreApplication::applicationVersion() + "\n";
+    s += "Scrobble Point: " + QString::number( The::settings().scrobblePoint() ) + "\n";
+
 	s += "Plugin paths:\n";
 	foreach (QString path, qApp->libraryPaths())
 		s+= "    " + path + "\n";
@@ -155,7 +136,10 @@ static QString systemInformationString()
 void
 SendLogsDialog::onSendClicked()
 {
-    SendLogsRequest* request = new SendLogsRequest( PRODUCT_NAME, VERSION, ui.moreInfoTextEdit->toPlainText() );
+    SendLogsRequest* request = new SendLogsRequest( qApp->applicationName(), 
+                                                    qApp->applicationVersion(), 
+                                                    ui.moreInfoTextEdit->toPlainText() );
+
     connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
     connect( request, SIGNAL( error() ), SLOT( onError() ) );
 

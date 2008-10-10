@@ -16,7 +16,7 @@ debug:macx-xcode {
 
     DIRS = app/client \
            lib/lastfm/core lib/lastfm/ws lib/lastfm/radio lib/lastfm/types lib/lastfm/scrobble \
-           lib/unicorn lib/moose 
+           lib/unicorn 
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )
@@ -42,8 +42,8 @@ else {
                lib/lastfm/radio/libradio.pro \
                lib/lastfm/scrobble/libscrobble.pro \
                lib/unicorn/libunicorn.pro \
-               lib/moose/libmoose.pro \
-	           app/client/client.pro
+	           app/client \
+               app/twiddly
 
 	# make the app client the default project in visual studio
 	win32:CONFIG( debug, debug|release ) {

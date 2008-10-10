@@ -11,6 +11,9 @@ do
         --release)
             echo 'Will optimise and strip binaries.'
             RELEASE=1;;
+		--3rdparty)
+		    svn co svn+ssh://gimli.last.fm/svn/libs/cpp lib/3rdparty
+			exit;;
         --help | -h | --usage)
             echo "There is one option, it is: --release"
             exit;;

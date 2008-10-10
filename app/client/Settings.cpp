@@ -26,5 +26,6 @@ Settings::Settings( const QString& version, const QString& path )
     m_weWereJustUpgraded = version != s.value( "Version", "An Impossible Version String" );
     
     s.setValue( "Path", path );
+    // we write this so we can determine if we were just upgraded, see above
     s.setValue( "Version", version ); 
 }

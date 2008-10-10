@@ -1,0 +1,34 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {E7C0F450-9B76-4481-B3DF-B3447B383762} = s 'Wmp_scrobbler Class'
+		{
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+		}
+	}
+}
+HKEY_LOCAL_MACHINE
+{
+    NoRemove SOFTWARE
+    {
+        NoRemove Microsoft
+        {
+            NoRemove MediaPlayer
+            {
+                NoRemove UIPlugins
+                {
+                    ForceRemove {E7C0F450-9B76-4481-B3DF-B3447B383762}
+                    {
+                        val FriendlyName = s 'res://wmp_scrobbler.dll/RT_STRING/#102'
+                        val Description = s 'res://wmp_scrobbler.dll/RT_STRING/#103'
+                        val Capabilities = d '3758096385'
+                    }
+                }
+            }
+        }
+    }
+}

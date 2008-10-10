@@ -1,0 +1,85 @@
+3.0.1.0 (16/5/08)
+-------------------------------------------------------------------------------
+* Better error handling.
+* Mac: fixed iTunes slowdown (beach balling)
+
+
+3.0.0.13 (13/5/08)
+-------------------------------------------------------------------------------
+* Fixed double scrobbling of tracks when using iPod classic.
+* Updates broken Updater.exe in client if installed.
+
+
+3.0.0.12 (8/5/08)
+-------------------------------------------------------------------------------
+* Win: fixed random crashes on track changes.
+* Win: fixed crash on track start in iTunes 6.
+
+
+3.0.0.10 (6/5/08)
+-------------------------------------------------------------------------------
+* Mac: fixed crash when upgrading iPod firmware.
+
+
+3.0.0.9 (1/5/08)
+-------------------------------------------------------------------------------
+* Retrying when we get a playcount diff of 0 from iTunes.
+
+
+3.0.0.8 (29/4/08)
+-------------------------------------------------------------------------------
+* Fixed crash on track start with iPod scrobbling disabled.
+
+
+3.0.0.5 (19/3/08)
+-------------------------------------------------------------------------------
+* Fixed crash on CD track change.
+* Fixed crash on unmounting Firewire device.
+* Don't start iPod scrobbling when a non-iPod USB device is unmounted.
+
+
+3.0.0.4 (17/3/08)
+-------------------------------------------------------------------------------
+* Repeated tracks now scrobble correctly (Win)
+* Fixed bug where a restarted iTunes track would not lead to the scrobble
+  timer in the client getting reset (Win)
+
+
+3.0.0.0 (19/2/08)
+-------------------------------------------------------------------------------
+* Now with iPod scrobbling
+
+
+2.0.13.0 (6/8/07)
+-------------------------------------------------------------------------------
+* Recompiled with new ScrobSub for Vista compatibility.
+* Fixed path retrieval for iTunes 7+
+
+
+2.0.11.0 (3/4/07)
+-------------------------------------------------------------------------------
+* Fixed crash on shutdown on Vista.
+* Fixed GDI memory leak making iTunes GUI sluggish after prolonged use.
+* Fixed version reporting.
+* Ripped out unnecessary WTL dependency.
+
+
+2.0.9.0 (13/9/06)
+-------------------------------------------------------------------------------
+* Changed structure around to work with new ScrobSub.
+
+
+2.0.8.0 (22/6/06)
+-------------------------------------------------------------------------------
+* Changed output name to itw_scrobbler.dll and recompiled with new ScrobSub
+  for the beta release of the new Last.fm client.
+
+
+2.0.6.0 (16/5/06)
+-------------------------------------------------------------------------------
+* Submitting songs from shared playlists now works
+
+
+2.0.4.0 (11/4/06)
+-------------------------------------------------------------------------------
+* Searching for "movie" as well as "video" to filter out video files

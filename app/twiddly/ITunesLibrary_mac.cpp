@@ -18,10 +18,8 @@
  ***************************************************************************/
 
 #include "ITunesLibrary.h"
-
-#include "libUnicorn/AppleScript.h"
-#include "logger.h"
-
+#include "IPodScrobble.h"
+#include "lib/lastfm/core/mac/AppleScript.h"
 #include <QDateTime>
 #include <QFileInfo>
 
@@ -59,7 +57,7 @@ ITunesLibrary::ITunesLibrary( const QString& pid, bool )
         m_tracks += t;
     }
     
-    LOGL( 3, "Found " << m_tracks.count() << " tracks" );
+    qDebug() << "Found" << m_tracks.count() << "tracks";
 }
 
 
@@ -107,13 +105,13 @@ qDateTimeFromScriptString( const QString& s )
 }
 
 
-TrackInfo
-ITunesLibrary::Track::trackInfo() const
+::Track
+ITunesLibrary::Track::lastfmTrack() const
 {
     // NOTE we only what data we require for scrobbling, though we could fill in
-    // more of the TrackInfo object
-    TrackInfo t;
-    t.setSource( TrackInfo::MediaDevice );
+    // more of the Track object
+    IPodScrobble t;
+    t.setSource( ::Track::MediaDevice );
 
     QString source;
     if (!m_sourcePersistentId.isEmpty())
@@ -145,15 +143,14 @@ ITunesLibrary::Track::trackInfo() const
     QTextStream s( &out, QIODevice::ReadOnly );
 
     t.setArtist( s.readLine() );
-    t.setTrack( s.readLine() );
+    t.setTitle( s.readLine() );
     t.setDuration( (uint) s.readLine().toFloat() );
     t.setAlbum( s.readLine() );
     t.setPlayCount( s.readLine().toInt() );
-    t.setTimeStamp( qDateTimeFromScriptString( s.readLine() ).toTime_t() );
+    t.setTimestamp( qDateTimeFromScriptString( s.readLine() ) );
 
     QFileInfo fileinfo( s.readLine() );
-    t.setFileName( fileinfo.fileName() );
-    t.setPath( fileinfo.absolutePath() );
+    t.setUrl( QUrl::fromLocalFile( fileinfo.absolutePath() ) );
 
     return t;
 }

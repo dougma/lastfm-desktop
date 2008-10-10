@@ -18,24 +18,20 @@
  ***************************************************************************/
 
 #include "PlayCountsDatabase.h"
-
 #include "IPod.h"
 #include "ITunesLibrary.h"
-
+#include "common/qt/msleep.cpp"
 #include "common/fileCreationTime.cpp"
-
-#include "libUnicorn/AppleScript.h"
-#include "libUnicorn/UnicornCommon.h"
-#include "libMoose/LastFmSettings.h"
-#include "libMoose/MooseCommon.h"
-#include "logger.h"
-
-#include <iostream>
-
+#include "lib/lastfm/core/CoreDir.h"
+#include "lib/lastfm/core/mac/AppleScript.h"
+#include "lib/lastfm/core/UniqueApplication.h"
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QTemporaryFile>
+#include <iostream>
+
+extern UniqueApplication moose;
 
 
 /** @author Max Howell <max@last.fm>
@@ -48,7 +44,7 @@ namespace QtOverrides
         bool arse( bool success )
         {
             if (!success)
-                LOGL( 2, lastError().text() << " in query:\n" << lastQuery() );
+                qWarning() << lastError().text() << "in query:\n" << lastQuery();
             return success;
         }
         
@@ -162,8 +158,8 @@ PlayCountsDatabase::beginTransaction()
     {
         // we only try 5 times since SQLITE_BUSY is just one of the
         // possible things that ConnectionError might mean
-        LOGL( 3, "SQLite might be busy trying again in 25ms..." );
-        UnicornUtils::msleep( 25 );
+        LOG( 3, "SQLite might be busy trying again in 25ms..." );
+        Qt::msleep( 25 );
 
         q.exec();
     }
@@ -243,7 +239,7 @@ PlayCountsDatabase::update( const ITunesLibrary::Track& track )
 
 
 AutomaticIPod::PlayCountsDatabase::PlayCountsDatabase() 
-              : ::PlayCountsDatabase( MooseUtils::savePath( "iTunesPlays.db" ) )
+              : ::PlayCountsDatabase( CoreDir::data().filePath( "iTunesPlays.db" ) )
 {}
 
 
@@ -278,9 +274,9 @@ pluginPath()
 void
 AutomaticIPod::PlayCountsDatabase::bootstrap()
 {
-    LOGL( 3, "Starting bootstrapping..." );
+    LOG( 3, "Starting bootstrapping..." );
     
-    Moose::sendToInstance( "container://Notification/Twiddly/Bootstrap/Started" );
+    moose.forward( "container://Notification/Twiddly/Bootstrap/Started" );
     
     beginTransaction();    
     
@@ -349,5 +345,5 @@ AutomaticIPod::PlayCountsDatabase::bootstrap()
 
     endTransaction();
 
-    Moose::sendToInstance( "container://Notification/Twiddly/Bootstrap/Finished" );
+    moose.forward( "container://Notification/Twiddly/Bootstrap/Finished" );
 }

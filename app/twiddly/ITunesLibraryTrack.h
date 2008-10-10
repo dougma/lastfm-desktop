@@ -107,7 +107,7 @@ struct IPodLibraryTrackData : public ITunesLibraryTrackData
           *
           * @defined ITunesLibrary.cpp
           */
-        TrackInfo trackInfo() const;
+        Track lastfmTrack() const;
     };
 
 
@@ -131,7 +131,7 @@ struct IPodLibraryTrackData : public ITunesLibraryTrackData
         ITunesLibraryTrack( const QString& uid, int c ) : PlayCountsDatabase::Track( uid, c )
         {}
         
-        TrackInfo trackInfo() const;
+        ::Track lastfmTrack() const;
 
         using PlayCountsDatabase::Track::isNull;
         using PlayCountsDatabase::Track::uniqueId;

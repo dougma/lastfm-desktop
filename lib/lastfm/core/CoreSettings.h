@@ -17,22 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef CORE_SETTINGS_H
+#define CORE_SETTINGS_H
+
 #include "lib/lastfm/core/CoreLocale.h"
 #include <QSettings>
-
-#define CORE_ORGANISATION_DOMAIN "Last.fm"
 
 
 /** Settings that are global to all Last.fm libraries */
 class CoreSettings : public QSettings
 {
 public:
-	CoreSettings() : QSettings( CORE_ORGANISATION_DOMAIN )
+	CoreSettings() : QSettings( organizationName() )
 	{}
 	
+    static const char* organizationName()
+    {
+        return "Last.fm";
+    }
+    
 	CoreLocale locale() const
 	{
 		QVariant const v = value( "locale" );
 		return v.isValid() ? QLocale( v.toString() ) : CoreLocale::system();
 	}
 };
+
+#endif

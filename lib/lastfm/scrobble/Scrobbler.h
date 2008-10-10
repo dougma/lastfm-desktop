@@ -29,7 +29,7 @@
 
 /** @author Max Howell <max@last.fm>
   * An implementation of the Audioscrobbler Realtime Submissions Protocol 
-  * version 1.2 for a single Last.fm user
+  * version 1.2.1 for a single Last.fm user
   * http://www.audioscrobbler.net/development/protocol/
   */
 class LASTFM_SCROBBLE_DLLEXPORT Scrobbler : public QObject

@@ -17,23 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CLIENT_SETTINGS_H
-#define CLIENT_SETTINGS_H
+#ifndef MOOSE_SETTINGS_H
+#define MOOSE_SETTINGS_H
 
-#include "lib/moose/MooseSettings.h"
+#ifdef QT_CORE_LIB
+
+#include "lib/unicorn/UnicornSettings.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
 
 
-/** usage, only put interesting settings in here, which mostly means ones set in
+/** Usage: only put interesting settings in here, which mostly means ones set in
   * in the settings dialog. For class local settings, just make a small 
   * QSettings local derived class */
-class Settings : public Moose::Settings
+class Settings : public Unicorn::Settings
 {
+    /** we force this object to be a singleton so that we force passing these
+      * two parameters as soon as possible, they are frankly, important */
     Settings( const QString& version, const QString& path );
 
     friend class App;
 
-private:
     bool m_weWereJustUpgraded;
+    
+public:
+    int scrobblePoint() const { return QSettings().value( "ScrobblePoint", ScrobblePoint::kDefaultScrobblePoint ).toInt(); }
+
+    /** The UniqueApplication id */
+    static const char* id();
 };
 
 
@@ -43,8 +53,32 @@ public:
     MutableSettings( const ::Settings& )
     {}
 
-    void setControlPort( int v ) { QSettings().setValue( "ControlPort", v ); }
     void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
 };
+
+
+#else
+    /** This section should contain inline functions only, and have no dependencies
+      * on anything that requires external linkage, it is used by the iTunes
+      * plugin and Twiddly, and thus has to be pure c++
+      * @author <max@last.fm> 
+      */
+    #include "version.h"
+
+    struct Settings
+    {
+        /** The UniqueApplication id */
+        static const char* id();
+
+    #ifdef( WIN32 )
+        std::wstring path();
+    #elif defined( __APPLE__ )
+        std::string path();
+    #endif
+    };
+#endif
+
+
+inline const char* Settings::id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
 
 #endif

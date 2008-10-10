@@ -22,7 +22,7 @@
 
 #include <lastfm/DllExportMacro.h>
 #include <QObject>
-#include <QString>
+#include <QStringList>
 #ifdef Q_WS_MAC
 #include <Carbon/Carbon.h>
 #endif
@@ -36,7 +36,8 @@
   * consequence. Prolly the same on Windows.
   *
   * Basically, make a unique app, try to forward the command line arguments
-  * over, if that fails, continue, otherwise exit( 0 )
+  * over, or test isAlreadyRunning() if forwarding fails or !isAlreadyRunning(),
+  * continue, otherwise exit( 0 )
   */
 class LASTFM_CORE_DLLEXPORT UniqueApplication : public QObject
 {
@@ -45,20 +46,36 @@ class LASTFM_CORE_DLLEXPORT UniqueApplication : public QObject
 public:
     UniqueApplication( const char* id );
 
-	/** if !isAlreadyOpen(), you'll need to do this too */
-	void init( const class QApplication& );
+    /** do this one as soon as possible if you _are_ the unique application,
+      * this one sets up the application mutex, so other apps and instances 
+      * will know they should forward args or exit */
+    void init1();
+    /** this one sets up forwarding */
+	void init2( const class QCoreApplication* );
 
 	bool isAlreadyRunning() const { return m_alreadyRunning; }
-    
+
     /** forwards arguments to the running instance, @returns success 
       * we convert using QString::fromLocal8Bit() */
     bool forward( int argc, char** argv );
     bool forward( const class QStringList& );
+    bool forward( const QString& arg ) { return forward( QStringList() << arg ); }
 
+
+    /** starts a new instance, or forwards if one already running, use from
+      * another process, clearly we can't create a new instance if you have
+      * never run the app with the specified id before */
+    bool open( const QStringList& args );
+    bool open( const QString& arg ) { return open( QStringList() << arg ); }
+    
+    /** we store paths for every application that ever calls init(), so you
+      * can access this from other processes */
+    QString path( const QString& default_value = "" ) const;
+    
 signals:
     /** the first one is argv[0] ie. the application path */
     void arguments( const class QStringList& );
-    
+
 private:
 	const char* m_id;
 	bool m_alreadyRunning;

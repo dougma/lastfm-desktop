@@ -1,0 +1,13 @@
+Edit the version in:
+
+iTunesPlugin.h
+iScrobbleWin.rc
+itunes_install.iss
+iTunes Scrobbler.plist
+
+Note there are two version numbers in the iss file.
+
+Build the release build in Visual Studio.
+
+Then open the iss and compile to get the installer exe.
+

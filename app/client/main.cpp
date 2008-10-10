@@ -19,6 +19,7 @@
 
 #include "App.h"
 #include "player/PlayerListener.h"
+#include "Settings.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
@@ -41,27 +42,28 @@
 int main( int argc, char** argv )
 {
 #ifdef NDEBUG
-    google_breakpad::ExceptionHandler( UnicornDir::save().path().toStdString(),
+    google_breakpad::ExceptionHandler( CoreDir::save().path().toStdString(),
                                        0,
                                        breakPadExecUploader,
                                        this,
                                        HANDLER_ALL );
 #endif
 
-    // must be set before the Settings object is created
+    // set asap - used everywhere!
     QCoreApplication::setApplicationName( PRODUCT_NAME );
     QCoreApplication::setApplicationVersion( VERSION );
-    QCoreApplication::setOrganizationName( "Last.fm" );
+    QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
-    UniqueApplication uapp( "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F" );
+    UniqueApplication uapp( Settings::id() );
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
-    
+    uapp.init1();
+
     try
     {
         App app( argc, argv );
-		uapp.init( app );
+		uapp.init2( &app );
         app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
 
       #ifdef Q_WS_MAC

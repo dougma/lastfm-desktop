@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-#include "logger.h"
+#include "common/c++/logger.h"
 #include <sys/stat.h>
 
 
@@ -43,7 +43,7 @@ namespace common
         struct STAT st;
         if (stat( path.c_str(), &st ) != 0)
         {
-            COMMON_LOGL( 3, "Couldn't stat: " << path );
+            LOG( 3, "Couldn't stat" << path );
             return 0;
         }
         else

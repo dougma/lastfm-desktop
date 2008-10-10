@@ -18,11 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesLibrary.h"
+#include "IPodScrobble.h"
 #include "PlayCountsDatabase.h"
-
-#include "libMoose/LastFmSettings.h"
-#include "libUnicorn/TrackInfo.h"
-
+#include "lib/lastfm/core/CoreSettings.h"
 #include <QDir>
 #include <QDomDocument>
 #include <QStringList>
@@ -43,20 +41,20 @@ public:
     void twiddle();
 
     /** allows us to encapsulate the real scrobble count() */
-    class ScrobbleList : private QList<TrackInfo>
+    class ScrobbleList : private QList<Track>
     {
         int m_realCount;
 
     public:
         ScrobbleList() : m_realCount( 0 )
         {}
-        using QList<TrackInfo>::isEmpty;
+        using QList<Track>::isEmpty;
         QDomDocument xml() const;
         int count() const { return m_realCount; }
-        ScrobbleList& operator+=( const TrackInfo& i )
+        ScrobbleList& operator+=( const Track& t )
         {
-            m_realCount += i.playCount();
-            append( i );
+            m_realCount += IPodScrobble(t).playCount();
+            append( t );
             return *this;
         }
     #ifdef WIN32
@@ -65,7 +63,7 @@ public:
           * to remove them */
         void removeAllWithUniqueId( const QString& uniqueId )
         {
-            QList<TrackInfo>::Iterator iter;
+            QList<Track>::Iterator iter;
             for( iter = begin(); iter != end(); ++iter ) 
             {
                 if( iter->uniqueID() == uniqueId )
@@ -79,7 +77,7 @@ public:
         void clear()
         {
             m_realCount = 0;
-            QList<TrackInfo>::clear();
+            QList<Track>::clear();
         }
     };
 
@@ -92,6 +90,15 @@ public:
     /** looks over-engineered, but makes Twiddly/main.cpp code read much better */
     class Settings
     {
+        class MediaDeviceSettings : public CoreSettings
+        {
+        public:
+            MediaDeviceSettings()
+            {
+                beginGroup( "iPod" );
+            }
+        };
+        
     public:
         Settings( IPod const * const ipod )
         {

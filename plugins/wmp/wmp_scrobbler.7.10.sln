@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wmp_scrobbler", "wmp_scrobbler.vcproj", "{CF8AD3FB-2EAF-4A9D-8619-F6701B9A9BDE}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{CF8AD3FB-2EAF-4A9D-8619-F6701B9A9BDE}.Debug.ActiveCfg = Debug|Win32
+		{CF8AD3FB-2EAF-4A9D-8619-F6701B9A9BDE}.Debug.Build.0 = Debug|Win32
+		{CF8AD3FB-2EAF-4A9D-8619-F6701B9A9BDE}.Release.ActiveCfg = Release|Win32
+		{CF8AD3FB-2EAF-4A9D-8619-F6701B9A9BDE}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,22 @@
+13/5/08 2.3.1.2
+-------------------------------------------------------------------------------
+* Updates broken Updater.exe in client if installed.
+
+
+16/1/08 2.3.1.1
+-------------------------------------------------------------------------------
+* Fix installer package to actually contain 2.3.1 and not 2.2!
+
+
+9/1/08 2.3.1.0
+-------------------------------------------------------------------------------
+* Make Scrobsubmitter global instead of heap-allocated to see if removing the
+  delete helps fixing crashes.
+* Only print to console on errors.
+* Only send Stop when playback stops.
+
+
+31/7/07 2.3.0.0
+-------------------------------------------------------------------------------
+* Recompiled with new ScrobSub for Vista compatibility.
+

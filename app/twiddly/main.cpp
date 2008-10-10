@@ -18,43 +18,55 @@
  ***************************************************************************/
 
 #include "IPod.h"
-
-#include "common/logger.h"
+#include "app/client/Settings.h"
+#include "lib/lastfm/core/CoreDir.h"
+#include "lib/lastfm/core/UniqueApplication.h"
+#include "common/c++/logger.cpp"
 #include "common/ITunesExceptions.h"
-#include "breakpad/BreakPad.h"
-#include "libMoose/MooseCommon.h"
-
 #include <iostream>
-
 #include <QtCore>
 #include <QtXml>
 
+// until breakpad can be installed more easily
+#undef NDEBUG
 
-/** @originator Max Howell <max@last.fm>
-  */
-
-void writeXml( const QDomDocument&, const QString& path );
 void initLogger();
+void qMsgHandler( QtMsgType, const char* msg );
+void writeXml( const QDomDocument&, const QString& path );
 void logException( QString );
 
+UniqueApplication moose( Settings::id() );
+
+
+/** @maintainer Max Howell <max@last.fm> */
 
 int
 main( int argc, char** argv )
 {
-    #ifndef NBREAKPAD
-        BreakPad breakpad( MooseUtils::savePath() );
-        breakpad.setProductName( "Twiddly" );
-    #endif
-    
+#ifdef NDEBUG
+    google_breakpad::ExceptionHandler( CoreDir::save().path().toStdString(),
+                                       0,
+                                       breakPadExecUploader,
+                                       this,
+                                       HANDLER_ALL );
+#endif
+
     // FIXME these names are wrong, but Moose::Settings is broken
-    QCoreApplication::setApplicationName( "Last.fm" );
+    QCoreApplication::setApplicationName( "Twiddly" );
     QCoreApplication::setOrganizationName( "Last.fm" );
     QCoreApplication::setOrganizationDomain( "last.fm" );
-    QCoreApplication app( argc, argv );
+
+    UniqueApplication uapp( "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0" );
+	bool const b = QByteArray(argv[0]) != "--bootstrap-needed?";
+    if (b) uapp.init1();
+
+    QCoreApplication app( argc, argv );    
+    if (b) uapp.init2( &app );
 
     initLogger();
-    LOGL( 3, app.arguments().join( " " ) );
-
+    
+    qDebug() << app.arguments();
+    
     try
     {
         if ( app.arguments().contains( "--bootstrap-needed?" ) )
@@ -62,19 +74,8 @@ main( int argc, char** argv )
             return AutomaticIPod::PlayCountsDatabase().isBootstrapNeeded();
         }        
 
-      #ifdef WIN32
-        // Create mutex so that plugin doesn't load > 1 twiddly instance
-        // We don't know why we go via a QString, but it's old code that we're
-        // leaving alone! --mxcl
-        QString mutexId( "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0" );
-        HANDLE mutex = ::CreateMutexA( NULL, false, mutexId.toAscii() );
-        DWORD const e = ::GetLastError();
-        if( e == ERROR_ALREADY_EXISTS || e == ERROR_ACCESS_DENIED )
-        {
-            LOGL( 3, "Detected another instance of iPodScrobbler running. Aborting..." );
-            return 0;
-        }
-      #endif
+        if (uapp.isAlreadyRunning())
+            throw "Twiddly already running!";
 
         QTime time;
         time.start();
@@ -85,11 +86,11 @@ main( int argc, char** argv )
         }
         else // twiddle!
         {
-            Moose::sendToInstance( "container://Notification/Twiddly/Started" );
+            moose.forward( "container://Notification/Twiddly/Started" );
 
             IPod* ipod = IPod::fromCommandLineArguments( app.arguments() );
 
-            LOGL( 3, "Twiddling device: " << ipod->serial );
+            qDebug() << "Twiddling device: " << ipod->serial;
             ipod->twiddle();
 
             //------------------------------------------------------------------
@@ -98,7 +99,7 @@ main( int argc, char** argv )
 
             if ( previousType == IPod::ManualType && currentType == IPod::AutomaticType )
             {
-                LOGL( 3, "iPod switched from manual to automatic"
+                LOG( 3, "iPod switched from manual to automatic"
                          " - deleting manual db and ignoring scrobbles" );
 
                 // The iPod was manual, but is now automatic, we must:
@@ -118,8 +119,7 @@ main( int argc, char** argv )
             ipod->settings().setType( currentType );
             //------------------------------------------------------------------
 
-            Moose::sendToInstance( "container://Notification/Twiddly/Finished/" +
-                                   QString::number( ipod->scrobbles().count() ) );
+            moose.forward( "container://Notification/Twiddly/Finished/" + QString::number( ipod->scrobbles().count() ) );
 
             if ( ipod->scrobbles().count() )
             {
@@ -131,15 +131,13 @@ main( int argc, char** argv )
 
                 writeXml( ipod->scrobbles().xml(), path );
 
-                Moose::sendToInstance( "container://SubmitScrobbleCache/Device/" + 
-                                       ipod->device + '/' + ipod->serial + '/' + ipod->vid + '/' + ipod->pid, 
-                                       Moose::StartNewInstance );                  
+                moose.open( "container://SubmitScrobbleCache/Device/" + ipod->device + '/' + ipod->serial + '/' + ipod->vid + '/' + ipod->pid ); 
             }
 
             delete ipod;           
         }
         
-        LOGL( 3, "Procedure took: " << (time.elapsed() / 1000) << " seconds" );
+        LOG( 3, "Procedure took: " << (time.elapsed() / 1000) << " seconds" );
     }
     catch( QString& s )
     {
@@ -185,26 +183,31 @@ logException( QString message )
 {
     std::string m = message.toStdString();
     std::cout << m << std::endl;
-    LOGL( 1, "FATAL ERROR: " << m );
+    LOG( 1, "FATAL ERROR: " << m );
     
     // we do this because LfmApp splits on spaces in parseMessage()
     message.replace( ' ', '_' );
-    Moose::sendToInstance( "container://Notification/Twiddly/Error/" + message );
+    moose.forward( "container://Notification/Twiddly/Error/" + message );
+}
+
+
+void
+qMsgHandler( QtMsgType, const char* msg )
+{
+    Logger::the().log( msg );
 }
 
 
 void
 initLogger()
 {
-    #ifdef Q_OS_MAC
-        #define FILENAME "Last.fm Twiddly.log"
-    #else
-        #define FILENAME "Twiddly.log"
-    #endif
-
-    Logger& logger = Logger::GetLogger();
-    logger.Init( MooseUtils::logPath( FILENAME ), false );
-    //commented out as was hanging windows debug builds
-//    logger.SetLevel( Logger::Debug );
-    LOGL( 3, "Log file created" );
+#ifdef WIN32
+    QString bytes = CoreDir::mainLog();
+    const wchar_t* path = bytes.utf16();
+#else
+    QByteArray bytes = CoreDir::mainLog().toLocal8Bit();
+    const char* path = bytes.data();
+#endif
+    Logger logger( path );
+    qInstallMsgHandler( qMsgHandler );
 }

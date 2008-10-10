@@ -44,6 +44,12 @@ namespace Ws
 		NotEnoughFans,
 		NotEnoughNeighbours,
 		
+        /** From here onwards the error is a QNetworkReply error, we have just
+          * consolidated them into these 5 for simplicity in error handling.
+          * You may prefer ours, or if you like, just get the Qt error from
+          * the WsReply object.
+          */
+
         /** Last.fm sucks, or something weird happened. 
           * Call networkError() for more details
 		  * Advise the user to try again in a _few_minutes_.

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>AudioScrobbler</string>
+	<key>CFBundleGetInfoString</key>
+	<string>The official Last.fm iTunes AudioScrobbler plugin</string>
+	<key>CFBundleIdentifier</key>
+	<string>fm.last.iTunes Scrobbler</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>AudioScrobbler</string>
+	<key>CFBundleDisplayName</key>
+	<string>Last.fm iTunes AudioScrobbler</string>
+	<key>CFBundlePackageType</key>
+	<string>hvpl</string>
+	<key>CFBundleSignature</key>
+	<string>hook</string>
+	<key>CFBundleVersion</key>
+	<string>3.0.1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>3.0.1</string>
+</dict>
+</plist>

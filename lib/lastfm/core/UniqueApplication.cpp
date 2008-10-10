@@ -18,7 +18,10 @@
  ***************************************************************************/
 
 #include "UniqueApplication.h"
+#include <QCoreApplication>
 #include <QDebug>
+#include <QProcess>
+#include <QSettings>
 #include <QStringList>
 #include <QWidget>
 
@@ -54,26 +57,47 @@ class UniqueApplicationWidget : public QWidget
 UniqueApplication::UniqueApplication( const char* id )
 			     : m_id( id ),
 				   m_alreadyRunning( false )
-{
+{    
 #ifdef WIN32
-    ::CreateMutexA( NULL, false, id ); //extern const char*
-
-    // The call fails with ERROR_ACCESS_DENIED if the Mutex was 
-    // created in a different users session because of passing
-    // NULL for the SECURITY_ATTRIBUTES on Mutex creation);
-    m_alreadyRunning = ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED;
-    
-	m_hwnd = m_alreadyRunning
-			? ::FindWindow( L"QWidget", (TCHAR*)windowTitle().utf16() )
-			: 0;
+	m_hwnd = ::FindWindow( L"QWidget", (wchar_t*)windowTitle().utf16() )
+    m_alreadyRunning = m_hwnd;
 #endif
     
 #ifdef Q_WS_MAC
     CFStringRef cfid = CFStringCreateWithCString( NULL, id, kCFStringEncodingISOLatin1 );
     m_port = CFMessagePortCreateRemote( kCFAllocatorDefault, cfid );
+    m_alreadyRunning = m_port;
+    CFRelease( cfid );
+#endif
+    
+#ifdef Q_WS_X11
+    qWarning() << "Single application instance code still unwritten!";
+#endif
+}
 
+
+void
+UniqueApplication::init1()
+{
+    if (m_alreadyRunning) {
+        Q_ASSERT_X( 0, "init1", "You're doing it wrong" );
+        return;
+    }
+
+#ifdef WIN32
+    ::CreateMutexA( NULL, false, m_id ); //extern const char*
+    
+    // The call fails with ERROR_ACCESS_DENIED if the Mutex was 
+    // created in a different users session because of passing
+    // NULL for the SECURITY_ATTRIBUTES on Mutex creation);
+    //bool success = ::GetLastError() == ERROR_ALREADY_EXISTS || ::GetLastError() == ERROR_ACCESS_DENIED;
+#endif
+    
+#ifdef __APPLE__
     if (m_port == 0)
     {
+        CFStringRef cfid = CFStringCreateWithCString( NULL, m_id, kCFStringEncodingISOLatin1 );
+        
         CFMessagePortContext context;
         context.version = 0;
         context.info = this;
@@ -95,30 +119,48 @@ UniqueApplication::UniqueApplication( const char* id )
         CFRelease( cfid );
     }    
 #endif
-    
-#ifdef Q_WS_X11
-    qWarning() << "Single application instance code still unwritten!";
-#endif
 }
-
 
 // we force passing qApp to force people to create the QApplication
 // instance before calling this function
 void
-UniqueApplication::init( const QApplication& )
+UniqueApplication::init2( const QCoreApplication* app )
 {
-	if (m_alreadyRunning)
-		return;
+    if (m_alreadyRunning) {
+        Q_ASSERT_X( 0, "init1", "You're doing it wrong" );
+        return;
+    }
 
-#ifdef WIN32
-	// sadly we can't do this any earlier, so on Windows, there's a fair amount of time
-	// where arguments will be lost. Perhaps we could make a win32 window? Then we don't
-	// need to wait for the QApplication to be initialised
-	UniqueApplicationWidget* w = new UniqueApplicationWidget;
-	w->app = this;
-	w->setWindowTitle( windowTitle() );
-	m_hwnd = w->winId();
+    Q_ASSERT( !QCoreApplication::organizationName().isEmpty() );
+
+    QSettings( QCoreApplication::organizationName() ).setValue( m_id, app->applicationFilePath() );
+    
+#ifdef WIN32   
+    if (!b) {
+        // sadly we can't do this any earlier, so on Windows, there's a fair amount of time
+        // where arguments will be lost. Perhaps we could make a win32 window? Then we don't
+        // need to wait for the QApplication to be initialised
+        UniqueApplicationWidget* w = new UniqueApplicationWidget;
+        w->app = this;
+        w->setWindowTitle( windowTitle() );
+        m_hwnd = w->winId();
+    }
 #endif
+}
+
+
+QString
+UniqueApplication::path( const QString& default_value ) const
+{
+    return QSettings( QCoreApplication::organizationName() ).value( m_id, default_value ).toString();
+}
+
+
+bool
+UniqueApplication::open( const QStringList& args )
+{
+    if (m_alreadyRunning) return false;
+    return QProcess::startDetached( path(), args );
 }
 
 
