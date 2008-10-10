@@ -17,63 +17,22 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "IPod.h"
-#include <sys/stat.h>
-#include <iostream>
-#include <sstream>
+#ifndef ITUNESEXCEPTIONS_H
+#define ITUNESEXCEPTIONS_H
 
-#ifndef WIN32
-    #include <dirent.h>
-#endif
+#include <stdexcept>
 
-
-const LOGGER_STRING 
-IPod::twiddlyFlags() const
+class ITunesException : public std::runtime_error
 {
-    LFM_STRINGSTREAM ss;
-    
-    ss << "--device ";
-    ss << device();
-    
-    ss << " --connection ";
-    switch( m_connectionType )
-    {
-        case usb:
-            ss << "usb";
-            break;
-            
-        case fireWire:
-            ss << "fireWire";
-            break;
-    }
-    
-    ss << " --pid " << m_pid;
-    ss << " --vid " << m_vid;
-    ss << " --serial " << m_serial;
-    
-    if( m_manualMode )
-        ss << " --manual";
-
-    return ss.str();
-}
+public:
+    ITunesException( const char* s = "ITunesException" ) : std::runtime_error( s ) { }
+};
 
 
-LOGGER_STRING
-IPod::device() const
+class PlayCountException : public ITunesException
 {
-    #ifdef WIN32
-        #define _(x) L##x
-    #else
-        #define _(x) x
-    #endif
+public:
+    PlayCountException() : ITunesException( "PlayCountException" ) { }
+};
 
-    switch( m_type )
-    {
-        case iPod:   return _( "ipod" );
-        case iTouch: return _( "itouch" );
-        case iPhone: return _( "iphone" );
-        default:     return _( "unknown" );
-    }
-
-    #undef _
-}
+#endif // ITUNESEXCEPTIONS_H

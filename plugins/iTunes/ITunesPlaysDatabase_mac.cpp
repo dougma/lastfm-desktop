@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "ITunesPlaysDatabase.h"
-#include "common/ITunesTrack.h"
-#include "common/ITunesExceptions.h"
-#include "common/logger.h"
+#include "ITunesTrack.h"
+#include "ITunesExceptions.h"
+#include "common/c++/logger.h"
 
 #include <pthread.h>
 #include <sqlite3.h>
@@ -65,7 +65,7 @@ ITunesPlaysDatabase::sync( void* that )
 {
     ExtendedITunesTrack& track = * (ExtendedITunesTrack*) that;
 
-    LOGL( 3, "Syncing " << track.path() );
+    LOG( 3, "Syncing " << track.path() );
 
     // On trackChange iTunes takes about 4 seconds to update the playCount for 
     // the previous track :(
@@ -102,7 +102,7 @@ ITunesPlaysDatabase::sync( void* that )
         }
         catch( PlayCountException& )
         {
-            LOGL( 2, "Applescript failed to obtain playCount" );
+            LOG( 2, "Applescript failed to obtain playCount" );
             
             // NOTE our options here are an additional scrobble or potentially
             // lose scrobbles, the latter is perhaps better, as statistically
@@ -111,21 +111,13 @@ ITunesPlaysDatabase::sync( void* that )
             // far less maintainable
         }
         
-        LOGL( 3, "Playcount unchanged - sleeping " << s << " seconds..." );
+        LOG( 3, "Playcount unchanged - sleeping " << s << " seconds..." );
         sqlite3_sleep( s * 1000 );
     }
 
     delete &track;
     
     pthread_exit( 0 );
-}
-
-
-static time_t now()
-{
-    struct timeval t;
-    gettimeofday( &t, NULL );
-    return t.tv_sec;
 }
 
 
@@ -151,7 +143,7 @@ ITunesPlaysDatabase::onPlayStateChanged( void* )
             pthread_create( &thread, NULL, sync, new ExtendedITunesTrack( s_track ) );
         }
         else
-            LOGL( 3, "Track is null, won't sync" );
+            LOG( 3, "Track is null, won't sync" );
 
         s_track = currentTrack;
     }

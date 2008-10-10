@@ -128,7 +128,7 @@ Moose::setFileDescriptorsCloseOnExec()
             fcntl( fd, F_SETFD, flags );
         }
     }
-    if (n) LOGL( 3, "Set " << n << " file descriptors FD_CLOEXEC" );
+    if (n) LOG( 3, "Set " << n << " file descriptors FD_CLOEXEC" );
 }
 
 
@@ -142,7 +142,7 @@ Moose::exec( const std::string& command, const std::string& args )
     
     std::string s = "\"" + command + "\" " + args + " &";
 
-    LOGL( 3, "Launching `" << s << "'" )
+    LOG( 3, "Launching `" << s << "'" )
     return ( std::system( s.c_str() ) >= 0 );
 }
 
@@ -247,7 +247,7 @@ Moose::isTwiddlyRunning()
 
     if ( getBsdProcessList( &processList, &processCount ) )
     {
-        LOGL( 3, "Failed to get the process list" );
+        LOG( 3, "Failed to get the process list" );
         return false;
     }
 
@@ -267,7 +267,7 @@ Moose::isTwiddlyRunning()
 
     free( processList );
 
-    if ( found ) LOGL( 3, "Twiddly already running!" );
+    if ( found ) LOG( 3, "Twiddly already running!" );
 
     return found;
 }

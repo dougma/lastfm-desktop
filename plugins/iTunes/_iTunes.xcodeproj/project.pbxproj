@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6303C7B10DAD03EA001F707C /* iTunesAPI.c in Sources */ = {isa = PBXBuildFile; fileRef = 01285C0900CC3A4A7F000001 /* iTunesAPI.c */; };
-		63233BAF0D7491470009EC65 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63233BAD0D7491470009EC65 /* logger.cpp */; };
+		63233BAF0D7491470009EC65 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63233BAD0D7491470009EC65 /* Logger.cpp */; };
 		632E70550DD9FF0200A16D88 /* playCountForDatabaseId.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 632E70520DD9FEF900A16D88 /* playCountForDatabaseId.scpt */; };
 		633C62970D6CA1DD00B609B9 /* main_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 633C62960D6CA1DD00B609B9 /* main_mac.cpp */; };
 		634E6EF50D3FBA7D00E16E0D /* currentTrackLocation.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 638053560D3E95A10003DB13 /* currentTrackLocation.scpt */; };
@@ -18,6 +18,7 @@
 		637A231E0DAA9B1C004590E1 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 637A231D0DAA9B1C004590E1 /* uninstall.sh */; };
 		638052470D3E53940003DB13 /* changelog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 638052460D3E53940003DB13 /* changelog.txt */; };
 		6392AF640D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6392AF620D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp */; };
+		63B2F45E0E9FBECD0088AF7A /* ITunesTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63B2F45D0E9FBECD0088AF7A /* ITunesTrack.cpp */; };
 		63E5E4770D6B51C500774857 /* IPodDetector_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */; };
 		63ED46C20DD8D52900F6FBE0 /* currentTrack.scpt in Resources */ = {isa = PBXBuildFile; fileRef = 63ED46BF0DD8D51D00F6FBE0 /* currentTrack.scpt */; };
 		DC26679C0BD9410900B4ED68 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01285C0700CC38597F000001 /* main.cpp */; };
@@ -25,7 +26,6 @@
 		FB0C1E670D9919CD004820B9 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0C1E660D9919CD004820B9 /* CoreServices.framework */; };
 		FB0C20D00D9922CD004820B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0C20CF0D9922CD004820B9 /* Carbon.framework */; };
 		FB3EA6B90D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */; };
-		FB3EA6C90D587677003DC14E /* ITunesTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */; };
 		FB4ED6F30D6B00CE00F243B8 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB4ED6F20D6B00CE00F243B8 /* IOKit.framework */; };
 		FB6471A70D80643A007006E4 /* IPod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6471A40D806439007006E4 /* IPod.cpp */; };
 		FB6471A90D80643A007006E4 /* IPod_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6471A60D80643A007006E4 /* IPod_mac.cpp */; };
@@ -37,8 +37,8 @@
 		01285C0700CC38597F000001 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		01285C0900CC3A4A7F000001 /* iTunesAPI.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = iTunesAPI.c; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		63233BAD0D7491470009EC65 /* logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = logger.cpp; path = common/logger.cpp; sourceTree = "<group>"; };
-		63233BAE0D7491470009EC65 /* logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logger.h; path = common/logger.h; sourceTree = "<group>"; };
+		63233BAD0D7491470009EC65 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logger.cpp; path = "../../common/c++/Logger.cpp"; sourceTree = "<group>"; };
+		63233BAE0D7491470009EC65 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = "../../common/c++/Logger.h"; sourceTree = "<group>"; };
 		632E70520DD9FEF900A16D88 /* playCountForDatabaseId.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = playCountForDatabaseId.scpt; path = scripts/playCountForDatabaseId.scpt; sourceTree = "<group>"; };
 		633C62960D6CA1DD00B609B9 /* main_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main_mac.cpp; sourceTree = "<group>"; };
 		637452E00D58B02B00429514 /* Moose_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Moose_mac.cpp; sourceTree = "<group>"; };
@@ -50,15 +50,15 @@
 		638053580D3E95A10003DB13 /* playCountForPersistentId.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = playCountForPersistentId.scpt; path = scripts/playCountForPersistentId.scpt; sourceTree = "<group>"; };
 		6392AF620D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ITunesPlaysDatabase.cpp; sourceTree = "<group>"; };
 		6392AF630D788A2D00E1B4F6 /* ITunesPlaysDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITunesPlaysDatabase.h; sourceTree = "<group>"; };
+		63B2F45D0E9FBECD0088AF7A /* ITunesTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ITunesTrack.cpp; sourceTree = "<group>"; };
 		63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IPodDetector_mac.cpp; sourceTree = "<group>"; };
 		63ED46BF0DD8D51D00F6FBE0 /* currentTrack.scpt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.scpt; name = currentTrack.scpt; path = scripts/currentTrack.scpt; sourceTree = "<group>"; };
-		AF289ABC0CDFDCF200C8C0B4 /* _iTunes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "_iTunes.plist"; sourceTree = "<group>"; };
+		AF289ABC0CDFDCF200C8C0B4 /* _iTunes.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = _iTunes.plist; sourceTree = "<group>"; };
 		DC2667A60BD9410900B4ED68 /* AudioScrobbler.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioScrobbler.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB0C1E660D9919CD004820B9 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		FB0C20CF0D9922CD004820B9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ITunesPlaysDatabase_mac.cpp; sourceTree = "<group>"; };
-		FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ITunesTrack.cpp; path = common/ITunesTrack.cpp; sourceTree = "<group>"; };
-		FB3EA6C80D587677003DC14E /* ITunesTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ITunesTrack.h; path = common/ITunesTrack.h; sourceTree = "<group>"; };
+		FB3EA6C80D587677003DC14E /* ITunesTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITunesTrack.h; sourceTree = "<group>"; };
 		FB4ED6F20D6B00CE00F243B8 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		FB5345DE0D4A060200BD9819 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		FB6471A40D806439007006E4 /* IPod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IPod.cpp; sourceTree = "<group>"; };
@@ -126,14 +126,14 @@
 				6392AF630D788A2D00E1B4F6 /* ITunesPlaysDatabase.h */,
 				63E5E4760D6B51C500774857 /* IPodDetector_mac.cpp */,
 				FBAF702D0D7496B000A4919B /* IPodDetector.h */,
-				63233BAD0D7491470009EC65 /* logger.cpp */,
-				63233BAE0D7491470009EC65 /* logger.h */,
+				63233BAD0D7491470009EC65 /* Logger.cpp */,
+				63233BAE0D7491470009EC65 /* Logger.h */,
 				FB5345DE0D4A060200BD9819 /* main.h */,
 				01285C0700CC38597F000001 /* main.cpp */,
 				633C62960D6CA1DD00B609B9 /* main_mac.cpp */,
 				FB3EA6B70D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp */,
-				FB3EA6C70D587677003DC14E /* ITunesTrack.cpp */,
 				FB3EA6C80D587677003DC14E /* ITunesTrack.h */,
+				63B2F45D0E9FBECD0088AF7A /* ITunesTrack.cpp */,
 				637A1ED30D4FCA15004FA19F /* Moose.h */,
 				637452E00D58B02B00429514 /* Moose_mac.cpp */,
 				01285C0000CC31B17F000001 /* iTunesVisualAPI */,
@@ -188,7 +188,7 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "iTunes Scrobbler" */;
+			buildConfigurationList = AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "_iTunes" */;
 			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 1;
 			mainGroup = 089C166AFE841209C02AAC07 /* iTunesPlugIn */;
@@ -224,15 +224,15 @@
 			files = (
 				DC26679C0BD9410900B4ED68 /* main.cpp in Sources */,
 				FB3EA6B90D5795BE003DC14E /* ITunesPlaysDatabase_mac.cpp in Sources */,
-				FB3EA6C90D587677003DC14E /* ITunesTrack.cpp in Sources */,
 				637452E10D58B02B00429514 /* Moose_mac.cpp in Sources */,
 				63E5E4770D6B51C500774857 /* IPodDetector_mac.cpp in Sources */,
 				633C62970D6CA1DD00B609B9 /* main_mac.cpp in Sources */,
-				63233BAF0D7491470009EC65 /* logger.cpp in Sources */,
+				63233BAF0D7491470009EC65 /* Logger.cpp in Sources */,
 				6392AF640D788A2D00E1B4F6 /* ITunesPlaysDatabase.cpp in Sources */,
 				FB6471A70D80643A007006E4 /* IPod.cpp in Sources */,
 				FB6471A90D80643A007006E4 /* IPod_mac.cpp in Sources */,
 				6303C7B10DAD03EA001F707C /* iTunesAPI.c in Sources */,
+				63B2F45E0E9FBECD0088AF7A /* ITunesTrack.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,8 +242,10 @@
 		AF2F40460BD811FE009D75EB /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				USER_HEADER_SEARCH_PATHS = ../../;
 			};
 			name = Development;
 		};
@@ -258,6 +260,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				USER_HEADER_SEARCH_PATHS = ../../;
 			};
 			name = Deployment;
 		};
@@ -265,6 +268,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				USER_HEADER_SEARCH_PATHS = ../../;
 			};
 			name = Default;
 		};
@@ -283,7 +287,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "_iTunes.plist";
+				INFOPLIST_FILE = _iTunes.plist;
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				OTHER_CFLAGS = "";
@@ -319,7 +323,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "_iTunes.plist";
+				INFOPLIST_FILE = _iTunes.plist;
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
@@ -350,7 +354,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "_iTunes.plist";
+				INFOPLIST_FILE = _iTunes.plist;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-lsqlite3";
@@ -370,7 +374,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "iTunes Scrobbler" */ = {
+		AF2F40450BD811FE009D75EB /* Build configuration list for PBXProject "_iTunes" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AF2F40460BD811FE009D75EB /* Development */,

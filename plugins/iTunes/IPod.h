@@ -22,7 +22,7 @@
 
 #include <string>
 #include <vector>
-#include "common/logger.h"
+#include "common/c++/logger.h"
 
 #ifdef WIN32
     #define LFM_STRINGSTREAM std::wstringstream
@@ -39,9 +39,9 @@
     class IPod
     {
         public:
-            const LFM_LOGGER_STRING twiddlyFlags() const;
-            const LFM_LOGGER_STRING& serial() const { return m_serial; }
-            LFM_LOGGER_STRING device() const;
+            const LOGGER_STRING twiddlyFlags() const;
+            const LOGGER_STRING& serial() const { return m_serial; }
+            LOGGER_STRING device() const;
 
             enum deviceType { unknown = 0,
                    iPod,
@@ -96,7 +96,7 @@
             IPod(): m_manualMode( false ), m_mobileScrobblerInstalled( false )
             {}
         
-            LFM_LOGGER_STRING m_serial;
+            LOGGER_STRING m_serial;
             int m_pid;
             int m_vid;
             

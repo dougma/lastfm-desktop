@@ -20,8 +20,8 @@
 #include "ITunesPlaysDatabase.h"
 
 #include "Moose.h"
-#include "common/logger.h"
-#include "common/ITunesTrack.h"
+#include "common/c++/logger.h"
+#include "ITunesTrack.h"
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -41,7 +41,7 @@
 
 // this is a macro to ensure useful location information in the log
 #define logError( db ) \
-        LOGL( 2, "sqlite error: " \
+        LOG( 2, "sqlite error: " \
             << sqlite3_errcode( db ) \
             << " (" << sqlite3_errmsg( db ) << ")" );
 
@@ -56,7 +56,7 @@ ITunesPlaysDatabase::ITunesPlaysDatabase()
 
     if ( sqlite3_open( path.c_str(), &m_db ) != SQLITE_OK )
     {
-        LOGL( 2, "ERROR: Could not open iTunesPlays Database: " << path );
+        LOG( 2, "ERROR: Could not open iTunesPlays Database: " << path );
         logError( m_db );
     }
 
@@ -90,7 +90,7 @@ ITunesPlaysDatabase::~ITunesPlaysDatabase()
 bool
 ITunesPlaysDatabase::query( /* utf-8 */ const char* statement, std::string* result )
 {
-    LOGL( 3, statement );
+    LOG( 3, statement );
     
     int error = 0;
     sqlite3_stmt* stmt = 0;
@@ -125,7 +125,7 @@ ITunesPlaysDatabase::query( /* utf-8 */ const char* statement, std::string* resu
                     if ( sqlite3_column_count( stmt ) > 0 && result )
                     {
                         *result = (const char*) sqlite3_column_text( stmt, 0 );
-                        LOGL( 3, "SQLite result: `" << *result << '\'' );
+                        LOG( 3, "SQLite result: `" << *result << '\'' );
                     }
                     break;
 
@@ -142,12 +142,12 @@ ITunesPlaysDatabase::query( /* utf-8 */ const char* statement, std::string* resu
             if ( busyCount >= 20 )
                 throw "Could not execute SQL - SQLite was too busy";
             
-            LOGL( 3, "SQLite was busy " << busyCount << " times" );
+            LOG( 3, "SQLite was busy " << busyCount << " times" );
         }
     }
     catch( const char* message )
     {
-        LOGL( 2, "ERROR: " << message );
+        LOG( 2, "ERROR: " << message );
         logError( m_db );
     }
 
@@ -157,7 +157,7 @@ ITunesPlaysDatabase::query( /* utf-8 */ const char* statement, std::string* resu
 }
 
 
-#include "common/fileCreationTime.cpp"
+#include "common/c++/fileCreationTime.cpp"
 
 
 bool
@@ -180,11 +180,11 @@ ITunesPlaysDatabase::isValid()
     long const stored_time = std::strtol( r.c_str(), 0, 10 /*base*/ );
     time_t actual_time = common::fileCreationTime( Moose::pluginPath() );
 
-    LOGL( 3, "Plugin binary ctime: " << actual_time );
+    LOG( 3, "Plugin binary ctime: " << actual_time );
 
     if (errno == EINVAL || stored_time != actual_time)
     {
-        LOGL( 3, "Uninstallation protection triggered; forcing bootstrap" );
+        LOG( 3, "Uninstallation protection triggered; forcing bootstrap" );
         return false;
     }
 

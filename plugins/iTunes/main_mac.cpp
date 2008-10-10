@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "iTunesPlugin.h"
-#include "common/logger.h"
+#include "main.h"
+#include "common/c++/logger.h"
 #include "ITunesPlaysDatabase.h"
 
 /** @author <max@last.fm> */
@@ -71,7 +71,7 @@ notificationCallback( CFNotificationCenterRef,
 {
     int const newState = state( info );
 
-    LOGL( 3, "iTunes player-state became: " << kPlayerStates[newState] );
+    LOG( 3, "iTunes player-state became: " << kPlayerStates[newState] );
 
     switch (newState)
     {

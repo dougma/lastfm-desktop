@@ -20,7 +20,7 @@
 #include "iPodDetector.h"
 #include "Ipod.h"
 
-#include "common/logger.h"
+#include "common/c++/logger.h"
 #include "Moose.h"
 
 #include <IOKit/IOKitLib.h>
@@ -107,7 +107,7 @@ IPodDetector::threadEntry( void* param )
     
     if( !ipd->setupDetection() )
     {
-        LOGL( 2, "Error - could not initialize iPod / iPhone detection.\n"
+        LOG( 2, "Error - could not initialize iPod / iPhone detection.\n"
                  "Devices will not be detected and wont scrobble." );
         ipd->m_threadError = true;
         return 0;
@@ -131,7 +131,7 @@ IPodDetector::threadEntry( void* param )
     ipd->m_detectorStarted = true;
     CFRunLoopRun();
     
-    LOGL( 3, "Clearing up iPodMap" );
+    LOG( 3, "Clearing up iPodMap" );
     //clear up memory
     map< std::string, IPod* >::iterator i;
     for( i = ipd->m_ipodMap.begin(); i != ipd->m_ipodMap.end(); ipd++ )
@@ -201,7 +201,7 @@ IPodDetector::setupDetection()
     
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPhone connected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPhone connected notification: " << mach_error_string( ioResult ) );
         return false;
     }
 
@@ -214,7 +214,7 @@ IPodDetector::setupDetection()
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPod connected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPod connected notification: " << mach_error_string( ioResult ) );
         return false;
     }
 
@@ -227,7 +227,7 @@ IPodDetector::setupDetection()
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPod Mini connected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPod Mini connected notification: " << mach_error_string( ioResult ) );
         return false;
     }
                                           
@@ -240,7 +240,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add firewire connected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add firewire connected notification: " << mach_error_string( ioResult ) );
         return false;
     }
     
@@ -253,7 +253,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPhone disconnected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPhone disconnected notification: " << mach_error_string( ioResult ) );
         return false;
     }
                                       
@@ -266,7 +266,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPod disconnected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPod disconnected notification: " << mach_error_string( ioResult ) );
         return false;
     }
                                       
@@ -279,7 +279,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPod Mini disconnected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPod Mini disconnected notification: " << mach_error_string( ioResult ) );
         return false;
     }
                                        
@@ -292,7 +292,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add iPod Mini disconnected notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add iPod Mini disconnected notification: " << mach_error_string( ioResult ) );
         return false;
     }
                                            
@@ -305,7 +305,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add device mount notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add device mount notification: " << mach_error_string( ioResult ) );
         return false;
     }        
                                        
@@ -318,7 +318,7 @@ IPodDetector::setupDetection()
                                                  
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not add device unmount notification: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not add device unmount notification: " << mach_error_string( ioResult ) );
         return false;
     }
 
@@ -354,7 +354,7 @@ IPodDetector::onUsbIPodDetected( void* param, io_iterator_t newIterator )
 
             if( iPod->isMobileScrobblerInstalled() )
             {
-                LOGL( 3, "Mobile Scrobbler detected on iPod Touch - client scrobbling not needed." );
+                LOG( 3, "Mobile Scrobbler detected on iPod Touch - client scrobbling not needed." );
                 delete iPod;
                 IOObjectRelease( ioUsbDeviceNub );
                 continue;
@@ -364,13 +364,13 @@ IPodDetector::onUsbIPodDetected( void* param, io_iterator_t newIterator )
             
             if( iPod->isManualMode() )
             {
-                LOGL( 3, "iPod detected in manual mode." );
+                LOG( 3, "iPod detected in manual mode." );
                 ipd->startTwiddlyWithIpodSerial( iPod->serial() );
             }
             else
             {
                 //Either the iPod is in automatic mode OR it's an old iPod
-                LOGL( 3, "iPod detected" );
+                LOG( 3, "iPod detected" );
                 ipd->startSyncTimer( iPod );    
             }
         }
@@ -396,7 +396,7 @@ IPodDetector::onIPhoneDetected( void* param, io_iterator_t newIterator )
 
             if( iPod->isMobileScrobblerInstalled() )
             {  
-                LOGL( 3, "Mobile Scrobbler detected on iPhone - client scrobbling not needed." );
+                LOG( 3, "Mobile Scrobbler detected on iPhone - client scrobbling not needed." );
                 delete iPod;
                 IOObjectRelease( ioUsbDeviceNub );
                 continue;
@@ -406,12 +406,12 @@ IPodDetector::onIPhoneDetected( void* param, io_iterator_t newIterator )
             
             if( iPod->isManualMode() )
             {
-                LOGL( 3, "iPhone detected in manual mode!" );
+                LOG( 3, "iPhone detected in manual mode!" );
                 ipd->startTwiddlyWithIpodSerial( iPod->serial(), "manualMode" );
             }
             else
             {
-                LOGL( 3, "iPhone detected in automatic mode!" );
+                LOG( 3, "iPhone detected in automatic mode!" );
                 ipd->startSyncTimer( iPod );  
             }
         }
@@ -453,7 +453,7 @@ IPodDetector::onFireWireDetected( void* param, io_iterator_t newIterator )
 
         if( ioResult != kIOReturnSuccess )
         {
-            LOGL( 3, "Could not get firewire device properties: " << mach_error_string( ioResult ) );
+            LOG( 3, "Could not get firewire device properties: " << mach_error_string( ioResult ) );
             IOObjectRelease( ioFireWireDeviceNub );
             continue;
         }
@@ -471,7 +471,7 @@ IPodDetector::onFireWireDetected( void* param, io_iterator_t newIterator )
             {
                 ipd->notifyIfUnknownIPod( iPod );
 
-                LOGL( 3, "FireWire iPod plugged in" );
+                LOG( 3, "FireWire iPod plugged in" );
                 ipd->m_ipodMap[ iPod->serial() ] = iPod;
                 ipd->startSyncTimer( iPod );
             }
@@ -552,12 +552,12 @@ IPodDetector::onDeviceNodeAdded( void* param, io_iterator_t newIterator )
         {
             io_name_t className;
             IOObjectGetClass( device, className );
-            LOGL( 3, "Could not get serial - className: " << className );
+            LOG( 3, "Could not get serial - className: " << className );
         }
 
         if( ipd->m_ipodMap.find( serialNo ) == ipd->m_ipodMap.end() )
         {
-            LOGL( 3, "Error: something's gone wrong - cannot find iPod in the map!" );
+            LOG( 3, "Error: something's gone wrong - cannot find iPod in the map!" );
             IOObjectRelease( device );
             continue;
         }
@@ -593,7 +593,7 @@ IPodDetector::onDeviceNodeAdded( void* param, io_iterator_t newIterator )
 std::string 
 IPodDetector::getMountPoint( const std::string& deviceName ) const
 {
-    LOGL( 3, deviceName << " scanned." );
+    LOG( 3, deviceName << " scanned." );
     std::string devPath = "/dev/";
     devPath += deviceName;
  
@@ -606,7 +606,7 @@ IPodDetector::getMountPoint( const std::string& deviceName ) const
     int result = getfsstat( mountInfo, sizeof( struct statfs ) * mountCount, MNT_WAIT );
     if ( result < 0 )
     {
-        LOGL( 3, "getfsstat error: " << result );
+        LOG( 3, "getfsstat error: " << result );
         return "";
     }
     
@@ -644,7 +644,7 @@ IPodDetector::onDeviceNodeRemoved( void* param, io_iterator_t newIterator )
         {
             if( CFBooleanGetValue( isLeaf ) )
             {
-                LOGL( 3, "Leaf node removal ignored" );
+                LOG( 3, "Leaf node removal ignored" );
                 IOObjectRelease( device );
                 continue;
             }
@@ -657,10 +657,10 @@ IPodDetector::onDeviceNodeRemoved( void* param, io_iterator_t newIterator )
                                                   &iter);
         if( ioResult != kIOReturnSuccess )
         {
-            LOGL( 3, "Could not create iterator to iterate over unmounted device" << mach_error_string( ioResult ) );
+            LOG( 3, "Could not create iterator to iterate over unmounted device" << mach_error_string( ioResult ) );
         }
         
-        LOGL( 3, "determining ipod unmount details" );
+        LOG( 3, "determining ipod unmount details" );
         io_object_t curParent;
         while( curParent = IOIteratorNext( iter ) )
         {
@@ -668,7 +668,7 @@ IPodDetector::onDeviceNodeRemoved( void* param, io_iterator_t newIterator )
             ioResult = IORegistryEntryGetName( curParent, deviceName );
             if( ioResult != kIOReturnSuccess )
             {
-                LOGL( 3, "Could not get unmount parent's name/class: " << mach_error_string( ioResult ) );
+                LOG( 3, "Could not get unmount parent's name/class: " << mach_error_string( ioResult ) );
                 IOObjectRelease( curParent );
                 continue;
             }
@@ -676,11 +676,11 @@ IPodDetector::onDeviceNodeRemoved( void* param, io_iterator_t newIterator )
             if( strncmp( deviceName, "iPod", 4 ) == 0 ||
                 strncmp( deviceName, "iPod mini", 9 ) == 0 )
             {
-                LOGL( 3, "iPod has been unmounted" );
+                LOG( 3, "iPod has been unmounted" );
                 std::string serial;
                 if( !IPod::getUsbSerial( curParent, &serial ) )
                 {
-                    LOGL( 3, "Error: could not determine serial number of iPod from unmount event" );
+                    LOG( 3, "Error: could not determine serial number of iPod from unmount event" );
                     IOObjectRelease( curParent );
                     continue;
                 }
@@ -688,11 +688,11 @@ IPodDetector::onDeviceNodeRemoved( void* param, io_iterator_t newIterator )
             }
             if( strncmp( deviceName, "IOFireWireSBP2LUN", 17 ) == 0 )
             {
-                LOGL( 3, "iPod has been unmounted" );
+                LOG( 3, "iPod has been unmounted" );
                 std::string serial;
                 if( !IPod::getFireWireSerial( curParent, &serial ) )
                 {
-                    LOGL( 3, "Error: could not determine serial number of iPod from unmount event" );
+                    LOG( 3, "Error: could not determine serial number of iPod from unmount event" );
                     IOObjectRelease( curParent );
                     continue;
                 }
@@ -729,7 +729,7 @@ IPodDetector::onMountStateChanged(  EventHandlerCallRef handlerCallRef,
                     if( result != noErr )
                     {
                         //This has been known to be caused by iPod firmware update / restore
-                        LOGL( 3, "Could not get event parameters. This mount will be ignored" );
+                        LOG( 3, "Could not get event parameters. This mount will be ignored" );
                         break;
                     }
                     
@@ -738,7 +738,7 @@ IPodDetector::onMountStateChanged(  EventHandlerCallRef handlerCallRef,
                     
                     if( result != noErr )
                     {
-                        LOGL( 3, "Could not get diskID from mounted volume. This mount will be ignored" );
+                        LOG( 3, "Could not get diskID from mounted volume. This mount will be ignored" );
                         break;
                     }
                     
@@ -746,12 +746,12 @@ IPodDetector::onMountStateChanged(  EventHandlerCallRef handlerCallRef,
                     CFStringGetCString( cfDiskID, diskID, sizeof( diskID ), kCFStringEncodingASCII );
                     CFRelease( cfDiskID );
                     
-                    LOGL( 3, "mounted Volume location = /dev/" << diskID );
+                    LOG( 3, "mounted Volume location = /dev/" << diskID );
 
                 
                     std::string volumePath = ipd->getMountPoint( diskID );
                     
-                    LOGL( 3, "Volume mounted at location: " << volumePath );
+                    LOG( 3, "Volume mounted at location: " << volumePath );
                     
                     std::map< std::string, IPod* >::iterator mapIter;
                     for( mapIter = ipd->m_ipodMap.begin(); 
@@ -770,12 +770,12 @@ IPodDetector::onMountStateChanged(  EventHandlerCallRef handlerCallRef,
 
                         if( curIpod->isManualMode() )
                         {
-                            LOGL( 3, "iPod detected in manual sync mode." );
+                            LOG( 3, "iPod detected in manual sync mode." );
                             ipd->startTwiddlyWithIpodSerial( curIpod->serial(), "manual" );
                         }
                         else
                         {
-                            LOGL( 3, "iPod detected in automatic sync mode." );
+                            LOG( 3, "iPod detected in automatic sync mode." );
                         }
                         
                     }
@@ -783,7 +783,7 @@ IPodDetector::onMountStateChanged(  EventHandlerCallRef handlerCallRef,
                 break;
                 case kEventVolumeUnmounted:
                 {
-                    LOGL( 3, "kEventVolumeUnmounted event received." );
+                    LOG( 3, "kEventVolumeUnmounted event received." );
                 }
                 break;
             }

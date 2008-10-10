@@ -37,7 +37,7 @@ IPod::newFromUsbDevice( io_object_t device, bool isIPhone /* = false */ )
         usbDevice = getBaseDevice( device );
         if( usbDevice == NULL )
         {
-            LOGL( 3, "Error could not find base USBDevice for device class: " << className );
+            LOG( 3, "Error could not find base USBDevice for device class: " << className );
             return NULL;
         }
     }
@@ -85,7 +85,7 @@ IPod::newFromUsbDevice( io_object_t device, bool isIPhone /* = false */ )
         }
         else
         {
-            LOGL( 3, "Warning: could not determine information from iPhone / iPod touch backup information\n"
+            LOG( 3, "Warning: could not determine information from iPhone / iPod touch backup information\n"
                      "The presumption is that this device is in automatic sync mode without mobile scrobbler installed" );
         }
     }
@@ -140,7 +140,7 @@ IPod::getDeviceId( io_object_t device, int* vid, int* pid )
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not get usb device properties: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not get usb device properties: " << mach_error_string( ioResult ) );
         return false;
     }
 
@@ -171,7 +171,7 @@ IPod::getDeviceFireWireId( io_object_t device, int* vid, int* pid )
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not get firewire device properties: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not get firewire device properties: " << mach_error_string( ioResult ) );
         return false;
     }
 
@@ -202,7 +202,7 @@ IPod::getUsbSerial( io_object_t device, std::string* serialOut )
         usbDevice = getBaseDevice( device );
         if( usbDevice == NULL )
         {
-            LOGL( 3, "Error could not find base USBDevice for device class: " << className );
+            LOG( 3, "Error could not find base USBDevice for device class: " << className );
             return NULL;
         }
     }
@@ -216,7 +216,7 @@ IPod::getUsbSerial( io_object_t device, std::string* serialOut )
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not get serial properties: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not get serial properties: " << mach_error_string( ioResult ) );
         return false;
     }
     
@@ -224,7 +224,7 @@ IPod::getUsbSerial( io_object_t device, std::string* serialOut )
     cfSerial = (CFStringRef)CFDictionaryGetValue( propertyDictionary, CFSTR( "USB Serial Number" ) );
     if( cfSerial == NULL )
     {
-        LOGL( 3, "Error - Could not get USB Serial Number" );
+        LOG( 3, "Error - Could not get USB Serial Number" );
         return false;
     }
     
@@ -254,7 +254,7 @@ IPod::getFireWireSerial( io_object_t device, std::string* serialOut )
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not get USB device properties: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not get USB device properties: " << mach_error_string( ioResult ) );
         return false;
     }
     
@@ -262,7 +262,7 @@ IPod::getFireWireSerial( io_object_t device, std::string* serialOut )
     cfSerial = (CFNumberRef)CFDictionaryGetValue( propertyDictionary, CFSTR( "GUID" ) );
     if( cfSerial == NULL )
     {
-        LOGL( 3, "GUID property does not exist for this device" );
+        LOG( 3, "GUID property does not exist for this device" );
         return false;
     } 
 
@@ -293,7 +293,7 @@ IPod::isOldIpod( io_object_t device )
 
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not create isOldIpod recursive iterator: " << mach_error_string( ioResult ) );
+        LOG( 3, "Could not create isOldIpod recursive iterator: " << mach_error_string( ioResult ) );
         throw ioResult;
     }
     
@@ -305,7 +305,7 @@ IPod::isOldIpod( io_object_t device )
         
         if( ioResult != kIOReturnSuccess )
         {
-            LOGL( 3, "Could not get class name from current object: " << mach_error_string( ioResult ) );
+            LOG( 3, "Could not get class name from current object: " << mach_error_string( ioResult ) );
             throw ioResult;
         }
 
@@ -342,7 +342,7 @@ IPod::createDictionaryFromXML( CFStringRef filePath ) const
 
     if( !result )
     {
-        LOGL( 3, "Error: could not get data from backup file:" << CFStringGetCStringPtr ( filePath, kCFStringEncodingASCII ) );
+        LOG( 3, "Error: could not get data from backup file:" << CFStringGetCStringPtr ( filePath, kCFStringEncodingASCII ) );
         CFRelease( fileURL );
         return dictionary;
     }
@@ -376,7 +376,7 @@ IPod::queryIPhoneManual() const
     
     if( propertyList == NULL )
     {
-        LOGL( 3, "Error: Could not read Info.plist file - presuming automatic sync enabled" );
+        LOG( 3, "Error: Could not read Info.plist file - presuming automatic sync enabled" );
         return false;
     }
 
@@ -384,7 +384,7 @@ IPod::queryIPhoneManual() const
     
     if( iTunesFiles == NULL )
     {
-        LOGL( 3, "Error: Could not extract the iTunes Files property from Info.plist file. "
+        LOG( 3, "Error: Could not extract the iTunes Files property from Info.plist file. "
                  "Presuming automatic sync enabled." );
         return false;
     }
@@ -393,14 +393,14 @@ IPod::queryIPhoneManual() const
     
     if( iTunesPrefsData == NULL )
     {
-        LOGL( 3, "Error: Could not read the iTunesPrefs data from Info.plist - iTunesFiles section. "
+        LOG( 3, "Error: Could not read the iTunesPrefs data from Info.plist - iTunesFiles section. "
                  "Presuming automatic sync enabled." );
         return false;
     }
     
     if( CFDataGetLength( iTunesPrefsData ) < 11 )
     {
-        LOGL( 3, "Error: Data length of iTunesPrefs data is too small. "
+        LOG( 3, "Error: Data length of iTunesPrefs data is too small. "
                  "Presuming automatic sync enabled." );
         return false;
     }
@@ -445,7 +445,7 @@ IPod::populateIPodManual()
     if( !result ||
         CFDataGetLength( iTunesPrefsData ) < 11 )
     {
-        LOGL( 3, "Error: Data length of iTunesPrefs data is too small. "
+        LOG( 3, "Error: Data length of iTunesPrefs data is too small. "
                  "Presuming automatic sync enabled. " << std::endl <<
                  "MountPoint: " << m_mountPoint );
         m_manualMode = false;
@@ -475,7 +475,7 @@ IPod::getBaseDevice( io_object_t device )
                                               &parentIter);
     if( ioResult != kIOReturnSuccess )
     {
-        LOGL( 3, "Could not create iterator to iterate over unmounted device" << mach_error_string( ioResult ) );
+        LOG( 3, "Could not create iterator to iterate over unmounted device" << mach_error_string( ioResult ) );
     }
     
     io_object_t curParent;
@@ -485,7 +485,7 @@ IPod::getBaseDevice( io_object_t device )
         ioResult = IORegistryEntryGetName( curParent, deviceName );
         if( ioResult != kIOReturnSuccess )
         {
-            LOGL( 3, "Could not get parent's name/class: " << mach_error_string( ioResult ) );
+            LOG( 3, "Could not get parent's name/class: " << mach_error_string( ioResult ) );
             IOObjectRelease( curParent );
             continue;
         }
@@ -516,7 +516,7 @@ IPod::queryMobileScrobblerInstalled() const
     plistFolder = opendir( backupPath.c_str() );
     if( plistFolder == NULL )
     {
-        LOGL( 3, "Could not query itouch / iphone backup folder - presuming MobileScrobbler is NOT installed.." );
+        LOG( 3, "Could not query itouch / iphone backup folder - presuming MobileScrobbler is NOT installed.." );
         return false;
     }
     while( dirEntry = readdir( plistFolder ) )

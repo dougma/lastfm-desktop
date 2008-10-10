@@ -31,7 +31,7 @@
     #define MOOSE_PLUGIN_HKEY_A MOOSE_HKEY_A "\\Plugins\\itw"
 #else
     #define MOOSE_STRING string
-    #define MOOSE_LOG LOGL
+    #define MOOSE_LOG LOG
     #define MOOSE_PREFS_PLIST "fm.last.Last.fm"
 #endif
 

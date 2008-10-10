@@ -19,11 +19,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "iTunesPlugin.h"
-
-#include "common/logger.h"
+#include "main.h"
 #include "IPodDetector.h"
 #include "Moose.h"
+#include "common/c++/logger.h"
 
 #if TARGET_OS_WIN32
     #include "ITunesComThread.h"
@@ -70,7 +69,7 @@ extern "C"
                 setupIPodSystem(); //sets up iPod scrobbling
 
               #if TARGET_OS_WIN32
-                LOGL( 3, "Initialising ScrobSubmitter" );
+                LOG( 3, "Initialising ScrobSubmitter" );
                 gSubmitter.Init( "itw", ScrobSubCallback, 0 );
               #endif
                 
@@ -78,17 +77,17 @@ extern "C"
 
         
             case kPluginPrepareToQuitMessage:
-                LOGL( 3, "EVENT: kPluginPrepareToQuitMessage" );
+                LOG( 3, "EVENT: kPluginPrepareToQuitMessage" );
 
                 cleanup();
                 return noErr;
 
         
             case kPluginCleanupMessage:
-                LOGL( 3, "EVENT: kPluginCleanupMessage" );
+                LOG( 3, "EVENT: kPluginCleanupMessage" );
 
               #if TARGET_OS_WIN32
-                LOGL( 3, "Terminating ScrobSubmitter" );
+                LOG( 3, "Terminating ScrobSubmitter" );
                 gSubmitter.Term();
               #endif
 
@@ -105,17 +104,15 @@ extern "C"
 static void initLogger()
 {
 #if TARGET_OS_WIN32
-    std::wstring sLogFile = ScrobSubmitter::GetLogPathW();
-    sLogFile += L"\\iTunesPlugin.log";
+    std::wstring path = ScrobSubmitter::GetLogPathW();
+    path += L"\\iTunesPlugin.log";
 #else
-    std::string sLogFile = ::getenv( "HOME" );
-    sLogFile += "/Library/Logs/Last.fm iTunes Plugin.log";
+    std::string path = ::getenv( "HOME" );
+    path += "/Library/Logs/Last.fm/iTunes.log";
 #endif
 
-    Logger& logger = Logger::GetLogger();
-    logger.Init( sLogFile, false );
-    logger.SetLevel( Logger::Debug );
-    LOGL( 3, "Log file created" );
+    new Logger( path.c_str(), Logger::Debug );
+    LOG( 3, "Log file created" );
 }
 
 
@@ -139,12 +136,12 @@ static void setupIPodSystem()
     }
 
 #if TARGET_OS_WIN32
-    LOGL( 3, "Initialising ITunesComThread" );
+    LOG( 3, "Initialising ITunesComThread" );
     gCom = new ITunesComThread();
 #endif
 
 #if TARGET_OS_MAC
-    LOGL( 3, "Initialising ITunesPlaysDatabase" );
+    LOG( 3, "Initialising ITunesPlaysDatabase" );
     ITunesPlaysDatabase::init(); // must be done b4 notification center registration
 
     CFNotificationCenterAddObserver( CFNotificationCenterGetDistributedCenter(),
@@ -155,19 +152,19 @@ static void setupIPodSystem()
                                      CFNotificationSuspensionBehaviorDeliverImmediately );
 #endif
 
-    LOGL( 3, "Initialising IPodDetector" );
+    LOG( 3, "Initialising IPodDetector" );
     gIPodDetector = new IPodDetector;
 }
 
 
 static void cleanup()
 {
-    LOGL( 3, "Deleting IPodDetector" );
+    LOG( 3, "Deleting IPodDetector" );
     delete gIPodDetector;
     gIPodDetector = 0;
     
 #if TARGET_OS_WIN32
-    LOGL( 3, "Deleting ITunesComThread" );
+    LOG( 3, "Deleting ITunesComThread" );
     delete gCom;
     gCom = 0;
 #else
@@ -187,7 +184,7 @@ static bool isClientInstalled()
 
 static void uninstall()
 {
-    LOGL( 3, "Client has gone, uninstalling self." );
+    LOG( 3, "Client has gone, uninstalling self." );
     // we have to change directory for the script to work properly
     std::string d = Moose::bundleFolder() + "Contents/Resources";
     // we have to change dir for the script to succeed as a safety precaution
@@ -249,7 +246,7 @@ RegisterVisualPlugin( PluginMessageInfo *messageInfo )
         kVisualPluginReleaseStage,
         kVisualPluginNonFinalRelease );
 
-    LOGL( 3, "Giving iTunes version number: " + GetVersionString() );
+    LOG( 3, "Giving iTunes version number: " + GetVersionString() );
 
 #if TARGET_OS_WIN32
     //FIXME actually, I doubt we want these
