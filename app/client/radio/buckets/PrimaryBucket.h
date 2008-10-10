@@ -21,21 +21,26 @@
 #define PRIMARY_BUCKET_H
 
 #include <QMainWindow>
-#include <QListWidget>
+namespace Unicorn{ class TabWidget; }
 
 class PrimaryBucket : public QMainWindow
 {
 	Q_OBJECT
 public:
-	PrimaryBucket( QWidget* w = 0 );
+	PrimaryBucket();
 
 private:
 	
 	struct {
-		class QTabWidget* tabWidget;
+		class Unicorn::TabWidget* tabWidget;
+        class PrimaryListView* stationsBucket;
 		class PrimaryListView* friendsBucket;
 		class PrimaryListView* tagsBucket;
+		class PlayerBucket* playerBucket;
 	} ui;
+
+public slots:
+	void replaceStation( class QMimeData* );
 
 };
 
@@ -43,38 +48,58 @@ private:
 #include <QMouseEvent>
 #include <QModelIndex>
 #include <QDebug>
+#include <QListWidget>
+#include "PlayableListItem.h"
+#include "PlayableMimeData.h"
+
 class PrimaryListView : public QListWidget
 {
 	Q_OBJECT
 public:
 	PrimaryListView( QWidget* parent ): QListWidget( parent ){};
+    
+protected:
+    QMimeData* mimeData( const QList<QListWidgetItem *> items ) const
+    {
+        if( items.isEmpty() )
+            return 0;
 
-	void mousePressEvent(QMouseEvent *event)
-	{
-		QModelIndex i = indexAt( event->pos());
-		if (event->button() == Qt::LeftButton
-			&& i.isValid() && i.flags() & Qt::ItemIsDragEnabled ) 
-		{
-			
-			QString text = i.data( Qt::DisplayRole ).toString();
-			QIcon icon = i.data( Qt::DecorationRole ).value<QIcon>();
-			QDrag *drag = new QDrag( this );
-			QMimeData *mimeData = new QMimeData;
-			
-			mimeData->setText( text );
-			mimeData->setImageData( icon.pixmap( 50 ).toImage() );
-			
-			drag->setMimeData( mimeData );
-			drag->setPixmap(icon.pixmap(50 ));
-			drag->setHotSpot(QPoint(drag->pixmap().width()/2,
-									drag->pixmap().height()));
-			
-			Qt::DropAction dropAction = drag->exec( Qt::CopyAction );
+        PlayableListItem* item = dynamic_cast<PlayableListItem*>( items.first() );
+        
+        PlayableMimeData* data = new PlayableMimeData();
+        data->setType( item->playableType() );
+        data->setText( item->text() );
+        data->setImageData( item->data( Qt::DecorationRole).value<QIcon>().pixmap(50).toImage() );
+        return data;
+    }
 
-			if( dropAction != Qt::IgnoreAction )
-				itemFromIndex( i )->setFlags( Qt::NoItemFlags );
-		}
-	}
+//	void mousePressEvent(QMouseEvent *event)
+//	{
+//		QModelIndex i = indexAt( event->pos());
+//		if (event->button() == Qt::LeftButton
+//			&& i.isValid() && i.flags() & Qt::ItemIsDragEnabled ) 
+//		{
+//			
+//			QString text = i.data( Qt::DisplayRole ).toString();
+//			QIcon icon = i.data( Qt::DecorationRole ).value<QIcon>();
+//			QDrag *drag = new QDrag( this );
+//			PlayableMimeData *mimeData = new PlayableMimeData;
+//			
+//			mimeData->setText( text );
+//			mimeData->setImageData( icon.pixmap( 50 ).toImage() );
+//			mimeData->setType( i.data( Qt::UserRole ).toInt() );
+//			
+//			drag->setMimeData( mimeData );
+//			drag->setPixmap(icon.pixmap(50 ));
+//			drag->setHotSpot(QPoint(drag->pixmap().width()/2,
+//									drag->pixmap().height()));
+//			
+//			Qt::DropAction dropAction = drag->exec( Qt::CopyAction );
+//
+//			if( dropAction != Qt::IgnoreAction )
+//				itemFromIndex( i )->setFlags( Qt::NoItemFlags );
+//		}
+//	}
 	
 };
 

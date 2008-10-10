@@ -38,4 +38,4 @@ protected:
     
 };
 
-#endif
+#endif //DOCK_WINDOW_H

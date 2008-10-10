@@ -43,7 +43,6 @@ public:
 	{
 		class BottomBar* bottombar;
 		class PrimaryBucket* primaryBucket;
-        class Firehose* firehose;
 		class ImageButton* cog;        
         class QLabel* text;
 		class PrettyCoverWidget* cover;

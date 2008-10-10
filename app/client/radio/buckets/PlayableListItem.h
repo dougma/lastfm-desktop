@@ -16,59 +16,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef PLAYABLE_LIST_ITEM
+#define PLAYABLE_LIST_ITEM
 
-#ifndef FIREHOSE_VIEW_H
-#define FIREHOSE_VIEW_H
+#include <QListWidgetItem>
+#include "PlayableMimeData.h"
 
-#include <QAbstractScrollArea>
-#include <QModelIndex>
-
-/** view that can only do minimal things, hence we don't even derive
-  * QAbstractItemView as that was way more work than we required 
-  * 
-  * @author <max@last.fm> 
-  */
-class FirehoseView : public QAbstractScrollArea
+class PlayableListItem : public QListWidgetItem
 {
-    Q_OBJECT
-    
-    class QAbstractItemDelegate* delegate;
-    class QTimeLine* timer;
-    class QAbstractItemModel* model;
-
-    int h;
-    int offset;
-
 public:
-    FirehoseView();
-
-    /** you can set any model you like, but it prolly won't work as expected,
-      * also, if you don't set this, we crash :P */
-    void setModel( QAbstractItemModel* );
-    /** as above */
-    void setDelegate( QAbstractItemDelegate* );
-
-private slots:
-    void onRowInserted();
-    void onModelReset();
-    void onFrameChange( int );
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void resizeEvent( QResizeEvent* );
-    virtual void scrollContentsBy( int, int );
+	PlayableListItem( QListWidget* parent = 0 ) : QListWidgetItem( parent, QListWidgetItem::UserType ){};
+	PlayableListItem( const QIcon & icon, const QString & text, QListWidget * parent = 0 )
+					:QListWidgetItem( icon, text, parent, QListWidgetItem::UserType ){};
+	
+	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 )
+	{
+		PlayableListItem* item = new PlayableListItem( parent );
+		
+		item->setText( data->text() );
+		
+		if( data->hasImage() )
+			item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
+		
+		item->setData( k_playableType, data->type() );
+		
+		return item;
+	};
+	
+	void setType( const PlayableMimeData::Type t ){ setData( k_playableType, t ); }
     
-    virtual void mouseDoubleClickEvent( QMouseEvent* );
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent( QMouseEvent* event );
-    
-    QModelIndex indexAt( const QPoint& point ) const;
-    
-    QScrollBar* bar() const { return verticalScrollBar(); }
-    
+    Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
+	
+	int playableType() const{ return data( k_playableType ).toInt(); }
+	
 private:
-    QMap< QModelIndex, QRect > m_itemRects;
-    QPoint m_dragStartPosition;
+	static const Qt::ItemDataRole k_playableType = Qt::UserRole; 
 };
 
-#endif
+#endif //PLAYABLE_LIST_ITEM

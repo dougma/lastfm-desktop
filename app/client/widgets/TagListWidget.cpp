@@ -22,6 +22,9 @@
 #include "Settings.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
+#include "the/MainWindow.h"
+#include "radio/buckets/PrimaryBucket.h"
+#include "PlayableMimeData.h"
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -38,6 +41,7 @@ TagListWidget::TagListWidget( QWidget* parent )
     setContextMenuPolicy( Qt::CustomContextMenu );
     setFrameStyle( NoFrame );
     setAlternatingRowColors( true );
+    setDragEnabled( true );
 
     class TallerRowDelegate : public QItemDelegate
     {
@@ -71,6 +75,7 @@ TagListWidget::TagListWidget( QWidget* parent )
     connect( a, SIGNAL(triggered()), SLOT(openTagPageForCurrentItem()) );
     
     connect( this, SIGNAL(customContextMenuRequested( QPoint )), SLOT(showMenu( QPoint )) );
+    connect( this, SIGNAL(itemDoubleClicked( QTreeWidgetItem*, int )), SLOT(onItemDoubleClicked ( QTreeWidgetItem*, int )) );
 }
 
 
@@ -80,7 +85,7 @@ TagListWidget::add( QString tag )
     tag = tag.toLower();
     
     //FIXME avoid duplicates
-    addTopLevelItem( new QTreeWidgetItem( QStringList() << tag ) );    
+    addTopLevelItem( new QTreeWidgetItem( QStringList() << tag ) );
     m_newTags += tag;
     
     return true;
@@ -138,6 +143,29 @@ TagListWidget::onTagsRequestFinished( WsReply* r )
 		addTopLevelItem( entry );
 	}
 	m_currentReply = 0;
+}
+
+
+void
+TagListWidget::onItemDoubleClicked ( QTreeWidgetItem* item, int column )
+{
+    PlayableMimeData* data = PlayableMimeData::createFromTag( item->text( 0 ) );
+    
+    //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
+    The::mainWindow().ui.primaryBucket->replaceStation( data );
+}
+
+
+QMimeData* 
+TagListWidget::mimeData( const QList<QTreeWidgetItem *> items ) const
+{
+    if( items.empty() )
+        return 0;
+    
+    QTreeWidgetItem* item = items.first();
+    PlayableMimeData* data = PlayableMimeData::createFromTag( item->data( 0, Qt::DisplayRole ).toString() );
+    data->setImageData( QImage( ":buckets/tag_white_on_blue.png" ));
+    return data;
 }
 
 

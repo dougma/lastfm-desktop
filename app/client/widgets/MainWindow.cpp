@@ -61,7 +61,7 @@ MainWindow::MainWindow()
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     close->setContext( Qt::ApplicationShortcut );
     connect( close, SIGNAL(activated()), SLOT(closeActiveWindow()) );
-   
+    
     connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
@@ -145,7 +145,7 @@ MainWindow::setupUi()
     ui.setupUi( this );
 	
     AuthenticatedUser user;
-	ui.account->setTitle( user );
+    ui.account->setTitle( user );
    	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
     
 	setupCentralWidget();
@@ -161,19 +161,29 @@ MainWindow::setupUi()
     ui.bottombar->ui.radio->setWidget( dw );
     dw->hide();
     dw->setFloating( true );
+    
     dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.friends->setWidget( dw );
     dw->hide();
+    
     dw = new QDockWidget;
     dw->setWindowTitle( "Info" );
-    dw->setWidget( new MetaInfoView );
+    MetaInfoView* miv;
+    dw->setWidget( miv = new MetaInfoView );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
     ui.bottombar->ui.library->setWidget( dw );
     dw->hide();
-
+    
+    dw = new QDockWidget;
+    dw->setWindowTitle( "Buckets" );
+    dw->setWidget( ui.primaryBucket = new PrimaryBucket );
+    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
+    dw->setFloating( true );
+    dw->hide();
+    
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
 #endif

@@ -19,7 +19,7 @@
 
 #include <QListWidget>
 #include <QSplitter>
-#include <QTabWidget>
+#include "UnicornTabWidget.h"
 #include <QStackedWidget>
 #include <QStackedLayout>
 #include "widgets/ImageButton.h"
@@ -27,56 +27,91 @@
 #include <QStringListModel>
 #include "PrimaryBucket.h"
 #include "PlayerBucket.h"
+#include "PlayableListItem.h"
 #include "lib/lastfm/types/User.h"
 
 
-PrimaryBucket::PrimaryBucket( QWidget* w )
-			  :QMainWindow( w )
+PrimaryBucket::PrimaryBucket()
 {
-
-	UnicornWidget::paintItBlack( this );
-	
 	ui.friendsBucket = new PrimaryListView( this );
-	ui.friendsBucket->setViewMode( QListView::IconMode );
-	ui.friendsBucket->setFlow( QListView::LeftToRight );
-	ui.friendsBucket->setWrapping( true );
-	ui.friendsBucket->setResizeMode( QListView::Adjust );
-	
+    ui.friendsBucket->setAlternatingRowColors( true );
+//	ui.friendsBucket->setViewMode( QListView::IconMode );
+//	ui.friendsBucket->setFlow( QListView::LeftToRight );
+//	ui.friendsBucket->setWrapping( true );
+//	ui.friendsBucket->setResizeMode( QListView::Adjust );
+    ui.friendsBucket->setDragEnabled( true );
+    ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    UnicornWidget::paintItBlack( ui.friendsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
+    
 	ui.tagsBucket = new PrimaryListView( this );
-	ui.tagsBucket->setViewMode( QListView::IconMode );
-	ui.tagsBucket->setFlow( QListView::LeftToRight );
-	ui.tagsBucket->setWrapping( true );
-	ui.tagsBucket->setResizeMode( QListView::Adjust );
+    ui.tagsBucket->setAlternatingRowColors( true );
+//	ui.tagsBucket->setViewMode( QListView::IconMode );
+//	ui.tagsBucket->setFlow( QListView::LeftToRight );
+//	ui.tagsBucket->setWrapping( true );
+//	ui.tagsBucket->setResizeMode( QListView::Adjust );
+    ui.tagsBucket->setDragEnabled( true );
+    ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
 	
+	ui.stationsBucket = new PrimaryListView( this );
+    ui.stationsBucket->setAlternatingRowColors( true );
+//	ui.stationsBucket->setViewMode( QListView::IconMode );
+//	ui.stationsBucket->setFlow( QListView::LeftToRight );
+//	ui.stationsBucket->setWrapping( true );
+//	ui.stationsBucket->setResizeMode( QListView::Adjust );
+    ui.stationsBucket->setDragEnabled( true );
+    ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
+    
 #define ADDITEM( b, n, i ) \
-	QListWidgetItem* n = new QListWidgetItem( QIcon( i ), #n); \
-	n->setSizeHint( QSize( 75, 75)); \
-	b->addItem( n );
-
-	ADDITEM( ui.friendsBucket, irvinebrown, ":buckets/irvinebrown.jpg" );
-	ADDITEM( ui.friendsBucket, mxcl, ":buckets/mxcl.png" );
-	ADDITEM( ui.friendsBucket, musicmobs, ":buckets/musicmobs.jpg" );
-	ADDITEM( ui.friendsBucket, dougma, ":buckets/dougma.jpg" );
-	ADDITEM( ui.friendsBucket, sharevari, ":buckets/sharevari.png" );
-
-	ADDITEM( ui.tagsBucket, Rock, ":buckets/tag_white_on_blue.png" );
-	ADDITEM( ui.tagsBucket, Jazz, ":buckets/tag_white_on_blue.png" );
-	ADDITEM( ui.tagsBucket, Metal, ":buckets/tag_white_on_blue.png" );
-	ADDITEM( ui.tagsBucket, Folk, ":buckets/tag_white_on_blue.png" );
+	PlayableListItem* n = new PlayableListItem( QIcon( i ), #n, b ); \
+	n->setSizeHint( QSize( 75, 25));
 	
+#define ADDUSER( b, n, i ) \
+	ADDITEM( b, n, i ) \
+	n->setType( PlayableMimeData::UserType );
+
+	ADDUSER( ui.friendsBucket, irvinebrown, ":buckets/irvinebrown.jpg" );
+	ADDUSER( ui.friendsBucket, mxcl, ":buckets/mxcl.png" );
+	ADDUSER( ui.friendsBucket, musicmobs, ":buckets/musicmobs.jpg" );
+	ADDUSER( ui.friendsBucket, dougma, ":buckets/dougma.jpg" );
+	ADDUSER( ui.friendsBucket, sharevari, ":buckets/sharevari.png" );
+#undef ADDUSER
+	
+#define ADDTAG( b, n, i ) \
+	ADDITEM( b, n, i ) \
+	n->setType( PlayableMimeData::TagType );
+	
+	ADDTAG( ui.tagsBucket, Rock, ":buckets/tag_white_on_blue.png" );
+	ADDTAG( ui.tagsBucket, Jazz, ":buckets/tag_white_on_blue.png" );
+	ADDTAG( ui.tagsBucket, Metal, ":buckets/tag_white_on_blue.png" );
+	ADDTAG( ui.tagsBucket, Folk, ":buckets/tag_white_on_blue.png" );
+
+#undef ADDTAG	
+
 #undef ADDITEM
 	
 	QSplitter* splitter = new QSplitter( Qt::Horizontal );
 
-	ui.tabWidget = new QTabWidget();
+	ui.tabWidget = new Unicorn::TabWidget;
 
-	ui.tabWidget->addTab( ui.friendsBucket, "Your Friends" );
-	ui.tabWidget->addTab( ui.tagsBucket, "Your Tags" );
+    ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
+	ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
+	ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
 	
 	splitter->addWidget( ui.tabWidget );
 	
-	PlayerBucket* pb;
-	splitter->addWidget( pb = new PlayerBucket( this ) );
+	splitter->addWidget( ui.playerBucket = new PlayerBucket( this ) );
 	
-	setCentralWidget( splitter );
+	UnicornWidget::paintItBlack( this );
+    
+    setCentralWidget( splitter );
+}
+
+
+void 
+PrimaryBucket::replaceStation( QMimeData* data )
+{
+	ui.playerBucket->clear();
+	ui.playerBucket->addFromMimeData( data );
 }

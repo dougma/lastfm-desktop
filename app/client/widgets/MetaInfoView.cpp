@@ -31,6 +31,7 @@
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "lib/lastfm/ws/WsReply.h"
 
+#include "lib/lastfm/radio/RadioStation.h"
 
 Bio::Bio()
 {
@@ -119,7 +120,7 @@ MetaInfoView::MetaInfoView()
     
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
-	    
+    
     UnicornWidget::paintItBlack( this );
     UnicornWidget::paintItBlack( ui.tags ); // you have to explicitly set
     UnicornWidget::paintItBlack( ui.similar ); // item views, or they stay white

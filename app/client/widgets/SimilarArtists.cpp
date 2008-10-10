@@ -21,8 +21,12 @@
 #include "FirehoseDelegate.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
+#include "PlayableMimeData.h"
+#include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "the/MainWindow.h"
+#include "radio/Buckets/PrimaryBucket.h"
 #include <QDebug>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -53,9 +57,14 @@ SimilarArtists::SimilarArtists()
 
 	QPalette p = palette();    
 	p.setBrush( QPalette::Text, Qt::white );
+	
+	m_model->setSupportedDragActions( Qt::CopyAction | Qt::MoveAction );
 
 	view->setPalette( p );
 	view->setAutoFillBackground( true );
+	view->setDragEnabled( true );
+	view->setDragDropMode( QAbstractItemView::DragOnly );
+	view->setMovement( QListView::Free );
 
 	connect( view, SIGNAL(doubleClicked( QModelIndex )), SLOT(onDoubleClicked( QModelIndex )) );
 }
@@ -64,7 +73,8 @@ SimilarArtists::SimilarArtists()
 void
 SimilarArtists::onDoubleClicked(const QModelIndex &index)
 {
-	emit artistDoubleClicked( m_model->data(index, Qt::DisplayRole).toString() );
+    //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
+	The::mainWindow().ui.primaryBucket->replaceStation( m_model->mimeData( index ));
 }
 
 
@@ -164,6 +174,28 @@ SimilarArtistsModel::data(const QModelIndex &index, int role) const
 }
 
 
+QMimeData* 
+SimilarArtistsModel::mimeData( const QModelIndex &index ) const
+{
+	int const row = index.row();
+	if( !index.isValid()) return 0;
+	if( row < 0 || row >= m_items.count()) return 0;
+	
+	return m_items[row]->mimeData();
+}
+
+
+QMimeData* 
+SimilarArtistsModel::mimeData( const QModelIndexList &indexes ) const
+{
+	
+//FIXME: only single items are supported at the moment so multiselection
+//		 drag and drop will only drag the first item :(
+	if( indexes.isEmpty() ) return 0;
+	
+	return mimeData( indexes.first() );
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -188,3 +220,13 @@ SimilarArtistsItem::onImageDownloaded()
 	emit imageAvailable();
 }
 
+QMimeData* 
+SimilarArtistsItem::mimeData() const
+{ 
+	PlayableMimeData* mimeData = PlayableMimeData::createFromArtist( artist() );
+	
+	if( !image().isNull() )
+		mimeData->setImageData( m_image.toImage() ); //In Qt 4.4.1 passing setImageData( QPixmap ) crashes so convert to QImage.
+	
+	return mimeData;
+}

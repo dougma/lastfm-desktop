@@ -69,6 +69,7 @@ public:
     
     virtual QSize sizeHint() const;
 
+
 private slots:
     void onTrackSpooled( const Track& );
     void onStateChanged( State );

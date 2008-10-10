@@ -22,6 +22,7 @@
 #define TAGLISTWIDGET_H
 
 #include <QTreeWidget>
+#include "PlayableMimeData.h"
 
 
 class TagListWidget : public QTreeWidget
@@ -37,8 +38,12 @@ public:
     void setTagsRequest( class WsReply* );
     QStringList newTags() const { return m_newTags; }
     
+protected:
+    virtual QMimeData* mimeData( const QList<QTreeWidgetItem *> items ) const;
+    
 private slots:
     void onTagsRequestFinished( WsReply* );
+    void onItemDoubleClicked( QTreeWidgetItem*, int column );
     
 private:
     class QMenu* m_menu;

@@ -40,6 +40,23 @@ public:
 	QRect visualRect ( const QModelIndex & index ) const;
 	QModelIndex indexAt( const QPoint& point ) const;
 	
+	bool addFromMimeData( const QMimeData* data );
+
+    
+    virtual void showEvent( QShowEvent* e )
+    {
+        Q_UNUSED( e );
+        if( ui.previewList )
+            ui.previewList->show();
+    }
+    
+    virtual void hideEvent ( QHideEvent * e )
+    {
+        Q_UNUSED( e );
+        if( ui.previewList )
+            ui.previewList->hide();
+    }
+    
 protected:
 	
 	void resizeEvent ( QResizeEvent* event );	
@@ -50,9 +67,15 @@ protected:
 	
 private:
 	static const QString k_dropText;
+    static const int k_itemMargin;
+    static const int k_itemSizeX;
+    static const int k_itemSizeY;
+    
 	bool m_showDropText;
 	QMap< QModelIndex, QRect > m_itemRects;
 	class QNetworkAccessManager* m_networkManager;
+	
+	QString queryString( const QModelIndex i, bool joined = true ) const;
 	
 private slots:
 	void playlistFetched();
@@ -69,23 +92,27 @@ public:
 	
 	void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 	{
-		if( option.state == QStyle::State_Active )
+		if( option.state & QStyle::State_Active )
 			painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x7e, 0x77) );
 		else
 			painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x2e, 0x77) );
 		
+		QRect iconRect = option.rect;
+		iconRect.adjust( 2, 2, -2, -15 );
+		
 		QIcon icon = index.data( Qt::DecorationRole ).value<QIcon>();
-		icon.paint( painter, option.rect );
+		icon.paint( painter, iconRect );
 		
 		painter->setPen( Qt::white );
 		QRect textRect = option.rect.adjusted( 5, 60, -5, -5 );
-
+        
 		QString text = index.data( Qt::DisplayRole ).toString();
 		painter->drawText( textRect, Qt::AlignCenter , text);
 	}
 	
 	QSize sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 	{
+		Q_UNUSED( index );
 		return option.rect.size();
 	}
 };

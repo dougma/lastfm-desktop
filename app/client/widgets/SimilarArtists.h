@@ -41,8 +41,6 @@ public:
 private slots:
 	void onDoubleClicked(const QModelIndex &index);
 
-signals:
-	void artistDoubleClicked(QString);
 };
 
 
@@ -54,6 +52,7 @@ class SimilarArtistsModel : public QAbstractItemModel
 	virtual QModelIndex parent(const QModelIndex& ) const { return QModelIndex(); }
 	virtual int rowCount( const QModelIndex& ) const { return m_items.count(); }
 	virtual int columnCount( const QModelIndex& ) const { return 1; }
+	virtual Qt::ItemFlags flags( const QModelIndex& index ) const { return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable; }
 
 	QList<class SimilarArtistsItem *> m_items;
 	class WsAccessManager *m_wam;
@@ -63,6 +62,8 @@ public:
 	~SimilarArtistsModel();
 
 	virtual QVariant data(const QModelIndex &index, int role) const;
+	virtual QMimeData* mimeData( const QModelIndex &index ) const;
+	virtual QMimeData* mimeData( const QModelIndexList &indexes ) const;
 
 	void clear();
 	void setContent(const class CoreDomElement &);
@@ -86,6 +87,8 @@ public:
 	QString artist() const { return m_artist; }
 	QPixmap image() const { return m_image; }
 	float matchPercent() const { return m_matchPercent; }
+	
+	QMimeData* mimeData() const;
 
 signals:
 	void imageAvailable();

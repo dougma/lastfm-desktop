@@ -20,7 +20,8 @@
 #include "FirehoseView.h"
 #include "FirehoseDelegate.h"
 #include <QtGui>
-
+#include "the/MainWindow.h"
+#include "radio/Buckets/PrimaryBucket.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
@@ -123,6 +124,7 @@ FirehoseView::paintEvent( QPaintEvent* )
     {
         opt.rect.moveTop( x*h + offset - dy );
         delegate->paint( &p, opt, model->index( x, 0 ) );
+        m_itemRects[ model->index( x, 0 )] = opt.rect;
     }
 }
 
@@ -132,4 +134,80 @@ FirehoseView::resizeEvent( QResizeEvent* )
 {
     bar()->setPageStep( viewport()->height() );
     SET_MAXIMUM;
+}
+
+
+QModelIndex 
+FirehoseView::indexAt( const QPoint& point ) const
+{
+    foreach ( const QModelIndex& i, m_itemRects.keys() )
+	{
+		const QRect& r = m_itemRects.value(i);
+		if( r.contains( point ))
+		{
+			return i;
+		}
+	}
+	return QModelIndex();
+}
+
+
+void 
+FirehoseView::mouseDoubleClickEvent( QMouseEvent* e )
+{
+    QModelIndex i = indexAt( e->pos() );
+    
+    PlayableMimeData* data = PlayableMimeData::createFromUser( i.data().toString() );
+    data->setImageData( i.data( Qt::DecorationRole ) );
+    
+    //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
+    The::mainWindow().ui.primaryBucket->replaceStation( data );
+}
+
+
+void 
+FirehoseView::mousePressEvent( QMouseEvent* event )
+{
+    if( event->button() == Qt::LeftButton )
+        m_dragStartPosition = event->pos();
+}
+
+
+void
+FirehoseView::mouseMoveEvent( QMouseEvent* event )
+{
+    if( !(event->buttons() & Qt::LeftButton) )
+        return;
+    
+    if( (event->pos() - m_dragStartPosition).manhattanLength()
+        < QApplication::startDragDistance() )
+        return;
+       
+    QDrag *drag = new QDrag( this );
+    QModelIndex i = indexAt( event->pos() );
+    PlayableMimeData* mimeData = PlayableMimeData::createFromUser( i.data().toString() );
+    mimeData->setImageData( i.data( Qt::DecorationRole ).value<QImage>() );
+    
+    drag->setMimeData(mimeData);
+    
+    QPixmap pixmap;
+    {
+        QImage image( m_itemRects[ i ].size(), QImage::Format_ARGB32_Premultiplied );
+        QPainter painter( &image );
+        QStyleOptionViewItem opt;
+        opt.font = font();
+        opt.palette = palette();
+        opt.state = QStyle::State_Active;
+        opt.rect = m_itemRects[ i ];
+        opt.rect.moveTo( 0, 0 );
+        delegate->paint( &painter, opt, i );
+        pixmap = QPixmap::fromImage( image );
+    }
+    drag->setPixmap( pixmap );
+    qDebug() << "Mouse press position: " << event->pos();
+    qDebug() << "Hotspot position: " << event->pos() - QPoint( 0, m_itemRects[ i ].top());
+    drag->setHotSpot( event->pos() - QPoint( 0, m_itemRects[ i ].top()) );
+    
+    Qt::DropAction dropAction = drag->exec();
+    
 }

@@ -18,7 +18,10 @@
  ***************************************************************************/
 
 #include "PlayerBucket.h"
-#include "widgets/ImageButton.h"
+#include "PrimaryBucket.h"
+#include "PlayableListItem.h"
+#include "PlayableMimeData.h"
+#include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QListView>
 #include <QMenu>
@@ -28,24 +31,28 @@
 #include <QVBoxLayout>
 
 const QString PlayerBucket::k_dropText  = tr( "Drag something in here to play it." );
+const int PlayerBucket::k_itemMargin = 4;
 
+//These should be based on the delegate's sizeHint - this requires
+//the delegate to calculate the sizeHint correctly however and this 
+//is not currently done!
+const int PlayerBucket::k_itemSizeX = 75;
+const int PlayerBucket::k_itemSizeY = 75;
 
 PlayerBucket::PlayerBucket( QWidget* w )
 			 :QListWidget( w ),
 			  m_showDropText( true)
 {
 	ui.previewList = new QListWidget;
-	ui.previewList->show();
-	
+    ui.previewList->hide();
 	m_networkManager = new WsAccessManager( this );
 	
 	setItemDelegate( new PlayerBucketDelegate( this ));
 	setAcceptDrops( true );
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
-	setDropIndicatorShown( false );
 	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	
+    setAutoFillBackground( true );
 }
 
 
@@ -66,8 +73,6 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 		dropFont.setPointSize( 20 );
 		p.setFont( dropFont );
 
-		int x = (viewport()->rect().width() / 2) - ( p.fontMetrics().width( k_dropText ) / 2);
-		int y = (viewport()->rect().height() / 2) - ( p.fontMetrics().height() / 2);
 		p.drawText( viewport()->rect().adjusted( 25, 25, -25, -25), Qt::AlignCenter | Qt::TextWordWrap, k_dropText );
 		return;
 	}
@@ -77,15 +82,15 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 	
 	QRect rect = viewport()->rect();
 	
-	int iconRowCount = ( itemModel->rowCount() * 75 ) / rect.width();
+	int iconRowCount = ( itemModel->rowCount() * (k_itemSizeX + k_itemMargin) ) / rect.width();
 	iconRowCount++;
 	int iconColumnCount = itemModel->rowCount() / iconRowCount;
 	if( itemModel->rowCount() % iconRowCount )
 		iconColumnCount++;
 	
-	int delegatesX = (rect.width() / 2 ) - ((iconColumnCount * 75) / 2 );
-	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * 75) / 2);
-	QRect itemRect( delegatesX, delegatesY, 75, 75 );
+	int delegatesX = (rect.width() / 2 ) - ((iconColumnCount * (k_itemSizeX + k_itemMargin )) / 2 );
+	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * ( k_itemSizeY + k_itemMargin)) / 2);
+	QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
 	
 	int index = 0;
 	for( int row = 0; row < iconRowCount; row++ )
@@ -100,7 +105,7 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 			if( currentIndex() == i )
 				styleOptions.state = QStyle::State_Active;
 			
-			styleOptions.rect.translate( itemRect.width() * col, itemRect.height() * row );
+			styleOptions.rect.translate( (itemRect.width() + k_itemMargin ) * col, (itemRect.height() + k_itemMargin) * row );
 			m_itemRects[ i ] = styleOptions.rect;
 			
 			delegate->paint( &p, styleOptions, i );
@@ -114,6 +119,7 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 void 
 PlayerBucket::resizeEvent ( QResizeEvent* event )
 {
+	Q_UNUSED( event );
 	viewport()->setBackgroundRole( QPalette::Window );
 	QLinearGradient lg( viewport()->rect().topLeft(), viewport()->rect().bottomLeft());
 	lg.setColorAt( 0, Qt::black );
@@ -127,26 +133,73 @@ PlayerBucket::resizeEvent ( QResizeEvent* event )
 
 void 
 PlayerBucket::dropEvent( QDropEvent* event)
-{ 
-	QListWidgetItem* item = new QListWidgetItem;
+{
+	if( !event->mimeData() )
+		return;
+	
+	if( addFromMimeData( event->mimeData() ) )
+		event->acceptProposedAction();
+	else
+		event->ignore();
+}
+
+
+//FIXME: Don't allow duplicate items?!
+//       on second thoughts.. there may be cases when duplicate items are acceptable: ( jonocole and mxcl ) or (jonocole and not jazz )
+//       probably fairly advanced though - but either way this needs decisions to be made.
+bool 
+PlayerBucket::addFromMimeData( const QMimeData* d )
+{
+	const PlayableMimeData* data = qobject_cast< const PlayableMimeData* >( d );
+	if( !data )
+		return false;
+	
+	
+	PlayableListItem* item = PlayableListItem::createFromMimeData( data, this );
 	item->setForeground( Qt::white );
 	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
-	item->setText( event->mimeData()->text() );
-	item->setIcon( QIcon( QPixmap::fromImage( event->mimeData()->imageData().value<QImage>())) );
 	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
-	addItem( item );
 	
-	QString query = "user:" + model()->index( 0, 0 ).data( Qt::DisplayRole ).toString();
+	
+	//Send query
+	QString query = queryString( model()->index( 0, 0 ), false );
 	for( int i = 1; i < model()->rowCount(); i++ )
 	{
 		QModelIndex index = model()->index( i, 0 );
-		query += " or user:" + index.data( Qt::DisplayRole ).toString();
+		query += queryString( index );
 	}
 	qDebug() << "RadioQL query: " << query;
 	QNetworkReply* reply = m_networkManager->get( QNetworkRequest( "http://tester:futureofmusic@ws.jono.dev.last.fm:8090/radioTest.php?query=" + query ));
 	connect( reply, SIGNAL( finished()), SLOT( playlistFetched()) );
+
+	return true;
+}
+
+
+QString 
+PlayerBucket::queryString( const QModelIndex i, bool joined ) const 
+{  
+	QString qs;
 	
-	event->acceptProposedAction();
+	switch ( i.data( Qt::UserRole ).toInt() ) {
+		case PlayableMimeData::UserType:
+            if( joined )
+                qs = " or ";
+			qs += "user:";
+			break;
+		case PlayableMimeData::ArtistType:
+            if( joined )
+                qs = " and ";
+			qs += "simart:";
+			break;
+		case PlayableMimeData::TagType:
+            if( joined )
+                qs = " and ";
+			qs += "tag:";
+			break;
+	}
+	qs += "\"" + i.data( Qt::DisplayRole ).toString() + "\"";
+	return qs;
 }
 
 
@@ -188,6 +241,10 @@ PlayerBucket::indexAt( const QPoint& point ) const
 		const QRect& r = m_itemRects.value(i);
 		if( r.contains( point ))
 		{
+            //For some reason the viewport isn't always repainted
+            //when the first item in the list is clicked - this works
+            //around the issue.
+            viewport()->update();
 			return i;
 		}
 	}
@@ -198,6 +255,7 @@ PlayerBucket::indexAt( const QPoint& point ) const
 QRect 
 PlayerBucket::visualRect ( const QModelIndex & index ) const 
 {
+	Q_UNUSED( index );
 	QAbstractItemModel* itemModel = model();
 	
 	if( !itemModel->rowCount())

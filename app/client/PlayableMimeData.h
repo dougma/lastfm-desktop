@@ -16,59 +16,65 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef PLAYABLE_MIME_DATA
+#define PLAYABLE_MIME_DATA
 
-#ifndef FIREHOSE_VIEW_H
-#define FIREHOSE_VIEW_H
+#include <QMimeData>
+#include "lib/lastfm/types/Artist.h"
+#include "lib/lastfm/types/Tag.h"
+#include "lib/lastfm/types/User.h"
 
-#include <QAbstractScrollArea>
-#include <QModelIndex>
 
-/** view that can only do minimal things, hence we don't even derive
-  * QAbstractItemView as that was way more work than we required 
-  * 
-  * @author <max@last.fm> 
-  */
-class FirehoseView : public QAbstractScrollArea
+class PlayableMimeData : public QMimeData
 {
-    Q_OBJECT
-    
-    class QAbstractItemDelegate* delegate;
-    class QTimeLine* timer;
-    class QAbstractItemModel* model;
-
-    int h;
-    int offset;
-
+	Q_OBJECT
 public:
-    FirehoseView();
-
-    /** you can set any model you like, but it prolly won't work as expected,
-      * also, if you don't set this, we crash :P */
-    void setModel( QAbstractItemModel* );
-    /** as above */
-    void setDelegate( QAbstractItemDelegate* );
-
-private slots:
-    void onRowInserted();
-    void onModelReset();
-    void onFrameChange( int );
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void resizeEvent( QResizeEvent* );
-    virtual void scrollContentsBy( int, int );
-    
-    virtual void mouseDoubleClickEvent( QMouseEvent* );
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent( QMouseEvent* event );
-    
-    QModelIndex indexAt( const QPoint& point ) const;
-    
-    QScrollBar* bar() const { return verticalScrollBar(); }
-    
+	enum Type { ArtistType = 0, TagType, UserType };
+	
+	static PlayableMimeData* createFromArtist( const Artist& a )
+	{
+		PlayableMimeData* data = new PlayableMimeData();
+		data->setText( a );
+		data->setUrls( QList<QUrl>() << a.www() );
+		data->setData( "text/x-lfm-entity-type", "Artist" );
+		data->m_type = ArtistType;
+		return data;
+	}
+	
+	static PlayableMimeData* createFromTag( const Tag& t )
+	{
+		PlayableMimeData* data = new PlayableMimeData();
+		data->setText( t );
+		data->setUrls( QList<QUrl>() << t.www() );
+		data->setData( "text/x-lfm-entity-type", "Tag" );
+		data->m_type = TagType;
+		return data;
+	}
+	
+	static PlayableMimeData* createFromUser( const User& u )
+	{
+		PlayableMimeData* data = new PlayableMimeData();
+		data->setText( u );
+		data->setUrls( QList<QUrl>() << u.www() );
+		data->setData( "text/x-lfm-entity-type", "User" );
+		data->m_type = UserType;
+		return data;
+	}
+	
+	int type() const
+	{
+		return m_type;
+	}
+	
+	void setType( const int t )
+	{
+		m_type = t;
+	}
+	
 private:
-    QMap< QModelIndex, QRect > m_itemRects;
-    QPoint m_dragStartPosition;
+	int m_type;
+	
 };
 
-#endif
+#endif //PLAYABLE_MIME_DATA
