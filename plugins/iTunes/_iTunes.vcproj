@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="iScrobbleWin"
+	Name="iTunes Scrobbler"
 	ProjectGUID="{50EF2156-958A-4184-B34E-77D7BA2422F5}"
-	RootNamespace="iScrobbleWin"
+	RootNamespace="iTunes Scrobbler"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\libs&quot;;..\ScrobSub;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;"
-				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;_DEBUG;_WINDOWS;_USRDLL;ISCROBBLEWIN_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;_DEBUG;_WINDOWS;_USRDLL;ITUNES_SCROBBLER_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -130,7 +130,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\ScrobSub;&quot;$(ProjectDir)\libs&quot;;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;"
-				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;NDEBUG;_WINDOWS;_USRDLL;ISCROBBLEWIN_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;NDEBUG;_WINDOWS;_USRDLL;ITUNES_SCROBBLER_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -317,7 +317,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\iTunesPlugin.cpp"
+				RelativePath=".\main.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -329,11 +329,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\iTunesPlugin.h"
+				RelativePath=".\main.h"
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesPlugin_win.cpp"
+				RelativePath=".\main_win.cpp"
 				>
 			</File>
 			<File
@@ -425,7 +425,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\iScrobbleWin.rc"
+				RelativePath=".\_iTunes.rc"
 				>
 			</File>
 			<File
