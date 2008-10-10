@@ -89,12 +89,26 @@ then
     case `uname` in
         Darwin)
 		cat <<HEREDOC>>Makefile
-dmg: all
-	cd app/client && make -f Makefile.appclient dmg
-bundle: all
-	cd app/client && make -f Makefile.appclient bundle
-install: all
-	cd app/client && make -f Makefile.appclient bundle-install
+
+CONTENTS_DIR=_bin/Last.fm.app/Contents
+PLUGINS_DIR=\$(CONTENTS_DIR)/MacOS/PlugIns
+
+dmg: all misc
+	cd app/client && make -f Makefile dmg
+bundle: all misc
+	cd app/client && make -f Makefile bundle
+install: all misc
+	cd app/client && make -f Makefile bundle-install
+misc: \$(PLUGINS_DIR)/AudioScrobbler.bundle \$(CONTENTS_DIR)/Resources/twiddly
+\$(PLUGINS_DIR):
+	mkdir \$@
+\$(PLUGINS_DIR)/AudioScrobbler.bundle: |\$(PLUGINS_DIR)
+	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
+	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle \$@
+\$(CONTENTS_DIR)/MacOS/twiddly:
+	cp _bin/twiddly \$@
+\$(CONTENTS_DIR)/Resources/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
+	cd \$(CONTENTS_DIR)/Resources && ln -s ../Contents/twiddly
 HEREDOC
 
 	esac

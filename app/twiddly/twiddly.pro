@@ -5,18 +5,9 @@ QT = core xml sql
 include( $$ROOT_DIR/common/qmake/include.pro )
 
 LIBS += -L$$DESTDIR
-
-SOURCES += main.cpp \
-           PlayCountsDatabase.cpp \
-           IPod.cpp
+SOURCES += main.cpp PlayCountsDatabase.cpp IPod.cpp
            
-macx* {
-    SOURCES += ITunesLibrary_mac.cpp
-    release {
-        QMAKE_POST_LINK = cd $$DESTDIR/*.app/Contents && cp ../../$$TARGET MacOS && cd Resources && ln -s ../Contents/$$TARGET
-    }
-}
-    
+macx*:SOURCES += ITunesLibrary_mac.cpp
 
 win32 {
     SOURCES += ITunesLibrary_win.cpp \
