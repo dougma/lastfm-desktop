@@ -59,7 +59,7 @@ UniqueApplication::UniqueApplication( const char* id )
 				   m_alreadyRunning( false )
 {    
 #ifdef WIN32
-	m_hwnd = ::FindWindow( L"QWidget", (wchar_t*)windowTitle().utf16() )
+	m_hwnd = ::FindWindow( L"QWidget", (wchar_t*)windowTitle().utf16() );
     m_alreadyRunning = m_hwnd;
 #endif
     
@@ -69,7 +69,7 @@ UniqueApplication::UniqueApplication( const char* id )
     m_alreadyRunning = m_port;
     CFRelease( cfid );
 #endif
-    
+
 #ifdef Q_WS_X11
     qWarning() << "Single application instance code still unwritten!";
 #endif
@@ -131,9 +131,9 @@ UniqueApplication::init2( const QCoreApplication* app )
         return;
     }
 
-    Q_ASSERT( !QCoreApplication::organizationName().isEmpty() );
+    Q_ASSERT( !app->organizationName().isEmpty() );
 
-    QSettings( QCoreApplication::organizationName() ).setValue( m_id, app->applicationFilePath() );
+    QSettings( app->organizationName() ).setValue( m_id, app->applicationFilePath() );
     
 #ifdef WIN32   
     if (!b) {
