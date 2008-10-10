@@ -22,7 +22,7 @@
 #include "ITunesLibrary.h"
 #include "PlayCountsDatabase.h"
 #include "common/qt/msleep.cpp"
-#include "common/ITunesExceptions.h"
+#include "plugins/iTunes/ITunesExceptions.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/mac/AppleScript.h"
 #include "lib/lastfm/types/Track.h"

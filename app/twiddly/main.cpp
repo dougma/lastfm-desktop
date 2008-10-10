@@ -22,7 +22,7 @@
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/UniqueApplication.h"
 #include "common/c++/logger.cpp"
-#include "common/ITunesExceptions.h"
+#include "plugins/iTunes/ITunesExceptions.h"
 #include <iostream>
 #include <QtCore>
 #include <QtXml>

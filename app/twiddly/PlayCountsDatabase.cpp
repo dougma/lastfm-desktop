@@ -21,7 +21,7 @@
 #include "IPod.h"
 #include "ITunesLibrary.h"
 #include "common/qt/msleep.cpp"
-#include "common/fileCreationTime.cpp"
+#include "common/c++/fileCreationTime.cpp"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/mac/AppleScript.h"
 #include "lib/lastfm/core/UniqueApplication.h"

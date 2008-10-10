@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "ITunesLibrary.h"
-#include "common/ITunesComWrapper.h"
-#include "common/logger.h"
+#include "plugins/iTunes/ITunesComWrapper.h"
+#include "common/c++/Logger.h"
 
 #include <cassert>
 

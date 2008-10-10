@@ -22,7 +22,7 @@
 
 #ifdef WIN32
 
-#include "common/ITunesTrack.h"
+#include "plugins/iTunes/ITunesTrack.h"
 #include <QSharedData>
 #include <QSharedDataPointer>
 

@@ -20,10 +20,10 @@ macx* {
 
 win32 {
     SOURCES += ITunesLibrary_win.cpp \
-			   common/ITunesTrack.cpp \
-               common/ITunesComWrapper.cpp \
-               common/EncodingUtils.cpp \ # IT'S A DRY SIN
-               iTunesCOMAPI/iTunesCOMInterface_i.c
+			   plugins/iTunes/ITunesTrack.cpp \
+               plugins/iTunes/ITunesComWrapper.cpp \
+               plugins/scrobsub/EncodingUtils.cpp \
+               lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface_i.c
 
     LIBS += -lcomsuppw
 

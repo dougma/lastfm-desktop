@@ -14,25 +14,56 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-#ifndef ITUNESEXCEPTIONS_H
-#define ITUNESEXCEPTIONS_H
+#include "Logger.h"
+#include <sys/stat.h>
 
-#include <stdexcept>
 
-class ITunesException : public std::runtime_error
+/** @author Max Howell 
+  * @brief Used by Twiddly and iTunesPlugin
+  */
+namespace common
 {
-public:
-    ITunesException( const char* s = "ITunesException" ) : std::runtime_error( s ) { }
-};
+    #if WIN32
+        #define STRING wstring
+        #define STAT _stat
+        #define stat _wstat
+        #define COMMON_LOGL LOGWL
+    #else
+        #define STAT stat
+        #define STRING string
+        #define COMMON_LOGL LOGL
+    #endif
 
+    static time_t
+    fileCreationTime( const std::STRING& path )
+    {
+        struct STAT st;
+        if (stat( path.c_str(), &st ) != 0)
+        {
+            LOG( 3, "Couldn't stat" << path );
+            return 0;
+        }
+        else
+            return st.st_ctime ? st.st_ctime : st.st_mtime;
+    }
 
-class PlayCountException : public ITunesException
-{
-public:
-    PlayCountException() : ITunesException( "PlayCountException" ) { }
-};
+    #undef STAT
+    #undef stat
+    #undef STRING
+    #undef COMMON_LOGL
 
-#endif // ITUNESEXCEPTIONS_H
+#ifdef QT_CORE_LIB
+    static inline time_t
+    fileCreationTime( const QString& path )
+    {
+    #ifdef Q_OS_WIN32
+        return fileCreationTime( path.toStdWString() );
+    #else
+        return fileCreationTime( path.toStdString() );
+    #endif
+    }
+#endif
+}
