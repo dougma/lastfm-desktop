@@ -83,6 +83,8 @@ FirehoseModel::onData()
         qWarning() << e;
         qDebug() << data;
     }
+	
+	delete r;
 }
 
 
