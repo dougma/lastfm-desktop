@@ -1,10 +1,5 @@
 <RCC>
   <qresource>
-    <file>buckets/mxcl.png</file>
-    <file>buckets/musicmobs.jpg</file>
-    <file>buckets/dougma.jpg</file>
-    <file>buckets/irvinebrown.jpg</file>
-    <file>buckets/sharevari.png</file>
     <file>buckets/tag_white_on_blue.png</file>
   </qresource>
 </RCC>
