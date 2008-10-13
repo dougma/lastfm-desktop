@@ -11,10 +11,10 @@ macx*:SOURCES += ITunesLibrary_mac.cpp
 
 win32 {
     SOURCES += ITunesLibrary_win.cpp \
-			   plugins/iTunes/ITunesTrack.cpp \
-               plugins/iTunes/ITunesComWrapper.cpp \
-               plugins/scrobsub/EncodingUtils.cpp \
-               lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface_i.c
+			   ../../plugins/iTunes/ITunesTrack.cpp \
+               ../../plugins/iTunes/ITunesComWrapper.cpp \
+               ../../plugins/scrobsub/EncodingUtils.cpp \
+               ../../lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface_i.c
 
     LIBS += -lcomsuppw
 
