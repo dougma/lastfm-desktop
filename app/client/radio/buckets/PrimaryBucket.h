@@ -39,6 +39,10 @@ private:
 		class PlayerBucket* playerBucket;
 	} ui;
 
+private slots:
+    void onUserGetFriendsReturn( class WsReply* );
+    void onUserGetTopTagsReturn( class WsReply* );
+    
 public slots:
 	void replaceStation( class QMimeData* );
 

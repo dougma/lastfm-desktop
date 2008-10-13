@@ -29,6 +29,8 @@
 #include "PlayerBucket.h"
 #include "PlayableListItem.h"
 #include "lib/lastfm/types/User.h"
+#include "lib/lastfm/ws/WsReply.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 
 
 PrimaryBucket::PrimaryBucket()
@@ -63,33 +65,10 @@ PrimaryBucket::PrimaryBucket()
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
     
-#define ADDITEM( b, n, i ) \
-	PlayableListItem* n = new PlayableListItem( QIcon( i ), #n, b ); \
-	n->setSizeHint( QSize( 75, 25));
-	
-#define ADDUSER( b, n, i ) \
-	ADDITEM( b, n, i ) \
-	n->setType( PlayableMimeData::UserType );
-
-	ADDUSER( ui.friendsBucket, irvinebrown, ":buckets/irvinebrown.jpg" );
-	ADDUSER( ui.friendsBucket, mxcl, ":buckets/mxcl.png" );
-	ADDUSER( ui.friendsBucket, musicmobs, ":buckets/musicmobs.jpg" );
-	ADDUSER( ui.friendsBucket, dougma, ":buckets/dougma.jpg" );
-	ADDUSER( ui.friendsBucket, sharevari, ":buckets/sharevari.png" );
-#undef ADDUSER
-	
-#define ADDTAG( b, n, i ) \
-	ADDITEM( b, n, i ) \
-	n->setType( PlayableMimeData::TagType );
-	
-	ADDTAG( ui.tagsBucket, Rock, ":buckets/tag_white_on_blue.png" );
-	ADDTAG( ui.tagsBucket, Jazz, ":buckets/tag_white_on_blue.png" );
-	ADDTAG( ui.tagsBucket, Metal, ":buckets/tag_white_on_blue.png" );
-	ADDTAG( ui.tagsBucket, Folk, ":buckets/tag_white_on_blue.png" );
-
-#undef ADDTAG	
-
-#undef ADDITEM
+    AuthenticatedUser user;
+    
+    connect( user.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
+    connect( user.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
 	
 	QSplitter* splitter = new QSplitter( Qt::Horizontal );
 
@@ -106,6 +85,42 @@ PrimaryBucket::PrimaryBucket()
 	UnicornWidget::paintItBlack( this );
     
     setCentralWidget( splitter );
+}
+
+
+void 
+PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
+{
+    static WsAccessManager* nam = 0;
+    if (!nam) nam = new WsAccessManager;
+    
+    QList< User > users = User::list( r );
+    
+    foreach( User user, users )
+    {
+        PlayableListItem* n = new PlayableListItem( user , ui.friendsBucket );
+        
+        QNetworkReply* r = nam->get( QNetworkRequest( user.mediumImageUrl()));
+        connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
+        
+        n->setSizeHint( QSize( 75, 25));
+        n->setType( PlayableMimeData::UserType );
+    }
+}
+
+
+void 
+PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
+{
+    WeightedStringList tags = Tag::list( r );
+    
+    foreach( WeightedString tag, tags )
+    {
+        PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
+        n->setIcon( QIcon( ":buckets/tag_white_on_blue.png" ) );
+        n->setSizeHint( QSize( 75, 25));
+        n->setType( PlayableMimeData::TagType );
+    }
 }
 
 

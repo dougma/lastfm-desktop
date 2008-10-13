@@ -16,36 +16,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef PLAYABLE_LIST_ITEM
-#define PLAYABLE_LIST_ITEM
 
-#include <QListWidgetItem>
-#include "PlayableMimeData.h"
-#include <QNetworkReply>
+#include "PlayableListItem.h"
 
-class PlayableListItem : public QObject, public QListWidgetItem
+PlayableListItem* /* static */
+PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget* parent )
 {
-    Q_OBJECT
+    PlayableListItem* item = new PlayableListItem( parent );
     
-public:
-	PlayableListItem( QListWidget* parent = 0 ) : QListWidgetItem( parent, QListWidgetItem::UserType ){};
-	PlayableListItem( const QString & text, QListWidget * parent = 0 )
-					:QListWidgetItem( text, parent, QListWidgetItem::UserType ){};
-	
-	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
-	
-	void setType( const PlayableMimeData::Type t ){ setData( k_playableType, t ); }
+    item->setText( data->text() );
     
-    Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
-	
-	int playableType() const{ return data( k_playableType ).toInt(); }
+    if( data->hasImage() )
+        item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
     
-public slots:
-    void iconDataDownloaded();
-	
-private:
-	static const Qt::ItemDataRole k_playableType = Qt::UserRole; 
+    item->setData( k_playableType, data->type() );
+    
+    return item;
 };
 
-#endif //PLAYABLE_LIST_ITEM
+
+void 
+PlayableListItem::iconDataDownloaded()
+{
+    QNetworkReply* reply = static_cast< QNetworkReply* >( sender());
+    
+    QPixmap pixmap;
+    pixmap.loadFromData( reply->readAll() );
+    
+    setIcon( QIcon( pixmap ) );
+}
