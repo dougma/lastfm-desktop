@@ -62,7 +62,7 @@ FirehoseModel::setNozzle( const QString& nozzle )
 void
 FirehoseModel::onData()
 {    
-    QNetworkReply* r = (QNetworkReply*)sender();
+    QTcpSocket* r = (QTcpSocket*)sender();
     QByteArray data = r->readAll();
     QDomDocument xml;
     xml.setContent( data );
@@ -83,8 +83,6 @@ FirehoseModel::onData()
         qWarning() << e;
         qDebug() << data;
     }
-	
-	delete r;
 }
 
 
@@ -127,6 +125,7 @@ FirehoseModel::onItemReady( FirehoseItem* item )
     m_timestamps.prepend( QDateTime::currentDateTime() );
     m_cumulative_count++;
     endInsertRows();
+    delete item;
 }
 
 
