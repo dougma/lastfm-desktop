@@ -4,3 +4,7 @@ SUBDIRS += lastfm/core/libcore.pro \
            lastfm/types/libtypes.pro \
            lastfm/scrobble/libscrobble.pro \
            lastfm/radio/libradio.pro
+
+dllexport.files = lastfm/DllExportMacro.h
+dllexport.path = $$INSTALL_DIR/include/lastfm
+INSTALLS = dllexport
