@@ -70,8 +70,11 @@ public slots:
 private slots:
 	void onScrobblerStatusChanged( int );
     void onBootstrapCompleted( const QString& playerId );
-    void onUnknownFingerprint( QString );
     void onTrackSpooled( const Track& t );
+    
+#ifdef Q_OS_MAC
+    void onUnknownFingerprint( QString );
+#endif
 
 private:
     class PlayerMediator* m_playerMediator;

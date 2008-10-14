@@ -283,6 +283,7 @@ App::onTrackSpooled( const Track& t )
 {
     if( t.isNull() ) return;
     
+#ifdef Q_OS_MAC
     if( t.source() == Track::Player )
     {
         FingerprintIdRequest * fpReq = new FingerprintIdRequest( t, this );
@@ -290,6 +291,7 @@ App::onTrackSpooled( const Track& t )
         fpReq->setAutoDelete( false );
         fpReq->start();
     }
+#endif
     
     if ( t.mbid().isNull())
     {
@@ -298,6 +300,7 @@ App::onTrackSpooled( const Track& t )
 }
 
 
+#ifdef Q_OS_MAC
 void 
 App::onUnknownFingerprint( QString )
 {
@@ -306,6 +309,7 @@ App::onUnknownFingerprint( QString )
     fpReq->setAutoDelete( true );
     fpReq->start( Fp::FullMode );
 }
+#endif
 
 
 void
