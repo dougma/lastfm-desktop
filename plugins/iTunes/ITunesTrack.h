@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Steet, Fifth Floor, Boston ,MA  02110-1301, USA.          *
  ***************************************************************************/
 
 #ifndef ITUNES_TRACK_H
@@ -23,7 +23,7 @@
 #include "ITunesExceptions.h"
 
 #ifdef WIN32
-    #include "../iTunesCOMAPI/iTunesCOMInterface.h"
+    #include "lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface.h"
 
     // Disable gay warning about exception specifications
     #pragma warning( disable : 4290 )
