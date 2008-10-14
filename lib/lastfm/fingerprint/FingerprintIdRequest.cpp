@@ -21,16 +21,24 @@
 #include "FingerprintIdRequest.h"
 #include "FingerprintGenerator.h"
 #include "Collection.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 
 #include <QApplication>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 
-FingerprintIdRequest::FingerprintIdRequest( const Track& track, QObject* parent ) 
+FingerprintIdRequest::FingerprintIdRequest( const Track& track, QObject* parent /* = 0 */, bool debug /* = false */ ) 
             :QObject( parent ),
-             m_track( track )
+             m_track( track ),
+             m_networkError( QNetworkReply::NoError ),
+             m_debug( debug ),
+             m_autoDelete( true )
 {
-    m_networkManager = new QNetworkAccessManager( this );
-
+    qRegisterMetaType<Fp::Error>("Fp::Error");
+    
+    m_networkManager = new WsAccessManager( this );
+    
     connect( this, SIGNAL( cachedFpIDFound( QString)), 
                    SIGNAL( FpIDFound( QString)), Qt::QueuedConnection );
     
@@ -44,7 +52,6 @@ FingerprintIdRequest::FingerprintIdRequest( const Track& track, QObject* parent 
         return;
     }
     
-    fingerprint();
 }
 
 
@@ -53,21 +60,26 @@ FingerprintIdRequest::~FingerprintIdRequest()
 
 
 void
-FingerprintIdRequest::fingerprint()
+FingerprintIdRequest::start( Fp::Mode mode /* = QueryMode */ )
 {
-    qDebug() << "Beginning..";
-    FingerprintGenerator* fingerprinter = new FingerprintGenerator( m_track.url().toLocalFile(), FingerprintGenerator::Query, this );
+    m_fingerprinter = new FingerprintGenerator( m_track.url().toLocalFile(), mode, this );
 
-    connect( fingerprinter, SIGNAL( success( QByteArray)), 
-                            SLOT( onFingerprintSuccess( QByteArray)) );
+    connect( m_fingerprinter, SIGNAL( failed( Fp::Error )), SIGNAL( failed( Fp::Error )));
+
+    //connect all success / failures to a private slot so the object can 
+    //be autoDeleted if appropriate.
+    connect( this, SIGNAL( failed( Fp::Error )), SLOT( onFailed( Fp::Error )));
+    connect( this, SIGNAL( FpIDFound( QString )), SLOT( onSuccess( QString )));
+    connect( this, SIGNAL( unknownFingerprint( QString )), SLOT( onSuccess( QString )));
+    
+    connect( m_fingerprinter, SIGNAL( success( QByteArray, QString )), 
+                              SLOT( onGeneratorSuccess( QByteArray, QString )) );
 }
 
 
 void
-FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
+FingerprintIdRequest::onGeneratorSuccess( const QByteArray& fp, QString sha256 )
 {
-    FingerprintGenerator* fingerprinter = static_cast< FingerprintGenerator* >( sender());
-    
     time_t now;
     time( &now );
     QString time = QString::number( now );
@@ -91,12 +103,12 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
                             QUERYITEM(        mbid,          m_track.mbid() ) <<
                             QUERYITEMENCODED( filename,      QFileInfo( m_track.url().toLocalFile() ).completeBaseName() ) <<
                             QUERYITEM(        tracknum,      QString::number( m_track.trackNumber() ) ) <<
-                            QUERYITEM(        sha256,        fingerprinter->sha256() ) <<
+                            QUERYITEM(        sha256,        sha256 ) <<
                             QUERYITEM(        time,          time ) <<
 							
 						    QUERYITEMENCODED( fpversion,     QString::number( fingerprint::FingerprintExtractor::getVersion() ) ) <<
                             QUERYITEM(        fulldump,      "false" ) <<
-                            QUERYITEM(        noupdate,      "true" ));
+                            QUERYITEM(        noupdate,       m_debug ? "true" : "false" ));
 	//FIXME: talk to mir about submitting fplibversion
                             
     #undef QUERYITEMENCODED
@@ -123,6 +135,24 @@ FingerprintIdRequest::onFingerprintSuccess( const QByteArray& fp )
 
 
 void
+FingerprintIdRequest::onFailed( Fp::Error e )
+{
+    Q_UNUSED( e );
+    if( m_autoDelete )
+        deleteLater();
+}
+
+
+void
+FingerprintIdRequest::onSuccess( QString s )
+{
+    Q_UNUSED( s );
+    if( m_autoDelete )
+        deleteLater();
+}
+
+
+void
 FingerprintIdRequest::onFingerprintQueryFetched()
 {
     QNetworkReply* queryReq = static_cast<QNetworkReply*>( sender() );
@@ -130,17 +160,10 @@ FingerprintIdRequest::onFingerprintQueryFetched()
     if ( queryReq->error() )
     {
         qDebug() << "Network error: " << queryReq->error();
-    
-        // TODO: clean up these signals, they're weird
-        if ( queryReq->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 400 )
-        {
-            emit networkError( QNetworkReply::ProtocolInvalidOperationError, 
-                               queryReq->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString() );
-        }
-        else
-            emit networkError( queryReq->error(), 
-                               queryReq->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString() );
 
+        m_networkError = queryReq->error();
+        
+        emit failed( Fp::NetworkError );
         return;
     }
 
@@ -150,14 +173,15 @@ FingerprintIdRequest::onFingerprintQueryFetched()
     // schedule a full fingerprint.
     //
     // In the case of an error, there will be no initial number, just
-    // an error string.op
+    // an error string.
 
     QString response( queryReq->readAll() );
     QStringList list = response.split( " " );
     
     if( list.isEmpty() )
     {
-        //TODO: Emit failure        
+        emit failed( Fp::MalformedResponse );
+        return;
     }
     
     QString fpid = list.at( 0 );
@@ -165,7 +189,8 @@ FingerprintIdRequest::onFingerprintQueryFetched()
     fpid.toUInt( &isANumber );
     if ( !isANumber )
     {
-        //TODO: Emit failure
+        qDebug() << "Malformed resonse: " << response;
+        emit failed( Fp::MalformedResponse );
         return;
     }
 
@@ -175,10 +200,19 @@ FingerprintIdRequest::onFingerprintQueryFetched()
     
     if( status == "NEW" )
     {
+        qDebug() << "NEW fingerprint found for track: " << m_track;
         emit unknownFingerprint( fpid );
     }
     else
     {
+        qDebug() << "fingerprint found for track: " << m_track << " fpid: " << fpid;
         emit FpIDFound( fpid );
     }
+}
+
+
+void 
+FingerprintIdRequest::setAutoDelete( bool autoDelete )
+{
+    m_autoDelete = autoDelete;
 }

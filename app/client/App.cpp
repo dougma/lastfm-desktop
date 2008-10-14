@@ -30,6 +30,7 @@
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
+#include "lib/lastfm/fingerprint/FingerprintIdRequest.h"
 #include "lib/unicorn/BackgroundJobQueue.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
@@ -280,10 +281,30 @@ App::onBootstrapCompleted( const QString& playerId )
 void
 App::onTrackSpooled( const Track& t )
 {
-    if (!t.isNull() && t.mbid().isNull())
+    if( t.isNull() ) return;
+    
+    if( t.source() == Track::Player )
+    {
+        FingerprintIdRequest * fpReq = new FingerprintIdRequest( t, this );
+        connect( fpReq, SIGNAL( unknownFingerprint( QString )), SLOT( onUnknownFingerprint( QString )));
+        fpReq->setAutoDelete( false );
+        fpReq->start();
+    }
+    
+    if ( t.mbid().isNull())
     {
         m_q->enqueue( new MbidJob( t ) );
     }
+}
+
+
+void 
+App::onUnknownFingerprint( QString )
+{
+    FingerprintIdRequest* fpReq = static_cast< FingerprintIdRequest* >( sender());
+    disconnect( fpReq, SIGNAL( unknownFingerprint( QString )), this, SLOT( onUnknownFingerprint( QString )));
+    fpReq->setAutoDelete( true );
+    fpReq->start( Fp::FullMode );
 }
 
 

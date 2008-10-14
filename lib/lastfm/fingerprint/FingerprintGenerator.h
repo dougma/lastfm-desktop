@@ -21,60 +21,27 @@
 #ifndef FINGERPRINT_GENERATOR_H
 #define FINGERPRINT_GENERATOR_H
 
+#include "FpError.h"
+#include "FpMode.h"
 #include "fplib/include/FingerprintExtractor.h"
 #include "Sha256File.h"
 
 #include <QFileInfo>
-#include <QThread>
+#include <QRunnable>
 #include <QMutex>
 #include <QMutexLocker>
 
-class FingerprintGenerator : public QThread
+class FingerprintGenerator : public QObject, public QRunnable
 {
     Q_OBJECT
     
     public:
 		
-        enum Mode
-        {
-            /** Short query fingerprint is generated */
-            Query,
-            
-            /** Full submittable query is generated */
-            Full,
-            
-            Max
-        };
-        
-        enum Error
-        {
-            /** File does not exist or cannot be read */
-            ReadError = 0,
-            
-            /** GetInfo failed to extract samplerate, bitrate, channels, duration etc */
-            GetInfoError,
-            
-            /** Track is shorter than minimum track duration for fingerprinting */
-            TrackTooShortError,
-            
-            /** Could not initialize the fingerprintExtractor (probably ran out of RAM) */
-            ExtractorInitError,
-            
-            /** The fingerprintExtractor has not been initialized before process() is called */
-            ExtractorProcessError,
-            
-            /** The fingerprintExtractor has been starved of data to generate a fingerprint */
-            ExtractorNotEnoughDataError,
-            
-            /** FingerprintExtractor::getFingerprint() has been called prematurely */
-            ExtractorNotReadyError
-        };
-		
-		FingerprintGenerator(const QFileInfo&, Mode, QObject* = 0 );
+        FingerprintGenerator(const QFileInfo&, Fp::Mode, QObject* = 0 );
 		
         void run();
                 
-        Mode mode() { return m_mode; }
+        Fp::Mode mode() { return m_mode; }
 		
         QByteArray& data() { return m_fingerprint; }
         QString sha256 ();
@@ -82,8 +49,8 @@ class FingerprintGenerator : public QThread
         void stop();
         
     signals:
-        void failed( FingerprintGenerator::Error );
-        void success( QByteArray);
+        void failed( Fp::Error );
+        void success( QByteArray, QString sha256 );
 		
     protected:
         //void fingerprintOld( QString path );
@@ -95,7 +62,7 @@ class FingerprintGenerator : public QThread
         QByteArray m_fingerprint;
         
     private:
-        Mode m_mode;
+        Fp::Mode m_mode;
         
         int m_sampleRate;
         int m_numChannels;

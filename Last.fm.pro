@@ -15,8 +15,8 @@ debug:macx-xcode {
 	system( mv version.h app/client )
 
     DIRS = app/client \
-           lib/lastfm/core lib/lastfm/ws lib/lastfm/radio lib/lastfm/types lib/lastfm/scrobble \
-           lib/unicorn 
+           lib/lastfm/core lib/lastfm/ws lib/lastfm/radio lib/lastfm/types lib/lastfm/scrobble lib/lastfm/fingerprint \
+           lib/unicorn
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )

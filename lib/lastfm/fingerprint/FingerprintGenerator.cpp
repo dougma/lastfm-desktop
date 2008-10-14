@@ -24,6 +24,7 @@
 #include "Sha256.h"
 #include "MP3_Source_Qt.h"
 
+#include <QThreadPool>
 #include <QDateTime>
 #include <QDebug>
 
@@ -33,13 +34,13 @@ using namespace fingerprint;
 static const uint k_bufferSize = 1024 * 8;
 static const int k_minTrackDuration = 30;
 
-FingerprintGenerator::FingerprintGenerator( const QFileInfo& f, Mode m, QObject* parent ) :
-    QThread( parent ),
+FingerprintGenerator::FingerprintGenerator( const QFileInfo& f, Fp::Mode m, QObject* parent ) :
+    QObject( parent ),
 	m_file( f ),
 	m_mode( m )
 {
-    Q_ASSERT( m < Max );
-    start();
+    Q_ASSERT( m < Fp::MaxMode );
+    QThreadPool::globalInstance()->start( this );
 }
 
 
@@ -48,7 +49,7 @@ FingerprintGenerator::run()
 {
     if( !m_file.isReadable() )
     {
-        emit failed( ReadError );
+        emit failed( Fp::ReadError );
         return;
     }
     fingerprint(m_file.filePath());
@@ -60,6 +61,7 @@ FingerprintGenerator::sha256()
 {
     unsigned char hash[SHA256_HASH_SIZE];
     QString sha;
+    qDebug() << m_file.filePath();
     Sha256File::getHash( m_file.filePath().toStdString(), hash );
     
     for (int i = 0; i < SHA256_HASH_SIZE; ++i) {
@@ -90,13 +92,13 @@ FingerprintGenerator::fingerprint( QString filename )
     }
     catch ( std::exception& e )
     {
-        emit( failed( GetInfoError) );
+        emit( failed( Fp::GetInfoError) );
         return;
     }
     
     if( duration < k_minTrackDuration )
     {
-        emit( failed( TrackTooShortError ));
+        emit( failed( Fp::TrackTooShortError ));
         return;
     }
     
@@ -105,11 +107,11 @@ FingerprintGenerator::fingerprint( QString filename )
     bool fpDone = false;
     try
     {
-        if ( mode() == Full )
+        if ( mode() == Fp::FullMode )
         {
             m_extractor.initForFullSubmit( m_sampleRate, m_numChannels );
         }
-        else
+        else if( mode() == Fp::QueryMode )
         {
             m_extractor.initForQuery( m_sampleRate, m_numChannels, duration );
 
@@ -121,10 +123,13 @@ FingerprintGenerator::fingerprint( QString filename )
                 static_cast<size_t>( m_sampleRate * m_numChannels * secsToSkip ),
                 false );
         }
+        else
+            Q_ASSERT( !"Unknown fingerprinting mode" );
+        
     }
     catch ( const std::exception& e )
     {
-        emit( failed( ExtractorInitError));
+        emit( failed( Fp::ExtractorInitError));
         return;
     }
     
@@ -143,7 +148,7 @@ FingerprintGenerator::fingerprint( QString filename )
         }
         catch ( const std::exception& e )
         {
-            emit( failed( ExtractorProcessError) );
+            emit( failed( Fp::ExtractorProcessError) );
             delete[] pPCMBuffer;
             return;
         }
@@ -154,7 +159,7 @@ FingerprintGenerator::fingerprint( QString filename )
 
     if ( !fpDone )
     {
-        emit( failed( ExtractorNotEnoughDataError));
+        emit( failed( Fp::ExtractorNotEnoughDataError));
         m_fingerprint.clear();
         return;
     }
@@ -164,12 +169,12 @@ FingerprintGenerator::fingerprint( QString filename )
 
     if( fpData.first == NULL || fpData.second == 0)
     {
-        emit( failed( ExtractorNotReadyError) );
+        emit( failed( Fp::ExtractorNotReadyError) );
         return;
     }
         
     m_fingerprint = QByteArray( fpData.first, fpData.second );
-    emit success( m_fingerprint);
+    emit success( m_fingerprint, sha256() );
 }
 
 

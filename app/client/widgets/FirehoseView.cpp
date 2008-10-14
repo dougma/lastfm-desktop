@@ -204,8 +204,6 @@ FirehoseView::mouseMoveEvent( QMouseEvent* event )
         pixmap = QPixmap::fromImage( image );
     }
     drag->setPixmap( pixmap );
-    qDebug() << "Mouse press position: " << event->pos();
-    qDebug() << "Hotspot position: " << event->pos() - QPoint( 0, m_itemRects[ i ].top());
     drag->setHotSpot( event->pos() - QPoint( 0, m_itemRects[ i ].top()) );
     
     Qt::DropAction dropAction = drag->exec();

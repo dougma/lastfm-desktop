@@ -39,6 +39,7 @@ const int PlayerBucket::k_itemMargin = 4;
 const int PlayerBucket::k_itemSizeX = 75;
 const int PlayerBucket::k_itemSizeY = 75;
 
+
 PlayerBucket::PlayerBucket( QWidget* w )
 			 :QListWidget( w ),
 			  m_showDropText( true)

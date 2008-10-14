@@ -70,6 +70,7 @@ public slots:
 private slots:
 	void onScrobblerStatusChanged( int );
     void onBootstrapCompleted( const QString& playerId );
+    void onUnknownFingerprint( QString );
     void onTrackSpooled( const Track& t );
 
 private:
