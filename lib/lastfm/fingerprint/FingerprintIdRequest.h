@@ -23,12 +23,14 @@
 
 #include "FingerprintGenerator.h"
 
-#include "lib/types/Track.h"
+#include "lib/lastfm/types/Track.h"
+#include "lib/lastfm/ws/WsError.h"
 
 #include "FingerprintDllExportMacro.h"
 
 #include <QObject>
 #include <QFileInfo>
+#include <QNetworkReply>
 
 /**
  *   @brief Check if the Fingerprint ID for the track has been cached in 
@@ -45,11 +47,16 @@ class FINGERPRINT_DLLEXPORT FingerprintIdRequest : public QObject
     
     public:
 
-        FingerprintIdRequest( const Track&, QObject* parent = 0 );
+        FingerprintIdRequest( const Track&, QObject* parent = 0, bool debug = false );
         ~FingerprintIdRequest();
+    
+        void start( Fp::Mode = Fp::QueryMode );
         
         const Track& track() const{ return m_track; }
-        bool wait(){ if( m_fingerprinter ) return m_fingerprinter->wait(); }
+        
+        void setAutoDelete( bool );
+    
+        QNetworkReply::NetworkError networkError(){ return m_networkError; }
         
     signals:
         /* This fingerprint has been found (either in the cache or from the servers ) */
@@ -67,20 +74,26 @@ class FINGERPRINT_DLLEXPORT FingerprintIdRequest : public QObject
           **/
         void cachedFpIDFound( QString );
         
-        void fingerprintError();
-        void networkError( QNetworkReply::NetworkError, QString );
+        void failed( Fp::Error );
         
     protected slots:
-        void onFingerprintSuccess( const QByteArray& );
+        void onGeneratorSuccess( const QByteArray&, QString sha256 );
         void onFingerprintQueryFetched();
+        
+        void onFailed( Fp::Error );
+        void onSuccess( QString );
         
     private:
         FingerprintGenerator* m_fingerprinter;
 
-        void fingerprint();
-
         Track m_track;
-		QNetworkAccessManager* m_networkManager;
+		class WsAccessManager* m_networkManager;
+        QNetworkReply::NetworkError m_networkError;
+    
+        bool m_debug;
+    
+        bool m_autoDelete;
+
 };
 
 #endif //FPID_FETCHER_H
