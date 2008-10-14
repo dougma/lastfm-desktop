@@ -136,15 +136,13 @@ UniqueApplication::init2( const QCoreApplication* app )
     QSettings( app->organizationName() ).setValue( m_id, app->applicationFilePath() );
     
 #ifdef WIN32   
-    if (!b) {
-        // sadly we can't do this any earlier, so on Windows, there's a fair amount of time
-        // where arguments will be lost. Perhaps we could make a win32 window? Then we don't
-        // need to wait for the QApplication to be initialised
-        UniqueApplicationWidget* w = new UniqueApplicationWidget;
-        w->app = this;
-        w->setWindowTitle( windowTitle() );
-        m_hwnd = w->winId();
-    }
+    // sadly we can't do this any earlier, so on Windows, there's a fair amount of time
+    // where arguments will be lost. Perhaps we could make a win32 window? Then we don't
+    // need to wait for the QApplication to be initialised
+    UniqueApplicationWidget* w = new UniqueApplicationWidget;
+    w->app = this;
+    w->setWindowTitle( windowTitle() );
+    m_hwnd = w->winId();
 #endif
 }
 
