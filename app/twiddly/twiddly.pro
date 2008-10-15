@@ -21,11 +21,4 @@ win32 {
 
     DEFINES += _WIN32_DCOM
     RC_FILE = Twiddly.rc
-
-    # Twiddly currently builds to iPodScrobblerd in debug builds, it's easier to handle
-    # the manifest merging that way, but we rename it to iPodScrobbler afterwards as
-    # that is how it was before (ask Max).
-    CONFIG(debug, debug|release) {
-        QMAKE_POST_LINK += && copy $$ROOT_DIR\bin\iPodScrobblerd.exe $$ROOT_DIR\bin\iPodScrobbler.exe
-    }
 }
