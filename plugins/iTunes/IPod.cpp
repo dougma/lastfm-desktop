@@ -27,7 +27,7 @@
 #endif
 
 
-const LOGGER_STRING 
+const COMMON_STD_STRING 
 IPod::twiddlyFlags() const
 {
     LFM_STRINGSTREAM ss;
@@ -58,7 +58,7 @@ IPod::twiddlyFlags() const
 }
 
 
-LOGGER_STRING
+COMMON_STD_STRING
 IPod::device() const
 {
     #ifdef WIN32

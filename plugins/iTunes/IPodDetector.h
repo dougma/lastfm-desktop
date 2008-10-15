@@ -62,9 +62,9 @@ private:
 
     // NOTE inline because there is no IPodDetector.cpp
     void 
-    startTwiddlyWithIpodSerial( const LOGGER_STRING& serial, char* trigger = "unknown" )
+    startTwiddlyWithIpodSerial( const COMMON_STD_STRING& serial, char* trigger = "unknown" )
     {
-        std::map< LOGGER_STRING, IPod*>::iterator it = m_ipodMap.find( serial );
+        std::map< COMMON_STD_STRING, IPod*>::iterator it = m_ipodMap.find( serial );
         if( it != m_ipodMap.end() )
         {
             LOG( 3, "Ipod scrobbling triggered by " << trigger << " method." );
@@ -75,7 +75,7 @@ private:
         }
     }
 
-    std::map< LOGGER_STRING, IPod*> m_ipodMap;
+    std::map< COMMON_STD_STRING, IPod*> m_ipodMap;
     
     void notifyIfUnknownIPod( IPod* ipod );
 

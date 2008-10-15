@@ -40,6 +40,7 @@ else {
                lib/lastfm/ws/libws.pro \
                lib/lastfm/types/libtypes.pro \
                lib/lastfm/radio/libradio.pro \
+               lib/lastfm/fingerprint/libfingerprint.pro \
                lib/lastfm/scrobble/libscrobble.pro \
                lib/unicorn/libunicorn.pro \
 	           app/client \
@@ -47,7 +48,9 @@ else {
 
 	# make the app client the default project in visual studio
 	win32:CONFIG( debug, debug|release ) {
-		SUBDIRS -= app/client/client.pro
-		SUBDIRS = app/client/client.pro $$SUBDIRS
+		SUBDIRS -= app/client
+		SUBDIRS = app/client $$SUBDIRS
 	}
+	
+	!macx*:SUBDIRS -= lib/lastfm/fingerprint/libfingerprint.pro
 }

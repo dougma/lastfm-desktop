@@ -39,9 +39,9 @@
     class IPod
     {
         public:
-            const LOGGER_STRING twiddlyFlags() const;
-            const LOGGER_STRING& serial() const { return m_serial; }
-            LOGGER_STRING device() const;
+            const COMMON_STD_STRING twiddlyFlags() const;
+            const COMMON_STD_STRING& serial() const { return m_serial; }
+            COMMON_STD_STRING device() const;
 
             enum deviceType { unknown = 0,
                    iPod,
@@ -96,7 +96,7 @@
             IPod(): m_manualMode( false ), m_mobileScrobblerInstalled( false )
             {}
         
-            LOGGER_STRING m_serial;
+            COMMON_STD_STRING m_serial;
             int m_pid;
             int m_vid;
             

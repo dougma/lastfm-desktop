@@ -1,13 +1,12 @@
 TARGET = fingerprint
 TEMPLATE = lib
 QT += xml network sql
-CONFIG += dll types core
+CONFIG += dll types core ws
 
 
 include( $$ROOT_DIR/common/qmake/include.pro )
 
-INCLUDEPATH +=	\
-        fplib/include
+INCLUDEPATH += fplib/include
 
 SOURCES   = $$findSources( cpp )
 HEADERS   = $$findSources( h )
