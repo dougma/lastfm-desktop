@@ -23,18 +23,8 @@
 // Link to wbemuuid.lib to resolve IWbemObjectSink and IWbemClassObject
 // interface definitions.
 
-
-// This brings in CoInitializeSecurity from objbase.h
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0400
-#endif
-
 #include "NdisEvents_win.h"
 #include "WmiSink_win.h"
-#include <atlcom.h>
-#include <objbase.h>
-#include <crtdbg.h>
-
 
 
 NdisEvents::NdisEvents()

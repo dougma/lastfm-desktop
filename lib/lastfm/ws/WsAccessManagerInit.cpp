@@ -21,8 +21,11 @@
 
 #include "WsAccessManagerInit.h"
 
-#define _WIN32_WINNT 0x0500
-#include <windows.h>
+#ifndef _WIN32_WINNT
+// bring in CoInitializeSecurity from objbase.h
+#define _WIN32_WINNT 0x0400
+#endif
+
 #include <objbase.h>
 #include <atlbase.h>
 #include <atlcom.h>
