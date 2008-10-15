@@ -604,10 +604,6 @@ void BootStrap::xmlentities( std::wstring &input )
 
 void BootStrap::appendTrack( struct BootStrapItem* item )
 {
-    // Ignore tracks with 0 play count
-    if( _wtoi( item->playcount.c_str() ) <= 0 )
-        return;
-
     //Ignore tracks with no artist / track names
     if( item->artist.length() < 1 ||
         item->track.length() < 1 )
