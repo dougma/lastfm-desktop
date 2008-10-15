@@ -97,11 +97,20 @@ WsProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkPr
 	return false;
 }
 
-
-void WsProxy::openSettingsWindow()
+void
+WsProxy::openSettingsWindow()
 {
 #ifdef WIN32
 	QWidget *w = QApplication::desktop();
 	m_settingsWindow.open(w ? w->winId() : NULL);
 #endif
 }
+
+void
+WsProxy::onConnectionUp(QString connectionName)
+{
+#ifdef WIN32
+    m_autoProxy.resetFailedState();
+#endif
+}
+

@@ -71,10 +71,11 @@ parsePacResult(const QString &pacResult)
 
 
 WsAutoProxy::WsAutoProxy()
-{
+: m_bFailed( false )
 #ifdef WIN32
-	m_hSession = 0;
+, m_hSession( 0 )
 #endif
+{
 }
 
 WsAutoProxy::~WsAutoProxy()
@@ -88,51 +89,60 @@ WsAutoProxy::~WsAutoProxy()
 bool
 WsAutoProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out, const QString &pacUrl)
 {
+    if (m_bFailed) return false;        // fail fast
+
 	bool result = false;
 #ifdef WIN32
-	if (!m_hSession)
-	{
-		m_hSession = WinHttpOpen(CA2W(userAgent), WINHTTP_ACCESS_TYPE_NO_PROXY, 0, 0, 0/*|WINHTTP_FLAG_ASYNC*/);
-	}
-	if (m_hSession)
-	{
-		WINHTTP_PROXY_INFO info;
-		WINHTTP_AUTOPROXY_OPTIONS opts;
-		memset(&opts, 0, sizeof(opts));
-		if (pacUrl.length()) 
-		{
-			opts.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
-			opts.lpszAutoConfigUrl = pacUrl.utf16();
-		} 
-		else
-		{
-			opts.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
-			opts.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP | WINHTTP_AUTO_DETECT_TYPE_DNS_A;
-		}
-		opts.fAutoLogonIfChallenged = TRUE;
+    if (!m_hSession)
+    {
+	    m_hSession = WinHttpOpen(CA2W(userAgent), WINHTTP_ACCESS_TYPE_NO_PROXY, 0, 0, WINHTTP_FLAG_ASYNC);
+    }
+    if (m_hSession)
+    {
+	    WINHTTP_PROXY_INFO info;
+	    WINHTTP_AUTOPROXY_OPTIONS opts;
+	    memset(&opts, 0, sizeof(opts));
+	    if (pacUrl.length()) 
+	    {
+		    opts.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
+		    opts.lpszAutoConfigUrl = pacUrl.utf16();
+	    } 
+	    else
+	    {
+		    opts.dwFlags = WINHTTP_AUTOPROXY_AUTO_DETECT;
+		    opts.dwAutoDetectFlags = WINHTTP_AUTO_DETECT_TYPE_DHCP | WINHTTP_AUTO_DETECT_TYPE_DNS_A;
+	    }
+	    opts.fAutoLogonIfChallenged = TRUE;
 		
-		if (WinHttpGetProxyForUrl(m_hSession, url.utf16(), &opts, &info))
-		{
-			if (info.lpszProxy) 
-			{
-				QList<QNetworkProxy> proxies = parsePacResult(QString::fromUtf16(info.lpszProxy));
-				if (!proxies.empty())
-				{
-					out = proxies.at(0);
-					result = true;
-				}
-				GlobalFree(info.lpszProxy);
-			}
-			if (info.lpszProxyBypass)
-			{
-				GlobalFree(info.lpszProxyBypass);
-			}
-		}
-	}
+	    if (WinHttpGetProxyForUrl(m_hSession, url.utf16(), &opts, &info)) {
+		    if (info.lpszProxy) 
+		    {
+			    QList<QNetworkProxy> proxies = parsePacResult(QString::fromUtf16(info.lpszProxy));
+			    if (!proxies.empty())
+			    {
+				    out = proxies.at(0);
+				    result = true;
+			    }
+			    GlobalFree(info.lpszProxy);
+		    }
+		    if (info.lpszProxyBypass)
+		    {
+			    GlobalFree(info.lpszProxyBypass);
+		    }
+        } else {
+            m_bFailed = true;
+        }
+    }
 #elif defined(Q_WS_MAC)
 	// todo
 #elif defined(Q_WS_X11)
 	// todo
 #endif
+
 	return result;
+}
+
+void WsAutoProxy::resetFailedState()
+{
+    m_bFailed = false;
 }

@@ -29,6 +29,7 @@ class LASTFM_WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
     Q_OBJECT
 
 	static class WsProxy *m_proxy;
+    static class WsNetEvent *m_netEvent;
 
  	/** called for every request since we support PAC, it's worth noting that 
 	  * this function calls QNetworkAccessManager::setProxy */

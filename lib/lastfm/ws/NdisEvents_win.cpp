@@ -35,6 +35,8 @@
 #include <objbase.h>
 #include <crtdbg.h>
 
+
+
 NdisEvents::NdisEvents()
     : m_pSink(0)
 {}
@@ -51,17 +53,7 @@ NdisEvents::~NdisEvents()
 HRESULT
 NdisEvents::registerForNdisEvents()
 {
-	HRESULT hr;
-
-	CSecurityDescriptor sd;
-	sd.InitializeFromThreadToken();
-	hr = CoInitializeSecurity(sd, -1, NULL, NULL,
-		RPC_C_AUTHN_LEVEL_PKT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
-	_ASSERT(SUCCEEDED(hr));
-	if (FAILED(hr))
-		return hr;
-
-    hr = m_pLocator.CoCreateInstance(CLSID_WbemLocator);
+	HRESULT hr = m_pLocator.CoCreateInstance(CLSID_WbemLocator);
 	if (FAILED(hr))
 		return hr;
 

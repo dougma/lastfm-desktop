@@ -17,71 +17,30 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#ifndef WS_PROXY_H
-#define WS_PROXY_H
+#ifndef LASTFM_WS_ACCESS_MANAGERINIT_H
+#define LASTFM_WS_ACCESS_MANAGERINIT_H
 
-#include <QCoreApplication>
-#include <QNetworkProxy>
-#include "WsAutoProxy.h"
+#include <lastfm/DllExportMacro.h>
 
+class LASTFM_WS_DLLEXPORT WsAccessManagerInit
+{
+public:
 #ifdef WIN32
-#include <windows.h>
-#include <winhttp.h>
+    // special setup requirements for windows
 
+    WsAccessManagerInit();
+    ~WsAccessManagerInit();
 
-/** @brief memory managing wrapper for WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
-  * @author <doug@last.fm>
-  */
+    class ComSetup *m_com;
 
-class IeSettings : public WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
-{
-public:
-	IeSettings();
-	~IeSettings();
-};
+#else
 
+    // nothing to do on other platforms
 
-/** @brief opens Internet Options control panel applet to Connections tab
-* @author <doug@last.fm>
-*
-*/
-
-class Win_SettingsWindow
-{
-	HMODULE m_hMod;
-	BOOL (WINAPI *m_proc)(HWND);
-
-public:
-	Win_SettingsWindow();
-	~Win_SettingsWindow();
-	bool open(HWND parent);
-};
+    WsAccessManagerInit() {}
+    ~WsAccessManagerInit() {}
 
 #endif
-
-
-/** @brief useful proxy functions
-  * @author <doug@last.fm>
-  */
-class WsProxy : public QObject
-{
-	Q_OBJECT
-
-#ifdef WIN32
-	Win_SettingsWindow m_settingsWindow;
-	WsAutoProxy m_autoProxy;
-#endif
-
-public:
-	WsProxy(QObject *parent = 0);
-
-	bool getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out);
-	void openSettingsWindow();
-
-
-private slots:
-    void onConnectionUp(QString connectionName);
-
 };
 
 #endif

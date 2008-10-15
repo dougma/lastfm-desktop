@@ -17,71 +17,58 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#ifndef WS_PROXY_H
-#define WS_PROXY_H
-
-#include <QCoreApplication>
-#include <QNetworkProxy>
-#include "WsAutoProxy.h"
-
 #ifdef WIN32
+
+#include "WsAccessManagerInit.h"
+
+#define _WIN32_WINNT 0x0500
 #include <windows.h>
-#include <winhttp.h>
+#include <objbase.h>
+#include <atlbase.h>
+#include <atlcom.h>
 
-
-/** @brief memory managing wrapper for WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
-  * @author <doug@last.fm>
-  */
-
-class IeSettings : public WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
+class ComSetup
 {
 public:
-	IeSettings();
-	~IeSettings();
+    ComSetup()
+    {
+        HRESULT hr = CoInitialize(0);
+        m_bComInitialised = SUCCEEDED(hr);
+        _ASSERT(m_bComInitialised);
+        if (m_bComInitialised) {
+            setupSecurity();
+        }
+    }
+
+    void setupSecurity()
+    {
+        CSecurityDescriptor sd;
+        sd.InitializeFromThreadToken();
+        HRESULT hr = CoInitializeSecurity(sd, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_PKT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL); 
+        _ASSERT(SUCCEEDED(hr));
+    }
+
+    ~ComSetup()
+    {
+        if (m_bComInitialised) {
+            CoUninitialize();
+        }
+    }
+
+private:
+    bool m_bComInitialised;
 };
 
-
-/** @brief opens Internet Options control panel applet to Connections tab
-* @author <doug@last.fm>
-*
-*/
-
-class Win_SettingsWindow
+WsAccessManagerInit::WsAccessManagerInit()
 {
-	HMODULE m_hMod;
-	BOOL (WINAPI *m_proc)(HWND);
+    // WsNetEvent on Windows needs COM security initialised a particular way,
+    // and COM security initialisation needs to happen early, so here we are.
+    m_com = new ComSetup();
+}
 
-public:
-	Win_SettingsWindow();
-	~Win_SettingsWindow();
-	bool open(HWND parent);
-};
-
-#endif
-
-
-/** @brief useful proxy functions
-  * @author <doug@last.fm>
-  */
-class WsProxy : public QObject
+WsAccessManagerInit::~WsAccessManagerInit()
 {
-	Q_OBJECT
-
-#ifdef WIN32
-	Win_SettingsWindow m_settingsWindow;
-	WsAutoProxy m_autoProxy;
-#endif
-
-public:
-	WsProxy(QObject *parent = 0);
-
-	bool getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out);
-	void openSettingsWindow();
-
-
-private slots:
-    void onConnectionUp(QString connectionName);
-
-};
+    delete m_com;
+}
 
 #endif

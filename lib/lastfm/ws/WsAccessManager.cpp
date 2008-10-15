@@ -20,9 +20,11 @@
 #include "WsAccessManager.h"
 #include "WsKeys.h"
 #include "WsProxy.h"
+#include "WsNetEvent.h"
 #include <QtNetwork>
 
 WsProxy *WsAccessManager::m_proxy = 0;
+WsNetEvent *WsAccessManager::m_netEvent = 0;
 
 
 WsAccessManager::WsAccessManager(QObject *parent)
@@ -30,6 +32,8 @@ WsAccessManager::WsAccessManager(QObject *parent)
 {
     // parented to qApplication as this is a application-lifetime object
 	if (!m_proxy) m_proxy = new WsProxy( qApp );
+    if (!m_netEvent) m_netEvent = new WsNetEvent( qApp );
+    connect( m_netEvent, SIGNAL(connectionUp(QString)), m_proxy, SLOT(onConnectionUp(QString)) );
     if (!Ws::UserAgent) Ws::UserAgent = qstrdup( QCoreApplication::applicationName().toAscii() );
 }
 

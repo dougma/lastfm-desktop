@@ -34,6 +34,7 @@ class WsAutoProxy
 #ifdef WIN32
 	HINTERNET m_hSession;
 #endif
+    bool m_bFailed;
 
 public:
 	WsAutoProxy();
@@ -42,7 +43,9 @@ public:
 	bool getProxyFor( const class QString &url, 
                       const class QByteArray &userAgent, 
                       class QNetworkProxy &out,
-                      const QString &pacUrl);
+                      const QString &pacUrl );
+
+    void resetFailedState();
 };
 
 #endif 
