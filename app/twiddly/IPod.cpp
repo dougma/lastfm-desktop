@@ -252,17 +252,19 @@ IPod::twiddle()
 #endif
 
 
-void
-IPod::ScrobbleList::removeAllWithUniqueId( const QString& uniqueId )
-{
-	QList<Track>::Iterator i;
-	for( i = begin(); i != end(); ++i ) 
+#ifdef WIN32
+	void
+	IPod::ScrobbleList::removeAllWithUniqueId( const QString& uniqueId )
 	{
-		IPodScrobble s( *i );
-		if( s.uniqueId() == uniqueId )
+		QList<Track>::Iterator i;
+		for( i = begin(); i != end(); ++i ) 
 		{
-			m_realCount -= s.playCount();
-			erase( i );
+			IPodScrobble s( *i );
+			if( s.uniqueId() == uniqueId )
+			{
+				m_realCount -= s.playCount();
+				erase( i );
+			}
 		}
 	}
-}
+#endif

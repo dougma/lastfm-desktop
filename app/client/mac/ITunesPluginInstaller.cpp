@@ -23,7 +23,6 @@
 #include <QDir>
 #include <QProcess>
 
-
 static const char* kBundleName = "AudioScrobbler.bundle";
 static const char* kPListFile = "Contents/Info.plist";
 
