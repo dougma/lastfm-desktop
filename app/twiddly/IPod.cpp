@@ -90,7 +90,7 @@ IPod::scrobbleId() const
 QDir
 IPod::saveDir() const 
 {
-    QDir d = CoreDir::data().filePath( "devices/" + device + '/' + serial );
+    QDir d = CoreDir::data().filePath( "devices/" + uid() );
     d.mkpath( "." );
     return d;
 }
@@ -102,7 +102,7 @@ IPod::ScrobbleList::xml() const
     QDomDocument xml;
     QDomElement root = xml.createElement( "submissions" );
     root.setAttribute( "product", "Twiddly" );
-    
+
     QListIterator<Track> i( *this );
     while (i.hasNext())
         root.appendChild( i.next().toDomElement( xml ) );

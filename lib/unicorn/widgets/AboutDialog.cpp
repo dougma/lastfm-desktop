@@ -33,12 +33,14 @@ static inline QLabel* label( const QString& text, Qt::WidgetAttribute size = Qt:
 }
 
 
-AboutDialog::AboutDialog( const char* version, QWidget* parent )
+AboutDialog::AboutDialog( QWidget* parent )
            : QDialog( parent )
 {
+    Q_ASSERT( qApp->applicationVersion().size() );
+    
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( new QLabel( "<b>" + qApp->applicationName() ) );
-    v->addWidget( label( version ) );
+    v->addWidget( label( qApp->applicationVersion() ) );
     v->addSpacing( 10 );
     v->addWidget( label( "<a href='http://www.last.fm'>www.last.fm</a>" ) );
     v->addWidget( label( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a>" ) );

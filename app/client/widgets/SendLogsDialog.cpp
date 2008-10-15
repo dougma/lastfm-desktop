@@ -19,7 +19,7 @@
 
 #include "SendLogsDialog.h"
 #include "SendLogsRequest.h"
-#include "the/settings.h"
+#include "Settings.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/CoreProcess.h"
@@ -50,10 +50,10 @@ static QString clientInformationString()
 {
     QString s;
 
-    s += "User: " + The::settings().username() + "\n";
+    s += "User: " + QString(Ws::Username) + "\n";
     s += "Path: " + QCoreApplication::applicationFilePath() + "\n";
     s += "Version: " + QCoreApplication::applicationVersion() + "\n";
-    s += "Scrobble Point: " + QString::number( The::settings().scrobblePoint() ) + "\n";
+    s += "Scrobble Point: " + QString::number( MooseConfig().scrobblePoint() ) + "\n";
 
 	s += "Plugin paths:\n";
 	foreach (QString path, qApp->libraryPaths())

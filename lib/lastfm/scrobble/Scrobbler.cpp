@@ -89,6 +89,13 @@ Scrobbler::cache( const Track& track )
 
 
 void
+Scrobbler::cache( const QList<Track>& tracks )
+{
+    m_cache->add( tracks );
+}
+
+
+void
 Scrobbler::submit()
 {
     m_submitter->setTracks( m_cache->tracks() );

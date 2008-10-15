@@ -22,13 +22,11 @@
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/ws/WsReply.h"
-#include "the/settings.h"
 
 MyTagsTuner::MyTagsTuner()
 {
 	setItemDelegate( new StationDelegate );
-	User u( The::settings().username() );
-	WsReply* reply = u.getTopTags();
+	WsReply* reply = AuthenticatedUser().getTopTags();
 	connect( reply, SIGNAL( finished( WsReply*)), SLOT(onFetchedTags( WsReply*)) );
 	connect( this, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onTagClicked( QListWidgetItem*)) );
 }

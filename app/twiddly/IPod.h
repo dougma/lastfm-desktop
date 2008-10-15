@@ -19,8 +19,8 @@
 
 #include "ITunesLibrary.h"
 #include "IPodScrobble.h"
+#include "IPodSettings.h"
 #include "PlayCountsDatabase.h"
-#include "lib/lastfm/core/CoreSettings.h"
 #include <QDir>
 #include <QDomDocument>
 #include <QStringList>
@@ -30,7 +30,7 @@
   */
 class IPod
 {
-public:
+public:   
     virtual ~IPod()
     {}
     
@@ -80,54 +80,17 @@ public:
             QList<Track>::clear();
         }
     };
+    
+    /** this must be writable by Qt as a path on all platforms */
+    QString uid() const { return device + '/' + serial; }
 
     ScrobbleList scrobbles() const { return m_scrobbles; }
     ScrobbleList& scrobbles() { return m_scrobbles; } //so we can clear()
 
-
-    enum Type { UnknownType, AutomaticType, ManualType };
-
-    /** looks over-engineered, but makes Twiddly/main.cpp code read much better */
-    class Settings
-    {
-        class MediaDeviceSettings : public CoreSettings
-        {
-        public:
-            MediaDeviceSettings()
-            {
-                beginGroup( "iPod" );
-            }
-        };
-        
-    public:
-        Settings( IPod const * const ipod )
-        {
-            m_uid = ipod->device + '/' + ipod->serial;
-        }
-
-        Type type() const { return (Type) value( "type", UnknownType ).toInt(); }
-        void setType( Type t ) { setValue( "type", t ); }
-
-    private:
-        QVariant value( const QString& key, const QVariant& defaultValue ) const
-        {
-            MediaDeviceSettings s;
-            s.beginGroup( m_uid );
-            return s.value( key, defaultValue );
-        }
-
-        void setValue( const QString& key, const QVariant& v )
-        {
-            MediaDeviceSettings s;
-            s.beginGroup( m_uid );
-            s.setValue( key, v );
-        }
-
-        QString m_uid;
-    };
-
-    Settings settings() const { return Settings( this ); }
-
+    IPodSettings settings() const 
+	{
+		return IPodSettings( device + '/' + serial );
+	}
 
     /** assigned to the mediaDeviceId on TrackInfo objects */
     QString scrobbleId() const;

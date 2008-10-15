@@ -80,10 +80,10 @@ CogButtonPopup::paintEvent( QPaintEvent* )
 
 
 #include <QtNetwork>
-#include "the/settings.h"
+#include "lib/lastfm/ws/WsKeys.h"
 void
 CogButtonPopup::praise()
 {
-	QUrl url = "http://oops.last.fm/talk/" + The::settings().username() + " praises y'all";
+	QUrl url = "http://oops.last.fm/talk/" + QString(Ws::Username) + " praises y'all";
 	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }

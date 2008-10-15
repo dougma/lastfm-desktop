@@ -26,17 +26,21 @@
 /** absolutely not thread-safe */
 class LASTFM_SCROBBLE_DLLEXPORT ScrobbleCache
 {
-    QString m_path;
     QString m_username;
-    QList<Track> m_tracks;
 
-    int m_subs_end;
-
-    void read();  /// reads from m_path into m_tracks
     void write(); /// writes m_tracks to m_path
 
     friend class ScrobblerSubmission;
 
+protected:
+    ScrobbleCache()
+    {}
+
+    QString m_path;
+    QList<Track> m_tracks;
+    
+    void read( QDomDocument& xml );  /// reads from m_path into m_tracks   
+    
 public:
     explicit ScrobbleCache( const QString& username );
 

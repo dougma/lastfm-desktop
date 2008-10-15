@@ -31,12 +31,14 @@ ScrobbleCache::ScrobbleCache( const QString& username )
 
     m_path = CoreDir::data().filePath( username + "_subs_cache.xml" );
     m_username = username;
-    read();
+
+    QDomDocument xml;
+    read( xml );
 }
 
 
 void
-ScrobbleCache::read()
+ScrobbleCache::read( QDomDocument& xml )
 {
     m_tracks.clear();
 
@@ -45,7 +47,6 @@ ScrobbleCache::read()
     QTextStream stream( &file );
     stream.setCodec( "UTF-8" );
 
-    QDomDocument xml;
     xml.setContent( stream.readAll() );
 
     for (QDomNode n = xml.documentElement().firstChild(); !n.isNull(); n = n.nextSibling())

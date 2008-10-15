@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SettingsDialog.h"
-#include "the/settings.h"
+#include "Settings.h"
 #include "lib/lastfm/core/CoreLocale.h"
 
 // Visual Studio sucks, thus we do this
@@ -53,7 +53,8 @@ SettingsDialog::SettingsDialog( QWidget* parent )
     ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), CoreLocale( QLocale::Chinese ).code() );
 
     //setup widgets
-    ui.logOutOnExit->setChecked( The::settings().logOutOnExit() );
+    MooseConfig config;
+    ui.logOutOnExit->setChecked( config.logOutOnExit() );
 
     // make OK button enable if something changes
     //NOTE we don't store initial value, so as a result if user changes the thing back, we do nothing..
@@ -73,7 +74,7 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 void //virtual
 SettingsDialog::accept()
 {
-    MutableSettings s( The::settings() );
+    MutableMooseConfig s;
 
     // note, don't delete the username/password from the settings yet, do that
     // at exit, in case the user changes his/her mind

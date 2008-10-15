@@ -19,7 +19,7 @@
 
 #include "MediaPlayerIndicator.h"
 #include "the/radio.h"
-#include "the/settings.h"
+#include "lib/lastfm/ws/WsKeys.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/types/Track.h"
 #include <QCoreApplication>
@@ -32,7 +32,7 @@ MediaPlayerIndicator::MediaPlayerIndicator()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
 	h->setMargin( 0 );
-	h->addWidget( m_nowPlayingIndicator = new QLabel( PRE + The::settings().username() ) );
+	h->addWidget( m_nowPlayingIndicator = new QLabel( QByteArray(PRE) + Ws::Username ) );
 	h->addStretch();
 	h->addWidget( m_playerDescription = new QLabel );
 

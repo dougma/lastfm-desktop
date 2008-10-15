@@ -17,6 +17,11 @@ do
         --help | -h | --usage)
             echo "There is one option, it is: --release"
             exit;;
+        --dev-clean)
+            mv Last.fm.xcodeproj /tmp
+			svn-clean
+			mv /tmp/Last.fm.xcodeproj .
+            exit;;
     esac
     
     shift
@@ -106,15 +111,16 @@ misc: \$(PLUGINS_DIR)/AudioScrobbler.bundle \$(CONTENTS_DIR)/Resources/twiddly
 	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
 	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle \$@
 \$(CONTENTS_DIR)/MacOS/twiddly:
+	common/dist/mac/deposx.sh _bin/twiddly /opt/qt/4.4.2/lib
 	cp _bin/twiddly \$@
 \$(CONTENTS_DIR)/Resources/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
-	cd \$(CONTENTS_DIR)/Resources && ln -s ../Contents/twiddly
+	cd \$(CONTENTS_DIR)/Resources && ln -sf ../Contents/twiddly
 HEREDOC
 
 	esac
 else
     case `uname` in
-        Darwin) 
+        Darwin)
             gen_xcodeproj || die "Configure failed."
             BUILD_CMD='open Last.fm.xcodeproj';;
         Linux)

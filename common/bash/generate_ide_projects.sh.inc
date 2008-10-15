@@ -34,4 +34,6 @@ gen_xcodeproj()
     # the only way to add the QtOverride stuff to xcodeprojects, which suggests
     # we should lose it
     perl -pi -e 's|HEADER_SEARCH_PATHS = \(|HEADER_SEARCH_PATHS = \( common/qt/override,|g' *.xcodeproj/project.pbxproj
+	# disable stupid recursive includes
+	perl -pi -e 's|buildSettings = {|buildSettings = {\n\t\tALWAYS_SEARCH_USER_PATHS = NO;|g' *.xcodeproj/project.pbxproj
 }

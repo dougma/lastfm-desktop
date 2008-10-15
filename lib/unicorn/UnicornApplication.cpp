@@ -73,8 +73,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
     }
 #endif
 
-    Settings s;
-    if (s.username().isEmpty() || s.sessionKey().isEmpty() || s.logOutOnExit())
+    CoreSettings s;
+    if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Unicorn::Settings().logOutOnExit())
     {
         LoginDialog d;
         if (d.exec() == QDialog::Accepted)
@@ -82,8 +82,7 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
             // if LogOutOnExit is enabled, really, we shouldn't store these,
             // but it means other Unicorn apps can log in while the client is 
             // loaded, and we delete the settings on exit if logOut is on
-            CoreSettings().setValue( "Username", d.username() );
-            Unicorn::UserSettings s;
+            s.setValue( "Username", d.username() );
             s.setValue( "SessionKey", d.sessionKey() );
         }
         else
@@ -92,8 +91,8 @@ Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserEx
         }
     }
 
-    Ws::Username = qstrdup( s.username().toUtf8().data() );
-    Ws::SessionKey = qstrdup( s.sessionKey().toUtf8().data() );
+    Ws::Username = qstrdup( s.value( "Username" ).toString().toUtf8().data() );
+    Ws::SessionKey = qstrdup( s.value( "SessionKey" ).toString().toUtf8().data() );
 }
 
 
@@ -128,10 +127,9 @@ Unicorn::Application::~Application()
     // did it then the user would be unable to change their mind
     if (Unicorn::Settings().logOutOnExit() || m_logoutAtQuit)
     {
-        Unicorn::UserSettings s;
-        s.remove( "Password" );
+        CoreSettings s;
         s.remove( "SessionKey" );
-        CoreSettings().remove( "Username" ); // do after the UserQSettings or it doesn't work!
+        s.remove( "Username" );
     }
 
     delete m_log;

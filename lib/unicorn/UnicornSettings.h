@@ -22,6 +22,7 @@
 
 #include "lib/DllExportMacro.h"
 #include "lib/lastfm/core/CoreSettings.h" //CORE_ORGANISATION_DOMAIN
+#include "lib/lastfm/ws/WsKeys.h"
 #include <QSettings>
 #include <QString>
 
@@ -45,9 +46,6 @@ namespace Unicorn
         Settings()
         {}
 
-        QString username() const { return CoreSettings().value( "Username" ).toString(); }
-        QString sessionKey() const { return UserSettings().value( "SessionKey", "" ).toString(); }
-
         // all Unicorn::Applications obey this
         bool logOutOnExit() const { return UserSettings().value( "LogOutOnExit", false ).toBool(); }
     };
@@ -55,7 +53,7 @@ namespace Unicorn
 
     inline UserSettings::UserSettings()
     {
-        QString const username = Settings().username();
+        QString const username = value( "Username" ).toString();
         beginGroup( username );
         // it shouldn't be possible, since Unicorn::Application enforces 
         // assignment of the username parameter before anything else
@@ -65,9 +63,6 @@ namespace Unicorn
 
     class UNICORN_DLLEXPORT MutableSettings : private Settings
     {
-        void setSessionKey(); // undefined, as basically, you're not allowed
-        void setUsername(); // to do this, Unicorn::Application can though
-
     public:
         MutableSettings()
         {}

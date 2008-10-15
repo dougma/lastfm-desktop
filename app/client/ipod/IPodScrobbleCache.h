@@ -17,12 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/DllExportMacro.h"
-#include <QDialog>
+#include <lib/lastfm/scrobble/ScrobbleCache.h>
 
 
-class UNICORN_DLLEXPORT AboutDialog : public QDialog
+class IPodScrobbleCache : public ScrobbleCache
 {
+    QString m_uid;
+    
 public:
-    AboutDialog( QWidget* parent );
+    IPodScrobbleCache( const QString& path );
+    
+    bool insane() const;
+    QString what() const;
+    
+    /** deletes the cache */
+    void remove();
 };

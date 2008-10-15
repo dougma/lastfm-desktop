@@ -20,12 +20,67 @@
 #include "Settings.h"
 
 
-Settings::Settings( const QString& version, const QString& path ) 
+#ifdef WIN32 && !defined( QT_CORE_LIB )
+#include <windows.h>
+
+std::wstring //static
+MooseConfig::defaultPath()
 {
-    QSettings s;
-    m_weWereJustUpgraded = version != s.value( "Version", "An Impossible Version String" );
-    
-    s.setValue( "Path", path );
-    // we write this so we can determine if we were just upgraded, see above
-    s.setValue( "Version", version ); 
+    HKEY h;
+    LONG lResult = RegOpenKeyExA( HKEY_CURRENT_USER, 
+                                  MOOSE_HKEY_A,
+                                  0,        // reserved
+                                  KEY_READ, // access mask
+                                  &h );
+
+    wchar_t buffer[MAX_PATH];
+    buffer[0] = L'\0';
+
+    if ( lResult == ERROR_SUCCESS )
+    {
+        try
+        {
+            RegistryUtils::QueryString( h, L"Path", buffer, MAX_PATH, false );
+        }
+        catch ( const RegistryUtils::CRegistryException& )
+        {
+            LOGL( 2, "Client path not found in HKCU" );
+        }
+        
+        RegCloseKey( h );
+    }
+
+    if ( buffer[0] == L'\0' )
+    {
+        // Couldn't read path from HKCU, try HKLM
+        lResult = RegOpenKeyExA(
+                                HKEY_LOCAL_MACHINE,
+                                MOOSE_HKEY_A,
+                                0,              // reserved
+                                KEY_READ,       // access mask
+                                &h);
+        
+        if ( lResult == ERROR_SUCCESS )
+        {
+            try
+            {
+                RegistryUtils::QueryString( h, L"Path", buffer, MAX_PATH, false );
+            }
+            catch ( const RegistryUtils::CRegistryException& )
+            {
+                LOGL( 2, "Client path not found in HKLM" );
+            }
+            
+            RegCloseKey( h );
+        }
+    }
+
+    if ( buffer[0] == L'\0' )
+    {
+        LOGL( 1, "Couldn't read the client path from the registry.");
+        return std::wstring();
+    }    
+
+    return buffer;
 }
+#endif

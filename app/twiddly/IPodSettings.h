@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2008 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,12 +17,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/DllExportMacro.h"
-#include <QDialog>
+#include "lib/lastfm/core/CoreSettings.h"
+
+enum IPodType { IPodUnknownType, IPodAutomaticType, IPodManualType };
 
 
-class UNICORN_DLLEXPORT AboutDialog : public QDialog
+/** Used by app/client so don't add anything specific to Twiddly 
+  * <max@last.fm>
+  */
+class IPodSettings
 {
+    class Settings : public CoreSettings
+    {
+    public:
+        Settings( IPodSettings const * const s )
+        {
+            beginGroup( "device/iPod" + s->m_uid );
+        }
+    };
+
+	friend class IPod;
+	friend class IPodScrobbleCache;
+    friend class Settings;
+
+    QString m_uid;
+    
+    IPodSettings( const QString& uid ) : m_uid( uid )
+    {}
+    
 public:
-    AboutDialog( QWidget* parent );
+    IPodType type() const { return (IPodType)Settings( this ).value( "type" ).toInt(); }
+    void setType( IPodType t ) { Settings( this ).setValue( "type", (int)t ); }
+    
+    QDateTime lastSync() const { return Settings( this ).value( "LastSync" ).toDateTime(); }
+    void setLastSync( const QDateTime& time ) { Settings( this ).setValue( "LastSync", time ); }
 };

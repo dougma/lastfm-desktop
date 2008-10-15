@@ -1,7 +1,7 @@
 
 /** these are our singletons, please, don't invent any more! */
 
-class Settings;
+class MooseConfig;
 class MainWindow;
 class App;
 class Radio;
@@ -10,6 +10,6 @@ namespace The
 {
     MainWindow& mainWindow();
     Radio& radio();
-    Settings& settings();
+    MooseConfig& config();
     App& app();
 }

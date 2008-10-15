@@ -33,7 +33,6 @@
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
-#include "version.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
@@ -284,7 +283,7 @@ MainWindow::showDiagnosticsDialog()
 void
 MainWindow::showAboutDialog()
 {
-    AboutDialog( VERSION, this ).exec();
+    AboutDialog( this ).exec();
 }
 
 

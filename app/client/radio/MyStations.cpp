@@ -21,7 +21,6 @@
 #include "MyStationsDelegate.h"
 #include "SearchResultsTuner.h"
 #include "the/radio.h"
-#include "the/settings.h"
 #include "the/mainWindow.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
@@ -40,7 +39,7 @@ RadioStation helper( RadioStation s, const QString& title )
 MyStations::MyStations()
 		   :m_searchResults( 0 )
 {
-	User user( The::settings().username() );
+	AuthenticatedUser user;
 	
 	m_myStationList << helper( RadioStation::library( user ), "My Library" )
                     << helper( RadioStation::recommendations( user ), "Recommended" )

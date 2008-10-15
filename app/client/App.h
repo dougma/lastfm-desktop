@@ -33,7 +33,6 @@ class App : public Unicorn::Application
 
     friend Radio& The::radio();
     friend MainWindow& The::mainWindow();
-    friend Settings& The::settings();
     
 public:
     App( int, char** );
@@ -82,7 +81,6 @@ private:
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
-    class Settings* m_settings;
     class BackgroundJobQueue* m_q;
 
     class QSystemTrayIcon* m_trayIcon;

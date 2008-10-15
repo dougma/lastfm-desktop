@@ -19,7 +19,6 @@
 
 #include "FriendsTuner.h"
 #include "lib/lastfm/types/User.h"
-#include "the/settings.h"
 #include "StationDelegate.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
@@ -35,8 +34,7 @@ FriendsTuner::FriendsTuner()
 	m_networkManager = new WsAccessManager( this );
 	setItemDelegate( new StationDelegate );
 	setSortingEnabled( true );
-	User u( The::settings().username() );
-	WsReply* reply = u.getFriends();
+	WsReply* reply = AuthenticatedUser().getFriends();
 	connect( reply, SIGNAL( finished( WsReply*)), SLOT(onFetchedFriends( WsReply*)) );
 	connect( this, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onFriendClicked( QListWidgetItem*)) );
 }

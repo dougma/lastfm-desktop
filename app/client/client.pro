@@ -4,6 +4,8 @@ CONFIG += unicorn radio core ws types scrobble
 QT = core gui xml network phonon webkit svg
 # Qt is broken and phonon requires openGL! I emailed them for fix0rs
 QT += opengl
+# Required because Twiddly requires it
+QT += sql
 VERSION = 2.0.0
 
 include( $$ROOT_DIR/common/qmake/include.pro )
@@ -30,7 +32,7 @@ else {
     win32:LIBS += -lshell32 -luser32
 }
 
-win32 {
+release:win32 {
 	root = $$system( cygpath -m '$$ROOT_DIR' )
 	qt = $$system( cygpath -m '$$QMAKE_LIBDIR_QT\\..' )
 

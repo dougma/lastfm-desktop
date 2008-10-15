@@ -24,6 +24,7 @@
 #include <mach/error.h>
 #include <IOKit/usb/IOUSBLib.h>
 
+
 IPod* //static
 IPod::newFromUsbDevice( io_object_t device, bool isIPhone /* = false */ )
 {

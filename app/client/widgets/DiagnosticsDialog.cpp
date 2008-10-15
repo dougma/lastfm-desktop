@@ -18,12 +18,12 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-#include "the/settings.h"
 #include "widgets/SendLogsDialog.h"
+#include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/scrobble/ScrobbleCache.h"
-#include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/scrobble/Scrobble.h"
+#include "lib/lastfm/ws/WsKeys.h"
 #include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
@@ -281,7 +281,7 @@ DiagnosticsDialog::radioHandshakeReturn( Request* req )
 void 
 DiagnosticsDialog::populateScrobbleCacheView()
 {
-    ScrobbleCache cache( The::settings().username() );
+    ScrobbleCache cache( Ws::Username );
 
     QList<QTreeWidgetItem *> items;
     foreach (Scrobble t, cache.tracks())

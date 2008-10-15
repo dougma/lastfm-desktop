@@ -20,17 +20,11 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <string>
+#include "common/c++/string.h"
 #include <fstream>
 #include <sstream>
-
 #ifdef WIN32
-    #define LOGGER_STRING std::wstring
-    #define LOGGER_CHAR wchar_t
-    #include <windows.h> //for CRITICAL_SECTION
-#else
-    #define LOGGER_STRING std::string
-    #define LOGGER_CHAR char
+#include <windows.h> //for CRITICAL_SECTION
 #endif
 
 
@@ -49,7 +43,7 @@ public:
 
     /** Sets the Logger instance to this, so only call once, and make it exist
       * as long as the application does */
-    Logger( const LOGGER_CHAR* filename, Severity severity = Info );
+    Logger( const COMMON_CHAR* filename, Severity severity = Info );
     ~Logger();
 
     static Logger& the() { return *instance; }

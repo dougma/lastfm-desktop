@@ -37,6 +37,9 @@ class LASTFM_SCROBBLE_DLLEXPORT Scrobbler : public QObject
     Q_OBJECT
 
 public:
+	/** You will need to do QCoreApplication::setVersion and 
+	  * QCoreApplication::setApplicationName for this to work, also you will 
+	  * need to have set all the keys in the Ws namespace in WsKeys.h */
     Scrobbler( const QString& clientId );
     ~Scrobbler();
 
@@ -46,6 +49,7 @@ public slots:
     void nowPlaying( const class Track& );
     /** will cache the track, but we won't submit it until you call submit() */
     void cache( const Track& );
+    void cache( const QList<Track>& );
     /** will submit the submission cache for this user */
     void submit();
     

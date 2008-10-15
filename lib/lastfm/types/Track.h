@@ -136,6 +136,10 @@ protected:
 };
 
 
+
+/** This class allows you to change Track objects, it is easy to use:
+  * MutableTrack( some_track_object ).setTitle( "Arse" );
+  */
 class LASTFM_TYPES_DLLEXPORT MutableTrack : public Track
 {
 public:

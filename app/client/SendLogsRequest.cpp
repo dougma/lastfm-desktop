@@ -18,9 +18,7 @@
  ***************************************************************************/
 
 #include "SendLogsRequest.h"
-
-#include "the/settings.h"
-
+#include "WsKeys.h"
 #include <QFile>
 #include <QTextDocument>
 #include <QDebug>
@@ -62,7 +60,7 @@ SendLogsRequest::send()
 {
     QString url = "http://oops.last.fm/logsubmission/add";
     
-    url += "?username=" + The::settings().username();
+    url += "?username=" + QString(Ws::Username);
     #ifdef Q_WS_MAC
         url += "&platform=macosx";
     #elif defined WIN32

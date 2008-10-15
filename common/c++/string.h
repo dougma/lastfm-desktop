@@ -17,12 +17,12 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/DllExportMacro.h"
-#include <QDialog>
+#ifdef WIN32
+    #define COMMON_STD_STRING std::wstring
+    #define COMMON_CHAR wchar_t
+#else
+    #define COMMON_STD_STRING std::string
+    #define COMMON_CHAR char
+#endif
 
-
-class UNICORN_DLLEXPORT AboutDialog : public QDialog
-{
-public:
-    AboutDialog( QWidget* parent );
-};
+#include <string>

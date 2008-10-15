@@ -1,4 +1,3 @@
-include( findsources.pro.inc )
 include( breakpad.pro.inc )
 include( debug.pro.inc )
 #win32:include( manifest.pro.inc )
@@ -79,6 +78,11 @@ defineTest( generateVersionHeader ) {
 	    system( echo \\'$$DEFINE VERSION \\\"$$VERSION\\\"\\' > version.h )
 	    system( echo \\'$$DEFINE PRODUCT_NAME \\\"$$TARGET\\\"\\' >> version.h )
 	}
+}
+
+
+defineReplace( findSources ) {
+    return( $$system( perl $$ROOT_DIR/common/qmake/findSources.pl $$1 $$2 ) )
 }
 
 

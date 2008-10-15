@@ -20,7 +20,8 @@
 #include "App.h"
 #include "MbidJob.h"
 #include "Settings.h"
-#include "version.h"
+#include "ipod/BatchScrobbleDialog.h"
+#include "ipod/IPodScrobbleCache.h"
 #include "player/PlayerListener.h"
 #include "player/PlayerMediator.h"
 #include "mac/ITunesListener.h"
@@ -127,7 +128,8 @@ App::App( int argc, char** argv )
     // ctor! Things will crash in interesting ways!
     //TODO bootstrapping
     
-    m_settings = new Settings( VERSION, applicationFilePath() );
+    bool updgradeJustOccurred = applicationVersion() != QSettings().value( "Version", "An Impossible Version String" );
+
     m_q = new BackgroundJobQueue;
     
     PlayerListener* listener = new PlayerListener( this );
@@ -179,7 +181,6 @@ App::App( int argc, char** argv )
 App::~App()
 {
     delete m_scrobbler;
-    delete m_settings;
     delete m_q;
     delete m_radio;
 }
@@ -348,13 +349,15 @@ App::open( const QUrl& url )
 }
 
 
-namespace  //anonymous namespace, keep to this file
+namespace //anonymous namespace, keep to this file
 {
     enum Argument
     {
         LastFmUrl,
         Pause, //toggles pause
         Skip,
+		SubmitIPodScrobbles,
+        Message,
         Unknown
     };
     
@@ -362,6 +365,7 @@ namespace  //anonymous namespace, keep to this file
     {
         if (arg == "--pause") return Pause;
         if (arg == "--skip") return Skip;
+		if (arg == "--twiddled") return SubmitIPodScrobbles;
         
         QUrl url( arg );
         if (url.isValid() && url.scheme() == "lastfm") return LastFmUrl;
@@ -373,15 +377,39 @@ namespace  //anonymous namespace, keep to this file
 
 void
 App::parseArguments( const QStringList& args )
-{  
+{
+    qDebug() << args;	
+	
     if (args.size() == 1)
         return;
-    
-    qDebug() << args;
     
     foreach (QString const arg, args.mid( 1 ))
         switch (argument( arg ))
         {
+			case Message:
+				break;
+			
+			case SubmitIPodScrobbles:
+            {
+                IPodScrobbleCache cache( args.value( 2 ) );
+                QList<Track> tracks = cache.tracks();
+                if (cache.insane() || MooseConfig().alwaysConfirmIPodScrobbles())
+                {
+                    BatchScrobbleDialog d( m_mainWindow );
+                    d.setTracks( tracks );
+                    d.exec();
+                    
+                    tracks = d.tracks();
+                }
+
+                m_scrobbler->cache( tracks );
+                cache.remove();
+
+                //TODO message "Your iPod tracks will be submitted at the end of this track"
+                
+				return;
+            }
+
             case LastFmUrl:
                 open( QUrl( arg ) );
                 break;
@@ -402,5 +430,4 @@ namespace The
 {
     Radio& radio() { return *app().m_radio; }
     MainWindow& mainWindow() { return *app().m_mainWindow; }
-    Settings& settings() { return *app().m_settings; }
 }

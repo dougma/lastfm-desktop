@@ -35,11 +35,13 @@ void qMsgHandler( QtMsgType, const char* msg );
 void writeXml( const QDomDocument&, const QString& path );
 void logException( QString );
 
-UniqueApplication moose( Settings::id() );
+UniqueApplication moose( MooseConfig::id() );
 
 
-/** @maintainer Max Howell <max@last.fm> */
-
+/** @maintainer Max Howell <max@last.fm>
+  *
+  * Fake params: --device ipod --connection usb --pid 4611 --vid 1452 --serial 000000C8B035
+  */
 int
 main( int argc, char** argv )
 {
@@ -60,7 +62,7 @@ main( int argc, char** argv )
 	bool const b = QByteArray(argv[0]) != "--bootstrap-needed?";
     if (b) uapp.init1();
 
-    QCoreApplication app( argc, argv );    
+    QCoreApplication app( argc, argv );
     if (b) uapp.init2( &app );
 
     initLogger();
@@ -77,6 +79,7 @@ main( int argc, char** argv )
         if (uapp.isAlreadyRunning())
             throw "Twiddly already running!";
 
+        QDateTime start_time = QDateTime::currentDateTime();
         QTime time;
         time.start();
 
@@ -94,13 +97,12 @@ main( int argc, char** argv )
             ipod->twiddle();
 
             //------------------------------------------------------------------
-            IPod::Type previousType = ipod->settings().type();
-            IPod::Type currentType = app.arguments().contains( "--manual" ) ? IPod::ManualType : IPod::AutomaticType;
+            IPodType previousType = ipod->settings().type();
+            IPodType currentType = app.arguments().contains( "--manual" ) ? IPodManualType : IPodAutomaticType;
 
-            if ( previousType == IPod::ManualType && currentType == IPod::AutomaticType )
+            if ( previousType == IPodManualType && currentType == IPodAutomaticType )
             {
-                LOG( 3, "iPod switched from manual to automatic"
-                         " - deleting manual db and ignoring scrobbles" );
+                qDebug() << "iPod switched from manual to automatic - deleting manual db and ignoring scrobbles";
 
                 // The iPod was manual, but is now automatic, we must:
                 // 1. remove the manual db, to avoid misscrobbles if it ever becomes
@@ -129,15 +131,19 @@ main( int argc, char** argv )
                 QString path = dir.filePath( filename );
                 dir.mkpath( "." );
 
-                writeXml( ipod->scrobbles().xml(), path );
+                QDomDocument xml = ipod->scrobbles().xml();
+                xml.documentElement().setAttribute( "uid", ipod->uid() );
+                writeXml( xml, path );
 
-                moose.open( "container://SubmitScrobbleCache/Device/" + ipod->device + '/' + ipod->serial + '/' + ipod->vid + '/' + ipod->pid ); 
+                moose.open( QStringList() << "--twiddled" << path );
             }
 
+            // do last so we don't record a sync if we threw and thus it "didn't" happen
+            ipod->settings().setLastSync( start_time );
             delete ipod;           
         }
         
-        LOG( 3, "Procedure took: " << (time.elapsed() / 1000) << " seconds" );
+        qDebug() << "Procedure took:" << (time.elapsed() / 1000) << "seconds";
     }
     catch( QString& s )
     {
@@ -181,9 +187,7 @@ writeXml( const QDomDocument& xml, const QString& path )
 void
 logException( QString message )
 {
-    std::string m = message.toStdString();
-    std::cout << m << std::endl;
-    LOG( 1, "FATAL ERROR: " << m );
+    qCritical() << "FATAL ERROR:" << message;
     
     // we do this because LfmApp splits on spaces in parseMessage()
     message.replace( ' ', '_' );

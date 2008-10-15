@@ -55,7 +55,7 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
     QCoreApplication::setOrganizationDomain( "last.fm" );
 
-    UniqueApplication uapp( Settings::id() );
+    UniqueApplication uapp( MooseConfig::id() );
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
     uapp.init1();

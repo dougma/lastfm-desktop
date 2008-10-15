@@ -41,7 +41,7 @@ class UniqueApplicationWidget : public QWidget
         Q_ASSERT(msg->hwnd == winId());
         COPYDATASTRUCT *data = (COPYDATASTRUCT*)msg->lParam;
         QString message = QString::fromLatin1( (char*)data->lpData, data->cbData / 2 );
-        
+
         emit app->arguments( message.split( QChar('\0') ) );
         
         if (result)
@@ -157,7 +157,7 @@ UniqueApplication::path( const QString& default_value ) const
 bool
 UniqueApplication::open( const QStringList& args )
 {
-    if (m_alreadyRunning) return false;
+    if (m_alreadyRunning) return forward( QStringList() << "fake_argv[0]" << args );
     return QProcess::startDetached( path(), args );
 }
 

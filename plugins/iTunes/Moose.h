@@ -46,10 +46,6 @@ namespace Moose
     std::MOOSE_STRING
     applicationSupport();
 
-    /** @returns utf8 encoded Last.fm client application binary path */
-    std::MOOSE_STRING
-    applicationPath();
-
     /** @returns utf8 encoded path */
     std::MOOSE_STRING
     twiddlyPath();

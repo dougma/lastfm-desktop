@@ -17,6 +17,4 @@ CONFIG( breakpad ) {
 		QMAKE_CFLAGS_RELEASE += -O3
 		QMAKE_CFLAGS_RELEASE -= -Os
 	}
-	
-	INCLUDEPATH += $$COMMON_LIBS_DIR/breakpad/src
 }

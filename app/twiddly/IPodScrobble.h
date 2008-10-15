@@ -36,7 +36,7 @@ struct IPodScrobble : public MutableTrack
     void setPlayCount( int const i ) { d->extras["playCount"] = QString::number( i ); }
     void setMediaDeviceId( const QString& id ) { d->extras["deviceId"] = id; }
     void setUniqueId( const QString& id ) { d->extras["uniqueId"] = id; }
-    void setTimestamp( const class QDateTime& t ) { d->extras["timestamp"] = QString::number( t.toTime_t() ); }
+    void setTimestamp( const class QDateTime& t ) { d->time = t; }
 };
 
 #endif

@@ -19,10 +19,7 @@
 
 #include "ITunesLibrary.h"
 #include "plugins/iTunes/ITunesComWrapper.h"
-#include "common/c++/Logger.h"
-
 #include <cassert>
-
 #include <QDateTime>
 #include <QFileInfo>
 
@@ -52,7 +49,7 @@ ITunesLibrary::ITunesLibrary( const QString&, bool const iPod ) :
         }
     }
 
-    LOGL( 3, "Found " << m_trackCount << " tracks in iTunes library" );
+    qDebug() << "Found " << m_trackCount << " tracks in iTunes library";
 
 }
 
@@ -120,7 +117,7 @@ ITunesLibrary::Track::trackInfo() const
         // so let's check for that.
         if ( unixTime == 0xFFFFFFFF )
         {
-            LOGWL( 2, "Caught a 0xFFFFFFFF timestamp, assume it's the scrobble of spury: " << i.toString() );
+            qWarning() << "Caught a 0xFFFFFFFF timestamp, assume it's the scrobble of spury:" << i.toString();
             return TrackInfo();
         } 
         
@@ -129,7 +126,7 @@ ITunesLibrary::Track::trackInfo() const
     else
     {
         // If we don't have a valid timestamp, set to current time. Should work. We hope.
-        LOGWL( 2, "Invalid timestamp, set to current: " << i.toString() );
+        qWarning() << "Invalid timestamp, set to current:" << i.toString();
         t.setTimeStamp( QDateTime::currentDateTime().toTime_t() );
     }
 

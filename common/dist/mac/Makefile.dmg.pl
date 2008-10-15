@@ -61,11 +61,11 @@ BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
 INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
 
-.PHONY = bundle bundle-clean bundle-install dmg dmg-clean help everything
+.PHONY = bundle bundle-clean bundle-install dmg dmg-clean everything
 
 YOUR_MUM: all
 
-\$(DESTDIR)mxcl-is-super: \$(TARGET) $plist
+\$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
 	perl -pi -e 's/@SHORT_VERSION@/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
 	$DEPOSX \$(TARGET) $QT_FRAMEWORKS_DIR
@@ -101,6 +101,7 @@ END
 QtFrameworks();
 plugins( "imageformats" );
 plugins( "phonon_backend" );
+plugins( "sqldrivers" );
 dylibs();
 
 
@@ -214,6 +215,6 @@ print <<END;
 
 bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist $install_deps \$(INSTALLDIR)/Contents/Resources/qt.conf
 
-bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(DESTDIR)mxcl-is-super \$(CONTENTS)/Resources/qt.conf $bundle_deps
+bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy \$(CONTENTS)/Resources/qt.conf $bundle_deps
 
 END

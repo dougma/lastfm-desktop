@@ -19,7 +19,6 @@
 
 #include "NeighboursTuner.h"
 #include "StationDelegate.h"
-#include "the/settings.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
@@ -32,8 +31,7 @@ NeighboursTuner::NeighboursTuner()
 {
 	m_networkManager = new WsAccessManager( this );
 	setItemDelegate( new StationDelegate );
-	User u( The::settings().username() );
-	WsReply* reply = u.getNeighbours();
+	WsReply* reply = AuthenticatedUser().getNeighbours();
 	connect( reply, SIGNAL( finished( WsReply*)), SLOT(onFetchedNeighbours( WsReply*)) );
 	connect( this, SIGNAL( itemClicked( QListWidgetItem* )), SLOT( onUserClicked( QListWidgetItem*)) );
 }

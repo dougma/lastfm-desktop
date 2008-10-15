@@ -32,7 +32,7 @@ Logger* Logger::instance = 0;
 using namespace std;
 
 
-Logger::Logger( const LOGGER_CHAR* path, Severity severity ) 
+Logger::Logger( const COMMON_CHAR* path, Severity severity ) 
       : mLevel( severity )
 {
     instance = this;
@@ -88,8 +88,8 @@ Logger::Logger( const LOGGER_CHAR* path, Severity severity )
     }
 
     // Print some initial startup info
-    LOG( 1, "******************************** STARTUP ***************************************" );
-    LOG( 1, "Log size: " << fileSize );
+    LOG( 1, "!!! OINKY BOINKY !!!" );
+    LOG( 1, "!!! Filesize: " << fileSize );
 }
 
 
