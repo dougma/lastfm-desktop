@@ -24,6 +24,7 @@
 #include "version.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/UniqueApplication.h"
+#include "lib/lastfm/ws/WsAccessManagerInit.h"
 #include <QDir>
 #include <QTimer>
 
@@ -54,6 +55,10 @@ int main( int argc, char** argv )
     QCoreApplication::setApplicationVersion( VERSION );
     QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
     QCoreApplication::setOrganizationDomain( "last.fm" );
+
+    // WsAccessManager needs special init (on windows), and it
+    // needs to be done early, so be careful about moving this:
+    WsAccessManagerInit init;
 
     UniqueApplication uapp( MooseConfig::id() );
     if (uapp.isAlreadyRunning())
