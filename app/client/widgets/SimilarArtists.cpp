@@ -25,8 +25,8 @@
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
-#include "the/MainWindow.h"
-#include "radio/Buckets/PrimaryBucket.h"
+#include "the/mainWindow.h"
+#include "radio/buckets/PrimaryBucket.h"
 #include <QDebug>
 #include <QNetworkReply>
 #include <QNetworkRequest>

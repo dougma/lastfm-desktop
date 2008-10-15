@@ -22,7 +22,7 @@
 #include "Settings.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
-#include "the/MainWindow.h"
+#include "the/mainWindow.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "PlayableMimeData.h"
 #include <QDesktopServices>

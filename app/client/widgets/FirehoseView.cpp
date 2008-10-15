@@ -20,8 +20,8 @@
 #include "FirehoseView.h"
 #include "FirehoseDelegate.h"
 #include <QtGui>
-#include "the/MainWindow.h"
-#include "radio/Buckets/PrimaryBucket.h"
+#include "the/mainWindow.h"
+#include "radio/buckets/PrimaryBucket.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
