@@ -88,7 +88,7 @@ header 'Generating Build System'
 
 if [ $RELEASE ]
 then
-    qmake -config release -recursive Last.fm.pro
+    qmake -config release -recursive "CONFIG -= debug_and_release" Last.fm.pro
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 
     case `uname` in
