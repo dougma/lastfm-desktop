@@ -20,8 +20,8 @@
 #include "ITunesPlaysDatabase.h"
 #include "Moose.h"
 
-#include "common/ITunesTrack.h"
-#include "common/logger.h"
+#include "ITunesTrack.h"
+#include "common/c++/logger.h"
 
 #include "sqlite3.h"
 

@@ -23,8 +23,8 @@
 
 #ifdef WIN32
 
-#include "common/ITunesTrack.h"
-#include "common/ITunesEventInterface.h"
+#include "ITunesTrack.h"
+#include "ITunesEventInterface.h"
 
 #include <windows.h>
 

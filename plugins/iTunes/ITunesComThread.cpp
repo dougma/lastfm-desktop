@@ -23,8 +23,8 @@
 #include "ITunesComThread.h"
 #include "ITunesPlaysDatabase.h"
 
-#include "common/ITunesComWrapper.h"
-#include "common/logger.h"
+#include "ITunesComWrapper.h"
+#include "common/c++/Logger.h"
 #include "Moose.h"
 #include "EncodingUtils.h"
 

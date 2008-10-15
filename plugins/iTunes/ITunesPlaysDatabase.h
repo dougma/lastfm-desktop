@@ -21,7 +21,7 @@
 #define ITUNES_PLAYS_DATABASE_H
 
 #ifdef WIN32
-	#include "common/ITunesTrack.h"
+	#include "ITunesTrack.h"
 #endif
 
 #include <string>

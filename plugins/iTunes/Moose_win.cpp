@@ -23,7 +23,7 @@
 #include <ShFolder.h>
 #include <wchar.h>
 
-#include "common/logger.h"
+#include "common/c++/Logger.h"
 #include "RegistryUtils.h" // part of ScrobSub
 
 using namespace::std;

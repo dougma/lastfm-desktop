@@ -21,6 +21,7 @@
 
 #include <cstdio>
 #include <string>
+#include <ctime>
 
 #include <comdef.h>
 #include <Wbemidl.h>

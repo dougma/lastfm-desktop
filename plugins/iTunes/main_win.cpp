@@ -19,9 +19,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "iTunesPlugin.h"
+#include "main.h"
 
-#include "common/logger.h"
+#include "common/c++/logger.h"
 #include "ITunesComThread.h"
 #include "Moose.h"
 #include "ScrobSubmitter.h"

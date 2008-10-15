@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\libs&quot;;..\ScrobSub;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\libs&quot;;..\ScrobSub;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;;../../"
 				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;_DEBUG;_WINDOWS;_USRDLL;ITUNES_SCROBBLER_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -237,11 +237,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesCOMAPI\iTunesCOMInterface.h"
+				RelativePath="..\..\lib\3rdparty\iTunesCOMAPI\iTunesCOMInterface.h"
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesCOMAPI\iTunesCOMInterface_i.c"
+				RelativePath="..\..\lib\3rdparty\iTunesCOMAPI\iTunesCOMInterface_i.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -285,15 +285,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\common\ITunesComWrapper.cpp"
+				RelativePath=".\ITunesComWrapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\common\ITunesComWrapper.h"
+				RelativePath=".\ITunesComWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath=".\common\ITunesEventInterface.h"
+				RelativePath=".\ITunesEventInterface.h"
 				>
 			</File>
 			<File
@@ -317,6 +317,34 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ITunesTrack.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\ITunesTrack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\iTunesVisualAPI\iTunesVisualAPI.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\c++\Logger.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\c++\Logger.h"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 				<FileConfiguration
@@ -334,34 +362,6 @@
 			</File>
 			<File
 				RelativePath=".\main_win.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\common\ITunesTrack.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\common\ITunesTrack.h"
-				>
-			</File>
-			<File
-				RelativePath=".\iTunesVisualAPI\iTunesVisualAPI.h"
-				>
-			</File>
-			<File
-				RelativePath=".\common\logger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\common\logger.h"
 				>
 			</File>
 			<File
@@ -421,11 +421,11 @@
 			Name="ProjectFiles"
 			>
 			<File
-				RelativePath=".\CGdiPlusBitmap.h"
+				RelativePath=".\_iTunes.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\_iTunes.rc"
+				RelativePath=".\CGdiPlusBitmap.h"
 				>
 			</File>
 			<File

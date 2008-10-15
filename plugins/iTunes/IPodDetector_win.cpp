@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "iPodDetector.h"
-#include "common/logger.h"
+#include "common/c++/Logger.h"
 #include "Moose.h"
 #include "IPod.h"
 #include <cassert>
