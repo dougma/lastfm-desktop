@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "ITunesTrack.h"
-#include "logger.h"
+#include "common/c++/Logger.h"
 
 #include <cassert>
 #include <errno.h>

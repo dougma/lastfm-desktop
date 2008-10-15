@@ -36,8 +36,24 @@ namespace Unicorn
     public:
         UserSettings();
     };
-    
-    
+
+#ifdef WIN32
+	struct HklmSettings : QSettings
+	{
+		HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
+		{}
+	};
+
+	
+	struct PluginSettings : HklmSettings
+	{
+		PluginSettings()
+		{
+			beginGroup( "Plugins" );
+		}
+	};
+#endif
+
     /** Settings that may be of use to the entire Last.fm suite 
       */
     class UNICORN_DLLEXPORT Settings

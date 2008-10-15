@@ -70,10 +70,9 @@ private:
     std::ostringstream ss; \
     ss << msg; \
     Logger::the().log( (Logger::Severity) level, ss.str(), __FUNCTION__, __LINE__ ); }
-#define LOGW( level, msg ) \
-    Logger::the().log( (Logger::Severity) level, \
-                       (std::wostringstream() << msg).str(), \
-                       __FUNCTION__, \
-                       __LINE__ );
+#define LOGW( level, msg ) { \
+	std::wostringstream ss; \
+	ss << msg; \
+	Logger::the().log( (Logger::Severity) level, ss.str(), __FUNCTION__, __LINE__ ); }
 
 #endif

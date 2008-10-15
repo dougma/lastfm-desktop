@@ -6,7 +6,8 @@ include( $$ROOT_DIR/common/qmake/include.pro )
 
 LIBS += -L$$DESTDIR
 SOURCES += main.cpp PlayCountsDatabase.cpp IPod.cpp
-           
+HEADERS += $$findSources( h )
+
 macx*:SOURCES += ITunesLibrary_mac.cpp
 
 win32 {

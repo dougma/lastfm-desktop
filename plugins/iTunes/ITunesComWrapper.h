@@ -38,7 +38,7 @@
 #include <atlbase.h>
 #include <atlsafe.h>
 #include <atlcom.h>
-#include "../iTunesCOMAPI/iTunesCOMInterface.h"
+#include "lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface.h"
 
 #include <string>
 #include <vector>

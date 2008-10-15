@@ -20,7 +20,8 @@
 #include "Settings.h"
 
 
-#ifdef WIN32 && !defined( QT_CORE_LIB )
+#ifdef WIN32
+#ifndef QT_CORE_LIB
 #include <windows.h>
 
 std::wstring //static
@@ -83,4 +84,5 @@ MooseConfig::defaultPath()
 
     return buffer;
 }
+#endif
 #endif

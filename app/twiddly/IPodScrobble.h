@@ -30,7 +30,8 @@ struct IPodScrobble : public MutableTrack
     
     IPodScrobble( const Track& that ) : MutableTrack( that )
     {}
-    
+
+	QString uniqueId() const { return d->extras["uniqueId"]; }
     int playCount() const { return d->extras["playCount"].toInt(); }
 
     void setPlayCount( int const i ) { d->extras["playCount"] = QString::number( i ); }

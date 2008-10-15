@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef ITUNESEXCEPTIONS_H
-#define ITUNESEXCEPTIONS_H
+#ifndef ITUNES_EXCEPTIONS_H
+#define ITUNES_EXCEPTIONS_H
 
 #include <stdexcept>
 

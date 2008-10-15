@@ -22,6 +22,7 @@
 #include "ITunesLibrary.h"
 #include "common/qt/msleep.cpp"
 #include "common/c++/fileCreationTime.cpp"
+#include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/mac/AppleScript.h"
 #include "lib/lastfm/core/UniqueApplication.h"
@@ -263,7 +264,7 @@ pluginPath()
     path += "/Library/iTunes/iTunes Plug-ins/AudioScrobbler.bundle/Contents/MacOS/AudioScrobbler";
     return path;
   #else
-    QString path = PluginsSettings().value( "itw/Path" ).toString();
+	QString path = Unicorn::PluginSettings().value( "itw/Path" ).toString();
     if (path.isEmpty())
         throw "Unknown iTunes plugin path";
     return path;

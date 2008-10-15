@@ -23,10 +23,10 @@
 #include "ITunesExceptions.h"
 
 #ifdef WIN32
-    #include "lib/3rdparty/iTunesCOMAPI/iTunesCOMInterface.h"
-
     // Disable gay warning about exception specifications
     #pragma warning( disable : 4290 )
+
+	struct IITTrack;
 #endif
 
 #include <string>

@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include "ITunesLibrary.h"
+#include "IPodScrobble.h"
+#include "common/qt/msleep.cpp"
 #include "plugins/iTunes/ITunesComWrapper.h"
 #include <cassert>
 #include <QDateTime>
@@ -43,7 +45,7 @@ ITunesLibrary::ITunesLibrary( const QString&, bool const iPod ) :
         // the plugin has called us prematurely
         for( int x = 0; x < 20 && m_trackCount == -1; x++)
         {
-            if (x) UnicornUtils::msleep( 500 );
+            if (x) Qt::msleep( 500 );
             // the first ipod is used, which isn't perfect, but oh well
             m_trackCount = m_com->iPodLibraryTrackCount();
         }
@@ -90,19 +92,19 @@ ITunesLibrary::nextTrack()
 }
 
 
-TrackInfo
-ITunesLibrary::Track::trackInfo() const
+Track
+ITunesLibrary::Track::lastfmTrack() const
 {
     // TODO: why are we doing this? It will return true for manual tracks as it checks the path.
     if ( isNull() )
-        return TrackInfo();
+        return Track();
 
     COM::ITunesTrack i = d->i;
 
     // These will throw if something goes wrong
-    TrackInfo t;
+    IPodScrobble t;
     t.setArtist( QString::fromStdWString( i.artist() ) );
-    t.setTrack( QString::fromStdWString( i.track() ) );
+    t.setTitle( QString::fromStdWString( i.track() ) );
     t.setDuration( i.duration() );
     t.setAlbum( QString::fromStdWString( i.album() ) );
     t.setPlayCount( i.playCount() );
@@ -117,26 +119,23 @@ ITunesLibrary::Track::trackInfo() const
         // so let's check for that.
         if ( unixTime == 0xFFFFFFFF )
         {
-            qWarning() << "Caught a 0xFFFFFFFF timestamp, assume it's the scrobble of spury:" << i.toString();
-            return TrackInfo();
+			qWarning() << "Caught a 0xFFFFFFFF timestamp, assume it's the scrobble of spury:" << QString::fromStdWString( i.toString() );
+            return Track();
         } 
         
-        t.setTimeStamp( unixTime );
+        t.setTimestamp( stamp );
     }
     else
     {
         // If we don't have a valid timestamp, set to current time. Should work. We hope.
-        qWarning() << "Invalid timestamp, set to current:" << i.toString();
-        t.setTimeStamp( QDateTime::currentDateTime().toTime_t() );
+        qWarning() << "Invalid timestamp, set to current:" << QString::fromStdWString( i.toString() );
+        t.setTimestamp( QDateTime::currentDateTime() );
     }
 
     const QString path = QString::fromStdWString( i.path() );
-    QFileInfo fileinfo( path );
 
-    t.setFileName( fileinfo.fileName() );
-    t.setPath( fileinfo.absoluteFilePath() );
-
-    t.setSource( TrackInfo::MediaDevice );
+	t.setUrl( QUrl::fromLocalFile( QFileInfo( path ).absoluteFilePath() ) );
+    t.setSource( Track::MediaDevice );
 
     return t;
 }

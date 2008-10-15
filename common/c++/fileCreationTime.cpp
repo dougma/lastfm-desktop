@@ -30,11 +30,11 @@ namespace common
         #define STRING wstring
         #define STAT _stat
         #define stat _wstat
-        #define COMMON_LOGL LOGWL
+        #define COMMON_LOG LOGW
     #else
         #define STAT stat
         #define STRING string
-        #define COMMON_LOGL LOGL
+        #define COMMON_LOG LOG
     #endif
 
     static time_t
@@ -43,7 +43,7 @@ namespace common
         struct STAT st;
         if (stat( path.c_str(), &st ) != 0)
         {
-            LOG( 3, "Couldn't stat" << path );
+            COMMON_LOG( 3, "Couldn't stat" << path );
             return 0;
         }
         else
@@ -53,7 +53,7 @@ namespace common
     #undef STAT
     #undef stat
     #undef STRING
-    #undef COMMON_LOGL
+    #undef COMMON_LOG
 
 #ifdef QT_CORE_LIB
     static inline time_t

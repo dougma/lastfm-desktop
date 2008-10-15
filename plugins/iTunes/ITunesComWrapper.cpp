@@ -21,16 +21,13 @@
 #ifdef WIN32
 
 #include "ITunesComWrapper.h"
-#include "EncodingUtils.h"
-
+#include "plugins/scrobsub/EncodingUtils.h"
+#include "common/c++/Logger.h"
 #include <comutil.h>
 #include <process.h>
-
 #include <iostream>
 #include <sstream>
 #include <cassert>
-
-#include "logger.h"
 
 using namespace std;
 
@@ -173,7 +170,7 @@ ITunesComWrapper::iPodLibraryPlaylist()
                 BSTR name;
                 HANDLE_COM_FAIL( playlist->get_Name( &name ) );
 
-                LOGWL( 3, "Playlist name: " << bstrToWString( name ) );
+                LOGW( 3, "Playlist name: " << bstrToWString( name ) );
             }
         }
         catch ( ITunesException& )
@@ -383,7 +380,7 @@ ITunesComWrapper::searchForTrack( ITPlaylistSearchField searchField, wstring sea
 void
 ITunesComWrapper::initialiseCom()
 {
-    LOGL( 3, "Calling CoInitializeEx..." );
+    LOG( 3, "Calling CoInitializeEx..." );
 
     // Init COM
     HRESULT res = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
@@ -391,14 +388,14 @@ ITunesComWrapper::initialiseCom()
     // S_FALSE means COM has already been initialised on this thread.
     if ( res != S_OK && res != S_FALSE )
     {
-        LOGL( 2, "Failed to initialise COM. Return: " << res );
+        LOG( 2, "Failed to initialise COM. Return: " << res );
     }
     else
     {
         bool retry = false;
         do
         {
-            LOGL( 3, "Calling CoCreateInstance..." );
+            LOG( 3, "Calling CoCreateInstance..." );
 
             HRESULT res = 0;
             res = CoCreateInstance( CLSID_iTunesApp, // CLSID
@@ -416,7 +413,7 @@ ITunesComWrapper::initialiseCom()
             {
                 // This seems to happen if there is a modal dialog being shown in iTunes
                 // or some other delay has occurred. Retrying should do the trick.
-                LOGL( 2, "Got CO_E_SERVER_EXEC_FAILURE, retrying..." );
+                LOG( 2, "Got CO_E_SERVER_EXEC_FAILURE, retrying..." );
                 retry = true;
             }
             else
@@ -431,7 +428,7 @@ ITunesComWrapper::initialiseCom()
         if ( m_iTunesApp == 0 )
             throw ITunesException( "Failed to get hold of iTunes instance via COM" );
 
-        LOGL( 3, "Value of iTunes ptr: " << m_iTunesApp );
+        LOG( 3, "Value of iTunes ptr: " << m_iTunesApp );
     }
 }
 
@@ -439,7 +436,7 @@ ITunesComWrapper::initialiseCom()
 void
 ITunesComWrapper::connectSink( ITunesEventInterface* handler )
 {
-    LOGL( 3, "Connecting sink" );
+    LOG( 3, "Connecting sink" );
     
     // Init COM the ATL way, needed for the CComObject to work
     g_atlModule = new TheAtlModule();
@@ -466,7 +463,7 @@ ITunesComWrapper::connectSink( ITunesEventInterface* handler )
 void
 ITunesComWrapper::uninitialiseCom()
 {
-    LOGL( 3, "Uninitialising COM..." );
+    LOG( 3, "Uninitialising COM..." );
 
     // Don't do anything unless we managed to initialise the iTunes pointer correctly
     if ( m_iTunesApp != 0 )
@@ -498,7 +495,7 @@ ITunesComWrapper::uninitialiseCom()
     // Close COM, returns no error
     CoUninitialize();
 
-    LOGL( 3, "CoUninitialize done" );
+    LOG( 3, "CoUninitialize done" );
 }
 
 
@@ -602,7 +599,7 @@ ITunesComWrapper::logComError( HRESULT res, wstring err )
     
     wostringstream os;
     os << L"COM error: " << err << L"\n  Result code: " << sRes;
-    LOGWL( 2, os.str() );
+    LOGW( 2, os.str() );
 }
 
 
@@ -625,12 +622,12 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
     {                                                                                        \
         if ( pdispparams == 0 )                                                              \
         {                                                                                    \
-            LOGL( 2, #name " event pdispparams NULL" );                                      \
+            LOG( 2, #name " event pdispparams NULL" );                                      \
             hr = DISP_E_PARAMNOTFOUND;                                                       \
         }                                                                                    \
         else                                                                                 \
         {                                                                                    \
-            LOGL( 2, #name " event returned wrong number of args: " << pdispparams->cArgs ); \
+            LOG( 2, #name " event returned wrong number of args: " << pdispparams->cArgs ); \
             hr = DISP_E_BADPARAMCOUNT;                                                       \
         }                                                                                    \
     }
@@ -642,7 +639,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
     {
         case ITEventDatabaseChanged:
         {
-            //LOGL( 3, "ondbchanged" );
+            //LOG( 3, "ondbchanged" );
 
             // OnDatabaseChanged should have two parameters
             if ( pdispparams != 0 && pdispparams->cArgs == 2 )
@@ -657,7 +654,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
 
         case ITEventPlayerPlay:
         {
-            //LOGL( 3, "onplay" );
+            //LOG( 3, "onplay" );
 
             // Should have one parameter
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
@@ -665,7 +662,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
                 if ( d == 0 )
                 {
-                    LOGL( 2, "d null in onPlay, sending empty track" );
+                    LOG( 2, "d null in onPlay, sending empty track" );
 
                     // iTunes can return 0 here, so we use a null track
                     m_handler->onPlay( ITunesTrack() );
@@ -687,7 +684,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
 
         case ITEventPlayerStop:
         {
-            //LOGL( 3, "onstop" );
+            //LOG( 3, "onstop" );
 
             // Should have one parameter
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
@@ -695,7 +692,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
                 if ( d == 0 )
                 {
-                    LOGL( 2, "d null in onStop, sending empty track" );
+                    LOG( 2, "d null in onStop, sending empty track" );
                     
                     // iTunes can return 0 here, so we use a null track
                     m_handler->onStop( ITunesTrack() );
@@ -717,7 +714,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
 
         case ITEventPlayerPlayingTrackChanged:
         {
-            //LOGL( 3, "ontrackchanged" );
+            //LOG( 3, "ontrackchanged" );
 
             // Should have one parameter
             if ( pdispparams != 0 && pdispparams->cArgs == 1 )
@@ -725,7 +722,7 @@ ITunesComEventSink::Invoke( DISPID dispidMember,       // the event in question
                 IDispatch* d = pdispparams->rgvarg[0].pdispVal;
                 if ( d == 0 )
                 {
-                    LOGL( 2, "d null in onTrackChanged, sending empty track" );
+                    LOG( 2, "d null in onTrackChanged, sending empty track" );
 
                     // iTunes can return 0 here, so we use a null track
                     m_handler->onTrackChanged( ITunesTrack() );
@@ -783,7 +780,7 @@ ITunesComEventSink::onDatabaseChangedEvent( VARIANT deletedObjectIDs,
     std::vector<ITunesEventInterface::ITunesIdSet> vecDeleted;
     std::vector<ITunesEventInterface::ITunesIdSet> vecChanged;
     
-    LOGL( 3, "Deleted: " << deleted.GetCount() << ", Changed: " << changed.GetCount() );
+    LOG( 3, "Deleted: " << deleted.GetCount() << ", Changed: " << changed.GetCount() );
 
     for ( ULONG i = 0; i < deleted.GetCount(); ++i )
     {

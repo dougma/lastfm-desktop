@@ -153,7 +153,7 @@ IPod::twiddle()
 
                     m_scrobbles.removeAllWithUniqueId( track.uniqueId() );
                     db.remove( track );
-                    LOG( 3, "Multiple tracks were found with the same unique id / path, this track won't be scrobbled from the iPod: " << track.uniqueId() );
+                    qDebug() << "Multiple tracks were found with the same unique id / path, this track won't be scrobbled from the iPod:" << track.uniqueId();
                     continue;
                 }
                 diffedTrackPaths.insert( track.uniqueId() );
@@ -250,3 +250,19 @@ IPod::twiddle()
     ManualIPod::ManualIPod()
     {}
 #endif
+
+
+void
+IPod::ScrobbleList::removeAllWithUniqueId( const QString& uniqueId )
+{
+	QList<Track>::Iterator i;
+	for( i = begin(); i != end(); ++i ) 
+	{
+		IPodScrobble s( *i );
+		if( s.uniqueId() == uniqueId )
+		{
+			m_realCount -= s.playCount();
+			erase( i );
+		}
+	}
+}

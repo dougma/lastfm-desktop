@@ -61,18 +61,7 @@ public:
         /** verbose, but named to make it clear you're expected to set uniqueIDs
           * on tracks added to the ScrobbleList on Windows, at least if you want
           * to remove them */
-        void removeAllWithUniqueId( const QString& uniqueId )
-        {
-            QList<Track>::Iterator iter;
-            for( iter = begin(); iter != end(); ++iter ) 
-            {
-                if( iter->uniqueID() == uniqueId )
-                {
-                    m_realCount -= iter->playCount();
-                    erase( iter );
-                }
-            }
-        }
+        void removeAllWithUniqueId( const QString& uniqueId );
     #endif
         void clear()
         {
