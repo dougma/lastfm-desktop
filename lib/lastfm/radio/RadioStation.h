@@ -44,6 +44,7 @@ public:
     static RadioStation lovedTracks( const User& user )     { return "lastfm://user/" + user + "/loved"; }
     static RadioStation globalTag( const Tag& tag )         { return "lastfm://globaltags/" + tag; }
     static RadioStation similar( const Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
+    static RadioStation rql( const QString& rql )           { return "lastfm://rql/" + QString( rql.toUtf8().toBase64()); }
 
     /** eg. "mxcl's Loved Tracks"
  	  * It is worth noting that the Radio doesn't set the title of RadioStation 

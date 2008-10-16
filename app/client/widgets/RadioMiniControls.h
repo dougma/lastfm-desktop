@@ -42,11 +42,13 @@ public:
 	ui;
 	
 private slots:
-	void onStateChanged( State );
+	void onRadioStopped();
+    void onRadioTuningIn( const class RadioStation& );
 	void onPlayClicked();
 	
 signals:
 	void stop();
+    void play();
 };
 
 

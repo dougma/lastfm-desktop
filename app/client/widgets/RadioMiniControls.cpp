@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <phonon/volumeslider.h>
+#include "the/Radio.h"
 
 
 RadioMiniControls::RadioMiniControls()
@@ -32,39 +33,30 @@ RadioMiniControls::RadioMiniControls()
     h->setSpacing( 0 );
 
     ui.play->setPixmap( ":/stop.png", QIcon::On );
+    ui.play->setCheckable( true );
+    ui.play->setChecked( false );
     ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
 	
-    layout()->addWidget( ui.volume );
+    h->addWidget( ui.volume );
 	
-	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
+	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
+    connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
 	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
-    
-    onStateChanged( Stopped );
 }
 
 
 void
-RadioMiniControls::onStateChanged( State state )
+RadioMiniControls::onRadioStopped()
 {
-	switch (state) 
-	{
-		case Playing:
-            break;
+    ui.play->setChecked( false );
+}
 
-        case TuningIn:
-            show();
-            ui.play->setChecked( true );
-			break;
-		
-		case Stopped:
-            hide();
-            ui.play->setChecked( false );
-			break;
-            
-        default:
-            break;
-	}
+
+void 
+RadioMiniControls::onRadioTuningIn( const RadioStation& )
+{
+    ui.play->setChecked( true );
 }
 
 
@@ -73,4 +65,6 @@ RadioMiniControls::onPlayClicked()
 {
 	if (!ui.play->isChecked())
 		emit stop();
+    else
+        emit play();
 }

@@ -21,7 +21,7 @@
 #include "PrimaryBucket.h"
 #include "PlayableListItem.h"
 #include "PlayableMimeData.h"
-#include "lib/lastfm/radio/RadioStation.h"
+#include "the/radio.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QListView>
 #include <QMenu>
@@ -29,6 +29,7 @@
 #include <QNetworkReply>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 const QString PlayerBucket::k_dropText  = tr( "Drag something in here to play it." );
 const int PlayerBucket::k_itemMargin = 4;
@@ -52,7 +53,6 @@ PlayerBucket::PlayerBucket( QWidget* w )
 	setAcceptDrops( true );
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
-	setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setAutoFillBackground( true );
 }
 
@@ -81,39 +81,27 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 	QPainter p( viewport() );
 	p.setClipRect( event->rect());
 	
-	QRect rect = viewport()->rect();
-	
-	int iconRowCount = ( itemModel->rowCount() * (k_itemSizeX + k_itemMargin) ) / rect.width();
-	iconRowCount++;
-	int iconColumnCount = itemModel->rowCount() / iconRowCount;
-	if( itemModel->rowCount() % iconRowCount )
-		iconColumnCount++;
-	
-	int delegatesX = (rect.width() / 2 ) - ((iconColumnCount * (k_itemSizeX + k_itemMargin )) / 2 );
-	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * ( k_itemSizeY + k_itemMargin)) / 2);
-	QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
-	
-	int index = 0;
-	for( int row = 0; row < iconRowCount; row++ )
+	foreach ( const QModelIndex& i, m_itemRects.keys() )
 	{
-		for( int col = 0; col < iconColumnCount && index < itemModel->rowCount(); col++ )
-		{
-			QModelIndex i = itemModel->index( index, 0 );
-			QStyledItemDelegate* delegate = static_cast<QStyledItemDelegate*>( itemDelegate( i ));
-			QStyleOptionViewItem styleOptions;
-			styleOptions.rect = itemRect;
+		const QRect& r = m_itemRects.value(i);
+       
+        QStyledItemDelegate* delegate = static_cast<QStyledItemDelegate*>( itemDelegate( i ));
+        QStyleOptionViewItem styleOptions;
+        styleOptions.rect = r;
+        
+        if( currentIndex() == i )
+            styleOptions.state = QStyle::State_Active;
 
-			if( currentIndex() == i )
-				styleOptions.state = QStyle::State_Active;
-			
-			styleOptions.rect.translate( (itemRect.width() + k_itemMargin ) * col, (itemRect.height() + k_itemMargin) * row );
-			m_itemRects[ i ] = styleOptions.rect;
-			
-			delegate->paint( &p, styleOptions, i );
-			index++;
+        delegate->paint( &p, styleOptions, i );
+    }
+}
 
-		}
-	}
+
+void 
+PlayerBucket::scrollContentsBy( int dx, int dy )
+{
+    calculateLayout();
+    viewport()->update();
 }
 
 
@@ -129,6 +117,51 @@ PlayerBucket::resizeEvent ( QResizeEvent* event )
 	QPalette p;
 	p.setBrush( QPalette::Window, lg );
 	viewport()->setPalette( p );
+    
+    calculateLayout();
+    
+}
+
+
+void 
+PlayerBucket::calculateLayout()
+{
+    QAbstractItemModel* itemModel = model();
+    
+    QRect rect = viewport()->rect();
+	
+	int iconRowCount = ( itemModel->rowCount() * (k_itemSizeX + k_itemMargin) ) / rect.width();
+	iconRowCount++;
+	int iconColumnCount = itemModel->rowCount() / iconRowCount;
+	if( itemModel->rowCount() % iconRowCount )
+		iconColumnCount++;
+	
+	int delegatesX = (rect.width() / 2 ) - ((iconColumnCount * (k_itemSizeX + k_itemMargin )) / 2 );
+	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * ( k_itemSizeY + k_itemMargin)) / 2);
+
+    delegatesY -= verticalScrollBar()->value();
+    
+    QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
+	
+	int index = 0;
+	for( int row = 0; row < iconRowCount; row++ )
+	{
+		for( int col = 0; col < iconColumnCount && index < itemModel->rowCount(); col++ )
+		{
+			QModelIndex i = itemModel->index( index, 0 );
+            
+            QRect rect = itemRect;
+			
+			rect.translate( (itemRect.width() + k_itemMargin ) * col, (itemRect.height() + k_itemMargin) * row );
+			m_itemRects[ i ] = rect;
+			
+			index++;
+            
+		}
+	}
+    
+    verticalScrollBar()->setPageStep( (iconRowCount * itemRect.height()) );
+    verticalScrollBar()->setRange( 0, (iconRowCount * itemRect.height()) - viewport()->size().height());
 }
 
 
@@ -160,8 +193,9 @@ PlayerBucket::addFromMimeData( const QMimeData* d )
 	item->setForeground( Qt::white );
 	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
 	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
-	
-	
+
+	calculateLayout();	
+    
 	//Send query
 	QString query = queryString( model()->index( 0, 0 ), false );
 	for( int i = 1; i < model()->rowCount(); i++ )
@@ -199,7 +233,7 @@ PlayerBucket::queryString( const QModelIndex i, bool joined ) const
 			qs += "tag:";
 			break;
 	}
-	qs += "\"" + i.data( Qt::DisplayRole ).toString() + "\"";
+	qs += "" + i.data( Qt::DisplayRole ).toString() + "";
 	return qs;
 }
 
@@ -230,7 +264,7 @@ PlayerBucket::playlistFetched()
 void 
 PlayerBucket::dragEnterEvent ( QDragEnterEvent * event )
 {		
-	event->accept( rect() );
+	event->accept( rect());
 }
 
 
@@ -277,4 +311,19 @@ PlayerBucket::visualRect ( const QModelIndex & index ) const
 	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * 75) / 2);
 	
 	return QRect( delegatesX, delegatesY, iconColumnCount, iconRowCount );
+}
+
+
+void
+PlayerBucket::play()
+{
+    QString query = queryString( model()->index( 0, 0 ), false );
+	for( int i = 1; i < model()->rowCount(); i++ )
+	{
+		QModelIndex index = model()->index( i, 0 );
+		query += queryString( index );
+	}
+    
+    qDebug() << "Playing query radio";
+    The::radio().play( RadioStation::rql( query) );
 }

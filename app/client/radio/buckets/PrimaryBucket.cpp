@@ -28,9 +28,11 @@
 #include "PrimaryBucket.h"
 #include "PlayerBucket.h"
 #include "PlayableListItem.h"
+#include "widgets/RadioMiniControls.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "the/radio.h"
 
 
 PrimaryBucket::PrimaryBucket()
@@ -80,7 +82,20 @@ PrimaryBucket::PrimaryBucket()
 	
 	splitter->addWidget( ui.tabWidget );
 	
-	splitter->addWidget( ui.playerBucket = new PlayerBucket( this ) );
+    QWidget* playerPane =  new QWidget( this );
+    new QVBoxLayout( playerPane );
+    playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
+    playerPane->layout()->addWidget( ui.controls = new RadioMiniControls);
+    
+    connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
+    connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
+    connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
+    connect( ui.controls, SIGNAL( play()), ui.playerBucket, SLOT( play()));
+    
+    ui.controls->show();
+        
+    
+	splitter->addWidget( playerPane );
 	
 	UnicornWidget::paintItBlack( this );
     

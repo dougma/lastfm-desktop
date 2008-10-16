@@ -21,6 +21,7 @@
 #define PRIMARY_BUCKET_H
 
 #include <QMainWindow>
+
 namespace Unicorn{ class TabWidget; }
 
 class PrimaryBucket : public QMainWindow
@@ -28,7 +29,7 @@ class PrimaryBucket : public QMainWindow
 	Q_OBJECT
 public:
 	PrimaryBucket();
-
+    
 private:
 	
 	struct {
@@ -37,8 +38,9 @@ private:
 		class PrimaryListView* friendsBucket;
 		class PrimaryListView* tagsBucket;
 		class PlayerBucket* playerBucket;
+        class RadioMiniControls* controls;
 	} ui;
-
+    
 private slots:
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );

@@ -57,6 +57,9 @@ public:
             ui.previewList->hide();
     }
     
+public slots:
+    void play();
+    
 protected:
 	
 	void resizeEvent ( QResizeEvent* event );	
@@ -64,7 +67,10 @@ protected:
 	void dragEnterEvent ( QDragEnterEvent * event );
 	
 	void paintEvent( QPaintEvent* );
-	
+    void scrollContentsBy( int dx, int dy );
+    
+    void calculateLayout();
+    
 private:
 	static const QString k_dropText;
     static const int k_itemMargin;
