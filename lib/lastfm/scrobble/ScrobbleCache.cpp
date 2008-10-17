@@ -50,7 +50,7 @@ ScrobbleCache::read( QDomDocument& xml )
     xml.setContent( stream.readAll() );
 
     for (QDomNode n = xml.documentElement().firstChild(); !n.isNull(); n = n.nextSibling())
-        if (n.nodeName() == "item")
+        if (n.nodeName() == "track")
             m_tracks += Track( n.toElement() );
 }
 

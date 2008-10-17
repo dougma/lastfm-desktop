@@ -61,7 +61,7 @@ public:
         // DO NOT UNDER ANY CIRCUMSTANCES CHANGE THE ORDER OR VALUES OF THIS ENUM!
         // you will cause broken settings and b0rked scrobbler cache submissions
 
-        Unknown = -1,
+        Unknown = 0,
         LastFmRadio,
         Player,
         MediaDevice,

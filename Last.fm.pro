@@ -47,7 +47,7 @@ else {
                app/twiddly
 
 	# make the app client the default project in visual studio
-	win32:CONFIG( debug, debug|release ) {
+	debug:win32 {
 		SUBDIRS -= app/client
 		SUBDIRS = app/client $$SUBDIRS
 	}

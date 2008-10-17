@@ -42,38 +42,23 @@ Track::Track( const QDomElement& e )
     d->duration = e.namedItem( "duration" ).toElement().text().toInt();
     d->url = e.namedItem( "url" ).toElement().text();
     d->rating = e.namedItem( "rating" ).toElement().text().toUInt();
-	d->extras["trackauth"] = e.namedItem( "auth" ).toElement().text();
-
-    // this is necessary because the default return for toInt() is 0, and that
-    // corresponds to Radio not Unknown :( oops.
-    QString const source = e.namedItem( "source" ).toElement().text();
-    if (source.isEmpty())
-        d->source = Unknown;
-    else
-        d->source = (Source)source.toInt();
-
-    // support 1.1.3 stringed timestamps, and 1.3.0 Unix Timestamps
-    QString const t130 = e.namedItem( "timestamp" ).toElement().text();
-    QDateTime const t113 = QDateTime::fromString( t130, "yyyy-MM-dd hh:mm:ss" );
-    if (t113.isValid())
-        d->time = t113;
-    else
-        d->time = QDateTime::fromTime_t( t130.toUInt() );
-
-#if 0
-    //old code, most likely unused
-    setPath( e.namedItem( "path" ).toElement().text() );
-    setFpId( e.namedItem( "fpId" ).toElement().text() );
-    setMbId( e.namedItem( "mbId" ).toElement().text() );
-    setPlayerId( e.namedItem( "playerId" ).toElement().text() );
-#endif
+    d->source = e.namedItem( "source" ).toElement().text().toInt(); //defaults to 0, or Track::Unknown
+    d->time = QDateTime::fromTime_t( e.namedItem( "timestamp" ).toElement().text().toUInt() );
+    
+    QDomNodeList nodes = e.namedItem( "extras" ).childNodes();
+    for (int i = 0; i < nodes.count(); ++i)
+    {
+        QDomNode n = nodes.at(i);
+        QString key = n.nodeName();
+        d->extras[key] = n.nodeValue();
+    }
 }
 
 
 QDomElement
 Track::toDomElement( QDomDocument& document ) const
 {
-    QDomElement item = document.createElement( "item" );
+    QDomElement item = document.createElement( "track" );
 
     #define makeElement( tagname, getter ) { \
 		QString v = getter; \
@@ -95,7 +80,12 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "rating", QString::number(d->rating) );
     makeElement( "fpId", fingerprintId() );
     makeElement( "mbId", mbid() );
-	makeElement( "auth", d->extras[	"trackauth"] );
+    
+    QDomElement extras = document.createElement( "extras" );
+    QMapIterator<QString, QString> i( d->extras );
+    while (i.hasNext())
+        makeElement( i.key(), i.value() );
+    item.appendChild( extras );
 
     return item;
 }
