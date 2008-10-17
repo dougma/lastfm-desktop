@@ -354,9 +354,8 @@ App::parseArguments( const QStringList& args )
                     IPodScrobble s = i.next();
 					int const n = s.playCount();
 					MutableTrack( s ).removeExtra( "playCount" );
-                    for (int y = n; y; --y)
+                    for (int y = 1; y < n; --y)
                         i.insert( s );
-                    s.setPlayCount( 1 );
                 }
 
                 m_scrobbler->cache( tracks );
