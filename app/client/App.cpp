@@ -30,6 +30,7 @@
 #include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
+#include "app/twiddly/IPodScrobble.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
@@ -343,9 +344,23 @@ App::parseArguments( const QStringList& args )
                     
                     tracks = d.tracks();
                 }
+                
+                // the scrobbler doesn't understand the playcount parameter
+                // this results in a series of scrobbles with identical timestamps
+                // but well. We can't do anything good about that.
+                QMutableListIterator<Track> i( tracks );
+                while (i.hasNext())
+                {
+                    IPodScrobble s = i.next();
+					int const n = s.playCount();
+					MutableTrack( s ).removeExtra( "playCount" );
+                    for (int y = n; y; --y)
+                        i.insert( s );
+                    s.setPlayCount( 1 );
+                }
 
                 m_scrobbler->cache( tracks );
-                cache.remove();
+                cache.remove(); //ie. filesystem delete
 
                 //TODO message "Your iPod tracks will be submitted at the end of this track"
                 

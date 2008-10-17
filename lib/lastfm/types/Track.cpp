@@ -50,22 +50,24 @@ Track::Track( const QDomElement& e )
     {
         QDomNode n = nodes.at(i);
         QString key = n.nodeName();
-        d->extras[key] = n.nodeValue();
+        d->extras[key] = n.toElement().text();
     }
+    
+    qDebug() << d->extras;
 }
 
 
 QDomElement
-Track::toDomElement( QDomDocument& document ) const
+Track::toDomElement( QDomDocument& xml ) const
 {
-    QDomElement item = document.createElement( "track" );
+    QDomElement item = xml.createElement( "track" );
 
     #define makeElement( tagname, getter ) { \
 		QString v = getter; \
-		if (!v.isEmpty())\
+		if (!v.isEmpty()) \
 		{ \
-			QDomElement e = document.createElement( tagname ); \
-			e.appendChild( document.createTextNode( v ) ); \
+			QDomElement e = xml.createElement( tagname ); \
+			e.appendChild( xml.createTextNode( v ) ); \
 			item.appendChild( e ); \
 		} \
 	}
@@ -80,11 +82,14 @@ Track::toDomElement( QDomDocument& document ) const
     makeElement( "rating", QString::number(d->rating) );
     makeElement( "fpId", fingerprintId() );
     makeElement( "mbId", mbid() );
-    
-    QDomElement extras = document.createElement( "extras" );
+
+    QDomElement extras = xml.createElement( "extras" );
     QMapIterator<QString, QString> i( d->extras );
-    while (i.hasNext())
-        makeElement( i.key(), i.value() );
+    while (i.hasNext()) {
+		QDomElement e = xml.createElement( i.next().key() );
+		e.appendChild( xml.createTextNode( i.value() ) );
+		extras.appendChild( e );
+	}
     item.appendChild( extras );
 
     return item;

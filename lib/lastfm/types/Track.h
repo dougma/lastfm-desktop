@@ -168,7 +168,8 @@ public:
 	
     void stamp() { d->time = QDateTime::currentDateTime(); }
 
-    void setExtra( QString key, QString value ) { d->extras[key] = value; }
+	void setExtra( const QString& key, const QString& value ) { d->extras[key] = value; }
+    void removeExtra( QString key ) { d->extras.remove( key ); }
 };
 
 
