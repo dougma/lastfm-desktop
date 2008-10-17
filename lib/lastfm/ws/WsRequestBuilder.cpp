@@ -38,14 +38,9 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 WsReply*
 WsRequestBuilder::start()
 {
-#ifdef WIN32
-    // we don't do this on unix because it was inexplicably crashing! -- Qt 4.4.3
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
-#else
-    QUrl url( "http://ws.audioscrobbler.com/2.0/" );    
-#endif
 
 	//Only GET requests should include query parameters
 	if( request_method == GET )
