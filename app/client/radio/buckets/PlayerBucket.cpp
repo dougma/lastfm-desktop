@@ -51,6 +51,9 @@ PlayerBucket::PlayerBucket( QWidget* w )
 	
 	setItemDelegate( new PlayerBucketDelegate( this ));
 	setAcceptDrops( true );
+    setDragDropMode( QAbstractItemView::DragDrop );
+    setDropIndicatorShown( false );
+
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
     setAutoFillBackground( true );
@@ -130,6 +133,9 @@ PlayerBucket::calculateLayout()
     
     QRect rect = viewport()->rect();
 	
+    if( rect.width() < 1 || rect.height() < 1 )
+        return;
+
 	int iconRowCount = ( itemModel->rowCount() * (k_itemSizeX + k_itemMargin) ) / rect.width();
 	iconRowCount++;
 	int iconColumnCount = itemModel->rowCount() / iconRowCount;

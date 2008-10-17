@@ -41,7 +41,6 @@ public:
 	QModelIndex indexAt( const QPoint& point ) const;
 	
 	bool addFromMimeData( const QMimeData* data );
-
     
     virtual void showEvent( QShowEvent* e )
     {
@@ -65,9 +64,15 @@ protected:
 	void resizeEvent ( QResizeEvent* event );	
 	void dropEvent( QDropEvent* event);	
 	void dragEnterEvent ( QDragEnterEvent * event );
+
+    //Not really sure why this has to be overloaded but seems to fix dnd on win32
+    //qt drag and drop API is NOT very clearly defined :(
+    void dragMoveEvent( QDragMoveEvent* event ){ event->acceptProposedAction(); }
 	
 	void paintEvent( QPaintEvent* );
     void scrollContentsBy( int dx, int dy );
+    
+    Qt::DropActions supportedDropActions () const { return (Qt::CopyAction | Qt::MoveAction | Qt::LinkAction); }
     
     void calculateLayout();
     

@@ -86,14 +86,14 @@ PrimaryBucket::PrimaryBucket()
     new QVBoxLayout( playerPane );
     playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
     playerPane->layout()->addWidget( ui.controls = new RadioMiniControls);
-    
+    UnicornWidget::paintItBlack( ui.controls );
+
     connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
     connect( ui.controls, SIGNAL( play()), ui.playerBucket, SLOT( play()));
     
     ui.controls->show();
-        
     
 	splitter->addWidget( playerPane );
 	
