@@ -17,35 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CORE_SETTINGS_H
-#define CORE_SETTINGS_H
+#ifndef MOOSE_H
+#define MOOSE_H
 
-#include "lib/lastfm/core/CoreLocale.h"
-#include <QSettings>
+#include "app/client/Settings.h"
+#include "lib/lastfm/core/CoreDir.h"
 
 
-/** Settings that are global to all Last.fm libraries */
-class CoreSettings : public QSettings
+namespace moose 
 {
-public:
-	CoreSettings( const QString& applicationName = "" ) : QSettings( organizationName(), applicationName )
-	{}
-    
-    static const char* organizationName()
-    {
-        return "Last.fm";
-    }
-    
-    static const char* organizationDomain()
-    {
-        return "last.fm";
-    }
+    static const char* id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
+    /** passed to QCoreApplication::setApplicationName() */
+    static const char* applicationName() { return "Last.fm"; }
 
-	CoreLocale locale() const
-	{
-		QVariant const v = value( "locale" );
-		return v.isValid() ? QLocale( v.toString() ) : CoreLocale::system();
-	}
-};
+    static QString path()
+    {
+        QString path = CoreSettings( applicationName() ).value( "/Path" ).toString();
+        if (path.size())
+            return path;
+
+        #ifdef __APPLE__
+            return "/Applications/Last.fm.app/Contents/MacOS/Last.fm";
+        #endif
+        #ifdef WIN32
+            path = HklmSettings().value( "Path" );
+            if (path.size())
+                return path;
+            return CoreDir::programFiles().filePath( "Last.fm/Last.fm.exe" );
+        #endif
+    }
+}
 
 #endif

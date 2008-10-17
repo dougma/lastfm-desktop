@@ -44,7 +44,7 @@
 #endif
 
 
-App::App( int argc, char** argv ) 
+App::App( int& argc, char** argv ) 
    : Unicorn::Application( argc, argv )
 {
 #ifdef Q_WS_MAC
@@ -62,12 +62,11 @@ App::App( int argc, char** argv )
 #elif defined (Q_WS_X11)
     Ws::UserAgent = "Last.fm Client (X11)";
 #endif
-    
-    // IMPORTANT don't allow any GUI thread message loops to run during this
-    // ctor! Things will crash in interesting ways!
-    //TODO bootstrapping
-    
-    bool updgradeJustOccurred = applicationVersion() != QSettings().value( "Version", "An Impossible Version String" );
+   
+	QSettings s;
+    bool updgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
+	s.setValue( "Version", applicationVersion() );
+    s.setValue( "Path", applicationFilePath() );
 
     m_q = new BackgroundJobQueue;
     
@@ -117,9 +116,6 @@ App::App( int argc, char** argv )
     Legacy::disableHelperApp();
 #endif
     
-    // if you don't do this, mac and Linux crash amazingly
-    qDebug() << argv[0];
-
     parseArguments( arguments() );
 }
 
@@ -339,7 +335,7 @@ App::parseArguments( const QStringList& args )
             {
                 IPodScrobbleCache cache( args.value( 2 ) );
                 QList<Track> tracks = cache.tracks();
-                if (cache.insane() || MooseConfig().alwaysConfirmIPodScrobbles())
+                if (cache.insane() || Settings().alwaysConfirmIPodScrobbles())
                 {
                     BatchScrobbleDialog d( m_mainWindow );
                     d.setTracks( tracks );

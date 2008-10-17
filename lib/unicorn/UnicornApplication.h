@@ -23,7 +23,6 @@
 #include "lib/DllExportMacro.h"
 #include "common/HideStupidWarnings.h"
 #include <QApplication>
-class Logger;
 
 
 namespace Unicorn
@@ -33,7 +32,6 @@ namespace Unicorn
         Q_OBJECT
 
         bool m_logoutAtQuit;
-        Logger* m_log;
 
     public:
         // shows a message box advising user of error before throwing
@@ -45,17 +43,16 @@ namespace Unicorn
         
         /** will put up the log in dialog if necessary, throwing if the user
           * cancels, ie. they refuse to log in */
-        Application( int, char** ) throw( StubbornUserException, UnsupportedPlatformException );
+        Application( int&, char** ) throw( StubbornUserException, UnsupportedPlatformException );
         ~Application();
 
         /** when the application exits, the user will be logged out 
           * the verb is "to log out", not "to logout". Demonstrated by, eg. "He
           * logged out", or, "she logs out" */
         void logoutAtQuit() { m_logoutAtQuit = true; }
-        
+                       
     private:
         void translate();
-        static void qMsgHandler( QtMsgType, const char* );
     };
 }
 

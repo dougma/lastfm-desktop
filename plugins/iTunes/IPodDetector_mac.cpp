@@ -864,7 +864,7 @@ IPodDetector::notifyIfUnknownIPod( IPod* ipod )
     if (!key)
         return;
 
-    CFStringRef appId = CFSTR( MOOSE_PREFS_PLIST );
+    CFStringRef appId = CFSTR( "fm.last.Last.fm" );
     CFStringRef user = (CFStringRef) CFPreferencesCopyAppValue( key, appId );
 
     if (user == NULL)

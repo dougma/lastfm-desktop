@@ -18,47 +18,22 @@
  ***************************************************************************/
 
 #include "UnicornApplication.h"
-#include "UnicornSettings.h"
+#include "UnicornCoreApplication.h"
 #include "widgets/LoginDialog.h"
-#include "common/c++/Logger.h"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/CoreSysInfo.h"
+#include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QDebug>
 #include <QTranslator>
 
-#ifdef WIN32
-extern void qWinMsgHandler( QtMsgType t, const char* msg );
-#endif
 
-
-Unicorn::Application::Application( int argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
+Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
-    // HI! DON'T USE OURS! GET YOUR OWN! http://www.last.fm/api
-    Ws::SharedSecret = "73582dfc9e556d307aead069af110ab8";
-    Ws::ApiKey = "c8c7b163b11f92ef2d33ba6cd3c2c3c3";
-
-    QCoreApplication::setOrganizationName( "Last.fm" );
-    QCoreApplication::setOrganizationDomain( "last.fm" );
-
-    CoreDir::mkpaths();
-
-#ifdef WIN32
-    QString bytes = CoreDir::mainLog();
-    const wchar_t* path = bytes.utf16();
-#else
-    QByteArray bytes = CoreDir::mainLog().toLocal8Bit();
-    const char* path = bytes.data();
-#endif
-    m_log = new Logger( path );
-
-    qInstallMsgHandler( qMsgHandler );
-    qDebug() << "Introducing" << applicationName()+'-'+applicationVersion();
-    qDebug() << "Directed by" << CoreSysInfo::platform();
-
+    UnicornCoreApplication::init();
+    
     translate();
 
 #ifdef Q_WS_MAC
@@ -131,23 +106,4 @@ Unicorn::Application::~Application()
         s.remove( "SessionKey" );
         s.remove( "Username" );
     }
-
-    delete m_log;
-}
-
-
-void
-Unicorn::Application::qMsgHandler( QtMsgType type, const char* msg )
-{
-    Logger::the().log( msg );
-
-#ifndef NDEBUG
-#ifdef WIN32
-    qWinMsgHandler( type, msg );
-#else
-	Q_UNUSED( type );
-    fprintf( stderr, "%s\n", msg );
-    fflush( stderr );
-#endif
-#endif
 }

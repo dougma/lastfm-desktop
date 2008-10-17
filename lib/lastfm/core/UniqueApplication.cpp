@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "UniqueApplication.h"
+#include "lib/lastfm/core/CoreSettings.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QProcess>
-#include <QSettings>
 #include <QStringList>
 #include <QWidget>
 
@@ -130,10 +130,6 @@ UniqueApplication::init2( const QCoreApplication* app )
         Q_ASSERT_X( 0, "init1", "You're doing it wrong" );
         return;
     }
-
-    Q_ASSERT( !app->organizationName().isEmpty() );
-
-    QSettings( app->organizationName() ).setValue( m_id, app->applicationFilePath() );
     
 #ifdef WIN32
     // sadly we can't do this any earlier, so on Windows, there's a fair amount of time
@@ -143,22 +139,9 @@ UniqueApplication::init2( const QCoreApplication* app )
     w->app = this;
     w->setWindowTitle( windowTitle() );
     m_hwnd = w->winId();
+#else
+    Q_UNUSED( app );
 #endif
-}
-
-
-QString
-UniqueApplication::path( const QString& default_value ) const
-{
-    return QSettings( QCoreApplication::organizationName() ).value( m_id, default_value ).toString();
-}
-
-
-bool
-UniqueApplication::open( const QStringList& args )
-{
-    if (m_alreadyRunning) return forward( QStringList() << "fake_argv[0]" << args );
-    return QProcess::startDetached( path(), args );
 }
 
 

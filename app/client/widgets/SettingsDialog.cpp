@@ -52,9 +52,7 @@ SettingsDialog::SettingsDialog( QWidget* parent )
     ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), CoreLocale( QLocale::Russian ).code() );
     ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), CoreLocale( QLocale::Chinese ).code() );
 
-    //setup widgets
-    MooseConfig config;
-    ui.logOutOnExit->setChecked( config.logOutOnExit() );
+    ui.logOutOnExit->setChecked( Unicorn::Settings().logOutOnExit() );
 
     // make OK button enable if something changes
     //NOTE we don't store initial value, so as a result if user changes the thing back, we do nothing..
@@ -74,7 +72,7 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 void //virtual
 SettingsDialog::accept()
 {
-    MutableMooseConfig s;
+    MutableSettings s;
 
     // note, don't delete the username/password from the settings yet, do that
     // at exit, in case the user changes his/her mind

@@ -17,20 +17,31 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef COMMON_FILE_LOCATIONS_H
-#define COMMON_FILE_LOCATIONS_H
+#ifndef UNICORN_CORE_APPLICATION_H
+#define UNICORN_CORE_APPLICATION_H
 
-// relative to UnicornDir::log()
-#define MOOSE_LOG_NAME "Last.fm.log"
-#define TWIDDLY_LOG_NAME "Twiddly.log"
+#include <QCoreApplication>
+#include <QFileInfo>
+namespace Unicorn { class Application; }
 
 
-// relative to qApp->applicationFilePath()
-#ifdef WIN32
-    #define RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE "../Resources/iPodScrobbler"
-#endif
-#ifdef Q_WS_MAC
-    #define RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE "iPodScrobbler.exe"
-#endif
+class UnicornCoreApplication : public QCoreApplication
+{
+	friend class Unicorn::Application;
+	
+	static void init();
+	static void qMsgHandler( QtMsgType, const char* );
+	
+public:
+	UnicornCoreApplication( int& argc, char** argv );
+	
+	QFileInfo log() const
+	{
+		Q_ASSERT( applicationName().size() );
+		return log( applicationName() );
+	}
+	
+	static QFileInfo log( const QString& productName );
+};
 
 #endif

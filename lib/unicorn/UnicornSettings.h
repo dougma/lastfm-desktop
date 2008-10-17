@@ -37,23 +37,6 @@ namespace Unicorn
         UserSettings();
     };
 
-#ifdef WIN32
-	struct HklmSettings : QSettings
-	{
-		HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
-		{}
-	};
-
-	
-	struct PluginSettings : HklmSettings
-	{
-		PluginSettings()
-		{
-			beginGroup( "Plugins" );
-		}
-	};
-#endif
-
     /** Settings that may be of use to the entire Last.fm suite 
       */
     class UNICORN_DLLEXPORT Settings
@@ -75,17 +58,6 @@ namespace Unicorn
         // assignment of the username parameter before anything else
         Q_ASSERT( !username.isEmpty() );
     }
-
-
-    class UNICORN_DLLEXPORT MutableSettings : private Settings
-    {
-    public:
-        MutableSettings()
-        {}
-
-        void setLanguage( QString langCode ) { CoreSettings().setValue( "AppLanguage", langCode ); }
-        void setLogOutOnExit( bool b ) { UserSettings().setValue( "LogOutOnExit", b ); }
-    };
 }
 
 #endif

@@ -24,6 +24,7 @@
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/CoreProcess.h"
 #include "lib/lastfm/core/CoreSysInfo.h"
+#include "lib/lastfm/ws/WsKeys.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>
@@ -53,7 +54,7 @@ static QString clientInformationString()
     s += "User: " + QString(Ws::Username) + "\n";
     s += "Path: " + QCoreApplication::applicationFilePath() + "\n";
     s += "Version: " + QCoreApplication::applicationVersion() + "\n";
-    s += "Scrobble Point: " + QString::number( MooseConfig().scrobblePoint() ) + "\n";
+    s += "Scrobble Point: " + QString::number( Settings().scrobblePoint() ) + "\n";
 
 	s += "Plugin paths:\n";
 	foreach (QString path, qApp->libraryPaths())

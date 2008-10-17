@@ -35,8 +35,7 @@
     #include "pthread.h"
 
     #include <CoreServices/CoreServices.h>
-    #include <Carbon/Carbon.h>
-    
+    #include <Carbon/Carbon.h>    
 #endif
 
 
@@ -52,7 +51,7 @@ public:
 private:
     // NOTE inline because there is no IPodDetector.cpp
     void
-    startTwiddlyWithFlag( const std::MOOSE_STRING& args )
+    startTwiddlyWithFlag( const COMMON_STD_STRING& args )
     {
         if ( !Moose::isTwiddlyRunning() )
         {

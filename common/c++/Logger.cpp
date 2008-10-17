@@ -29,6 +29,7 @@
 #endif
 
 Logger* Logger::instance = 0;
+
 using namespace std;
 
 
@@ -88,8 +89,10 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
     }
 
     // Print some initial startup info
-    LOG( 1, "!!! OINKY BOINKY !!!" );
-    LOG( 1, "!!! Filesize: " << fileSize );
+    instance->log( "!!! OINKY BOINKY !!!" );
+    std::ostringstream ss;
+    ss << "!!! Filesize: " << fileSize;
+    instance->log( ss.str().c_str() );
 }
 
 
@@ -124,9 +127,8 @@ Logger::log( const char* message )
     EnterCriticalSection( &mMutex );
 #else
     pthread_mutex_lock( &mMutex );
-#endif
-
-    mFileOut << "[" << time() << "] " << message << "\n";
+#endif#include "lib/lastfm/core/CoreDir.h"
+    mFileOut << "[" << time() << "] " << message << std::endl;
 
 #ifdef WIN32
     LeaveCriticalSection( &mMutex );
@@ -144,7 +146,7 @@ Logger::log( Severity level, const std::string& message, const char* function, i
 
     std::ostringstream s;
     s << function << "():" << line << " L" << level << std::endl;
-    s << message;
+    s << message << std::endl;
 
     log( s.str().c_str() );
 }

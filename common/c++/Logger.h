@@ -50,7 +50,7 @@ public:
 
     void log( Severity level, const std::string& message, const char* function, int line );
     void log( Severity level, const std::wstring& message, const char* function, int line );
-
+    
     /** plain write + flush */
     void log( const char* message );
 

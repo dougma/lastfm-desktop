@@ -32,7 +32,7 @@
 #include <QTemporaryFile>
 #include <iostream>
 
-extern UniqueApplication moose;
+extern UniqueApplication gMoose;
 
 
 /** @author Max Howell <max@last.fm>
@@ -275,9 +275,9 @@ pluginPath()
 void
 AutomaticIPod::PlayCountsDatabase::bootstrap()
 {
-    LOG( 3, "Starting bootstrapping..." );
+    qDebug() << "Starting bootstrapping...";
     
-    moose.forward( "container://Notification/Twiddly/Bootstrap/Started" );
+    gMoose.forward( "container://Notification/Twiddly/Bootstrap/Started" );
     
     beginTransaction();    
     
@@ -346,5 +346,5 @@ AutomaticIPod::PlayCountsDatabase::bootstrap()
 
     endTransaction();
 
-    moose.forward( "container://Notification/Twiddly/Bootstrap/Finished" );
+    gMoose.forward( "container://Notification/Twiddly/Bootstrap/Finished" );
 }

@@ -45,7 +45,7 @@ namespace CoreDir
       * OSX:   ~/Library/Application Support/Last.fm/
       * Unix:  ~/.local/share/Last.fm/
       */
-    LASTFM_CORE_DLLEXPORT inline QDir data()
+    inline QDir data()
     {
         return dataDotDot().filePath( "Last.fm" );
     }
@@ -57,7 +57,7 @@ namespace CoreDir
       * OSX:   ~/Library/Logs/Last.fm/ on OS X.
       * Unix:  userData()
       */
-    LASTFM_CORE_DLLEXPORT inline QDir logs()
+    inline QDir logs()
     {
         #ifdef Q_WS_MAC
             return QDir::home().filePath( "Library/Logs/Last.fm" );
@@ -65,20 +65,10 @@ namespace CoreDir
             return data();    
         #endif
     }
-
-
-    LASTFM_CORE_DLLEXPORT inline QString mainLog()
-    {
-    #ifdef NDEBUG
-        return logs().filePath( QCoreApplication::applicationName() + ".log" );
-    #else
-        return logs().filePath( QCoreApplication::applicationName() + ".debug.log" );
-    #endif
-    }
-
+    
 
     /** @returns path to directory for storing cached images etc. */
-    LASTFM_CORE_DLLEXPORT inline QDir cache()
+    inline QDir cache()
     {
         #ifdef Q_WS_MAC
             return QDir::home().filePath( "Library/Cache/Last.fm" );
@@ -88,7 +78,7 @@ namespace CoreDir
     }
 
 
-    LASTFM_CORE_DLLEXPORT inline void mkpaths()
+    inline void mkpaths()
     {
         cache().mkpath( "." );
         data().mkpath( "." );

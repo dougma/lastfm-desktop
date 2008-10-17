@@ -114,7 +114,7 @@ misc: \$(PLUGINS_DIR)/AudioScrobbler.bundle \$(CONTENTS_DIR)/Resources/twiddly
 	common/dist/mac/deposx.sh _bin/twiddly /opt/qt/4.4.2/lib
 	cp _bin/twiddly \$@
 \$(CONTENTS_DIR)/Resources/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
-	cd \$(CONTENTS_DIR)/Resources && ln -sf ../Contents/twiddly
+	cd \$(CONTENTS_DIR)/Resources && ln -s ../MacOS/twiddly
 HEREDOC
 
 	esac

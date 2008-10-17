@@ -61,20 +61,6 @@ public:
     bool forward( const class QStringList& );
 	/** this function adds a fake argv[0] */
     bool forward( const QString& arg ) { return forward( QStringList() << "fake_argv[0]" << arg ); }
-
-    /** starts a new instance, or forwards if one already running, use from
-      * another process, clearly we can't create a new instance if you have
-      * never run the app with the specified id before */
-    bool open( const QStringList& args );
-    bool open( const QString& arg ) { return open( QStringList() << arg ); }
-    
-    /** we store paths for every application that ever calls init(), so you
-      * can access this from other processes */
-    QString path( const QString& default_value = "" ) const;
-
-#ifndef QT_CORE_LIB
-    COMMON_STD_STRING path( const COMMON_STD_STRING default_value = "" ) const;
-#endif
     
 signals:
     /** the first one is argv[0] ie. the application path */

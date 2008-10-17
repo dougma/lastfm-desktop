@@ -35,7 +35,7 @@ class App : public Unicorn::Application
     friend MainWindow& The::mainWindow();
     
 public:
-    App( int, char** );
+    App( int&, char** );
     ~App();
 
     void setMainWindow( class MainWindow* ); //access via The::mainWindow()

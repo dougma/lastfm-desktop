@@ -24,7 +24,6 @@
 #include "lib/lastfm/scrobble/ScrobbleCache.h"
 #include "lib/lastfm/scrobble/Scrobble.h"
 #include "lib/lastfm/ws/WsKeys.h"
-#include "common/FileLocations.h"
 #include <QByteArray>
 #include <QClipboard>
 #include <QFile>
@@ -408,7 +407,11 @@ DiagnosticsDialog::onLogPoll()
     delete[] dataBuffer;
 }
 
-void 
+
+#include "app/twiddly.h"
+#include "lib/unicorn/UnicornCoreApplication.h"
+#include "lib/lastfm/core/UniqueApplication.h"
+void
 DiagnosticsDialog::onScrobbleIpodClicked()
 {
 #ifndef Q_WS_X11
@@ -424,12 +427,13 @@ DiagnosticsDialog::onScrobbleIpodClicked()
 
     if (!m_logFile.is_open())
     {
-        m_logFile.open( CoreDir::logs().filePath( TWIDDLY_LOG_NAME ).toStdString().c_str() );
+        QString const path = UnicornCoreApplication::log( twiddly::applicationName() ).absoluteFilePath();
+        m_logFile.open( path.toStdString().c_str() );
         m_logFile.seekg( 0, std::ios_base::end );
         m_logTimer->start( 10 );
     }
 
-    QProcess::startDetached( QDir(qApp->applicationDirPath()).filePath( RELATIVE_PATH_TO_INSTALLED_TWIDDLY_EXE ) );
+    QProcess::startDetached( twiddly::path(), args );
 #endif
 }
 

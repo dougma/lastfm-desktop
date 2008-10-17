@@ -21,7 +21,7 @@
 #include "Settings.h"
 
 #define NEW_STOP_WATCH_MACRO() { \
-    ScrobblePoint sp( m_track.duration() * MooseConfig().scrobblePoint() / 100 ); \
+    ScrobblePoint sp( m_track.duration() * Settings().scrobblePoint() / 100 ); \
     m_watch = new StopWatch( sp ); \
     connect( m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) ); }
 

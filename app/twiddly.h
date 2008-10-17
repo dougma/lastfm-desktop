@@ -17,35 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CORE_SETTINGS_H
-#define CORE_SETTINGS_H
-
-#include "lib/lastfm/core/CoreLocale.h"
-#include <QSettings>
+#include "app/moose.h"
+#include <QFileInfo>
 
 
-/** Settings that are global to all Last.fm libraries */
-class CoreSettings : public QSettings
+/** you need to link to unicorn to use the non-inlined functions. 
+  * <max@last.fm> 
+  */
+namespace twiddly
 {
-public:
-	CoreSettings( const QString& applicationName = "" ) : QSettings( organizationName(), applicationName )
-	{}
-    
-    static const char* organizationName()
-    {
-        return "Last.fm";
-    }
-    
-    static const char* organizationDomain()
-    {
-        return "last.fm";
-    }
+	static const char* id() { return "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0"; }
+    /** passed to QCoreApplication::setApplicationName() */
+    static const char* applicationName() { return "Twiddly"; }
 
-	CoreLocale locale() const
-	{
-		QVariant const v = value( "locale" );
-		return v.isValid() ? QLocale( v.toString() ) : CoreLocale::system();
-	}
-};
-
-#endif
+    /** returns the path to the executable, if we know it, or a guess, if we
+      * don't, we generally know the path on eg. Windows. Or if the client has 
+      * been run at least once. */
+    static QString path()
+    {
+    #ifdef __APPLE__
+        return QFileInfo( moose::path() + "../Resources/twiddly" ).absoluteFilePath();
+    #endif
+    #ifdef WIN32
+        return moose::path() + "twiddly.exe";
+    #endif
+    }
+}

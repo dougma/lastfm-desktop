@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 #include "IPod.h"
+#include "app/twiddly.h"
 #include "app/client/Settings.h"
+#include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/UniqueApplication.h"
-#include "common/c++/logger.cpp"
 #include "plugins/iTunes/ITunesExceptions.h"
 #include <iostream>
 #include <QtCore>
@@ -30,12 +31,10 @@
 // until breakpad can be installed more easily
 #undef NDEBUG
 
-void initLogger();
-void qMsgHandler( QtMsgType, const char* msg );
 void writeXml( const QDomDocument&, const QString& path );
 void logException( QString );
 
-UniqueApplication moose( MooseConfig::id() );
+UniqueApplication gMoose( moose::id() );
 
 
 /** @maintainer Max Howell <max@last.fm>
@@ -53,21 +52,19 @@ main( int argc, char** argv )
                                        HANDLER_ALL );
 #endif
 
-    // FIXME these names are wrong, but Moose::Settings is broken
-    QCoreApplication::setApplicationName( "Twiddly" );
-    QCoreApplication::setOrganizationName( "Last.fm" );
-    QCoreApplication::setOrganizationDomain( "last.fm" );
+    QCoreApplication::setApplicationName( twiddly::applicationName() );
+    QCoreApplication::setApplicationVersion( "2" );
 
-    UniqueApplication uapp( "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0" );
+    UniqueApplication uapp( twiddly::id() );
 	bool const b = QByteArray(argv[0]) != "--bootstrap-needed?";
     if (b) uapp.init1();
 
-    QCoreApplication app( argc, argv );
-    if (b) uapp.init2( &app );
+	char* argv2[2];
+	argv2[0] = qstrdup( argv[0] );
+	argv2[1] = qstrdup( argv[1] );
 
-    initLogger();
-    
-    qDebug() << app.arguments();
+    UnicornCoreApplication app( argc, argv );
+    if (b) uapp.init2( &app );
     
     try
     {
@@ -89,7 +86,7 @@ main( int argc, char** argv )
         }
         else // twiddle!
         {
-            moose.forward( "container://Notification/Twiddly/Started" );
+            gMoose.forward( "container://Notification/Twiddly/Started" );
 
             IPod* ipod = IPod::fromCommandLineArguments( app.arguments() );
 
@@ -121,7 +118,7 @@ main( int argc, char** argv )
             ipod->settings().setType( currentType );
             //------------------------------------------------------------------
 
-            moose.forward( "container://Notification/Twiddly/Finished/" + QString::number( ipod->scrobbles().count() ) );
+            gMoose.forward( "container://Notification/Twiddly/Finished/" + QString::number( ipod->scrobbles().count() ) );
 
             if ( ipod->scrobbles().count() )
             {
@@ -135,7 +132,7 @@ main( int argc, char** argv )
                 xml.documentElement().setAttribute( "uid", ipod->uid() );
                 writeXml( xml, path );
 
-                moose.open( QStringList() << "--twiddled" << path );
+				QProcess::startDetached( moose::path(), QStringList() << "--twiddled" << path );
             }
 
             // do last so we don't record a sync if we threw and thus it "didn't" happen
@@ -191,27 +188,5 @@ logException( QString message )
     
     // we do this because LfmApp splits on spaces in parseMessage()
     message.replace( ' ', '_' );
-    moose.forward( "container://Notification/Twiddly/Error/" + message );
-}
-
-
-void
-qMsgHandler( QtMsgType, const char* msg )
-{
-    Logger::the().log( msg );
-}
-
-
-void
-initLogger()
-{
-#ifdef WIN32
-    QString bytes = CoreDir::mainLog();
-    const wchar_t* path = bytes.utf16();
-#else
-    QByteArray bytes = CoreDir::mainLog().toLocal8Bit();
-    const char* path = bytes.data();
-#endif
-    new Logger( path );
-    qInstallMsgHandler( qMsgHandler );
+    gMoose.forward( "container://Notification/Twiddly/Error/" + message );
 }

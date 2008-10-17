@@ -22,13 +22,14 @@
 #include "Settings.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
+#include "app/moose.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/UniqueApplication.h"
 #include "lib/lastfm/ws/WsAccessManagerInit.h"
 #include <QDir>
 #include <QTimer>
 
-#undef NDEBUG //tmp
+#undef NDEBUG
 
 #ifdef NDEBUG
     #include "app/breakpad/ExceptionHandler.h"
@@ -50,20 +51,21 @@ int main( int argc, char** argv )
                                        HANDLER_ALL );
 #endif
 
-    // set asap - used everywhere!
-    QCoreApplication::setApplicationName( PRODUCT_NAME );
+    QCoreApplication::setApplicationName( moose::applicationName() );
     QCoreApplication::setApplicationVersion( VERSION );
     QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
-    QCoreApplication::setOrganizationDomain( "last.fm" );
+    QCoreApplication::setOrganizationDomain( CoreSettings::organizationDomain() );
 
     // WsAccessManager needs special init (on windows), and it
     // needs to be done early, so be careful about moving this:
     WsAccessManagerInit init;
 
-    UniqueApplication uapp( MooseConfig::id() );
+#if 1
+    UniqueApplication uapp( moose::id() );
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
     uapp.init1();
+#endif
 
     try
     {

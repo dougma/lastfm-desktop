@@ -21,17 +21,13 @@
 #define MOOSE_H
 
 #include <cstdio>
-#include <string>
+#include "common/c++/string.h"
 
 #ifdef WIN32
-    #define MOOSE_STRING wstring
-    #define MOOSE_LOG LOGWL
     #define MOOSE_HKEY_A "Software\\Last.fm\\Client"
     #define MOOSE_HKEY  L"Software\\Last.fm\\Client"
     #define MOOSE_PLUGIN_HKEY_A MOOSE_HKEY_A "\\Plugins\\itw"
 #else
-    #define MOOSE_STRING string
-    #define MOOSE_LOG LOG
     #define MOOSE_PREFS_PLIST "fm.last.Last.fm"
 #endif
 
@@ -39,24 +35,24 @@
 namespace Moose
 {
     /** @returns  /-terminated utf8 encoded path */
-    std::MOOSE_STRING
+    COMMON_STD_STRING
     applicationFolder();
 
     /** @returns /-terminated utf8 encoded path */
-    std::MOOSE_STRING
+    COMMON_STD_STRING
     applicationSupport();
 
     /** @returns utf8 encoded Last.fm client application binary path */
-    std::MOOSE_STRING
+    COMMON_STD_STRING
     applicationPath();    
     
     /** @returns utf8 encoded path */
-    std::MOOSE_STRING
+    COMMON_STD_STRING
     twiddlyPath();
 
-    /** @returns the completet path to the plugin library binary
+    /** @returns the complete path to the plugin library binary
       * 16-bit unicode on Windows and local 8-bit on Mac */
-    std::MOOSE_STRING
+    COMMON_STD_STRING
     pluginPath();
 
     bool
@@ -65,7 +61,7 @@ namespace Moose
     /** on mac, calls setFileDescriptorsCloseOnExec() for you
       * on mac all parameters should be utf8 */
     bool
-    exec( const std::MOOSE_STRING& command, const std::MOOSE_STRING& space_separated_args );
+    exec( const COMMON_STD_STRING& command, const COMMON_STD_STRING& space_separated_args );
     
     bool
     iPodScrobblingEnabled();
@@ -97,18 +93,16 @@ namespace Moose
 
 
 #ifndef WIN32
-    #define TWIDDLY_EXECUTABLE_NAME "iPodScrobbler"
-
     inline std::string 
     Moose::twiddlyPath()
     {
-        return applicationFolder() + "../Resources/" TWIDDLY_EXECUTABLE_NAME;
+        return applicationFolder() + "../Resources/twiddly";
     }
 #else
     inline std::wstring
     Moose::twiddlyPath()
     {
-        return applicationFolder() + L"iPodScrobbler.exe";
+        return applicationFolder() + L"twiddly.exe";
     }
 #endif
 

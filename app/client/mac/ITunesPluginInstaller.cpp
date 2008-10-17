@@ -76,7 +76,7 @@ ITunesPluginInstaller::install()
 
                 if ( installPlugin() )
                 {
-                    qDebug() << "Successfully installed the plugin.";
+                    qDebug() << "Successfully installed the plugin to:" << k_iTunesPluginDir;
                 }
                 else
                     qDebug() << "Installing the plugin failed!";
