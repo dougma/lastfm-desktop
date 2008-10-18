@@ -51,11 +51,6 @@ Bio::clearContent()
 void 
 Bio::setContent( const CoreDomElement &lfm )
 {
-#define ARTIST_CLASS "artist"
-#define PLAYS_CLASS "plays"
-#define CONTENT_CLASS "content"
-#define EDITME_CLASS "editme"
-
 	try 
     {
 		CoreDomElement a = lfm["artist"];
@@ -64,14 +59,14 @@ Bio::setContent( const CoreDomElement &lfm )
 		QString	plays = a["stats"]["playcount"].text();
 		QString listeners = a["stats"]["listeners"].text();
 		QString content = a["bio"]["content"].text();
-		QString editmessage = tr("edit this online");
+		QString editmessage = tr("Edit this in your browser");
 
 		QString html;
 		QTextStream(&html) <<
-			"<a class=\""ARTIST_CLASS"\" href=\"" << url << "\">" << name << "</a>" <<
-			"<p class=\""PLAYS_CLASS"\">" << tr("%L1 plays (%L2 listeners)").arg(plays.toInt()).arg(listeners.toInt()) << "</p>" <<
-			"<p class=\""CONTENT_CLASS"\">" << content.replace("\r", "<br>") << "</p>" <<
-			"<a class=\""EDITME_CLASS"\" href=\"" << url << "/+wiki/edit" << "\"><img src= />" << editmessage << "</a>";
+			"<a class='artist' href=\"" << url << "\">" << name << "</a>" <<
+			"<p class='plays'>" << tr("%L1 plays (%L2 listeners)").arg(plays.toInt()).arg(listeners.toInt()) << "</p>" <<
+			"<p class='content'>" << content.replace("\r", "<br>") << "</p>" <<
+			"<a class='editme' href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
 		setHtml(html);
 	}
 	catch (CoreDomElement::Exception& e)
@@ -146,9 +141,11 @@ MetaInfoView::onTrackSpooled( const Track& t )
 		ui.similar->clear();
 		delete m_artistInfoReply;
 		delete m_artistSimilarReply;
+		m_artistInfoReply = t.artist().getInfo();
+		m_artistSimilarReply = t.artist().getSimilar();
 		// issue the new requests and connect them up
-		connect( m_artistInfoReply = t.artist().getInfo(), SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
-		connect( m_artistSimilarReply = t.artist().getSimilar(), SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
+		connect( m_artistInfoReply, SIGNAL(finished(WsReply*)), SLOT(onArtistInfo(WsReply*)) );
+		connect( m_artistSimilarReply, SIGNAL(finished(WsReply*)), SLOT(onSimilar(WsReply*)) );
 
 		// TagListWidget internalises the pattern:
 		ui.tags->setTagsRequest( t.getTopTags() );
