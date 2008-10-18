@@ -28,8 +28,8 @@ Mbid::fromLocalFile( const QString& path )
 {   
     char out[MBID_BUFFER_SIZE];
     QByteArray const bytes = QFile::encodeName( path );
-    qDebug() << getMP3_MBID( bytes.data(), out );
+    int const r = getMP3_MBID( bytes.data(), out );
     Mbid mbid;
-    mbid.id = QString::fromLatin1( out );
+	if (r == 0) mbid.id = QString::fromLatin1( out );
     return mbid;
 }
