@@ -67,7 +67,9 @@ App::App( int& argc, char** argv )
 	QSettings s;
     bool updgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
 	s.setValue( "Version", applicationVersion() );
+#ifdef NDEBUG
     s.setValue( "Path", applicationFilePath() );
+#endif
 
     m_q = new BackgroundJobQueue;
     

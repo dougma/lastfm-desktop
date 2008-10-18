@@ -29,9 +29,9 @@
 #include <QDir>
 #include <QTimer>
 
-#undef NDEBUG
+#define NBREAKPAD
 
-#ifdef NDEBUG
+#ifndef NBREAKPAD
     #include "app/breakpad/ExceptionHandler.h"
 #endif
 
@@ -43,7 +43,7 @@
 
 int main( int argc, char** argv )
 {
-#ifdef NDEBUG
+#ifndef NBREAKPAD
     google_breakpad::ExceptionHandler( CoreDir::save().path().toStdString(),
                                        0,
                                        breakPadExecUploader,
@@ -60,7 +60,7 @@ int main( int argc, char** argv )
     // needs to be done early, so be careful about moving this:
     WsAccessManagerInit init;
 
-#if 1
+#ifdef NDEBUG
     UniqueApplication uapp( moose::id() );
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
@@ -70,8 +70,10 @@ int main( int argc, char** argv )
     try
     {
         App app( argc, argv );
+#ifdef NDEBUG
 		uapp.init2( &app );
         app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
+#endif
 
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
