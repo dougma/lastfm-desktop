@@ -17,10 +17,12 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include <QLabel>
-#include <QWebView>
-#include "State.h"
 #include "lib/lastfm/types/Track.h"
+#include "State.h"
+#include <QLabel>
+#include <QPointer>
+#include <QWebView>
+
 
 namespace Unicorn 
 {
@@ -61,8 +63,8 @@ class MetaInfoView : public QLabel
 	Track m_track;
 
 	// the most recent requests (so we don't act on delayed replies)
-	WsReply *m_artistInfoReply;
-	WsReply *m_artistSimilarReply;
+	QPointer<WsReply> m_artistInfoReply;
+	QPointer<WsReply> m_artistSimilarReply;
 	
 public:
     MetaInfoView();
