@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,21 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "../types/Track.h"
-#include "../core/CoreException.h"
-#include <QList>
+#ifndef LASTFM_PLAYLIST_H
+#define LASTFM_PLAYLIST_H
+
+#include <QString>
+#include <QUrl>
+#include <lastfm/types/Xspf.h>
+class WsReply;
 
 
-class Playlist
+class LASTFM_TYPES_DLLEXPORT Playlist
 {
-public:
-	/** not documented because we are deliberately trying to upset you */
-	Playlist( class WsReply* ) throw( CoreException );
-
-	QList<Track> tracks() const { return m_tracks; }
-	QString title() const{ return m_title; }
+	int m_id;
 	
-private:
-	QList<Track> m_tracks;
-	QString m_title;
+	Playlist() : m_id( -1 )
+	{}
+
+public:
+	Playlist( int id ) : m_id( id )
+	{}
+	
+	int id() const { return m_id; }
+
+	WsReply* addTrack( const class Track& ) const;
+	WsReply* fetch() const;
+
+	static WsReply* create( const QString& title, const QString& description = "" );
+	static WsReply* fetch( const QUrl& url );
+	
+	static Xspf fetch( WsReply* );
 };
+
+#endif

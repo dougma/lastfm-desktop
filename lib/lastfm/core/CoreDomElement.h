@@ -89,6 +89,8 @@ public:
 
     QString text() const { return e.text(); }
     QList<CoreDomElement> children( const QString& named ) const;
+    
+    operator QDomElement() const { return e; }
 };
 
 

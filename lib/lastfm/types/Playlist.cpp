@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,41 +18,42 @@
  ***************************************************************************/
 
 #include "Playlist.h"
-#include "../ws/WsReply.h"
-#include <QUrl>
+#include "Track.h"
+#include "../ws/WsRequestBuilder.h"
 
 
-Playlist::Playlist( WsReply* reply ) throw( CoreException )
-{    
-	m_title = reply->lfm()["playlist"]["title"].text();
-		
-	//FIXME should we use UnicornUtils::urlDecode()?
-	//The title is url encoded, has + instead of space characters 
-	//and has a + at the begining. So it needs cleaning up:
-	m_title.replace( '+', ' ' );
-	m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-	m_title = m_title.trimmed();
-	
-	foreach (CoreDomElement e, reply->lfm()["playlist"][ "trackList" ].children( "track" ))
-	{
-		MutableTrack t;
-		try
-		{
-			//TODO we don't want to throw an exception for any of these really,
-			//TODO only if we couldn't get any, but even then so what
-			t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-			t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-			t.setTitle( e[ "title" ].text() );
-			t.setArtist( e[ "creator" ].text() );
-			t.setAlbum( e[ "album" ].text() );
-			t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-			t.setSource( Track::LastFmRadio );
-		}
-		catch (CoreDomElement::Exception& exception)
-		{
-			qWarning() << exception << e;
-		}
-		
-		m_tracks += t; // outside since location is enough basically
-	}
+WsReply*
+Playlist::addTrack( const Track& t ) const
+{
+	return WsRequestBuilder( "playlist.addTrack" )
+			.add( "playlistID", m_id )
+			.add( "artist", t.artist() )
+			.add( "track", t.title() )
+			.post();
+}
+
+
+WsReply*
+Playlist::fetch() const
+{
+	return fetch( QUrl("lastfm://playlist/" + QString::number( m_id )) );
+}
+
+
+WsReply* //static
+Playlist::fetch( const QUrl& url )
+{
+	return WsRequestBuilder( "playlist.fetch" )
+			.add( "playlistURL", url.toString() )
+			.get();
+}
+
+
+WsReply* //static
+Playlist::create( const QString& title, const QString& description /*=""*/ )
+{
+	return WsRequestBuilder( "playlist.create" )
+			.add( "title", title )
+			.addIfNotEmpty( "description", description )
+			.post();
 }

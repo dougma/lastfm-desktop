@@ -51,6 +51,7 @@ public:
 
     /** add a parameter to the request */
     WsRequestBuilder& add( const QString& key, const QString& value ) { params.add( key, value ); return *this; }
+    WsRequestBuilder& add( const QString& key, int const value ) { return add( key, QString::number( value ) ); }
     /** adds the parameter if @p value is not empty */
     WsRequestBuilder& addIfNotEmpty( const QString& key, const QString& v ) { if (v.size()) params.add( key, v ); return *this; }
   

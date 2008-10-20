@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include "Tuner.h"
-#include "Playlist.h"
-#include <QBuffer>
-#include <QDebug>
+#include "../types/Xspf.h"
 #include "../ws/WsRequestBuilder.h"
 #include "../ws/WsReply.h"
+#include <QBuffer>
+#include <QDebug>
 #include <QtXml>
 
 
@@ -98,22 +98,31 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
 			emit error( reply->error() );
 			return;
 	}
-			
-	Playlist p( reply );
+    
+    try
+    {
+        Xspf xspf( reply->lfm()["playlist"] );
 
-	if (p.tracks().isEmpty())
-	{
-		// sometimes the recs service craps out and gives us a blank playlist
-		
-		if (!tryAgain())
-		{
-			// an empty playlist is a bug, if there is no content
-			// NotEnoughContent should have been returned with the WsReply
-			emit error( Ws::MalformedResponse );
-		}
-	}
-	else {
-		m_retry_counter = 0;
-		emit tracks( p.tracks() );
-	}
+        if (xspf.tracks().isEmpty())
+        {
+            // sometimes the recs service craps out and gives us a blank playlist
+            
+            if (!tryAgain())
+            {
+                // an empty playlist is a bug, if there is no content
+                // NotEnoughContent should have been returned with the WsReply
+                emit error( Ws::MalformedResponse );
+            }
+        }
+        else {
+            m_retry_counter = 0;
+            emit tracks( xspf.tracks() );
+        }
+    }
+    catch (CoreDomElement::Exception& e)
+    {
+        qWarning() << e;
+        if (!tryAgain())
+            emit error( Ws::TryAgainLater );
+    }
 }

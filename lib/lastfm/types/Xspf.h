@@ -17,68 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Tag.h"
-#include "User.h"
-#include "../core/CoreUrl.h"
-#include "../ws/WsRequestBuilder.h"
+#ifndef LASTFM_XSPF_H
+#define LASTFM_XSPF_H
+
+#include <lastfm/DllExportMacro.h>
+#include <lastfm/types/Track.h>
+#include <QList>
 
 
-QUrl
-Tag::www() const
+class LASTFM_TYPES_DLLEXPORT Xspf
 {
-	return CoreUrl( "http://www.last.fm/tag/" + CoreUrl::encode( m_name ) ).localised();
-}
+public:
+	Xspf( const class QDomElement& playlist_node );
 
+	QList<Track> tracks() const { return m_tracks; }
+	QString title() const{ return m_title; }
 
-QUrl
-Tag::www( const User& user ) const
-{
-	return CoreUrl( "http://www.last.fm/" + CoreUrl::encode( user ) + "/tags/" + CoreUrl::encode( m_name ) ).localised();
-}
+private:
+	QList<Track> m_tracks;
+	QString m_title;
+};
 
-
-WsReply*
-Tag::search() const
-{
-	return WsRequestBuilder( "tag.search" ).add( "tag", m_name ).get();
-}
-
-
-QStringList /* static */
-Tag::search( WsReply* r )
-{
-	QStringList tags;
-    try {
-        foreach( CoreDomElement e, r->lfm().children( "tag" ))
-            tags += e["name"].text();
-    }
-    catch( CoreDomElement::Exception& e )
-    {
-        qWarning() << e;
-    }    
-	return tags;
-}
-
-
-WeightedStringList //static
-Tag::list( WsReply* r )
-{
-	WeightedStringList tags;
-    try
-    {
-        foreach (CoreDomElement e, r->lfm().children( "tag" ))
-        {
-            int const weight = e.optional("count").text().toInt();
-            
-            // we toLower always as otherwise it is ugly mixed case, as first
-            // ever tag decides case, and Last.fm is case insensitive about it 
-            // anyway
-            tags += WeightedString( e["name"].text().toLower(), weight );
-        }
-    }
-    catch( CoreDomElement::Exception& e)
-    {
-        qWarning() << e;
-    }
-    return tags;
-}
+#endif
