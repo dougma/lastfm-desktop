@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <phonon/volumeslider.h>
-#include "the/Radio.h"
+#include "the/radio.h"
 
 
 RadioMiniControls::RadioMiniControls()
