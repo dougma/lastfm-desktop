@@ -24,8 +24,7 @@
 #include <QPalette>
 #include <QPushButton>
 #include <QWidget>
-
-class QAbstractItemView;
+#include <QAbstractItemView>
 
 
 void //static
@@ -36,8 +35,9 @@ UnicornWidget::paintItBlack( QWidget* w )
     p.setBrush( QPalette::WindowText, QColor( 84, 84, 84 ) );
     p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );   
     
-    if (reinterpret_cast<QAbstractItemView*>(w))
+    if (qobject_cast<QAbstractItemView*>(w))
     {
+        // reinterpret cast didn't work. Lol.
         p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
         p.setBrush( QPalette::Text, Qt::white );
     }
