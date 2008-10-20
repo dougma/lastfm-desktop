@@ -24,8 +24,9 @@
 #include "common/c++/string.h"
 
 #ifdef WIN32
-    #define MOOSE_HKEY_A "Software\\Last.fm\\Client"
-    #define MOOSE_HKEY  L"Software\\Last.fm\\Client"
+    #define UNICORN_HKEY L"Software\\Last.fm\\" 
+    #define MOOSE_HKEY_A "Software\\Last.fm\\Last.fm"
+    #define MOOSE_HKEY  L"Software\\Last.fm\\Last.fm"
     #define MOOSE_PLUGIN_HKEY_A MOOSE_HKEY_A "\\Plugins\\itw"
 #else
     #define MOOSE_PREFS_PLIST "fm.last.Last.fm"

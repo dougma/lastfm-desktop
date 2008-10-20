@@ -380,7 +380,7 @@ IPodDetector::onDeviceConnected( IWbemClassObject* const device )
 void
 IPodDetector::notifyIfUnknownIPod( IPod* ipod )
 {
-    std::wstring const key = MOOSE_HKEY L"\\MediaDevices\\" +
+    std::wstring const key = UNICORN_HKEY L"\\device\\" +
                              ipod->device() + L"\\" +
                              ipod->serial();
 

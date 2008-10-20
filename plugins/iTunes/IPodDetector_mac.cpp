@@ -855,7 +855,7 @@ void
 IPodDetector::notifyIfUnknownIPod( IPod* ipod )
 {
     // Qt unexpectedly separates with '.'
-    std::string tmp = "MediaDevices." + ipod->device() + '.' + ipod->serial() + ".user";
+    std::string tmp = "device." + ipod->device() + '.' + ipod->serial() + ".user";
     CFStringRef key = CFStringCreateWithBytes( NULL,
                                               (const unsigned char*) tmp.c_str(),
                                                tmp.length(),
@@ -864,7 +864,7 @@ IPodDetector::notifyIfUnknownIPod( IPod* ipod )
     if (!key)
         return;
 
-    CFStringRef appId = CFSTR( "fm.last.Last.fm" );
+    CFStringRef appId = CFSTR( "fm.last" );
     CFStringRef user = (CFStringRef) CFPreferencesCopyAppValue( key, appId );
 
     if (user == NULL)
