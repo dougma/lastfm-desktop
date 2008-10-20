@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "DelegateDragHint.h"
-#include "the/App.h"
+#include <QCoreApplication>
 
 void
 DelegateDragHint::onFinishedAnimation()
@@ -26,8 +26,10 @@ DelegateDragHint::onFinishedAnimation()
  
     if( m_mimeData )
     {
+        QDragEnterEvent* eevent = new QDragEnterEvent( m_target->pos(), Qt::CopyAction | Qt::MoveAction, m_mimeData, Qt::LeftButton, Qt::NoModifier );
+        QCoreApplication::postEvent( m_target, eevent );
         QDropEvent* event = new QDropEvent( m_target->pos(), Qt::CopyAction | Qt::MoveAction, m_mimeData, Qt::LeftButton, Qt::NoModifier );
-        App::postEvent( m_target, event );
+        QCoreApplication::postEvent( m_target, event );
     }
     hide();
     deleteLater();
