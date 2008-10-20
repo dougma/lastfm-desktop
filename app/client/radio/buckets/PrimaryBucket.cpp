@@ -28,41 +28,33 @@
 #include "PrimaryBucket.h"
 #include "PlayerBucket.h"
 #include "PlayableListItem.h"
+#include "DelegateDragHint.h"
 #include "widgets/RadioMiniControls.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "the/radio.h"
 
+#include <Phonon/volumeslider.h>
 
 PrimaryBucket::PrimaryBucket()
 {
 	ui.friendsBucket = new PrimaryListView( this );
     ui.friendsBucket->setAlternatingRowColors( true );
-//	ui.friendsBucket->setViewMode( QListView::IconMode );
-//	ui.friendsBucket->setFlow( QListView::LeftToRight );
-//	ui.friendsBucket->setWrapping( true );
-//	ui.friendsBucket->setResizeMode( QListView::Adjust );
     ui.friendsBucket->setDragEnabled( true );
     ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
     
 	ui.tagsBucket = new PrimaryListView( this );
     ui.tagsBucket->setAlternatingRowColors( true );
-//	ui.tagsBucket->setViewMode( QListView::IconMode );
-//	ui.tagsBucket->setFlow( QListView::LeftToRight );
-//	ui.tagsBucket->setWrapping( true );
-//	ui.tagsBucket->setResizeMode( QListView::Adjust );
     ui.tagsBucket->setDragEnabled( true );
     ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
 	
 	ui.stationsBucket = new PrimaryListView( this );
     ui.stationsBucket->setAlternatingRowColors( true );
-//	ui.stationsBucket->setViewMode( QListView::IconMode );
-//	ui.stationsBucket->setFlow( QListView::LeftToRight );
-//	ui.stationsBucket->setWrapping( true );
-//	ui.stationsBucket->setResizeMode( QListView::Adjust );
     ui.stationsBucket->setDragEnabled( true );
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
@@ -86,6 +78,8 @@ PrimaryBucket::PrimaryBucket()
     new QVBoxLayout( playerPane );
     playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
     playerPane->layout()->addWidget( ui.controls = new RadioMiniControls);
+    ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
+    
     UnicornWidget::paintItBlack( ui.controls );
 
     connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
@@ -144,4 +138,31 @@ PrimaryBucket::replaceStation( QMimeData* data )
 {
 	ui.playerBucket->clear();
 	ui.playerBucket->addFromMimeData( data );
+}
+
+
+void 
+PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
+{
+    PrimaryListView* itemView = dynamic_cast< PrimaryListView*>( sender() );
+    Q_ASSERT( itemView );
+    
+    QStyleOptionViewItem options;
+    options.initFrom( this );
+    options.decorationSize = itemView->iconSize().expandedTo( QSize( 16, 16) );
+    options.displayAlignment = Qt::AlignVCenter | Qt::AlignLeft;
+    options.decorationAlignment = Qt::AlignVCenter | Qt::AlignCenter;
+    options.rect = itemView->visualRect( index );
+    DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
+    w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
+    w->dragTo( ui.playerBucket );
+    connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
+}
+
+
+void 
+PrimaryBucket::onDnDAnimationFinished()
+{
+    DelegateDragHint* delegateWidget = static_cast<DelegateDragHint*>(sender());
+    QModelIndex index = delegateWidget->index();
 }

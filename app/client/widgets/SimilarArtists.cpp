@@ -26,7 +26,9 @@
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "the/mainWindow.h"
+#include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/PrimaryBucket.h"
+#include "radio/buckets/PlayerBucket.h"
 #include <QDebug>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -73,8 +75,15 @@ SimilarArtists::SimilarArtists()
 void
 SimilarArtists::onDoubleClicked(const QModelIndex &index)
 {
+    QListView* listView = static_cast<QListView*>( sender());
+    QStyleOptionViewItem options;
+    options.initFrom( this );
+    options.rect = listView->visualRect( index );
+    DelegateDragHint* dragHint = new DelegateDragHint( listView->itemDelegate(), index, options, listView );
+    dragHint->setMimeData( listView->model()->mimeData( QModelIndexList() << index ) );
+    
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
-	The::mainWindow().ui.primaryBucket->replaceStation( m_model->mimeData( index ));
+    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucket );
 }
 
 

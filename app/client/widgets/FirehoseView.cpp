@@ -21,7 +21,9 @@
 #include "FirehoseDelegate.h"
 #include <QtGui>
 #include "the/mainWindow.h"
+#include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/PrimaryBucket.h"
+#include "radio/buckets/PlayerBucket.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
@@ -152,6 +154,13 @@ FirehoseView::indexAt( const QPoint& point ) const
 }
 
 
+QRect 
+FirehoseView::visualRect( const QModelIndex& index ) const
+{
+    return m_itemRects[ index ];
+}
+
+
 void 
 FirehoseView::mouseDoubleClickEvent( QMouseEvent* e )
 {
@@ -160,8 +169,14 @@ FirehoseView::mouseDoubleClickEvent( QMouseEvent* e )
     PlayableMimeData* data = PlayableMimeData::createFromUser( i.data().toString() );
     data->setImageData( i.data( Qt::DecorationRole ) );
     
+    QStyleOptionViewItem options;
+    options.initFrom( this );
+    options.rect = visualRect( i );
+    DelegateDragHint* dragHint = new DelegateDragHint( delegate, i, options, this );
+    dragHint->setMimeData( data );
+    
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
-    The::mainWindow().ui.primaryBucket->replaceStation( data );
+    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucket );
 }
 
 

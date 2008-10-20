@@ -177,7 +177,7 @@ PlayerBucket::dropEvent( QDropEvent* event)
 	if( !event->mimeData() )
 		return;
 	
-	if( addFromMimeData( event->mimeData() ) )
+	if( addFromMimeData( event->mimeData()))
 		event->acceptProposedAction();
 	else
 		event->ignore();
@@ -270,7 +270,7 @@ PlayerBucket::playlistFetched()
 void 
 PlayerBucket::dragEnterEvent ( QDragEnterEvent * event )
 {		
-	event->accept( rect());
+	event->accept();
 }
 
 

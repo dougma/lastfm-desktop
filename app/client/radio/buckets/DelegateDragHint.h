@@ -16,60 +16,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef DELEGATE_DRAG_HINT_H
+#define DELEGATE_DRAG_HINT_H
 
-#ifndef FIREHOSE_VIEW_H
-#define FIREHOSE_VIEW_H
+#include <QAbstractItemDelegate>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QTimeLine>
+#include <QDebug>
 
-#include <QAbstractScrollArea>
-#include <QModelIndex>
-
-/** view that can only do minimal things, hence we don't even derive
-  * QAbstractItemView as that was way more work than we required 
-  * 
-  * @author <max@last.fm> 
-  */
-class FirehoseView : public QAbstractScrollArea
+class DelegateDragHint : public QWidget
 {
     Q_OBJECT
-    
-    class QAbstractItemDelegate* delegate;
-    class QTimeLine* timer;
-    class QAbstractItemModel* model;
-
-    int h;
-    int offset;
-
 public:
-    FirehoseView();
-
-    /** you can set any model you like, but it prolly won't work as expected,
-      * also, if you don't set this, we crash :P */
-    void setModel( QAbstractItemModel* );
-    /** as above */
-    void setDelegate( QAbstractItemDelegate* );
-
+    DelegateDragHint( QAbstractItemDelegate* d, const QModelIndex& i, const QStyleOptionViewItem& options, QWidget* p ): m_d( d ), m_i( i ), m_options( options ), m_mimeData( 0 ), QWidget( 0 )
+    { 
+        setWindowFlags( Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
+        setWindowOpacity( 0.3 );
+        resize( options.rect.size() );
+        move( p->mapToGlobal( options.rect.topLeft()));
+    }
+    
+    void paintEvent( QPaintEvent* e );
+    
+    void dragTo( QWidget* target );
+   
+    void setMimeData( QMimeData* data ){ m_mimeData = data; }
+    
+    QSize sizeHint() const { QStyleOptionViewItem option; option.rect = rect(); return m_d->sizeHint( option, m_i); }
+    
+    QModelIndex index(){ return m_i; }
+    
+signals:
+    void finishedAnimation();
+    
 private slots:
-    void onRowInserted();
-    void onModelReset();
-    void onFrameChange( int );
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void resizeEvent( QResizeEvent* );
-    virtual void scrollContentsBy( int, int );
+    void onDragFrameChanged( int frame );
     
-    virtual void mouseDoubleClickEvent( QMouseEvent* );
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent( QMouseEvent* event );
-    
-    QModelIndex indexAt( const QPoint& point ) const;
-    QRect visualRect( const QModelIndex& i ) const;
-    
-    QScrollBar* bar() const { return verticalScrollBar(); }
+    void onFinishedAnimation();
     
 private:
-    QMap< QModelIndex, QRect > m_itemRects;
-    QPoint m_dragStartPosition;
+    QWidget* m_target;
+    QPoint m_startPoint;
+    QMimeData* m_mimeData;
+    QAbstractItemDelegate* m_d;
+    QModelIndex m_i;
+    QStyleOptionViewItem m_options;
 };
 
-#endif
+#endif //DELEGATE_DRAG_HINT_H

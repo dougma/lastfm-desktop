@@ -43,7 +43,7 @@ protected:
     
 private slots:
     void onTagsRequestFinished( WsReply* );
-    void onItemDoubleClicked( QTreeWidgetItem*, int column );
+    void onDoubleClicked( const QModelIndex& );
     
 private:
     class QMenu* m_menu;

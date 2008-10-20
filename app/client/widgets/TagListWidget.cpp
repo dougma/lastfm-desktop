@@ -23,6 +23,8 @@
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "the/mainWindow.h"
+#include "radio/buckets/DelegateDragHint.h"
+#include "radio/buckets/PlayerBucket.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "PlayableMimeData.h"
 #include <QDesktopServices>
@@ -75,7 +77,7 @@ TagListWidget::TagListWidget( QWidget* parent )
     connect( a, SIGNAL(triggered()), SLOT(openTagPageForCurrentItem()) );
     
     connect( this, SIGNAL(customContextMenuRequested( QPoint )), SLOT(showMenu( QPoint )) );
-    connect( this, SIGNAL(itemDoubleClicked( QTreeWidgetItem*, int )), SLOT(onItemDoubleClicked ( QTreeWidgetItem*, int )) );
+    connect( this, SIGNAL(doubleClicked( const QModelIndex& )), SLOT(onDoubleClicked ( const QModelIndex& )) );
 }
 
 
@@ -147,12 +149,18 @@ TagListWidget::onTagsRequestFinished( WsReply* r )
 
 
 void
-TagListWidget::onItemDoubleClicked ( QTreeWidgetItem* item, int column )
+TagListWidget::onDoubleClicked ( const QModelIndex& index )
 {
-    PlayableMimeData* data = PlayableMimeData::createFromTag( item->text( 0 ) );
+    PlayableMimeData* data = PlayableMimeData::createFromTag( model()->data( index, Qt::DisplayRole ).toString());
+
+    QStyleOptionViewItem options;
+    options.initFrom( this );
+    options.rect = visualRect( index );
+    DelegateDragHint* dragHint = new DelegateDragHint( itemDelegate(), index, options, this );
+    dragHint->setMimeData( data );
     
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
-    The::mainWindow().ui.primaryBucket->replaceStation( data );
+    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucket );
 }
 
 

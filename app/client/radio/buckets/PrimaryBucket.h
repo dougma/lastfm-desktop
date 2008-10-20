@@ -30,8 +30,7 @@ class PrimaryBucket : public QMainWindow
 public:
 	PrimaryBucket();
     
-private:
-	
+
 	struct {
 		class Unicorn::TabWidget* tabWidget;
         class PrimaryListView* stationsBucket;
@@ -41,9 +40,13 @@ private:
         class RadioMiniControls* controls;
 	} ui;
     
+private:
+	
 private slots:
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
+    void onItemDoubleClicked( const class QModelIndex& index );
+    void onDnDAnimationFinished();
     
 public slots:
 	void replaceStation( class QMimeData* );
@@ -60,7 +63,9 @@ public slots:
 
 class PrimaryListView : public QListWidget
 {
-	Q_OBJECT
+    Q_OBJECT
+    
+    friend class PrimaryBucket;
 public:
 	PrimaryListView( QWidget* parent ): QListWidget( parent ){};
     

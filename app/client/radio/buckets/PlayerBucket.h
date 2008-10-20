@@ -28,6 +28,8 @@
 #include <QDomElement>
 #include <QDomNodeList>
 
+#include "the/App.h"
+
 class PlayerBucket : public QListWidget
 {
 	Q_OBJECT
@@ -42,6 +44,11 @@ public:
 	
 	bool addFromMimeData( const QMimeData* data );
     
+public slots:
+    void play();
+    
+protected:
+    
     virtual void showEvent( QShowEvent* e )
     {
         Q_UNUSED( e );
@@ -55,15 +62,32 @@ public:
         if( ui.previewList )
             ui.previewList->hide();
     }
-    
-public slots:
-    void play();
-    
-protected:
 	
 	void resizeEvent ( QResizeEvent* event );	
 	void dropEvent( QDropEvent* event);	
 	void dragEnterEvent ( QDragEnterEvent * event );
+    
+    bool event( QEvent* event )
+    {
+        switch( event->type() )
+        {
+            case QEvent::DragEnter:
+                dragEnterEvent( static_cast<QDragEnterEvent*>(event) );
+                break;
+                
+            case QEvent::Drop:
+                dropEvent( static_cast<QDropEvent*>(event) );
+                break;
+                
+            case QEvent::DragMove:
+                dragMoveEvent( static_cast<QDragMoveEvent*>(event) );
+                break;
+
+            default:
+                return QListWidget::event( event );
+        }
+        return true;
+    }
 
     //Not really sure why this has to be overloaded but seems to fix dnd on win32
     //qt drag and drop API is NOT very clearly defined :(
@@ -103,10 +127,10 @@ public:
 	
 	void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 	{
-		if( option.state & QStyle::State_Active )
-			painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x7e, 0x77) );
-		else
-			painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x2e, 0x77) );
+        if( option.state & QStyle::State_Active )
+            painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x7e, 0x77) );
+        else
+            painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x2e, 0x77) );
 		
 		QRect iconRect = option.rect;
 		iconRect.adjust( 2, 2, -2, -15 );
@@ -126,6 +150,7 @@ public:
 		Q_UNUSED( index );
 		return option.rect.size();
 	}
+    
 };
 
 #endif //PLAYER_BUCKET_H
