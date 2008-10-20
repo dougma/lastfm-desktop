@@ -33,12 +33,20 @@ public:
     
     static const char* organizationName()
     {
+    #ifdef NDEBUG
         return "Last.fm";
+    #else
+        return "Last.am";
+    #endif
     }
     
     static const char* organizationDomain()
     {
+    #ifdef NDEBUG
         return "last.fm";
+    #else
+        return "last.am";
+    #endif
     }
 
 	CoreLocale locale() const

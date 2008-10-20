@@ -32,7 +32,7 @@ class IPodSettings
     public:
         Settings( IPodSettings const * const s )
         {
-            beginGroup( "device/iPod" + s->m_uid );
+            beginGroup( "device/" + s->m_uid );
         }
     };
 
