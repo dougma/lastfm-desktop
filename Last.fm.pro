@@ -53,4 +53,5 @@ else {
 	}
 	
 	!macx*:SUBDIRS -= lib/lastfm/fingerprint/libfingerprint.pro
+	linux*:SUBDIRS -= app/twiddly
 }
