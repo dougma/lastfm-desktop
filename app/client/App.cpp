@@ -43,6 +43,9 @@
 #ifdef WIN32
     #include "legacy/disableHelperApp.cpp"
 #endif
+#ifdef Q_WS_MAC
+    extern void qt_mac_set_menubar_icons( bool );
+#endif
 
 
 App::App( int& argc, char** argv ) 
@@ -53,6 +56,7 @@ App::App( int& argc, char** argv )
     // pixelmetrics when it is created, which means a post setStyle doesn't
     // work
     setStyle( new UnicornMacStyle );
+    qt_mac_set_menubar_icons( false );
 #endif
     
     // ATTENTION! Under no circumstance change these strings! --mxcl
