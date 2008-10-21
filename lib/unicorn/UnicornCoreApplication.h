@@ -22,10 +22,12 @@
 
 #include <QCoreApplication>
 #include <QFileInfo>
+#include "lib/DllExportMacro.h"
+
 namespace Unicorn { class Application; }
 
 
-class UnicornCoreApplication : public QCoreApplication
+class UNICORN_DLLEXPORT UnicornCoreApplication : public QCoreApplication
 {
 	friend class Unicorn::Application;
 	

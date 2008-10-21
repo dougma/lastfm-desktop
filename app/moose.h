@@ -40,7 +40,7 @@ namespace moose
             return "/Applications/Last.fm.app/Contents/MacOS/Last.fm";
         #endif
         #ifdef WIN32
-            path = HklmSettings().value( "Path" );
+            path = HklmSettings().value( "Path" ).toString();
             if (path.size())
                 return path;
             return CoreDir::programFiles().filePath( "Last.fm/Last.fm.exe" );
