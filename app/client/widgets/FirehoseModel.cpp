@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "FirehoseModel.h"
+#include "app/moose.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QNetworkReply>
@@ -132,7 +133,7 @@ FirehoseModel::onItemReady( FirehoseItem* item )
 void
 FirehoseModel::onFinished()
 {
-    qDebug() << "Oh, we d/c'd. Prolly an error happened";
+    qDebug() << "OHAI! We d/c'd. I guess you put your laptop to sleep or sumfink?";
 }
 
 
@@ -148,9 +149,16 @@ FirehoseModel::data(const QModelIndex &index, int role) const
     {
         case Qt::DisplayRole: return m_users[row];
         case Qt::DecorationRole: return m_avatars[row];
-        case TrackRole: return QVariant::fromValue( m_tracks[row] );
-        case TimestampRole: return m_timestamps[row];
-        case CumulativeCountRole: return m_cumulative_count;
+        case moose::TrackRole: return QVariant::fromValue( m_tracks[row] );
+        case moose::TimestampRole: return m_timestamps[row];
+        case moose::CumulativeCountRole: return m_cumulative_count;
+            
+        case moose::SecondaryDisplayRole: return m_tracks[row].toString();
+        case moose::SmallDisplayRole:
+        {
+            QString format = CoreLocale::system().qlocale().timeFormat( QLocale::ShortFormat );
+            return m_timestamps[row].toString( format );
+        }
     }
     
     return QVariant();

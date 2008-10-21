@@ -28,14 +28,6 @@
 #include "lib/lastfm/types/Track.h"
 
 
-enum
-{
-    TrackRole = Qt::UserRole,
-    TimestampRole,
-    CumulativeCountRole
-};
-
-
 class FirehoseModel : public QAbstractItemModel
 {
     Q_OBJECT
