@@ -115,6 +115,14 @@ public:
 void
 Radio::enqueue( const QList<Track>& tracks )
 {   
+    if (m_state == Stopped) {
+        // this should be impossible. If we are stopped, then the GUI looks
+        // stopped too, and receiving tracks to play will result in a playing
+        // radio and a stopped GUI. NICE.
+        Q_ASSERT( 0 );
+        return;
+    }
+    
 	if (tracks.isEmpty()) {
 		qWarning() << "Received blank playlist, Last.fm is b0rked";
 		stop();
@@ -178,7 +186,7 @@ Radio::skip()
 		m_mediaObject->play();
 #endif
 	}
-	else
+	else if (m_state != Stopped)
 	{
 		// we are still waiting for a playlist to come back from the tuner
 		
@@ -205,6 +213,9 @@ Radio::onTunerError( Ws::Error e )
 void
 Radio::stop()
 {
+    delete m_tuner;
+    m_tuner = 0;
+    
     m_mediaObject->blockSignals( true ); //prevent the error state due to setting current source to null
 	m_mediaObject->stop();
 	m_mediaObject->clearQueue();
@@ -230,7 +241,7 @@ Radio::clear()
 
 
 void
-Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
+Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ )
 {
     switch (newstate)
     {
