@@ -46,6 +46,7 @@ class LASTFM_WS_DLLEXPORT WsReply : public QObject
     QDomDocument m_xml;
     QDomElement m_lfm;
     QByteArray m_data;
+    QVariant m_associatedData;
 
     friend class WsRequestBuilder;
 	friend QDebug operator<<( QDebug, WsReply* );
@@ -60,6 +61,10 @@ public:
     static QString networkErrorString( QNetworkReply::NetworkError );
 
 	QString method() const;
+    
+    /** use the metadata component to remind you what wsreply this is */
+    void setAssociatedData( const QVariant& v ) { m_associatedData = v; }
+    QVariant associatedData() const { return m_associatedData; }
 	
 #ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH
     /** blocks until complete
