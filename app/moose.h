@@ -46,6 +46,19 @@ namespace moose
             return CoreDir::programFiles().filePath( "Last.fm/Last.fm.exe" );
         #endif
     }
+
+
+    enum ItemDataRole
+    {
+        TrackRole = Qt::UserRole,
+        TimestampRole,
+        CumulativeCountRole,
+        SecondaryDisplayRole,
+        SmallDisplayRole,
+        UrlRole,
+        WeightingRole,
+        IdentityRole
+    };
 }
 
 #endif
