@@ -37,7 +37,7 @@ public:
 		class PrimaryListView* friendsBucket;
 		class PrimaryListView* tagsBucket;
 		class PlayerBucket* playerBucket;
-        class RadioMiniControls* controls;
+        class RadioControls* controls;
 	} ui;
     
 private:

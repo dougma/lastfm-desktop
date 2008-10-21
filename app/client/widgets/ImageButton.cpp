@@ -78,10 +78,6 @@ ImageButton::paintEvent( QPaintEvent* event )
         iconRect.setLeft( iconRect.left() + m_iconOffsets[ mode ].x() );
         iconRect.setBottom( iconRect.bottom() + m_iconOffsets[ mode ].y() - 3 );
     }
-    else
-    {
-        if( mode == QIcon::Active ) p.setCompositionMode( QPainter::CompositionMode_Exclusion );   
-    }
     
     icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
     
@@ -104,6 +100,32 @@ ImageButton::setPixmap( const QString& path, const QIcon::State st )
     
     QIcon i = icon();
     i.addPixmap( p, QIcon::Normal, st );
+    setIcon( i );
+}
+
+
+void 
+ImageButton::setPixmap( const QString& path, const QIcon::Mode m )
+{
+    QPixmap p( path );
+    
+    setIconSize( p.size().expandedTo( iconSize() ) );
+    
+    QIcon i = icon();
+    i.addPixmap( p, m );
+    setIcon( i );
+}
+
+
+void 
+ImageButton::setPixmap( const QString& path, const QIcon::State s, const QIcon::Mode m )
+{
+    QPixmap p( path );
+    
+    setIconSize( p.size().expandedTo( iconSize() ) );
+    
+    QIcon i = icon();
+    i.addPixmap( p, m, s );
     setIcon( i );
 }
 

@@ -33,7 +33,7 @@ public:
 	struct 
 	{
 		class QTabWidget* tabWidget;
-        class RadioMiniControls* controls;
+        class RadioControls* controls;
 	} ui;
 	
 protected:

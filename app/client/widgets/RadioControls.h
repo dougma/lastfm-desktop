@@ -14,57 +14,51 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "RadioMiniControls.h"
-#include "widgets/ImageButton.h"
-#include <QApplication>
-#include <QHBoxLayout>
-#include <phonon/volumeslider.h>
-#include "the/radio.h"
+#ifndef RADIO_CONTROLS_H
+#define RADIO_CONTROLS_H
+
+#include "State.h"
+#include <QWidget>
+namespace Phonon { class VolumeSlider; }
+class ImageButton;
 
 
-RadioMiniControls::RadioMiniControls()
+class RadioControls : public QWidget
 {
-    QHBoxLayout* h = new QHBoxLayout( this );
-    h->addWidget( ui.play = new ImageButton( ":/play.png" ) );
-    h->addWidget( ui.skip = new ImageButton( ":/skip.png" ) );
-    h->setSpacing( 0 );
+	Q_OBJECT
 
-    ui.play->setPixmap( ":/stop.png", QIcon::On );
-    ui.play->setCheckable( true );
-    ui.play->setChecked( false );
-    ui.volume = new Phonon::VolumeSlider;
-	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
+public:
+    RadioControls();
+
+	struct Ui
+    {
+        ImageButton* play;
+        ImageButton* skip;
+        Phonon::VolumeSlider* volume;
+    } 
+	ui;
+    
+    virtual bool eventFilter( QObject*, QEvent* );
+    bool sliderEventFilter( class QSlider*, QEvent* ) const;
+    bool toolButtonEventFilter( class QToolButton*, QEvent* ) const;
 	
-    h->addWidget( ui.volume );
+private slots:
+	void onRadioStopped();
+    void onRadioTuningIn( const class RadioStation& );
+	void onPlayClicked();
+    
+    void onVolumeValueChanged( int );
 	
-	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
-    connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
-	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
-}
+signals:
+	void stop();
+    void play();
+    
+private:
+    class QSlider* m_volumeSlider;
+};
 
 
-void
-RadioMiniControls::onRadioStopped()
-{
-    ui.play->setChecked( false );
-}
-
-
-void 
-RadioMiniControls::onRadioTuningIn( const RadioStation& )
-{
-    ui.play->setChecked( true );
-}
-
-
-void
-RadioMiniControls::onPlayClicked()
-{
-	if (!ui.play->isChecked())
-		emit stop();
-    else
-        emit play();
-}
+#endif RADIO_CONTROLS_H

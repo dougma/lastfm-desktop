@@ -40,6 +40,9 @@ public:
 	
 	virtual QSize sizeHint() const;
 	void setPixmap( const QString&, const QIcon::State = QIcon::Off );
+    void setPixmap( const QString&, const QIcon::Mode m );
+    void setPixmap( const QString&, const QIcon::State, const QIcon::Mode );
+
 	void setBackgroundPixmap( const QString&, const QIcon::Mode = QIcon::Normal );
 	void moveIcon( int x, int y, QIcon::Mode = QIcon::Normal );
     

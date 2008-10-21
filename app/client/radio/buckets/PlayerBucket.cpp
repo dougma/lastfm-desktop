@@ -45,10 +45,6 @@ PlayerBucket::PlayerBucket( QWidget* w )
 			 :QListWidget( w ),
 			  m_showDropText( true)
 {
-	ui.previewList = new QListWidget;
-    ui.previewList->hide();
-	m_networkManager = new WsAccessManager( this );
-	
 	setItemDelegate( new PlayerBucketDelegate( this ));
 	setAcceptDrops( true );
     setDragDropMode( QAbstractItemView::DragDrop );
@@ -209,9 +205,6 @@ PlayerBucket::addFromMimeData( const QMimeData* d )
 		QModelIndex index = model()->index( i, 0 );
 		query += queryString( index );
 	}
-	qDebug() << "RadioQL query: " << query;
-	QNetworkReply* reply = m_networkManager->get( QNetworkRequest( "http://tester:futureofmusic@ws.jono.dev.last.fm:8090/radioTest.php?query=" + query ));
-	connect( reply, SIGNAL( finished()), SLOT( playlistFetched()) );
 
 	return true;
 }
@@ -241,29 +234,6 @@ PlayerBucket::queryString( const QModelIndex i, bool joined ) const
 	}
 	qs += "" + i.data( Qt::DisplayRole ).toString() + "";
 	return qs;
-}
-
-
-void
-PlayerBucket::playlistFetched()
-{
-	QNetworkReply* reply = static_cast< QNetworkReply* > (sender());
-	
-	QDomDocument xmlDoc;
-	QByteArray data = reply->readAll();
-	xmlDoc.setContent( data );
-	
-	QDomNodeList tracks = xmlDoc.elementsByTagName( "track" );
-
-	ui.previewList->clear();
-	for( int i = 0; i < tracks.size(); i++ )
-	{
-		QString info;
-		QDomElement track = tracks.at( i ).toElement();
-		info += track.elementsByTagName( "creator" ).at( 0 ).toElement().text();
-		info += " - " + track.elementsByTagName( "title" ).at( 0 ).toElement().text();
-		ui.previewList->addItem( info );
-	}
 }
 
 

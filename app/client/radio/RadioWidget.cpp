@@ -24,7 +24,7 @@
 #include "NeighboursTuner.h"
 #include "MyStations.h"
 #include "widgets/ImageButton.h"
-#include "widgets/RadioMiniControls.h"
+#include "widgets/RadioControls.h"
 #include "the/radio.h"
 #include <QAction>
 #include <QEvent>
@@ -71,7 +71,7 @@ RadioWidget::RadioWidget( QWidget* parent )
 
     QVBoxLayout* v = new QVBoxLayout( centralwidget );
 	v->addWidget( s );
-    v->addWidget( ui.controls = new RadioMiniControls );
+    v->addWidget( ui.controls = new RadioControls );
 	
     ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
 

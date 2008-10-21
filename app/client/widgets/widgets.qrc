@@ -48,4 +48,17 @@
       <file>ScrobbleButton/off.png</file>
       <file>ScrobbleButton/SADFACE.png</file>
   </qresource>
+  <qresource>
+      <file>RadioControls/volume/icon.png</file>
+      <file>RadioControls/volume/rail.png</file>
+      <file>RadioControls/volume/handle.png</file>
+  </qresource>
+  <qresource>
+      <file>RadioControls/stop/rest.png</file>
+      <file>RadioControls/stop/onpress.png</file>
+  </qresource>
+  <qresource>
+      <file>RadioControls/skip/rest.png</file>
+      <file>RadioControls/skip/onpress.png</file>
+  </qresource>
 </RCC>

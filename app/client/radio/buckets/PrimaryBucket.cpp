@@ -29,7 +29,7 @@
 #include "PlayerBucket.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
-#include "widgets/RadioMiniControls.h"
+#include "widgets/RadioControls.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
@@ -77,11 +77,10 @@ PrimaryBucket::PrimaryBucket()
     QWidget* playerPane =  new QWidget( this );
     new QVBoxLayout( playerPane );
     playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
-    playerPane->layout()->addWidget( ui.controls = new RadioMiniControls);
+    playerPane->layout()->addWidget( ui.controls = new RadioControls);
+    playerPane->setAutoFillBackground( true );
     ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
     
-    UnicornWidget::paintItBlack( ui.controls );
-
     connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
@@ -90,10 +89,12 @@ PrimaryBucket::PrimaryBucket()
     ui.controls->show();
     
 	splitter->addWidget( playerPane );
+    UnicornWidget::paintItBlack( splitter );
+    splitter->setAutoFillBackground( true );
 	
-	UnicornWidget::paintItBlack( this );
-    
     setCentralWidget( splitter );
+    
+	UnicornWidget::paintItBlack( this );
 }
 
 

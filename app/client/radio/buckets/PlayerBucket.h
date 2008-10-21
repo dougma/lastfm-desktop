@@ -35,9 +35,6 @@ class PlayerBucket : public QListWidget
 	Q_OBJECT
 public:
 	PlayerBucket( QWidget* w );
-	struct {
-		class QListWidget* previewList;
-	} ui;
 	
 	QRect visualRect ( const QModelIndex & index ) const;
 	QModelIndex indexAt( const QPoint& point ) const;
@@ -48,21 +45,7 @@ public slots:
     void play();
     
 protected:
-    
-    virtual void showEvent( QShowEvent* e )
-    {
-        Q_UNUSED( e );
-        if( ui.previewList )
-            ui.previewList->show();
-    }
-    
-    virtual void hideEvent ( QHideEvent * e )
-    {
-        Q_UNUSED( e );
-        if( ui.previewList )
-            ui.previewList->hide();
-    }
-	
+
 	void resizeEvent ( QResizeEvent* event );	
 	void dropEvent( QDropEvent* event);	
 	void dragEnterEvent ( QDragEnterEvent * event );
@@ -111,9 +94,6 @@ private:
 	class QNetworkAccessManager* m_networkManager;
 	
 	QString queryString( const QModelIndex i, bool joined = true ) const;
-	
-private slots:
-	void playlistFetched();
 
 };
 

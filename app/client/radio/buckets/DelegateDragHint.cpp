@@ -51,14 +51,17 @@ DelegateDragHint::dragTo( QWidget* target )
 {
     m_target = target;
     m_startPoint = pos();
+    
     QTimeLine* timeLine = new QTimeLine( 1000, this );
     timeLine->setFrameRange( 0, 100 );
     timeLine->setCurveShape( QTimeLine::EaseInCurve );
+    
     connect( timeLine, SIGNAL( frameChanged(int)), SLOT( onDragFrameChanged(int)));
     connect( timeLine, SIGNAL( finished()), SIGNAL( finishedAnimation()));
     connect( timeLine, SIGNAL( finished()), SLOT( onFinishedAnimation()));
     timeLine->start();
     show();
+    clearFocus();
 }
 
 
