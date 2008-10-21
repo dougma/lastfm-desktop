@@ -43,6 +43,13 @@ User::getNeighbours() const
 }
 
 
+WsReply*
+User::getPlaylists() const
+{
+    return WsRequestBuilder( "user.getPlaylists" ).add( "user", m_name ).get();
+}
+
+
 QList<User> //static
 User::list( WsReply* r )
 {
