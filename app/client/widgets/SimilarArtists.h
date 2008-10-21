@@ -23,11 +23,11 @@
 #include <QAbstractItemModel>
 #include <QList>
 #include <QVariant>
-#include <QWidget>
+#include <QListView>
 #include <QPixmap>
 
 
-class SimilarArtists : public QWidget
+class SimilarArtists : public QListView
 {
 	Q_OBJECT
 
@@ -79,14 +79,14 @@ class SimilarArtistsItem : public QObject
 
 	QString m_artist;
 	QPixmap m_image;
-	float m_matchPercent;
+	float m_weighting;
 
 public:
 	SimilarArtistsItem( const class CoreDomElement&, class WsAccessManager * );
 
 	QString artist() const { return m_artist; }
 	QPixmap image() const { return m_image; }
-	float matchPercent() const { return m_matchPercent; }
+	float weighting() const { return m_weighting; }
 	
 	QMimeData* mimeData() const;
 

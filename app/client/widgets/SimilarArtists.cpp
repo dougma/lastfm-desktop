@@ -22,6 +22,7 @@
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
 #include "PlayableMimeData.h"
+#include "app/moose.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
@@ -38,49 +39,35 @@
 
 SimilarArtists::SimilarArtists()
 {
-	QListView* view = new QListView;
-	QVBoxLayout *v = new QVBoxLayout( this );
-	v->addWidget( view );
-	v->setMargin( 0 );
-	v->setSpacing( 0 );
+	setModel( m_model = new SimilarArtistsModel( this ) );
 
-	m_model = new SimilarArtistsModel( view );
-	view->setModel(m_model);
-
-	delete view->itemDelegate();
-	view->setItemDelegate( new FirehoseDelegate );
-	view->setAttribute( Qt::WA_MacShowFocusRect, false );
-
-	// mxcl's awesome protected hack (tm)
-	struct ProtectionHack : QAbstractScrollArea { using QAbstractScrollArea::setViewportMargins; };
-	reinterpret_cast<ProtectionHack*>(view)->setViewportMargins( 4, 4, 4, 4 );
-
-	UnicornWidget::paintItBlack( this );
+	delete itemDelegate();
+	setItemDelegate( new FirehoseDelegate );
+	setAttribute( Qt::WA_MacShowFocusRect, false );
 
 	QPalette p = palette();    
 	p.setBrush( QPalette::Text, Qt::white );
 	
 	m_model->setSupportedDragActions( Qt::CopyAction | Qt::MoveAction );
 
-	view->setPalette( p );
-	view->setAutoFillBackground( true );
-	view->setDragEnabled( true );
-	view->setDragDropMode( QAbstractItemView::DragOnly );
-	view->setMovement( QListView::Free );
+	setPalette( p );
+	setAutoFillBackground( true );
+	setDragEnabled( true );
+	setDragDropMode( QAbstractItemView::DragOnly );
+	setMovement( QListView::Free );
 
-	connect( view, SIGNAL(doubleClicked( QModelIndex )), SLOT(onDoubleClicked( QModelIndex )) );
+	connect( this, SIGNAL(doubleClicked( QModelIndex )), SLOT(onDoubleClicked( QModelIndex )) );
 }
 
 
 void
 SimilarArtists::onDoubleClicked(const QModelIndex &index)
 {
-    QListView* listView = static_cast<QListView*>( sender());
     QStyleOptionViewItem options;
     options.initFrom( this );
-    options.rect = listView->visualRect( index );
-    DelegateDragHint* dragHint = new DelegateDragHint( listView->itemDelegate(), index, options, listView );
-    dragHint->setMimeData( listView->model()->mimeData( QModelIndexList() << index ) );
+    options.rect = visualRect( index );
+    DelegateDragHint* dragHint = new DelegateDragHint( itemDelegate(), index, options, this );
+    dragHint->setMimeData( model()->mimeData( QModelIndexList() << index ) );
     
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
     dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucket );
@@ -175,8 +162,9 @@ SimilarArtistsModel::data(const QModelIndex &index, int role) const
 
 	switch (role)
 	{
-	case Qt::DisplayRole: return m_items[row]->artist();
-	case Qt::DecorationRole: return m_items[row]->image();
+        case Qt::DisplayRole: return m_items[row]->artist();
+        case Qt::DecorationRole: return m_items[row]->image();
+        case moose::WeightingRole: return m_items[row]->weighting();
 	}
 
 	return QVariant();
@@ -197,10 +185,9 @@ SimilarArtistsModel::mimeData( const QModelIndex &index ) const
 QMimeData* 
 SimilarArtistsModel::mimeData( const QModelIndexList &indexes ) const
 {
-	
-//FIXME: only single items are supported at the moment so multiselection
-//		 drag and drop will only drag the first item :(
-	if( indexes.isEmpty() ) return 0;
+	//FIXME: only single items are supported at the moment so multiselection
+    //		 drag and drop will only drag the first item :(
+	if (indexes.isEmpty()) return 0;
 	
 	return mimeData( indexes.first() );
 }
@@ -209,9 +196,9 @@ SimilarArtistsModel::mimeData( const QModelIndexList &indexes ) const
 
 
 SimilarArtistsItem::SimilarArtistsItem( const class CoreDomElement& artist, WsAccessManager *wam )
-{
+{    
 	m_artist = artist["name"].text();
-	m_matchPercent = artist["match"].text().toFloat();
+	m_weighting = artist["match"].text().toDouble() / 100;
 
 	QString imgUrl(artist["image size=medium"].text());
 	QNetworkReply* reply = wam->get( QNetworkRequest(imgUrl) );
