@@ -101,15 +101,14 @@ public:
     Source source() const { return (Source)d->source; }
     QString fingerprintId() const { return d->fingerprintId; }
 
-    QString durationString() const;
+    QString durationString() const { return durationString( d->duration ); }
+    static QString durationString( int seconds );
 
     /** default separator is an en-dash */
     QString toString( const QChar& separator = QChar(8211) ) const;
     /** the standard representation of this object as an XML node */
     QDomElement toDomElement( class QDomDocument& ) const;
 
-    
-//////////// TODO move to class Scrobble
     bool operator<( const Track &that ) const
     {
         return this->d->time < that.d->time;

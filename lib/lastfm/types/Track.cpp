@@ -114,11 +114,11 @@ Track::toString( const QChar& separator ) const
 }
 
 
-QString
-Track::durationString() const
+QString //static
+Track::durationString( int const duration )
 {
-    QTime t = QTime().addSecs( d->duration );
-    if (d->duration < 60*60)
+    QTime t = QTime().addSecs( duration );
+    if (duration < 60*60)
         return t.toString( "m:ss" );
     else
         return t.toString( "hh:mm:ss" );
