@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "FriendsPicker.h"
-#include "widgets/UnicornLineEdit.h"
+#include "widgets/HelpTextLineEdit.h"
 #include "widgets/UnicornWidget.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
@@ -33,7 +33,7 @@ FriendsPicker::FriendsPicker( const User& user )
     qDebug() << user;
     
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new Unicorn::LineEdit( tr("Search") ) );
+    v->addWidget( new HelpTextLineEdit( tr("Search") ) );
     v->addWidget( ui.list = new QListWidget );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
  

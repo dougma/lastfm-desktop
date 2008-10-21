@@ -17,27 +17,21 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "UnicornLineEdit.h"
-#include <QPainter>
+#ifndef HELP_TEXT_LINE_EDIT_H
+#define HELP_TEXT_LINE_EDIT_H
+
+#include <QLineEdit>
 
 
-Unicorn::LineEdit::LineEdit( const QString& text )
-                 : m_text( text )
+class HelpTextLineEdit : public QLineEdit
 {
-    setMinimumWidth( fontMetrics().width( m_text ) + 12 );
-}
+    QString const m_text;
 
-
-void
-Unicorn::LineEdit::paintEvent( QPaintEvent* e )
-{
-    QLineEdit::paintEvent( e );
+public:
+    HelpTextLineEdit( const QString& helpText = "" );
     
-    if (text().isEmpty())
-    {
-        QRect r = rect().adjusted( 5, 2, -5, 0 );
-        QPainter p( this );
-        p.setPen( Qt::gray );
-        p.drawText( r, Qt::AlignVCenter, m_text );
-    }
-}
+protected:
+    virtual void paintEvent( QPaintEvent* );
+};
+
+#endif
