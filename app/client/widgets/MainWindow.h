@@ -28,6 +28,7 @@ class ShareDialog;
 class TagDialog;
 class SettingsDialog;
 class DiagnosticsDialog;
+class PlaylistDialog;
 
 
 class MainWindow : public QMainWindow
@@ -59,7 +60,7 @@ public slots:
     void showAboutDialog();
     void showShareDialog();
 	void showTagDialog();
-    void showMetaInfoView();
+    void showPlaylistDialog();
     void showCogMenu();
     void closeActiveWindow();
 
@@ -86,4 +87,5 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
 };

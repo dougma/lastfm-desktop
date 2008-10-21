@@ -30,6 +30,7 @@
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
 #include "widgets/MetaInfoView.h"
+#include "widgets/PlaylistDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
@@ -60,8 +61,7 @@ MainWindow::MainWindow()
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     close->setContext( Qt::ApplicationShortcut );
     connect( close, SIGNAL(activated()), SLOT(closeActiveWindow()) );
-    
-    connect( ui.meta, SIGNAL(triggered()), SLOT(showMetaInfoView()) );
+
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
@@ -262,7 +262,11 @@ MainWindow::setupCentralWidget()
 void
 MainWindow::showCogMenu()
 {
-    (new CogButtonPopup( centralWidget()->sizeHint().width(), centralWidget() ))->show();
+    int const w = centralWidget()->sizeHint().width();
+    CogButtonPopup* cog = new CogButtonPopup( w, centralWidget() );
+    cog->show();
+    
+    connect( cog, SIGNAL(addToPlaylistClicked()), SLOT(showPlaylistDialog()) );
 }
 
 
@@ -288,9 +292,9 @@ MainWindow::showAboutDialog()
 
 
 void
-MainWindow::showMetaInfoView()
+MainWindow::showPlaylistDialog()
 {
-
+    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track )
 }
 
 
@@ -459,9 +463,9 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 		}
 		else if (scrobbles > 0)
 		{
-			ui.account->addAction( tr("%L1 scrobbles").arg( scrobbles ) )->setEnabled( false );			
+			ui.account->addAction( tr("%L1 scrobbles").arg( scrobbles ) )->setEnabled( false );
 		}
-	}
+    }
 	catch (CoreDomElement::Exception&)
 	{}
 }

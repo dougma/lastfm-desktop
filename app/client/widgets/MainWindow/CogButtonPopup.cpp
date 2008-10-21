@@ -19,6 +19,7 @@
 
 #include "CogButtonPopup.h"
 #include "widgets/UnicornWidget.h"
+#include <QCoreApplication>
 #include <QPainter>
 #include <QTimeLine>
 #include <QVBoxLayout>
@@ -27,18 +28,19 @@
 
 CogButtonPopup::CogButtonPopup( int width, QWidget* parent ) : QWidget( parent )
 {
-    QPushButton* cancel, *p;
+    QPushButton* cancel, *playlist, *praise;
     
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( p = new QPushButton( tr("Add to Playlist") ) );
-    v->addWidget( new QPushButton( tr("Praise the Client Team") ) );
+    v->addWidget( playlist = new QPushButton( tr("Add to Playlist") ) );
+    v->addWidget( praise = new QPushButton( tr("Praise the Client Team") ) );
     v->addSpacing( 8 );
     v->addWidget( cancel = new QPushButton( tr("Cancel") ) );
+
+	connect( playlist, SIGNAL(clicked()), SIGNAL(addToPlaylistClicked()) );
+	connect( praise, SIGNAL(clicked()), SLOT(praise()) );
     
-    connect( cancel, SIGNAL(clicked()), SLOT(bye()) );
-    
-    
-	connect( p, SIGNAL(clicked()), SLOT(praise()) );
+    foreach (QPushButton* b, findChildren<QPushButton*>())
+        connect( b, SIGNAL(clicked()), SLOT(bye()) );
     
     // because the actionbar doesn't set its width correctly
     width = 270;
@@ -80,10 +82,10 @@ CogButtonPopup::paintEvent( QPaintEvent* )
 
 
 #include <QtNetwork>
-#include "lib/lastfm/ws/WsKeys.h"
+#include "lib/lastfm/types/User.h"
 void
 CogButtonPopup::praise()
 {
-	QUrl url = "http://oops.last.fm/talk/" + QString(Ws::Username) + " praises y'all";
+	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " praises y'all";
 	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }

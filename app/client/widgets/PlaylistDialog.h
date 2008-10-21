@@ -14,38 +14,42 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef MULTI_BUTTON_POPUP_H
-#define MULTI_BUTTON_POPUP_H
-
-#include <QWidget>
+#include "lib/lastfm/types/Track.h"
+#include <QDialog>
 
 
-class CogButtonPopup : public QWidget
+class PlaylistDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
+	
+	Track m_track;
+    class UserPlaylistsModel* m_model;
     
-    class QTimeLine* m_timeline;
+    void setupUi();
+
+    virtual void accept();
     
 public:
-    CogButtonPopup( const int width, QWidget* parent );   
-    
+	PlaylistDialog( QWidget* parent );
+
+	void setTrack( const Track& );
+    Track track() const { return m_track; }
+	
+	struct Ui
+	{
+		class PlaylistsView* playlists;
+		class QDialogButtonBox* buttons;
+        class TrackWidget* track;
+	}
+	ui;
+	
 public slots:
-    void move( int i )
-    {
-        QWidget::move( x(), parentWidget()->height() - i );
-    }
-
-    void praise();
-    void bye();
-
-signals:
-    void addToPlaylistClicked();
+    void create();
     
-private:
-    virtual void paintEvent( QPaintEvent* );
+private slots:
+	void onGotUserPlaylists( WsReply* );
+    void onPlaylistCreated( WsReply* );
 };
-
-#endif

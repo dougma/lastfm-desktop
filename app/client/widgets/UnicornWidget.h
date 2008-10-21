@@ -55,12 +55,12 @@ public:
 		m_the##Type->activateWindow();
 
 #define UNICORN_UNIQUE_PER_TRACK_DIALOG( Type, t ) \
-	if (!m_the##Type || m_the##Type->track() != t) { \
+	if (!t.isNull() && (!m_the##Type || m_the##Type->track() != t)) { \
 		m_the##Type = new Type( this ); \
 		PRIVATE_SETUP_UNICORN_UNIQUE_DIALOG( m_the##Type ); \
 		m_the##Type->setTrack( t ); \
 		m_the##Type->show(); \
 	} else \
-		m_the##Type->activateWindow(); \
+		m_the##Type->activateWindow();
 
 #endif
