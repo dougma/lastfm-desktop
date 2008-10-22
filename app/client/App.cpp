@@ -20,6 +20,7 @@
 #include "App.h"
 #include "MbidJob.h"
 #include "Settings.h"
+#include "Resolver.h"
 #include "ipod/BatchScrobbleDialog.h"
 #include "ipod/IPodScrobbleCache.h"
 #include "mac/MacStyle.h"
@@ -99,7 +100,8 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
-	m_radio = new Radio( new Phonon::AudioOutput );
+    m_resolver = new Resolver();
+	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
@@ -132,6 +134,7 @@ App::~App()
     delete m_scrobbler;
     delete m_q;
     delete m_radio;
+    delete m_resolver;
 }
 
 

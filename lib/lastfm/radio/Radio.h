@@ -44,7 +44,7 @@ class LASTFM_RADIO_DLLEXPORT Radio : public QObject
     Q_OBJECT
 
 public:
-    Radio( Phonon::AudioOutput* );
+    Radio( Phonon::AudioOutput*, class RadioContentResolver *resolver = 0 );
     ~Radio();
 	
 	enum State
@@ -114,6 +114,7 @@ private:
 	Radio::State m_state;
 	Track m_track;
 	RadioStation m_station;
+    class RadioContentResolver *m_resolver;
 	
     QMap<QUrl, Track> m_queue;
 };
@@ -150,5 +151,12 @@ inline QDebug operator<<( QDebug d, Phonon::State s )
 
 
 Q_DECLARE_METATYPE( Radio::State );
+
+
+class RadioContentResolver 
+{
+public:
+    virtual void resolve(const Track &) = 0;
+};
 
 #endif //RADIO_H

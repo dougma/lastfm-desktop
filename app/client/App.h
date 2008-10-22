@@ -81,6 +81,7 @@ private:
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
+    class Resolver *m_resolver;
     class BackgroundJobQueue* m_q;
 
     class QSystemTrayIcon* m_trayIcon;

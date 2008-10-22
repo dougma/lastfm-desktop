@@ -25,10 +25,11 @@
 #include <cmath>
 
 
-Radio::Radio( Phonon::AudioOutput* output )
+Radio::Radio( Phonon::AudioOutput* output, RadioContentResolver *resolver )
      : m_tuner( 0 ),
        m_audioOutput( output ),
-       m_state( Radio::Stopped )
+       m_state( Radio::Stopped ),
+       m_resolver( resolver )
 {
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
@@ -114,7 +115,7 @@ public:
 
 void
 Radio::enqueue( const QList<Track>& tracks )
-{   
+{  
     if (m_state == Stopped) {
         // this should be impossible. If we are stopped, then the GUI looks
         // stopped too, and receiving tracks to play will result in a playing
@@ -132,6 +133,8 @@ Radio::enqueue( const QList<Track>& tracks )
     QList<QUrl> urls;
     foreach (const Track& t, tracks)
     {
+        if (m_resolver)
+            m_resolver->resolve(t);
         urls += t.url();
         m_queue[t.url()] = t;
     }
