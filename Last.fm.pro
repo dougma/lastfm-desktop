@@ -50,6 +50,8 @@ else {
 	debug:win32 {
 		SUBDIRS -= app/client
 		SUBDIRS = app/client $$SUBDIRS
+
+		PRECOMPILED_HEADER = common/precompiled.h
 	}
 	
 	!macx*:SUBDIRS -= lib/lastfm/fingerprint/libfingerprint.pro
