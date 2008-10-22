@@ -29,6 +29,8 @@ namespace Unicorn { class Application; }
 
 class UNICORN_DLLEXPORT UnicornCoreApplication : public QCoreApplication
 {
+    Q_DISABLE_COPY(UnicornCoreApplication);
+
 	friend class Unicorn::Application;
 	
 	static void init();
