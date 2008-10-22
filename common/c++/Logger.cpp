@@ -30,18 +30,38 @@
 
 Logger* Logger::instance = 0;
 
-using namespace std;
+#define LOBSTER \
+"                         ,.---." << std::endl << \
+"               ,,,,     /    _ `." << std::endl << \
+"                \\\\\\\\   /      \\  )" << std::endl << \
+"                 |||| /\\/``-.__\\/" << std::endl << \
+"                 ::::/\\/_" << std::endl << \
+" {{`-.__.-'(`(^^(^^^(^ 9 `.========='" << std::endl << \
+"{{{{{{ { ( ( (  (   (-----:=" << std::endl << \
+" {{.-'~~'-.(,(,,(,,,(__6_.'=========." << std::endl << \
+"                 ::::\\/\\ " << std::endl << \
+"                 |||| \\/\\  ,-'/\\" << std::endl << \
+"  jwheare       ////   \\ `` _/  )" << std::endl << \
+"    2008       ''''     \\  `   /" << std::endl << \
+"                         `---''" << std::endl
 
 
 Logger::Logger( const COMMON_CHAR* path, Severity severity ) 
       : mLevel( severity )
 {
+    using namespace std;
+    
     instance = this;
 
 #ifdef WIN32
     InitializeCriticalSection( &mMutex );
+#else
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init( &attr );
+    pthread_mutex_init( &mMutex, &attr );
+#endif
 
-    // Trim file size if above 500k
+#ifdef WIN32
     HANDLE hFile = CreateFileW( path,
                                GENERIC_READ,
                                0, 
@@ -52,10 +72,6 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
     long const fileSize = GetFileSize( hFile, NULL );
     CloseHandle( hFile );
 #else
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init( &attr );
-    pthread_mutex_init( &mMutex, &attr );
-
     struct stat st;
     long const fileSize = stat( path, &st ) == 0 ? st.st_size : 0;
 #endif
@@ -74,7 +90,7 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
         outFile.close();
     }
 
-    ios::openmode flags = ios::out;
+    ios::openmode flags = ios::out | ios::app;
     mFileOut.open( path, flags );
 
     if (!mFileOut)
@@ -87,12 +103,10 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
 	#endif
         return;
     }
-
-    // Print some initial startup info
-    instance->log( "!!! OINKY BOINKY !!!" );
-    std::ostringstream ss;
-    ss << "!!! Filesize: " << fileSize;
-    instance->log( ss.str().c_str() );
+    
+    mFileOut << "________________________________________________________________________________" << endl;
+    mFileOut << endl << endl << LOBSTER;
+    mFileOut << "\"Your argument is invalid because I own a giant lobster\"" << endl << endl;
 }
 
 
@@ -145,7 +159,10 @@ Logger::log( Severity level, const std::string& message, const char* function, i
         return;
 
     std::ostringstream s;
-    s << function << "():" << line << " L" << level << std::endl;
+    s << function << "()";
+    if (level < mLevel)
+        s << line << ": L" << level;
+    s << std::endl;
     s << message << std::endl;
 
     log( s.str().c_str() );
