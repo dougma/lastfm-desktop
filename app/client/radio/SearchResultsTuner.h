@@ -27,7 +27,7 @@ class SearchResultsTuner : public QTabWidget
 
 public:
 	SearchResultsTuner();
-	void addArtists( QStringList );
+	void addArtists( QList<class Artist> );
 	void addTags( QStringList );
 
 private slots:

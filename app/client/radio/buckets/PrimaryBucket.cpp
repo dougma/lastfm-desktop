@@ -21,6 +21,8 @@
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStackedLayout>
+#include <QLineEdit>
+#include <QComboBox>
 #include "widgets/ImageButton.h"
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
@@ -37,9 +39,11 @@
 
 #include <Phonon/volumeslider.h>
 
+Q_DECLARE_METATYPE( PlayableMimeData::Type )
+
 PrimaryBucket::PrimaryBucket()
 {
-	ui.friendsBucket = new PrimaryListView( this );
+    ui.friendsBucket = new PrimaryListView( this );
     ui.friendsBucket->setAlternatingRowColors( true );
     ui.friendsBucket->setDragEnabled( true );
     ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -71,8 +75,24 @@ PrimaryBucket::PrimaryBucket()
     ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
 	ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
 	ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
-	
-	splitter->addWidget( ui.tabWidget );
+    
+    QWidget* primaryPane = new QWidget( this );
+    new QVBoxLayout( primaryPane );
+    primaryPane->layout()->addWidget( ui.tabWidget );
+    
+    QWidget* freeInputWidget = new QWidget( this );
+    new QHBoxLayout( freeInputWidget );
+    freeInputWidget->layout()->addWidget( ui.freeInput = new QLineEdit );
+    ui.freeInput->setAttribute( Qt::WA_MacShowFocusRect, false );
+    
+    freeInputWidget->layout()->addWidget( ui.inputSelector = new QComboBox );
+    ui.inputSelector->addItem( "Artist", QVariant::fromValue(PlayableMimeData::ArtistType) );
+    ui.inputSelector->addItem( "Tag", QVariant::fromValue(PlayableMimeData::TagType) );
+    ui.inputSelector->addItem( "User", QVariant::fromValue(PlayableMimeData::UserType) );
+    
+    primaryPane->layout()->addWidget( freeInputWidget );
+
+	splitter->addWidget( primaryPane );
 	
     QWidget* playerPane =  new QWidget( this );
     new QVBoxLayout( playerPane );
@@ -85,6 +105,7 @@ PrimaryBucket::PrimaryBucket()
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
     connect( ui.controls, SIGNAL( play()), ui.playerBucket, SLOT( play()));
+    connect( ui.freeInput, SIGNAL( returnPressed()), SLOT( onFreeInputReturn()));
     
     ui.controls->show();
     
@@ -95,6 +116,14 @@ PrimaryBucket::PrimaryBucket()
     setCentralWidget( splitter );
     
 	UnicornWidget::paintItBlack( this );
+}
+
+
+void
+PrimaryBucket::onFreeInputReturn()
+{
+    PlayableMimeData::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<PlayableMimeData::Type>();
+    ui.playerBucket->addAndLoadItem( ui.freeInput->text(), type );
 }
 
 
@@ -131,14 +160,6 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
         n->setSizeHint( QSize( 75, 25));
         n->setType( PlayableMimeData::TagType );
     }
-}
-
-
-void 
-PrimaryBucket::replaceStation( QMimeData* data )
-{
-	ui.playerBucket->clear();
-	ui.playerBucket->addFromMimeData( data );
 }
 
 

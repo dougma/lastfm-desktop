@@ -30,6 +30,9 @@
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
 #include <QScrollBar>
+#include "lib/lastfm/core/CoreDomElement.h"
+
+Q_DECLARE_METATYPE( PlayableListItem* )
 
 const QString PlayerBucket::k_dropText  = tr( "Drag something in here to play it." );
 const int PlayerBucket::k_itemMargin = 4;
@@ -45,6 +48,8 @@ PlayerBucket::PlayerBucket( QWidget* w )
 			 :QListWidget( w ),
 			  m_showDropText( true)
 {
+    m_networkManager = new WsAccessManager( this );
+    
 	setItemDelegate( new PlayerBucketDelegate( this ));
 	setAcceptDrops( true );
     setDragDropMode( QAbstractItemView::DragDrop );
@@ -115,6 +120,7 @@ PlayerBucket::resizeEvent ( QResizeEvent* event )
 	
 	QPalette p;
 	p.setBrush( QPalette::Window, lg );
+
 	viewport()->setPalette( p );
     
     calculateLayout();
@@ -302,4 +308,21 @@ PlayerBucket::play()
     
     qDebug() << "Playing query radio";
     The::radio().play( RadioStation::rql( query) );
+}
+
+
+void 
+PlayerBucket::addAndLoadItem( const QString& itemText, const PlayableMimeData::Type type )
+{
+    PlayableListItem* item = new PlayableListItem( this );
+    item->setText( itemText );
+    item->setType( type );
+	item->setForeground( Qt::white );
+	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
+	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
+    item->fetchImage();
+    addItem( item );
+
+    calculateLayout();
+    
 }

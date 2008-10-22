@@ -38,6 +38,8 @@ public:
 		class PrimaryListView* tagsBucket;
 		class PlayerBucket* playerBucket;
         class RadioControls* controls;
+        class QLineEdit* freeInput;
+        class QComboBox* inputSelector;
 	} ui;
     
 private:
@@ -47,9 +49,8 @@ private slots:
     void onUserGetTopTagsReturn( class WsReply* );
     void onItemDoubleClicked( const class QModelIndex& index );
     void onDnDAnimationFinished();
+    void onFreeInputReturn();
     
-public slots:
-	void replaceStation( class QMimeData* );
 
 };
 

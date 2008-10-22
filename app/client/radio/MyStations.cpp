@@ -129,7 +129,7 @@ MyStations::onSearch()
 void 
 MyStations::onArtistSearchResults( WsReply* r )
 {
-	QStringList results = Artist::search( r );
+	QList<Artist> results = Artist::search( r );
 	m_searchResults->addArtists( results );
 	emit searchResultComplete( m_searchResults, m_searchResults->objectName() );
 	ui.spinner->hide();

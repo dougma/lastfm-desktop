@@ -29,6 +29,8 @@
 #include <QDomNodeList>
 
 #include "the/App.h"
+#include "lib/lastfm/types/Artist.h"
+#include "PlayableMimeData.h"
 
 class PlayerBucket : public QListWidget
 {
@@ -38,9 +40,10 @@ public:
 	
 	QRect visualRect ( const QModelIndex & index ) const;
 	QModelIndex indexAt( const QPoint& point ) const;
-	
-	bool addFromMimeData( const QMimeData* data );
     
+    /** add the item to the bucket and load any associated data (ie image) */
+    void addAndLoadItem( const QString& item, const PlayableMimeData::Type );
+	
 public slots:
     void play();
     
@@ -83,6 +86,9 @@ protected:
     
     void calculateLayout();
     
+    bool addFromMimeData( const QMimeData* data );
+    
+   
 private:
 	static const QString k_dropText;
     static const int k_itemMargin;
@@ -91,7 +97,7 @@ private:
     
 	bool m_showDropText;
 	QMap< QModelIndex, QRect > m_itemRects;
-	class QNetworkAccessManager* m_networkManager;
+	class WsAccessManager* m_networkManager;
 	
 	QString queryString( const QModelIndex i, bool joined = true ) const;
 

@@ -191,7 +191,7 @@ MainWindow::setupUi()
 
 void
 MainWindow::setupCentralWidget()
-{    
+{       
     QWidget* actionbar, *indicator;
     ImageButton* love, *ban, *share, *tag;
 

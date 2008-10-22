@@ -42,6 +42,9 @@ public:
     
 	/** the url for this artist's page at www.last.fm */
 	QUrl www() const;
+    
+    QUrl smallImageUrl(){ return m_smallImage; }
+    QUrl imageUrl(){ return m_image; }
 	
 	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
 	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
@@ -59,8 +62,12 @@ public:
     /** Last.fm dictates that you may submit at most 10 of these */
     WsReply* addTags( const QStringList& ) const;
 	
-	WsReply* search() const;
-	static QStringList search( WsReply* );
+	WsReply* search( int limit = -1 ) const;
+	static QList<Artist> search( WsReply* );
+    
+private:
+	QUrl m_smallImage;
+	QUrl m_image;
 };
 
 #endif

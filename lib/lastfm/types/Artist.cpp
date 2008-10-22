@@ -62,9 +62,14 @@ Artist::getSimilar() const
 
 
 WsReply* 
-Artist::search() const
+Artist::search( int limit ) const
 {
-	return WsRequestBuilder( "artist.search" ).add( "artist", m_name ).get();
+    WsRequestBuilder r( "artist.search" );
+    r.add( "artist", m_name );
+
+    if( limit > 0 ) r.add( "limit", limit );
+    
+    return r.get();
 }
 
 
@@ -90,15 +95,18 @@ Artist::getSimilar( WsReply* r )
 }
 
 
-QStringList /* static */
+QList<Artist> /* static */
 Artist::search( WsReply* r )
 {
-	QStringList results;
+	QList<Artist> results;
 	try
 	{
 		foreach( CoreDomElement e, r->lfm().children( "artist" ))
 		{
-			results += e["name"].text();
+            Artist a( e["name"].text());
+            a.m_smallImage = e.optional( "image_small" ).text();
+            a.m_image = e.optional( "image" ).text();
+			results += a;
 		}
 	}
 	catch( CoreDomElement::Exception& e)

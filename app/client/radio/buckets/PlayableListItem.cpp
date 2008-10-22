@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "PlayableListItem.h"
+#include "lib/lastfm/ws/WsReply.h"
 
 PlayableListItem* /* static */
 PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget* parent )
@@ -44,4 +45,71 @@ PlayableListItem::iconDataDownloaded()
     pixmap.loadFromData( reply->readAll() );
     
     setIcon( QIcon( pixmap ) );
+
+}
+
+
+void 
+PlayableListItem::fetchImage()
+{
+    switch( playableType())
+    {
+        case PlayableMimeData::ArtistType:
+        {
+            Artist a( text() );
+            WsReply* reply = a.search( 5 );
+            
+            connect( reply, SIGNAL(finished(WsReply*)), SLOT(onArtistSearchFinished(WsReply*)) );
+            return;
+        }
+            
+        case PlayableMimeData::UserType:
+        {
+            //TODO user.search method - waiting on webteam
+            return;
+        }
+        
+        case PlayableMimeData::TagType:
+        {
+            setIcon( QIcon( ":/buckets/tag_white_on_blue.png" ) );
+            return;
+        }
+    }
+}
+
+
+void 
+PlayableListItem::onArtistSearchFinished( WsReply* r )
+{
+    try
+    {
+        QList<Artist> results = Artist::search( r );
+        
+        Artist a = results.first();
+        
+        if(a != text())
+        {
+            //TODO: handle exact artist not found case
+            //      I'm going to work on the updated player bucket 
+            //      before I dive into this.
+        }
+        
+        if( a.imageUrl().isValid() )
+        {
+            QNetworkReply* get = m_networkManager->get( QNetworkRequest( a.imageUrl() ));
+            connect( get, SIGNAL( finished()), SLOT( iconDataDownloaded()));
+        }
+    }
+    catch( CoreDomElement::Exception e )
+    {
+        return;
+    }
+}
+
+
+void 
+PlayableListItem::setIcon( const QIcon& icon )
+{
+    QListWidgetItem::setIcon( icon );
+    listWidget()->viewport()->update();
 }

@@ -39,9 +39,10 @@ SearchResultsTuner::SearchResultsTuner()
 
 
 void
-SearchResultsTuner::addArtists( QStringList a )
+SearchResultsTuner::addArtists( QList<Artist> al )
 {
-	ui.artistList->addItems( a );
+    foreach( const Artist& a, al )
+        ui.artistList->addItem( a );
 }
 
 

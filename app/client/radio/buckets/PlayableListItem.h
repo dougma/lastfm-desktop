@@ -23,15 +23,16 @@
 #include <QListWidgetItem>
 #include "PlayableMimeData.h"
 #include <QNetworkReply>
+#include "lib/lastfm/ws/WsAccessManager.h"
 
 class PlayableListItem : public QObject, public QListWidgetItem
 {
     Q_OBJECT
     
 public:
-	PlayableListItem( QListWidget* parent = 0 ) : QListWidgetItem( parent, QListWidgetItem::UserType ){};
+	PlayableListItem( QListWidget* parent = 0 ) : QObject( parent ), QListWidgetItem( parent, QListWidgetItem::UserType ){ m_networkManager = new WsAccessManager( this ); }
 	PlayableListItem( const QString & text, QListWidget * parent = 0 )
-					:QListWidgetItem( text, parent, QListWidgetItem::UserType ){};
+					:QObject( parent ), QListWidgetItem( text, parent, QListWidgetItem::UserType ){};
 	
 	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
 	
@@ -41,11 +42,19 @@ public:
 	
 	int playableType() const{ return data( k_playableType ).toInt(); }
     
+    void fetchImage();
+    
+    void setIcon( const QIcon& icon );
+    
 public slots:
     void iconDataDownloaded();
+    
+private slots:
+    void onArtistSearchFinished( WsReply* r );
 	
 private:
-	static const Qt::ItemDataRole k_playableType = Qt::UserRole; 
+	static const Qt::ItemDataRole k_playableType = Qt::UserRole;
+    class WsAccessManager* m_networkManager;
 };
 
 #endif //PLAYABLE_LIST_ITEM
