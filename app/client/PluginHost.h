@@ -31,6 +31,26 @@
 typedef void *(*P_getService)(const char*);
 
 
+// Plugin encapsulates the plugin entry point.
+// We may extend this class to give each plugin a thread for extra 
+// plugin isolation.
+class Plugin : public QObject //: public QThread
+{
+    Q_OBJECT;
+    
+    P_getService m_getService;
+    
+public:
+    Plugin(P_getService getService, QObject* parent);
+    
+    template<class I>
+    I* getService(const char* serviceName)
+    {
+        return (I*) m_getService(serviceName);
+    }
+};
+
+
 // PluginHost loads all the plugins, and is used to 
 // obtain the plugins offering a particular service
 class PluginHost : QObject
@@ -58,26 +78,6 @@ public:
                 result << ip;
         }
         return result;
-    }
-};
-
-
-// Plugin encapsulates the plugin entry point.
-// We may extend this class to give each plugin a thread for extra 
-// plugin isolation.
-class Plugin : public QObject //: public QThread
-{
-    Q_OBJECT;
-
-    P_getService m_getService;
-
-public:
-    Plugin(P_getService getService, QObject* parent);
-
-    template<class I>
-    I* getService(const char* serviceName)
-    {
-        return (I*) m_getService(serviceName);
     }
 };
 

@@ -30,7 +30,7 @@ PluginHost::PluginHost(const QString& pluginPath)
         if (QLibrary::isLibrary(pluginDir.filePath(f))) {
             // it looks like a shared library, so try loading it:
             QLibrary lib(pluginDir.filePath(f));
-            P_getService get = static_cast<P_getService>(lib.resolve(PLUGIN_ENTRYPOINT));
+            P_getService get = (P_getService) lib.resolve(PLUGIN_ENTRYPOINT);
             if (get) {
                 m_plugins << new Plugin(get, this);
                 // and the lib will remain loaded until app terminates. ok?

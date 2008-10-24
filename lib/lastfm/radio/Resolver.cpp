@@ -21,13 +21,14 @@
 #include "lastfm/types/Track.h"
 
 
-Resolver::Resolver(QList<ITrackResolverPlugin*>& plugins)
-    : m_plugins(plugins)
+Resolver::Resolver( const QList<ITrackResolverPlugin*>& plugins)
+        : m_plugins(plugins)
 {
     foreach(ITrackResolverPlugin* p, plugins) {
         p->init();
     }
 }
+
 
 ResolveReply *
 Resolver::resolve(const Track &track)

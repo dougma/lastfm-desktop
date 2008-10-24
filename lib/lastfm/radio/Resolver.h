@@ -22,6 +22,8 @@
 
 #include "lib/lastfm/radio/Radio.h"
 #include "app/clientplugins/ITrackResolver.h"
+#include <QList>
+
 
 // Resolver class is used for starting the track resolution requests
 class LASTFM_RADIO_DLLEXPORT Resolver
@@ -29,7 +31,7 @@ class LASTFM_RADIO_DLLEXPORT Resolver
     QList<ITrackResolverPlugin*> m_plugins;
 
 public:
-    Resolver(QList<ITrackResolverPlugin*>& plugins);
+    Resolver( const QList<ITrackResolverPlugin*>& plugins);
 
     // Creates a ResolveReply (and submits the resolve request to
     // the plugins).  Returns NULL if there are no plugins.
