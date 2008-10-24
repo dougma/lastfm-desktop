@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by                                                 *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,15 +17,16 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+
 #include "Collection.h"
 #include "lib/lastfm/core/CoreDir.h"
-
-#include <QStringList>
+#include <QDebug>
 #include <QFileInfo>
+#include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QStringList>
 #include <QVariant>
-#include <QDebug>
 
 static const int k_collectionDbVersion = 1;
 
@@ -36,60 +36,22 @@ Collection* Collection::s_instance = NULL;
 
 Collection::Collection()
 {
-    initDatabase();
-}
-
-
-Collection::~Collection()
-{
-    QSqlDatabase::removeDatabase( "collection" );
-    m_db.close();
-}
-
-
-Collection&
-Collection::instance()
-{
-    static QMutex mutex;
-    QMutexLocker locker( &mutex );
-
-    if ( !s_instance )
-    {
-        s_instance = new Collection;
-    }
-
-    return *s_instance;
-}
-
-
-bool
-Collection::initDatabase()
-{
-    QMutexLocker locker_q( &m_mutex );
-
-    if ( !m_db.isValid() )
-    {
-        m_db = QSqlDatabase::addDatabase( "QSQLITE", "collection" );
-
-        if ( m_dbPath.isEmpty() )
-            m_db.setDatabaseName( CoreDir::data().filePath( "collection.db" ) );
-        else
-            m_db.setDatabaseName( m_dbPath );
-    }
+    m_db = QSqlDatabase::addDatabase( "QSQLITE", "collection" );
+    m_db.setDatabaseName( CoreDir::data().filePath( "collection.db" ) );
     
-    if( !m_db.open())
-    {
-        qDebug() << "Could not open sqlite database: " << m_db.databaseName() << ". Error: " << m_db.lastError();
-        return false;
+    if (!m_db.open()) {
+        qDebug() << m_db.lastError();
+        return;
     }
 
-    qDebug() << "Opening Collection database" << ( m_db.isValid() ? "worked" : "failed" );
-    if ( !m_db.isValid() )
-        return false;
+    if (!m_db.isValid()) {
+        qWarning() << "collection.db connection is not valid";
+        return;
+    }
 
-    if ( !m_db.tables().contains( "files" ) )
+    if (!m_db.tables().contains( "files" ))
     {
-        qDebug() << "Creating Collection database!";
+        qDebug() << "Creating Collection database";
 
         query( "CREATE TABLE artists ("
                     "id          INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -184,8 +146,30 @@ Collection::initDatabase()
         query( "UPDATE metadata set key='version', value='"
                     + QString::number( k_collectionDbVersion ) + "';" );
     }
+}
 
-    return true;
+
+Collection& //static
+Collection::instance()
+{
+    static QMutex mutex;
+    QMutexLocker locker( &mutex );
+    
+    if ( !s_instance )
+    {
+        s_instance = new Collection;
+        qAddPostRoutine(destroy);
+    }
+    
+    return *s_instance;
+}
+
+
+void //static
+Collection::destroy()
+{
+    delete s_instance;
+    QSqlDatabase::removeDatabase( "collection" );
 }
 
 
@@ -202,6 +186,7 @@ Collection::version() const
 
     return 0;
 }
+
 
 bool
 Collection::query( const QString& queryToken )
@@ -236,7 +221,7 @@ Collection::fileURI( const QString& filePath )
 
 
 QString
-Collection::getFingerprint( const QString& filePath )
+Collection::getFingerprintId( const QString& filePath )
 {
     QSqlQuery query( m_db );
     query.prepare( "SELECT fpId FROM files WHERE uri = :uri" );
@@ -249,7 +234,7 @@ Collection::getFingerprint( const QString& filePath )
                  << "SQL error was:"    << query.lastError().databaseText() << endl
                  << "SQL error type:"   << query.lastError().type();
     }
-    else if ( query.next() )
+    else if (query.next())
         return query.value( 0 ).toString();
 
     return "";
@@ -257,7 +242,7 @@ Collection::getFingerprint( const QString& filePath )
 
 
 bool
-Collection::setFingerprint( const QString& filePath, QString fpId )
+Collection::setFingerprintId( const QString& filePath, QString fpId )
 {
     bool isNumeric;
     int intFpId = fpId.toInt( &isNumeric );
@@ -279,11 +264,4 @@ Collection::setFingerprint( const QString& filePath, QString fpId )
     }
 
     return true;
-}
-
-
-void
-Collection::destroy()
-{
-    delete s_instance;
 }

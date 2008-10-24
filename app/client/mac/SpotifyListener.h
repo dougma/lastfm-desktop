@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <mir@last.fm>                                          *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -15,42 +14,11 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef __SHA_FILE_H
-#define __SHA_FILE_H
 
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <iomanip>
-
-class Sha256File
+class SpotifyListener
 {
-public:
-
-   static void 
-   getHash(const std::string& fileName, unsigned char* pHash);
-
-   static std::string
-   toHexString(const unsigned char* pHash, size_t size)
-   {
-      std::ostringstream oss;
-      for (size_t i = 0; i < size; ++i)
-         oss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(pHash[i]);
-
-      return oss.str();
-   }
-
-   static int
-   hashSize();
-
-private:
-
-   static void 
-   getHash( std::ifstream& inFile, unsigned char* pHash );
-
+    
 };
-
-#endif // __SHA_FILE_H

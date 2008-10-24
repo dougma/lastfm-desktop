@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <mir@last.fm>                                          *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -24,20 +23,15 @@
 #include <string>
 #include <vector>
 #include <fstream>
-
 #include <mad.h>
-
 #include <QString>
 #include <QFile>
-
-using namespace std;
 
 // ----------------------------------------------------------------------- ------
 
 class MP3_Source
 {
 public:
-
    // ctor
    MP3_Source();
    virtual ~MP3_Source();
@@ -63,7 +57,7 @@ private:
 
    static bool isRecoverable(const mad_error& error, bool log = false);
 
-   static string MadErrorString(const mad_error& error);
+    static std::string MadErrorString(const mad_error& error);
 
    struct mad_stream	m_mad_stream;
    struct mad_frame	    m_mad_frame;

@@ -17,38 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "BackgroundJobQueue.h"
+#ifndef MBID_JOB_H
+#define MBID_JOB_H
+
+#include "lib/lastfm/types/Track.h"
+#include <QRunnable>
+#include <QObject>
 
 
-void
-BackgroundJobQueue::enqueue( BackgroundJob* job )
+class ExtractIdentifiersJob : public QObject, public QRunnable
 {
-    if (!job->isValid()) {
-        delete job;
-        return;
-    }
+    Q_OBJECT
+    
+    Track m_gui_track;
+    Track m_track;
+    QString m_path;
 
-    QMutexLocker locker( &mutex );
-    q.enqueue( job );
-    connect( job, SIGNAL(finished()), job, SLOT(onFinished()) );
-    connect( job, SIGNAL(finished()), job, SLOT(deleteLater()) );
-    locker.unlock();
-    start();
-}
+    virtual void run();
+    int fpid() const;
+    static void waitForFinished( class QNetworkReply* );
+    
+public:
+    ExtractIdentifiersJob( const Track& );
+    ~ExtractIdentifiersJob();
 
+signals:
+    void mbid( const QString& );
+    
+private slots:
+    void onMbid( const QString& mbid );
+};
 
-void
-BackgroundJobQueue::run()
-{
-    for (;;)
-    {
-        QMutexLocker locker( &mutex );
-        if (q.isEmpty())
-            return;
-        BackgroundJob* job = q.dequeue();
-        locker.unlock();
-        
-        job->run();
-        emit job->finished();
-    }
-}
+#endif

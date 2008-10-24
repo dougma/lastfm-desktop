@@ -252,13 +252,17 @@ ITunesListener::setupCurrentTrack()
     #define ENDL " & \"\n\" & "
     const char* code =
         "tell application \"iTunes\" to tell current track\n"
-	//disabled as throws when track is non-local and I do all my testing that way! FIXME
-//            "set L to location\n"
+            "try\n"
+                "set L to location\n"
+                "set L to POSIX path of L\n"
+            "on error\n"
+                "set L to \"\"\n"
+            "end try\n"
             "return artist" ENDL
                    "album" ENDL
                    "name" ENDL
                    "(duration as integer)" ENDL
-//                   "POSIX path of L" ENDL
+                   "L" ENDL
                    "persistent ID\n"
         "end tell";
     #undef ENDL

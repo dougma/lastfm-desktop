@@ -17,33 +17,38 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef BACKGROUND_JOB_H
-#define BACKGROUND_JOB_H
+#ifndef LASTFM_FINGERPRINT_ID_H
+#define LASTFM_FINGERPRINT_ID_H
 
-#include <QObject>
-#include "lib/DllExportMacro.h"
+#include <lastfm/DllExportMacro.h>
+#include <QDebug>
+#include <QString>
 
 
-class UNICORN_DLLEXPORT BackgroundJob : public QObject
+class LASTFM_FINGERPRINT_DLLEXPORT FingerprintId
 {
-    Q_OBJECT
-    friend class BackgroundJobQueue;
-
-protected:
-    /** reimplement if you want to prevent jobs running if certain criteria
-      * are not met, you will be deleted in the GUI thread immediately if you 
-      * return false */
-    virtual bool isValid() const { return true; }
-    /** do the work here, it will be called from teh queue thread */
-    virtual void run() = 0;
-
-signals:
-    void finished();
+    QString id;
     
-protected slots:
-    /** called from the GUI thread */
-    virtual void onFinished()
-    {}
+    friend class Fingerprint;
+    
+public:
+    FingerprintId() : id( -1 )
+    {}    
+    
+    FingerprintId( const class Track& t );
+    
+    bool isNull() const { return id.isEmpty(); }
+    
+    /** -1 if you need to generate it */
+    operator int() { return id.size() ? id.toInt() : -1; }
+    /** isEmpty() if you need to generate it */
+    operator QString() { return id; }
 };
+
+
+inline QDebug operator<<( QDebug d, FingerprintId id)
+{
+    return d << int(id);
+}
 
 #endif

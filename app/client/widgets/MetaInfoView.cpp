@@ -59,14 +59,15 @@ Bio::setContent( const CoreDomElement &lfm )
 		QString	plays = a["stats"]["playcount"].text();
 		QString listeners = a["stats"]["listeners"].text();
 		QString content = a["bio"]["content"].text();
-		QString editmessage = tr("Edit this in your browser");
+		QString editmessage = tr("Edit it too!");
 
 		QString html;
 		QTextStream(&html) <<
-			"<a class='artist' href=\"" << url << "\">" << name << "</a>" <<
-			"<p class='plays'>" << tr("%L1 plays (%L2 listeners)").arg(plays.toInt()).arg(listeners.toInt()) << "</p>" <<
-			"<p class='content'>" << content.replace("\r", "<br>") << "</p>" <<
-			"<a class='editme' href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
+			"<a id=artist href=\"" << url << "\">" << name << "</a>" <<
+			"<p id=plays>" << tr("%L1 plays (%L2 listeners)").arg(plays.toInt()).arg(listeners.toInt()) << "</p>" <<
+			"<p id=content>" << content.replace(QRegExp("\r+"), "<p>") << "</p>"
+            "<p id=editme>" << tr("This information was created by users like you! ") <<
+            "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
 		setHtml(html);
 	}
 	catch (CoreDomElement::Exception& e)

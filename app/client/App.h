@@ -70,10 +70,6 @@ private slots:
 	void onScrobblerStatusChanged( int );
     void onBootstrapCompleted( const QString& playerId );
     void onTrackSpooled( const Track& t );
-    
-#ifdef Q_OS_MAC
-    void onUnknownFingerprint( QString );
-#endif
 
 private:
     class PlayerMediator* m_playerMediator;
@@ -82,7 +78,6 @@ private:
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
     class Resolver *m_resolver;
-    class BackgroundJobQueue* m_q;
 
     class QSystemTrayIcon* m_trayIcon;
 };

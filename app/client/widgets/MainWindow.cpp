@@ -53,6 +53,9 @@
 #include "windows.h"
 #endif
 
+#define SETTINGS_POSITION_KEY "MainWindowPosition"
+
+
 
 MainWindow::MainWindow()
 {    
@@ -75,6 +78,15 @@ MainWindow::MainWindow()
 
     // set up window in default state
     onTrackSpooled( Track() );
+
+    QVariant v = QSettings().value( SETTINGS_POSITION_KEY );
+    if (!v.isValid()) move( v.toPoint() ); //if null, let Qt decide
+}
+
+
+MainWindow::~MainWindow()
+{
+    QSettings().setValue( SETTINGS_POSITION_KEY, pos() );
 }
 
 

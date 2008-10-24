@@ -80,7 +80,7 @@ Track::toDomElement( QDomDocument& xml ) const
     makeElement( "url", d->url.toString() );
     makeElement( "source", QString::number( d->source ) );
     makeElement( "rating", QString::number(d->rating) );
-    makeElement( "fpId", fingerprintId() );
+    makeElement( "fpId", QString::number(d->fpid) );
     makeElement( "mbId", mbid() );
 
     QDomElement extras = xml.createElement( "extras" );
@@ -230,4 +230,21 @@ Track::www() const
 	QString const artist = CoreUrl::encode( d->artist );
 	QString const track = CoreUrl::encode( d->title );
 	return CoreUrl( "http://www.last.fm/music/" + artist + "/_/" + track ).localised();
+}
+
+
+bool
+Track::isMp3() const
+{
+    //FIXME really we should check the file header?
+    return d->url.scheme() == "file" &&
+           d->url.path().endsWith( ".mp3", Qt::CaseInsensitive );
+}
+
+
+Track
+Track::clone() const
+{
+    TrackData* d = new TrackData( *this->d );
+    return Track( d );
 }

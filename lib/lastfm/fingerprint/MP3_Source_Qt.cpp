@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Last.fm Ltd <mir@last.fm>                                          *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -29,6 +28,9 @@
 
 #include "MP3_Source_Qt.h"
 #undef max // was definded in mad
+
+using namespace std;
+
 
 // -----------------------------------------------------------
 

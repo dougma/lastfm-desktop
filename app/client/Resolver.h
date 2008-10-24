@@ -20,7 +20,6 @@
 #ifndef RESOLVER_H
 #define RESOLVER_H
 
-#include "lib/lastfm/radio/Radio.h"
 
 class Resolver : public RadioContentResolver
 {
@@ -32,9 +31,6 @@ public:
     {
         int i = 0;
     }
-
-private:
-
 };
 
 #endif

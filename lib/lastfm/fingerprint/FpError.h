@@ -17,8 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef FP_ERRORS_H
-#define FP_ERRORS_H
+#ifndef LASTFM_FP_ERROR_H
+#define LASTFM_FP_ERROR_H
+
 
 namespace Fp
 {
@@ -26,7 +27,7 @@ namespace Fp
     {
         /** File does not exist or cannot be read */
         ReadError = 0,
-        
+
         /** GetInfo failed to extract samplerate, bitrate, channels, duration etc */
         GetInfoError,
         
@@ -43,14 +44,8 @@ namespace Fp
         ExtractorNotEnoughDataError,
         
         /** FingerprintExtractor::getFingerprint() has been called prematurely */
-        ExtractorNotReadyError,
-        
-        /** Unexpected response from the fingerprint/query request */
-        MalformedResponse,
-        
-        /** call networkError() on the FingerprintIdRequest object to get the QNetworkReply::Error */
-        NetworkError
+        ExtractorNotReadyError
     };
 }
 
-#endif //FP_ERRORS_H
+#endif

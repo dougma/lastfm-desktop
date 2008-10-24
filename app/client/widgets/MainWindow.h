@@ -37,7 +37,8 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-
+    ~MainWindow();
+    
     QSize sizeHint() const;
 	
 	struct Ui : ::Ui::MainWindow

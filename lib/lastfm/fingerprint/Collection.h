@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by                                                 *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,67 +17,43 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-/*! \class Collection
-    \brief Collection management class.
-    super description, what does it store? what does it manage?
-    bad name if it only handles fingerprints
-*/
+/** Class that we use to store fingerprints, basically
+  */
 
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
-#include "FingerprintDllExportMacro.h"
+#include "lib/lastfm/DllExportMacro.h"
 #include <QObject>
-#include <QMutex>
 #include <QSqlDatabase>
 
 
 /** @author: <chris@last.fm> */
-class FINGERPRINT_DLLEXPORT Collection : public QObject
+class LASTFM_FINGERPRINT_DLLEXPORT Collection
 {
-    Q_OBJECT
-
 public:
-    /** \brief Returns the singleton instance to the controller. */
-    static Collection&
-    instance();
+    static Collection& instance();
 
-    /** \brief Terminates and deletes the collection instance. */
-    void
-    destroy();
-
-    /** \brief Temp method: Gets a fingerprint id. Returns -1 if none found. */
-    virtual QString
-    getFingerprint( const QString& filePath );
+    /** \brief Temp method: Gets a fingerprint id. Returns "" if none found. */
+    virtual QString getFingerprintId( const QString& filePath );
 
     /** \brief Temp method: Sets a fingerprint id. */
-    bool
-    setFingerprint( const QString& filePath, QString fpId );
+    bool setFingerprintId( const QString& filePath, QString fpId );
 
 private:
     Collection();
-    ~Collection();
 
     /** the database version
         * version 0: up until 1.4.1
         * version 1: from 1.4.2 */
-    int
-    version() const;
+    int version() const;
+    bool query( const QString& queryToken );
+    QString fileURI( const QString& filePath );
 
-    virtual bool
-    initDatabase();
-
-    bool
-    query( const QString& queryToken );
-
-    QString
-    fileURI( const QString& filePath );
-
+    static void destroy();    
+    
     static Collection* s_instance;
-
-    QMutex m_mutex;
     QSqlDatabase m_db;
-    QString m_dbPath;
 };
 
 #endif // COLLECTION_H

@@ -44,7 +44,7 @@ struct TrackData : QSharedData
     short source;
     short rating;
     QString mbid; /// musicbrainz id
-    QString fingerprintId;
+    int fpid;
     QUrl url;
     QDateTime time; /// the time the track was started at
 
@@ -53,6 +53,15 @@ struct TrackData : QSharedData
 };
 
 
+
+/** Our track type. It's quite good, you may want to use it as your track type
+  * in general. It is explicitly shared. Which means when you make a copy, they
+  * both point to the same data still. This is like Qt's implicitly shared
+  * classes, eg. QString, however if you mod a copy of a QString, the copy
+  * detaches first, so then you have two copies. Our Track object doesn't
+  * detach, which is very handy for our usage in the client, but perhaps not
+  * what you want. If you need a deep copy for eg. work in a thread, call 
+  * clone(). */
 class LASTFM_TYPES_DLLEXPORT Track
 {
 public:
@@ -71,6 +80,12 @@ public:
 
     Track();
     explicit Track( const QDomElement& );
+    
+    /** if you plan to use this track in a separate thread, you need to clone it
+      * first, otherwise nothing is thread-safe, not this creates a disconnected
+      * Track object, modifications to this or that will not effect that or this
+      */
+    Track clone() const;
 
     /** this track and that track point to the same object, so they are the same
       * in fact. This doesn't do a deep data comparison. So even if all the 
@@ -99,7 +114,7 @@ public:
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
-    QString fingerprintId() const { return d->fingerprintId; }
+    int fingerprintId() const { return d->fpid; }
 
     QString durationString() const { return durationString( d->duration ); }
     static QString durationString( int seconds );
@@ -113,6 +128,8 @@ public:
     {
         return this->d->time < that.d->time;
     }
+    
+    bool isMp3() const;
     
 //////////// lastfm::Ws
     
@@ -132,6 +149,10 @@ public:
 	
 protected:
     QExplicitlySharedDataPointer<TrackData> d;
+    
+private:
+    Track( TrackData* thatd ) : d( thatd )
+    {}
 };
 
 
@@ -157,7 +178,7 @@ public:
     void setSource( Source s ) { d->source = s; }
     
     void setMbid( Mbid id ) { d->mbid = id; }
-    void setFingerprintId( QString id ) { d->fingerprintId = id; }
+    void setFingerprintId( int id ) { d->fpid = id; }
     
     WsReply* love();
     WsReply* ban();

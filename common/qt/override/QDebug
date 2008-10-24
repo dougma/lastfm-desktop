@@ -42,9 +42,10 @@ struct StampedDebug : QDebug
 //		out += filename + ":" + QString::number( line );
 
 		#if __GNUG__
-		int const m = function.indexOf( "::" ); // work with ctors and dtors
+        int const k = function.indexOf( '(' );
+		int const m = function.mid( 0, k ).lastIndexOf( "::" ); // work with ctors and dtors
 		int const n = m == -1 ? 0 : function.lastIndexOf( ' ', m ) + 1;
-		function = function.mid( n, function.indexOf( '(' ) - n );
+		function = function.mid( n, k - n );
 		#endif
 
 		out += function + "()";

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "MbidJob.h"
+#include "ExtractIdentifiersJob.h"
 #include "Settings.h"
 #include "Resolver.h"
 #include "ipod/BatchScrobbleDialog.h"
@@ -33,12 +33,12 @@
 #include "widgets/MainWindow.h"
 #include "app/twiddly/IPodScrobble.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/lastfm/fingerprint/FingerprintId.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
-#include "lib/lastfm/fingerprint/FingerprintIdRequest.h"
-#include "lib/unicorn/BackgroundJobQueue.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
+#include <QThreadPool>
 #include <phonon/audiooutput.h>
 
 #ifdef WIN32
@@ -75,8 +75,6 @@ App::App( int& argc, char** argv )
 #ifdef NDEBUG
     s.setValue( "Path", applicationFilePath() );
 #endif
-
-    m_q = new BackgroundJobQueue;
     
     PlayerListener* listener = new PlayerListener( this );
     connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
@@ -100,7 +98,7 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
-    m_resolver = new Resolver();
+    m_resolver = new Resolver;
 	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
@@ -132,7 +130,6 @@ App::App( int& argc, char** argv )
 App::~App()
 {
     delete m_scrobbler;
-    delete m_q;
     delete m_radio;
     delete m_resolver;
 }
@@ -234,35 +231,21 @@ App::onBootstrapCompleted( const QString& playerId )
 void
 App::onTrackSpooled( const Track& t )
 {
-    if( t.isNull() ) return;
+    if (t.isNull()) return;
     
 #ifdef Q_OS_MAC
-    if( t.source() == Track::Player )
+    if (t.source() == Track::Player && t.isMp3())
     {
-        FingerprintIdRequest * fpReq = new FingerprintIdRequest( t, this );
-        connect( fpReq, SIGNAL( unknownFingerprint( QString )), SLOT( onUnknownFingerprint( QString )));
-        fpReq->setAutoDelete( false );
-        fpReq->start();
+        FingerprintId fpid( t );
+        
+        if (t.mbid().isNull() || fpid.isNull())
+        {
+            QThreadPool::globalInstance()->start( new ExtractIdentifiersJob( t ) );
+        }
     }
 #endif
     
-    if ( t.mbid().isNull())
-    {
-        m_q->enqueue( new MbidJob( t ) );
-    }
 }
-
-
-#ifdef Q_OS_MAC
-void 
-App::onUnknownFingerprint( QString )
-{
-    FingerprintIdRequest* fpReq = static_cast< FingerprintIdRequest* >( sender());
-    disconnect( fpReq, SIGNAL( unknownFingerprint( QString )), this, SLOT( onUnknownFingerprint( QString )));
-    fpReq->setAutoDelete( true );
-    fpReq->start( Fp::FullMode );
-}
-#endif
 
 
 void

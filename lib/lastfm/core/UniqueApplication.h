@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QStringList>
 #ifdef Q_WS_MAC
-#include <Carbon/Carbon.h>
+#include <CoreFoundation/CFMessagePort.h>
 #endif
 #ifdef WIN32
 #include <windows.h>
