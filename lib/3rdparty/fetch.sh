@@ -1,13 +1,11 @@
-echo "This script uses wget, and the build chain."
-echo "You'll need to do the make install step yourself in each directory."
-echo
-
 source ../../common/bash/utils.sh.inc
 
 function go
 {
     tar=`basename $1`
     dir=`basename $1 .tar.gz`
+    
+    shift
  
     header $dir
     
@@ -15,11 +13,38 @@ function go
     test -d $dir || tar xzf $tar
     
     pushd $dir
-    ./configure
+    test -f config.h || ./configure $@
+    perl -pi -e 's/-O3/-Zi -Oy -Ox -GL/g' Makefile
     make
-    popd &>/dev/null
+    popd
 }
 
-go http://surfnet.dl.sourceforge.net/sourceforge/mad/libmad-0.15.1b.tar.gz
-go http://www.fftw.org/fftw-3.1.3.tar.gz
-go http://www.mega-nerd.com/SRC/libsamplerate-0.1.4.tar.gz
+function co
+{
+    svn co $1 $2
+    pushd $2
+    ./configure
+    make
+    popd
+}
+
+
+################################################################################
+
+if [[ `uname` == "CYGWIN_NT_5.1" ]]
+then
+    which make || die "You need to install GNU make"
+    which ld || die "You need to install cygwin binutils"
+    which wget || die "You need to install wget"
+
+    go http://surfnet.dl.sourceforge.net/sourceforge/mad/libmad-0.15.1b.tar.gz --disable-debug
+    go http://www.fftw.org/fftw-3.1.3.tar.gz --enable-float --disable-debug
+    go http://www.mega-nerd.com/SRC/libsamplerate-0.1.4.tar.gz --disable-debug
+fi
+
+co http://google-breakpad.googlecode.com/svn/trunk/ breakpad
+
+
+header Done!
+echo "Now do make install in each directory or something"
+echo
