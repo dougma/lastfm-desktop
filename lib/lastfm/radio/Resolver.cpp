@@ -24,6 +24,9 @@
 Resolver::Resolver(QList<ITrackResolverPlugin*>& plugins)
     : m_plugins(plugins)
 {
+    foreach(ITrackResolverPlugin* p, plugins) {
+        p->init();
+    }
 }
 
 ResolveReply *

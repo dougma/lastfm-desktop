@@ -99,9 +99,9 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
     
-    PluginHost pluginHost(qApp->applicationDirPath() + "/plugins/");
-    m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("trackResolver") );
-	m_radio = new Radio( new Phonon::AudioOutput, 0 );
+    PluginHost pluginHost(qApp->applicationDirPath() + "/plugins/");    // todo: make this a member so we can reuse it
+    m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
+	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
