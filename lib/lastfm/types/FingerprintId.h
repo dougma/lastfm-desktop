@@ -25,7 +25,7 @@
 #include <QString>
 
 
-class LASTFM_FINGERPRINT_DLLEXPORT FingerprintId
+class LASTFM_TYPES_DLLEXPORT FingerprintId
 {
     int id;
 
