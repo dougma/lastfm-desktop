@@ -17,6 +17,13 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifdef __APPLE__
+    // first to prevent compilation errors with Qt 4.5.0
+    #include <Carbon/Carbon.h>
+    #include <ApplicationServices/ApplicationServices.h>
+    static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
+#endif
+
 #include "App.h"
 #include "player/PlayerListener.h"
 #include "Settings.h"
@@ -33,11 +40,6 @@
 
 #ifndef NBREAKPAD
     #include "app/breakpad/ExceptionHandler.h"
-#endif
-
-#ifdef Q_WS_MAC
-    #include <ApplicationServices/ApplicationServices.h>
-    static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
 #endif
 
 
