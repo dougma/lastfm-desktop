@@ -19,13 +19,14 @@
 
 #include "Radio.h"
 #include "Tuner.h"
+#include "Resolver.h"
 #include <QThread>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <cmath>
 
 
-Radio::Radio( Phonon::AudioOutput* output, RadioContentResolver *resolver )
+Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
      : m_tuner( 0 ),
        m_audioOutput( output ),
        m_state( Radio::Stopped ),

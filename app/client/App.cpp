@@ -20,7 +20,7 @@
 #include "App.h"
 #include "ExtractIdentifiersJob.h"
 #include "Settings.h"
-#include "Resolver.h"
+#include "PluginHost.h"
 #include "ipod/BatchScrobbleDialog.h"
 #include "ipod/IPodScrobbleCache.h"
 #include "mac/MacStyle.h"
@@ -36,6 +36,7 @@
 #include "lib/lastfm/fingerprint/Fingerprint.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
+#include "lib/lastfm/radio/Resolver.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include <QThreadPool>
@@ -97,8 +98,9 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
-
-    m_resolver = new Resolver;
+    
+    PluginHost pluginHost(qApp->applicationDirPath() + "/plugins/");
+    m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("trackResolver") );
 	m_radio = new Radio( new Phonon::AudioOutput, 0 );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
