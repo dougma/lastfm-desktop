@@ -80,7 +80,7 @@ MainWindow::MainWindow()
     onTrackSpooled( Track() );
 
     QVariant v = QSettings().value( SETTINGS_POSITION_KEY );
-    if (!v.isValid()) move( v.toPoint() ); //if null, let Qt decide
+    if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
 }
 
 
