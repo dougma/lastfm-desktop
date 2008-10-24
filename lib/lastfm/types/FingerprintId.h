@@ -17,12 +17,37 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "FingerprintId.h"
-#include "Collection.h"
-#include "lib/lastfm/types/Track.h"
+#ifndef LASTFM_FINGERPRINT_ID_H
+#define LASTFM_FINGERPRINT_ID_H
+
+#include <lastfm/DllExportMacro.h>
+#include <QDebug>
+#include <QString>
 
 
-FingerprintId::FingerprintId( const Track& t )
+class LASTFM_FINGERPRINT_DLLEXPORT FingerprintId
 {
-    id = Collection::instance().getFingerprintId( t.url().toLocalFile() );
+    int id;
+
+public:
+    FingerprintId() : id( -1 )
+    {}
+
+    FingerprintId( uint i ) : id( i )
+    {}
+
+    bool isNull() const { return id == -1; }
+
+    /** -1 if you need to generate it */
+    operator int() { return id; }
+    /** isEmpty() if you need to generate it */
+    operator QString() { return id == -1 ? "" : QString::number( id ); }
+};
+
+
+inline QDebug operator<<( QDebug d, FingerprintId id)
+{
+    return d << int(id);
 }
+
+#endif

@@ -23,6 +23,8 @@
 #include <lastfm/DllExportMacro.h>
 #include <lastfm/types/Album.h>
 #include <lastfm/types/Artist.h>
+#include <lastfm/types/FingerprintId.h>
+#include <lastfm/types/Mbid.h>
 #include <lastfm/core/WeightedStringList.h>
 #include <QDateTime>
 #include <QDomElement>
@@ -110,11 +112,11 @@ public:
     QString title() const { return d->title; }
     uint trackNumber() const { return d->trackNumber; }
     uint duration() const { return d->duration; }
-    QString mbid() const { return d->mbid; }
+    Mbid mbid() const { return Mbid(d->mbid); }
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
-    int fingerprintId() const { return d->fpid; }
+    FingerprintId fingerprintId() const { return d->fpid; }
 
     QString durationString() const { return durationString( d->duration ); }
     static QString durationString( int seconds );
@@ -198,7 +200,8 @@ TrackData::TrackData()
              : trackNumber( 0 ),
                duration( 0 ),
                source( Track::Unknown ),
-               rating( 0 )
+               rating( 0 ),
+               fpid( -1 )
 {}
 
 

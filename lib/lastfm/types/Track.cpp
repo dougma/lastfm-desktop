@@ -179,7 +179,7 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 	
 	TrackWsRequestBuilder& add( Track const * const t )
 	{
-		if (t->mbid().isEmpty()) 
+		if (t->mbid().isNull()) 
 		{
 			WsRequestBuilder::add( "artist", t->artist() );
 			WsRequestBuilder::add( "track", t->title() );

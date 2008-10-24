@@ -33,7 +33,7 @@
 #include "widgets/MainWindow.h"
 #include "app/twiddly/IPodScrobble.h"
 #include "lib/lastfm/core/QMessageBoxBuilder.h"
-#include "lib/lastfm/fingerprint/FingerprintId.h"
+#include "lib/lastfm/fingerprint/Fingerprint.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
 #include <QLineEdit>
@@ -99,7 +99,7 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
     m_resolver = new Resolver;
-	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
+	m_radio = new Radio( new Phonon::AudioOutput, 0 );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
@@ -236,7 +236,7 @@ App::onTrackSpooled( const Track& t )
 #ifdef Q_OS_MAC
     if (t.source() == Track::Player && t.isMp3())
     {
-        FingerprintId fpid( t );
+        FingerprintId fpid = Fingerprint( t ).id();
         
         if (t.mbid().isNull() || fpid.isNull())
         {

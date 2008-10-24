@@ -34,8 +34,16 @@ static const int k_minTrackDuration = 30;
 Fingerprint::Fingerprint( const Track& t )
            : m_track( t ),
              m_extractor( 0 ),
-             m_complete( false )
-{}
+             m_complete( false ),
+             m_id( -1 )
+{
+    QString id = Collection::instance().getFingerprintId( t.url().toLocalFile() );   
+    if (id.size()) {
+        bool b;
+        m_id = id.toInt( &b );
+        if (!b) m_id = -1;
+    }
+}
 
 
 Fingerprint::~Fingerprint()
@@ -230,8 +238,8 @@ Fingerprint::submit( QNetworkAccessManager* nam ) const
 }
 
 
-FingerprintId
-Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested ) const
+void
+Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested )
 {
     // The response data will consist of a number and a string.
     // The number is the fpid and the string is either FOUND or NEW
@@ -245,22 +253,19 @@ Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested 
     QStringList const list = response.split( ' ' );
     
     if (list.isEmpty())
-        return FingerprintId();
+        return;
     
     QString const fpid = list.value( 0 );
     QString const status = list.value( 1 );
     
-    bool isANumber;
-    fpid.toUInt( &isANumber );
-    if (!isANumber)
-        return FingerprintId();
+    bool b;
+    uint fpid_as_uint = fpid.toUInt( &b );
+    if (!b) return;
     
     Collection::instance().setFingerprintId( m_track.url().toLocalFile(), fpid );
     
     if (complete_fingerprint_requested)
         *complete_fingerprint_requested = (status == "NEW");
-    
-    FingerprintId id;
-    id.id = fpid;
-    return id;
+
+    m_id = (int)fpid_as_uint;
 }

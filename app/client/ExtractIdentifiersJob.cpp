@@ -19,7 +19,6 @@
 
 #include "ExtractIdentifiersJob.h"
 #include "lib/lastfm/fingerprint/Fingerprint.h"
-#include "lib/lastfm/fingerprint/FingerprintId.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QDebug>
 #include <QEventLoop>
@@ -59,16 +58,14 @@ ExtractIdentifiersJob::run()
 }
 
 
-int
+FingerprintId
 ExtractIdentifiersJob::fpid() const
 {
     WsAccessManager wam;
-    FingerprintId fpid;
+    Fingerprint fp( m_track );
     
     try
     {
-        Fingerprint fp( m_track );
-
         qDebug() << "Doing partial fingerprint for" << m_track;
         fp.generate();
 
@@ -76,7 +73,7 @@ ExtractIdentifiersJob::fpid() const
         waitForFinished( reply );
         
         bool complete_fp_required = false;
-        fpid = fp.decode( reply, &complete_fp_required );
+        fp.decode( reply, &complete_fp_required );
         
         if (complete_fp_required)
         {
@@ -93,7 +90,7 @@ ExtractIdentifiersJob::fpid() const
         qWarning() << e;
     }
     
-    return fpid;
+    return fp.id();
 }
 
 

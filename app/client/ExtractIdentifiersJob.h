@@ -34,7 +34,7 @@ class ExtractIdentifiersJob : public QObject, public QRunnable
     QString m_path;
 
     virtual void run();
-    int fpid() const;
+    FingerprintId fpid() const;
     static void waitForFinished( class QNetworkReply* );
     
 public:
