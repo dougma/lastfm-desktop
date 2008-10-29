@@ -37,7 +37,7 @@
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "the/radio.h"
 
-#include <Phonon/volumeslider.h>
+#include <phonon/volumeslider.h>
 
 Q_DECLARE_METATYPE( PlayableMimeData::Type )
 

@@ -124,7 +124,7 @@ else
             gen_xcodeproj || die "Configure failed."
             BUILD_CMD='open Last.fm.xcodeproj';;
         Linux)
-            qmake -config debug -recursive Last.fm.pro || die "Configure failed."
+            qmake -config debug -recursive Last.fm.pro "CONFIG += warn_off" || die "Configure failed."
             BUILD_CMD='make'
             middle "Configured to produce a debug build.";;
         *)      

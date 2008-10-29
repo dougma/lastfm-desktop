@@ -8,7 +8,7 @@ QT += opengl
 QT += sql
 VERSION = 2.0.0
 
-macx*:CONFIG += fingerprint
+!win32:CONFIG += fingerprint
 
 include( $$ROOT_DIR/common/qmake/include.pro )
 

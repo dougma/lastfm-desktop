@@ -28,7 +28,7 @@
 #include <QDomElement>
 #include <QDomNodeList>
 
-#include "the/App.h"
+#include "the/app.h"
 #include "lib/lastfm/types/Artist.h"
 #include "PlayableMimeData.h"
 
