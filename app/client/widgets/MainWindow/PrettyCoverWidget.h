@@ -41,10 +41,6 @@ public:
 	};
 	
 	Ui ui;
-    
-    virtual QSize sizeHInt() const {
-        return QSize( 280, 298 );
-    }
 	
 private slots:
 	void onAlbumImageDownloaded( const QByteArray& );

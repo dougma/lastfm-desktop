@@ -39,8 +39,6 @@ public:
     MainWindow();
     ~MainWindow();
     
-    QSize sizeHint() const;
-	
 	struct Ui : ::Ui::MainWindow
 	{
 		class BottomBar* bottombar;
@@ -48,6 +46,7 @@ public:
 		class ImageButton* cog;        
         class QLabel* text;
 		class PrettyCoverWidget* cover;
+        class MetaInfoView* info;
     } ui;
 
 protected:

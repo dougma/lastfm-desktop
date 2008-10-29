@@ -81,6 +81,12 @@ MainWindow::MainWindow()
 
     QVariant v = QSettings().value( SETTINGS_POSITION_KEY );
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
+    
+    // doing this properly and trying to manipulate the sizeHint and that is
+    // nigh on impossible because Qt sucks at this stuff
+    ui.cover->setMinimumHeight( 278 );
+    ui.info->setMinimumHeight( 200 );
+    resize( 100, 100 );
 }
 
 
@@ -182,8 +188,7 @@ MainWindow::setupUi()
     
     dw = new QDockWidget;
     dw->setWindowTitle( "Info" );
-    MetaInfoView* miv;
-    dw->setWidget( miv = new MetaInfoView );
+    dw->setWidget( ui.info = new MetaInfoView );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
     ui.bottombar->ui.library->setWidget( dw );
     dw->hide();
@@ -413,14 +418,6 @@ MainWindow::onSystemTrayIconActivated( const QSystemTrayIcon::ActivationReason r
           #endif
             break;
     }
-}
-
-
-
-QSize
-MainWindow::sizeHint() const
-{
-    return QSize( 300, 300 );
 }
 
 
