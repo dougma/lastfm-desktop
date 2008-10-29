@@ -111,7 +111,7 @@ misc: \$(PLUGINS_DIR)/AudioScrobbler.bundle \$(CONTENTS_DIR)/Resources/twiddly
 	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
 	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle \$@
 \$(CONTENTS_DIR)/MacOS/twiddly:
-	common/dist/mac/deposx.sh _bin/twiddly /opt/qt/4.4.2/lib
+	common/dist/mac/deposx.sh _bin/twiddly /opt/qt/4.4.3-release/lib
 	cp _bin/twiddly \$@
 \$(CONTENTS_DIR)/Resources/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
 	cd \$(CONTENTS_DIR)/Resources && ln -s ../MacOS/twiddly
