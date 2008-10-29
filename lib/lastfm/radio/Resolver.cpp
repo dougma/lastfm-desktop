@@ -24,53 +24,55 @@
 Resolver::Resolver( const QList<ITrackResolverPlugin*>& plugins)
         : m_plugins(plugins)
 {
+    // ResolveAttempt needs these types registered for its queued signals
+    qRegisterMetaType<Track>("Track");
+    qRegisterMetaType<ITrackResolveResponse *>("ITrackResolveResponse *");
+
     foreach(ITrackResolverPlugin* p, plugins) {
         p->init();
     }
 }
 
 
-ResolveReply *
-Resolver::resolve(const Track &track)
+ResolveAttempt *
+Resolver::create(const Track& track) const
 {
-    ResolveReply *reply = 0; 
-    ResolveRequest* req = 0;
+    ResolveAttempt* reply = new ResolveAttempt();
     int refcount = m_plugins.size();
     if (refcount) {
-        reply = new ResolveReply;
-        req = new ResolveRequest(track, reply, refcount);
-        reply->setRequest(req);
-        foreach(ITrackResolverPlugin *p, m_plugins) {
-            p->resolve(req);
-        }
+        reply->m_req = new ResolveRequest(track, reply, refcount);
     }
     return reply;
 }
 
+void Resolver::submit(const ResolveAttempt* r) const
+{
+    if (r->m_req) {
+        foreach(ITrackResolverPlugin *p, m_plugins) {
+            p->resolve(r->m_req);
+        }
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 
-ResolveReply::ResolveReply()
+ResolveAttempt::ResolveAttempt()
 : m_req(0)
 {
 }
 
-ResolveReply::~ResolveReply()
+ResolveAttempt::~ResolveAttempt()
 {
     delete m_req;
 }
 
-void 
-ResolveReply::setRequest(ResolveRequest* req)
-{
-    m_req = req;
-}
-
 //////////////////////////////////////////////////////////////////////
 
-ResolveRequest::ResolveRequest(const Track& t, ResolveReply* reply, unsigned refCount)
-: m_ref(refCount)
+ResolveRequest::ResolveRequest(const Track& t, ResolveAttempt* reply, unsigned refCount)
+: m_track(t)
 , m_reply(reply)
+, m_ref(refCount)
 , m_artist( QString(t.artist()).toUtf8() )
 , m_album( QString(t.album()).toUtf8() )
 , m_title( t.title().toUtf8() )
@@ -126,14 +128,14 @@ void
 ResolveRequest::result(class ITrackResolveResponse *resp)
 {
     m_responses << resp;    // we take ownership
-    emit m_reply->response(resp);
+    emit m_reply->resolveResponse(m_track, resp);
 }
 
 void 
 ResolveRequest::finished()
 {
     if (0 == --m_ref) {
-        emit m_reply->requestComplete();
+        emit m_reply->resolveComplete(m_track);
     }
 }
 

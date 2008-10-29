@@ -21,9 +21,12 @@
 #include "Tuner.h"
 #include "Resolver.h"
 #include <QThread>
+#include <QTimer>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <cmath>
+
+#define TUNING_RESOLVER_WAIT_MS 3000
 
 
 Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
@@ -36,6 +39,7 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
+    connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) );   // this fires when the whole queue is about to finish
     Phonon::createPath( m_mediaObject, m_audioOutput );
 }
 
@@ -94,21 +98,21 @@ Radio::play( const RadioStation& station )
   * sucked */
 class EnqueueThread : public QThread
 {
-	QList<QUrl> m_urls;
+	QUrl m_url;
 	Phonon::MediaObject* m_o;
 	
 public:
-	EnqueueThread( const QList<QUrl>& urls, Phonon::MediaObject* object )
+	EnqueueThread( QUrl& url, Phonon::MediaObject* object )
 	{
 		m_o = object;
-		m_urls = urls;
+		m_url = url;
 		connect( this, SIGNAL(finished()), SLOT(deleteLater()) );
 		start();
 	}
 	
 	virtual void run()
 	{
-		m_o->enqueue( m_urls );
+        m_o->enqueue( Phonon::MediaSource(m_url) );
 		m_o->play();
 	}
 }; 
@@ -131,22 +135,28 @@ Radio::enqueue( const QList<Track>& tracks )
 		return;
 	}
 	
-    QList<QUrl> urls;
     foreach (const Track& t, tracks)
     {
-        if (m_resolver)
-            m_resolver->resolve(t);
-        urls += t.url();
-        m_queue[t.url()] = t;
+        if (m_resolver) {
+            ResolveAttempt *ra = m_resolver->create(t);
+            connect(ra, SIGNAL(resolveResponse(const Track, class ITrackResolveResponse*)), SLOT(onResolveResult(const Track, class ITrackResolveResponse*)) );
+            connect(ra, SIGNAL(resolveComplete(const Track)), SLOT(onResolveComplete(const Track)) );
+            m_resolver->submit(ra);
+        }
+        m_queue << t;
     }
-	
-#ifdef Q_WS_MAC
-	new EnqueueThread( urls, m_mediaObject );
-#else
-	m_mediaObject->enqueue( urls );
-	m_mediaObject->play();
-#endif
+
+    if (m_state == TuningIn) {
+        // we need to kick off phonon
+        if (m_resolver) {
+            // give the resolver a chance with the first track
+            QTimer::singleShot(TUNING_RESOLVER_WAIT_MS, this, SLOT(phononEnqueue()));
+        } else {
+            phononEnqueue();
+        }
+    }
 }
+
 
 
 class SkipThread : public QThread
@@ -177,29 +187,32 @@ public:
 void
 Radio::skip()
 {
+    // attempt to refill the phonon queue if it's empty
+	if (m_mediaObject->queue().isEmpty())
+        phononEnqueue();
+
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
-	if (q.size())
+    if (q.size())
 	{
 #ifdef Q_WS_MAC
 		new SkipThread( m_mediaObject );
 #else
 		Phonon::MediaSource source = q.front();
-		q.pop_front();
 		m_mediaObject->setQueue( q );
 		m_mediaObject->setCurrentSource( source );
 		m_mediaObject->play();
 #endif
 	}
-	else if (m_state != Stopped)
-	{
-		// we are still waiting for a playlist to come back from the tuner
+    else if (m_state != Stopped)
+    {
+	    // we are still waiting for a playlist to come back from the tuner
 		
-		m_mediaObject->blockSignals( true ); //dont' tell outside world that we stopped
-		m_mediaObject->stop();
-		m_mediaObject->setCurrentSource( QUrl() );
-		m_mediaObject->blockSignals( false );
-		changeState( TuningIn );
-	}
+	    m_mediaObject->blockSignals( true ); //dont' tell outside world that we stopped
+	    m_mediaObject->stop();
+	    m_mediaObject->setCurrentSource( QUrl() );
+	    m_mediaObject->blockSignals( false );
+	    changeState( TuningIn );
+    }
 }
 
 
@@ -236,6 +249,7 @@ void
 Radio::clear()
 {
     m_queue.clear();
+    m_candidates.clear();
     m_track = Track();
     m_station = RadioStation();
     
@@ -251,12 +265,8 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
     {
         case Phonon::ErrorState:
 			if (m_mediaObject->errorType() == Phonon::FatalError)
-			{
 				qCritical() << m_mediaObject->errorString();
-				stop(); // just in case phonon is broken
-			}
-			else
-				skip();
+            skip();     // maybe the next track will be better
             break;
 			
 		case Phonon::PausedState:
@@ -278,48 +288,90 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
             break;
 
 		case Phonon::PlayingState:
-            if (spoolNextTrack())
-                changeState( Playing );
+            fetchMoreTracks();
+            changeState( Playing );
             break;
 
 		case Phonon::LoadingState:
-            spoolNextTrack();
+            fetchMoreTracks();
 			break;
     }
 }
 
+static
+int 
+candidate_sort(ITrackResolveResponse* a, ITrackResolveResponse* b)
+{
+    return a->matchQuality() - b->matchQuality();
+}
 
+#define MIN_MATCH_QUALITY 0.5
+
+
+// Looks at the head of the playqueue, makes a MediaSource object 
+// and places that in the phonon queue.
+// The track at the playqueue head remains until onPhononCurrentSourceChanged.
+void
+Radio::phononEnqueue()
+{
+    if (m_queue.isEmpty())
+        return;
+
+    // under windows, both of these style paths are tested as working:
+    //#define TESTFILE "\\\\osmutante\\public\\mp3\\Midlake\\The Trials Of Van Occupanther\\01 - Roscoe.mp3"
+    //#define TESTFILE "\\\\?\\Volume{782a1ee3-830a-11dd-ba9c-806e6f6e6963}\\mp3\\Lemon Jelly - lemonjelly.ky\\01 - In the Bath.mp3"
+        //m_mediaObject->enqueue( Phonon::MediaSource(QUrl(QString(TESTFILE))) );
+        //m_mediaObject->play();
+        //return;
+
+    // time has run out for content resolution, we need something now!
+    // mutate the track at the front of the queue with the best resolve result
+    Track t = m_queue.first();
+    QList<ITrackResolveResponse*> candidates( m_candidates.values(t) );
+    if (!candidates.isEmpty())
+    {
+        qSort(candidates.begin(), candidates.end(), candidate_sort);
+        ITrackResolveResponse* best = candidates.first();
+        QString localContent( QString::fromUtf8(best->url()) );
+        qDebug() << "Local Content: " + localContent;
+
+        MutableTrack mt(t);
+        mt.setArtist(best->artist());
+        mt.setAlbum(best->artist());
+        mt.setTitle(best->title());
+        mt.setDuration(best->duration());
+        mt.setUrl(QUrl(localContent));
+    }
+
+#ifdef Q_WS_MAC
+    new EnqueueThread( t.url(), m_mediaObject );
+#else
+    m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
+    m_mediaObject->play();
+#endif
+}
+
+// onPhononCurrentSourceChanged happens always (even if the source is
+// unplayable), so we use it to update our now playing track.
 void
 Radio::onPhononCurrentSourceChanged(const Phonon::MediaSource &)
 {
-	spoolNextTrack();
+    Track t = m_queue.takeFirst();
+    m_candidates.remove(t);
+
+    MutableTrack(t).stamp();
+    m_track = t;
+    changeState( Buffering );
+    emit trackSpooled( m_track );
 }
 
 
-bool
-Radio::spoolNextTrack()
+void
+Radio::fetchMoreTracks()
 {
-    QUrl const url = m_mediaObject->currentSource().url();
-    
-    if (url == m_track.url())
-        return true;
-
-    Track t = m_queue.take( url );
-    if (t.isNull())
-    {
-        qWarning() << "Cannot find track for" << url;
-        return false;
-    }
-    
-    MutableTrack( t ).stamp();
-    m_track = t;
-    
+    // todo: we have already have a tuner request outstanding.. is this a problem?
     if (m_queue.isEmpty() && m_tuner)
         m_tuner->fetchFiveMoreTracks();
-    
-    changeState( Buffering );
-    emit trackSpooled( m_track );
-    return true;
 }
 
 
@@ -331,7 +383,7 @@ Radio::changeState( Radio::State const newstate )
     if (oldstate == newstate) 
         return;
 
-  qDebug().nospace() << newstate << " (was " << oldstate << ')';
+    qDebug().nospace() << newstate << " (was " << oldstate << ')';
      
     m_state = newstate; // always assign state properties before you tell other
                         // objects about it
@@ -366,3 +418,23 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
         emit tuningIn( m_station );
     }
 }
+
+
+void 
+Radio::onResolveResult( const Track t, class ITrackResolveResponse* resp )
+{
+    if (m_queue.contains(t))
+    {
+        m_candidates.insertMulti(t, resp);
+    }
+}
+
+void 
+Radio::onResolveComplete( const Track t )
+{
+    if (m_queue.contains(t)) 
+    {
+        // todo: if in the TUNING_RESOLVER_WAIT_MS period, and this is the head track: signal.
+    }
+}
+

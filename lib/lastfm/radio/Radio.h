@@ -92,6 +92,9 @@ private slots:
     void onPhononStateChanged( Phonon::State, Phonon::State );
 	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
 	void onTunerError( Ws::Error );
+    void onResolveResult( const Track, class ITrackResolveResponse* );
+    void onResolveComplete( const Track );
+    void phononEnqueue();
 
 	/** we get a "proper" station name from the tune webservice */
 	void setStationNameIfCurrentlyBlank( const QString& );
@@ -100,11 +103,8 @@ private:
     /** resets internals to what Stopped means, used by changeState() */
     void clear();
     
-    /** @returns true if successfully spooled or already spooled
-      * spooling here basically means aligning m_track and m_mediaObjects 
-      * currentSource */
-    bool spoolNextTrack();
-    
+    void fetchMoreTracks();
+
 	/** emits signals if appropriate */
 	void changeState( State );
 	
@@ -116,7 +116,8 @@ private:
 	RadioStation m_station;
     class Resolver *m_resolver;
 	
-    QMap<QUrl, Track> m_queue;
+    QList<Track> m_queue;
+    QMap<Track, ITrackResolveResponse*> m_candidates;
 };
 
 

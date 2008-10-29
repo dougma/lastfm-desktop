@@ -33,33 +33,34 @@ class LASTFM_RADIO_DLLEXPORT Resolver
 public:
     Resolver( const QList<ITrackResolverPlugin*>& plugins);
 
-    // Creates a ResolveReply (and submits the resolve request to
-    // the plugins).  Returns NULL if there are no plugins.
-    class ResolveReply* resolve(const Track &);
+    // Creates the ResolveAttempt
+    class ResolveAttempt* create(const Track &) const;
+
+    // submits the resolve
+    void submit(const ResolveAttempt*) const;
 };
 
 
-// ResolveReply represents an in-progress track resolution request; it
+// ResolveAttempt represents an in-progress track resolution request; it
 // generates signals on responses (there can be multiple) and on completion
-class LASTFM_RADIO_DLLEXPORT ResolveReply : public QObject
+class LASTFM_RADIO_DLLEXPORT ResolveAttempt : public QObject
 {
     Q_OBJECT;
-    Q_DISABLE_COPY(ResolveReply);
+    Q_DISABLE_COPY(ResolveAttempt);
 
     class ResolveRequest* m_req;        // we own this
 
-    ResolveReply();
-    void setRequest(ResolveRequest*);
+    ResolveAttempt();
 
-    friend class Resolver;              // Resolver constructs us
+    friend class Resolver;              // Resolver creates and submits
     friend class ResolveRequest;        // ResolveRequest emits our signals 
 
 public:
-    ~ResolveReply();
+    ~ResolveAttempt();
 
 signals:
-    void response(class ITrackResolveResponse *);
-    void requestComplete();
+    void resolveResponse(const Track, ITrackResolveResponse *);
+    void resolveComplete(const Track);
 };
 
 
@@ -67,7 +68,7 @@ signals:
 // Its lifetime is managed by the plugins (calling finished())
 class LASTFM_RADIO_DLLEXPORT ResolveRequest : public ITrackResolveRequest
 {
-    // Track m_track;   // would this be useful?
+    Track m_track;
     QByteArray m_artist;
     QByteArray m_album;
     QByteArray m_title;
@@ -75,11 +76,12 @@ class LASTFM_RADIO_DLLEXPORT ResolveRequest : public ITrackResolveRequest
     QByteArray m_fpid;
 
     unsigned m_ref;         // may be referenced by multiple plugins
-    ResolveReply* m_reply;
+    ResolveAttempt* m_reply;
+
     QList <ITrackResolveResponse*> m_responses; // we own these
 
 public:
-    ResolveRequest(const Track&, ResolveReply* reply, unsigned refCount);
+    ResolveRequest(const Track&, ResolveAttempt* reply, unsigned refCount);
     ~ResolveRequest();
 
     virtual const char *artist() const;
