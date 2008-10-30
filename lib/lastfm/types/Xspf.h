@@ -28,6 +28,7 @@
 class LASTFM_TYPES_DLLEXPORT Xspf
 {
 public:
+    /** pass in the playlist node! */
 	Xspf( const class QDomElement& playlist_node );
 
 	QList<Track> tracks() const { return m_tracks; }

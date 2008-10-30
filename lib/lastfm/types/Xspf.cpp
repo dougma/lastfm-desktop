@@ -61,7 +61,7 @@ Xspf::Xspf( const QDomElement& playlist_node )
             m_tracks += t; // outside since location is enough basically
         }
     }
-    catch (CoreDomElement& e)
+    catch (CoreDomElement::Exception& e)
     {
         qWarning() << e;        
     }
