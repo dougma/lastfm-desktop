@@ -29,6 +29,9 @@ debug:macx-xcode {
     SOURCES -= lib/lastfm/core/win/Utils.cpp
 	SOURCES -= lib/lastfm/ws/sens_win.cpp lib/lastfm/ws/NdisEvents_win.cpp lib/lastfm/ws/WmiSink_win.cpp
 
+    HEADERS -= lib/lastfm/radio/legacy/Tuner.h
+    SOURCES -= lib/lastfm/radio/legacy/Tuner.cpp
+
     INCLUDEPATH += app/client lib
     LIBS += -framework SystemConfiguration -framework CoreServices
 }
@@ -44,7 +47,8 @@ else {
                lib/lastfm/scrobble/libscrobble.pro \
                lib/unicorn/libunicorn.pro \
 	           app/client \
-               app/twiddly
+               app/twiddly \
+               app/clientplugins/localresolver/libresolver.pro
 
 	# make the app client the default project in visual studio
 	debug:win32 {
