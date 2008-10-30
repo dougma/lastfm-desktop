@@ -35,6 +35,9 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
        m_state( Radio::Stopped ),
        m_resolver( resolver )
 {
+    // for EnqueueThread, TODO remove!
+    qRegisterMetaType<Phonon::MediaSource>( "MediaSource" );
+    
     m_mediaObject = new Phonon::MediaObject( this );
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
