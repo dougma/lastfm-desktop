@@ -102,7 +102,7 @@ class EnqueueThread : public QThread
 	Phonon::MediaObject* m_o;
 	
 public:
-	EnqueueThread( QUrl& url, Phonon::MediaObject* object )
+	EnqueueThread( const QUrl& url, Phonon::MediaObject* object )
 	{
 		m_o = object;
 		m_url = url;
