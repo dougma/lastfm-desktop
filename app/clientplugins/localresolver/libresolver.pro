@@ -1,6 +1,6 @@
 TARGET = resolver
 TEMPLATE = lib
-CONFIG += qt dll core
+CONFIG += qt dll core taglib
 QT += sql
 
 include( $$ROOT_DIR/common/qmake/include.pro )
@@ -16,7 +16,4 @@ HEADERS   = $$findSources( h )
 
 SOURCES -= test.cpp
 
-LIBS += -L$$BIN_DIR 
 win32:LIBS += -lmpr
-win32:debug:LIBS += -ltagd
-win32:!debug:LIBS += -ltag

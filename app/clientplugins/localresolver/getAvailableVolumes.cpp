@@ -23,6 +23,7 @@
     #include <windows.h>
 #endif
 
+#include <QDir>
 #include <QString>
 #include <QStringList>
 
@@ -93,8 +94,9 @@ QStringList getAvailableVolumes()
             }
         }
     }
-#else
-    // todo
+#elif defined(Q_WS_MAC)
+    //TODO HACK FIXME!
+    result += QDir::home().filePath( "Music" ) + "/";
 #endif
 
     return result;

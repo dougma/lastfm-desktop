@@ -386,7 +386,7 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
         "AND f.album LIKE :album "
         "AND f.title LIKE :title " 
     );
-    _ASSERT(bPrepared);
+    Q_ASSERT(bPrepared);
 
     query.bindValue( ":artist", artist.isEmpty() ? "%" : artist.toLower() );
     query.bindValue( ":album", album.isEmpty() ? "%" : album.toLower() );
@@ -420,7 +420,7 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
             "VALUES (:modificationDate, :title, :artist, :album, :kbps, :duration) "
             "WHERE id = :fileId" );
 
-        _ASSERT(bPrepared);
+        Q_ASSERT(bPrepared);
 
         query.bindValue(":fileId", fileId);
         query.bindValue(":modificationDate", lastModified);
@@ -435,7 +435,7 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
     }
     query.exec();
     bool bResult = !query.lastError().isValid();
-    _ASSERT(bResult);
+    Q_ASSERT(bResult);
     return bResult;
 }
 
