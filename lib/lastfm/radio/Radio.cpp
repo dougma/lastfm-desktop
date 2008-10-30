@@ -26,7 +26,7 @@
 #include <phonon/audiooutput.h>
 #include <cmath>
 
-#define TUNING_RESOLVER_WAIT_MS 3000
+#define TUNING_RESOLVER_WAIT_MS 500
 
 
 Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
@@ -308,8 +308,6 @@ candidate_sort(ITrackResolveResponse* a, ITrackResolveResponse* b)
     return a->matchQuality() - b->matchQuality();
 }
 
-#define MIN_MATCH_QUALITY 0.5
-
 
 // Looks at the head of the playqueue, makes a MediaSource object 
 // and places that in the phonon queue.
@@ -317,41 +315,31 @@ candidate_sort(ITrackResolveResponse* a, ITrackResolveResponse* b)
 void
 Radio::phononEnqueue()
 {
-    if (m_queue.isEmpty())
-        return;
+    // only keep one track in the phononQueue
+    if (!m_queue.isEmpty() && m_mediaObject->queue().isEmpty()) {
+        // mutate the track at the front of the (non-phonon) queue 
+        // with the best resolve result
+        Track t = m_queue.first();
+        QList<ITrackResolveResponse*> candidates( m_candidates.values(t) );
+        if (!candidates.isEmpty())
+        {
+            qSort(candidates.begin(), candidates.end(), candidate_sort);
+            ITrackResolveResponse* best = candidates.first();
+            QString localContent( QString::fromUtf8(best->url()) );
+            qDebug() << "Local Content: " + localContent;
 
-    // under windows, both of these style paths are tested as working:
-    //#define TESTFILE "\\\\osmutante\\public\\mp3\\Midlake\\The Trials Of Van Occupanther\\01 - Roscoe.mp3"
-    //#define TESTFILE "\\\\?\\Volume{782a1ee3-830a-11dd-ba9c-806e6f6e6963}\\mp3\\Lemon Jelly - lemonjelly.ky\\01 - In the Bath.mp3"
-        //m_mediaObject->enqueue( Phonon::MediaSource(QUrl(QString(TESTFILE))) );
-        //m_mediaObject->play();
-        //return;
+            MutableTrack mt(t);
+            mt.setDuration(best->duration());
+            mt.setUrl(QUrl(localContent));
+        }
 
-    // time has run out for content resolution, we need something now!
-    // mutate the track at the front of the queue with the best resolve result
-    Track t = m_queue.first();
-    QList<ITrackResolveResponse*> candidates( m_candidates.values(t) );
-    if (!candidates.isEmpty())
-    {
-        qSort(candidates.begin(), candidates.end(), candidate_sort);
-        ITrackResolveResponse* best = candidates.first();
-        QString localContent( QString::fromUtf8(best->url()) );
-        qDebug() << "Local Content: " + localContent;
-
-        MutableTrack mt(t);
-        mt.setArtist(best->artist());
-        mt.setAlbum(best->artist());
-        mt.setTitle(best->title());
-        mt.setDuration(best->duration());
-        mt.setUrl(QUrl(localContent));
+    #ifdef Q_WS_MAC
+        new EnqueueThread( t.url(), m_mediaObject );
+    #else
+        m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
+        m_mediaObject->play();
+    #endif
     }
-
-#ifdef Q_WS_MAC
-    new EnqueueThread( t.url(), m_mediaObject );
-#else
-    m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
-    m_mediaObject->play();
-#endif
 }
 
 // onPhononCurrentSourceChanged happens always (even if the source is
@@ -426,8 +414,7 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
 void 
 Radio::onResolveResult( const Track t, class ITrackResolveResponse* resp )
 {
-    if (m_queue.contains(t))
-    {
+    if (m_queue.contains(t)) {
         m_candidates.insertMulti(t, resp);
     }
 }
@@ -435,9 +422,10 @@ Radio::onResolveResult( const Track t, class ITrackResolveResponse* resp )
 void 
 Radio::onResolveComplete( const Track t )
 {
-    if (m_queue.contains(t)) 
-    {
-        // todo: if in the TUNING_RESOLVER_WAIT_MS period, and this is the head track: signal.
+    if (0 == m_queue.indexOf(t)) {
+        // resolve completed for the head of the queue
+        // maybe ahead of TUNING_RESOLVER_WAIT_MS timeout:
+        phononEnqueue();
     }
 }
 
