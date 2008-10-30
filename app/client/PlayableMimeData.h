@@ -25,12 +25,13 @@
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/types/User.h"
 
+#include "radio/buckets/SeedTypes.h"
+
 
 class PlayableMimeData : public QMimeData
 {
 	Q_OBJECT
 public:
-	enum Type { ArtistType = 0, TagType, UserType };
 	
 	static PlayableMimeData* createFromArtist( const Artist& a )
 	{
@@ -38,7 +39,7 @@ public:
 		data->setText( a );
 		data->setUrls( QList<QUrl>() << a.www() );
 		data->setData( "text/x-lfm-entity-type", "Artist" );
-		data->m_type = ArtistType;
+		data->m_type = Seed::ArtistType;
 		return data;
 	}
 	
@@ -48,7 +49,7 @@ public:
 		data->setText( t );
 		data->setUrls( QList<QUrl>() << t.www() );
 		data->setData( "text/x-lfm-entity-type", "Tag" );
-		data->m_type = TagType;
+		data->m_type = Seed::TagType;
 		return data;
 	}
 	
@@ -58,22 +59,22 @@ public:
 		data->setText( u );
 		data->setUrls( QList<QUrl>() << u.www() );
 		data->setData( "text/x-lfm-entity-type", "User" );
-		data->m_type = UserType;
+		data->m_type = Seed::UserType;
 		return data;
 	}
 	
-	int type() const
+    Seed::Type type() const
 	{
 		return m_type;
 	}
 	
-	void setType( const int t )
+	void setType( Seed::Type t )
 	{
 		m_type = t;
 	}
 	
 private:
-	int m_type;
+    Seed::Type m_type;
 	
 };
 

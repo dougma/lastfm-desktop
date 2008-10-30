@@ -58,6 +58,10 @@
       <file>RadioControls/stop/onpress.png</file>
   </qresource>
   <qresource>
+      <file>RadioControls/play/rest.png</file>
+      <file>RadioControls/play/onpress.png</file>
+  </qresource>
+  <qresource>
       <file>RadioControls/skip/rest.png</file>
       <file>RadioControls/skip/onpress.png</file>
   </qresource>

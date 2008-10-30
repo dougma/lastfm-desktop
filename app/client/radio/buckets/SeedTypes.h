@@ -16,50 +16,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef PLAYABLE_LIST_ITEM
-#define PLAYABLE_LIST_ITEM
 
-#include <QListWidgetItem>
-#include "PlayableMimeData.h"
-#include <QNetworkReply>
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "app/moose.h"
+#ifndef SEED_TYPES_H
+#define SEED_TYPES_H
 
-class PlayableListItem : public QObject, public QListWidgetItem
+namespace Seed
 {
-    Q_OBJECT
-    
-public:
-	PlayableListItem( QListWidget* parent = 0 ) : QObject( parent ), QListWidgetItem( parent, QListWidgetItem::UserType ){ m_networkManager = new WsAccessManager( this ); }
-	PlayableListItem( const QString & text, QListWidget * parent = 0 )
-					:QObject( parent ), QListWidgetItem( text, parent, QListWidgetItem::UserType ){};
-	
-	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
-	
-	void setType( const Seed::Type t ){ setData( moose::TypeRole, t ); }
-    
-    Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
-	
-    Seed::Type playableType() const{ return (Seed::Type)data( moose::TypeRole ).toInt(); }
-    
-    void fetchImage();
-    
-    void setPixmap( const QPixmap& icon );
-    
-    void flash();
-    
-public slots:
-    void iconDataDownloaded();
-    
-private slots:
-    void onArtistSearchFinished( WsReply* r );
-    void onFlashFrameChanged( int );
-    void onFlashFinished();
-    
-private:
-    class WsAccessManager* m_networkManager;
-    
-};
-
-#endif //PLAYABLE_LIST_ITEM
+    enum Type { 
+        ArtistType = 0, 
+        TagType, 
+        UserType 
+    };
+}
+#endif

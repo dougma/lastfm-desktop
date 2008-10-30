@@ -57,7 +57,9 @@ namespace moose
         SmallDisplayRole,
         UrlRole,
         WeightingRole,
-        IdentityRole
+        IdentityRole,
+        TypeRole,
+        HighlightRole
     };
 }
 

@@ -39,7 +39,7 @@
 
 #include <phonon/volumeslider.h>
 
-Q_DECLARE_METATYPE( PlayableMimeData::Type )
+Q_DECLARE_METATYPE( Seed::Type )
 
 PrimaryBucket::PrimaryBucket()
 {
@@ -86,9 +86,9 @@ PrimaryBucket::PrimaryBucket()
     ui.freeInput->setAttribute( Qt::WA_MacShowFocusRect, false );
     
     freeInputWidget->layout()->addWidget( ui.inputSelector = new QComboBox );
-    ui.inputSelector->addItem( "Artist", QVariant::fromValue(PlayableMimeData::ArtistType) );
-    ui.inputSelector->addItem( "Tag", QVariant::fromValue(PlayableMimeData::TagType) );
-    ui.inputSelector->addItem( "User", QVariant::fromValue(PlayableMimeData::UserType) );
+    ui.inputSelector->addItem( "Artist", QVariant::fromValue(Seed::ArtistType) );
+    ui.inputSelector->addItem( "Tag", QVariant::fromValue(Seed::TagType) );
+    ui.inputSelector->addItem( "User", QVariant::fromValue(Seed::UserType) );
     
     primaryPane->layout()->addWidget( freeInputWidget );
 
@@ -106,6 +106,7 @@ PrimaryBucket::PrimaryBucket()
     connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
     connect( ui.controls, SIGNAL( play()), ui.playerBucket, SLOT( play()));
     connect( ui.freeInput, SIGNAL( returnPressed()), SLOT( onFreeInputReturn()));
+    connect( ui.playerBucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketItemRemoved( QString, Seed::Type)));
     
     ui.controls->show();
     
@@ -122,28 +123,28 @@ PrimaryBucket::PrimaryBucket()
 void
 PrimaryBucket::onFreeInputReturn()
 {
-    PlayableMimeData::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<PlayableMimeData::Type>();
+    Seed::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<Seed::Type>();
     ui.playerBucket->addAndLoadItem( ui.freeInput->text(), type );
+    ui.freeInput->clear();
 }
 
 
 void 
 PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
 {
-    static WsAccessManager* nam = 0;
-    if (!nam) nam = new WsAccessManager;
+    static WsAccessManager* nam = new WsAccessManager;
     
     QList< User > users = User::list( r );
     
     foreach( User user, users )
     {
-        PlayableListItem* n = new PlayableListItem( user , ui.friendsBucket );
+        PlayableListItem* n = new PlayableListItem( user, ui.friendsBucket );
         
         QNetworkReply* r = nam->get( QNetworkRequest( user.mediumImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
         n->setSizeHint( QSize( 75, 25));
-        n->setType( PlayableMimeData::UserType );
+        n->setType( Seed::UserType );
     }
 }
 
@@ -156,9 +157,9 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
-        n->setIcon( QIcon( ":buckets/tag_white_on_blue.png" ) );
+        n->setPixmap( QPixmap( ":buckets/tag.png" ) );
         n->setSizeHint( QSize( 75, 25));
-        n->setType( PlayableMimeData::TagType );
+        n->setType( Seed::TagType );
     }
 }
 
@@ -168,6 +169,9 @@ PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
 {
     PrimaryListView* itemView = dynamic_cast< PrimaryListView*>( sender() );
     Q_ASSERT( itemView );
+
+    if( !(itemView->itemFromIndex( index )->flags() & Qt::ItemIsEnabled) )
+        return;
     
     QStyleOptionViewItem options;
     options.initFrom( this );
@@ -175,6 +179,9 @@ PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
     options.displayAlignment = Qt::AlignVCenter | Qt::AlignLeft;
     options.decorationAlignment = Qt::AlignVCenter | Qt::AlignCenter;
     options.rect = itemView->visualRect( index );
+    
+    itemView->itemFromIndex( index )->setFlags( Qt::NoItemFlags );
+    
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
     w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
     w->dragTo( ui.playerBucket );
@@ -187,4 +194,27 @@ PrimaryBucket::onDnDAnimationFinished()
 {
     DelegateDragHint* delegateWidget = static_cast<DelegateDragHint*>(sender());
     QModelIndex index = delegateWidget->index();
+}
+
+
+void 
+PrimaryBucket::onPlayerBucketItemRemoved( QString text, Seed::Type type )
+{
+    switch ( type ) {
+        case Seed::UserType :
+            foreach( QListWidgetItem* item, ui.friendsBucket->findItems( text, Qt::MatchFixedString ))
+            {
+                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+            }
+            break;
+            
+        case Seed::TagType:
+            foreach( QListWidgetItem* item, ui.tagsBucket->findItems( text, Qt::MatchFixedString ))
+            {
+                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+            }
+            break;
+        default:
+            break;
+    }
 }

@@ -19,6 +19,7 @@
 
 #include "DelegateDragHint.h"
 #include <QCoreApplication>
+#include <QAbstractScrollArea>
 
 void
 DelegateDragHint::onFinishedAnimation()
@@ -26,6 +27,9 @@ DelegateDragHint::onFinishedAnimation()
  
     if( m_mimeData )
     {
+        if( QAbstractScrollArea* abstractScrollArea = dynamic_cast<QAbstractScrollArea*>(m_target))
+            m_target = abstractScrollArea->viewport();
+        
         QDragEnterEvent* eevent = new QDragEnterEvent( m_target->pos(), Qt::CopyAction | Qt::MoveAction, m_mimeData, Qt::LeftButton, Qt::NoModifier );
         QCoreApplication::postEvent( m_target, eevent );
         QDropEvent* event = new QDropEvent( m_target->pos(), Qt::CopyAction | Qt::MoveAction, m_mimeData, Qt::LeftButton, Qt::NoModifier );
@@ -52,7 +56,7 @@ DelegateDragHint::dragTo( QWidget* target )
     m_target = target;
     m_startPoint = pos();
     
-    QTimeLine* timeLine = new QTimeLine( 1000, this );
+    QTimeLine* timeLine = new QTimeLine( 500, this );
     timeLine->setFrameRange( 0, 100 );
     timeLine->setCurveShape( QTimeLine::EaseInCurve );
     
@@ -61,7 +65,6 @@ DelegateDragHint::dragTo( QWidget* target )
     connect( timeLine, SIGNAL( finished()), SLOT( onFinishedAnimation()));
     timeLine->start();
     show();
-    clearFocus();
 }
 
 
@@ -70,7 +73,8 @@ DelegateDragHint::paintEvent( QPaintEvent* e )
 {
     QPainter p( this );
     p.setClipRect( e->rect() );
-    m_options.state = QStyle::State_Selected | QStyle::State_Active | QStyle::State_HasFocus | QStyle::State_Enabled;
+    m_options.palette = palette();
+    m_options.state = QStyle::State_Selected | QStyle::State_Active | QStyle::State_Enabled | QStyle::State_HasFocus;
     m_options.showDecorationSelected = true;
     m_options.rect = rect();
     m_d->paint( &p, m_options, m_i );

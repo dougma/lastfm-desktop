@@ -21,6 +21,7 @@
 #define PRIMARY_BUCKET_H
 
 #include <QMainWindow>
+#include "SeedTypes.h"
 
 namespace Unicorn{ class TabWidget; }
 
@@ -45,6 +46,7 @@ public:
 private:
 	
 private slots:
+    void onPlayerBucketItemRemoved( QString, Seed::Type );
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
     void onItemDoubleClicked( const class QModelIndex& index );
@@ -57,10 +59,10 @@ private slots:
 
 #include <QMouseEvent>
 #include <QModelIndex>
-#include <QDebug>
 #include <QListWidget>
 #include "PlayableListItem.h"
 #include "PlayableMimeData.h"
+#include <QDebug>
 
 class PrimaryListView : public QListWidget
 {
@@ -68,7 +70,7 @@ class PrimaryListView : public QListWidget
     
     friend class PrimaryBucket;
 public:
-	PrimaryListView( QWidget* parent ): QListWidget( parent ){};
+	PrimaryListView( QWidget* parent ): QListWidget( parent ){}
     
 protected:
     QMimeData* mimeData( const QList<QListWidgetItem *> items ) const
@@ -84,34 +86,12 @@ protected:
         data->setImageData( item->data( Qt::DecorationRole).value<QIcon>().pixmap(50).toImage() );
         return data;
     }
-
-//	void mousePressEvent(QMouseEvent *event)
-//	{
-//		QModelIndex i = indexAt( event->pos());
-//		if (event->button() == Qt::LeftButton
-//			&& i.isValid() && i.flags() & Qt::ItemIsDragEnabled ) 
-//		{
-//			
-//			QString text = i.data( Qt::DisplayRole ).toString();
-//			QIcon icon = i.data( Qt::DecorationRole ).value<QIcon>();
-//			QDrag *drag = new QDrag( this );
-//			PlayableMimeData *mimeData = new PlayableMimeData;
-//			
-//			mimeData->setText( text );
-//			mimeData->setImageData( icon.pixmap( 50 ).toImage() );
-//			mimeData->setType( i.data( Qt::UserRole ).toInt() );
-//			
-//			drag->setMimeData( mimeData );
-//			drag->setPixmap(icon.pixmap(50 ));
-//			drag->setHotSpot(QPoint(drag->pixmap().width()/2,
-//									drag->pixmap().height()));
-//			
-//			Qt::DropAction dropAction = drag->exec( Qt::CopyAction );
-//
-//			if( dropAction != Qt::IgnoreAction )
-//				itemFromIndex( i )->setFlags( Qt::NoItemFlags );
-//		}
-//	}
+    
+    void focusOutEvent( QFocusEvent* event )
+    {
+        clearSelection();
+        QListWidget::focusOutEvent( event );
+    }
 	
 };
 

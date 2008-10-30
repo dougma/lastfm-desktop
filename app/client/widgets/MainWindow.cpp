@@ -173,7 +173,7 @@ MainWindow::setupUi()
     QDockWidget* dw;
     dw = new QDockWidget;
     dw->setWindowTitle( tr("Radio") );
-    dw->setWidget( new RadioWidget );
+    dw->setWidget( ui.primaryBucket = new PrimaryBucket );
     addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.radio->setWidget( dw );
     dw->hide();
@@ -191,13 +191,6 @@ MainWindow::setupUi()
     dw->setWidget( ui.info = new MetaInfoView );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
     ui.bottombar->ui.library->setWidget( dw );
-    dw->hide();
-    
-    dw = new QDockWidget;
-    dw->setWindowTitle( "Buckets" );
-    dw->setWidget( ui.primaryBucket = new PrimaryBucket );
-    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
-    dw->setFloating( true );
     dw->hide();
     
 #ifndef Q_WS_MAC

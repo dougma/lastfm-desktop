@@ -16,55 +16,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef DELEGATE_DRAG_HINT_H
-#define DELEGATE_DRAG_HINT_H
+
+#ifndef SEED_DELEGATE_H
+#define SEED_DELEGATE_H
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
-#include <QPaintEvent>
-#include <QTimeLine>
+#include <QFontMetrics>
 #include <QDebug>
+#include "app/moose.h"
 
-class DelegateDragHint : public QWidget
+class SeedDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    DelegateDragHint( QAbstractItemDelegate* d, const QModelIndex& i, const QStyleOptionViewItem& options, QWidget* p ): QWidget( 0 ), m_mimeData( 0 ), m_d( d ), m_i( i ), m_options( options )
-    {
-        setPalette( p->palette() );
-        setFocusPolicy( Qt::NoFocus );
-        setWindowFlags( Qt::CustomizeWindowHint | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-        setWindowOpacity( 0.3 );
-        resize( options.rect.size() );
-        move( p->mapToGlobal( options.rect.topLeft()));
-    }
+    SeedDelegate( QObject* parent = 0 );
     
-    void paintEvent( QPaintEvent* e );
+    void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const;
     
-    void dragTo( QWidget* target );
-   
-    void setMimeData( QMimeData* data ){ m_mimeData = data; }
-    
-    QSize sizeHint() const { QStyleOptionViewItem option; option.rect = rect(); return m_d->sizeHint( option, m_i); }
-    
-    QModelIndex index(){ return m_i; }
-    
-signals:
-    void finishedAnimation();
-    
-private slots:
-    void onDragFrameChanged( int frame );
-    
-    void onFinishedAnimation();
+    QSize sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const;
     
 private:
-    QWidget* m_target;
-    QPoint m_startPoint;
-    QMimeData* m_mimeData;
-    QAbstractItemDelegate* m_d;
-    QModelIndex m_i;
-    QStyleOptionViewItem m_options;
+    QPixmap m_overlay;
+    QPixmap m_selectedOverlay;
+    
 };
 
-#endif //DELEGATE_DRAG_HINT_H
+#endif //SEED_DELEGATE_H

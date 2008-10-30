@@ -19,6 +19,10 @@
 
 #include "PlayableListItem.h"
 #include "lib/lastfm/ws/WsReply.h"
+#include <QTimeLine>
+#include <QPainter>
+#include "app/moose.h"
+
 
 PlayableListItem* /* static */
 PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget* parent )
@@ -30,7 +34,7 @@ PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget*
     if( data->hasImage() )
         item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
     
-    item->setData( k_playableType, data->type() );
+    item->setData( moose::TypeRole, data->type() );
     
     return item;
 };
@@ -44,7 +48,7 @@ PlayableListItem::iconDataDownloaded()
     QPixmap pixmap;
     pixmap.loadFromData( reply->readAll() );
     
-    setIcon( QIcon( pixmap ) );
+    setPixmap( pixmap );
 
 }
 
@@ -54,7 +58,7 @@ PlayableListItem::fetchImage()
 {
     switch( playableType())
     {
-        case PlayableMimeData::ArtistType:
+        case Seed::ArtistType:
         {
             Artist a( text() );
             WsReply* reply = a.search( 5 );
@@ -63,15 +67,15 @@ PlayableListItem::fetchImage()
             return;
         }
             
-        case PlayableMimeData::UserType:
+        case Seed::UserType:
         {
             //TODO user.search method - waiting on webteam
             return;
         }
         
-        case PlayableMimeData::TagType:
+        case Seed::TagType:
         {
-            setIcon( QIcon( ":/buckets/tag_white_on_blue.png" ) );
+            setIcon( QIcon( ":/buckets/tag.png" ) );
             return;
         }
     }
@@ -108,8 +112,54 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
 
 
 void 
-PlayableListItem::setIcon( const QIcon& icon )
+PlayableListItem::setPixmap( const QPixmap& pm )
 {
-    QListWidgetItem::setIcon( icon );
-    listWidget()->viewport()->update();
+    //crop the avatar to a 64x64 square
+    const QPixmap scaled = pm.scaled( 64, 64, Qt::KeepAspectRatioByExpanding );
+    const QPixmap cropped = scaled.copy( 0, 0, 64, 64);
+    
+    QListWidgetItem::setIcon( cropped );
+    
+    if( listWidget())
+        listWidget()->viewport()->update();
+}
+
+
+void 
+PlayableListItem::flash()
+{
+    QTimeLine* flashTimeLine = new QTimeLine( 150, this );
+    flashTimeLine->setFrameRange( 0, 100 );
+    flashTimeLine->setCurveShape( QTimeLine::EaseOutCurve );
+    connect( flashTimeLine, SIGNAL( frameChanged( int )), SLOT( onFlashFrameChanged( int )));
+    connect( flashTimeLine, SIGNAL( finished()), SLOT( onFlashFinished()));
+    flashTimeLine->start();
+}
+
+
+void 
+PlayableListItem::onFlashFrameChanged( int frame )
+{
+    setData( moose::HighlightRole, QVariant::fromValue<int>( frame ) );
+    if( listWidget() )
+        listWidget()->viewport()->update();
+    
+}
+
+
+void 
+PlayableListItem::onFlashFinished()
+{
+    QTimeLine* tl = static_cast<QTimeLine*>(sender());
+    
+    if( tl->direction() == QTimeLine::Forward )
+    {
+        tl->setCurveShape( QTimeLine::EaseInCurve );
+        tl->setDuration( 300 );
+        tl->setDirection( QTimeLine::Backward );
+        tl->start();
+    }
+    else
+        tl->deleteLater();
+    
 }

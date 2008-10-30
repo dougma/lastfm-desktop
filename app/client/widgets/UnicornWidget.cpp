@@ -40,6 +40,7 @@ UnicornWidget::paintItBlack( QWidget* w )
         // reinterpret cast didn't work. Lol.
         p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
         p.setBrush( QPalette::Text, Qt::white );
+        p.setBrush( QPalette::Disabled, QPalette::Text, Qt::darkGray );
     }
 
     w->setPalette( p );

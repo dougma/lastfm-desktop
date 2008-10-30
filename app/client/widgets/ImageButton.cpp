@@ -33,7 +33,8 @@ ImageButton::ImageButton( QWidget* parent )
 {}
 
 
-ImageButton::ImageButton( const QString& path )
+ImageButton::ImageButton( const QString& path, QWidget* parent )
+            : QAbstractButton( parent )
 {   
     setPixmap( path );
     

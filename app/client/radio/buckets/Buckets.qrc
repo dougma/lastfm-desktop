@@ -1,5 +1,10 @@
 <RCC>
   <qresource>
-    <file>buckets/tag_white_on_blue.png</file>
+    <file>buckets/tag.png</file>
+    <file>buckets/radio_clear_all_x.png</file>
+    <file>buckets/x_button.png</file>
+    <file>buckets/avatar_overlay_selected.png</file>
+    <file>buckets/avatar_overlay.png</file>
+    <file>buckets/show_query.png</file>
   </qresource>
 </RCC>

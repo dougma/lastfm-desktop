@@ -32,7 +32,7 @@ class ImageButton : public QAbstractButton
 	
 public:
     ImageButton( QWidget* parent = 0 );
-	ImageButton( const QString& path );
+	ImageButton( const QString& path, QWidget* parent = 0 );
 
 	void setAction( class QAction* );
     

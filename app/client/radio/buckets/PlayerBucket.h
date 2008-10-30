@@ -31,6 +31,7 @@
 #include "the/app.h"
 #include "lib/lastfm/types/Artist.h"
 #include "PlayableMimeData.h"
+#include "app/moose.h"
 
 class PlayerBucket : public QListWidget
 {
@@ -42,7 +43,11 @@ public:
 	QModelIndex indexAt( const QPoint& point ) const;
     
     /** add the item to the bucket and load any associated data (ie image) */
-    void addAndLoadItem( const QString& item, const PlayableMimeData::Type );
+    void addAndLoadItem( const QString& item, const Seed::Type );
+    
+    
+signals:
+    void itemRemoved( QString, Seed::Type );
 	
 public slots:
     void play();
@@ -52,31 +57,8 @@ protected:
 	void resizeEvent ( QResizeEvent* event );	
 	void dropEvent( QDropEvent* event);	
 	void dragEnterEvent ( QDragEnterEvent * event );
-    
-    bool event( QEvent* event )
-    {
-        switch( event->type() )
-        {
-            case QEvent::DragEnter:
-                dragEnterEvent( static_cast<QDragEnterEvent*>(event) );
-                break;
-                
-            case QEvent::Drop:
-                dropEvent( static_cast<QDropEvent*>(event) );
-                break;
-                
-            case QEvent::DragMove:
-                dragMoveEvent( static_cast<QDragMoveEvent*>(event) );
-                break;
+    void mousePressEvent( QMouseEvent* event );
 
-            default:
-                return QListWidget::event( event );
-        }
-        return true;
-    }
-
-    //Not really sure why this has to be overloaded but seems to fix dnd on win32
-    //qt drag and drop API is NOT very clearly defined :(
     void dragMoveEvent( QDragMoveEvent* event ){ event->acceptProposedAction(); }
 	
 	void paintEvent( QPaintEvent* );
@@ -85,58 +67,50 @@ protected:
     Qt::DropActions supportedDropActions () const { return (Qt::CopyAction | Qt::MoveAction | Qt::LinkAction); }
     
     void calculateLayout();
+    void calculateItemRemoveLayout();
+    void calculateToolIconsLayout();
     
     bool addFromMimeData( const QMimeData* data );
     
+    bool addItem( class PlayableListItem* item );
+    void addItem( QListWidgetItem* item );
+    
+    void removeIndex( const QModelIndex& i );
+    void removeItem( PlayableListItem* item );
+    
+    
+private slots:
+    void onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*);
+    void showQuery();
+    void clearItems();   
+    void removeCurrentItem();
+    
+    void onQueryEditReturn();
    
+    
 private:
 	static const QString k_dropText;
     static const int k_itemMargin;
     static const int k_itemSizeX;
     static const int k_itemSizeY;
     
+    QString m_descriptionText;
+    
 	bool m_showDropText;
 	QMap< QModelIndex, QRect > m_itemRects;
 	class WsAccessManager* m_networkManager;
-	
+
+    QString queryString() const;
 	QString queryString( const QModelIndex i, bool joined = true ) const;
-
-};
-
-#include <QAbstractItemDelegate>
-#include <QPainter>
-class PlayerBucketDelegate : public QAbstractItemDelegate
-{
-	Q_OBJECT
-public:
-	PlayerBucketDelegate( QObject* parent = 0 ):QAbstractItemDelegate( parent ){};
-	
-	void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
-	{
-        if( option.state & QStyle::State_Active )
-            painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x7e, 0x77) );
-        else
-            painter->fillRect( option.rect, QColor( 0x2e, 0x2e, 0x2e, 0x77) );
-		
-		QRect iconRect = option.rect;
-		iconRect.adjust( 2, 2, -2, -15 );
-		
-		QIcon icon = index.data( Qt::DecorationRole ).value<QIcon>();
-		icon.paint( painter, iconRect );
-		
-		painter->setPen( Qt::white );
-		QRect textRect = option.rect.adjusted( 5, 60, -5, -5 );
-        
-		QString text = index.data( Qt::DisplayRole ).toString();
-		painter->drawText( textRect, Qt::AlignCenter , text);
-	}
-	
-	QSize sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
-	{
-		Q_UNUSED( index );
-		return option.rect.size();
-	}
     
+    
+    struct {
+        class ImageButton* clearButton;
+        class ImageButton* removeButton;
+        class ImageButton* queryEditButton;
+        class QLineEdit* queryEdit;
+        } ui;
+
 };
 
 #endif //PLAYER_BUCKET_H
