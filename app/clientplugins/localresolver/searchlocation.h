@@ -76,7 +76,7 @@ private:
         }
 
         foreach(const QString& dir, subdirectories(m_src.m_volume + path)) {
-            if (!_recurseDirs(path + dir + "\\", callback))
+            if (!_recurseDirs(path + dir + QDir::separator(), callback))
                 return false;
         }
 
