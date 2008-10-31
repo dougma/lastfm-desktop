@@ -1,7 +1,10 @@
 TARGET = resolver
 TEMPLATE = lib
-CONFIG += qt dll core taglib
+CONFIG += qt dll core
 QT += sql
+CONFIG += taglib
+
+#TODO rename localresolver.pro
 
 include( $$ROOT_DIR/common/qmake/include.pro )
 
