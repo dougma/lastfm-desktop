@@ -83,6 +83,11 @@ Unicorn::TabBar::succombToTheDarkSide()
 {
     m_inactive = QPixmap(":/DockWindow/tab/inactive.png");
     m_active = QPixmap(":/DockWindow/tab/active.png");
+
+    QFont f = font();
+    f.setPointSize( 12 );
+    f.setBold( false );
+    setFont( f );
     
     QPalette p = palette();
     p.setColor( QPalette::Active, QPalette::Text, Qt::white );
@@ -112,7 +117,7 @@ Unicorn::TabBar::paintEvent( QPaintEvent* )
         }
         else
             p.setPen( palette().color( QPalette::Inactive, QPalette::Text ) );
-        
+                
         p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
     }
     
