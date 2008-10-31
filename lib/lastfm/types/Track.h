@@ -109,7 +109,13 @@ public:
 
     Artist artist() const { return Artist( d->artist ); }
     Album album() const { return Album( artist(), d->album ); }
-    QString title() const { return d->title; }
+    QString title() const
+    {
+        /** if no title is set, return the musicbrainz unknown identifier
+          * in case some part of the GUI tries to display it anyway. Note isNull
+          * returns false still. So you should have queried this! */
+        return d->title.isEmpty() ? "[unknown]" : d->title;
+    }
     uint trackNumber() const { return d->trackNumber; }
     uint duration() const { return d->duration; }
     Mbid mbid() const { return Mbid(d->mbid); }
@@ -182,6 +188,7 @@ public:
     void setMbid( Mbid id ) { d->mbid = id; }
     void setFingerprintId( int id ) { d->fpid = id; }
     
+    /** you also must scrobble this track for the love to become permenant */
     WsReply* love();
     WsReply* ban();
 

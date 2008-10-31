@@ -49,7 +49,13 @@ public:
 	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
 	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
 	
-    operator QString() const { return m_name; }
+    operator QString() const 
+    {
+        /** if no artist name is set, return the musicbrainz unknown identifier
+          * in case some part of the GUI tries to display it anyway. Note isNull
+          * returns false still. So you should have queried this! */
+        return m_name.isEmpty() ? "[unknown]" : m_name; 
+    }
 
     WsReply* share( const class User& recipient, const QString& message = "" );
 	WsReply* getInfo() const;	

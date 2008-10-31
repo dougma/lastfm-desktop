@@ -36,6 +36,7 @@ public:
     {}
 
     operator QString() const { return m_name; }
+    QString name() const { return m_name; }
 	
     /** You can get a WeightedStringList using Tag::getTopTags() */
 	WsReply* getTopTags() const;
