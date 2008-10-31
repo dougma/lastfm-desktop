@@ -42,8 +42,12 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
-    connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) );   // this fires when the whole queue is about to finish
+    connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
     Phonon::createPath( m_mediaObject, m_audioOutput );
+
+    if (m_resolver) {
+        connect( m_resolver, SIGNAL(resolveComplete( const Track )), SLOT(onResolveComplete( const Track )) );
+    }
 }
 
 
@@ -141,10 +145,7 @@ Radio::enqueue( const QList<Track>& tracks )
     foreach (const Track& t, tracks)
     {
         if (m_resolver) {
-            ResolveAttempt *ra = m_resolver->create(t);
-            connect(ra, SIGNAL(resolveResponse(const Track, class ITrackResolveResponse*)), SLOT(onResolveResult(const Track, class ITrackResolveResponse*)) );
-            connect(ra, SIGNAL(resolveComplete(const Track)), SLOT(onResolveComplete(const Track)) );
-            m_resolver->submit(ra);
+            m_resolver->resolve(t);
         }
         m_queue << t;
     }
@@ -251,11 +252,15 @@ Radio::stop()
 void
 Radio::clear()
 {
+    if (m_resolver) {
+        foreach(const Track& t, m_queue) {
+            m_resolver->stopResolving(t);
+        }
+    }
     m_queue.clear();
-    m_candidates.clear();
+
     m_track = Track();
     m_station = RadioStation();
-    
     delete m_tuner;
     m_tuner = 0;    
 }
@@ -317,20 +322,9 @@ Radio::phononEnqueue()
 {
     // only keep one track in the phononQueue
     if (!m_queue.isEmpty() && m_mediaObject->queue().isEmpty()) {
-        // mutate the track at the front of the (non-phonon) queue 
-        // with the best resolve result
         Track t = m_queue.first();
-        QList<ITrackResolveResponse*> candidates( m_candidates.values(t) );
-        if (!candidates.isEmpty())
-        {
-            qSort(candidates.begin(), candidates.end(), candidate_sort);
-            ITrackResolveResponse* best = candidates.first();
-            QString localContent( QString::fromUtf8(best->url()) );
-            qDebug() << "Local Content: " + localContent;
-
-            MutableTrack mt(t);
-            mt.setDuration(best->duration());
-            mt.setUrl(QUrl(localContent));
+        if (m_resolver) {
+            m_resolver->stopResolving( t );  
         }
 
     #ifdef Q_WS_MAC
@@ -348,9 +342,7 @@ void
 Radio::onPhononCurrentSourceChanged(const Phonon::MediaSource &)
 {
     Track t = m_queue.takeFirst();
-    m_candidates.remove(t);
-
-    MutableTrack(t).stamp();
+    MutableTrack( t ).stamp();
     m_track = t;
     changeState( Buffering );
     emit trackSpooled( m_track );
@@ -410,19 +402,10 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
     }
 }
 
-
-void 
-Radio::onResolveResult( const Track t, class ITrackResolveResponse* resp )
-{
-    if (m_queue.contains(t)) {
-        m_candidates.insertMulti(t, resp);
-    }
-}
-
 void 
 Radio::onResolveComplete( const Track t )
 {
-    if (0 == m_queue.indexOf(t)) {
+    if (!m_queue.isEmpty() && t == m_queue[0]) {
         // resolve completed for the head of the queue
         // maybe ahead of TUNING_RESOLVER_WAIT_MS timeout:
         phononEnqueue();

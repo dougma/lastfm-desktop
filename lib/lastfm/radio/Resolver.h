@@ -25,49 +25,52 @@
 #include <QList>
 
 
+
 // Resolver class is used for starting the track resolution requests
-class LASTFM_RADIO_DLLEXPORT Resolver
-{
-    QList<ITrackResolverPlugin*> m_plugins;
-
-public:
-    Resolver( const QList<ITrackResolverPlugin*>& plugins);
-
-    // Creates the ResolveAttempt
-    class ResolveAttempt* create(const Track &) const;
-
-    // submits the resolve
-    void submit(const ResolveAttempt*) const;
-};
-
-
-// ResolveAttempt represents an in-progress track resolution request; it
-// generates signals on responses (there can be multiple) and on completion
-class LASTFM_RADIO_DLLEXPORT ResolveAttempt : public QObject
+class LASTFM_RADIO_DLLEXPORT Resolver : public QObject
 {
     Q_OBJECT;
-    Q_DISABLE_COPY(ResolveAttempt);
 
-    class ResolveRequest* m_req;        // we own this
+    // makes Track work as a key in an associative container
+    class MappableTrack : public Track
+    {
+    public:
+        MappableTrack(const Track& t)
+            :Track(t)
+        {
+        }
 
-    ResolveAttempt();
+        bool operator<(const MappableTrack& that) const
+        {
+            return (this->d < that.d);
+        }
+    };
 
-    friend class Resolver;              // Resolver creates and submits
-    friend class ResolveRequest;        // ResolveRequest emits our signals 
+    QList<ITrackResolverPlugin*> m_plugins;
+    QMap<MappableTrack, float> m_active;    // maps tracks, to best quality match so far
 
 public:
-    ~ResolveAttempt();
+    Resolver(const QList<ITrackResolverPlugin*>& plugins);
+    ~Resolver();
+
+    void resolve(const Track &);
+    void stopResolving(const Track &);
 
 signals:
-    void resolveResponse(const Track, ITrackResolveResponse *);
     void resolveComplete(const Track);
+
+private slots:
+    void onResolveResponse(const Track, ITrackResolveResponse *);
+    void onResolveComplete(const Track);
 };
 
 
 // This is the request object sent to the plugins
 // Its lifetime is managed by the plugins (calling finished())
-class LASTFM_RADIO_DLLEXPORT ResolveRequest : public ITrackResolveRequest
+class ResolveRequest : public QObject, public ITrackResolveRequest
 {
+    Q_OBJECT;
+
     Track m_track;
     QByteArray m_artist;
     QByteArray m_album;
@@ -76,13 +79,9 @@ class LASTFM_RADIO_DLLEXPORT ResolveRequest : public ITrackResolveRequest
     QByteArray m_fpid;
 
     unsigned m_ref;         // may be referenced by multiple plugins
-    ResolveAttempt* m_reply;
-
-    QList <ITrackResolveResponse*> m_responses; // we own these
 
 public:
-    ResolveRequest(const Track&, ResolveAttempt* reply, unsigned refCount);
-    ~ResolveRequest();
+    ResolveRequest(const Track&, unsigned refCount);
 
     virtual const char *artist() const;
     virtual const char *album() const;
@@ -90,8 +89,12 @@ public:
     virtual const char *lastfm_fpid() const;
     virtual const char *musicbrainz_trackid() const;
     virtual const char *puid() const; 
-    virtual void result(class ITrackResolveResponse *resp);
+    virtual void result(ITrackResolveResponse *resp);
     virtual void finished();
+
+signals:
+    void resolveResponse(const Track, ITrackResolveResponse *);
+    void resolveComplete(const Track);
 };
 
 

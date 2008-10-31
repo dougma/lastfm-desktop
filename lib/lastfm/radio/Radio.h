@@ -92,9 +92,8 @@ private slots:
     void onPhononStateChanged( Phonon::State, Phonon::State );
 	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
 	void onTunerError( Ws::Error );
-    void onResolveResult( const Track, class ITrackResolveResponse* );
-    void onResolveComplete( const Track );
     void phononEnqueue();
+    void onResolveComplete( const Track t );
 
 	/** we get a "proper" station name from the tune webservice */
 	void setStationNameIfCurrentlyBlank( const QString& );
@@ -115,9 +114,8 @@ private:
 	Track m_track;
 	RadioStation m_station;
     class Resolver *m_resolver;
-	
+
     QList<Track> m_queue;
-    QMap<Track, ITrackResolveResponse*> m_candidates;
 };
 
 

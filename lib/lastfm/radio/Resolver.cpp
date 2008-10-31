@@ -24,7 +24,7 @@
 Resolver::Resolver( const QList<ITrackResolverPlugin*>& plugins)
         : m_plugins(plugins)
 {
-    // ResolveAttempt needs these types registered for its queued signals
+    // needs these for queued signals
     qRegisterMetaType<Track>("Track");
     qRegisterMetaType<ITrackResolveResponse *>("ITrackResolveResponse *");
 
@@ -33,59 +33,85 @@ Resolver::Resolver( const QList<ITrackResolverPlugin*>& plugins)
     }
 }
 
-
-ResolveAttempt *
-Resolver::create(const Track& track) const
+Resolver::~Resolver()
 {
-    ResolveAttempt* reply = new ResolveAttempt();
-    int refcount = m_plugins.size();
-    if (refcount) {
-        reply->m_req = new ResolveRequest(track, reply, refcount);
+    foreach(ITrackResolverPlugin* p, m_plugins) {
+        p->finished();
     }
-    return reply;
 }
 
-void Resolver::submit(const ResolveAttempt* r) const
+
+void
+Resolver::resolve(const Track& track)
 {
-    if (r->m_req) {
-        foreach(ITrackResolverPlugin *p, m_plugins) {
-            p->resolve(r->m_req);
+    if (!track.isNull()) {      // protect our sanity
+        int refcount = m_plugins.size();
+        if (refcount) {
+            ResolveRequest *rr = new ResolveRequest(track, refcount);
+
+            // we queue the signals back here to maintain our
+            // promise of calling the plugins from the same thread
+            connect(rr, SIGNAL(resolveResponse(const Track, ITrackResolveResponse *)), 
+                SLOT(onResolveResponse(const Track, ITrackResolveResponse *)), Qt::QueuedConnection );
+            connect(rr, SIGNAL(resolveComplete(const Track)), 
+                SLOT(onResolveComplete(const Track)), Qt::QueuedConnection );
+
+            // ResolveRequest is deleted when the last plugin callsback on ResolveRequest::finished()
+            
+            foreach(ITrackResolverPlugin *p, m_plugins) {
+                p->resolve(rr);
+            }
+            m_active[MappableTrack(track)] = -1.0;
         }
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////
-
-ResolveAttempt::ResolveAttempt()
-: m_req(0)
+void
+Resolver::onResolveResponse(const Track t, ITrackResolveResponse *resp)
 {
-}
+    if (m_active.contains(t) && resp->matchQuality() > m_active.value(t)) {
+        // This response is the best one so far, so
+        // mutate the track right now...
+        // or should we push this out to the class user?
+        // well they did trust us to resolve it so we'll do it here
+        m_active[t] = resp->matchQuality();
+        QString localContent(QString::fromUtf8(resp->url()));
 
-ResolveAttempt::~ResolveAttempt()
-{
-    delete m_req;
-}
+        qDebug() << "local content!!!: " + localContent;
 
-//////////////////////////////////////////////////////////////////////
-
-ResolveRequest::ResolveRequest(const Track& t, ResolveAttempt* reply, unsigned refCount)
-: m_track(t)
-, m_reply(reply)
-, m_ref(refCount)
-, m_artist( QString(t.artist()).toUtf8() )
-, m_album( QString(t.album()).toUtf8() )
-, m_title( t.title().toUtf8() )
-, m_mbid( QString(t.mbid()).toUtf8() )
-, m_fpid( QString(t.fingerprintId()).toUtf8() )
-{
-}
-
-ResolveRequest::~ResolveRequest()
-{
-    foreach(ITrackResolveResponse *r, m_responses) {
-        r->finished();
+        MutableTrack mt(t);
+        mt.setDuration(resp->duration());
+        mt.setUrl(QUrl(localContent));
     }
+    resp->finished();
+}
+
+void 
+Resolver::onResolveComplete(const Track t)
+{
+    if (m_active.contains(MappableTrack(t))) {
+        emit resolveComplete(t);
+    }
+}
+
+void
+Resolver::stopResolving(const Track& t) 
+{
+    m_active.remove(MappableTrack(t));
+}
+
+//////////////////////////////////////////////////////////////////////
+
+
+ResolveRequest::ResolveRequest(const Track& t, unsigned refCount)
+: m_track(t)
+, m_ref(refCount)
+, m_artist(QString(t.artist()).toUtf8())
+, m_album(QString(t.album()).toUtf8())
+, m_title(t.title().toUtf8())
+, m_mbid(QString(t.mbid()).toUtf8())
+, m_fpid(QString(t.fingerprintId()).toUtf8())
+{
 }
 
 const char *
@@ -127,15 +153,15 @@ ResolveRequest::puid() const
 void 
 ResolveRequest::result(class ITrackResolveResponse *resp)
 {
-    m_responses << resp;    // we take ownership
-    emit m_reply->resolveResponse(m_track, resp);
+    emit resolveResponse(m_track, resp);
 }
 
 void 
 ResolveRequest::finished()
 {
     if (0 == --m_ref) {
-        emit m_reply->resolveComplete(m_track);
+        emit resolveComplete(m_track);
+        delete this;
     }
 }
 
