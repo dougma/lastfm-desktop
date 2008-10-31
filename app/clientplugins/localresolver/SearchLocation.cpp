@@ -90,7 +90,7 @@ SearchLocation::audioFiles(const QString& path) const
             entryInfoList(nameFilters, QDir::Files | QDir::Readable));
 
 	foreach (const QFileInfo& i, list) {
-        map[i.fileName()] = i.lastModified().toUTC().toTime_t();
+        result[i.fileName()] = i.lastModified().toUTC().toTime_t();
 	}
 #endif
 
