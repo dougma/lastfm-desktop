@@ -98,9 +98,20 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
-    
-    PluginHost pluginHost(qApp->applicationDirPath() + "/plugins/");    // todo: make this a member so we can reuse it
+
+#ifndef NDEBUG
+    QString plugins_path = qApp->applicationDirPath();
+#else
+#ifdef Q_WS_X11
+    QString plugins_path = "/usr/lib/lastfm/";
+#else
+    QString plugins_path = qApp->applicationDirPath() + "/plugins";
+#endif
+#endif
+
+    PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
+
 	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
