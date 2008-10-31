@@ -69,8 +69,14 @@ TrackResolver::Response::Response(const LocalCollection::ResolveResult &r)
     m_duration( r.m_duration ),
     m_kbps( r.m_kbps )
 {
-    QString url(r.m_sourcename + r.m_path + r.m_filename);
-    m_url = url/*.replace('\\', "/")*/.toUtf8();
+#ifdef WIN32
+    // win32 phonon doesn't like them converted to file:// urls
+    m_url = (r.m_sourcename + r.m_path + r.m_filename).toUtf8();
+#else
+    // and mac/linux prefers them as file:// urls
+    QUrl url = QUrl::fromLocalFile(r.m_sourcename + r.m_path + r.m_filename);
+    m_url = url.toString().toUtf8();
+#endif
 }
 
 float
