@@ -37,7 +37,7 @@ ScrobblerSubmission::submitNextBatch()
 {
     if (hasPendingRequests())
 		// the tracks cannot be submitted at this time
-		// if a parent Scrobbler exists, it will submit another batch
+		// if a parent Scrobbler instance exists, it will submit another batch
 		// when the current one is done
 		return;
 
@@ -50,25 +50,25 @@ ScrobblerSubmission::submitNextBatch()
     bool portable = false;
     for (int i = 0; i < 50 && !m_tracks.isEmpty(); ++i)
     {
-        Scrobble t = m_tracks.takeFirst();
+        Scrobble s = m_tracks.takeFirst();
 
         QByteArray const N = QByteArray::number( i );
         #define e( x ) QUrl::toPercentEncoding( x )
-        m_data += "&a[" + N + "]=" + e(t.artist()) +
-                  "&t[" + N + "]=" + e(t.title()) +
-                  "&i[" + N + "]=" + QByteArray::number( t.timestamp().toTime_t() ) +
-                  "&o[" + N + "]=" + t.sourceString() +
-                  "&r[" + N + "]=" + t.ratingCharacter() +
-                  "&l[" + N + "]=" + QByteArray::number( t.duration() ) +
-                  "&b[" + N + "]=" + e(t.album()) +
-                  "&n[" + N + "]=" + QByteArray::number( t.trackNumber() ) +
-                  "&m[" + N + "]=" + e(t.mbid());
+        m_data += "&a[" + N + "]=" + e(s.artist()) +
+                  "&t[" + N + "]=" + e(s.title()) +
+                  "&i[" + N + "]=" + QByteArray::number( s.timestamp().toTime_t() ) +
+                  "&o[" + N + "]=" + s.sourceString() +
+                  "&r[" + N + "]=" + s.ratingCharacter() +
+                  "&l[" + N + "]=" + QByteArray::number( s.duration() ) +
+                  "&b[" + N + "]=" + e(s.album()) +
+                  "&n[" + N + "]=" + QByteArray::number( s.trackNumber() ) +
+                  "&m[" + N + "]=" + e(s.mbid());
         #undef e
 
-        if (t.source() == Track::MediaDevice)
+        if (s.source() == Track::MediaDevice)
             portable = true;
 
-        m_batch += t;
+        m_batch += s;
     }
 
     if (portable)

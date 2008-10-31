@@ -12,3 +12,6 @@ DEFINES += _RADIO_DLLEXPORT
 headers.files = Radio.h RadioStation.h Tuner.h
 headers.path = $$INSTALL_DIR/include/lastfm/radio
 INSTALLS = target headers
+
+HEADERS -= legacy/Tuner.h
+SOURCES -= legacy/Tuner.cpp

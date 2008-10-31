@@ -79,7 +79,7 @@ Radio::play( const RadioStation& station )
 {
     if (m_state != Stopped)
     {
-        //FIXME filthy!
+        //FIXME filthy! get us to a clean slate
         State oldstate = m_state;
         m_state = Stopped;    //prevents stateChanged() doing anything
         stop();
@@ -111,6 +111,8 @@ class EnqueueThread : public QThread
 public:
 	EnqueueThread( const QUrl& url, Phonon::MediaObject* object )
 	{
+        qDebug() << url;
+        
 		m_o = object;
 		m_url = url;
 		connect( this, SIGNAL(finished()), SLOT(deleteLater()) );
@@ -147,14 +149,14 @@ Radio::enqueue( const QList<Track>& tracks )
         if (m_resolver) {
             m_resolver->resolve(t);
         }
-        m_queue << t;
+        m_queue += t;
     }
 
     if (m_state == TuningIn) {
         // we need to kick off phonon
         if (m_resolver) {
             // give the resolver a chance with the first track
-            QTimer::singleShot(TUNING_RESOLVER_WAIT_MS, this, SLOT(phononEnqueue()));
+            QTimer::singleShot( TUNING_RESOLVER_WAIT_MS, this, SLOT(phononEnqueue()) );
         } else {
             phononEnqueue();
         }
@@ -306,6 +308,7 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
     }
 }
 
+
 // Looks at the head of the playqueue, makes a MediaSource object 
 // and places that in the phonon queue.
 // The track at the playqueue head remains until onPhononCurrentSourceChanged.
@@ -319,23 +322,19 @@ Radio::phononEnqueue()
             m_resolver->stopResolving( t );  
         }
 
-    #ifdef Q_WS_MAC
-        new EnqueueThread( t.url(), m_mediaObject );
-    #else
         m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
         m_mediaObject->play();
-    #endif
     }
 }
+
 
 // onPhononCurrentSourceChanged happens always (even if the source is
 // unplayable), so we use it to update our now playing track.
 void
-Radio::onPhononCurrentSourceChanged(const Phonon::MediaSource &)
+Radio::onPhononCurrentSourceChanged( const Phonon::MediaSource& )
 {
-    Track t = m_queue.takeFirst();
-    MutableTrack( t ).stamp();
-    m_track = t;
+    m_track = m_queue.takeFirst();
+    MutableTrack( m_track ).stamp();
     changeState( Buffering );
     emit trackSpooled( m_track );
 }
@@ -345,6 +344,7 @@ void
 Radio::fetchMoreTracks()
 {
     // todo: we have already have a tuner request outstanding.. is this a problem?
+    // mxcl says: is the above meant to be prefixed by what if? Or always true?
     if (m_queue.isEmpty() && m_tuner)
         m_tuner->fetchFiveMoreTracks();
 }
@@ -393,6 +393,7 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
         emit tuningIn( m_station );
     }
 }
+
 
 void 
 Radio::onResolveComplete( const Track t )

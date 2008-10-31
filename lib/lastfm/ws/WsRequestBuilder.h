@@ -25,6 +25,8 @@
 #include <lastfm/ws/WsRequestParameters.h>
    
 
+/** A convenience class to create a WsReply for Last.fm webservices.
+  * We add the session key, api signature and session key to every request */
 class LASTFM_WS_DLLEXPORT WsRequestBuilder
 {
     enum RequestMethod
