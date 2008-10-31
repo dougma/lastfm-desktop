@@ -50,6 +50,8 @@ private:
     QStringList m_newTags;
 	WsReply *m_currentReply;
 
+    QTreeWidgetItem* createNewItem( QString tag );
+
 private slots:
     void showMenu( const QPoint& );
     

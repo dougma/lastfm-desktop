@@ -81,15 +81,28 @@ TagListWidget::TagListWidget( QWidget* parent )
 }
 
 
-bool
-TagListWidget::add( QString tag )
+QTreeWidgetItem*
+TagListWidget::createNewItem( QString tag )
 {
     tag = tag.toLower();
     
+    QTreeWidgetItem* item = new QTreeWidgetItem( QStringList() << tag );
+    QIcon icon;
+    icon.addPixmap( QPixmap( ":/buckets/tag.png" ) );
+    item->setIcon( 0, icon );
+
+    addTopLevelItem( item );
+
+    return item;
+}
+
+
+bool
+TagListWidget::add( QString tag )
+{
     //FIXME avoid duplicates
-    addTopLevelItem( new QTreeWidgetItem( QStringList() << tag ) );
+    createNewItem( tag );
     m_newTags += tag;
-    
     return true;
 }
 
@@ -138,11 +151,9 @@ TagListWidget::onTagsRequestFinished( WsReply* r )
 {    
 	foreach (WeightedString tag, Tag::list( r ))
 	{
-		QTreeWidgetItem *entry = new QTreeWidgetItem;
-		entry->setText( 0, tag );
+        QTreeWidgetItem *entry = createNewItem( tag );
 		// I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
 		entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
-		addTopLevelItem( entry );
 	}
 	m_currentReply = 0;
 }
