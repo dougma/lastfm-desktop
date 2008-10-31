@@ -66,6 +66,7 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
     else
         bg = option.palette.color( QPalette::Base );
     
+#if 0
     QVariant weighting = index.data( moose::WeightingRole );
     if (weighting.isValid())
     {
@@ -75,7 +76,8 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
         g.setColorAt( 0, Qt::transparent );
         g.setColorAt( 1, bg.lighter() );
         painter->fillRect( r, g );
-    }    
+    }
+#endif
     
     QTransform t;
     QPoint p = option.rect.topLeft();
