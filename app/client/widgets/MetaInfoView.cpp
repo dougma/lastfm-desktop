@@ -22,6 +22,7 @@
 #include <QDesktopServices>
 #include <QTemporaryFile>
 #include <QVBoxLayout>
+#include <QWebFrame>
 #include "widgets/SimilarArtists.h"
 #include "widgets/TagListWidget.h"
 #include "widgets/UnicornTabWidget.h"
@@ -37,14 +38,16 @@ Bio::Bio()
 {
 	settings()->setUserStyleSheetUrl( QUrl::fromLocalFile( cssPath() ) );
 	page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-	connect(this, SIGNAL(linkClicked(const QUrl &)), SLOT(onLinkClicked(const QUrl &)) );
+	connect( this, SIGNAL(linkClicked(QUrl)), SLOT(onLinkClicked(QUrl)) );
+    clearContent();
+    page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
 }
 
 
 void
 Bio::clearContent()
 {
-	setHtml("");
+    setHtml("");
 }
 
 
