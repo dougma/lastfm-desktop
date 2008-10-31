@@ -36,7 +36,7 @@ public:
 	/** @returns the equivalent ISO language code as used in HTTP headers */
 	QString iso639() const;
 	
-	/** the two letter langauge codes we use on the side */
+	/** the two letter langauge codes we use on the site */
 	QString code() const;
 	
 	QLocale qlocale() const { return QLocale( m_language ); }

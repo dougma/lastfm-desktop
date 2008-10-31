@@ -22,6 +22,7 @@
 
 #ifdef Q_WS_MAC
 #include "common/c++/mac/getBsdProcessList.c"
+#include <unistd.h>
 
 bool //static
 CoreProcess::isRunning( const QString& processName )
