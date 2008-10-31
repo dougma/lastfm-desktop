@@ -306,14 +306,6 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
     }
 }
 
-static
-int 
-candidate_sort(ITrackResolveResponse* a, ITrackResolveResponse* b)
-{
-    return a->matchQuality() - b->matchQuality();
-}
-
-
 // Looks at the head of the playqueue, makes a MediaSource object 
 // and places that in the phonon queue.
 // The track at the playqueue head remains until onPhononCurrentSourceChanged.
