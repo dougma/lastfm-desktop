@@ -19,6 +19,7 @@
 
 #include "CogButtonPopup.h"
 #include "widgets/UnicornWidget.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 #include <QCoreApplication>
 #include <QPainter>
 #include <QTimeLine>
@@ -86,6 +87,6 @@ CogButtonPopup::paintEvent( QPaintEvent* )
 void
 CogButtonPopup::praise()
 {
-	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " praises y'all";
-	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
+	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " praises the client team";
+	(new WsAccessManager)->get( QNetworkRequest( url ) );
 }
