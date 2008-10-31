@@ -19,17 +19,18 @@
 
 #include "ITunesPluginInstaller.h"
 #include "lib/lastfm/core/mac/CFStringToQString.h"
+#include "lib/lastfm/core/CoreDir.h"
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
 
-static const char* kBundleName = "AudioScrobbler.bundle";
+#define BUNDLE_NAME "AudioScrobbler.bundle"
 static const char* kPListFile = "Contents/Info.plist";
 
 
 ITunesPluginInstaller::ITunesPluginInstaller()
-        : k_shippedPluginDir( qApp->applicationDirPath() + "/PlugIns/" + kBundleName + "/" ),
-          k_iTunesPluginDir( QDir::homePath() + "/Library/iTunes/iTunes Plug-ins/" + kBundleName + "/" ),
+        : k_shippedPluginDir( CoreDir::bundle().filePath( "Contents/Resources/" BUNDLE_NAME ) + '/' ),
+          k_iTunesPluginDir( QDir::homePath() + "/Library/iTunes/iTunes Plug-ins/" BUNDLE_NAME "/" ),
           m_needsTwiddlyBootstrap( false )
 {}
 

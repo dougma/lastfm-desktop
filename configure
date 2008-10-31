@@ -96,7 +96,9 @@ then
 		cat <<HEREDOC>>Makefile
 
 CONTENTS_DIR=_bin/Last.fm.app/Contents
-PLUGINS_DIR=\$(CONTENTS_DIR)/MacOS/PlugIns
+RESOURCES_DIR=\$(CONTENTS_DIR)/Resources
+PLUGINS_DIR=\$(CONTENTS_DIR)/MacOS/plugins
+QT_LIB_DIR=/opt/qt/4.4.3-release/lib
 
 dmg: all misc
 	cd app/client && make -f Makefile dmg
@@ -104,17 +106,22 @@ bundle: all misc
 	cd app/client && make -f Makefile bundle
 install: all misc
 	cd app/client && make -f Makefile bundle-install
-misc: \$(PLUGINS_DIR)/AudioScrobbler.bundle \$(CONTENTS_DIR)/Resources/twiddly
-\$(PLUGINS_DIR):
+misc: \$(RESOURCES_DIR)/AudioScrobbler.bundle \$(RESOURCES_DIR)/twiddly \$(PLUGINS_DIR)/libresolver.1.dylib
+\$(RESOURCES_DIR):
 	mkdir \$@
-\$(PLUGINS_DIR)/AudioScrobbler.bundle: |\$(PLUGINS_DIR)
+\$(RESOURCES_DIR)/AudioScrobbler.bundle: |\$(RESOURCES_DIR)
 	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
 	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle \$@
-\$(CONTENTS_DIR)/MacOS/twiddly:
-	common/dist/mac/deposx.sh _bin/twiddly /opt/qt/4.4.3-release/lib
+\$(CONTENTS_DIR)/MacOS/twiddly: _bin/twiddly
+	common/dist/mac/deposx.sh _bin/twiddly \$(QT_LIB_DIR)
 	cp _bin/twiddly \$@
-\$(CONTENTS_DIR)/Resources/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
-	cd \$(CONTENTS_DIR)/Resources && ln -s ../MacOS/twiddly
+\$(RESOURCES_DIR)/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
+	cd \$(RESOURCES_DIR) && ln -s ../MacOS/twiddly
+\$(PLUGINS_DIR):
+	mkdir \$@
+\$(PLUGINS_DIR)/libresolver.1.dylib: _bin/libresolver.1.dylib |\$(PLUGINS_DIR)
+	common/dist/mac/deposx.sh _bin/libresolver.1.dylib \$(QT_LIB_DIR)
+	cp _bin/libresolver.1.dylib \$@
 HEREDOC
 
 	esac
