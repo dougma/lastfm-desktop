@@ -337,14 +337,14 @@ Radio::onPhononCurrentSourceChanged( const Phonon::MediaSource& )
     MutableTrack( m_track ).stamp();
     changeState( Buffering );
     emit trackSpooled( m_track );
+    phononEnqueue();
 }
 
 
 void
 Radio::fetchMoreTracks()
 {
-    // todo: we have already have a tuner request outstanding.. is this a problem?
-    // mxcl says: is the above meant to be prefixed by what if? Or always true?
+    // todo: we _may_ already have a tuner request outstanding.. is this a problem?
     if (m_queue.isEmpty() && m_tuner)
         m_tuner->fetchFiveMoreTracks();
 }
@@ -398,7 +398,8 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
 void 
 Radio::onResolveComplete( const Track t )
 {
-    if (!m_queue.isEmpty() && t == m_queue[0]) {
+    if (!m_queue.isEmpty() && t == m_queue[0]) 
+    {
         // resolve completed for the head of the queue
         // maybe ahead of TUNING_RESOLVER_WAIT_MS timeout:
         phononEnqueue();
