@@ -38,36 +38,44 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 WsReply*
 WsRequestBuilder::start()
 {
+    #define MAKE_REQUEST \
+        QNetworkRequest request( url ); \
+        request.setRawHeader( "User-Agent", Ws::UserAgent );
+
+
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
 
-	//Only GET requests should include query parameters
-	if( request_method == GET )
-		url.setQueryItems( params );
-	
-    QNetworkRequest request( url );
-    request.setRawHeader( "User-Agent", Ws::UserAgent );
-
+    typedef QPair<QString, QString> Pair; // don't break foreach macro
+    QList<Pair> params = this->params;
+    
     switch (request_method)
     {
         case GET:
+        {
+            // Qt setQueryItems doesn't encode a bunch of stuff, so we do it manually
+            foreach (Pair pair, params)
+            {
+                QByteArray const key = QUrl::toPercentEncoding( pair.first );
+                QByteArray const value = QUrl::toPercentEncoding( pair.second );
+                url.addEncodedQueryItem( key, value );
+            }
+            MAKE_REQUEST
             return new WsReply( nam->get( request ) );
+        }
 
-        case POST: 
+        case POST:
 		{
-			//Build encoded query for use in the POST Content
 			QByteArray query;
-            typedef QPair<QString, QString> Pair;
-            QList<Pair> params = this->params;
 			foreach (Pair param, params)
 			{
-				query += QUrl::toPercentEncoding( param.first, "!$&'()*+,;=:@/?" )
+				query += QUrl::toPercentEncoding( param.first )
 					  + "="
-					  + QUrl::toPercentEncoding( param.second, "!$&'()*+,;=:@/?" )
+					  + QUrl::toPercentEncoding( param.second )
 					  + "&";
 			}
-			
+            MAKE_REQUEST
 			return new WsReply( nam->post( request, query ) );
 		}
     }
