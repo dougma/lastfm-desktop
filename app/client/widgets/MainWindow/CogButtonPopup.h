@@ -39,6 +39,7 @@ public slots:
     }
 
     void praise();
+    void curse();
     void bye();
 
 signals:

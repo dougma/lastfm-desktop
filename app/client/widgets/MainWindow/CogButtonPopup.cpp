@@ -29,16 +29,19 @@
 
 CogButtonPopup::CogButtonPopup( int width, QWidget* parent ) : QWidget( parent )
 {
-    QPushButton* cancel, *playlist, *praise;
+    QPushButton* cancel, *playlist, *praise, *curse;
     
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( playlist = new QPushButton( tr("Add to Playlist") ) );
+    v->addSpacing( 8 );
     v->addWidget( praise = new QPushButton( tr("Praise the Client Team") ) );
+    v->addWidget( curse = new QPushButton( tr("Gently, Curse the Client Team") ) );
     v->addSpacing( 8 );
     v->addWidget( cancel = new QPushButton( tr("Cancel") ) );
 
 	connect( playlist, SIGNAL(clicked()), SIGNAL(addToPlaylistClicked()) );
 	connect( praise, SIGNAL(clicked()), SLOT(praise()) );
+	connect( curse, SIGNAL(clicked()), SLOT(curse()) );
     
     foreach (QPushButton* b, findChildren<QPushButton*>())
         connect( b, SIGNAL(clicked()), SLOT(bye()) );
@@ -87,6 +90,22 @@ CogButtonPopup::paintEvent( QPaintEvent* )
 void
 CogButtonPopup::praise()
 {
-	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " praises the client team";
+    QStringList praises;
+    praises << "thinks your are all jolly good chaps"
+            << "wants to have your babies"
+            << "is amazed at your skills";
+    
+    uint random = QDateTime::currentDateTime().toTime_t();
+    QString praise = praises.value( random % praises.count() );
+    
+	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " " + praise;
 	(new WsAccessManager)->get( QNetworkRequest( url ) );
+}
+
+
+void
+CogButtonPopup::curse()
+{
+	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
+	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }
