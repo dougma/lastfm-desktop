@@ -31,7 +31,6 @@
 
 Q_DECLARE_METATYPE( PlayableListItem* )
 
-const QString PlayerBucket::k_dropText  = tr( "Drag something in here to play it." );
 const int PlayerBucket::k_itemMargin = 4;
 
 //These should be based on the delegate's sizeHint - this requires
@@ -42,27 +41,27 @@ const int PlayerBucket::k_itemSizeY = 88;
 
 
 PlayerBucket::PlayerBucket( QWidget* w )
-			 :QListWidget( w ),
+			: QListWidget( w ),
 			  m_showDropText( true)
 {
     connect( this, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT( onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
     setIconSize( QSize( 66, 68 ));
     m_networkManager = new WsAccessManager( this );
-    
+
     ui.clearButton = new ImageButton( ":buckets/radio_clear_all_x.png", this );
     ui.clearButton->resize( ui.clearButton->size());
     connect( ui.clearButton, SIGNAL( clicked()), SLOT( clearItems()));
-    
+
     ui.removeButton = new ImageButton( ":buckets/x_button.png", this );
     ui.removeButton->hide();
     connect( ui.removeButton, SIGNAL( clicked()), SLOT( removeCurrentItem()));
-    
+
     ui.queryEditButton = new ImageButton( ":buckets/show_query.png", this );
-   
+
     //Not sure why this is needed but otherwise the button isn't sized properly :-s
     ui.queryEditButton->resize( ui.queryEditButton->size());
     connect( ui.queryEditButton, SIGNAL( clicked()), SLOT( showQuery()));
-    
+
     ui.queryEdit = new QLineEdit( this );
     ui.queryEdit->setAttribute( Qt::WA_MacShowFocusRect, false );
     QPalette p = ui.queryEdit->palette();
@@ -71,12 +70,11 @@ PlayerBucket::PlayerBucket( QWidget* w )
     ui.queryEdit->setPalette( p);
     ui.queryEdit->setAlignment( Qt::AlignCenter );
     ui.queryEdit->setFrame( false );
-    
+
     connect( ui.queryEdit, SIGNAL( returnPressed()), SLOT( onQueryEditReturn()));
-    
-    
+
     setAttribute( Qt::WA_MacShowFocusRect, false );
-    
+
 	setItemDelegate( new SeedDelegate( this ));
 	setAcceptDrops( true );
     setDragDropMode( QAbstractItemView::DragDrop );
@@ -93,22 +91,37 @@ void
 PlayerBucket::paintEvent( QPaintEvent* event )
 {
     QPainter p( viewport() );
+    
+    QLinearGradient g( 0, 0, 0, viewport()->height() );
+    g.setColorAt( 0, QColor( 25, 25, 25 ) );
+    g.setColorAt( 1, QColor( 51, 51, 51 ) );
+    p.fillRect( viewport()->rect(), g );
+    
+    QRect r = QRect( QPoint(1, 1), viewport()->rect().bottomRight() - QPoint(1,1) );
+	QLinearGradient lg( r.topLeft(), r.bottomLeft() );
+	lg.setColorAt( 0, QColor( 7, 7, 7 ) );
+	lg.setColorAt( 1, QColor( 27, 26, 26 ));
+    p.fillRect( r, lg );
+    
 	p.setClipRect( event->rect());
     p.setRenderHint( QPainter::Antialiasing, true );
     QPen pen( QColor( 0x4e, 0x4e, 0x4e ), 3, Qt::DashLine, Qt::RoundCap );
     pen.setDashPattern( QVector<qreal>() << 5 << 2 );
     pen.setWidth( 1 );
     p.setPen( pen );
-    p.drawRoundedRect( viewport()->rect().adjusted( 5, 5, -5, -5), 10, 10 );
+    p.drawRoundedRect( viewport()->rect().adjusted( 10, 10, -10, -10), 10, 10 );
     
 	QAbstractItemModel* itemModel = model();
 	if( !itemModel->rowCount() )
 	{
-		QFont dropFont = p.font();
-		dropFont.setPointSize( 20 );
-		p.setFont( dropFont );
+        QFont f = p.font();
+        f.setBold( true );
+        f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
+        p.setFont( f );
 
-		p.drawText( viewport()->rect().adjusted( 25, 25, -25, -25), Qt::AlignCenter | Qt::TextWordWrap, k_dropText );
+		p.drawText( viewport()->rect().adjusted( 25, 25, -25, -25), 
+		            Qt::AlignCenter | Qt::TextWordWrap, 
+		            tr("Drag something in here to play it.") );
 		return;
 	}
 	
@@ -144,15 +157,7 @@ void
 PlayerBucket::resizeEvent ( QResizeEvent* event )
 {
 	Q_UNUSED( event );
-	viewport()->setBackgroundRole( QPalette::Window );
-	QLinearGradient lg( viewport()->rect().topLeft(), viewport()->rect().bottomLeft());
-	lg.setColorAt( 0, Qt::black );
-	lg.setColorAt( 1, QColor( 0x17, 0x17, 0x17 ));
-	
-	QPalette p;
-	p.setBrush( QPalette::Window, lg );
-	viewport()->setPalette( p );
-    
+	viewport()->setBackgroundRole( QPalette::Window );    
     calculateLayout();
 }
 

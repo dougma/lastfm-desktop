@@ -41,6 +41,44 @@
 
 Q_DECLARE_METATYPE( Seed::Type )
 
+
+struct SpecialSplitter : public QSplitter
+{
+    SpecialSplitter( Qt::Orientation o ) : QSplitter( o )
+    {}
+
+    struct cHandle : public QSplitterHandle
+    {
+        cHandle( QSplitter* parent ) : QSplitterHandle( Qt::Horizontal, parent )
+        {}
+        
+        virtual void paintEvent( QPaintEvent* )
+        {
+            QPainter p( this );
+            p.fillRect( rect(), QColor( 35, 35, 35 ) );
+            p.setPen( QColor( 23, 23, 24 ) );
+            p.drawLine( 0, 0, 0, height() );
+        }        
+    };
+    
+    virtual QSplitterHandle* createHandle() { return new cHandle( this ); }
+};
+
+
+struct SpecialWidget : QWidget
+{
+    virtual void paintEvent( QPaintEvent* )
+    {
+        QPainter p( this );
+        p.fillRect( rect(), QColor( 35, 35, 35 ) );
+        p.setPen( QColor( 27, 27, 27 ) );
+        p.drawLine( 0, 0, width(), 0 );
+        p.setPen( QColor( 55, 55, 55 ) );
+        p.drawLine( 0, 1, width(), 1 );
+    }    
+};
+
+
 PrimaryBucket::PrimaryBucket()
 {
     ui.friendsBucket = new PrimaryListView( this );
@@ -62,25 +100,40 @@ PrimaryBucket::PrimaryBucket()
     ui.stationsBucket->setDragEnabled( true );
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
-    
+
+#if 0        
+    QString const name = AuthenticatedUser().name();
+    foreach (QString url, QStringList() << "My Library Radio" << "My Loved Tracks Radio" << "My Neighbourhood Radio" )
+    {
+        PlayableListItem* n = new PlayableListItem( url, ui.stationsBucket );
+        n->setPixmap( QPixmap( ":/BottomBar/icon/radio/on.png" ) );
+        n->setSizeHint( QSize( 75, 25) );
+        n->setType( Seed::StationType );
+    }
+#endif
+
     AuthenticatedUser user;
     
     connect( user.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
     connect( user.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
 	
-	QSplitter* splitter = new QSplitter( Qt::Horizontal );
+	QSplitter* splitter = new SpecialSplitter( Qt::Horizontal );
 
 	ui.tabWidget = new Unicorn::TabWidget;
 
     ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
 	ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
 	ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
+    ui.tabWidget->bar()->succombToTheDarkSide();
+    ui.tabWidget->bar()->setMinimumHeight( 26 );
     
     QWidget* primaryPane = new QWidget( this );
     new QVBoxLayout( primaryPane );
     primaryPane->layout()->addWidget( ui.tabWidget );
+    primaryPane->layout()->setMargin( 0 );
+    primaryPane->layout()->setSpacing( 0 );
     
-    QWidget* freeInputWidget = new QWidget( this );
+    QWidget* freeInputWidget = new SpecialWidget;
     new QHBoxLayout( freeInputWidget );
     freeInputWidget->layout()->addWidget( ui.freeInput = new QLineEdit );
     ui.freeInput->setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -89,15 +142,19 @@ PrimaryBucket::PrimaryBucket()
     ui.inputSelector->addItem( "Artist", QVariant::fromValue(Seed::ArtistType) );
     ui.inputSelector->addItem( "Tag", QVariant::fromValue(Seed::TagType) );
     ui.inputSelector->addItem( "User", QVariant::fromValue(Seed::UserType) );
+    ui.inputSelector->setAttribute( Qt::WA_MacNormalSize ); //wtf? needed tho, when floating
     
     primaryPane->layout()->addWidget( freeInputWidget );
 
 	splitter->addWidget( primaryPane );
 	
-    QWidget* playerPane =  new QWidget( this );
+    QWidget* playerPane =  new QWidget;
     new QVBoxLayout( playerPane );
     playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
     playerPane->layout()->addWidget( ui.controls = new RadioControls);
+    playerPane->layout()->setContentsMargins( 0, 7, 7, 0 );
+    playerPane->layout()->setSpacing( 0 );
+    
     playerPane->setAutoFillBackground( true );
     ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
     
@@ -111,8 +168,6 @@ PrimaryBucket::PrimaryBucket()
     ui.controls->show();
     
 	splitter->addWidget( playerPane );
-    UnicornWidget::paintItBlack( splitter );
-    splitter->setAutoFillBackground( true );
 	
     setCentralWidget( splitter );
     
@@ -157,7 +212,7 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
-        n->setPixmap( QPixmap( ":buckets/tag.png" ) );
+        n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
         n->setSizeHint( QSize( 75, 25));
         n->setType( Seed::TagType );
     }
