@@ -28,7 +28,7 @@
 
 #include <QObject>
 #include <QMutex>
-#include <QSqlDatabase.h>
+#include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 

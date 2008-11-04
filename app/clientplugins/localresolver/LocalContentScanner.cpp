@@ -23,7 +23,7 @@
 #include "LocalCollection.h"
 #include "MediaMetaInfo.h"
 #include "SearchLocation.h"
-#include <memory.h>
+#include <memory>
 
 // we make use of QThreadPool priorities to allow some tasks to queue jump
 #define PRIORITY_VOLUMEAVAILABLE 0
