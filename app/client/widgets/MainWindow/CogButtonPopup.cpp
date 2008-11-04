@@ -91,9 +91,10 @@ void
 CogButtonPopup::praise()
 {
     QStringList praises;
-    praises << "thinks your are all jolly good chaps"
+    praises << "thinks you're all jolly good chaps"
             << "wants to have your babies"
-            << "is amazed at your skills";
+            << "is amazed at your skills"
+            << "is gay and/or heterosexual for you (depending on gender)";
     
     uint random = QDateTime::currentDateTime().toTime_t();
     QString praise = praises.value( random % praises.count() );
