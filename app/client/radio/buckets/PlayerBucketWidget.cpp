@@ -99,7 +99,7 @@ PlayerBucketWidget::addAndLoadItem( const QString& itemText, const Seed::Type ty
 {
     PlayableListItem* item = new PlayableListItem;
     item->setText( itemText );
-    item->setType( type );
+    item->setPlayableType( type );
 	item->setForeground( Qt::white );
 	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
 	item->setFlags( item->flags() | Qt::ItemIsDragEnabled );

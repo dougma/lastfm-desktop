@@ -25,7 +25,9 @@ namespace Seed
     enum Type { 
         ArtistType = 0, 
         TagType, 
-        UserType 
+        UserType,
+        PreDefinedType,
+        CustomType
     };
 }
 #endif

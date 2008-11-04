@@ -28,7 +28,7 @@
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
 #include "PrimaryBucket.h"
-#include "PlayerBucket.h"
+#include "PlayerBucketWidget.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
 #include "widgets/RadioControls.h"
@@ -100,16 +100,15 @@ PrimaryBucket::PrimaryBucket()
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
 
-#if 0        
+     
     QString const name = AuthenticatedUser().name();
-    foreach (QString url, QStringList() << "My Library Radio" << "My Loved Tracks Radio" << "My Neighbourhood Radio" )
+    foreach (QString url, QStringList() << "My Library" << "My Recommendations" << "My Loved Tracks" << "My Neighbourhood" )
     {
         PlayableListItem* n = new PlayableListItem( url, ui.stationsBucket );
-        n->setPixmap( QPixmap( ":/BottomBar/icon/radio/on.png" ) );
+        n->setPixmap( QPixmap( ":/BottomBar/icon/radio/on.png" ).scaled( 64, 64, Qt::KeepAspectRatio ));
         n->setSizeHint( QSize( 75, 25) );
-        n->setType( Seed::StationType );
+        n->setPlayableType( Seed::PreDefinedType );
     }
-#endif
 
     AuthenticatedUser user;
     
@@ -181,7 +180,7 @@ PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
         n->setSizeHint( QSize( 75, 25));
-        n->setType( Seed::UserType );
+        n->setPlayableType( Seed::UserType );
     }
 }
 
@@ -196,7 +195,7 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
         n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
         n->setSizeHint( QSize( 75, 25));
-        n->setType( Seed::TagType );
+        n->setPlayableType( Seed::TagType );
     }
 }
 

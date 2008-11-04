@@ -23,7 +23,7 @@
 #include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/PrimaryBucket.h"
-#include "radio/buckets/PlayerBucket.h"
+#include "radio/buckets/PlayerBucketWidget.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            

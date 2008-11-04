@@ -37,7 +37,7 @@ public:
 	
 	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
 	
-	void setType( const Seed::Type t ){ setData( moose::TypeRole, t ); }
+	void setPlayableType( const Seed::Type t ){ setData( moose::TypeRole, t ); }
     
     Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
 	
