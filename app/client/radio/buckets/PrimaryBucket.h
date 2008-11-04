@@ -45,11 +45,13 @@ public:
 	} ui;
     
 private:
+    class WsAccessManager* m_accessManager;
 	
 private slots:
     void onPlayerBucketItemRemoved( QString, Seed::Type );
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
+    void onUserGetPlaylistsReturn( class WsReply* );
     void onItemDoubleClicked( const class QModelIndex& index );
     void onDnDAnimationFinished();
     void onFreeInputReturn();
@@ -84,6 +86,9 @@ protected:
         data->setType( item->playableType() );
         data->setText( item->text() );
         data->setImageData( item->data( Qt::DecorationRole).value<QIcon>().pixmap(50).toImage() );
+        
+        if( item->playableType() == Seed::PreDefinedType )
+            data->setRQL( item->rql() );
         return data;
     }
     

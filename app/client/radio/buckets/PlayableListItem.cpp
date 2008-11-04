@@ -114,11 +114,18 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
 void 
 PlayableListItem::setPixmap( const QPixmap& pm )
 {
+    QPixmap iconPm = pm;
+    QSize diff = pm.size() - QSize( 64, 64 );
+
     //crop the avatar to a 64x64 square
-    const QPixmap scaled = pm.scaled( 64, 64, Qt::KeepAspectRatioByExpanding );
-    const QPixmap cropped = scaled.copy( 0, 0, 64, 64);
+    if( diff.height() > 0 || diff.width() > 0 )
+    {
+        const QPixmap scaled = pm.scaled( 64, 64, Qt::KeepAspectRatioByExpanding );
+        const QPixmap cropped = scaled.copy( ((pm.width() - 64) / 2), ((pm.height() - 64) / 2), 64, 64);
+        iconPm = cropped;
+    }
     
-    QListWidgetItem::setIcon( cropped );
+    QListWidgetItem::setIcon( iconPm );
     
     if( listWidget())
         listWidget()->viewport()->update();

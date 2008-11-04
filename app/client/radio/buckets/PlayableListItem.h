@@ -42,10 +42,12 @@ public:
     Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
 	
     Seed::Type playableType() const{ return (Seed::Type)data( moose::TypeRole ).toInt(); }
+    QString rql() const{ return m_rql; }
     
     void fetchImage();
     
     void setPixmap( const QPixmap& icon );
+    void setRQL( const QString& rql ){ m_rql = rql; }
     
     void flash();
     
@@ -59,6 +61,7 @@ private slots:
     
 private:
     class WsAccessManager* m_networkManager;
+    QString m_rql;
     
 };
 

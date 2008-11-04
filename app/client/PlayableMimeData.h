@@ -62,6 +62,15 @@ public:
 		data->m_type = Seed::UserType;
 		return data;
 	}
+    
+    static PlayableMimeData* createFromPredefined( const QString& s )
+    {
+		PlayableMimeData* data = new PlayableMimeData();
+		data->setText( s );
+		data->setData( "text/x-lfm-entity-type", "Predefined" );
+		data->m_type = Seed::PreDefinedType;
+		return data;
+    }
 	
     Seed::Type type() const
 	{
@@ -72,9 +81,14 @@ public:
 	{
 		m_type = t;
 	}
+    
+    void setRQL( const QString& rql ){ m_rql = rql; }
+
+    QString rql() const{ return m_rql; }
 	
 private:
     Seed::Type m_type;
+    QString m_rql;
 	
 };
 

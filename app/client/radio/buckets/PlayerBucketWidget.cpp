@@ -79,10 +79,14 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
 
     BorderedContainer* bc;
     layout()->addWidget( bc = new BorderedContainer( this ));
+    
+    
+    bc->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+    bc->setFixedSize( 310, 240 );
+    
     bc->setWidget( ui.bucket = new PlayerBucketList( this ));
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
-    ui.bucket->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum) );
     
     layout()->addWidget( ui.controls = new RadioControls );
     ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Maximum) );
@@ -90,6 +94,9 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
     connect( ui.controls, SIGNAL( skip()), &The::radio(), SLOT( skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
+    
+    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+    setFixedSize( sizeHint());
     
 }
 

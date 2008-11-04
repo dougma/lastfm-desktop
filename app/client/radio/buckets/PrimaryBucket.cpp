@@ -38,9 +38,6 @@
 
 #include <phonon/volumeslider.h>
 
-Q_DECLARE_METATYPE( Seed::Type )
-
-
 struct SpecialSplitter : public QSplitter
 {
     SpecialSplitter( Qt::Orientation o ) : QSplitter( o )
@@ -80,6 +77,8 @@ struct SpecialWidget : QWidget
 
 PrimaryBucket::PrimaryBucket()
 {
+    m_accessManager = new WsAccessManager( this );
+    
     ui.friendsBucket = new PrimaryListView( this );
     ui.friendsBucket->setAlternatingRowColors( true );
     ui.friendsBucket->setDragEnabled( true );
@@ -98,22 +97,34 @@ PrimaryBucket::PrimaryBucket()
     ui.stationsBucket->setAlternatingRowColors( true );
     ui.stationsBucket->setDragEnabled( true );
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
 
+    
+    AuthenticatedUser authUser;
      
-    QString const name = AuthenticatedUser().name();
-    foreach (QString url, QStringList() << "My Library" << "My Recommendations" << "My Loved Tracks" << "My Neighbourhood" )
+    QString const name = authUser.name();
+    
+    typedef QPair<QString, QString> StringPair;
+    typedef QList<StringPair > PairList;
+    StringPair station;
+    foreach( station, PairList() << StringPair( tr("My Library"), QString("library:%1").arg(name))
+                                 << StringPair( tr("My Loved Tracks"), QString("loved:%1").arg(name))
+                                 << StringPair( tr("My Recommendations"), QString( "recs:%1" ).arg(name)))
+                               // FIXME: Neighbours not implemented in RQL yet!
+                               //  << StringPair( tr("My Loved Tracks"), QString( "neighbour:" << "My Neighbourhood" )
+
     {
-        PlayableListItem* n = new PlayableListItem( url, ui.stationsBucket );
+        PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
+        n->setRQL( station.second );
         n->setPixmap( QPixmap( ":/BottomBar/icon/radio/on.png" ).scaled( 64, 64, Qt::KeepAspectRatio ));
         n->setSizeHint( QSize( 75, 25) );
         n->setPlayableType( Seed::PreDefinedType );
     }
 
-    AuthenticatedUser user;
-    
-    connect( user.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
-    connect( user.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
+    connect( authUser.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
+    connect( authUser.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
+    connect( authUser.getPlaylists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetPlaylistsReturn( WsReply* )) );
 	
 	QSplitter* splitter = new SpecialSplitter( Qt::Horizontal );
 
@@ -151,6 +162,8 @@ PrimaryBucket::PrimaryBucket()
     connect( ui.playerBucketWidget, SIGNAL( itemRemoved( QString, Seed::Type )), SLOT( onPlayerBucketItemRemoved( QString, Seed::Type )));
 	
     setCentralWidget( splitter );
+    setFixedHeight( sizeHint().height());
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed);
     
 	UnicornWidget::paintItBlack( this );
 }
@@ -168,15 +181,13 @@ PrimaryBucket::onFreeInputReturn()
 void 
 PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
 {
-    static WsAccessManager* nam = new WsAccessManager;
-    
     QList< User > users = User::list( r );
     
     foreach( User user, users )
     {
         PlayableListItem* n = new PlayableListItem( user, ui.friendsBucket );
         
-        QNetworkReply* r = nam->get( QNetworkRequest( user.mediumImageUrl()));
+        QNetworkReply* r = m_accessManager->get( QNetworkRequest( user.mediumImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
         n->setSizeHint( QSize( 75, 25));
@@ -196,6 +207,30 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
         n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
         n->setSizeHint( QSize( 75, 25));
         n->setPlayableType( Seed::TagType );
+    }
+}
+            
+            
+void 
+PrimaryBucket::onUserGetPlaylistsReturn( WsReply* r )
+{
+    QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
+    foreach( CoreDomElement playlist, playlists )
+    {
+        PlayableListItem* n = new PlayableListItem( playlist[ "title" ].text(), ui.stationsBucket );
+
+        QString mediumImageUrl = playlist.optional( "image size=medium").text();
+        if( !mediumImageUrl.isEmpty() )
+        {
+            QNetworkReply* r = m_accessManager->get( QNetworkRequest( mediumImageUrl));
+            connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
+        } 
+        
+        n->setSizeHint( QSize( 75, 25));
+        n->setPlayableType( Seed::PreDefinedType );
+        //FIXME: this is not yet implemented in RQL
+        n->setRQL( "" );
+        
     }
 }
 

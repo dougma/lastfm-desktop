@@ -20,14 +20,19 @@
 #ifndef SEED_TYPES_H
 #define SEED_TYPES_H
 
+#include <QMetaType>
+
 namespace Seed
 {
     enum Type { 
         ArtistType = 0, 
         TagType, 
-        UserType,
-        PreDefinedType,
+        UserType, 
+        PreDefinedType, 
         CustomType
     };
 }
-#endif
+
+Q_DECLARE_METATYPE( Seed::Type )
+
+#endif //SEED_TYPES_H

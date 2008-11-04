@@ -91,6 +91,7 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
+
     calculateLayout();
 }
 
@@ -280,6 +281,9 @@ PlayerBucketList::addFromMimeData( const QMimeData* d )
 	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
 	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
     
+    if( item->playableType() == Seed::PreDefinedType )
+        item->setRQL( data->rql());
+    
     if( !addItem( item ) )
         return false;
 
@@ -312,6 +316,9 @@ PlayerBucketList::queryString() const
 }
 
 
+/* this really needs to be moved into the seedItem delegate - I'm
+   going to hold off until I've made a decision as to whether to 
+   convert this to QGraphicsItems first though! - jono */
 QString 
 PlayerBucketList::queryString( const QModelIndex i, bool joined ) const 
 {  
@@ -323,16 +330,24 @@ PlayerBucketList::queryString( const QModelIndex i, bool joined ) const
                 qs = " and ";
 			qs += "user:";
 			break;
+            
 		case Seed::ArtistType:
             if( joined )
                 qs = " and ";
 			qs += "simart:";
 			break;
+            
 		case Seed::TagType:
             if( joined )
                 qs = " and ";
 			qs += "tag:";
 			break;
+            
+        case Seed::PreDefinedType:
+            if( joined )
+                qs = " and ";
+            qs += ((PlayableListItem*)itemFromIndex( i ))->rql();
+            return qs;
 	}
 	qs += "\"" + i.data( Qt::DisplayRole ).toString() + "\"";
 	return qs;
