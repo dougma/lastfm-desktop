@@ -10,13 +10,7 @@ function go
     header $dir
     
     test -f $tar || wget $1
-    test -d $dir || tar xzf $tar
-    
-    pushd $dir
-    test -f config.h || ./configure $@
-    perl -pi -e 's/-O3/-Zi -Oy -Ox -GL/g' Makefile
-    make
-    popd
+#    test -d $dir || tar xzf $tar
 }
 
 function co
@@ -39,9 +33,11 @@ CYGWIN_NT_5.1)
 
     go http://surfnet.dl.sourceforge.net/sourceforge/mad/libmad-0.15.1b.tar.gz --disable-debug
     go http://www.fftw.org/fftw-3.1.3.tar.gz --enable-float --disable-debug
-    go http://www.mega-nerd.com/SRC/libsamplerate-0.1.4.tar.gz --disable-debug;;
-
-Darwin)
+    go http://www.mega-nerd.com/SRC/libsamplerate-0.1.4.tar.gz --disable-debug
+    go http://developer.kde.org/~wheeler/files/src/taglib-1.5.tar.gz --disable-debug
+    ;;
+*)
+    echo Please refer to the README file.
     ;;
 esac
 

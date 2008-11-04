@@ -1,0 +1,28 @@
+Windows
+=======
+
+You need to install:
+* mad
+* fftw3 (single precision)
+* libsamplerate
+* taglib
+
+The fetch.sh will attempt to fetch and build them all. But you need to use
+MinGW in order to compile fftw and libsamplerate.
+
+We have binaries at /svn/clientside/bin/win.
+Minimal headers are also in lib/3rdparty, though we don't keep these up to date.
+
+
+Mac OS X
+========
+Use macports to install:
+
+* taglib
+* fftw3-3
+* libsamplerate
+* taglib
+
+Linux
+=====
+Install the same as for the Mac with your package manager.
