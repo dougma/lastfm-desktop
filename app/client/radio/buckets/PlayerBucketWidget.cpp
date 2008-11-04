@@ -50,7 +50,6 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
             pen.setWidth( 1 );
             p.setPen( pen );
             p.drawRoundedRect( rect().adjusted( 10, 10, -10, -10), 10, 10 );
-            m_widget->update();
         }
         
         void resizeEvent( QResizeEvent* e )
