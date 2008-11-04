@@ -43,8 +43,8 @@ MediaPlayerIndicator::MediaPlayerIndicator()
     connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(onTuningIn( RadioStation )) );
     
 	// prevent the text length resizing the window!
-	username->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-    m_status->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+//	username->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+//    m_status->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
     
 #ifdef Q_WS_MAC
 	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
