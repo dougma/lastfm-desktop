@@ -551,7 +551,7 @@
           </sizepolicy>
          </property>
          <property name="text" >
-          <string>Please note that tracks longer than 4 minutes will still scrobble at 4 minutes.</string>
+          <string>Please note that tracks longer than 8 minutes will still scrobble at 4 minutes.</string>
          </property>
          <property name="wordWrap" >
           <bool>true</bool>
