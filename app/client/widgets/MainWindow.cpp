@@ -176,13 +176,16 @@ MainWindow::setupUi()
     dw->setWidget( ui.primaryBucket = new PrimaryBucket );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.radio->setWidget( dw );
+    ui.bottombar->ui.radio->setToolTip( dw->windowTitle() );
     dw->hide();
+    connect( ui.viewRadio, SIGNAL(triggered()), dw, SLOT(show()) );
     
     dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
     addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.friends->setWidget( dw );
+    ui.bottombar->ui.friends->setToolTip( dw->windowTitle() );
     dw->hide();
     
     dw = new QDockWidget;
@@ -190,7 +193,9 @@ MainWindow::setupUi()
     dw->setWidget( ui.info = new MetaInfoView );
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.library->setWidget( dw );
+    ui.bottombar->ui.library->setToolTip( dw->windowTitle() );
     dw->hide();
+    connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
