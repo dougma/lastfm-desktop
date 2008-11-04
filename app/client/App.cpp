@@ -77,7 +77,7 @@ App::App( int& argc, char** argv )
     s.setValue( "Path", applicationFilePath() );
 #endif
     
-    PlayerListener* listener;
+    PlayerListener* listener = 0;
     try {
         listener = new PlayerListener( this );
         connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
