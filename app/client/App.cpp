@@ -77,8 +77,18 @@ App::App( int& argc, char** argv )
     s.setValue( "Path", applicationFilePath() );
 #endif
     
-    PlayerListener* listener = new PlayerListener( this );
-    connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+    PlayerListener* listener;
+    try {
+        listener = new PlayerListener( this );
+        connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+    }
+    catch (PlayerListener::SocketFailure& e)
+    {
+        MessageBoxBuilder( 0 )
+                .setTitle( "Sorry" )
+                .setText( "You can't run the old client and the new client at once yet! We'll stay open, but scrobbling won't work." )
+                .exec();
+    }
     
     m_playerMediator = new PlayerMediator( listener );
     connect( m_playerMediator, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );

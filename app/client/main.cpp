@@ -102,13 +102,7 @@ int main( int argc, char** argv )
     {
         //TODO message to user
         //FIXME can't have it so that there is no radio option if listener socket fails!
-        qDebug() << "Socket failure:" << e.what();
-		
-		MessageBoxBuilder( 0 )
-			.setTitle( "Sorry Old Boy" )
-			.setText( "You can't run the old client and the new client at once yet!" )
-			.exec();
-		
+        qDebug() << "Socket failure:" << e.what();		
         return 1;
     }
     catch (Unicorn::Application::UnsupportedPlatformException&)
