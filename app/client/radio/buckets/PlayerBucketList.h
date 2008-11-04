@@ -33,18 +33,17 @@
 #include "PlayableMimeData.h"
 #include "app/moose.h"
 
-class PlayerBucket : public QListWidget
+
+class PlayerBucketList : public QListWidget
 {
 	Q_OBJECT
 public:
-	PlayerBucket( QWidget* w );
+	PlayerBucketList( QWidget* w );
 	
 	QRect visualRect ( const QModelIndex & index ) const;
 	QModelIndex indexAt( const QPoint& point ) const;
     
-    /** add the item to the bucket and load any associated data (ie image) */
-    void addAndLoadItem( const QString& item, const Seed::Type );
-    
+    bool addItem( class PlayableListItem* item );
     
 signals:
     void itemRemoved( QString, Seed::Type );
@@ -71,8 +70,7 @@ protected:
     void calculateToolIconsLayout();
     
     bool addFromMimeData( const QMimeData* data );
-    
-    bool addItem( class PlayableListItem* item );
+
     void addItem( QListWidgetItem* item );
     
     void removeIndex( const QModelIndex& i );

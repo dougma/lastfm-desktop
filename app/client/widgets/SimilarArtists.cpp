@@ -70,7 +70,7 @@ SimilarArtists::onDoubleClicked(const QModelIndex &index)
     dragHint->setMimeData( model()->mimeData( QModelIndexList() << index ) );
     
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
-    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucket );
+    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucketWidget );
 }
 
 

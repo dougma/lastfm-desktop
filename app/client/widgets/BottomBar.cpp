@@ -23,6 +23,9 @@
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QPainter>
+#include <QMouseEvent>
+#include <QApplication>
+#include "the/mainWindow.h"
 
 
 BottomBar::BottomBar()

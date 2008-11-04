@@ -36,7 +36,12 @@ public:
         BottomBarButton* friends;
         BottomBarButton* library;
         ScrobbleButton* scrobble;
-    } ui;    
+    } ui;
+    
+    
+private:
+    QPoint m_mouseDownPos;
+    QPoint m_offset;
 };
 
 

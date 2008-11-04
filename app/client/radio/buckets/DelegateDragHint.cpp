@@ -19,7 +19,7 @@
 
 #include "DelegateDragHint.h"
 #include <QCoreApplication>
-#include <QAbstractScrollArea>
+#include <QAbstractItemView>
 
 void
 DelegateDragHint::onFinishedAnimation()
@@ -27,7 +27,7 @@ DelegateDragHint::onFinishedAnimation()
  
     if( m_mimeData )
     {
-        if( QAbstractScrollArea* abstractScrollArea = dynamic_cast<QAbstractScrollArea*>(m_target))
+        if( QAbstractScrollArea* abstractScrollArea = qobject_cast<QAbstractScrollArea*>(m_target))
             m_target = abstractScrollArea->viewport();
         
         QDragEnterEvent* eevent = new QDragEnterEvent( m_target->pos(), Qt::CopyAction | Qt::MoveAction, m_mimeData, Qt::LeftButton, Qt::NoModifier );
@@ -53,7 +53,16 @@ DelegateDragHint::onDragFrameChanged( int frame )
 void
 DelegateDragHint::dragTo( QWidget* target )
 {
+
+    if( !qobject_cast< QAbstractItemView* >( target ))
+    {
+        target = target->findChild< QAbstractItemView* >();
+        if( !target )
+            return;
+    }
+    
     m_target = target;
+
     m_startPoint = pos();
     
     QTimeLine* timeLine = new QTimeLine( 500, this );

@@ -30,12 +30,15 @@
 
 ImageButton::ImageButton( QWidget* parent )
            : QAbstractButton( parent )
-{}
+{
+    resize( 0, 0 );
+}
 
 
 ImageButton::ImageButton( const QString& path, QWidget* parent )
             : QAbstractButton( parent )
 {   
+    resize( 0, 0 );
     setPixmap( path );
     
     QPixmap disabled( path.left( path.length() - 6 ) + "disabled.png" );
@@ -88,7 +91,7 @@ ImageButton::paintEvent( QPaintEvent* event )
 QSize
 ImageButton::sizeHint() const
 {
-    return iconSize();
+    return size();
 }
 
 
@@ -96,6 +99,8 @@ void
 ImageButton::setPixmap( const QString& path, const QIcon::State st )
 {
     QPixmap p( path );
+    
+    resize( p.size().expandedTo( size()) );
     
     setIconSize( p.size().expandedTo( iconSize() ) );
     
@@ -110,6 +115,8 @@ ImageButton::setPixmap( const QString& path, const QIcon::Mode m )
 {
     QPixmap p( path );
     
+    resize( p.size().expandedTo( size()) );
+    
     setIconSize( p.size().expandedTo( iconSize() ) );
     
     QIcon i = icon();
@@ -123,6 +130,8 @@ ImageButton::setPixmap( const QString& path, const QIcon::State s, const QIcon::
 {
     QPixmap p( path );
     
+    resize( p.size().expandedTo( size()) );
+    
     setIconSize( p.size().expandedTo( iconSize() ) );
     
     QIcon i = icon();
@@ -135,7 +144,9 @@ void
 ImageButton::setBackgroundPixmap( const QString& path, const QIcon::Mode m )
 {
     QPixmap p( path );
-
+    
+    resize( p.size().expandedTo( size()) );
+    
     setIconSize( p.size().expandedTo( iconSize() ) );
     m_backgroundIcon.addPixmap( p, m );
 }

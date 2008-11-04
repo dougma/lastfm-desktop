@@ -174,22 +174,21 @@ MainWindow::setupUi()
     dw = new QDockWidget;
     dw->setWindowTitle( tr("Radio") );
     dw->setWidget( ui.primaryBucket = new PrimaryBucket );
-    addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
+    addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.radio->setWidget( dw );
     dw->hide();
-    dw->setFloating( true );
     
     dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
-    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
+    addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.friends->setWidget( dw );
     dw->hide();
     
     dw = new QDockWidget;
     dw->setWindowTitle( "Info" );
     dw->setWidget( ui.info = new MetaInfoView );
-    addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Horizontal );
+    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.library->setWidget( dw );
     dw->hide();
     

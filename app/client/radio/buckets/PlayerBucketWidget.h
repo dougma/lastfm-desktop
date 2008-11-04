@@ -16,50 +16,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef PLAYER_BUCKET_WIDGET_H
+#define PLAYER_BUCKET_WIDGET_H
 
-#ifndef RADIO_CONTROLS_H
-#define RADIO_CONTROLS_H
-
-#include "State.h"
 #include <QWidget>
-namespace Phonon { class VolumeSlider; }
-class ImageButton;
+#include "SeedTypes.h"
 
-
-class RadioControls : public QWidget
+class PlayerBucketWidget : public QWidget
 {
-	Q_OBJECT
-
+    Q_OBJECT
 public:
-    RadioControls();
-
-	struct Ui
-    {
-        ImageButton* play;
-        ImageButton* skip;
-        Phonon::VolumeSlider* volume;
-    } 
-	ui;
+    PlayerBucketWidget( QWidget* parent = 0 );
     
-    virtual bool eventFilter( QObject*, QEvent* );
-    bool sliderEventFilter( class QSlider*, QEvent* ) const;
-    bool toolButtonEventFilter( class QToolButton*, QEvent* ) const;
-	
-private slots:
-	void onRadioStopped();
-    void onRadioTuningIn( const class RadioStation& );
-	void onPlayClicked();
+    /** add the item to the bucket and load any associated data (ie image) */
+    void addAndLoadItem( const QString& item, const Seed::Type );
     
-    void onVolumeValueChanged( int );
-	
 signals:
-	void stop();
-    void play();
-    void skip();
+    void itemRemoved( QString, Seed::Type );
     
-private:
-    class QSlider* m_volumeSlider;
+    protected slots:
+    
+protected:
+    struct {
+        class PlayerBucketList* bucket;
+        class RadioControls* controls;
+    } ui;
 };
 
-
-#endif RADIO_CONTROLS_H
+#endif //PLAYER_BUCKET_WIDGET_H

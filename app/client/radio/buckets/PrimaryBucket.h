@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include "SeedTypes.h"
+#include "PlayerBucketWidget.h"
 
 namespace Unicorn{ class TabWidget; }
 
@@ -37,7 +38,7 @@ public:
         class PrimaryListView* stationsBucket;
 		class PrimaryListView* friendsBucket;
 		class PrimaryListView* tagsBucket;
-		class PlayerBucket* playerBucket;
+		class PlayerBucketWidget* playerBucketWidget;
         class RadioControls* controls;
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;
@@ -52,7 +53,6 @@ private slots:
     void onItemDoubleClicked( const class QModelIndex& index );
     void onDnDAnimationFinished();
     void onFreeInputReturn();
-    
 
 };
 

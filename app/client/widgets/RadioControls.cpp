@@ -54,6 +54,7 @@ RadioControls::RadioControls()
     ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
     ui.volume->setMuteVisible( true );
+    ui.volume->setAudioOutput( The::radio().audioOutput());
     
     QToolButton* muteButton = ui.volume->findChild<QToolButton*>();
     if( muteButton )
@@ -71,7 +72,7 @@ RadioControls::RadioControls()
 	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
     connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
 	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
-    
+    connect( ui.skip, SIGNAL( clicked()), SIGNAL(skip()));
     setAutoFillBackground( true );
     UnicornWidget::paintItBlack( this );
 }

@@ -35,7 +35,6 @@
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
-#include "the/radio.h"
 
 #include <phonon/volumeslider.h>
 
@@ -137,6 +136,7 @@ PrimaryBucket::PrimaryBucket()
     new QHBoxLayout( freeInputWidget );
     freeInputWidget->layout()->addWidget( ui.freeInput = new QLineEdit );
     ui.freeInput->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.freeInput, SIGNAL( returnPressed()), SLOT( onFreeInputReturn()));
     
     freeInputWidget->layout()->addWidget( ui.inputSelector = new QComboBox );
     ui.inputSelector->addItem( "Artist", QVariant::fromValue(Seed::ArtistType) );
@@ -148,26 +148,8 @@ PrimaryBucket::PrimaryBucket()
 
 	splitter->addWidget( primaryPane );
 	
-    QWidget* playerPane =  new QWidget;
-    new QVBoxLayout( playerPane );
-    playerPane->layout()->addWidget( ui.playerBucket = new PlayerBucket( playerPane ) );
-    playerPane->layout()->addWidget( ui.controls = new RadioControls);
-    playerPane->layout()->setContentsMargins( 0, 7, 7, 0 );
-    playerPane->layout()->setSpacing( 0 );
-    
-    playerPane->setAutoFillBackground( true );
-    ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
-    
-    connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
-    connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
-    connect( ui.controls, SIGNAL( stop()), ui.playerBucket, SLOT( clear()));
-    connect( ui.controls, SIGNAL( play()), ui.playerBucket, SLOT( play()));
-    connect( ui.freeInput, SIGNAL( returnPressed()), SLOT( onFreeInputReturn()));
-    connect( ui.playerBucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketItemRemoved( QString, Seed::Type)));
-    
-    ui.controls->show();
-    
-	splitter->addWidget( playerPane );
+    splitter->addWidget( ui.playerBucketWidget = new PlayerBucketWidget( splitter ) );    
+    connect( ui.playerBucketWidget, SIGNAL( itemRemoved( QString, Seed::Type )), SLOT( onPlayerBucketItemRemoved( QString, Seed::Type )));
 	
     setCentralWidget( splitter );
     
@@ -179,7 +161,7 @@ void
 PrimaryBucket::onFreeInputReturn()
 {
     Seed::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<Seed::Type>();
-    ui.playerBucket->addAndLoadItem( ui.freeInput->text(), type );
+    ui.playerBucketWidget->addAndLoadItem( ui.freeInput->text(), type );
     ui.freeInput->clear();
 }
 
@@ -239,7 +221,7 @@ PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
     
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
     w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
-    w->dragTo( ui.playerBucket );
+    w->dragTo( ui.playerBucketWidget );
     connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
 }
 

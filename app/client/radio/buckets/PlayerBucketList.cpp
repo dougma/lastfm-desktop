@@ -17,30 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayerBucket.h"
+#include "PlayerBucketList.h"
 #include "PrimaryBucket.h"
 #include "SeedDelegate.h"
 #include "PlayableListItem.h"
 #include "PlayableMimeData.h"
-#include "the/radio.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include <QVBoxLayout>
 #include <QListView>
 #include <QScrollBar>
 #include <QPushButton>
 #include "widgets/ImageButton.h"
+#include "widgets/UnicornWidget.h"
+#include "lib/lastfm/radio/RadioStation.h"
+#include "the/radio.h"
 
 Q_DECLARE_METATYPE( PlayableListItem* )
 
-const int PlayerBucket::k_itemMargin = 4;
+const int PlayerBucketList::k_itemMargin = 4;
 
 //These should be based on the delegate's sizeHint - this requires
 //the delegate to calculate the sizeHint correctly however and this 
 //is not currently done!
-const int PlayerBucket::k_itemSizeX = 66;
-const int PlayerBucket::k_itemSizeY = 88;
+const int PlayerBucketList::k_itemSizeX = 66;
+const int PlayerBucketList::k_itemSizeY = 88;
 
 
-PlayerBucket::PlayerBucket( QWidget* w )
+PlayerBucketList::PlayerBucketList( QWidget* w )
 			: QListWidget( w ),
 			  m_showDropText( true)
 {
@@ -64,17 +67,23 @@ PlayerBucket::PlayerBucket( QWidget* w )
 
     ui.queryEdit = new QLineEdit( this );
     ui.queryEdit->setAttribute( Qt::WA_MacShowFocusRect, false );
-    QPalette p = ui.queryEdit->palette();
-    p.setBrush( QPalette::Base, Qt::transparent );
-    p.setBrush( QPalette::Text, Qt::white );
-    ui.queryEdit->setPalette( p);
+    QPalette queryPalette = ui.queryEdit->palette();
+    queryPalette.setBrush( QPalette::Base, Qt::transparent );
+    queryPalette.setBrush( QPalette::Text, Qt::white );
+    ui.queryEdit->setPalette( queryPalette );
     ui.queryEdit->setAlignment( Qt::AlignCenter );
     ui.queryEdit->setFrame( false );
+    
+    QPalette viewPortPalette = viewport()->palette();
+    viewPortPalette.setBrush( QPalette::Text, QBrush( 0x777777));
+    viewport()->setPalette( viewPortPalette );
 
     connect( ui.queryEdit, SIGNAL( returnPressed()), SLOT( onQueryEditReturn()));
 
     setAttribute( Qt::WA_MacShowFocusRect, false );
 
+    viewport()->setAutoFillBackground( false );
+    setFrameShape( QFrame::NoFrame );
 	setItemDelegate( new SeedDelegate( this ));
 	setAcceptDrops( true );
     setDragDropMode( QAbstractItemView::DragDrop );
@@ -82,44 +91,24 @@ PlayerBucket::PlayerBucket( QWidget* w )
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
-    setAutoFillBackground( true );
     calculateLayout();
 }
 
 
 void
-PlayerBucket::paintEvent( QPaintEvent* event )
+PlayerBucketList::paintEvent( QPaintEvent* event )
 {
     QPainter p( viewport() );
-    
-    QLinearGradient g( 0, 0, 0, viewport()->height() );
-    g.setColorAt( 0, QColor( 25, 25, 25 ) );
-    g.setColorAt( 1, QColor( 51, 51, 51 ) );
-    p.fillRect( viewport()->rect(), g );
-    
-    QRect r = QRect( QPoint(1, 1), viewport()->rect().bottomRight() - QPoint(1,1) );
-	QLinearGradient lg( r.topLeft(), r.bottomLeft() );
-	lg.setColorAt( 0, QColor( 7, 7, 7 ) );
-	lg.setColorAt( 1, QColor( 27, 26, 26 ));
-    p.fillRect( r, lg );
-    
-	p.setClipRect( event->rect());
-    p.setRenderHint( QPainter::Antialiasing, true );
-    QPen pen( QColor( 0x4e, 0x4e, 0x4e ), 3, Qt::DashLine, Qt::RoundCap );
-    pen.setDashPattern( QVector<qreal>() << 5 << 2 );
-    pen.setWidth( 1 );
-    p.setPen( pen );
-    p.drawRoundedRect( viewport()->rect().adjusted( 10, 10, -10, -10), 10, 10 );
-    
-	QAbstractItemModel* itemModel = model();
+   
+    QAbstractItemModel* itemModel = model();
 	if( !itemModel->rowCount() )
 	{
         QFont f = p.font();
         f.setBold( true );
-        f.setPixelSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
+        f.setPointSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
         p.setFont( f );
 
-		p.drawText( viewport()->rect().adjusted( 25, 25, -25, -25), 
+		p.drawText( viewport()->rect(), 
 		            Qt::AlignCenter | Qt::TextWordWrap, 
 		            tr("Drag something in here to play it.") );
 		return;
@@ -145,7 +134,7 @@ PlayerBucket::paintEvent( QPaintEvent* event )
 
 
 void 
-PlayerBucket::scrollContentsBy( int dx, int dy )
+PlayerBucketList::scrollContentsBy( int dx, int dy )
 {
     Q_UNUSED( dx ); Q_UNUSED( dy );
     calculateLayout();
@@ -154,16 +143,15 @@ PlayerBucket::scrollContentsBy( int dx, int dy )
 
 
 void 
-PlayerBucket::resizeEvent ( QResizeEvent* event )
+PlayerBucketList::resizeEvent ( QResizeEvent* event )
 {
 	Q_UNUSED( event );
-	viewport()->setBackgroundRole( QPalette::Window );    
     calculateLayout();
 }
 
 
 void 
-PlayerBucket::calculateLayout()
+PlayerBucketList::calculateLayout()
 {
    
     QAbstractItemModel* itemModel = model();
@@ -221,7 +209,7 @@ PlayerBucket::calculateLayout()
 
 
 void 
-PlayerBucket::calculateToolIconsLayout()
+PlayerBucketList::calculateToolIconsLayout()
 {
     //show/hide clear button
 
@@ -233,16 +221,19 @@ PlayerBucket::calculateToolIconsLayout()
         return;
     }
     
-    ui.clearButton->move( rect().translated( -66, 2 ).topRight());
+    const int scrollbarOffset = verticalScrollBar()->isVisible() ? verticalScrollBar()->width() : 0;
+    const int iconSpacing = 5;
+    
+    ui.clearButton->move( rect().translated( -ui.clearButton->width() - scrollbarOffset, 0 ).topRight());
     ui.clearButton->show();
     if( !ui.queryEdit->isVisible())
     {
-        ui.queryEditButton->move( rect().translated( -32, -ui.queryEditButton->height()-2).bottomLeft());
+        ui.queryEditButton->move( rect().translated( -ui.clearButton->width() - iconSpacing - ui.queryEditButton->width() - scrollbarOffset, 0).topRight());
         ui.queryEditButton->show();
     }
     else
     {
-        ui.queryEdit->move( rect().bottomLeft() - QPoint( -8, ui.queryEdit->height() + 8 ));   
+        ui.queryEdit->move( rect().bottomLeft() - QPoint( -8, ui.queryEdit->height()));   
         ui.queryEdit->resize( (size().width() - 16), ui.queryEdit->rect().height() );
     }
 
@@ -250,7 +241,7 @@ PlayerBucket::calculateToolIconsLayout()
 
 
 void 
-PlayerBucket::calculateItemRemoveLayout()
+PlayerBucketList::calculateItemRemoveLayout()
 {
     //move the remove button to correct position
     if( currentIndex().isValid() )
@@ -265,7 +256,7 @@ PlayerBucket::calculateItemRemoveLayout()
 
 
 void 
-PlayerBucket::dropEvent( QDropEvent* event)
+PlayerBucketList::dropEvent( QDropEvent* event)
 {
 	if( !event->mimeData() )
 		return;
@@ -278,7 +269,7 @@ PlayerBucket::dropEvent( QDropEvent* event)
 
 
 bool 
-PlayerBucket::addFromMimeData( const QMimeData* d )
+PlayerBucketList::addFromMimeData( const QMimeData* d )
 {
 	const PlayableMimeData* data = qobject_cast< const PlayableMimeData* >( d );
 	if( !data )
@@ -309,7 +300,7 @@ PlayerBucket::addFromMimeData( const QMimeData* d )
                           
                           
 QString 
-PlayerBucket::queryString() const
+PlayerBucketList::queryString() const
 {
     QString query = queryString( model()->index( 0, 0 ), false );
     for( int i = 1; i < model()->rowCount(); i++ )
@@ -322,7 +313,7 @@ PlayerBucket::queryString() const
 
 
 QString 
-PlayerBucket::queryString( const QModelIndex i, bool joined ) const 
+PlayerBucketList::queryString( const QModelIndex i, bool joined ) const 
 {  
 	QString qs;
 	
@@ -343,20 +334,20 @@ PlayerBucket::queryString( const QModelIndex i, bool joined ) const
 			qs += "tag:";
 			break;
 	}
-	qs += "" + i.data( Qt::DisplayRole ).toString() + "";
+	qs += "\"" + i.data( Qt::DisplayRole ).toString() + "\"";
 	return qs;
 }
 
 
 void 
-PlayerBucket::dragEnterEvent ( QDragEnterEvent * event )
+PlayerBucketList::dragEnterEvent ( QDragEnterEvent * event )
 {		
 	event->accept();
 }
 
 
 QModelIndex 
-PlayerBucket::indexAt( const QPoint& point ) const
+PlayerBucketList::indexAt( const QPoint& point ) const
 {
 	foreach ( const QModelIndex& i, m_itemRects.keys() )
 	{
@@ -376,7 +367,7 @@ PlayerBucket::indexAt( const QPoint& point ) const
 
 
 QRect 
-PlayerBucket::visualRect ( const QModelIndex & index ) const 
+PlayerBucketList::visualRect ( const QModelIndex & index ) const 
 {
 	Q_UNUSED( index );
 	QAbstractItemModel* itemModel = model();
@@ -403,7 +394,7 @@ PlayerBucket::visualRect ( const QModelIndex & index ) const
 
 
 void
-PlayerBucket::play()
+PlayerBucketList::play()
 {
     
     RadioStation station = RadioStation::rql( queryString() );
@@ -413,24 +404,8 @@ PlayerBucket::play()
 }
 
 
-void 
-PlayerBucket::addAndLoadItem( const QString& itemText, const Seed::Type type )
-{
-    PlayableListItem* item = new PlayableListItem;
-    item->setText( itemText );
-    item->setType( type );
-	item->setForeground( Qt::white );
-	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
-	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
-    item->fetchImage();
-    if( addItem( item ) )
-        calculateLayout();
-    
-}
-
-
 bool 
-PlayerBucket::addItem( PlayableListItem* item )
+PlayerBucketList::addItem( PlayableListItem* item )
 {
     PlayableListItem* foundItem = 0;
     foreach( QListWidgetItem* anItem, findItems( item->text(), Qt::MatchFixedString ))
@@ -458,14 +433,15 @@ PlayerBucket::addItem( PlayableListItem* item )
 
 
 void
-PlayerBucket::addItem( QListWidgetItem* item )
+PlayerBucketList::addItem( QListWidgetItem* item )
 {
     QListWidget::addItem( item );
+    calculateLayout();
 }
 
 
 void 
-PlayerBucket::removeIndex( const QModelIndex& index )
+PlayerBucketList::removeIndex( const QModelIndex& index )
 {
     PlayableListItem* item = static_cast<PlayableListItem*>( itemFromIndex( index ));
     if( item )
@@ -474,7 +450,7 @@ PlayerBucket::removeIndex( const QModelIndex& index )
 
 
 void 
-PlayerBucket::removeItem( PlayableListItem* item )
+PlayerBucketList::removeItem( PlayableListItem* item )
 {
     setCurrentItem( NULL );
     emit itemRemoved( item->text(), (Seed::Type)item->playableType());
@@ -486,7 +462,7 @@ PlayerBucket::removeItem( PlayableListItem* item )
 
 
 void 
-PlayerBucket::clearItems()
+PlayerBucketList::clearItems()
 {
     while( model()->rowCount() )
     {
@@ -498,7 +474,7 @@ PlayerBucket::clearItems()
 
 
 void 
-PlayerBucket::removeCurrentItem()
+PlayerBucketList::removeCurrentItem()
 {
     if( currentIndex().isValid() )
         removeIndex( currentIndex() );
@@ -506,16 +482,23 @@ PlayerBucket::removeCurrentItem()
 
 
 void 
-PlayerBucket::showQuery()
+PlayerBucketList::showQuery()
 {
-    ui.queryEditButton->hide();
-    ui.queryEdit->show();
-    calculateLayout();
+    if( ui.queryEdit->isVisible() )
+    {
+        ui.queryEdit->hide();
+        calculateLayout();
+    }
+    else
+    {
+        ui.queryEdit->show();
+        calculateLayout();
+    }
 }
 
 
 void 
-PlayerBucket::onCurrentItemChanged( QListWidgetItem* current, QListWidgetItem* previous )
+PlayerBucketList::onCurrentItemChanged( QListWidgetItem* current, QListWidgetItem* previous )
 {
     if( current ) 
     {
@@ -529,7 +512,7 @@ PlayerBucket::onCurrentItemChanged( QListWidgetItem* current, QListWidgetItem* p
 
 
 void 
-PlayerBucket::mousePressEvent( QMouseEvent* event )
+PlayerBucketList::mousePressEvent( QMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton &&
         !indexAt( event->pos()).isValid())
@@ -545,7 +528,7 @@ PlayerBucket::mousePressEvent( QMouseEvent* event )
 
 
 void 
-PlayerBucket::onQueryEditReturn()
+PlayerBucketList::onQueryEditReturn()
 {
     RadioStation station = RadioStation::rql( ui.queryEdit->text() );
     
