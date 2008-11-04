@@ -38,8 +38,7 @@ private slots:
     void onStateChanged( State );
 	
 private:
-	QLabel* m_playerDescription;
-	QLabel* m_nowPlayingIndicator;
+	QLabel* m_status;
     
     QString m_playerName;
     QString m_playbackCommencedString;

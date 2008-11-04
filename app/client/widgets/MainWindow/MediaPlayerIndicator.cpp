@@ -30,27 +30,28 @@
 
 MediaPlayerIndicator::MediaPlayerIndicator()
 {
+    QLabel* username;
+    
     QHBoxLayout* h = new QHBoxLayout( this );
 	h->setMargin( 0 );
-	h->addWidget( m_nowPlayingIndicator = new QLabel( QByteArray(PRE) + Ws::Username ) );
+	h->addWidget( username = new QLabel( PRE + Ws::Username ) );
 	h->addStretch();
-	h->addWidget( m_playerDescription = new QLabel );
+	h->addWidget( m_status = new QLabel );
 
     connect( qApp, SIGNAL(playerChanged( QString )), SLOT(onPlayerChanged( QString )) );
     connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
     connect( &The::radio(), SIGNAL(tuningIn( RadioStation )), SLOT(onTuningIn( RadioStation )) );
     
 	// prevent the text length resizing the window!
-	m_nowPlayingIndicator->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-    m_playerDescription->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+	username->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
+    m_status->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
     
 #ifdef Q_WS_MAC
 	QPalette p( Qt::white, Qt::black ); //Qt-4.4.1 on mac sucks
-	m_nowPlayingIndicator->setPalette( p );
-	m_playerDescription->setPalette( p );
-
-    m_playerDescription->setAttribute( Qt::WA_MacMiniSize );
-	m_nowPlayingIndicator->setAttribute( Qt::WA_MacMiniSize );
+	username->setPalette( p );
+	m_status->setPalette( p );
+    username->setAttribute( Qt::WA_MacMiniSize );
+	m_status->setAttribute( Qt::WA_MacMiniSize );
 #endif
 }
 
@@ -61,19 +62,19 @@ MediaPlayerIndicator::onPlayerChanged( const QString& name )
     m_playerName = name;
     
     m_playbackCommencedString = !name.isEmpty()
-        ? m_playbackCommencedString = PRE + tr("listening to %1").arg( "</font>" + name )
-        : "";
+            ? m_playbackCommencedString = PRE + tr("listening to %1").arg( "</font>" + name )
+            : "";
 }
 
 
 void
 MediaPlayerIndicator::onTuningIn( const RadioStation& station )
 {
-    m_playerDescription->setText( PRE + tr( "tuning to %1").arg( station.url() ) );
+    m_status->setText( PRE + tr( "tuning to %1").arg( station.url() ) );
       
     m_playbackCommencedString = station.title().isEmpty()
-        ? "Last.fm"
-        : PRE + tr( "%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( station.title() );
+            ? "Last.fm"
+            : PRE + tr( "%1 on</font> Last.fm", "eg. Recommendation Radio on Last.fm" ).arg( station.title() );
 }
 
 
@@ -83,15 +84,15 @@ MediaPlayerIndicator::onStateChanged( State state )
     switch (state)
     {
         case Stopped:
-            m_playerDescription->clear();
+            m_status->clear();
             break;
             
         case Playing:
-            m_playerDescription->setText( m_playbackCommencedString );
+            m_status->setText( m_playbackCommencedString );
             break;
 
         case Paused:
-            m_playerDescription->setText( "<b>" + tr("%1 is paused").arg( m_playerName + PRE ) );
+            m_status->setText( "<b>" + tr("%1 is paused").arg( m_playerName + PRE ) );
             break;
             
         default:

@@ -214,6 +214,8 @@ MainWindow::setupCentralWidget()
     v->setContentsMargins( 9, 9, 9, 0 );
     v->setSpacing( 0 );
     
+    indicator->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
+    
     QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
 	v2->addStretch();
     v2->addWidget( ui.text = new QLabel );
