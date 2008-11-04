@@ -34,7 +34,7 @@ MediaPlayerIndicator::MediaPlayerIndicator()
     
     QHBoxLayout* h = new QHBoxLayout( this );
 	h->setMargin( 0 );
-	h->addWidget( username = new QLabel( PRE + Ws::Username ) );
+	h->addWidget( username = new QLabel( QString(PRE) + Ws::Username ) );
 	h->addStretch();
 	h->addWidget( m_status = new QLabel );
 
