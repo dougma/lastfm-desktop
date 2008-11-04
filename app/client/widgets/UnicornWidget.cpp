@@ -33,7 +33,6 @@ UnicornWidget::paintItBlack( QWidget* w )
     QPalette p = w->palette();
     p.setBrush( QPalette::Window, QColor( 35, 35, 35 ) );
     p.setBrush( QPalette::WindowText, QColor( 84, 84, 84 ) );
-    p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );   
     
     if (qobject_cast<QAbstractItemView*>(w))
     {

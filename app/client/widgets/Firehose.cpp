@@ -62,6 +62,7 @@ Firehose::Firehose()
     QPalette p = palette();
     p.setBrush( QPalette::Base, p.window() );
     p.setBrush( QPalette::Text, p.windowText() );
+    p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
     setPalette( p );
     view->setPalette( palette() );
     view->setAutoFillBackground( true );
