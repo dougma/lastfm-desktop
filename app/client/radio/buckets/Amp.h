@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include "SeedTypes.h"
+#include "lib/lastfm/types/Track.h"
 
 class Amp : public QWidget
 {
@@ -32,18 +33,33 @@ public:
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );
     
+    struct
+    {
+        class ImageButton* love;
+        class ImageButton* ban;
+        class ImageButton* share;
+        class ImageButton* tag;
+        class ImageButton* cog;
+    } scrobbleRatingUi;
+    
 signals:
     void itemRemoved( QString, Seed::Type );
     
     protected slots:
     
 protected:
+    
     struct {
         class PlayerBucketList* bucket;
         class RadioControls* controls;
     } ui;
     
     void resizeEvent( QResizeEvent* );
+    
+    void setupUi();
+  
+protected slots:
+    void onTrackSpooled( Track );
 };
 
 #endif //PLAYER_BUCKET_WIDGET_H

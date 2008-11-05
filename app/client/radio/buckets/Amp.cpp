@@ -18,12 +18,15 @@
  ***************************************************************************/
 
 #include "Amp.h"
+#include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "Amp.h"
 #include "widgets/RadioControls.h"
 #include "widgets/UnicornWidget.h"
 #include "the/radio.h"
+#include "the/MainWindow.h"
+#include "ImageButton.h"
 #include "PlayableListItem.h"
 #include "PlayerBucketList.h"
 
@@ -33,6 +36,15 @@
 Amp::Amp( QWidget* p )
     :QWidget( p )
 {
+    setupUi();
+    connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+}
+
+
+void 
+Amp::setupUi()
+{
+    
     setAutoFillBackground( true );
     new QHBoxLayout( this );
     
@@ -40,7 +52,12 @@ Amp::Amp( QWidget* p )
     
     struct BorderedContainer : public QWidget
     {
-        BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ){ setLayout( new QVBoxLayout ); layout()->setContentsMargins( 15, 15, 15, 15 ); setAutoFillBackground( true ); }
+        BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
+        { 
+            setLayout( new QVBoxLayout ); 
+            layout()->setContentsMargins( 15, 15, 15, 15 ); 
+            setAutoFillBackground( true ); 
+        }
         
         void paintEvent( QPaintEvent* e )
         {
@@ -66,11 +83,6 @@ Amp::Amp( QWidget* p )
             
         }
         
-        void moveEvent( QMoveEvent* e )
-        {
-            Q_UNUSED( e )
-        }
-        
     };
     
     layout()->addWidget( ui.controls = new RadioControls );
@@ -84,12 +96,31 @@ Amp::Amp( QWidget* p )
     
     
     bc->setFixedHeight( 100 );
-  
     
     layout()->addWidget( bucketLayoutWidget );
     
-    connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
+    QWidget* scrobbleRatingControls = new QWidget( this );
+    {
+        QGridLayout* layout = new QGridLayout( scrobbleRatingControls );
+        layout->addWidget( scrobbleRatingUi.love = new ImageButton( ":/MainWindow/button/love/up.png" ), 0, 0 );
+        layout->addWidget( scrobbleRatingUi.ban = new ImageButton( ":/MainWindow/button/ban/up.png" ), 0, 1 );
+        layout->addWidget( scrobbleRatingUi.tag = new ImageButton( ":/MainWindow/button/tag/up.png" ), 1, 0 );
+        layout->addWidget( scrobbleRatingUi.share = new ImageButton( ":/MainWindow/button/share/up.png" ), 1, 1 );
+        
+        scrobbleRatingUi.ban->moveIcon( 0, 1, QIcon::Active );
+        scrobbleRatingUi.tag->moveIcon( 0, 1, QIcon::Active );
+        scrobbleRatingUi.love->moveIcon( 0, 1, QIcon::Active );
+        scrobbleRatingUi.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
+        scrobbleRatingUi.love->setCheckable( true );
+        scrobbleRatingUi.share->moveIcon( 0, 1, QIcon::Active );
+        
+    }
     
+    
+    layout()->addWidget( scrobbleRatingControls );
+    layout()->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
+    
+    connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
     connect( ui.controls, SIGNAL( skip()), &The::radio(), SLOT( skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
@@ -124,4 +155,14 @@ Amp::resizeEvent( QResizeEvent* event )
     lg.setColorAt( 1, 0x2d2d2d );
     p.setBrush( QPalette::Window, lg );
     setPalette( p );
+}
+
+
+void 
+Amp::onTrackSpooled( Track t )
+{
+    if( !t.isNull()) 
+        scrobbleRatingUi.cog->setEnabled( true ); 
+    else 
+        scrobbleRatingUi.cog->setEnabled( false ); 
 }

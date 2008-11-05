@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -22,8 +22,8 @@
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
-#include "radio/buckets/PlayerBucketWidget.h"
-#include "radio/buckets/PrimaryBucket.h"
+#include "radio/buckets/Amp.h"
+#include "radio/buckets/Sources.h"
 #include "Settings.h"
 #include "the/app.h"
 #include "widgets/BottomBar.h"
@@ -72,7 +72,7 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
-    connect( ui.cog, SIGNAL(clicked()), SLOT(showCogMenu()) );
+    connect( ui.amp->scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(showCogMenu()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
@@ -108,7 +108,6 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( true );
         ui.love->setEnabled( true );
 		ui.love->setChecked( false );
-        ui.cog->setEnabled( true );
         
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
@@ -118,7 +117,6 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
-        ui.cog->setEnabled( false );
     }
         
     #ifndef Q_WS_MAC
@@ -175,10 +173,16 @@ MainWindow::setupUi()
 
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
     v->addWidget( ui.info );
-    v->addWidget( ui.amp = new PlayerBucketWidget );
-    v->addWidget( ui.sources = new PrimaryBucket );
+    v->addWidget( ui.amp = new Amp );
+    v->addWidget( ui.sources = new Sources );
     v->setSpacing( 0 );
     v->setMargin( 0 );
+    
+    ui.sources->connectToAmp( ui.amp );
+    ui.amp->scrobbleRatingUi.ban->setAction( ui.ban );
+    ui.amp->scrobbleRatingUi.tag->setAction( ui.tag );
+    ui.amp->scrobbleRatingUi.love->setAction( ui.love );
+    ui.amp->scrobbleRatingUi.share->setAction( ui.share );
 
     ui.bottombar->ui.radio->setWidget( ui.amp );
     ui.bottombar->ui.radio->setToolTip( tr("Radio") );
@@ -211,7 +215,6 @@ void
 MainWindow::setupInfoWidget()
 {       
     QWidget* actionbar, *indicator;
-    ImageButton* love, *ban, *share, *tag;
 
     ui.info = new QWidget;
     
@@ -229,32 +232,7 @@ MainWindow::setupInfoWidget()
 	v2->addStretch();
     v2->addWidget( ui.text = new QLabel );
 	v2->addSpacing( 4 );
-    v2->addWidget( actionbar = new QWidget );
-	v2->addSpacing( 5 );
-    v2->setAlignment( actionbar, Qt::AlignCenter );    
-    v2->setMargin( 0 );
-    v2->setSpacing( 0 );
-
-	QHBoxLayout* h = new QHBoxLayout( actionbar );
-    h->addWidget( love = new ImageButton( ":/MainWindow/button/love/up.png" ) );
-	h->addWidget( ban = new ImageButton( ":/MainWindow/button/ban/up.png" ) );
-	h->addWidget( ui.cog = new ImageButton( ":/MainWindow/button/cog/up.png") );
-    h->addWidget( tag = new ImageButton( ":/MainWindow/button/tag/up.png" ) );
-    h->addWidget( share = new ImageButton( ":/MainWindow/button/share/up.png" ) );   
-	h->setSpacing( 24 );
-    h->setSizeConstraint( QLayout::SetFixedSize );
     
-    ban->moveIcon( 0, 1, QIcon::Active );
-    ban->setAction( ui.ban );
-    tag->moveIcon( 0, 1, QIcon::Active );
-    tag->setAction( ui.tag );
-    love->moveIcon( 0, 1, QIcon::Active );
-    love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
-	love->setCheckable( true );
-    love->setAction( ui.love );
-    share->moveIcon( 0, 1, QIcon::Active );
-    share->setAction( ui.share );
-
     ui.text->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
     ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     ui.text->setTextFormat( Qt::RichText );            
