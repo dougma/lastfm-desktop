@@ -47,7 +47,7 @@ public:
 		class ImageButton* cog;
         class QLabel* text;
 		class PrettyCoverWidget* cover;
-        class MetaInfoView* info;
+        class QWidget* info;
     } ui;
 
 protected:
@@ -77,7 +77,7 @@ private slots:
     
 private:
     void setupUi();
-    void setupCentralWidget();
+    void setupInfoWidget();
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );

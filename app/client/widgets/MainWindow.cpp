@@ -166,46 +166,39 @@ MainWindow::setupUi()
     ui.account->setTitle( user );
    	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
     
-	setupCentralWidget();
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     /** hah! works :) But I'm sure is hideously dangerous, etc. */
     setStatusBar( (QStatusBar*) (ui.bottombar = new BottomBar) );
 
-    QDockWidget* dw;
-    dw = new QDockWidget;
-    dw->setWindowTitle( tr("Radio") );
-    dw->setWidget( ui.amp = new PlayerBucketWidget );
-    addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Vertical );
-    ui.bottombar->ui.radio->setWidget( dw );
-    ui.bottombar->ui.radio->setToolTip( dw->windowTitle() );
-    dw->hide();
-    connect( ui.viewRadio, SIGNAL(triggered()), dw, SLOT(show()) );
-    
-    dw = new QDockWidget;
+    setCentralWidget( new QWidget );
+    setupInfoWidget();
+
+    QVBoxLayout* v = new QVBoxLayout( centralWidget() );
+    v->addWidget( ui.info );
+    v->addWidget( ui.amp = new PlayerBucketWidget );
+    v->addWidget( ui.sources = new PrimaryBucket );
+    v->setSpacing( 0 );
+    v->setMargin( 0 );
+
+    ui.bottombar->ui.radio->setWidget( ui.amp );
+    ui.bottombar->ui.radio->setToolTip( tr("Radio") );
+    connect( ui.viewRadio, SIGNAL(triggered()), ui.amp, SLOT(show()) );
+
+    QDockWidget* dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
-    addDockWidget( Qt::LeftDockWidgetArea, dw, Qt::Vertical );
+    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.friends->setWidget( dw );
     ui.bottombar->ui.friends->setToolTip( dw->windowTitle() );
     dw->hide();
+    dw->setFloating( true );
     
-    dw = new QDockWidget;
-    dw->setWindowTitle( "Info" );
-    dw->setWidget( ui.info = new MetaInfoView );
-    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
-    ui.bottombar->ui.library->setWidget( dw );
-    ui.bottombar->ui.library->setToolTip( dw->windowTitle() );
-    dw->hide();
+    ui.bottombar->ui.library->setWidget( ui.info );
+    ui.bottombar->ui.library->setToolTip( tr("Track Information") );
     connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
     
-    dw = new QDockWidget;
-    dw->setWindowTitle( "Sources" );
-    dw->setWidget( ui.sources = new PrimaryBucket );
-    dw->setFloating( true );
-    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
-    ui.bottombar->ui.sources->setWidget( dw );
-    ui.bottombar->ui.sources->setToolTip( dw->windowTitle() );
-    dw->hide();
+    ui.bottombar->ui.sources->setWidget( ui.sources );
+    ui.bottombar->ui.sources->setToolTip( "Music Sources" );
     connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
     
 #ifndef Q_WS_MAC
@@ -215,14 +208,14 @@ MainWindow::setupUi()
 
 
 void
-MainWindow::setupCentralWidget()
+MainWindow::setupInfoWidget()
 {       
     QWidget* actionbar, *indicator;
     ImageButton* love, *ban, *share, *tag;
 
-    setCentralWidget( new QWidget );
+    ui.info = new QWidget;
     
-	QVBoxLayout* v = new QVBoxLayout( centralWidget() );
+	QVBoxLayout* v = new QVBoxLayout( ui.info );
 	v->addWidget( indicator = new MediaPlayerIndicator );
 	v->addSpacing( 10 );
     v->addWidget( ui.cover = new PrettyCoverWidget );
@@ -266,10 +259,10 @@ MainWindow::setupCentralWidget()
     ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     ui.text->setTextFormat( Qt::RichText );            
     
-    UnicornWidget::paintItBlack( centralWidget() );
-    centralWidget()->setAutoFillBackground( true );
+    UnicornWidget::paintItBlack( ui.info );
+    ui.info->setAutoFillBackground( true );
 
-    QPalette p = centralWidget()->palette();
+    QPalette p = ui.info->palette();
     p.setColor( QPalette::Text, Qt::white );
     p.setColor( QPalette::WindowText, Qt::white );
     ui.text->setPalette( p );
@@ -289,8 +282,8 @@ MainWindow::setupCentralWidget()
 void
 MainWindow::showCogMenu()
 {
-    int const w = centralWidget()->sizeHint().width();
-    CogButtonPopup* cog = new CogButtonPopup( w, centralWidget() );
+    int const w = ui.info->sizeHint().width();
+    CogButtonPopup* cog = new CogButtonPopup( w, ui.info );
     cog->show();
     
     connect( cog, SIGNAL(addToPlaylistClicked()), SLOT(showPlaylistDialog()) );
