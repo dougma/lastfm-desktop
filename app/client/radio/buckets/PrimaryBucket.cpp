@@ -208,6 +208,8 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
 void 
 PrimaryBucket::onUserGetPlaylistsReturn( WsReply* r )
 {
+    return;
+
     QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
     foreach( CoreDomElement playlist, playlists )
     {
