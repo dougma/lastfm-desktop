@@ -66,8 +66,8 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
         }
     }
 
-    Ws::Username = qstrdup( s.value( "Username" ).toString().toUtf8().data() );
-    Ws::SessionKey = qstrdup( s.value( "SessionKey" ).toString().toUtf8().data() );
+    Ws::Username = s.value( "Username" ).toString();
+    Ws::SessionKey = s.value( "SessionKey" ).toString();
 }
 
 

@@ -137,9 +137,7 @@ static QString systemInformationString()
 void
 SendLogsDialog::onSendClicked()
 {
-    SendLogsRequest* request = new SendLogsRequest( qApp->applicationName(), 
-                                                    qApp->applicationVersion(), 
-                                                    ui.moreInfoTextEdit->toPlainText() );
+    SendLogsRequest* request = new SendLogsRequest( ui.moreInfoTextEdit->toPlainText() );
 
     connect( request, SIGNAL( success() ), SLOT( onSuccess() ) );
     connect( request, SIGNAL( error() ), SLOT( onError() ) );

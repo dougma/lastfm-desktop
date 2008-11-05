@@ -21,25 +21,18 @@
 #define LASTFM_WS_KEYS_H
 
 #include <lastfm/DllExportMacro.h>
+#include <QString>
 
 
 /** you need to assign these in your application, they start off 
   * assigned as null strings, if you are using UnicornApplication, don't
-  * worry about it. */
+  * worry about it. All the strings should be utf8. 
+  *
+  * Some are const char*, some QString. The rationale, is performance and 
+  * convenience respectively.
+  */
 namespace Ws
-{
-    /** You will need to assign this before using any webservices */
-	LASTFM_WS_DLLEXPORT extern const char* Username;
-    
-    /** Some webservices require authentication. See the following 
-      * documentation:
-      * http://www.last.fm/api/authentication
-      * http://www.last.fm/api/desktopauth 
-      * You have to authenticate and then assign to SessionKey, liblastfm does
-      * not do that for you.
-      */
-    LASTFM_WS_DLLEXPORT extern const char* SessionKey;
-    
+{    
     /** both of these are provided when you register at http://last.fm/api */
     LASTFM_WS_DLLEXPORT extern const char* SharedSecret;
     LASTFM_WS_DLLEXPORT extern const char* ApiKey;
@@ -47,6 +40,18 @@ namespace Ws
 	/** if you don't assign this, we create one for you, this is so we can
 	  * create pretty logs with your app's usage information */
 	LASTFM_WS_DLLEXPORT extern const char* UserAgent;
+
+    /** You will need to assign this before using any webservices */
+	LASTFM_WS_DLLEXPORT extern QString Username;
+
+    /** Some webservices require authentication. See the following 
+      * documentation:
+      * http://www.last.fm/api/authentication
+      * http://www.last.fm/api/desktopauth 
+      * You have to authenticate and then assign to SessionKey, liblastfm does
+      * not do that for you.
+      */
+    LASTFM_WS_DLLEXPORT extern QString SessionKey;
 }
 
 #endif

@@ -19,15 +19,14 @@
 
 #include "SendLogsRequest.h"
 #include "lib/lastfm/ws/WsKeys.h"
+#include <QCoreApplication>
 #include <QFile>
 #include <QTextDocument>
 #include <QDebug>
 
 
-SendLogsRequest::SendLogsRequest( QString clientname, QString clientversion, QString usernotes )
+SendLogsRequest::SendLogsRequest( const QString& usernotes )
 {
-    m_clientname = clientname;
-    m_clientversion = clientversion;
     m_usernotes = usernotes;
 }
 
@@ -58,23 +57,23 @@ SendLogsRequest::addLogData( QString name, QString data )
 void
 SendLogsRequest::send()
 {
-    QString url = "http://oops.last.fm/logsubmission/add";
-    
-    url += "?username=" + QString(Ws::Username);
+    QUrl url;
+    url.setScheme( "http" );
+    url.setHost( "oops.last.fm" );
+    url.setPath( "logsubmission/add" );
+    url.addQueryItem( "username", Ws::Username );
     #ifdef Q_WS_MAC
-        url += "&platform=macosx";
+        url.addQueryItem( "platform", "macosx" );
     #elif defined WIN32
-        url += "&platform=win32";
+        url.addQueryItem( "platform", "win32" );
     #else
-        url += "&platform=linux";
+        url.addQueryItem( "platform", "linux" );
     #endif
-    url += "&clientname=" + m_clientname;
-    url += "&clientversion=" + m_clientversion;
+    url.addQueryItem( "clientname", QCoreApplication::applicationName() );
+    url.addQueryItem( "clientversion", QCoreApplication::applicationVersion() );
 
-    QNetworkRequest request = QNetworkRequest( QUrl( url ) );
-    request.setRawHeader( "Host", "oops.last.fm" );
-    request.setRawHeader( "Content-Type", "multipart/form-data;"
-                                          "boundary=8e61d618ca16" );
+    QNetworkRequest request = QNetworkRequest( url );
+    request.setRawHeader( "Content-Type", "multipart/form-data;boundary=8e61d618ca16" );
     request.setRawHeader( "Accept", "*/*" );
 
     m_data.append( postData( "usernotes", escapeString( m_usernotes ).toLatin1() ) );

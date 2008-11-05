@@ -41,11 +41,13 @@ Artist::www() const
 	return "http://www.last.fm/music/" + CoreUrl::encode( m_name );
 }
 
+
 WsReply* 
 Artist::getInfo() const
 {
 	return WsRequestBuilder( "artist.getInfo" ).add( "artist", m_name ).get();
 }
+
 
 WsReply* 
 Artist::getTags() const

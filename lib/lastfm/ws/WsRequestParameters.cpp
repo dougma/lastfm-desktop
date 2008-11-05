@@ -26,7 +26,7 @@
 WsRequestParameters::WsRequestParameters()
 {
     add( "api_key", Ws::ApiKey );
-    if (Ws::SessionKey) add( "sk", Ws::SessionKey );
+    if (Ws::SessionKey.size()) add( "sk", Ws::SessionKey );
 }
 
 
@@ -63,19 +63,14 @@ WsRequestParameters::methodSignature() const
 
 namespace Ws
 {
-    /** we set this to "" since not having a session key is valid for some 
-      * webservices */
-    const char* SessionKey = "";
+    QString SessionKey;
+    QString Username;
     
     /** we leave these unset as you can't use the webservices without them
       * so lets make the programmer aware of it during testing by crashing */
     const char* SharedSecret;
     const char* ApiKey;
-    
-    /** if Username isn't set it is almost certainly programmer error, but it
-      * is probably a rare bug, so let's not crash* */
-    const char* Username = "";
-    
+       
     /** if this is found set to "" we conjure ourselves a suitable one */
 	const char* UserAgent = "";
 }

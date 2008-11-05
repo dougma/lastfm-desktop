@@ -35,7 +35,7 @@ using namespace std;
 // -----------------------------------------------------------
 
 MP3_Source::MP3_Source()
-: m_pMP3_Buffer ( new unsigned char[m_MP3_BufferSize+MAD_BUFFER_GUARD] )
+          : m_pMP3_Buffer ( new unsigned char[m_MP3_BufferSize+MAD_BUFFER_GUARD] )
 {}
 
 // -----------------------------------------------------------

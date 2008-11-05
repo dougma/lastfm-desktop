@@ -37,7 +37,7 @@ class SendLogsRequest : public QObject
         void error();
 
     public:
-        SendLogsRequest(QString clientname, QString clientversion, QString usernotes );
+        SendLogsRequest( const QString& usernotes );
         
         void addLog( QString name, QString filename );
         void addLogData( QString name, QString data );
@@ -51,7 +51,7 @@ class SendLogsRequest : public QObject
         WsAccessManager m_networkAccessManager;
         QByteArray m_data;
         QStringList m_logs;
-        QString m_clientname, m_clientversion, m_usernotes;
+        QString m_usernotes;
         bool m_error;
     
     private slots:
