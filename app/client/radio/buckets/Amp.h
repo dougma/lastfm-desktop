@@ -23,11 +23,11 @@
 #include <QWidget>
 #include "SeedTypes.h"
 
-class PlayerBucketWidget : public QWidget
+class Amp : public QWidget
 {
     Q_OBJECT
 public:
-    PlayerBucketWidget( QWidget* parent = 0 );
+    Amp( QWidget* parent = 0 );
     
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );

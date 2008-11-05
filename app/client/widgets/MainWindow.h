@@ -42,8 +42,8 @@ public:
 	struct Ui : ::Ui::MainWindow
 	{
 		class BottomBar* bottombar;
-		class PlayerBucketWidget* amp;
-        class PrimaryBucket* sources;
+		class Amp* amp;
+        class Sources* sources;
 		class ImageButton* cog;
         class QLabel* text;
 		class PrettyCoverWidget* cover;

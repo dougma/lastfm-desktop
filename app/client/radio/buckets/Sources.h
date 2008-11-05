@@ -25,11 +25,11 @@
 
 namespace Unicorn{ class TabWidget; }
 
-class PrimaryBucket : public QMainWindow
+class Sources : public QMainWindow
 {
 	Q_OBJECT
 public:
-	PrimaryBucket();
+	Sources();
     
 
 	struct {
@@ -42,17 +42,22 @@ public:
         class QComboBox* inputSelector;
 	} ui;
     
-private:
+    void connectToAmp( class Amp* amp );
+    
+protected:
     class WsAccessManager* m_accessManager;
+    class Amp* m_connectedAmp;
 	
-private slots:
-    void onPlayerBucketItemRemoved( QString, Seed::Type );
+protected slots:
+    void onAmpSeedRemoved( QString, Seed::Type );
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
     void onUserGetPlaylistsReturn( class WsReply* );
     void onItemDoubleClicked( const class QModelIndex& index );
     void onDnDAnimationFinished();
     void onFreeInputReturn();
+    
+    void onAmpDestroyed(){ m_connectedAmp = 0; }
 
 };
 
@@ -68,7 +73,7 @@ class PrimaryListView : public QListWidget
 {
     Q_OBJECT
     
-    friend class PrimaryBucket;
+    friend class Sources;
 public:
 	PrimaryListView( QWidget* parent ): QListWidget( parent ){}
     

@@ -17,19 +17,21 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayerBucketWidget.h"
+#include "Amp.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include "PlayerBucketList.h"
+#include "Amp.h"
 #include "widgets/RadioControls.h"
 #include "widgets/UnicornWidget.h"
 #include "the/radio.h"
 #include "PlayableListItem.h"
+#include "PlayerBucketList.h"
 
+#include <QPaintEvent>
 #include <QPainter>
 
-PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
-                   :QWidget( p )
+Amp::Amp( QWidget* p )
+    :QWidget( p )
 {
     setAutoFillBackground( true );
     new QHBoxLayout( this );
@@ -38,7 +40,7 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
     
     struct BorderedContainer : public QWidget
     {
-        BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ){ setAutoFillBackground( true ); }
+        BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ){ setLayout( new QVBoxLayout ); layout()->setContentsMargins( 15, 15, 15, 15 ); setAutoFillBackground( true ); }
         
         void paintEvent( QPaintEvent* e )
         {
@@ -62,36 +64,29 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
             p.setBrush( QPalette::Window, g );
             setPalette( p );
             
-            QSize size = e->size() - QSize( 30, 30 );
-            widget->resize( size );
         }
         
         void moveEvent( QMoveEvent* e )
         {
             Q_UNUSED( e )
-            widget->move( 15, 15 );
         }
         
-        QWidget* widget;
     };
     
-    ((QBoxLayout*)layout())->addStretch( 0 );
     layout()->addWidget( ui.controls = new RadioControls );
     ui.controls->setAutoFillBackground( false );
+    ui.controls->layout()->setSizeConstraint( QLayout::SetFixedSize );
     
     QWidget* bucketLayoutWidget = new QWidget( this );
     BorderedContainer* bc = new BorderedContainer( this );
-    bc->widget = ui.bucket = new PlayerBucketList( bc );
-    ((QBoxLayout*)layout())->addStretch( 2 );
+    bc->layout()->addWidget( ui.bucket = new PlayerBucketList( bc ));
     layout()->addWidget( bc );
     
     
-    bc->setFixedSize( 200, 100 );
-    ((QBoxLayout*)layout())->addStretch( 3 );  
+    bc->setFixedHeight( 100 );
   
     
     layout()->addWidget( bucketLayoutWidget );
-    ((QBoxLayout*)layout())->insertStretch( -1, 1);
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
@@ -106,7 +101,7 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
 
 
 void 
-PlayerBucketWidget::addAndLoadItem( const QString& itemText, const Seed::Type type )
+Amp::addAndLoadItem( const QString& itemText, const Seed::Type type )
 {
     PlayableListItem* item = new PlayableListItem;
     item->setText( itemText );
@@ -121,7 +116,7 @@ PlayerBucketWidget::addAndLoadItem( const QString& itemText, const Seed::Type ty
 
 
 void 
-PlayerBucketWidget::resizeEvent( QResizeEvent* event )
+Amp::resizeEvent( QResizeEvent* event )
 {
     QPalette p = palette();
     QLinearGradient lg( 0, 0, 0, event->size().height() );

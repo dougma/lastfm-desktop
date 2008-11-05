@@ -24,8 +24,8 @@
 #include "lib/lastfm/ws/WsReply.h"
 #include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
-#include "radio/buckets/PlayerBucketWidget.h"
-#include "radio/buckets/PrimaryBucket.h"
+#include "radio/buckets/Amp.h"
+#include "radio/buckets/Sources.h"
 #include "PlayableMimeData.h"
 #include <QDesktopServices>
 #include <QHeaderView>
@@ -170,7 +170,6 @@ TagListWidget::onDoubleClicked ( const QModelIndex& index )
     DelegateDragHint* dragHint = new DelegateDragHint( itemDelegate(), index, options, this );
     dragHint->setMimeData( data );
     
-    //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
     dragHint->dragTo( The::mainWindow().ui.amp );
 }
 

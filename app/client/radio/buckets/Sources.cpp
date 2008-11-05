@@ -27,8 +27,8 @@
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
-#include "PrimaryBucket.h"
-#include "PlayerBucketWidget.h"
+#include "Sources.h"
+#include "Amp.h"
 #include "the/mainWindow.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
@@ -76,7 +76,8 @@ struct SpecialWidget : QWidget
 };
 
 
-PrimaryBucket::PrimaryBucket()
+Sources::Sources()
+        :m_connectedAmp( 0 )
 {
     m_accessManager = new WsAccessManager( this );
     
@@ -164,16 +165,21 @@ PrimaryBucket::PrimaryBucket()
 
 
 void
-PrimaryBucket::onFreeInputReturn()
+Sources::onFreeInputReturn()
 {
+    if( !m_connectedAmp )
+        return;
+    
     Seed::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<Seed::Type>();
-    The::mainWindow().ui.amp->addAndLoadItem( ui.freeInput->text(), type );
+
+    m_connectedAmp->addAndLoadItem( ui.freeInput->text(), type );
+    
     ui.freeInput->clear();
 }
 
 
 void 
-PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
+Sources::onUserGetFriendsReturn( WsReply* r )
 {
     QList< User > users = User::list( r );
     
@@ -191,7 +197,7 @@ PrimaryBucket::onUserGetFriendsReturn( WsReply* r )
 
 
 void 
-PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
+Sources::onUserGetTopTagsReturn( WsReply* r )
 {
     WeightedStringList tags = Tag::list( r );
     
@@ -206,10 +212,8 @@ PrimaryBucket::onUserGetTopTagsReturn( WsReply* r )
             
             
 void 
-PrimaryBucket::onUserGetPlaylistsReturn( WsReply* r )
+Sources::onUserGetPlaylistsReturn( WsReply* r )
 {
-    return;
-
     QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
     foreach( CoreDomElement playlist, playlists )
     {
@@ -232,8 +236,11 @@ PrimaryBucket::onUserGetPlaylistsReturn( WsReply* r )
 
 
 void 
-PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
+Sources::onItemDoubleClicked( const QModelIndex& index )
 {
+    if( !m_connectedAmp )
+        return;
+    
     PrimaryListView* itemView = dynamic_cast< PrimaryListView*>( sender() );
     Q_ASSERT( itemView );
 
@@ -251,13 +258,13 @@ PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
     
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
     w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
-    w->dragTo( The::mainWindow().ui.amp );
+    w->dragTo( m_connectedAmp );
     connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
 }
 
 
 void 
-PrimaryBucket::onDnDAnimationFinished()
+Sources::onDnDAnimationFinished()
 {
     DelegateDragHint* delegateWidget = static_cast<DelegateDragHint*>(sender());
     QModelIndex index = delegateWidget->index();
@@ -265,7 +272,7 @@ PrimaryBucket::onDnDAnimationFinished()
 
 
 void 
-PrimaryBucket::onPlayerBucketItemRemoved( QString text, Seed::Type type )
+Sources::onAmpSeedRemoved( QString text, Seed::Type type )
 {
     switch ( type ) {
         case Seed::UserType :
@@ -281,7 +288,26 @@ PrimaryBucket::onPlayerBucketItemRemoved( QString text, Seed::Type type )
                 item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
             }
             break;
+            
+        case Seed::PreDefinedType:
+            foreach( QListWidgetItem* item, ui.stationsBucket->findItems( text, Qt::MatchFixedString ))
+            {
+                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+            }
+            break;            
         default:
             break;
     }
+}
+
+
+void 
+Sources::connectToAmp( Amp* amp )
+{
+    if( m_connectedAmp )
+        m_connectedAmp->disconnect( this );
+    
+    m_connectedAmp = amp;
+    connect( m_connectedAmp, SIGNAL(itemRemoved(QString, Seed::Type)), SLOT( onAmpSeedRemoved(QString, Seed::Type)));
+    connect( m_connectedAmp, SIGNAL(destroyed()), SLOT( onAmpDestroyed()));
 }

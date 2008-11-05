@@ -22,8 +22,8 @@
 #include <QtGui>
 #include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
-#include "radio/buckets/PrimaryBucket.h"
-#include "radio/buckets/PlayerBucketWidget.h"
+#include "radio/buckets/Sources.h"
+#include "radio/buckets/Amp.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
@@ -175,7 +175,6 @@ FirehoseView::mouseDoubleClickEvent( QMouseEvent* e )
     DelegateDragHint* dragHint = new DelegateDragHint( delegate, i, options, this );
     dragHint->setMimeData( data );
     
-    //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
     dragHint->dragTo( The::mainWindow().ui.amp );
 }
 

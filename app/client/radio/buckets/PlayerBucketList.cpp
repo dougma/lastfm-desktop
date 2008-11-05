@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerBucketList.h"
-#include "PrimaryBucket.h"
+#include "Sources.h"
 #include "SeedDelegate.h"
 #include "PlayableListItem.h"
 #include "PlayableMimeData.h"
