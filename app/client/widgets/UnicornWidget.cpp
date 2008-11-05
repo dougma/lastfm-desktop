@@ -40,6 +40,7 @@ UnicornWidget::paintItBlack( QWidget* w )
         p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
         p.setBrush( QPalette::Text, Qt::white );
         p.setBrush( QPalette::Disabled, QPalette::Text, Qt::darkGray );
+        p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
     }
 
     w->setPalette( p );
