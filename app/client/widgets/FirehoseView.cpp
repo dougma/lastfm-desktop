@@ -176,7 +176,7 @@ FirehoseView::mouseDoubleClickEvent( QMouseEvent* e )
     dragHint->setMimeData( data );
     
     //FIXME: This is soo incredibly unencapsulated! (applies to SimilarArtists, TagListWidget and FirehoseView )
-    dragHint->dragTo( The::mainWindow().ui.primaryBucket->ui.playerBucketWidget );
+    dragHint->dragTo( The::mainWindow().ui.amp );
 }
 
 

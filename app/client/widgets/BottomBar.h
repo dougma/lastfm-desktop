@@ -33,6 +33,7 @@ public:
 
     struct {
         BottomBarButton* radio;
+        BottomBarButton* sources;
         BottomBarButton* friends;
         BottomBarButton* library;
         ScrobbleButton* scrobble;

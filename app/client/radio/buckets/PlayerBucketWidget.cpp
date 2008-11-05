@@ -19,8 +19,10 @@
 
 #include "PlayerBucketWidget.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include "PlayerBucketList.h"
 #include "widgets/RadioControls.h"
+#include "widgets/UnicornWidget.h"
 #include "the/radio.h"
 #include "PlayableListItem.h"
 
@@ -29,16 +31,16 @@
 PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
                    :QWidget( p )
 {
-    new QVBoxLayout( this );
+    setAutoFillBackground( true );
+    new QHBoxLayout( this );
     
     layout()->setContentsMargins( 0, 0, 0, 0 );
-    layout()->setSpacing( 0 );
     
     struct BorderedContainer : public QWidget
     {
         BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ){ setAutoFillBackground( true ); }
         
-        void setWidget( QWidget* w ){ m_widget = w;}
+        void setWidget( QWidget* w ){ m_widget = w; w->show();}
         void paintEvent( QPaintEvent* e )
         {
             QPainter p( this );
@@ -75,28 +77,32 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
         QWidget* m_widget;
     };
     
+    ((QBoxLayout*)layout())->addStretch( 0 );
+    layout()->addWidget( ui.controls = new RadioControls );
+    ui.controls->setAutoFillBackground( false );
+    
+    QWidget* bucketLayoutWidget = new QWidget( this );
 
     BorderedContainer* bc;
-    layout()->addWidget( bc = new BorderedContainer( this ));
+    ((QBoxLayout*)layout())->addStretch( 2 );
+    layout()->addWidget( bc = new BorderedContainer( this ) );
+    bc->setWidget( ui.bucket = new PlayerBucketList( bucketLayoutWidget ) );
+    bc->setFixedSize( 200, 100 );
+    ((QBoxLayout*)layout())->addStretch( 3 );  
+  
     
-    
-    bc->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-    bc->setFixedSize( 310, 240 );
-    
-    bc->setWidget( ui.bucket = new PlayerBucketList( this ));
+//    layout()->addWidget( bucketLayoutWidget );
+    ((QBoxLayout*)layout())->insertStretch( -1, 1);
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
-    layout()->addWidget( ui.controls = new RadioControls );
-    ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Maximum) );
     
     connect( ui.controls, SIGNAL( skip()), &The::radio(), SLOT( skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
     
-    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-    setFixedSize( sizeHint());
-    
+    UnicornWidget::paintItBlack( this );
+    UnicornWidget::paintItBlack( bucketLayoutWidget);
 }
 
 
@@ -112,4 +118,16 @@ PlayerBucketWidget::addAndLoadItem( const QString& itemText, const Seed::Type ty
     item->fetchImage();
     ui.bucket->addItem( item );
     
+}
+
+
+void 
+PlayerBucketWidget::resizeEvent( QResizeEvent* event )
+{
+    QPalette p = palette();
+    QLinearGradient lg( 0, 0, 0, event->size().height() );
+    lg.setColorAt( 0, 0x5c5e60 );
+    lg.setColorAt( 1, 0x353536 );
+    p.setBrush( QPalette::Window, lg );
+    setPalette( p );
 }

@@ -42,6 +42,8 @@ protected:
         class PlayerBucketList* bucket;
         class RadioControls* controls;
     } ui;
+    
+    void resizeEvent( QResizeEvent* );
 };
 
 #endif //PLAYER_BUCKET_WIDGET_H

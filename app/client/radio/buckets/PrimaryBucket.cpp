@@ -29,6 +29,7 @@
 #include <QStringListModel>
 #include "PrimaryBucket.h"
 #include "PlayerBucketWidget.h"
+#include "the/mainWindow.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
 #include "widgets/RadioControls.h"
@@ -126,8 +127,6 @@ PrimaryBucket::PrimaryBucket()
     connect( authUser.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
     connect( authUser.getPlaylists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetPlaylistsReturn( WsReply* )) );
 	
-	QSplitter* splitter = new SpecialSplitter( Qt::Horizontal );
-
 	ui.tabWidget = new Unicorn::TabWidget;
 
     ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
@@ -156,12 +155,7 @@ PrimaryBucket::PrimaryBucket()
     
     primaryPane->layout()->addWidget( freeInputWidget );
 
-	splitter->addWidget( primaryPane );
-	
-    splitter->addWidget( ui.playerBucketWidget = new PlayerBucketWidget( splitter ) );    
-    connect( ui.playerBucketWidget, SIGNAL( itemRemoved( QString, Seed::Type )), SLOT( onPlayerBucketItemRemoved( QString, Seed::Type )));
-	
-    setCentralWidget( splitter );
+    setCentralWidget( primaryPane );
     setFixedHeight( sizeHint().height());
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed);
     
@@ -173,7 +167,7 @@ void
 PrimaryBucket::onFreeInputReturn()
 {
     Seed::Type type = ui.inputSelector->itemData(ui.inputSelector->currentIndex()).value<Seed::Type>();
-    ui.playerBucketWidget->addAndLoadItem( ui.freeInput->text(), type );
+    The::mainWindow().ui.amp->addAndLoadItem( ui.freeInput->text(), type );
     ui.freeInput->clear();
 }
 
@@ -255,7 +249,7 @@ PrimaryBucket::onItemDoubleClicked( const QModelIndex& index )
     
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
     w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
-    w->dragTo( ui.playerBucketWidget );
+    w->dragTo( The::mainWindow().ui.amp );
     connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
 }
 

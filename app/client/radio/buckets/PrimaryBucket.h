@@ -22,7 +22,6 @@
 
 #include <QMainWindow>
 #include "SeedTypes.h"
-#include "PlayerBucketWidget.h"
 
 namespace Unicorn{ class TabWidget; }
 
@@ -38,7 +37,6 @@ public:
         class PrimaryListView* stationsBucket;
 		class PrimaryListView* friendsBucket;
 		class PrimaryListView* tagsBucket;
-		class PlayerBucketWidget* playerBucketWidget;
         class RadioControls* controls;
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;

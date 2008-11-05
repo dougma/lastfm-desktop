@@ -82,12 +82,14 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 
     setAttribute( Qt::WA_MacShowFocusRect, false );
 
-    viewport()->setAutoFillBackground( false );
     setFrameShape( QFrame::NoFrame );
 	setItemDelegate( new SeedDelegate( this ));
 	setAcceptDrops( true );
     setDragDropMode( QAbstractItemView::DragDrop );
     setDropIndicatorShown( false );
+    
+//    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+//    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );

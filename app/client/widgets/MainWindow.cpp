@@ -22,6 +22,7 @@
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
+#include "radio/buckets/PlayerBucketWidget.h"
 #include "radio/buckets/PrimaryBucket.h"
 #include "Settings.h"
 #include "the/app.h"
@@ -173,7 +174,7 @@ MainWindow::setupUi()
     QDockWidget* dw;
     dw = new QDockWidget;
     dw->setWindowTitle( tr("Radio") );
-    dw->setWidget( ui.primaryBucket = new PrimaryBucket );
+    dw->setWidget( ui.amp = new PlayerBucketWidget );
     addDockWidget( Qt::BottomDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.radio->setWidget( dw );
     ui.bottombar->ui.radio->setToolTip( dw->windowTitle() );
@@ -194,6 +195,16 @@ MainWindow::setupUi()
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     ui.bottombar->ui.library->setWidget( dw );
     ui.bottombar->ui.library->setToolTip( dw->windowTitle() );
+    dw->hide();
+    connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
+    
+    dw = new QDockWidget;
+    dw->setWindowTitle( "Sources" );
+    dw->setWidget( ui.sources = new PrimaryBucket );
+    dw->setFloating( true );
+    addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
+    ui.bottombar->ui.sources->setWidget( dw );
+    ui.bottombar->ui.sources->setToolTip( dw->windowTitle() );
     dw->hide();
     connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
     

@@ -20,6 +20,7 @@
 #include "RadioControls.h"
 #include "widgets/ImageButton.h"
 #include <QApplication>
+#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <phonon/volumeslider.h>
 #include "UnicornWidget.h"
@@ -33,7 +34,10 @@
 RadioControls::RadioControls()
               : m_volumeSlider( 0 )
 {
-    QHBoxLayout* h = new QHBoxLayout( this );
+    QVBoxLayout* v = new QVBoxLayout( this );
+    
+    QWidget* hLayoutWidget = new QWidget( this );
+    QHBoxLayout* h = new QHBoxLayout( hLayoutWidget );
     
     h->addWidget( ui.play = new ImageButton( ":/RadioControls/play/rest.png" ) );
     ui.play->setPixmap( ":/RadioControls/play/onpress.png", QIcon::Active );
@@ -51,6 +55,8 @@ RadioControls::RadioControls()
     ui.play->setCheckable( true );
     ui.play->setChecked( false );
     
+    v->addWidget( hLayoutWidget );
+    
     ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
     ui.volume->setMuteVisible( true );
@@ -67,7 +73,9 @@ RadioControls::RadioControls()
         connect( m_volumeSlider, SIGNAL(valueChanged(int)), SLOT(onVolumeValueChanged(int)));
     }
 	
-    h->addWidget( ui.volume );
+    v->addWidget( ui.volume );
+    v->insertStretch( 0, 1 );
+    v->insertStretch( -1, 1 );
 	
 	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
     connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));

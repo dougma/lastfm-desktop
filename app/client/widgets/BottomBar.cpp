@@ -32,6 +32,7 @@ BottomBar::BottomBar()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
     h->addWidget( ui.radio = new BottomBarButton );
+    h->addWidget( ui.sources = new BottomBarButton );
     h->addWidget( ui.friends = new BottomBarButton );
     h->addWidget( ui.library = new BottomBarButton );
     h->addSpacing( 12 );
@@ -49,6 +50,14 @@ BottomBar::BottomBar()
 	ui.radio->setPixmap( ":/BottomBar/icon/radio/on.png", QIcon::On );
 	ui.radio->moveIcon( 1, 0 );
 	ui.radio->moveIcon( 1, 1, QIcon::Active );
+    
+	ui.sources->setCheckable( true );
+	ui.sources->setBackgroundPixmap( ":/BottomBar/button/middle/up.png" );
+	ui.sources->setBackgroundPixmap( ":/BottomBar/button/middle/down.png", QIcon::Active );
+	ui.sources->setPixmap( ":/BottomBar/icon/radio/off.png" );
+	ui.sources->setPixmap( ":/BottomBar/icon/radio/on.png", QIcon::On );
+	ui.sources->moveIcon( 1, 0 );
+	ui.sources->moveIcon( 1, 1, QIcon::Active );
 	
 	ui.friends->setCheckable( true );
 	ui.friends->setBackgroundPixmap( ":/BottomBar/button/middle/up.png" );
