@@ -23,13 +23,12 @@
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
-#include "lib/lastfm/DllExportMacro.h"
 #include <QObject>
 #include <QSqlDatabase>
 
 
 /** @author: <chris@last.fm> */
-class LASTFM_FINGERPRINT_DLLEXPORT Collection
+class Collection
 {
 public:
     static Collection& instance();
