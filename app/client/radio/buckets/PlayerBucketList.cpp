@@ -61,8 +61,6 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 
     ui.queryEditButton = new ImageButton( ":buckets/show_query.png", this );
 
-    //Not sure why this is needed but otherwise the button isn't sized properly :-s
-    ui.queryEditButton->resize( ui.queryEditButton->size());
     connect( ui.queryEditButton, SIGNAL( clicked()), SLOT( showQuery()));
 
     ui.queryEdit = new QLineEdit( this );
@@ -77,6 +75,7 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
     QPalette viewPortPalette = viewport()->palette();
     viewPortPalette.setBrush( QPalette::Text, QBrush( 0x777777));
     viewport()->setPalette( viewPortPalette );
+    viewport()->setAutoFillBackground( false );
 
     connect( ui.queryEdit, SIGNAL( returnPressed()), SLOT( onQueryEditReturn()));
 
@@ -88,8 +87,8 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
     setDragDropMode( QAbstractItemView::DragDrop );
     setDropIndicatorShown( false );
     
-//    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-//    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
 	setSelectionMode( QAbstractItemView::ExtendedSelection );
 	setContextMenuPolicy( Qt::CustomContextMenu );
@@ -101,6 +100,7 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 void
 PlayerBucketList::paintEvent( QPaintEvent* event )
 {
+    Q_UNUSED( event );
     QPainter p( viewport() );
    
     QAbstractItemModel* itemModel = model();
@@ -108,7 +108,7 @@ PlayerBucketList::paintEvent( QPaintEvent* event )
 	{
         QFont f = p.font();
         f.setBold( true );
-        f.setPointSize( 16 ); // indeed pixels are fine on mac and windows, not linux though
+        f.setPointSize( 16 );
         p.setFont( f );
 
 		p.drawText( viewport()->rect(), 

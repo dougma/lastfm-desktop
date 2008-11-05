@@ -40,11 +40,9 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
     {
         BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ){ setAutoFillBackground( true ); }
         
-        void setWidget( QWidget* w ){ m_widget = w; w->show();}
         void paintEvent( QPaintEvent* e )
         {
             QPainter p( this );
-            
             p.setClipRect( e->rect());
             p.setRenderHint( QPainter::Antialiasing, true );
             QPen pen( QBrush(0x4e4e4e), 3, Qt::DashLine, Qt::RoundCap );
@@ -65,16 +63,16 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
             setPalette( p );
             
             QSize size = e->size() - QSize( 30, 30 );
-            m_widget->resize( size );
+            widget->resize( size );
         }
         
         void moveEvent( QMoveEvent* e )
         {
-            QPoint widgetPos = e->pos() + QPoint( 15, 15 );
-            m_widget->move( widgetPos );
+            Q_UNUSED( e )
+            widget->move( 15, 15 );
         }
         
-        QWidget* m_widget;
+        QWidget* widget;
     };
     
     ((QBoxLayout*)layout())->addStretch( 0 );
@@ -82,16 +80,17 @@ PlayerBucketWidget::PlayerBucketWidget( QWidget* p )
     ui.controls->setAutoFillBackground( false );
     
     QWidget* bucketLayoutWidget = new QWidget( this );
-
-    BorderedContainer* bc;
+    BorderedContainer* bc = new BorderedContainer( this );
+    bc->widget = ui.bucket = new PlayerBucketList( bc );
     ((QBoxLayout*)layout())->addStretch( 2 );
-    layout()->addWidget( bc = new BorderedContainer( this ) );
-    bc->setWidget( ui.bucket = new PlayerBucketList( bucketLayoutWidget ) );
+    layout()->addWidget( bc );
+    
+    
     bc->setFixedSize( 200, 100 );
     ((QBoxLayout*)layout())->addStretch( 3 );  
   
     
-//    layout()->addWidget( bucketLayoutWidget );
+    layout()->addWidget( bucketLayoutWidget );
     ((QBoxLayout*)layout())->insertStretch( -1, 1);
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
@@ -127,7 +126,7 @@ PlayerBucketWidget::resizeEvent( QResizeEvent* event )
     QPalette p = palette();
     QLinearGradient lg( 0, 0, 0, event->size().height() );
     lg.setColorAt( 0, 0x5c5e60 );
-    lg.setColorAt( 1, 0x353536 );
+    lg.setColorAt( 1, 0x2d2d2d );
     p.setBrush( QPalette::Window, lg );
     setPalette( p );
 }
