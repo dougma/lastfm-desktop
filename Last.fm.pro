@@ -58,6 +58,5 @@ else {
 		PRECOMPILED_HEADER = common/precompiled.h
 	}
 	
-	win32:SUBDIRS -= lib/lastfm/fingerprint/libfingerprint.pro
 	linux*:SUBDIRS -= app/twiddly
 }

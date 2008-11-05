@@ -35,11 +35,8 @@ CONFIG( qtestlib ) {
 }
 
 CONFIG( taglib ) {
-    win32: LIBS += -L$$COMMON_LIBS_DIR/taglib/taglib -ltag
-    else {
-        CONFIG += link_pkgconfig
-        PKGCONFIG += taglib
-    }
+    CONFIG += link_pkgconfig
+    PKGCONFIG += taglib
 }
 
 CONFIG( mad ) {

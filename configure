@@ -88,7 +88,7 @@ header 'Generating Build System'
 
 if [ $RELEASE ]
 then
-    qmake -config release -recursive "CONFIG -= debug_and_release" Last.fm.pro
+    qmake -config release -recursive "CONFIG -= debug debug_and_release" Last.fm.pro
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 
     case `uname` in
@@ -135,6 +135,7 @@ else
             BUILD_CMD='make'
             middle "Configured to produce a debug build.";;
         *)      
+            svn co svn+ssh://gimli.last.fm/svn/clientside/bin/win _bin
             gen_vs_sln || die "Configure failed."
             BUILD_CMD='cygstart Last.sln';;
     esac

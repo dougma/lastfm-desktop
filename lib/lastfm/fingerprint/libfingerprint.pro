@@ -19,14 +19,12 @@ mac*:release {
     INCLUDEPATH += /opt/local/include
 }
 else:win32 {
-    # Really not sure about the sanity of this...
-    LIBPATH += $$BUILD_DIR/../fplib $$ROOT_DIR/res/libsamplerate $$ROOT_DIR/res/mad
-    LIBS += -lfplib$$EXT -llibfftw3f-3 -lmad
-    LIBS += -llibsamplerate
+    INCLUDEPATH += $$ROOT_DIR/lib/3rdparty
 
-    DEFINES += __NO_THREAD_CHECK FINGERPRINT_DLLEXPORT_PRO
+    LIBS += -llibsamplerate -llibfftw3f-3 -lmad
 
-    # Remove warnings in debug build
+    DEFINES += __NO_THREAD_CHECK _FINGERPRINT_DLLEXPORT
+
     QMAKE_LFLAGS_DEBUG += /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmt.lib
 } else {
     CONFIG += link_pkgconfig
