@@ -124,13 +124,9 @@ Artist::addTags( const QStringList& tags ) const
 {
     if (tags.isEmpty())
         return 0;
-    
-    QString comma_separated_tags;
-    foreach( QString const tag, tags)
-        comma_separated_tags += tag;
-    
+
     return WsRequestBuilder( "artist.addTags" )
             .add( "artist", m_name )
-            .add( "tags", comma_separated_tags )
+            .add( "tags", tags.join( QChar(',') ) )
             .post();
 }
