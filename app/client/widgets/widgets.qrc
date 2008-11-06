@@ -1,12 +1,6 @@
 <RCC>
   <qresource>
-    <file>MainWindow/button/love/checked.png</file>
-    <file>MainWindow/button/ban/disabled.png</file>
     <file>MainWindow/button/cog/up.png</file>
-    <file>MainWindow/button/cog/disabled.png</file>
-    <file>MainWindow/button/love/disabled.png</file>
-    <file>MainWindow/button/share/disabled.png</file>
-    <file>MainWindow/button/tag/disabled.png</file>
     <file>MainWindow/button/ban/up.png</file>
     <file>MainWindow/button/love/up.png</file>
     <file>MainWindow/button/share/up.png</file>
@@ -55,14 +49,11 @@
   </qresource>
   <qresource>
       <file>RadioControls/stop/rest.png</file>
-      <file>RadioControls/stop/onpress.png</file>
   </qresource>
   <qresource>
       <file>RadioControls/play/rest.png</file>
-      <file>RadioControls/play/onpress.png</file>
   </qresource>
   <qresource>
       <file>RadioControls/skip/rest.png</file>
-      <file>RadioControls/skip/onpress.png</file>
   </qresource>
 </RCC>

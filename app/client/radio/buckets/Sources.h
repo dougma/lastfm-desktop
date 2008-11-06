@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef PRIMARY_BUCKET_H
-#define PRIMARY_BUCKET_H
+#ifndef SOURCES_H
+#define SOURCES_H
 
 #include <QMainWindow>
 #include "SeedTypes.h"
@@ -103,4 +103,4 @@ protected:
 	
 };
 
-#endif
+#endif //SOURCES_H

@@ -91,11 +91,12 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
         
         Artist a = results.first();
         
-        if(a != text())
+        if(((QString)a).toLower() != text().toLower())
         {
             //TODO: handle exact artist not found case
             //      I'm going to work on the updated player bucket 
             //      before I dive into this.
+            return;
         }
         
         if( a.imageUrl().isValid() )
@@ -121,7 +122,7 @@ PlayableListItem::setPixmap( const QPixmap& pm )
     if( diff.height() > 0 || diff.width() > 0 )
     {
         const QPixmap scaled = pm.scaled( 64, 64, Qt::KeepAspectRatioByExpanding );
-        const QPixmap cropped = scaled.copy( ((pm.width() - 64) / 2), ((pm.height() - 64) / 2), 64, 64);
+        const QPixmap cropped = scaled.copy( ((scaled.width() - 64) / 2), ((scaled.height() - 64) / 2), 64, 64);
         iconPm = cropped;
     }
     

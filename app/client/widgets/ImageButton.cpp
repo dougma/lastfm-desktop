@@ -44,9 +44,7 @@ ImageButton::ImageButton( const QString& path, QWidget* parent )
     QPixmap disabled( path.left( path.length() - 6 ) + "disabled.png" );
     if (!disabled.isNull())
     {
-        QIcon i = icon();
-        i.addPixmap( disabled, QIcon::Disabled );
-        setIcon( i );
+        setPixmap( disabled, QIcon::Disabled );
     }
 }
 
@@ -96,9 +94,8 @@ ImageButton::sizeHint() const
 
 
 void
-ImageButton::setPixmap( const QString& path, const QIcon::State st )
+ImageButton::setPixmap( const QPixmap& p, const QIcon::State st )
 {
-    QPixmap p( path );
     
     resize( p.size().expandedTo( size()) );
     
@@ -111,9 +108,8 @@ ImageButton::setPixmap( const QString& path, const QIcon::State st )
 
 
 void 
-ImageButton::setPixmap( const QString& path, const QIcon::Mode m )
+ImageButton::setPixmap( const QPixmap& p, const QIcon::Mode m )
 {
-    QPixmap p( path );
     
     resize( p.size().expandedTo( size()) );
     
@@ -126,9 +122,8 @@ ImageButton::setPixmap( const QString& path, const QIcon::Mode m )
 
 
 void 
-ImageButton::setPixmap( const QString& path, const QIcon::State s, const QIcon::Mode m )
+ImageButton::setPixmap( const QPixmap& p, const QIcon::State s, const QIcon::Mode m )
 {
-    QPixmap p( path );
     
     resize( p.size().expandedTo( size()) );
     

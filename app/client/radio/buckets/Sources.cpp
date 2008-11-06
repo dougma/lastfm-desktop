@@ -191,7 +191,7 @@ Sources::onUserGetFriendsReturn( WsReply* r )
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
         n->setSizeHint( QSize( 75, 25));
-        n->setPlayableType( Seed::UserType );
+        n->setPlayableType( Seed::UserType );	
     }
 }
 

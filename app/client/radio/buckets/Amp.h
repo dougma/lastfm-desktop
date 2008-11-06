@@ -17,12 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef PLAYER_BUCKET_WIDGET_H
-#define PLAYER_BUCKET_WIDGET_H
+#ifndef AMP_H
+#define AMP_H
 
 #include <QWidget>
 #include "SeedTypes.h"
 #include "lib/lastfm/types/Track.h"
+#include "widgets/UnicornWidget.h"
+#include "widgets/PlaylistDialog.h"
 
 class Amp : public QWidget
 {
@@ -42,11 +44,13 @@ public:
         class ImageButton* cog;
     } scrobbleRatingUi;
     
+public slots:
+    void toggleCogMenu( bool );
+    void showPlaylistDialog();
+    
 signals:
     void itemRemoved( QString, Seed::Type );
-    
-    protected slots:
-    
+
 protected:
     
     struct {
@@ -55,11 +59,20 @@ protected:
     } ui;
     
     void resizeEvent( QResizeEvent* );
-    
     void setupUi();
+    class QMenu* m_cogMenu;
+    Track m_track;
   
 protected slots:
     void onTrackSpooled( Track );
+    void onContextMenuRequested( const QPoint& );
+
+    void onPraiseClientTeam();
+    void onCurseClientTeam();
+
+private:
+    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
+    
 };
 
-#endif //PLAYER_BUCKET_WIDGET_H
+#endif //AMP_H

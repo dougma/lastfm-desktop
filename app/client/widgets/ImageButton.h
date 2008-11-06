@@ -39,9 +39,14 @@ public:
 	virtual void paintEvent ( QPaintEvent* event );
 	
 	virtual QSize sizeHint() const;
-	void setPixmap( const QString&, const QIcon::State = QIcon::Off );
-    void setPixmap( const QString&, const QIcon::Mode m );
-    void setPixmap( const QString&, const QIcon::State, const QIcon::Mode );
+    
+    void setPixmap( const QPixmap&, const QIcon::State = QIcon::Off );
+    void setPixmap( const QPixmap&, const QIcon::Mode m );
+    void setPixmap( const QPixmap&, const QIcon::State, const QIcon::Mode );
+    
+	inline void setPixmap( const QString& s, const QIcon::State st = QIcon::Off ){ setPixmap( QPixmap( s ), st );  }
+    inline void setPixmap( const QString& s, const QIcon::Mode m ){ setPixmap( QPixmap( s ), m ); }
+    inline void setPixmap( const QString& s, const QIcon::State st, const QIcon::Mode m ){ setPixmap( QPixmap( s ), st, m ); }
 
 	void setBackgroundPixmap( const QString&, const QIcon::Mode = QIcon::Normal );
 	void moveIcon( int x, int y, QIcon::Mode = QIcon::Normal );

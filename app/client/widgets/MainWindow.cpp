@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "MainWindow/CogButtonPopup.h"
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
@@ -72,7 +71,6 @@ MainWindow::MainWindow()
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
-    connect( ui.amp->scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(showCogMenu()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
@@ -258,17 +256,6 @@ MainWindow::setupInfoWidget()
 
 
 void
-MainWindow::showCogMenu()
-{
-    int const w = ui.info->sizeHint().width();
-    CogButtonPopup* cog = new CogButtonPopup( w, ui.info );
-    cog->show();
-    
-    connect( cog, SIGNAL(addToPlaylistClicked()), SLOT(showPlaylistDialog()) );
-}
-
-
-void
 MainWindow::showSettingsDialog()
 {
     UNICORN_UNIQUE_DIALOG( SettingsDialog )
@@ -286,13 +273,6 @@ void
 MainWindow::showAboutDialog()
 {
     AboutDialog( this ).exec();
-}
-
-
-void
-MainWindow::showPlaylistDialog()
-{
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track )
 }
 
 

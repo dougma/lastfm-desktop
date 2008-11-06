@@ -17,6 +17,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef PLAYLIST_DIALOG_H
+#define PLAYLIST_DIALOG_H
+
 #include "lib/lastfm/types/Track.h"
 #include <QDialog>
 
@@ -53,3 +56,5 @@ private slots:
 	void onGotUserPlaylists( WsReply* );
     void onPlaylistCreated( WsReply* );
 };
+
+#endif //PLAYLIST_DIALOG_H

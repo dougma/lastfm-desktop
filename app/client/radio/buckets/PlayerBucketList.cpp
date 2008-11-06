@@ -108,7 +108,7 @@ PlayerBucketList::paintEvent( QPaintEvent* event )
 	{
         QFont f = p.font();
         f.setBold( true );
-        f.setPointSize( 16 );
+        f.setPointSize( 12 );
         p.setFont( f );
 
 		p.drawText( viewport()->rect(), 

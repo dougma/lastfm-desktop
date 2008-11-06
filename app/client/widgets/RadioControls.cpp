@@ -35,9 +35,12 @@ RadioControls::RadioControls()
               : m_volumeSlider( 0 )
 {
     QVBoxLayout* v = new QVBoxLayout( this );
-    
+    v->setContentsMargins( 0, 0, 0, 0 );
+    v->setSpacing( 0 );
     QWidget* hLayoutWidget = new QWidget( this );
     QHBoxLayout* h = new QHBoxLayout( hLayoutWidget );
+    h->setContentsMargins( 0, 0, 0, 0 );
+    h->setSpacing( 0 );
     
     h->addWidget( ui.play = new ImageButton( ":/RadioControls/play/rest.png" ) );
     ui.play->setPixmap( ":/RadioControls/play/onpress.png", QIcon::Active );
@@ -48,14 +51,17 @@ RadioControls::RadioControls()
     ui.play->setChecked( false );
     
     h->addWidget( ui.skip = new ImageButton( ":/RadioControls/skip/rest.png" ) );
-    ui.skip->setPixmap( ":/RadioControls/skip/onpress.png", QIcon::Active );
-    
-    h->setSpacing( 1 );
 
+    ui.skip->setPixmap( ":/RadioControls/skip/onpress.png", QIcon::Active );
     ui.play->setCheckable( true );
     ui.play->setChecked( false );
+
+    h->insertStretch( 0, 1 );
+    h->insertStretch( -1, 1 );
     
     v->addWidget( hLayoutWidget );
+    v->insertStretch( 0, 1 );
+    v->insertStretch( -1, 1 );
     
     ui.volume = new Phonon::VolumeSlider;
 	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
@@ -74,8 +80,6 @@ RadioControls::RadioControls()
     }
 	
     v->addWidget( ui.volume );
-    v->insertStretch( 0, 1 );
-    v->insertStretch( -1, 1 );
 	
 	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
     connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
