@@ -23,28 +23,28 @@
 #include "lib/lastfm/radio/Radio.h"
 #include "app/clientplugins/ITrackResolver.h"
 #include <QList>
+#include <QMap>
 
+// makes Track work as a key in an associative container
+class MappableTrack : public Track
+{
+public:
+    MappableTrack(const Track& t)
+        :Track(t)
+    {
+    }
+
+    bool operator<(const MappableTrack& that) const
+    {
+        return this->d.data() < that.d.data();
+    }
+};
 
 
 // Resolver class is used for starting the track resolution requests
 class LASTFM_RADIO_DLLEXPORT Resolver : public QObject
 {
     Q_OBJECT;
-
-    // makes Track work as a key in an associative container
-    class MappableTrack : public Track
-    {
-    public:
-        MappableTrack(const Track& t)
-            :Track(t)
-        {
-        }
-
-        bool operator<(const MappableTrack& that) const
-        {
-            return (this->d < that.d);
-        }
-    };
 
     QList<ITrackResolverPlugin*> m_plugins;
     QMap<MappableTrack, float> m_active;    // maps tracks, to best quality match so far
@@ -54,7 +54,13 @@ public:
     ~Resolver();
 
     void resolve(const Track &);
-    void stopResolving(const Track &);
+
+    /* prevents further signals for track t,
+    returns true if resolving was complete for track t */
+    bool stopResolving(const Track &);
+
+    /* returns true if still resolving track t */
+    bool stillResolving(const Track &);
 
 signals:
     void resolveComplete(const Track);

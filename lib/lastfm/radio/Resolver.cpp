@@ -61,7 +61,7 @@ Resolver::resolve(const Track& track)
             foreach(ITrackResolverPlugin *p, m_plugins) {
                 p->resolve(rr);
             }
-            m_active[MappableTrack(track)] = -1.0;
+            m_active.insert(MappableTrack(track), -1.0);
         }
     }
 }
@@ -90,14 +90,21 @@ void
 Resolver::onResolveComplete(const Track t)
 {
     if (m_active.contains(MappableTrack(t))) {
+        m_active.remove(MappableTrack(t));
         emit resolveComplete(t);
     }
 }
 
-void
+bool
 Resolver::stopResolving(const Track& t) 
 {
-    m_active.remove(MappableTrack(t));
+    return 0 == m_active.remove(MappableTrack(t));
+}
+
+bool
+Resolver::stillResolving(const Track& t)
+{
+    return m_active.contains(MappableTrack(t));
 }
 
 //////////////////////////////////////////////////////////////////////
