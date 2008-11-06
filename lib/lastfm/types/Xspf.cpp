@@ -23,13 +23,13 @@
 #include <QUrl>
 
 
-Xspf::Xspf( const QDomElement& playlist_node )
+Xspf::Xspf( const QDomElement& playlist_node, Track::Source src /* = Track::LastFmRadio */ )
 {
     try
     {
         CoreDomElement e( playlist_node );
         
-        m_title = e["title"].text();
+        m_title = e.optional( "title" ).text();
             
         //FIXME should we use UnicornUtils::urlDecode()?
         //The title is url encoded, has + instead of space characters 
@@ -38,20 +38,18 @@ Xspf::Xspf( const QDomElement& playlist_node )
         m_title = QUrl::fromPercentEncoding( m_title.toAscii());
         m_title = m_title.trimmed();
         
-        foreach (CoreDomElement e, e[ "trackList" ].children( "track" ))
+        foreach (CoreDomElement e, e.optional( "trackList" ).children( "track" ))
         {
             MutableTrack t;
             try
             {
-                //TODO we don't want to throw an exception for any of these really,
-                //TODO only if we couldn't get any, but even then so what
-                t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-                t.setExtra( "trackauth", e[ "extension" ][ "trackauth" ].text() );
-                t.setTitle( e[ "title" ].text() );
-                t.setArtist( e[ "creator" ].text() );
-                t.setAlbum( e[ "album" ].text() );
-                t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-                t.setSource( Track::LastFmRadio );
+                t.setUrl( e.optional( "location" ).text() );
+                t.setExtra( "trackauth", e.optional( "extension" ).optional( "trackauth" ).text() );
+                t.setTitle( e.optional( "title" ).text() );
+                t.setArtist( e.optional( "creator" ).text() );
+                t.setAlbum( e.optional( "album" ).text() );
+                t.setDuration( e.optional( "duration" ).text().toInt() / 1000 );
+                t.setSource( src );
             }
             catch (CoreDomElement::Exception& exception)
             {
