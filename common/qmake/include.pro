@@ -37,6 +37,7 @@ CONFIG( qtestlib ) {
 CONFIG( taglib ) {
     CONFIG += link_pkgconfig
     PKGCONFIG += taglib
+    win32:debug:LIBS += tagd.lib    # tagd.lib will precede PKGCONFIG added libs
 }
 
 CONFIG( mad ) {
