@@ -23,6 +23,7 @@
 #include "lib/lastfm/scrobble/ScrobblePoint.h"
 #include <QDateTime>
 #include <QObject>
+#include <QTimer>
 
 
 /** Emits timeout() after seconds specified to start. 
