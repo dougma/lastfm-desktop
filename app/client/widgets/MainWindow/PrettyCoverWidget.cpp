@@ -82,46 +82,32 @@ PrettyCoverWidget::onAlbumImageDownloaded( const QByteArray& data )
 void
 PrettyCoverWidget::paintEvent( QPaintEvent* e )
 {
+    if (m_cover.isNull())
+        return;
+
     QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
-    p.setRenderHint( QPainter::SmoothPixmapTransform );
+    p.setRenderHint( QPainter::SmoothPixmapTransform );    
     
-    if (m_cover.isNull())
-    {
-        if (!m_track.isNull())
-            return;
-        
-        QSvgRenderer svg( QString(":/lastfm/as.svg") );
-        
-        QSize s = svg.defaultSize() * 5;
-        s.scale( 120, 0, Qt::KeepAspectRatioByExpanding );
-        QRect r = QRect( rect().center() - QRect( QPoint(), s ).center() - QPoint( 0, 20 ), s );
+    QTransform trans;
+    qreal const scale = qreal(height()) / m_cover.height();
+    trans.scale( scale, scale );
+    p.setTransform( trans );
 
-        p.setOpacity( qreal(40)/255 );
-        svg.render( &p, r );
-    }
-    else {
-        
-        QTransform trans;
-        qreal const scale = qreal(height()) / m_cover.height();
-        trans.scale( scale, scale );
-        p.setTransform( trans );
+    QPointF f = trans.inverted().map( QPointF( width(), 0 ) );
 
-        QPointF f = trans.inverted().map( QPointF( width(), 0 ) );
+    f.rx() -= m_cover.width();
+    f.rx() /= 2;
 
-        f.rx() -= m_cover.width();
-        f.rx() /= 2;
-
-        p.drawImage( f, m_cover );
-    }
+    p.drawImage( f, m_cover );
 }
 
 
 QImage //static
 PrettyCoverWidget::addReflection( const QImage &in )
 {
-    const uint H = 5 * in.height() / 7;
+    const uint H = in.height() / 4;
 	
     QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
     QPainter p( &out );

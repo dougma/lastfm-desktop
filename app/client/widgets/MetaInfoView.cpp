@@ -126,6 +126,7 @@ MetaInfoView::MetaInfoView()
 
     ui.tabs->hide();
     ui.tabs->bar()->succombToTheDarkSide();
+    ui.tabs->bar()->hide();
 
     setAutoFillBackground( true );
     setAlignment( Qt::AlignCenter );

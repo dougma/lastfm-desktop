@@ -97,7 +97,6 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
         m_timer->start();
 
         connect( watch, SIGNAL(paused( bool )), m_timer, SLOT(setPaused( bool )) );
-        connect( watch, SIGNAL(tick( int )), SLOT(updateToolTip( int )) );
         connect( watch, SIGNAL(timeout()), SLOT(onScrobbled()) );
     }
 }

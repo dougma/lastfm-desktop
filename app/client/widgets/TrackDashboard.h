@@ -17,75 +17,50 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TRACK_DASHBOARD_H
+#define TRACK_DASHBOARD_H
 
+#include <QWidget>
 #include "lib/lastfm/types/Track.h"
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include <QPointer>
-#include "State.h"
-#include "ui_MainWindow.h"
-#include "widgets/UnicornWidget.h"
-
-class ShareDialog;
-class TagDialog;
-class SettingsDialog;
-class DiagnosticsDialog;
-class PlaylistDialog;
 
 
-class MainWindow : public QMainWindow
+class TrackDashboard : public QWidget
 {
     Q_OBJECT
-
-public:
-    MainWindow();
-    ~MainWindow();
-    
-	struct Ui : ::Ui::MainWindow
-	{
-		class Amp* amp;
-        class Sources* sources;
-        class TrackDashboard* dashboard;
-        class ImageButton* cog;
-    } ui;
-
-protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-	void showTagDialog();
-    void closeActiveWindow();
-
-signals:
-	void loved();
-	void banned();
-	
-private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-	void onUserGetInfoReturn( class WsReply* );
-    void onTrackSpooled( const Track& );
-    void onStateChanged( State );
-    
-private:
-    void setupUi();
-    void setupInfoWidget();
-	
-	virtual void dragEnterEvent( QDragEnterEvent* );
-	virtual void dropEvent( QDropEvent* );
     
     Track m_track;
-	
-	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
+    class QNetworkAccessManager* nam;
+    
+public:
+    TrackDashboard();
+    
+    void setTrack( const class Track& );
+    void clear(); 
+
+    struct //FIXME make not public
+    {
+        QWidget* actionbar;
+        QWidget* papyrus;
+        QWidget* info;
+        class PrettyCoverWidget* cover;
+        class QLabel* title;
+        class QTextBrowser* bio;
+        class FadingScrollBar* scrollbar;
+        class QLabel* artist;
+        class QLabel* artist_text;
+    } ui;
+    
+public slots:
+    void setPapyrusPosition( int );
+    
+private slots:
+    void onArtistGotInfo( class WsReply* );
+    void onArtistImageDownloaded();
+    
+private:
+    virtual void paintEvent( QPaintEvent* );
+    virtual void resizeEvent( QResizeEvent* );
+    virtual bool event( QEvent* );
 };
 
-#endif //MAINWINDOW_H
+#endif

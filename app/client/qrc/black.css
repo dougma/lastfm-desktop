@@ -1,11 +1,12 @@
 body{
-    background: #181819;
-    color:#fff;
+    color:#a3a5a8;
 	font-size:small;
 	font-family:"Lucida Grande";
+    padding: 1em;
 }
 
-a { color:#bbb }
+a { color:#077eab; text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 #artist:link { color:#fff }
 #artist:visited { color:#fff }

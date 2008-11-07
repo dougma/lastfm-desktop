@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "MainWindow/MediaPlayerIndicator.h"
-#include "MainWindow/PrettyCoverWidget.h"
 #include "radio/RadioWidget.h"
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/Sources.h"
@@ -29,19 +27,16 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
-#include "widgets/MetaInfoView.h"
 #include "widgets/PlaylistDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
+#include "widgets/TrackDashboard.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/lastfm/ws/WsReply.h"
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QDockWidget>
-#include <QShortcut>
+#include <QtGui>
 #include <QSplitter>
 #include <QPainter>
 
@@ -139,12 +134,6 @@ MainWindow::MainWindow()
 
     QVariant v = QSettings().value( SETTINGS_POSITION_KEY );
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
-    
-    // doing this properly and trying to manipulate the sizeHint and that is
-    // nigh on impossible because Qt sucks at this stuff
-    ui.cover->setMinimumHeight( 278 );
-    ui.info->setMinimumHeight( 200 );
-    resize( 100, 100 );
 }
 
 
@@ -168,14 +157,18 @@ MainWindow::onTrackSpooled( const Track& t )
         
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
+
+        ui.dashboard->setTrack( t );
     }
     else {
         ui.share->setEnabled( false );
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
         ui.ban->setEnabled( false );
-    }
         
+        ui.dashboard->clear();
+    }
+
     #ifndef Q_WS_MAC
         // it's ugly on any platform, but useful on non-mac as the taskbar
         // shows the track that is playing
@@ -183,27 +176,18 @@ MainWindow::onTrackSpooled( const Track& t )
                 ? qApp->applicationName()
                 : t.toString() );
     #endif
-
-    if (!t.isNull())
-    {
-        //TODO handle bad data! eg no artist, no track
-        ui.text->setText( "<div style='margin-bottom:3px'>" + t.artist() + "</div><div><b>" + t.title() );
-        ui.cover->setTrack( t );
-    }
-    else {
-        ui.text->clear();
-        ui.cover->clear();        
-    }    
 }
 
 
+#include "MainWindow/PrettyCoverWidget.h" //FIXME
 void
 MainWindow::onStateChanged( State s )
 {
 	switch (s)
 	{            
         case TuningIn:
-			ui.cover->ui.spinner->show();
+            //FIXME
+			ui.dashboard->ui.cover->ui.spinner->show();
 			break;
             
         default:
@@ -223,12 +207,11 @@ MainWindow::setupUi()
     
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     setCentralWidget( new QWidget );
-    setupInfoWidget();
 
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
-    v->addWidget( ui.info );
-    {
-        
+    v->addWidget( ui.dashboard = new TrackDashboard );
+    
+    {   
         SpecialSplitter* s = new SpecialSplitter( Qt::Vertical, this );
         s->addMergeWidget( ui.amp = new Amp );
         s->addWidget( ui.sources = new Sources );
@@ -263,52 +246,6 @@ MainWindow::setupUi()
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
-#endif
-}
-
-
-void
-MainWindow::setupInfoWidget()
-{       
-    QWidget* indicator;
-
-    ui.info = new QWidget;
-    
-	QVBoxLayout* v = new QVBoxLayout( ui.info );
-	v->addWidget( indicator = new MediaPlayerIndicator );
-	v->addSpacing( 10 );
-    v->addWidget( ui.cover = new PrettyCoverWidget );
-    v->setStretchFactor( ui.cover, 1 );
-    v->setContentsMargins( 9, 9, 9, 0 );
-    v->setSpacing( 0 );
-    
-    indicator->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
-    
-    QVBoxLayout* v2 = new QVBoxLayout( ui.cover );
-	v2->addStretch();
-    v2->addWidget( ui.text = new QLabel );
-	v2->addSpacing( 4 );
-    
-    ui.text->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
-    ui.text->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
-    ui.text->setTextFormat( Qt::RichText );            
-    
-    UnicornWidget::paintItBlack( ui.info );
-    ui.info->setAutoFillBackground( true );
-
-    QPalette p = ui.info->palette();
-    p.setColor( QPalette::Text, Qt::white );
-    p.setColor( QPalette::WindowText, Qt::white );
-    ui.text->setPalette( p );
-
-#ifdef Q_WS_MAC
-    ui.text->setAttribute( Qt::WA_MacSmallSize );
-    
-    // Qt-mac sucks for some reason
-    foreach (QLabel* l, indicator->findChildren<QLabel*>())
-        l->setPalette( p );
-#else
-    indicator->setPalette( p );
 #endif
 }
 
