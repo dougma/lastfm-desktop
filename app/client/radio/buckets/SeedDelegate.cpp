@@ -22,8 +22,8 @@
 SeedDelegate::SeedDelegate( QObject* parent )
              :QAbstractItemDelegate( parent )
 { 
-    m_overlay = QPixmap( ":buckets/avatar_overlay_selected.png" ); 
-    m_selectedOverlay = QPixmap( ":buckets/avatar_overlay.png" ); 
+    m_selectedOverlay = QPixmap( ":buckets/avatar_overlay_selected.png" ); 
+    m_overlay = QPixmap( ":buckets/avatar_overlay.png" ); 
 }
 
 
@@ -49,11 +49,11 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     if( option.state & QStyle::State_Selected )
     {
-        painter->drawPixmap( overlayRect, m_overlay );
+        painter->drawPixmap( overlayRect, m_selectedOverlay );
     }
     else
     {
-        painter->drawPixmap( overlayRect, m_selectedOverlay );
+        painter->drawPixmap( overlayRect, m_overlay );
     }
     
     if( flashValue > 0 )
@@ -61,7 +61,7 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     painter->setPen( Qt::white );
     QFont f = painter->font();
-    f.setPointSize( f.pointSize() - 2 );
+    f.setPointSize( f.pointSize() - 4 );
     painter->setFont( f );
     
     

@@ -39,29 +39,6 @@
 
 #include <phonon/volumeslider.h>
 
-struct SpecialSplitter : public QSplitter
-{
-    SpecialSplitter( Qt::Orientation o ) : QSplitter( o )
-    {}
-
-    struct cHandle : public QSplitterHandle
-    {
-        cHandle( QSplitter* parent ) : QSplitterHandle( Qt::Horizontal, parent )
-        {}
-        
-        virtual void paintEvent( QPaintEvent* )
-        {
-            QPainter p( this );
-            p.fillRect( rect(), QColor( 35, 35, 35 ) );
-            p.setPen( QColor( 23, 23, 24 ) );
-            p.drawLine( 0, 0, 0, height() );
-        }        
-    };
-    
-    virtual QSplitterHandle* createHandle() { return new cHandle( this ); }
-};
-
-
 struct SpecialWidget : QWidget
 {
     virtual void paintEvent( QPaintEvent* )
@@ -81,27 +58,7 @@ Sources::Sources()
 {
     m_accessManager = new WsAccessManager( this );
     
-    ui.friendsBucket = new PrimaryListView( this );
-    ui.friendsBucket->setAlternatingRowColors( true );
-    ui.friendsBucket->setDragEnabled( true );
-    ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
-    connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
-    UnicornWidget::paintItBlack( ui.friendsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
-    
-	ui.tagsBucket = new PrimaryListView( this );
-    ui.tagsBucket->setAlternatingRowColors( true );
-    ui.tagsBucket->setDragEnabled( true );
-    ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
-    connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
-    UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
-	
-	ui.stationsBucket = new PrimaryListView( this );
-    ui.stationsBucket->setAlternatingRowColors( true );
-    ui.stationsBucket->setDragEnabled( true );
-    ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
-    connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
-    UnicornWidget::paintItBlack( ui.stationsBucket );    //as above
-
+    setupUi();
     
     AuthenticatedUser authUser;
      
@@ -114,33 +71,61 @@ Sources::Sources()
                                  << StringPair( tr("My Loved Tracks"), QString("loved:%1").arg(name))
                                  << StringPair( tr("My Recommendations"), QString( "recs:%1" ).arg(name)))
                                // FIXME: Neighbours not implemented in RQL yet!
-                               //  << StringPair( tr("My Loved Tracks"), QString( "neighbour:" << "My Neighbourhood" )
+                               //  << StringPair( tr("My Neighbours"), QString( "neighbours:%1" ).arg(name)))
 
     {
         PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
         n->setRQL( station.second );
-        n->setPixmap( QPixmap( ":/BottomBar/icon/radio/on.png" ).scaled( 64, 64, Qt::KeepAspectRatio ));
-        n->setSizeHint( QSize( 75, 25) );
         n->setPlayableType( Seed::PreDefinedType );
+        n->setSizeHint( QSize( 70, 70));
+        connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
 
     connect( authUser.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
     connect( authUser.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
     connect( authUser.getPlaylists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetPlaylistsReturn( WsReply* )) );
 	
-	ui.tabWidget = new Unicorn::TabWidget;
+}
 
-    ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
-	ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
-	ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
+
+void 
+Sources::setupUi()
+{
+    new QVBoxLayout( this );
+    layout()->setMargin( 0 );
+    layout()->setSpacing( 0 );
+    
+    ui.tabWidget = new Unicorn::TabWidget;
     ui.tabWidget->bar()->succombToTheDarkSide();
     ui.tabWidget->bar()->setMinimumHeight( 26 );
+    layout()->addWidget( ui.tabWidget );
     
-    QWidget* primaryPane = new QWidget( this );
-    new QVBoxLayout( primaryPane );
-    primaryPane->layout()->addWidget( ui.tabWidget );
-    primaryPane->layout()->setMargin( 0 );
-    primaryPane->layout()->setSpacing( 0 );
+    ui.stationsBucket = new PrimaryListView( this );
+    ui.stationsBucket->setAlternatingRowColors( true );
+    ui.stationsBucket->setDragEnabled( true );
+    ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
+    UnicornWidget::paintItBlack( ui.stationsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
+    ui.stationsBucket->setAlternatingRowColors( false );
+    ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
+    
+    ui.friendsBucket = new PrimaryListView( this );
+    ui.friendsBucket->setAlternatingRowColors( true );
+    ui.friendsBucket->setDragEnabled( true );
+    ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
+    UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
+    ui.friendsBucket->setAlternatingRowColors( false );
+    ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
+    
+	ui.tagsBucket = new PrimaryListView( this );
+    ui.tagsBucket->setAlternatingRowColors( true );
+    ui.tagsBucket->setDragEnabled( true );
+    ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
+    UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
+    ui.tagsBucket->setAlternatingRowColors( false );
+    ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
     
     QWidget* freeInputWidget = new SpecialWidget;
     new QHBoxLayout( freeInputWidget );
@@ -154,13 +139,12 @@ Sources::Sources()
     ui.inputSelector->addItem( "User", QVariant::fromValue(Seed::UserType) );
     ui.inputSelector->setAttribute( Qt::WA_MacNormalSize ); //wtf? needed tho, when floating
     
-    primaryPane->layout()->addWidget( freeInputWidget );
-
-    setCentralWidget( primaryPane );
-    setFixedHeight( sizeHint().height());
-    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout()->addWidget( freeInputWidget );
     
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 	UnicornWidget::paintItBlack( this );
+    
+    
 }
 
 
@@ -190,7 +174,7 @@ Sources::onUserGetFriendsReturn( WsReply* r )
         QNetworkReply* r = m_accessManager->get( QNetworkRequest( user.mediumImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
-        n->setSizeHint( QSize( 75, 25));
+        n->setSizeHint( QSize( 70, 70));
         n->setPlayableType( Seed::UserType );	
     }
 }
@@ -204,8 +188,8 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
+        n->setSizeHint( QSize( 40, 60));
         n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
-        n->setSizeHint( QSize( 75, 25));
         n->setPlayableType( Seed::TagType );
     }
 }
@@ -214,24 +198,25 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
 void 
 Sources::onUserGetPlaylistsReturn( WsReply* r )
 {
+#if 0 //FIXME: No RQL for playlists yet!
     QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
     foreach( CoreDomElement playlist, playlists )
     {
         PlayableListItem* n = new PlayableListItem( playlist[ "title" ].text(), ui.stationsBucket );
 
-        QString mediumImageUrl = playlist.optional( "image size=medium").text();
-        if( !mediumImageUrl.isEmpty() )
+        QString smallImageUrl = playlist.optional( "image size=small").text();
+        if( !smallImageUrl.isEmpty() )
         {
-            QNetworkReply* r = m_accessManager->get( QNetworkRequest( mediumImageUrl));
+            QNetworkReply* r = m_accessManager->get( QNetworkRequest( smallImageUrl));
             connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         } 
         
-        n->setSizeHint( QSize( 75, 25));
         n->setPlayableType( Seed::PreDefinedType );
         //FIXME: this is not yet implemented in RQL
         n->setRQL( "" );
         
     }
+#endif
 }
 
 
@@ -310,4 +295,36 @@ Sources::connectToAmp( Amp* amp )
     m_connectedAmp = amp;
     connect( m_connectedAmp, SIGNAL(itemRemoved(QString, Seed::Type)), SLOT( onAmpSeedRemoved(QString, Seed::Type)));
     connect( m_connectedAmp, SIGNAL(destroyed()), SLOT( onAmpDestroyed()));
+}
+
+
+void
+Sources::onAuthUserInfoReturn( WsReply* r )
+{
+    QList<CoreDomElement> images = r->lfm().children( "image" );
+    if( images.isEmpty() )
+        return;
+
+    QNetworkReply* reply = m_accessManager->get( QNetworkRequest( images.first().text() ));
+
+    connect( reply, SIGNAL( finished()), SLOT( authUserIconDataDownloaded()));
+}
+
+
+void 
+Sources::authUserIconDataDownloaded()
+{
+    QNetworkReply* reply = static_cast< QNetworkReply* >( sender());
+
+    QPixmap pm;
+    pm.loadFromData( reply->readAll()); 
+    QListWidgetItem* item;
+    for( int i = 0; (item = ui.stationsBucket->item( i )); i++ )
+    {
+        PlayableListItem* pitem;
+        if( !(pitem = dynamic_cast< PlayableListItem*>( item )))
+            continue;
+        
+        pitem->setPixmap( pm );
+    }
 }

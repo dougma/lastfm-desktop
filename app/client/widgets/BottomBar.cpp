@@ -19,7 +19,6 @@
 
 #include "BottomBar.h"
 #include "widgets/ImageButton.h"
-#include "widgets/ScrobbleButton.h"
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QPainter>
@@ -37,7 +36,6 @@ BottomBar::BottomBar()
     h->addWidget( ui.library = new BottomBarButton );
     h->addSpacing( 12 );
     h->addStretch();
-    h->addWidget( ui.scrobble = new ScrobbleButton );
     h->setSpacing( 0 );
     h->setContentsMargins( 8, 3, 4, 4 );
     

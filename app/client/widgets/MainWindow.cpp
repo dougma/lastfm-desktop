@@ -42,6 +42,8 @@
 #include <QDesktopServices>
 #include <QDockWidget>
 #include <QShortcut>
+#include <QSplitter>
+#include <QPainter>
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -55,6 +57,63 @@
 
 #define SETTINGS_POSITION_KEY "MainWindowPosition"
 
+struct SpecialSplitter : public QSplitter
+{
+    SpecialSplitter( Qt::Orientation o, QWidget* p ) : QSplitter( o, p )
+    {}
+    
+    struct cHandle : public QSplitterHandle
+    {
+        cHandle( Qt::Orientation o, QSplitter* parent ) : QSplitterHandle( o, parent )
+        {}
+        
+        virtual void paintEvent( QPaintEvent* event )
+        {
+            QPainter p( this );
+            p.setClipRect( event->rect() );
+            p.fillRect( rect(), palette().brush( QPalette::Window ));
+        }
+                                     
+    };
+    
+    //This merges the splitter handle into the widget
+    bool eventFilter( QObject* obj, QEvent* event )
+    {
+        if( event->type() != QEvent::Resize && event->type() != QEvent::Show )
+            return false;
+        
+        QWidget* w = qobject_cast< QWidget* >( obj );
+        if( !w )
+            return false;
+        
+        QPalette pal = w->palette();
+        const QGradient* grad = pal.brush( QPalette::Window ).gradient();
+        if( !grad || grad->type() != QGradient::LinearGradient )
+            return false;
+        
+        QLinearGradient lg = *((QLinearGradient*)grad);
+        lg.setFinalStop( lg.finalStop().x(), lg.finalStop().y() - handleWidth());
+        pal.setBrush( QPalette::Window, lg );
+        w->setPalette( pal );
+        
+        lg.setStart( 0, w->height() );
+        lg.setFinalStop( lg.finalStop().x(), 1 );
+        QPalette hpal = handle( count() - 1 )->palette();
+        hpal.setBrush( QPalette::Window, lg );
+        handle( count() - 1 )->setPalette( hpal );
+        return false;
+    }
+
+    //This widget will be merged into the splitter handle
+    // - only works for splitters with 2 widgets!
+    void addMergeWidget( QWidget* w )
+    {
+        addWidget( w );
+        w->installEventFilter( this );
+    }
+    
+    virtual QSplitterHandle* createHandle() { return new cHandle( orientation(), this ); }
+};
 
 
 MainWindow::MainWindow()
@@ -163,16 +222,25 @@ MainWindow::setupUi()
    	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
     
     setDockOptions( AnimatedDocks | AllowNestedDocks );
-    /** hah! works :) But I'm sure is hideously dangerous, etc. */
-    setStatusBar( (QStatusBar*) (ui.bottombar = new BottomBar) );
-
     setCentralWidget( new QWidget );
     setupInfoWidget();
 
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
     v->addWidget( ui.info );
-    v->addWidget( ui.amp = new Amp );
-    v->addWidget( ui.sources = new Sources );
+    {
+        
+        SpecialSplitter* s = new SpecialSplitter( Qt::Vertical, this );
+        s->addMergeWidget( ui.amp = new Amp );
+        s->addWidget( ui.sources = new Sources );
+        v->addWidget( s );
+        
+        s->setCollapsible( 0, false );
+        s->setCollapsible( 1, false );
+        
+        s->setStretchFactor( 0, 1 );
+        s->setStretchFactor( 1, 10 );
+    }
+    
     v->setSpacing( 0 );
     v->setMargin( 0 );
     
@@ -182,25 +250,15 @@ MainWindow::setupUi()
     ui.amp->scrobbleRatingUi.love->setAction( ui.love );
     ui.amp->scrobbleRatingUi.share->setAction( ui.share );
 
-    ui.bottombar->ui.radio->setWidget( ui.amp );
-    ui.bottombar->ui.radio->setToolTip( tr("Radio") );
     connect( ui.viewRadio, SIGNAL(triggered()), ui.amp, SLOT(show()) );
 
     QDockWidget* dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
     dw->setWidget( new Firehose );
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
-    ui.bottombar->ui.friends->setWidget( dw );
-    ui.bottombar->ui.friends->setToolTip( dw->windowTitle() );
     dw->hide();
     dw->setFloating( true );
     
-    ui.bottombar->ui.library->setWidget( ui.info );
-    ui.bottombar->ui.library->setToolTip( tr("Track Information") );
-    connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
-    
-    ui.bottombar->ui.sources->setWidget( ui.sources );
-    ui.bottombar->ui.sources->setToolTip( "Music Sources" );
     connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
     
 #ifndef Q_WS_MAC
@@ -212,7 +270,7 @@ MainWindow::setupUi()
 void
 MainWindow::setupInfoWidget()
 {       
-    QWidget* actionbar, *indicator;
+    QWidget* indicator;
 
     ui.info = new QWidget;
     

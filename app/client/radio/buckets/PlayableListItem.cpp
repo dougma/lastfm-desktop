@@ -49,7 +49,6 @@ PlayableListItem::iconDataDownloaded()
     pixmap.loadFromData( reply->readAll() );
     
     setPixmap( pixmap );
-
 }
 
 
@@ -101,7 +100,7 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
         
         if( a.imageUrl().isValid() )
         {
-            QNetworkReply* get = m_networkManager->get( QNetworkRequest( a.imageUrl() ));
+            QNetworkReply* get = m_networkManager->get( QNetworkRequest( a.smallImageUrl() ));
             connect( get, SIGNAL( finished()), SLOT( iconDataDownloaded()));
         }
     }
@@ -116,17 +115,17 @@ void
 PlayableListItem::setPixmap( const QPixmap& pm )
 {
     QPixmap iconPm = pm;
-    QSize diff = pm.size() - QSize( 64, 64 );
+    QSize diff = pm.size() - QSize( 34, 34 );
 
-    //crop the avatar to a 64x64 square
+    //crop the avatar to a 34x34 square
     if( diff.height() > 0 || diff.width() > 0 )
     {
-        const QPixmap scaled = pm.scaled( 64, 64, Qt::KeepAspectRatioByExpanding );
-        const QPixmap cropped = scaled.copy( ((scaled.width() - 64) / 2), ((scaled.height() - 64) / 2), 64, 64);
+        const QPixmap scaled = pm.scaled( 34, 34, Qt::KeepAspectRatioByExpanding );
+        const QPixmap cropped = scaled.copy( ((scaled.width() - 34) / 2), ((scaled.height() - 34) / 2), 34, 34);
         iconPm = cropped;
     }
     
-    QListWidgetItem::setIcon( iconPm );
+    setIcon( iconPm );
     
     if( listWidget())
         listWidget()->viewport()->update();

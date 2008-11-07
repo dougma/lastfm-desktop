@@ -39,8 +39,8 @@ const int PlayerBucketList::k_itemMargin = 4;
 //These should be based on the delegate's sizeHint - this requires
 //the delegate to calculate the sizeHint correctly however and this 
 //is not currently done!
-const int PlayerBucketList::k_itemSizeX = 66;
-const int PlayerBucketList::k_itemSizeY = 88;
+const int PlayerBucketList::k_itemSizeX = 36;
+const int PlayerBucketList::k_itemSizeY = 50;
 
 
 PlayerBucketList::PlayerBucketList( QWidget* w )
@@ -48,7 +48,7 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 			  m_showDropText( true)
 {
     connect( this, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT( onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
-    setIconSize( QSize( 66, 68 ));
+    setIconSize( QSize( 33, 38 ));
     m_networkManager = new WsAccessManager( this );
 
     ui.clearButton = new ImageButton( ":buckets/radio_clear_all_x.png", this );
@@ -176,7 +176,6 @@ PlayerBucketList::calculateLayout()
     delegatesY -= verticalScrollBar()->value();
     
     QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
-	QRect itemDeleteRect( itemRect.topRight().x() - 9, itemRect.topRight().y() - 9, 18, 18 );
     
     m_itemRects.clear();
 	int index = 0;
@@ -187,11 +186,9 @@ PlayerBucketList::calculateLayout()
 			QModelIndex i = itemModel->index( index, 0 );
             
             QRect rect = itemRect;
-            QRect deleteRect = itemDeleteRect;
 		
             QPoint offset( (itemRect.width() + k_itemMargin ) * col, (itemRect.height() + k_itemMargin) * row );
 			rect.translate( offset );
-            deleteRect.translate( offset );
             
 			m_itemRects[ i ] = rect;
 			
@@ -227,11 +224,11 @@ PlayerBucketList::calculateToolIconsLayout()
     const int scrollbarOffset = verticalScrollBar()->isVisible() ? verticalScrollBar()->width() : 0;
     const int iconSpacing = 5;
     
-    ui.clearButton->move( rect().translated( -ui.clearButton->width() - scrollbarOffset, 0 ).topRight());
+    ui.clearButton->move( rect().right() - ui.clearButton->width(), rect().center().y() - (ui.clearButton->height() / 2.0f ));
     ui.clearButton->show();
     if( !ui.queryEdit->isVisible())
     {
-        ui.queryEditButton->move( rect().translated( -ui.clearButton->width() - iconSpacing - ui.queryEditButton->width() - scrollbarOffset, 0).topRight());
+        ui.queryEditButton->move( rect().left(), rect().center().y() - (ui.queryEditButton->height() / 2.0f ));
         ui.queryEditButton->show();
     }
     else
@@ -394,19 +391,7 @@ PlayerBucketList::visualRect ( const QModelIndex & index ) const
 		return viewport()->rect();
 	}
 	
-	QRect rect = viewport()->rect();
-	int iconRowCount = ( itemModel->rowCount() * 75 ) / rect.width();
-	iconRowCount++;
-	int iconColumnCount = itemModel->rowCount() / iconRowCount;
-
-	if ( itemModel->rowCount() % iconColumnCount )
-		iconRowCount++;
-	
-	
-	int delegatesX = (rect.width() / 2 ) - (((iconColumnCount + iconRowCount - 1) * 75) / 2 );
-	int delegatesY = (rect.height() / 2 ) - ((iconRowCount * 75) / 2);
-	
-	return QRect( delegatesX, delegatesY, iconColumnCount, iconRowCount );
+    return m_itemRects[ index ];
 }
 
 

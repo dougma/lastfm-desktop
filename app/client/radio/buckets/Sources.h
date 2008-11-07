@@ -25,12 +25,13 @@
 
 namespace Unicorn{ class TabWidget; }
 
-class Sources : public QMainWindow
+class Sources : public QWidget
 {
 	Q_OBJECT
 public:
 	Sources();
     
+    void setupUi();
 
 	struct {
 		class Unicorn::TabWidget* tabWidget;
@@ -44,6 +45,11 @@ public:
     
     void connectToAmp( class Amp* amp );
     
+    QSize sizeHint() const
+    {
+        return QSize( 0, 200 );
+    }
+    
 protected:
     class WsAccessManager* m_accessManager;
     class Amp* m_connectedAmp;
@@ -53,6 +59,10 @@ protected slots:
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
     void onUserGetPlaylistsReturn( class WsReply* );
+
+    void onAuthUserInfoReturn( class WsReply* );
+    void authUserIconDataDownloaded();
+    
     void onItemDoubleClicked( const class QModelIndex& index );
     void onDnDAnimationFinished();
     void onFreeInputReturn();
@@ -75,7 +85,14 @@ class PrimaryListView : public QListWidget
     
     friend class Sources;
 public:
-	PrimaryListView( QWidget* parent ): QListWidget( parent ){}
+	PrimaryListView( QWidget* parent ): QListWidget( parent )
+    {
+        setViewMode( QListView::IconMode );
+        setFlow( QListView::LeftToRight );
+        setResizeMode( QListView::Adjust );
+        setSpacing( 0 );
+        setUniformItemSizes( true );
+    }
     
 protected:
     QMimeData* mimeData( const QList<QListWidgetItem *> items ) const
@@ -88,7 +105,7 @@ protected:
         PlayableMimeData* data = new PlayableMimeData();
         data->setType( item->playableType() );
         data->setText( item->text() );
-        data->setImageData( item->data( Qt::DecorationRole).value<QIcon>().pixmap(50).toImage() );
+        data->setImageData( item->icon().pixmap(34).toImage() );
         
         if( item->playableType() == Seed::PreDefinedType )
             data->setRQL( item->rql() );

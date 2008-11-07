@@ -26,6 +26,8 @@
 #include "widgets/UnicornWidget.h"
 #include "widgets/PlaylistDialog.h"
 
+#include <QMouseEvent>
+#include "the/MainWindow.h"
 class Amp : public QWidget
 {
     Q_OBJECT
@@ -45,7 +47,6 @@ public:
     } scrobbleRatingUi;
     
 public slots:
-    void toggleCogMenu( bool );
     void showPlaylistDialog();
     
 signals:
@@ -62,6 +63,21 @@ protected:
     void setupUi();
     class QMenu* m_cogMenu;
     Track m_track;
+    
+    QPoint m_mouseDownPos;
+    void mousePressEvent( QMouseEvent* e )
+    {
+        m_mouseDownPos = e->pos();
+    }
+    
+    void mouseMoveEvent( QMouseEvent* e )
+    {
+        The::mainWindow().move( e->globalPos() 
+                                - m_mouseDownPos 
+                                - QPoint( 0, parentWidget()->mapToParent( mapToParent( pos() )).y() 
+                                             + The::mainWindow().frameGeometry().height() 
+                                             - The::mainWindow().height()) );
+    }
   
 protected slots:
     void onTrackSpooled( Track );
@@ -69,7 +85,8 @@ protected slots:
 
     void onPraiseClientTeam();
     void onCurseClientTeam();
-
+    void onCogMenuClicked();
+    
 private:
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
     

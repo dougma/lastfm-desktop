@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include "lib/lastfm/types/Track.h"
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include <QPointer>
@@ -41,7 +44,6 @@ public:
     
 	struct Ui : ::Ui::MainWindow
 	{
-		class BottomBar* bottombar;
 		class Amp* amp;
         class Sources* sources;
         class QLabel* text;
@@ -86,3 +88,5 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
 };
+
+#endif //MAINWINDOW_H

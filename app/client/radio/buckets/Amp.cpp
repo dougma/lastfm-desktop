@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include "Amp.h"
 #include "widgets/RadioControls.h"
+#include "widgets/ScrobbleButton.h"
 #include "widgets/UnicornWidget.h"
 #include "the/radio.h"
 #include "the/MainWindow.h"
@@ -55,7 +56,7 @@ Amp::setupUi()
     new QHBoxLayout( this );
     
     layout()->setSpacing( 5 );
-    layout()->setContentsMargins( 5, 6, 5, 8 );
+    layout()->setContentsMargins( 5, 6, 5, 3 );
 
     
     layout()->addWidget( ui.controls = new RadioControls );
@@ -67,7 +68,7 @@ Amp::setupUi()
         BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
         { 
             setLayout( new QVBoxLayout ); 
-            layout()->setContentsMargins( 7, 7, 7, 7 ); 
+            layout()->setContentsMargins( 3, 3, 3, 3 ); 
             setAutoFillBackground( false ); 
         }
         
@@ -139,15 +140,25 @@ Amp::setupUi()
     
     layout()->addWidget( scrobbleRatingControls );
     
-    layout()->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
-    scrobbleRatingUi.cog->setCheckable( true );
-    connect( scrobbleRatingUi.cog, SIGNAL(toggled( bool )), SLOT(toggleCogMenu( bool )) );
+    QWidget* cogAndScrobble = new QWidget( this );
+    {
+        QVBoxLayout* layout = new QVBoxLayout( cogAndScrobble );
+        layout->setSizeConstraint( QLayout::SetFixedSize );
+        layout->setSpacing( 0 );
+        layout->setContentsMargins( 0, 0, 0, 0 );
+        layout->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
+        scrobbleRatingUi.cog->setCheckable( true );
+        connect( scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
+
+        m_cogMenu = new QMenu( this );
+        m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
+        m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
+        m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
+        
+        layout->addWidget( new ScrobbleButton );
+    }
     
-    m_cogMenu = new QMenu( this );
-    m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
-    m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
-    m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
-    
+    layout()->addWidget( cogAndScrobble );
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
@@ -155,9 +166,9 @@ Amp::setupUi()
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
     
-    setFixedHeight( 69 );
+    setMinimumHeight( 110 );
     setMinimumWidth( 456 );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
 }
 
 
@@ -200,7 +211,7 @@ Amp::onTrackSpooled( Track t )
 
 
 void
-Amp::toggleCogMenu( bool show )
+Amp::onCogMenuClicked()
 {
     emit customContextMenuRequested( scrobbleRatingUi.cog->mapToGlobal( QPoint( 0, scrobbleRatingUi.cog->height()) ) );
 }

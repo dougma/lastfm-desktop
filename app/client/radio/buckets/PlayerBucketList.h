@@ -87,7 +87,6 @@ private slots:
    
     
 private:
-	static const QString k_dropText;
     static const int k_itemMargin;
     static const int k_itemSizeX;
     static const int k_itemSizeY;
