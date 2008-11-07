@@ -21,41 +21,8 @@
 #define STOP_WATCH_H
 
 #include "lib/lastfm/scrobble/ScrobblePoint.h"
-#include <QThread>
-#include <QMutex>
 #include <QDateTime>
-
-//TODO arbiturary start times
-//TODO hideously inefficient, though of course not bad, but at the least we 
-// should stop waking every 250ms when the player is paused
-
-
-/** exists so we can destroy stop watches without blocking the GUI thread in
-  * wait() */
-class StopWatchThread : public QThread
-{
-    Q_OBJECT
-    Q_DISABLE_COPY( StopWatchThread )
-    ~StopWatchThread() {} // use deleteLater()
-
-    bool m_done;
-
-public:
-    StopWatchThread() : m_done( false ), m_paused( true ), m_timeout( 0 ), m_elapsed( 0 )
-    {}
-
-    virtual void run();
-    void deleteLater();
-
-    bool m_paused;
-    /** all in units of milliseconds */
-    uint m_timeout;
-    uint m_elapsed;
-    
-signals:
-    void tick( int ); // int is the usual signal/slot parameter, uint breaks
-    void timeout();
-};
+#include <QObject>
 
 
 /** Emits timeout() after seconds specified to start. 
@@ -70,22 +37,27 @@ class StopWatch : public QObject
 public:
     /** the StopWatch starts off paused, call resume() to start */
     StopWatch( const ScrobblePoint& timeout_in_seconds );
-    ~StopWatch();
+    
+    bool isFinished() const { return m_remaining == 0 && !m_timer->isActive(); }
     
     void pause();
     void resume();
-
-    uint elapsed() { return m_thread->m_elapsed / 1000; }
     
     ScrobblePoint scrobblePoint() const { return m_point; }
 
 signals:
     void paused( bool );
-    void tick( int );
     void timeout();
 
+private slots:
+    void finished();
+    
 private:
-    StopWatchThread* m_thread;
+    void start();
+    
+    class QTimer* m_timer;
+    uint m_remaining;
+    QTime m_elapsed;
     ScrobblePoint m_point;
 };
 
