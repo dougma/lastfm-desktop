@@ -117,7 +117,7 @@ public:
         return d->title.isEmpty() ? "[unknown]" : d->title;
     }
     uint trackNumber() const { return d->trackNumber; }
-    uint duration() const { return d->duration; }
+    uint duration() const { return d->duration; } /// in seconds
     Mbid mbid() const { return Mbid(d->mbid); }
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
