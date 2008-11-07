@@ -137,7 +137,7 @@ else
         *)      
             svn co svn+ssh://gimli.last.fm/svn/clientside/bin/win _bin
             gen_vs_sln || die "Configure failed."
-            BUILD_CMD='cygstart Last.sln';;
+            BUILD_CMD='devenv /useenv Last.sln';;
     esac
 fi
 
