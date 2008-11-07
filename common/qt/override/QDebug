@@ -36,10 +36,6 @@ struct StampedDebug : QDebug
         Q_UNUSED( file );
 
 		QByteArray out;
-		out += QTime::currentTime().toString( "[hh:mm:ss] " );
-
-//		QByteArray const filename = file.mid( file.lastIndexOf( '/' ) + 1 );
-//		out += filename + ":" + QString::number( line );
 
 		#if __GNUG__
         int const k = function.indexOf( '(' );
