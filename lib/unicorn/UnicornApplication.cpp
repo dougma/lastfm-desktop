@@ -59,6 +59,7 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
             // loaded, and we delete the settings on exit if logOut is on
             s.setValue( "Username", d.username() );
             s.setValue( "SessionKey", d.sessionKey() );
+            s.setValue( "Password", d.passwordHash() );
         }
         else
         {

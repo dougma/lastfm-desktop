@@ -61,14 +61,13 @@ LoginDialog::authenticate()
     ui.spinner->show();
     ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
 
-    // always lowercase the username before generating the md5
-    m_username = ui.username->text().toLower();
-
-    QString const password = ui.password->text();
+    m_username = ui.username->text();
+    m_password = Qt::md5( ui.password->text().toUtf8() );
 
     WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
             .add( "username", m_username )
-            .add( "authToken", Qt::md5( (m_username + Qt::md5( password.toUtf8() )).toUtf8() ) )
+            // always lowercase the username before generating the md5
+            .add( "authToken", Qt::md5( (m_username + m_password).toLower().toUtf8() ) )
             .get();
 
     connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAuthenticated( WsReply* )) );
@@ -78,13 +77,19 @@ LoginDialog::authenticate()
 void
 LoginDialog::onAuthenticated( WsReply* reply )
 {
-    switch (reply->error())
+	switch (reply->error())
     {
         case Ws::NoError:
         {
             try
             {
-                m_sessionKey = reply->lfm()["session"]["key"].nonEmptyText();
+                CoreDomElement session = reply->lfm()["session"];
+                
+                // replace username; because eg. perhaps the user typed their
+                // username with the wrong camel case
+                session.assignIfNonEmpty( "name", &m_username );
+                
+                m_sessionKey = session["key"].nonEmptyText();
                 accept();
                 break;
             }
