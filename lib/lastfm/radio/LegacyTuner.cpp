@@ -22,6 +22,7 @@
 #include "lib/lastfm/core/CoreLocale.h"
 #include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "lib/lastfm/types/Xspf.h"
 #include <QCoreApplication>
 #include <QtNetwork>
 
@@ -157,60 +158,6 @@ LegacyTuner::tryAgain()
 	return true;
 }
 
-
-class Xspf
-{
-    QList<Track> m_tracks;
-    QString m_title;
-    
-public:
-    Xspf( const QDomElement& playlist_node )
-    {
-        try
-        {
-            CoreDomElement e( playlist_node );
-            
-            m_title = e["title"].text();
-            
-            //FIXME should we use UnicornUtils::urlDecode()?
-            //The title is url encoded, has + instead of space characters 
-            //and has a + at the begining. So it needs cleaning up:
-            m_title.replace( '+', ' ' );
-            m_title = QUrl::fromPercentEncoding( m_title.toAscii());
-            m_title = m_title.trimmed();
-            
-            foreach (CoreDomElement e, e[ "trackList" ].children( "track" ))
-            {
-                MutableTrack t;
-                try
-                {
-                    //TODO we don't want to throw an exception for any of these really,
-                    //TODO only if we couldn't get any, but even then so what
-                    t.setUrl( e[ "location" ].text() ); //location first due to exception throwing
-                    t.setExtra( "trackauth", e[ "lastfm:trackauth" ].text() );
-                    t.setTitle( e[ "title" ].text() );
-                    t.setArtist( e[ "creator" ].text() );
-                    t.setAlbum( e[ "album" ].text() );
-                    t.setDuration( e[ "duration" ].text().toInt() / 1000 );
-                    t.setSource( Track::LastFmRadio );
-                }
-                catch (CoreDomElement::Exception& exception)
-                {
-                    qWarning() << exception << e;
-                }
-                
-                m_tracks += t; // outside try-catch since location is enough basically
-            }
-        }
-        catch (CoreDomElement::Exception& e)
-        {
-            qWarning() << e;        
-        }
-    }
-    
-    QList<Track> tracks() const { return m_tracks; }
-};
-    
     
 void
 LegacyTuner::onGetPlaylistReturn()
