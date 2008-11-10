@@ -125,7 +125,6 @@ MetaInfoView::MetaInfoView()
     UnicornWidget::paintItBlack( ui.similar ); // item views, or they stay white
 
     ui.tabs->hide();
-    ui.tabs->bar()->succombToTheDarkSide();
     ui.tabs->bar()->hide();
 
     setAutoFillBackground( true );

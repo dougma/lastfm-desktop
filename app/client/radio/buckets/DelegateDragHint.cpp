@@ -43,7 +43,7 @@ DelegateDragHint::onFinishedAnimation()
 void 
 DelegateDragHint::onDragFrameChanged( int frame )
 {
-    const QPoint destPoint = m_target->mapToGlobal( m_target->rect().center() - QPoint( width() / 2.0f, 0 ));
+    const QPoint destPoint = m_target->mapToGlobal( m_target->rect().center() - QPoint( width() / 2.0f, height() / 2.0f ));
     QPoint distanceIncrement = destPoint - m_startPoint;
     distanceIncrement /= ( frame );
     move( destPoint - distanceIncrement );

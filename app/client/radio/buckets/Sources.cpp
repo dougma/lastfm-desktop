@@ -77,7 +77,8 @@ Sources::Sources()
         PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
         n->setRQL( station.second );
         n->setPlayableType( Seed::PreDefinedType );
-        n->setSizeHint( QSize( 70, 70));
+        QRect textRect = QFontMetrics( n->font()).boundingRect( station.first );
+        n->setSizeHint( QSize( textRect.width() + 20 , 70));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
 
@@ -96,7 +97,6 @@ Sources::setupUi()
     layout()->setSpacing( 0 );
     
     ui.tabWidget = new Unicorn::TabWidget;
-    ui.tabWidget->bar()->succombToTheDarkSide();
     ui.tabWidget->bar()->setMinimumHeight( 26 );
     layout()->addWidget( ui.tabWidget );
     
@@ -188,7 +188,7 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
-        n->setSizeHint( QSize( 40, 60));
+        n->setSizeHint( QSize( 70, 70));
         n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
         n->setPlayableType( Seed::TagType );
     }
@@ -233,8 +233,8 @@ Sources::onItemDoubleClicked( const QModelIndex& index )
         return;
     
     QStyleOptionViewItem options;
-    options.initFrom( this );
-    options.decorationSize = itemView->iconSize().expandedTo( QSize( 16, 16) );
+    options.initFrom( itemView );
+    options.decorationSize = itemView->iconSize();
     options.displayAlignment = Qt::AlignVCenter | Qt::AlignLeft;
     options.decorationAlignment = Qt::AlignVCenter | Qt::AlignCenter;
     options.rect = itemView->visualRect( index );

@@ -37,7 +37,7 @@ UnicornWidget::paintItBlack( QWidget* w )
     if (qobject_cast<QAbstractItemView*>(w))
     {
         // reinterpret cast didn't work. Lol.
-        p.setBrush( QPalette::Base, QColor( 35, 35, 35 ) );
+        p.setBrush( QPalette::Base, QColor( 0x2d2d2e ) );
         p.setBrush( QPalette::Text, Qt::white );
         p.setBrush( QPalette::Disabled, QPalette::Text, Qt::darkGray );
         p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );

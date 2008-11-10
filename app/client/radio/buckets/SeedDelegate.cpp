@@ -45,7 +45,7 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     //FIXME: why isn't the icon painting at 64x64? - this works around it 
     //       for now but the avatar is slightly blurry.
-    painter->drawPixmap( iconRect, icon.pixmap( iconRect.size()));
+    icon.paint( painter, iconRect);
     
     if( option.state & QStyle::State_Selected )
     {
@@ -61,7 +61,7 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     painter->setPen( Qt::white );
     QFont f = painter->font();
-    f.setPointSize( f.pointSize() - 4 );
+    f.setPointSize( 10 );
     painter->setFont( f );
     
     

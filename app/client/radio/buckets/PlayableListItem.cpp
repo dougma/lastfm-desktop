@@ -35,7 +35,6 @@ PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget*
         item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
     
     item->setData( moose::TypeRole, data->type() );
-    
     return item;
 };
 
@@ -87,6 +86,9 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
     try
     {
         QList<Artist> results = Artist::search( r );
+        
+        if( results.isEmpty() )
+            return;
         
         Artist a = results.first();
         

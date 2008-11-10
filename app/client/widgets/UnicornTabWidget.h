@@ -29,21 +29,25 @@ namespace Unicorn
 {
     class TabBar : public QTabBar
     {
-        QPixmap m_active;
-        QPixmap m_inactive;
+        friend class UnicornMacStyle;
+
         
     public:
+        QPixmap m_active;
+        QPixmap m_inactive;
         TabBar();
         
         virtual QSize sizeHint() const;
         
-        void succombToTheDarkSide();
+        void setSpacing( int );
         
     protected:
         virtual void mousePressEvent( QMouseEvent* );
         virtual void paintEvent( QPaintEvent* );
         virtual void tabInserted( int );
         virtual void tabRemoved( int );
+
+        int m_spacing;
     };
     
     

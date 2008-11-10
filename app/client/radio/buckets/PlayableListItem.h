@@ -31,10 +31,17 @@ class PlayableListItem : public QObject, public QListWidgetItem
     Q_OBJECT
     
 public:
-	PlayableListItem( QListWidget* parent = 0 ) : QObject( parent ), QListWidgetItem( parent, QListWidgetItem::UserType ){ m_networkManager = new WsAccessManager( this ); }
+	PlayableListItem( QListWidget* parent = 0 ) : QObject( parent ), QListWidgetItem( parent, QListWidgetItem::UserType ){ setupItem(); m_networkManager = new WsAccessManager( this ); }
 	PlayableListItem( const QString & text, QListWidget * parent = 0 )
-					:QObject( parent ), QListWidgetItem( text, parent, QListWidgetItem::UserType ){};
+    :QObject( parent ), QListWidgetItem( text, parent, QListWidgetItem::UserType ){ setupItem(); m_networkManager = new WsAccessManager( this ); } ;
 	
+    void setupItem()
+    {
+        QFont f = font();
+        f.setPointSize( 10 );
+        setFont( f );   
+    }
+    
 	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
 	
 	void setPlayableType( const Seed::Type t ){ setData( moose::TypeRole, t ); }

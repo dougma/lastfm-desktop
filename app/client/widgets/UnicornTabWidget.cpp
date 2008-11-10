@@ -26,19 +26,20 @@
 
 Unicorn::TabBar::TabBar()
 {
-#ifdef Q_WS_MAC
     QFont f = font();
-    f.setPointSize( 11 );
+    f.setPointSize( 10 );
+    f.setBold( false );
     setFont( f );
-#endif
-
-    m_inactive = QPixmap(":/controls/inactive/tab.png");
-    m_active = QPixmap(":/controls/active/tab.png");
-
+    
     QPalette p = palette();
-    p.setColor( QPalette::Active, QPalette::Text, Qt::black );
-    p.setColor( QPalette::Inactive, QPalette::Text, QColor( 42, 42, 42 ) );
+    p.setBrush( QPalette::Window, QBrush( 0x111112 ) );
+    p.setBrush( QPalette::Button, QBrush( 0x2d2d2e ));
+    p.setBrush( QPalette::Inactive, QPalette::Button, QBrush( 0x1f1f20 ));
+    p.setColor( QPalette::Active, QPalette::Text, Qt::white );
+    p.setColor( QPalette::Inactive, QPalette::Text, Qt::white );
     setPalette( p );
+    
+    setAutoFillBackground( true );
 }
 
 
@@ -48,7 +49,7 @@ Unicorn::TabBar::sizeHint() const
     return QSize( QTabBar::sizeHint().width(), m_active.height() - 2 );
 }
 
-
+#include <QDebug>
 void
 Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 {
@@ -57,7 +58,16 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
         return;
     }
     
-    setCurrentIndex( e->pos().x() / (width() / count()) );
+    int w = minimumWidth() / count();
+    int hOffset = (width() - minimumWidth()) / 2.0f;   
+    int index = ( (e->pos().x() - hOffset) / (w + m_spacing ) );
+    
+    qDebug() << "Tab:" << index;
+    //ignore if the click was in the spacing between tabs
+    if( e->pos().x() > ( hOffset + ((index + 1) *  (w + m_spacing)) ) )
+        return;
+    
+    setCurrentIndex( index );
 }
 
 
@@ -79,51 +89,54 @@ Unicorn::TabBar::tabRemoved( int i )
 
 
 void
-Unicorn::TabBar::succombToTheDarkSide()
-{
-    m_inactive = QPixmap(":/DockWindow/tab/inactive.png");
-    m_active = QPixmap(":/DockWindow/tab/active.png");
-
-    QFont f = font();
-    f.setPointSize( 12 );
-    f.setBold( false );
-    setFont( f );
-    
-    QPalette p = palette();
-    p.setColor( QPalette::Active, QPalette::Text, Qt::white );
-    p.setColor( QPalette::Inactive, QPalette::Text, Qt::white );
-    setPalette( p );
-}
-
-
-void
-Unicorn::TabBar::paintEvent( QPaintEvent* )
+Unicorn::TabBar::paintEvent( QPaintEvent* e )
 {
     QPainter p( this );
-    p.fillRect( rect(), m_inactive );
-        
-    int w = width() / count();
+    
+    p.setClipRect( e->rect());
+
+    int hOffset = (width() - minimumWidth()) / 2.0f;
+    int w = minimumWidth() / count();
+   
     for (int i = 0; i < count(); ++i)
     {
-        int const x = i*w;
+        int const x = hOffset + (i * ( w + m_spacing ));
         
         if (i == count() - 1)
-            w += width() % w;
+            w += (m_active.isNull() ? minimumWidth() : width()) % w;
         
         if (currentIndex() == i)
         {
-            p.fillRect( x, 0, w, height(), m_active );
+            if( !m_active.isNull())
+                p.fillRect( x, 0, w, height(), m_active );
+            else
+                p.fillRect( x, 0, w, height(), palette().brush( QPalette::Button ));
+            
             p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
         }
         else
+        {
+            if( !m_inactive.isNull())
+                p.fillRect( x, 0, w, height(), m_inactive );
+            else
+                p.fillRect( x, 0, w, height(), palette().brush( QPalette::Inactive, QPalette::Button ));
             p.setPen( palette().color( QPalette::Inactive, QPalette::Text ) );
+        }
                 
         p.drawText( x, 0, w, height(), Qt::AlignCenter, tabText( i ) );
     }
     
     const int h = height() - 1;
-    p.setPen( QColor( 29, 28, 28 ) );
-    p.drawLine( 0, h, width(), h );    
+    p.setPen( 0x29292a );
+    
+    p.drawLine( 0, h, width(), h );   
+}
+
+
+void 
+Unicorn::TabBar::setSpacing( int spacing )
+{
+    m_spacing = spacing;
 }
 
 
@@ -131,9 +144,19 @@ Unicorn::TabWidget::TabWidget()
 {
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( m_bar = new TabBar );
+    m_bar->setSpacing( 3 );
     v->addWidget( m_stack = new QStackedWidget );
     v->setSpacing( 0 );
     v->setMargin( 0 );
+    
+    setAutoFillBackground( true );
+    
+    QPalette p = palette();
+    p.setBrush( QPalette::Window, QBrush( 0x111112 ) );
+    setPalette( p );
+    
+    setContentsMargins( 5, 5, 5, 5 );
+    
     connect( m_bar, SIGNAL(currentChanged( int )), m_stack, SLOT(setCurrentIndex( int )) );
 }
 

@@ -90,8 +90,9 @@ public:
         setViewMode( QListView::IconMode );
         setFlow( QListView::LeftToRight );
         setResizeMode( QListView::Adjust );
-        setSpacing( 0 );
+        setIconSize( QSize( 34, 34 ) );
         setUniformItemSizes( true );
+        model()->setSupportedDragActions( Qt::CopyAction );
     }
     
 protected:
@@ -105,7 +106,7 @@ protected:
         PlayableMimeData* data = new PlayableMimeData();
         data->setType( item->playableType() );
         data->setText( item->text() );
-        data->setImageData( item->icon().pixmap(34).toImage() );
+        data->setImageData( item->data( Qt::DecorationRole ).value<QIcon>().pixmap(34).toImage() );
         
         if( item->playableType() == Seed::PreDefinedType )
             data->setRQL( item->rql() );
