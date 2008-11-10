@@ -76,17 +76,6 @@ public:
             return CoreDomElement();
         }
     }
-
-    /** won't throw */
-    void assignIfNonEmpty( const QString& key, QString* assignee )
-    {
-        try 
-        {
-            *assignee = (*this)[key].nonEmptyText();
-        }
-        catch (Exception&)
-        {}
-    }
     
     /** Selects a child element, you can specify attributes like so:
       *

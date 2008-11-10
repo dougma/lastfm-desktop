@@ -87,7 +87,9 @@ LoginDialog::onAuthenticated( WsReply* reply )
                 
                 // replace username; because eg. perhaps the user typed their
                 // username with the wrong camel case
-                session.assignIfNonEmpty( "name", &m_username );
+                QString username = session.optional( "name" ).text();
+                if (username.size())
+                    m_username = username;
                 
                 m_sessionKey = session["key"].nonEmptyText();
                 accept();
