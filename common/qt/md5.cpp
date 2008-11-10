@@ -25,6 +25,6 @@ namespace Qt
     static inline QString md5( const QByteArray& src )
     {
         QByteArray const digest = QCryptographicHash::hash( src, QCryptographicHash::Md5 );
-        return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' );
+        return QString::fromLatin1( digest.toHex() ).rightJustified( 32, '0' ).toLower();
     }
 }
