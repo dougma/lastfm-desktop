@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Tuner.h"
+#include "LegacyTuner.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/core/CoreLocale.h"
 #include "lib/lastfm/core/CoreSettings.h"
@@ -25,15 +25,12 @@
 #include <QCoreApplication>
 #include <QtNetwork>
 
-namespace lastfm {
-namespace legacy {
 
-
-Tuner::Tuner( const RadioStation& station, const QString& password_md5 )
+LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
      : m_nam( new WsAccessManager( this ) ),
        m_retry_counter( 0 ),
-       m_stationUrl( station.url() )
-{   
+       m_station( station )
+{    
 #ifdef WIN32
     static const char *PLATFORM = "win32";
 #elif defined Q_WS_X11
@@ -53,6 +50,8 @@ Tuner::Tuner( const RadioStation& station, const QString& password_md5 )
     url.addQueryItem( "username", Ws::Username );
     url.addQueryItem( "passwordmd5", password_md5 );
     url.addQueryItem( "language", CoreSettings().locale().code() );
+    
+    qDebug() << url;
 
     QNetworkRequest request( url );
     QNetworkReply* reply = m_nam->get( request );
@@ -74,7 +73,7 @@ static QByteArray replyParameter( const QByteArray& data, const QByteArray& key 
     
 
 void
-Tuner::onHandshakeReturn()
+LegacyTuner::onHandshakeReturn()
 {
     QNetworkReply* reply = (QNetworkReply*)sender();
     reply->deleteLater();
@@ -87,28 +86,40 @@ Tuner::onHandshakeReturn()
     QUrl url;
     url.setScheme( "http" );
     url.setHost( "ws.audioscrobbler.com" );
-    url.setPath( "/radio/adjust.php" );
     url.addEncodedQueryItem( "session", m_session );
-    url.addQueryItem( "url", m_stationUrl );
-    url.addQueryItem( "lang", CoreSettings().locale().code() );
-
-    qDebug() << url;
+    url.addQueryItem( "url", m_station.url() );
     
-    QNetworkRequest request( url );
-    reply = m_nam->get( request );
-    connect( reply, SIGNAL(finished()), SLOT(onAdjustReturn()) );
+    if (m_station.isLegacyPlaylist())
+    {
+        // It's a preview/playlist, use getresourceplaylist
+        url.setPath( "/1.0/webclient/getresourceplaylist.php" );
+        url.addQueryItem( "desktop", "1" );
+
+        QNetworkRequest request( url );
+        reply = m_nam->get( request );
+        connect( reply, SIGNAL(finished()), SLOT(onGetPlaylistReturn()) );        
+    }
+    else
+    {
+        url.setPath( "/radio/adjust.php" );
+        
+
+        url.addQueryItem( "lang", CoreSettings().locale().code() );
+
+        QNetworkRequest request( url );
+        reply = m_nam->get( request );
+        connect( reply, SIGNAL(finished()), SLOT(onAdjustReturn()) );
+    }
 }
 
 
 void
-Tuner::onAdjustReturn()
+LegacyTuner::onAdjustReturn()
 {
     QNetworkReply* reply = (QNetworkReply*)sender();
     QByteArray data = reply->readAll();
-    qDebug() << data;
     
-    m_stationName = QString::fromUtf8( replyParameter( data, "stationname" ) );
-    emit stationName( m_stationName );
+    emit title( QString::fromUtf8( replyParameter( data, "stationname" ) ) );
     
     fetchFiveMoreTracks();
 
@@ -116,9 +127,12 @@ Tuner::onAdjustReturn()
 }
 
 
-void
-Tuner::fetchFiveMoreTracks()
+bool
+LegacyTuner::fetchFiveMoreTracks()
 {
+    if (m_station.isLegacyPlaylist())
+        return false;
+    
     QUrl url;
     url.setScheme( "http" );
     url.setHost( "ws.audioscrobbler.com" );
@@ -129,11 +143,13 @@ Tuner::fetchFiveMoreTracks()
     QNetworkRequest request( url );
     QNetworkReply* reply = m_nam->get( request );
     connect( reply, SIGNAL(finished()), SLOT(onGetPlaylistReturn()) );
+    
+    return true;
 }
 
 
 bool
-Tuner::tryAgain()
+LegacyTuner::tryAgain()
 {
 	if (++m_retry_counter > 5)
 		return false;
@@ -197,7 +213,7 @@ public:
     
     
 void
-Tuner::onGetPlaylistReturn()
+LegacyTuner::onGetPlaylistReturn()
 {
     QNetworkReply* reply = (QNetworkReply*)sender();
     reply->deleteLater();
@@ -226,6 +242,3 @@ Tuner::onGetPlaylistReturn()
         emit tracks( xspf.tracks() );
     }
 }
-
-} //namespace legacy
-} //namespace lastfm

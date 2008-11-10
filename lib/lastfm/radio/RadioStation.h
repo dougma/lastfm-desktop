@@ -54,9 +54,17 @@ public:
 	QString title() const { return m_title; }
 	/** the Last.fm url, eg. lastfm://user/mxcl/loved */
 	QString url() const { return m_url; }
-	
+
 	void setTitle( const QString& s ) { m_title = s; }
-	
+
+    bool isLegacyPlaylist() const
+    {
+        return m_url.startsWith( "lastfm://play/" ) ||
+               m_url.startsWith( "lastfm://preview/" ) ||
+               m_url.startsWith( "lastfm://track/" ) ||
+               m_url.startsWith( "lastfm://playlist/" );
+    }
+    
 private:
 	QString m_url;
 	QString m_title;

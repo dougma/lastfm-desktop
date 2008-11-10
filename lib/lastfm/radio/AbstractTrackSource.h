@@ -17,51 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_TUNER_H
-#define LASTFM_TUNER_H
+#ifndef TRACK_SOURCE_H
+#define TRACK_SOURCE_H
 
-#include "AbstractTrackSource.h"
-#include <lastfm/DllExportMacro.h>
-#include <lastfm/radio/RadioStation.h>
 #include <lastfm/types/Track.h>
 #include <lastfm/ws/WsError.h>
+#include <QObject>
 #include <QList>
 
 
-/** With regard to error handling. We handle Ws::TryAgain up to 5 times, don't 
-  * try again after that!
-  * Just tell the user to try again later. 
-  */
-class LASTFM_RADIO_DLLEXPORT Tuner : public AbstractTrackSource
+class AbstractTrackSource : public QObject
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+    
 public:
-	/** You need to have assigned Ws::* for this to work, creating the tuner
-	  * automatically fetches the first 5 tracks for the station */
-    explicit Tuner( const RadioStation& );
-
-    /** Will emit 5 tracks from tracks(), they have to played within an hour
-	  * or the streamer will refuse to stream them. Also the previous five are
-      * invalidated apart from the one that is currently playing, so sorry, you
-      * can't build up big lists of tracks.
-      *
-      * I feel I must point out that asking the user which one they want to play
-      * is also not allowed according to our terms and conditions, which you
-      * already agreed to in order to get your API key. Sorry about that dude. 
-      */
-    virtual bool fetchFiveMoreTracks();
-
-private slots:
-	void onTuneReturn( WsReply* );
-	void onGetPlaylistReturn( WsReply* );
-
-private:
-	/** Tries again up to 5 times 
-	  * @returns true if we tried again, otherwise you should emit error */
-	bool tryAgain();
-
-	uint m_retry_counter;
+    virtual bool fetchFiveMoreTracks() { return false; }
+    
+signals:
+	void title( const QString& );
+	void tracks( const QList<Track>& );
+    void error( Ws::Error );
 };
 
 #endif

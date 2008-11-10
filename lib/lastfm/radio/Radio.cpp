@@ -18,8 +18,12 @@
  ***************************************************************************/
 
 #include "Radio.h"
-#include "Tuner.h"
+#include "AbstractTrackSource.h"
+#include "LegacyTuner.h"
 #include "Resolver.h"
+#include "Tuner.h"
+#include "common/qt/md5.cpp"
+#include "lib/lastfm/core/CoreSettings.h"
 #include <QThread>
 #include <QTimer>
 #include <phonon/mediaobject.h>
@@ -32,28 +36,37 @@
 Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
      : m_tuner( 0 ),
        m_audioOutput( output ),
+       m_mediaObject( 0 ),
        m_state( Radio::Stopped ),
-       m_resolver( resolver )
+       m_resolver( resolver ),
+       go( new RadioGuiObject )
 {
-    // for EnqueueThread, TODO remove!
     qRegisterMetaType<Phonon::MediaSource>( "MediaSource" );
+    qRegisterMetaType<Phonon::MediaSource>( "Phonon::MediaSource" );
+
+    start();
+}
+
     
-    m_mediaObject = new Phonon::MediaObject( this );
+void
+Radio::run()
+{    
+    connect( go, SIGNAL(play( RadioStation )), SLOT(onPlay( RadioStation )) );
+    connect( go, SIGNAL(stop()), SLOT(onStop()) );
+    connect( go, SIGNAL(skip()), SLOT(onSkip()) );
+    
+    m_mediaObject = new Phonon::MediaObject;
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
     Phonon::createPath( m_mediaObject, m_audioOutput );
 
-    if (m_resolver) {
-        connect( m_resolver, SIGNAL(resolveComplete( const Track )), SLOT(onResolveComplete( const Track )) );
-    }
-}
+    if (m_resolver)
+        connect( m_resolver, SIGNAL(resolveComplete( Track )), SLOT(onResolveComplete( Track )) );
+    
+    exec();
 
-
-Radio::~Radio()
-{
-#ifndef WIN32 //for now I'm scared on Windows
 	if (m_mediaObject->state() != Phonon::PlayingState)
         return;
 
@@ -69,13 +82,12 @@ Radio::~Radio()
 
 		struct Thread : QThread { using QThread::msleep; };
 		Thread::msleep( 7 );
-    } 
-#endif
+    }
 }
 
 
 void
-Radio::play( const RadioStation& station )
+Radio::onPlay( const RadioStation& station )
 {
     if (m_state != Stopped)
     {
@@ -88,43 +100,18 @@ Radio::play( const RadioStation& station )
     }
 
 	m_station = station;
-    
 	delete m_tuner;
-    m_tuner = new Tuner( station );
-	connect( m_tuner, SIGNAL(stationName( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
+
+    m_tuner = station.isLegacyPlaylist()
+            ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
+            : (AbstractTrackSource*) new Tuner( station );
+
+	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
 	connect( m_tuner, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
 
     changeState( TuningIn );
 }
-
-
-#include <QThread>
-/** my gosh, this is dangerous, FIXME!
-  * done because on mac Phonon would hang in enqueu for a few seconds, which
-  * sucked */
-class EnqueueThread : public QThread
-{
-	QUrl m_url;
-	Phonon::MediaObject* m_o;
-	
-public:
-	EnqueueThread( const QUrl& url, Phonon::MediaObject* object )
-	{
-        qDebug() << url;
-        
-		m_o = object;
-		m_url = url;
-		connect( this, SIGNAL(finished()), SLOT(deleteLater()) );
-		start();
-	}
-	
-	virtual void run()
-	{
-        m_o->enqueue( Phonon::MediaSource(m_url) );
-		m_o->play();
-	}
-}; 
 
 
 void
@@ -164,34 +151,8 @@ Radio::enqueue( const QList<Track>& tracks )
 }
 
 
-
-class SkipThread : public QThread
-{
-	Phonon::MediaObject* m_mediaObject;
-	
-public:
-	SkipThread( Phonon::MediaObject* object )
-	{
-		m_mediaObject = object;
-		connect( this, SIGNAL(finished()), SLOT(deleteLater()) );
-		start();
-	}
-	
-	virtual void run()
-	{
-		QList<Phonon::MediaSource> q = m_mediaObject->queue();
-		Phonon::MediaSource source = q.front();
-		q.pop_front();
-	
-		m_mediaObject->setCurrentSource( source );
-		m_mediaObject->setQueue( q );
-		m_mediaObject->play();
-	}
-};
-
-
 void
-Radio::skip()
+Radio::onSkip()
 {
     // attempt to refill the phonon queue if it's empty
 	if (m_mediaObject->queue().isEmpty())
@@ -200,14 +161,10 @@ Radio::skip()
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
     if (q.size())
 	{
-#ifdef Q_WS_MAC
-		new SkipThread( m_mediaObject );
-#else
 		Phonon::MediaSource source = q.front();
 		m_mediaObject->setQueue( q );
 		m_mediaObject->setCurrentSource( source );
 		m_mediaObject->play();
-#endif
 	}
     else if (m_state != Stopped)
     {
@@ -234,7 +191,7 @@ Radio::onTunerError( Ws::Error e )
 
 
 void
-Radio::stop()
+Radio::onStop()
 {
     delete m_tuner;
     m_tuner = 0;
@@ -318,9 +275,8 @@ Radio::phononEnqueue()
     // only keep one track in the phononQueue
     if (!m_queue.isEmpty() && m_mediaObject->queue().isEmpty()) {
         Track t = m_queue.first();
-        if (m_resolver) {
-            m_resolver->stopResolving( t );  
-        }
+        if (m_resolver) 
+            m_resolver->stopResolving( t );
 
         m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
         m_mediaObject->play();

@@ -53,8 +53,7 @@ Tuner::onTuneReturn( WsReply* reply )
 	}
 
 	try {
-		m_stationName = reply->lfm()["station"]["name"].text();
-		emit stationName( m_stationName );
+		emit title( reply->lfm()["station"]["name"].text() );
 	}
 	catch (CoreException&)
 	{}
@@ -63,11 +62,12 @@ Tuner::onTuneReturn( WsReply* reply )
 }
 
 
-void
+bool
 Tuner::fetchFiveMoreTracks()
 {
     WsReply* reply = WsRequestBuilder( "radio.getPlaylist" ).add( "rtp", "1" ).get();
 	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetPlaylistReturn( WsReply* )) );
+    return true;
 }
 
 
