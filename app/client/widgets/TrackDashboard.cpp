@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "TrackDashboard.h"
+#include "FadingScrollbar.h"
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
@@ -48,17 +49,17 @@ namespace mxcl
 
 
 struct Line : QWidget
+{
+    Line()
     {
-        Line()
-        {
-            setFixedHeight( 1 );
-        }
-        
-        virtual void paintEvent( QPaintEvent* )
-        {
-            QPainter( this ).fillRect( 0, 0, width(), 1, QColor( 0x3a, 0x3b, 0x3c ) );
-        }
-    };
+        setFixedHeight( 1 );
+    }
+    
+    virtual void paintEvent( QPaintEvent* )
+    {
+        QPainter( this ).fillRect( 0, 0, width(), 1, QColor( 0x3a, 0x3b, 0x3c ) );
+    }
+};
 
 
 struct ListView : QListWidget
@@ -76,108 +77,47 @@ struct ListView : QListWidget
 };
 
 
-struct FadingScrollBar : QScrollBar
-{
-    QTimeLine* m_timeline;
-    bool m_hide_when_zero;
-    
-    FadingScrollBar( QWidget* parent ) : QScrollBar( parent )
-    {
-        m_hide_when_zero = false;
-        
-        m_timeline = new QTimeLine( 300, this );
-        m_timeline->setFrameRange( 0, 255 );
-        m_timeline->setUpdateInterval( 5 );
-        connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(update()) );
-        QScrollBar::hide();
-    }
-    
-    void show()
-    {
-        m_hide_when_zero = false;
-        m_timeline->setCurveShape( QTimeLine::EaseInCurve );
-        m_timeline->setDirection( QTimeLine::Backward );
-        m_timeline->start();
-        QScrollBar::show();
-    }
-    
-    void hide()
-    {
-        m_hide_when_zero = true;
-        m_timeline->setCurveShape( QTimeLine::EaseOutCurve );
-        m_timeline->setDirection( QTimeLine::Forward );
-        m_timeline->start();
-    }
-    
-    virtual void paintEvent( QPaintEvent* e )
-    {           
-        QScrollBar::paintEvent( e );
-        
-        if (m_timeline->state() == QTimeLine::Running)
-        {
-            int const f = m_timeline->currentFrame();
-                        
-            QPainter p( this );
-            p.fillRect( rect(), QColor( 0x16, 0x16, 0x17, f ) );
-            
-            if (m_hide_when_zero && f >= 254) 
-                QScrollBar::hide();
-        }
-    }
-};
-
-
 TrackDashboard::TrackDashboard()
 {   
     nam = new WsAccessManager( this );
     
-    QWidget* indicator;
-    
-    ui.papyrus = new QWidget( this );
-    
-	QVBoxLayout* v = new QVBoxLayout( this );
-	v->addWidget( indicator = new MediaPlayerIndicator );
-    v->addStretch();
-    v->setContentsMargins( 9, 9, 9, 0 );
-    v->setSpacing( 0 );
-    
-    indicator->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
-    
+    ui.papyrus = new QWidget( this );    
     ui.cover = new PrettyCoverWidget;
     ui.cover->setParent( ui.papyrus );
+    
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     
     QHBoxLayout* h = new QHBoxLayout;
     h->addWidget( ui.artist = new QLabel );
     h->addWidget( ui.artist_text = new QLabel );
     h->setStretchFactor( ui.artist_text, 1 );
     h->setMargin( 0 );
-    
+    h->setSpacing( 9 );
+
     ui.info = new QWidget( ui.papyrus );
-    v = new QVBoxLayout( ui.info );
-    v->addWidget( ui.title = new QLabel );
-    v->addSpacing( 20 );
+    QVBoxLayout* v = new QVBoxLayout( ui.info );
     v->addLayout( h );
+    v->addSpacing( 10 );
     v->addWidget( ui.bio = new mxcl::TextBrowser);
+    v->addSpacing( 10 );
     v->addWidget( new Line );
+    v->addSpacing( 10 );
     v->addWidget( new QLabel( HEADING "Tags" ) );
     v->addWidget( new ListView );
+    v->addSpacing( 10 );
     v->addWidget( new Line );
+    v->addSpacing( 10 );
     v->addWidget( new QLabel( HEADING "Top Listeners" ) );
     v->addWidget( new ListView );
     v->addWidget( new Line );
-    v->addSpacing( 27 );
+    v->addSpacing( 10 );
     v->setMargin( 0 );
-
-    v->setAlignment( ui.title, Qt::AlignHCenter );
+    v->setSpacing( 0 );
 
     ui.scrollbar = new FadingScrollBar( this );
-    ui.scrollbar->hide();
+    ui.scrollbar->setVisible( false );
     connect( ui.scrollbar, SIGNAL(valueChanged( int )), SLOT(setPapyrusPosition( int )) );
-    
-    ui.title->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
-    ui.title->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
-    ui.title->setTextFormat( Qt::RichText );            
-    
+        
     UnicornWidget::paintItBlack( this );
     UnicornWidget::paintItBlack( ui.bio );
     setAutoFillBackground( true );
@@ -191,14 +131,6 @@ TrackDashboard::TrackDashboard()
     p.setColor( QPalette::Text, QColor( 0xa3, 0xa5, 0xa8 ) );
     ui.bio->setPalette( p );
     
-
-#ifdef Q_WS_MAC
-    p.setColor( QPalette::WindowText, Qt::white );
-    ui.title->setPalette( p );
-    ui.title->setAttribute( Qt::WA_MacSmallSize );
-    indicator->setPalette( p );
-#endif
-
 	QFile file( ":/black.css" );
 	file.open( QFile::ReadOnly );
     QString css = file.readAll();
@@ -211,41 +143,42 @@ TrackDashboard::TrackDashboard()
     ui.bio->document()->setDefaultStyleSheet( css );
     ui.bio->setAutoFillBackground( false );
     
-    setMinimumHeight( 440 );
+//    setMinimumHeight( 440 );
+    
+    clear();
 }
 
 
 void
 TrackDashboard::setTrack( const Track& t )
 {
-    if (t.isNull()) {
-        clear();
-        return;
+    if (m_track.artist() != t.artist())
+    {
+        ui.info->hide();
+
+        static QPointer<WsReply> r;
+        delete r; //only one at a time please
+        r = t.artist().getInfo();
+
+        connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
     }
-    
-    m_track = t;
-    
+
     ui.cover->setTrack( t );
-    
-    static QPointer<WsReply> r;
-    delete r; //only one at a time please
-    r = t.artist().getInfo();
 
-    connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
-
-    ui.title->setText( "<B><span style='font-size:12pt'>" + t.title() );
+    m_track = t;
 }
 
 
 void
 TrackDashboard::clear()
 {
-    ui.title->clear();
     ui.cover->clear();
     ui.bio->clear();
     ui.scrollbar->setRange( 0, 0 );
     ui.artist->clear();
     ui.artist_text->clear();
+    
+    ui.info->hide();
     
     m_track = Track();
 }
@@ -270,7 +203,6 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
                 "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ") <<
                 "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
         ui.bio->setHtml( html );
-        ui.bio->setFixedWidth( 251 );
         resizeEvent( 0 );
         
         ui.artist_text->setText( HEADING + name + "</b></div>" + 
@@ -283,6 +215,10 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         connect( reply, SIGNAL(finished()), SLOT(onArtistImageDownloaded()) );
         
         ui.artist->setFixedHeight( ui.artist_text->sizeHint().height() + 10 );
+
+        ui.info->show();
+        
+        ui.cover->setMinimumWidth( ui.artist->height() );
 	}
 	catch (CoreDomElement::Exception& e)
 	{
@@ -318,19 +254,53 @@ TrackDashboard::onArtistImageDownloaded()
 
 void
 TrackDashboard::resizeEvent( QResizeEvent* )
-{   
-    ui.cover->setFixedSize( 260, 325 );
-    int const x = (width() - ui.cover->width()) / 2;
-    ui.cover->move( x, 34 );
+{
+    ui.papyrus->setFixedWidth( width() );    
 
-    ui.info->move( x, 45 + ui.cover->width() + 10 );
-    ui.bio->setFixedWidth( ui.cover->width() );
+    int w = 0;
+    
+    if (width() > ui.cover->widthForHeight( height() ) * 2)
+    {
+        ui.scrollbar->fadeIn();
+        ui.cover->setParent( this );
+        ui.cover->show();
+        ui.cover->raise();
+        
+        ui.cover->move( 12, 12 );
+        int h = height() - 24;
+        ui.cover->resize( ui.cover->widthForHeight( h ), h );
+        
+        ui.info->move( ui.cover->geometry().right() + 12, 0 );
+        
+        w = width() - ui.info->geometry().x() - ui.scrollbar->width() - 12;
+    }
+    else
+    {
+        ui.scrollbar->fadeOutLater();
+        ui.cover->setParent( ui.papyrus );
+        ui.cover->move( 0, 0 );
+        ui.cover->show();
+        ui.cover->raise();
+        
+        w = qMax( ui.cover->coverWidth(), uint(180) );
+        int const x = (width() - w) / 2;
+
+        ui.cover->resize( ui.papyrus->width(), height() - ui.artist->height() - 24 );
+        ui.info->move( x, ui.cover->height() );
+    }
+
+    ui.info->setFixedWidth( w );
+    ui.bio->document()->setTextWidth( w );
+    ui.bio->setFixedSize( ui.bio->sizeHint() );
+    ui.bio->adjustSize();
     ui.info->adjustSize();
 
-    ui.papyrus->resize( width(), ui.info->height() + ui.info->geometry().y() );
-    
-    const int w = ui.scrollbar->sizeHint().width();
-    ui.scrollbar->setGeometry( width() - w, 0, w, height() );
+    ui.papyrus->resize( 0xff, ui.info->height() + ui.info->geometry().y() );
+
+    {
+        const int w = ui.scrollbar->sizeHint().width();
+        ui.scrollbar->setGeometry( width() - w, 0, w, height() );
+    }
  
     if (!m_track.isNull())
     {
@@ -339,8 +309,17 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     }
     
     setPapyrusPosition( ui.scrollbar->value() );
+    ui.scrollbar->raise();
 }
 
+
+void
+TrackDashboard::setPapyrusPosition( int y )
+{
+    int const fudge = orientation() == Qt::Horizontal ? -2 : 10;
+    
+    ui.papyrus->move( 0, fudge - y );
+}
 
 bool
 TrackDashboard::event( QEvent* e )
@@ -349,11 +328,13 @@ TrackDashboard::event( QEvent* e )
     {
         case QEvent::Enter:
             if (ui.scrollbar->maximum() > 0)
-                ui.scrollbar->show();
+                ui.scrollbar->fadeIn();
             break;
         
+        case QEvent::FocusOut:
         case QEvent::Leave:
-            ui.scrollbar->hide();
+            if (orientation() != Qt::Horizontal)
+                ui.scrollbar->fadeOut();
             break;
             
         case QEvent::Wheel:
@@ -362,13 +343,6 @@ TrackDashboard::event( QEvent* e )
     }
     
     return QWidget::event( e );
-}
-
-
-void
-TrackDashboard::setPapyrusPosition( int y )
-{
-    ui.papyrus->move( 0, -y );
 }
 
 

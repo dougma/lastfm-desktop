@@ -17,63 +17,6 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TRACK_INFO_WIDGET_H
-#define TRACK_INFO_WIDGET_H
-
-#include <QImage>
-#include <QWidget>
-#include "lib/lastfm/types/Track.h"
+#include "FadingScrollBar.h"
 
 
-class PrettyCoverWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    PrettyCoverWidget();
-
-	void setTrack( const Track& );
-	void clear();
-    
-    void setReflectionHeight( uint h ) { m_reflection_height = h; }
-    uint reflectionHeight() const { return m_reflection_height; }
-    
-    int widthForHeight( int h ) const
-    {
-        return h - m_reflection_height;
-    }
-
-    int heightForWidth( int w ) const
-    {
-        return w + m_reflection_height;
-    }
-    
-    void setMinimumWidth( int w )
-    {
-        setMinimumSize( w, heightForWidth( w ) );
-    }
-    
-    uint coverWidth() const { return m_rendered_width; }
-	
-	struct Ui
-	{
-		class SpinnerLabel* spinner;
-	};
-	
-	Ui ui;
-	
-private slots:
-	void onAlbumImageDownloaded( const QByteArray& );
-
-private:
-    void paintEvent( QPaintEvent* );
-
-    QImage m_cover;
-	Track m_track;
-    uint m_rendered_width;
-    uint m_reflection_height;
-	
-	static QImage addReflection( const QImage& );
-};
-
-#endif //TRACK_INFO_WIDGET_H

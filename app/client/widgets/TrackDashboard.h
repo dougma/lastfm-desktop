@@ -24,26 +24,34 @@
 #include "lib/lastfm/types/Track.h"
 
 
+/** @author <max@last.fm> */
+
 class TrackDashboard : public QWidget
 {
     Q_OBJECT
-    
+
     Track m_track;
     class QNetworkAccessManager* nam;
-    
+
 public:
     TrackDashboard();
-    
-    void setTrack( const class Track& );
-    void clear(); 
 
+    void setTrack( const class Track& );
+    void clear();
+
+    Qt::Orientation orientation() const
+    {
+        return ui.info->geometry().y() == 0 ? Qt::Horizontal : Qt::Vertical;
+    }
+
+    virtual QSize sizeHint() const { return QSize( 100, 100 ); }
+    
     struct //FIXME make not public
     {
         QWidget* actionbar;
         QWidget* papyrus;
         QWidget* info;
         class PrettyCoverWidget* cover;
-        class QLabel* title;
         class QTextBrowser* bio;
         class FadingScrollBar* scrollbar;
         class QLabel* artist;
