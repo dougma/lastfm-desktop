@@ -61,7 +61,7 @@ SendLogsRequest::send()
     url.setScheme( "http" );
     url.setHost( "oops.last.fm" );
     url.setPath( "logsubmission/add" );
-    url.addQueryItem( "username", Ws::Username );
+    url.addEncodedQueryItem( "username", QUrl::toPercentEncoding(Ws::Username) );
     #ifdef Q_WS_MAC
         url.addQueryItem( "platform", "macosx" );
     #elif defined WIN32
