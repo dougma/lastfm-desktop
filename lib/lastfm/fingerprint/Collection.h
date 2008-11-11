@@ -34,7 +34,7 @@ public:
     static Collection& instance();
 
     /** \brief Temp method: Gets a fingerprint id. Returns "" if none found. */
-    virtual QString getFingerprintId( const QString& filePath );
+    QString getFingerprintId( const QString& filePath );
 
     /** \brief Temp method: Sets a fingerprint id. */
     bool setFingerprintId( const QString& filePath, QString fpId );

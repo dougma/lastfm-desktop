@@ -34,8 +34,8 @@ static const int k_minTrackDuration = 30;
 Fingerprint::Fingerprint( const Track& t )
            : m_track( t ),
              m_extractor( 0 ),
-             m_complete( false ),
-             m_id( -1 )
+             m_id( -1 ),
+             m_complete( false )
 {
     QString id = Collection::instance().getFingerprintId( t.url().toLocalFile() );   
     if (id.size()) {
@@ -202,26 +202,28 @@ Fingerprint::submit( QNetworkAccessManager* nam ) const
     QString const path = t.url().toLocalFile();
     QFileInfo const fi( path );
 
+    #define e( x ) QUrl::toPercentEncoding( x )
     QUrl url( "http://www.last.fm/fingerprint/query/" );
-    url.addQueryItem( "artist", t.artist() );
-    url.addQueryItem( "album", t.album() );
-    url.addQueryItem( "track", t.title() );
-    url.addQueryItem( "duration", QString::number( t.duration() ) );
-    url.addQueryItem( "mbid", t.mbid() );
-    url.addQueryItem( "filename", fi.completeBaseName() );
-    url.addQueryItem( "fileextension", fi.completeSuffix() );
-    url.addQueryItem( "tracknum", QString::number( t.trackNumber() ) );
-    url.addQueryItem( "sha256", sha256( path ) );
-    url.addQueryItem( "time", QString::number( QDateTime::currentDateTime().toTime_t() ) );
-    url.addQueryItem( "fpversion", QString::number( fingerprint::FingerprintExtractor::getVersion() ) );
-    url.addQueryItem( "fulldump", m_complete ? "true" : "false" );
-    url.addQueryItem( "noupdate", "false" );
-    
+    url.addEncodedQueryItem( "artist", e(t.artist()) );
+    url.addEncodedQueryItem( "album", e(t.album()) );
+    url.addEncodedQueryItem( "track", e(t.title()) );
+    url.addEncodedQueryItem( "duration", QByteArray::number(t.duration()) );
+    url.addEncodedQueryItem( "mbid", e(t.mbid()) );
+    url.addEncodedQueryItem( "filename", e(fi.completeBaseName()) );
+    url.addEncodedQueryItem( "fileextension", e(fi.completeSuffix()) );
+    url.addEncodedQueryItem( "tracknum", QByteArray::number( t.trackNumber() ) );
+    url.addEncodedQueryItem( "sha256", sha256( path ).toAscii() );
+    url.addEncodedQueryItem( "time", QByteArray::number(QDateTime::currentDateTime().toTime_t()) );
+    url.addEncodedQueryItem( "fpversion", QByteArray::number((int)fingerprint::FingerprintExtractor::getVersion()) );
+    url.addEncodedQueryItem( "fulldump", m_complete ? "true" : "false" );
+    url.addEncodedQueryItem( "noupdate", "false" );
+    #undef e
+
 	//FIXME: talk to mir about submitting fplibversion
-    
+
     QNetworkRequest request( url );
     request.setHeader( QNetworkRequest::ContentTypeHeader, "multipart/form-data; boundary=----------------------------8e61d618ca16" );
-    
+
     QByteArray bytes;
     bytes += "------------------------------8e61d618ca16\r\n";
     bytes += "Content-Disposition: ";
@@ -233,7 +235,7 @@ Fingerprint::submit( QNetworkAccessManager* nam ) const
 
     qDebug() << url;
     qDebug() << "Fingerprint size:" << bytes.size() << "bytes";
-    
+
     return nam->post( request, bytes );
 }
 

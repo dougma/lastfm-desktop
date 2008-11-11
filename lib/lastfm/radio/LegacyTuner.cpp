@@ -46,13 +46,11 @@ LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_m
     url.setScheme( "http" );
     url.setHost( "ws.audioscrobbler.com" );
     url.setPath( "/radio/handshake.php" );
-    url.addQueryItem( "version", QCoreApplication::applicationVersion() );
-    url.addQueryItem( "platform", PLATFORM );
-    url.addQueryItem( "username", Ws::Username );
-    url.addQueryItem( "passwordmd5", password_md5 );
-    url.addQueryItem( "language", CoreSettings().locale().code() );
-    
-    qDebug() << url;
+    url.addEncodedQueryItem( "version", QCoreApplication::applicationVersion().toAscii() );
+    url.addEncodedQueryItem( "platform", PLATFORM );
+    url.addEncodedQueryItem( "username", QUrl::toPercentEncoding(Ws::Username) );
+    url.addEncodedQueryItem( "passwordmd5", password_md5.toAscii() );
+    url.addEncodedQueryItem( "language", CoreSettings().locale().code().toAscii() );
 
     QNetworkRequest request( url );
     QNetworkReply* reply = m_nam->get( request );
