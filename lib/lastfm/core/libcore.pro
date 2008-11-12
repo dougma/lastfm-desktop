@@ -1,6 +1,12 @@
 TARGET = core
 TEMPLATE = lib
-QT = core gui xml
+QT = core xml
+
+# UniqueApplication on Windows needs QWidget sadly
+win32: QT += gui
+
+# AppleScript stuff
+macx*: LIBS += -framework Carbon
 
 include( $$ROOT_DIR/common/qmake/include.pro )
 

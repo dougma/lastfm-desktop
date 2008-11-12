@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include "UnicornApplication.h"
+#include "QMessageBoxBuilder.h"
 #include "UnicornCoreApplication.h"
 #include "widgets/LoginDialog.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QDebug>
 #include <QTranslator>

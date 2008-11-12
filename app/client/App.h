@@ -58,6 +58,8 @@ public slots:
       * need to be handled at a higher level */
     void onWsError( Ws::Error );
 
+    void onRadioError( int, const class QVariant& );
+
     /** currently also quits, needs fixing! */
     void logout();
 

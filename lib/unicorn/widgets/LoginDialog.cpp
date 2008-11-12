@@ -19,7 +19,7 @@
 
 #include "LoginDialog.h"
 #include "common/qt/md5.cpp"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/ws/WsRequestBuilder.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include <QMovie>

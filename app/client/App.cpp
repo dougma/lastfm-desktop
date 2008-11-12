@@ -32,7 +32,7 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
 #include "app/twiddly/IPodScrobble.h"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/fingerprint/Fingerprint.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
@@ -129,6 +129,7 @@ App::App( int& argc, char** argv )
     connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
     connect( m_radio, SIGNAL(trackStarted( Track )), m_playerMediator, SLOT(onRadioTrackStarted( Track )) );
     connect( m_radio, SIGNAL(stopped()), m_playerMediator, SLOT(onRadioStopped()) );
+    connect( m_radio, SIGNAL(error( int, QVariant )), SLOT(onRadioError( int, QVariant )) );
     
 #ifdef __APPLE__
 #ifdef NDEBUG
@@ -207,6 +208,13 @@ App::onWsError( Ws::Error e )
 		default:
 			break;
     }
+}
+
+
+void
+App::onRadioError( int e, const QVariant& data )
+{
+    
 }
 
 

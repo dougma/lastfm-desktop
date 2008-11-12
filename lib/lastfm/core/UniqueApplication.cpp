@@ -23,10 +23,10 @@
 #include <QDebug>
 #include <QProcess>
 #include <QStringList>
-#include <QWidget>
 
 
 #ifdef WIN32
+#include <QWidget>
 class UniqueApplicationWidget : public QWidget
 {
 	friend class UniqueApplication;
