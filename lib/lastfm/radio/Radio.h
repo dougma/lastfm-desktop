@@ -37,26 +37,15 @@ namespace Phonon
 class QAction;
 
 
-struct RadioGuiObject : public QObject
-{
-    Q_OBJECT
-    friend class Radio;
-    
-signals:
-    void play( const RadioStation& );
-    void skip();
-    void stop();
-};
-
-
 /** @author <max@last.fm>
  */
-class LASTFM_RADIO_DLLEXPORT Radio : public QThread
+class LASTFM_RADIO_DLLEXPORT Radio : public QObject
 {
     Q_OBJECT
 
 public:
     Radio( Phonon::AudioOutput*, class Resolver* resolver = 0 );
+    ~Radio();
 	
 	enum State
 	{
@@ -68,14 +57,12 @@ public:
 
 	State state() const { return m_state; }
 
-    virtual void run();
-	
     Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
-	
+
 public slots:
-    void play( const RadioStation& station ) { emit go->play( station ); }
-    void skip() { emit go->skip(); }
-    void stop() { emit go->stop(); }
+    void play( const RadioStation& station );
+    void skip();
+    void stop();
 
 signals:
     /** emitted up to twice, as first time may not have a title for the station
@@ -102,10 +89,6 @@ private slots:
 
 	/** we get a "proper" station name from the tune webservice */
 	void setStationNameIfCurrentlyBlank( const QString& );
-
-    void onPlay( const RadioStation& );
-    void onSkip();
-    void onStop();
 	
 private:
     /** resets internals to what Stopped means, used by changeState() */
@@ -123,7 +106,6 @@ private:
 	Track m_track;
 	RadioStation m_station;
     class Resolver *m_resolver;
-    RadioGuiObject* go;
 
     QList<Track> m_queue;
 };

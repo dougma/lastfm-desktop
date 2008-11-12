@@ -38,35 +38,22 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
        m_audioOutput( output ),
        m_mediaObject( 0 ),
        m_state( Radio::Stopped ),
-       m_resolver( resolver ),
-       go( new RadioGuiObject )
+       m_resolver( resolver )
 {
-    qRegisterMetaType<Phonon::MediaSource>( "MediaSource" );
-    qRegisterMetaType<Phonon::MediaSource>( "Phonon::MediaSource" );
-
-    start();
-}
-
-    
-void
-Radio::run()
-{    
-    connect( go, SIGNAL(play( RadioStation )), SLOT(onPlay( RadioStation )) );
-    connect( go, SIGNAL(stop()), SLOT(onStop()) );
-    connect( go, SIGNAL(skip()), SLOT(onSkip()) );
-    
     m_mediaObject = new Phonon::MediaObject;
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
-    Phonon::createPath( m_mediaObject, m_audioOutput );
-
-    if (m_resolver)
-        connect( m_resolver, SIGNAL(resolveComplete( Track )), SLOT(onResolveComplete( Track )) );
+    Phonon::createPath( m_mediaObject, m_audioOutput );    
     
-    exec();
+    if (m_resolver)
+        connect( m_resolver, SIGNAL(resolveComplete( Track )), SLOT(onResolveComplete( Track )) );    
+}
 
+    
+Radio::~Radio()
+{    
 	if (m_mediaObject->state() != Phonon::PlayingState)
         return;
 
@@ -87,7 +74,7 @@ Radio::run()
 
 
 void
-Radio::onPlay( const RadioStation& station )
+Radio::play( const RadioStation& station )
 {
     if (m_state != Stopped)
     {
@@ -152,7 +139,7 @@ Radio::enqueue( const QList<Track>& tracks )
 
 
 void
-Radio::onSkip()
+Radio::skip()
 {
     // attempt to refill the phonon queue if it's empty
 	if (m_mediaObject->queue().isEmpty())
@@ -191,7 +178,7 @@ Radio::onTunerError( Ws::Error e )
 
 
 void
-Radio::onStop()
+Radio::stop()
 {
     delete m_tuner;
     m_tuner = 0;
