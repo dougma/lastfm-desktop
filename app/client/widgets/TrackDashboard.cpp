@@ -310,6 +310,9 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     
     setPapyrusPosition( ui.scrollbar->value() );
     ui.scrollbar->raise();
+    
+    if (m_track.isNull())
+        ui.scrollbar->hide();
 }
 
 

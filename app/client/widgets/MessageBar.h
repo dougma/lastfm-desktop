@@ -17,55 +17,36 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_ERROR_H
-#define LASTFM_WS_ERROR_H
+#ifndef MESSAGE_BAR_H
+#define MESSAGE_BAR_H
 
-namespace Ws
+#include <QWidget>
+
+
+/** @author <max@last.fm> */
+
+class MessageBar : public QWidget
 {
-    enum Error
-    {
-        NoError = 1,
+    Q_OBJECT
+    
+    class QTimeLine* m_timeline;
 
-        /** see http://last.fm/api/ */
-        InvalidService = 2,
-        InvalidMethod,
-        AuthenticationFailed,
-        InvalidFormat,
-        InvalidParameters,
-        InvalidResourceSpecified,
-        OperationFailed,
-        InvalidSessionKey,
-        InvalidApiKey,
-        ServiceOffline,
-        SubscribersOnly,
-
-        /** Last.fm sucks. 
-          * There may be an error in networkError(), or this may just be some
-          * internal error completing your request.
-          * Advise the user to try again in a _few_minutes_.
-          * For some cases, you may want to try again yourself, at this point
-          * in the API you will have to. Eventually we will discourage this and
-          * do it for you, as we don't want to strain Last.fm's servers
-          */
-        TryAgainLater = 16,
-        
-		NotEnoughContent = 20,
-		NotEnoughMembers,
-		NotEnoughFans,
-		NotEnoughNeighbours,
-
-        /** Last.fm fucked up, or something mangled the response on its way */
-        MalformedResponse = 100,
-
-        /** call networkError() for more details */
-        UrLocalNetworkIsFuckedLol,
-        UrProxyIsFuckedLol,
-
-        /** you aborted the request, the lib never does, we promise! */
-        Aborted,
-        
-        UnknownError
-    };
-}
+    struct Ui {
+        QWidget* papyrus;
+    } ui;
+    
+    virtual void resizeEvent( QResizeEvent* );
+    
+public:
+    MessageBar();
+    
+public slots:
+    void showError( const QString& );
+    void showInformation( const QString& );
+    
+private slots:
+    void animate( int );
+    void onLabelDestroyed();
+};
 
 #endif

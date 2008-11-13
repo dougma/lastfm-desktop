@@ -212,9 +212,33 @@ App::onWsError( Ws::Error e )
 
 
 void
-App::onRadioError( int e, const QVariant& data )
+App::onRadioError( int code, const QVariant& data )
 {
-    
+    switch (code)
+    {
+        case Ws::NotEnoughContent:
+            emit error( tr("Sorry, there is no more content available for this radio station.") );
+            break;
+            
+        case Ws::MalformedResponse:
+        case Ws::TryAgainLater:
+            emit error( tr("Sorry, there was a radio error at Last.fm. Please try again later.") );
+            break;
+            
+        case Ws::SubscribersOnly:
+            emit error( tr("Sorry, this station is only available to Last.fm subscribers. "
+                           "<A href='http://www.last.fm/subscribe'>Sign up</a>.") );
+            break;
+
+        case Ws::UnknownError:
+            // string contains Phonon generated user readable error message
+            emit error( data.toString() );
+            break;
+
+        default:
+            emit error( tr("Sorry, an unexpected error occurred.") );
+            break;
+    }
 }
 
 

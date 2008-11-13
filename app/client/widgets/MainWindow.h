@@ -48,6 +48,7 @@ public:
         class Sources* sources;
         class TrackDashboard* dashboard;
         class ImageButton* cog;
+        class MessageBar* messagebar;
     } ui;
 
 protected:
@@ -61,7 +62,6 @@ public slots:
     void showAboutDialog();
     void showShareDialog();
 	void showTagDialog();
-    void closeActiveWindow();
 
 signals:
 	void loved();

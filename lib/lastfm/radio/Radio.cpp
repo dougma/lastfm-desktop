@@ -219,8 +219,8 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
     {
         case Phonon::ErrorState:
 			if (m_mediaObject->errorType() == Phonon::FatalError)
-				qCritical() << m_mediaObject->errorString();
-            skip();     // maybe the next track will be better
+				emit error( Ws::UnknownError, m_mediaObject->errorString() );
+            skip(); // maybe the next track will be better
             break;
 			
 		case Phonon::PausedState:
@@ -349,3 +349,9 @@ Radio::onResolveComplete( const Track t )
     }
 }
 
+
+void
+Radio::onBuffering( int percent_filled )
+{
+    qDebug() << percent_filled;
+}

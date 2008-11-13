@@ -74,6 +74,8 @@ Tuner::fetchFiveMoreTracks()
 bool
 Tuner::tryAgain()
 {
+    qDebug() << "Bad response count" << m_retry_counter;
+    
 	if (++m_retry_counter > 5)
 		return false;
 	fetchFiveMoreTracks();
@@ -83,7 +85,7 @@ Tuner::tryAgain()
 
 void
 Tuner::onGetPlaylistReturn( WsReply* reply )
-{
+{   
 	switch (reply->error())
 	{
 		case Ws::NoError:

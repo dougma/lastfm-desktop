@@ -17,55 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_ERROR_H
-#define LASTFM_WS_ERROR_H
+#include <QList>
 
-namespace Ws
+namespace Qt
 {
-    enum Error
+    template <class T> static inline QList<T> reverse( QList<T> list )
     {
-        NoError = 1,
-
-        /** see http://last.fm/api/ */
-        InvalidService = 2,
-        InvalidMethod,
-        AuthenticationFailed,
-        InvalidFormat,
-        InvalidParameters,
-        InvalidResourceSpecified,
-        OperationFailed,
-        InvalidSessionKey,
-        InvalidApiKey,
-        ServiceOffline,
-        SubscribersOnly,
-
-        /** Last.fm sucks. 
-          * There may be an error in networkError(), or this may just be some
-          * internal error completing your request.
-          * Advise the user to try again in a _few_minutes_.
-          * For some cases, you may want to try again yourself, at this point
-          * in the API you will have to. Eventually we will discourage this and
-          * do it for you, as we don't want to strain Last.fm's servers
-          */
-        TryAgainLater = 16,
-        
-		NotEnoughContent = 20,
-		NotEnoughMembers,
-		NotEnoughFans,
-		NotEnoughNeighbours,
-
-        /** Last.fm fucked up, or something mangled the response on its way */
-        MalformedResponse = 100,
-
-        /** call networkError() for more details */
-        UrLocalNetworkIsFuckedLol,
-        UrProxyIsFuckedLol,
-
-        /** you aborted the request, the lib never does, we promise! */
-        Aborted,
-        
-        UnknownError
-    };
+        for (int x = 0; x < list.size() / 2; ++x)
+            qSwap( list[x], list[list.size()-1-x] );
+        return list;
+    }
 }
-
-#endif

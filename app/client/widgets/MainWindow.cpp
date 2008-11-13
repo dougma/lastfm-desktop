@@ -27,6 +27,7 @@
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
+#include "widgets/MessageBar.h"
 #include "widgets/PlaylistDialog.h"
 #include "widgets/SettingsDialog.h"
 #include "widgets/ShareDialog.h"
@@ -128,6 +129,8 @@ MainWindow::MainWindow()
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
+    
+    connect( qApp, SIGNAL(error( QString )), ui.messagebar, SLOT(showError( QString )) );
 
     // set up window in default state
     onTrackSpooled( Track() );
@@ -209,6 +212,7 @@ MainWindow::setupUi()
     setCentralWidget( new QWidget );
 
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
+    v->addWidget( ui.messagebar = new MessageBar );
     v->addWidget( ui.dashboard = new TrackDashboard );
     
     {   
@@ -433,15 +437,4 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
     }
 	catch (CoreDomElement::Exception&)
 	{}
-}
-
-
-void
-MainWindow::closeActiveWindow()
-{
-    // I hummed and haaa'd about putting this here or in App.cpp, but it seems
-    // like if I was a n00b, I'd look here first, so I put it here
-    
-    QWidget* w = qApp->activeWindow();
-    if (w) w->close();
 }

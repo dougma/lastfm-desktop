@@ -52,6 +52,9 @@ signals:
     void stopped();
     void stateChanged( State newstate, const Track& = Track() ); //convenience
     void scrobblePointReached( const Track& );
+
+    /** something should show it. Currently MainWindow does */
+    void error( const QString& message );
     
 public slots:
     /** all webservices connect to this and emit in the case of bad errors that

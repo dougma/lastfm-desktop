@@ -27,6 +27,7 @@
 #include <phonon/phononnamespace.h>
 #include <QList>
 #include <QThread>
+#include <QVariant>
 
 namespace Phonon
 {
@@ -73,11 +74,9 @@ signals:
     void buffering( int );
     void stopped();
 	
-	/** playback may still be occuring, so you may want to hold the error
-	  * eg. NotEnoughContent mid-track means we can't get anymore tracks after
-	  * the current playlist finishes */
-	//TODO hold error until it's relevant?
-	void error( Ws::Error );
+	/** the error is either one of Ws::Error, or if Ws::Unknown a fatal error
+      * from Phonon with error message set in data */
+	void error( int, const QVariant& data = QVariant() );
 
 private slots:
     void enqueue( const QList<Track>& );
@@ -86,6 +85,7 @@ private slots:
 	void onTunerError( Ws::Error );
     void phononEnqueue();
     void onResolveComplete( const Track t );
+    void onBuffering( int );
 
 	/** we get a "proper" station name from the tune webservice */
 	void setStationNameIfCurrentlyBlank( const QString& );

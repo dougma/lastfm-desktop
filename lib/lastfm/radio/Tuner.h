@@ -31,6 +31,8 @@
 /** With regard to error handling. We handle Ws::TryAgain up to 5 times, don't 
   * try again after that!
   * Just tell the user to try again later. 
+  *
+  * See the base class for most of the implementation.
   */
 class LASTFM_RADIO_DLLEXPORT Tuner : public AbstractTrackSource
 {
