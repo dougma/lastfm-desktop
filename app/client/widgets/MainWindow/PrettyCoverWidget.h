@@ -55,13 +55,6 @@ public:
     
     uint coverWidth() const { return m_rendered_width; }
 	
-	struct Ui
-	{
-		class SpinnerLabel* spinner;
-	};
-	
-	Ui ui;
-	
 private slots:
 	void onAlbumImageDownloaded( const QByteArray& );
 

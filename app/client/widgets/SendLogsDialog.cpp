@@ -20,7 +20,7 @@
 #include "SendLogsDialog.h"
 #include "SendLogsRequest.h"
 #include "Settings.h"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/CoreProcess.h"
 #include "lib/lastfm/core/CoreSysInfo.h"

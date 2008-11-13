@@ -45,7 +45,7 @@ MessageBar::show( const QString& message, const QString& id )
 {    
     QLabel* label = findChild<QLabel*>( id );
     
-    if (label) {
+    if (label && id.size()) {
         if (message.isEmpty())
         {
             QProgressBar* p = label->findChild<QProgressBar*>();
@@ -55,7 +55,7 @@ MessageBar::show( const QString& message, const QString& id )
             QTimer::singleShot( 3000, label, SLOT(deleteLater()) );
         }
         else
-            label->setText( id );
+            label->setText( message );
         return;
     }
     
@@ -89,17 +89,11 @@ MessageBar::show( const QString& message, const QString& id )
     label->show();
     
     ui.papyrus->move( 0, -label->height() );
+
+    doLayout();
     
-    int y = 0;
-    foreach (QLabel* l, Qt::reverse<QLabel*>( findChildren<QLabel*>() ))
-    {
-        l->move( 0, y );
-        y += l->height();
-    }
-    ui.papyrus->setFixedSize( width(), y );
-        
     connect( close, SIGNAL(clicked()), label, SLOT(deleteLater()) );    
-    connect( label, SIGNAL(destroyed()), SLOT(onLabelDestroyed()) );
+    connect( label, SIGNAL(destroyed()), SLOT(onLabelDestroyed()), Qt::QueuedConnection );
         
     m_timeline->setFrameRange( height(), ui.papyrus->height() );
     m_timeline->start();
@@ -115,13 +109,23 @@ MessageBar::animate( int i )
 
 
 void
+MessageBar::doLayout()
+{
+    int y = 0;
+    foreach (QLabel* l, Qt::reverse<QLabel*>( findChildren<QLabel*>() ))
+    {        
+        l->move( 0, y );
+        y += l->height();
+    }
+    ui.papyrus->setFixedSize( width(), y );
+}
+
+
+void
 MessageBar::onLabelDestroyed()
 {
-    int h = 0;
-    foreach (QLabel* l, findChildren<QLabel*>())
-        h += l->height();
-
-    setFixedHeight( h );
+    doLayout();
+    setFixedHeight( ui.papyrus->height() );
 }
 
 

@@ -32,10 +32,11 @@ class TrackDashboard : public QWidget
 
     Track m_track;
     class QNetworkAccessManager* nam;
-
+    
 public:
     TrackDashboard();
 
+    void beginLoadingAnimation();
     void setTrack( const class Track& );
     void clear();
 
@@ -56,6 +57,7 @@ public:
         class FadingScrollBar* scrollbar;
         class QLabel* artist;
         class QLabel* artist_text;
+        class SpinnerLabel* spinner;
     } ui;
     
 public slots:

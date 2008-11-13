@@ -36,6 +36,7 @@ class MessageBar : public QWidget
     } ui;
     
     virtual void resizeEvent( QResizeEvent* );
+    void doLayout();
     
 public:
     MessageBar();

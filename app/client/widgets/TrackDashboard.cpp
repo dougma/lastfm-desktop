@@ -22,6 +22,7 @@
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
+#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QtGui>
@@ -123,7 +124,7 @@ TrackDashboard::TrackDashboard()
     setAutoFillBackground( true );
     
     QPalette p = palette();
-    QColor c( 0x16, 0x16, 0x17 );
+    QColor c( 0x0e, 0x0e, 0x0e );
     p.setColor( QPalette::Window, c );
     p.setColor( QPalette::Base, Qt::transparent );
     p.setColor( QPalette::Text, Qt::white );
@@ -143,7 +144,8 @@ TrackDashboard::TrackDashboard()
     ui.bio->document()->setDefaultStyleSheet( css );
     ui.bio->setAutoFillBackground( false );
     
-//    setMinimumHeight( 440 );
+	ui.spinner = new SpinnerLabel( this );
+    ui.spinner->move( 10, 10 );
     
     clear();
 }
@@ -170,6 +172,13 @@ TrackDashboard::setTrack( const Track& t )
 
 
 void
+TrackDashboard::beginLoadingAnimation()
+{
+    ui.spinner->show();
+}
+
+
+void
 TrackDashboard::clear()
 {
     ui.cover->clear();
@@ -177,7 +186,7 @@ TrackDashboard::clear()
     ui.scrollbar->setRange( 0, 0 );
     ui.artist->clear();
     ui.artist_text->clear();
-    
+	ui.spinner->hide();    
     ui.info->hide();
     
     m_track = Track();

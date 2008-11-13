@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "PrettyCoverWidget.h"
-#include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QSvgRenderer>
 #include <QtGui>
 
@@ -30,9 +29,6 @@ PrettyCoverWidget::PrettyCoverWidget()
     QFont font = this->font();
     font.setBold( true );
     setFont( font );
-    
-	ui.spinner = new SpinnerLabel( this );
-	ui.spinner->hide();
 
     clear();
 }
@@ -42,7 +38,6 @@ void
 PrettyCoverWidget::clear()
 {
 	m_track = Track();
-	ui.spinner->hide();
 	qDeleteAll( findChildren<AlbumImageFetcher*>() );   
     m_cover = QImage();
     update();
@@ -62,8 +57,6 @@ PrettyCoverWidget::setTrack( const Track& t )
 		QObject* o = new AlbumImageFetcher( t.album(), Album::ExtraLarge );
 		connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
 		o->setParent( this );
-		
-		ui.spinner->show();
 	}
 
 	m_track = t;
@@ -80,8 +73,6 @@ PrettyCoverWidget::onAlbumImageDownloaded( const QByteArray& data )
 	update();
 
 	sender()->deleteLater();
-	
-	ui.spinner->hide();
 }
 
 
