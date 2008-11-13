@@ -54,6 +54,8 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
     
 Radio::~Radio()
 {    
+    // I'm not confident about the sleep code on Windows --mxcl
+#ifndef WIN32
 	if (m_mediaObject->state() != Phonon::PlayingState)
         return;
 
@@ -70,6 +72,7 @@ Radio::~Radio()
 		struct Thread : QThread { using QThread::msleep; };
 		Thread::msleep( 7 );
     }
+#endif
 }
 
 

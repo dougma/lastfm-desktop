@@ -22,7 +22,7 @@
 #include <QEvent>
 #include <QLabel> //TODO implementation
 #include <QMovie> //TODO implementation
-
+#include <QDebug>
  
 class SpinnerLabel : public QLabel
 {
@@ -48,6 +48,8 @@ public:
     {
         setMovie( m_movie = new QMovie( ":/lastfm/spinner.mng" ) );
         m_movie->setParent( this );
+        //qt fucking sucks
+        setFixedSize( 25, 18 );
     }
 };
 

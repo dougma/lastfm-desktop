@@ -35,8 +35,6 @@
 Tuner::Tuner( const RadioStation& station )
      : m_retry_counter( 0 )
 {
-    qDebug() << "radio.tune:" << station.url();
-    
     WsReply* reply = WsRequestBuilder( "radio.tune" )
 			.add( "station", station.url() )
 			.post();
@@ -47,7 +45,9 @@ Tuner::Tuner( const RadioStation& station )
 void
 Tuner::onTuneReturn( WsReply* reply )
 {
-	if (reply->error() != Ws::NoError) {
+    qDebug() << reply;
+    
+    if (reply->error() != Ws::NoError) {
 		emit error( reply->error() );
 		return;
 	}
