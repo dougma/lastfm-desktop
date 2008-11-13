@@ -387,7 +387,8 @@ App::parseArguments( const QStringList& args )
 
 			case Twiddled:
             {
-                emit status( "", "twiddling" ); //clear status for ipod scrobbling
+                emit status( tr("iPod scrobbling complete."), "twiddling" ); // clear status for ipod scrobbling
+                emit status( "", "twiddling" ); // removes message after small delay
 
                 IPodScrobbleCache cache( args.value( 2 ) );
                 QList<Track> tracks = cache.tracks();
