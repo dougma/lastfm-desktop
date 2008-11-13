@@ -55,6 +55,7 @@ signals:
 
     /** something should show it. Currently MainWindow does */
     void error( const QString& message );
+    void status( const QString& message, const QString& id );
     
 public slots:
     /** all webservices connect to this and emit in the case of bad errors that

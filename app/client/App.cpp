@@ -146,8 +146,6 @@ App::App( int& argc, char** argv )
     //TODO do only once?
     Legacy::disableHelperApp();
 #endif
-    
-    parseArguments( arguments() );
 }
 
 
@@ -346,8 +344,9 @@ namespace //anonymous namespace, keep to this file
         LastFmUrl,
         Pause, //toggles pause
         Skip,
-		SubmitIPodScrobbles,
-        Message,
+        IPodDetected,
+		Twiddling,
+        Twiddled,
         Unknown
     };
     
@@ -355,7 +354,9 @@ namespace //anonymous namespace, keep to this file
     {
         if (arg == "--pause") return Pause;
         if (arg == "--skip") return Skip;
-		if (arg == "--twiddled") return SubmitIPodScrobbles;
+        if (arg == "--ipod-detected") return IPodDetected;
+        if (arg == "--twiddling") return Twiddling;
+		if (arg == "--twiddled") return Twiddled;
         
         QUrl url( arg );
         if (url.isValid() && url.scheme() == "lastfm") return LastFmUrl;
@@ -376,13 +377,24 @@ App::parseArguments( const QStringList& args )
     foreach (QString const arg, args.mid( 1 ))
         switch (argument( arg ))
         {
-			case Message:
-				break;
-			
-			case SubmitIPodScrobbles:
+            case IPodDetected:
+                emit status( tr("Your iPod will be scrobbled to your Last.fm profile from now on."), "" );
+                return;
+
+			case Twiddling:
+                emit status( tr("Your iPod scrobbles are being determined."), "twiddling" );
+				return;
+
+			case Twiddled:
             {
+                emit status( "", "twiddling" ); //clear status for ipod scrobbling
+
                 IPodScrobbleCache cache( args.value( 2 ) );
                 QList<Track> tracks = cache.tracks();
+
+                if (tracks.isEmpty())
+                    qWarning() << "Empty iPod scrobble cache, but that shouldn't be possible!";
+
                 if (cache.insane() || Settings().alwaysConfirmIPodScrobbles())
                 {
                     BatchScrobbleDialog d( m_mainWindow );

@@ -28,6 +28,11 @@ MessageBar::MessageBar()
     setFixedHeight( 0 );
     
     ui.papyrus = new QWidget( this );
+
+    QPalette p = palette();
+    p.setColor( QPalette::Window, QColor( 0xfa, 0xfa, 0xc7 ) );
+    setPalette( p );
+    setAutoFillBackground( true );
     
     m_timeline = new QTimeLine( 500, this );
     m_timeline->setUpdateInterval( 10 );
@@ -36,23 +41,46 @@ MessageBar::MessageBar()
 
 
 void
-MessageBar::showError( const QString& message )
-{
-    QPalette p = palette();
-    p.setColor( QPalette::Window, QColor( 0xfa, 0xfa, 0xc7 ) );
+MessageBar::show( const QString& message, const QString& id )
+{    
+    QLabel* label = findChild<QLabel*>( id );
     
-    QLabel* label = new QLabel( message, ui.papyrus );
-    label->setPalette( p );
+    if (label) {
+        if (message.isEmpty())
+        {
+            QProgressBar* p = label->findChild<QProgressBar*>();
+            if (p)
+                p->setRange( 0, 1 ),
+                p->setValue( 1 );
+            QTimer::singleShot( 3000, label, SLOT(deleteLater()) );
+        }
+        else
+            label->setText( id );
+        return;
+    }
+    
+    label = new QLabel( message, ui.papyrus );
     label->setBackgroundRole( QPalette::Base );
-    label->setMargin( 4 );
+    label->setMargin( 8 );
+    label->setIndent( 4 );
     label->setTextFormat( Qt::RichText );
     label->setOpenExternalLinks( true );
     label->setTextInteractionFlags( Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse );
-    label->setAutoFillBackground( true );
     
     ImageButton* close = new ImageButton( ":/buckets/radio_clear_all_x.png" );
     QHBoxLayout* h = new QHBoxLayout( label );
     h->addStretch();
+    
+    if (id.size())
+    {
+        label->setObjectName( id );
+        
+        QProgressBar* p;
+        h->addWidget( p = new QProgressBar );
+        p->setRange( 0, 0 );
+        p->setFixedWidth( 90 );
+    }
+
     h->addWidget( close );
     h->setMargin( 4 );
     
@@ -71,16 +99,11 @@ MessageBar::showError( const QString& message )
     ui.papyrus->setFixedSize( width(), y );
         
     connect( close, SIGNAL(clicked()), label, SLOT(deleteLater()) );    
-    connect( label, SIGNAL(destroyed()), SLOT(onLabelDestroyed()), Qt::QueuedConnection );
+    connect( label, SIGNAL(destroyed()), SLOT(onLabelDestroyed()) );
         
     m_timeline->setFrameRange( height(), ui.papyrus->height() );
     m_timeline->start();
 }
-
-
-void
-MessageBar::showInformation( const QString& )
-{}
 
 
 void
@@ -97,7 +120,7 @@ MessageBar::onLabelDestroyed()
     int h = 0;
     foreach (QLabel* l, findChildren<QLabel*>())
         h += l->height();
-    
+
     setFixedHeight( h );
 }
 
@@ -108,4 +131,11 @@ MessageBar::resizeEvent( QResizeEvent* )
     ui.papyrus->setFixedWidth( width() );
     foreach (QLabel* l, findChildren<QLabel*>())
         l->setFixedWidth( width() );
+}
+
+
+void
+MessageBar::remove( const QString& id )
+{
+    delete findChild<QLabel*>( id );
 }

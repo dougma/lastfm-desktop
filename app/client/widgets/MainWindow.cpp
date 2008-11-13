@@ -118,7 +118,7 @@ MainWindow::MainWindow()
 
     QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
     close->setContext( Qt::ApplicationShortcut );
-    connect( close, SIGNAL(activated()), SLOT(closeActiveWindow()) );
+    connect( close, SIGNAL(activated()), SLOT(close()) );
 
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
@@ -130,8 +130,9 @@ MainWindow::MainWindow()
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
     
-    connect( qApp, SIGNAL(error( QString )), ui.messagebar, SLOT(showError( QString )) );
-
+    connect( qApp, SIGNAL(error( QString )), ui.messagebar, SLOT(show( QString )) );
+    connect( qApp, SIGNAL(status( QString, QString )), ui.messagebar, SLOT(show( QString, QString )) );
+    
     // set up window in default state
     onTrackSpooled( Track() );
 
@@ -182,20 +183,11 @@ MainWindow::onTrackSpooled( const Track& t )
 }
 
 
-#include "MainWindow/PrettyCoverWidget.h" //FIXME
 void
 MainWindow::onStateChanged( State s )
 {
-	switch (s)
-	{            
-        case TuningIn:
-            //FIXME
-			ui.dashboard->ui.cover->ui.spinner->show();
-			break;
-            
-        default:
-            break;
-	}
+	if (s == TuningIn)
+        ui.dashboard->beginLoadingAnimation();
 }
 
 

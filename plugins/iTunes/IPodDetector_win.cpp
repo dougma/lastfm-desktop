@@ -394,7 +394,7 @@ IPodDetector::notifyIfUnknownIPod( IPod* ipod )
     if ( r != ERROR_SUCCESS )
     {
         Moose::exec( Moose::applicationPath(), 
-                     L"container://Notification/iTunesPlugin/IPodDetected" );
+                     L"--ipod-detected" );
         
         r = RegCreateKeyExW( HKEY_CURRENT_USER,
                              key.c_str(),

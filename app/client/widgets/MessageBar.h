@@ -41,8 +41,8 @@ public:
     MessageBar();
     
 public slots:
-    void showError( const QString& );
-    void showInformation( const QString& );
+    void show( const QString&, const QString& id = QString() );
+    void remove( const QString& id );
     
 private slots:
     void animate( int );

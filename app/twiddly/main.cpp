@@ -86,7 +86,7 @@ main( int argc, char** argv )
         }
         else // twiddle!
         {
-            gMoose.forward( "container://Notification/Twiddly/Started" );
+            gMoose.forward( "--twiddling" );
 
             IPod* ipod = IPod::fromCommandLineArguments( app.arguments() );
 
@@ -118,9 +118,7 @@ main( int argc, char** argv )
             ipod->settings().setType( currentType );
             //------------------------------------------------------------------
 
-            gMoose.forward( "container://Notification/Twiddly/Finished/" + QString::number( ipod->scrobbles().count() ) );
-
-            if ( ipod->scrobbles().count() )
+            if (ipod->scrobbles().count())
             {
                 // create a unique storage location for the XML
                 QDir dir = ipod->saveDir().filePath( "scrobbles" );

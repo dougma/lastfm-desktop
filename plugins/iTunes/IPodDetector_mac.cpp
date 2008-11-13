@@ -871,7 +871,7 @@ IPodDetector::notifyIfUnknownIPod( IPod* ipod )
     {
         CFPreferencesSetAppValue( key, CFSTR( "" ), appId );
         CFPreferencesAppSynchronize( appId );
-        Moose::exec( Moose::applicationPath(), "container://Notification/iTunesPlugin/IPodDetected" );
+        Moose::exec( Moose::applicationPath(), "--ipod-detected" );
     }
     else
         CFRelease( user );

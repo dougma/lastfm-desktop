@@ -95,6 +95,8 @@ int main( int argc, char** argv )
       #else
         window.show();
       #endif
+        
+        app.parseArguments( app.arguments() );
 
         return app.exec();
     }
