@@ -30,7 +30,7 @@
 #include "widgets/MainWindow.h"
 #include "version.h"
 #include "app/moose.h"
-#include "lib/lastfm/core/QMessageBoxBuilder.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/UniqueApplication.h"
 #include "lib/lastfm/ws/WsAccessManagerInit.h"
 #include <QDir>
