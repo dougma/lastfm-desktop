@@ -21,10 +21,6 @@
 #define FADING_SCROLL_BAR_H
 
 #include <QScrollBar>
-
-
-#include <QPainter>
-#include <QTimeLine>
 #include <QTimer>
 
 
@@ -32,52 +28,16 @@ class FadingScrollBar : public QScrollBar
 {
     Q_OBJECT
     
-    QTimer* m_hideTimer;
-    QTimeLine* m_timeline;
+    class QTimer* m_hideTimer;
+    class QTimeLine* m_timeline;
     bool m_hide_when_zero;
 
 public:
-    FadingScrollBar( QWidget* parent ) : QScrollBar( parent )
-    {
-        m_hide_when_zero = false;
-        
-        m_timeline = new QTimeLine( 300, this );
-        m_timeline->setFrameRange( 0, 255 );
-        m_timeline->setUpdateInterval( 5 );
-        connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(update()) );
-        QScrollBar::hide();
-        
-        m_hideTimer = new QTimer( this );
-        m_hideTimer->setSingleShot(true);
-        m_hideTimer->setInterval( 1500 );
-        connect( m_hideTimer, SIGNAL(timeout()), SLOT(fadeOut()) );
-    }
+    FadingScrollBar( QWidget* parent );
     
 public slots:
-    void fadeIn()
-    {
-        m_hideTimer->stop();        
-        
-        if (isVisible())
-            return;
-        m_hide_when_zero = false;
-        m_timeline->setCurveShape( QTimeLine::EaseInCurve );
-        m_timeline->setDirection( QTimeLine::Backward );
-        m_timeline->start();
-        QScrollBar::show();
-    }
-    
-    void fadeOut()
-    {
-        m_hideTimer->stop();        
-        
-        if (isHidden())
-            return;
-        m_hide_when_zero = true;
-        m_timeline->setCurveShape( QTimeLine::EaseOutCurve );
-        m_timeline->setDirection( QTimeLine::Forward );
-        m_timeline->start();
-    }
+    void fadeIn();
+    void fadeOut();
     
     void fadeOutLater()
     {
@@ -85,32 +45,8 @@ public slots:
     }
     
 private:
-    virtual void sliderChange( SliderChange change )
-    {
-        if (change == SliderValueChange && !isVisible())
-        {
-            fadeIn();
-            m_hideTimer->start();
-        }
-        
-        QScrollBar::sliderChange( change );
-    }
-    
-    virtual void paintEvent( QPaintEvent* e )
-    {           
-        QScrollBar::paintEvent( e );
-        
-        if (m_timeline->state() == QTimeLine::Running)
-        {
-            int const f = m_timeline->currentFrame();
-            
-            QPainter p( this );
-            p.fillRect( rect(), QColor( 0x16, 0x16, 0x17, f ) );
-            
-            if (m_hide_when_zero && f >= 254) 
-                QScrollBar::hide();
-        }
-    }
+    virtual void sliderChange( SliderChange change );
+    virtual void paintEvent( QPaintEvent* e );
 };
 
 #endif

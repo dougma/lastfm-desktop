@@ -88,9 +88,9 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
 
     // yes, I know the following two lines are horrendous, a pint if you can
     // make it simpler without refactoring to a function! :)
-    QColor const primary = isEnabled
-            ? (isActive ? Qt::white : (isSelected ? Qt::black : Qt::white))
-            : QColor(AGING_MOOSE);    
+    QColor const primary = Qt::white;//isEnabled
+//            ? (isActive ? Qt::white : (isSelected ? Qt::black : Qt::white))
+//            : QColor(AGING_MOOSE);    
     QColor const secondary = isSelected ? (isActive ? Qt::white : Qt::black) : QColor(AGING_MOOSE);
 
     QPixmap px = index.data( Qt::DecorationRole ).value<QPixmap>();

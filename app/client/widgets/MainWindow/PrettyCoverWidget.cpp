@@ -25,6 +25,7 @@
 PrettyCoverWidget::PrettyCoverWidget()
                  : m_rendered_width( 0 )
                  , m_reflection_height( 75 )
+                 , m_showArtist( true )
 {
     QFont font = this->font();
     font.setBold( true );
@@ -128,9 +129,12 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
     
     if (p.fontMetrics().width( m_track.title() ) <= width())
     {
+        QString text = m_track.title();
+        if (m_showArtist) text += "\n" + m_track.artist();
+        
         QRect r = rect();
         r.setTop( r.bottom() - m_reflection_height );
-        p.drawText( r, Qt::AlignCenter, m_track.title() );
+        p.drawText( r, Qt::AlignCenter, text );
     }
     
     m_rendered_width = scale * m_cover.width();

@@ -153,7 +153,7 @@ TrackDashboard::TrackDashboard()
 
 void
 TrackDashboard::setTrack( const Track& t )
-{
+{    
     if (m_track.artist() != t.artist())
     {
         ui.info->hide();
@@ -168,6 +168,8 @@ TrackDashboard::setTrack( const Track& t )
     ui.cover->setTrack( t );
 
     m_track = t;
+
+    resizeEvent( 0 );
 }
 
 
@@ -205,12 +207,19 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		QString listeners = e["stats"]["listeners"].text();
 		QString content = e["bio"]["content"].text();
 		QString editmessage = tr("Edit it too!");
-        
-		QString html;
-		QTextStream(&html) <<
-                "<p id=content>" << content.replace(QRegExp("\r+"), "<p>") << "</p>"
-                "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ") <<
-                "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
+
+		QString html;        
+        if (content.isEmpty())
+        {
+            // this should be all one tr, but meh.
+            html = tr("We don't have a description for this artist yet.") + "<a href='" + 
+                   url + "/+wiki/edit'>" + tr("Why not write one?") + "</a>";
+        }
+        else
+            QTextStream( &html ) <<
+                    "<p id=content>" << content.replace(QRegExp("\r+"), "<p>") << "</p>"
+                    "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ") <<
+                    "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
         ui.bio->setHtml( html );
         resizeEvent( 0 );
         
@@ -264,6 +273,9 @@ TrackDashboard::onArtistImageDownloaded()
 void
 TrackDashboard::resizeEvent( QResizeEvent* )
 {
+    if (m_track.isNull())
+        return;
+    
     ui.papyrus->setFixedWidth( width() );    
 
     int w = 0;
@@ -274,8 +286,9 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setParent( this );
         ui.cover->show();
         ui.cover->raise();
-        
+        ui.cover->setShowArtist( false );
         ui.cover->move( 12, 12 );
+
         int h = height() - 24;
         ui.cover->resize( ui.cover->widthForHeight( h ), h );
         
@@ -289,12 +302,13 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setParent( ui.papyrus );
         ui.cover->move( 0, 0 );
         ui.cover->show();
+        ui.cover->setShowArtist( true );
         ui.cover->raise();
         
         w = qMax( ui.cover->coverWidth(), uint(180) );
         int const x = (width() - w) / 2;
 
-        ui.cover->resize( ui.papyrus->width(), height() - ui.artist->height() - 24 );
+        ui.cover->resize( ui.papyrus->width(), height() - 12 );
         ui.info->move( x, ui.cover->height() );
     }
 
@@ -328,7 +342,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
 void
 TrackDashboard::setPapyrusPosition( int y )
 {
-    int const fudge = orientation() == Qt::Horizontal ? -2 : 10;
+    int const fudge = orientation() == Qt::Horizontal ? -2 : 15;
     
     ui.papyrus->move( 0, fudge - y );
 }
