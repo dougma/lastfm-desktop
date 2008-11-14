@@ -20,43 +20,17 @@
 #include "Firehose.h"
 #include "FirehoseDelegate.h"
 #include "FirehoseModel.h"
-#include "FirehoseView.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
 #include <QVBoxLayout>
 
 
 Firehose::Firehose()
-{
-    Unicorn::TabBar* tabs;
-    class FirehoseView* view;
-    
-    QVBoxLayout *v = new QVBoxLayout( this );
-    //v->addWidget( tabs = new Unicorn::TabBar );
-    v->addWidget( view = new FirehoseView );
-    v->setMargin( 0 );
-    v->setSpacing( 0 );
-    
-    FirehoseModel* model;
-    view->setModel( model = new FirehoseModel );
-    view->setDelegate( new FirehoseDelegate );
-
-#if 0
-    CoreSignalMapper* mapper = new CoreSignalMapper( this );
-    mapper->setMapping( 0, "user/1000002?rt=xml&special=staffmembers" );
-    mapper->setMapping( 1, "user/2113030?rt=xml" );
-    connect( tabs, SIGNAL(currentChanged( int )), mapper, SLOT(map( int )) );
-    connect( mapper, SIGNAL(mapped( QString )), model, SLOT(setNozzle( QString )) );
-    
-    tabs->addTab( tr("Last.fm Staff") );
-    tabs->addTab( tr("All your Friends") );
-    
-    //tabs->succombToTheDarkSide();
-#else
-    model->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
+{   
+    setFrameStyle( QFrame::NoFrame );
+    setModel( model = new FirehoseModel );
+    setDelegate( new FirehoseDelegate );
     setMinimumWidth( 250 );
-    Q_UNUSED( tabs );
-#endif
 
     UnicornWidget::paintItBlack( this );
     QPalette p = palette();
@@ -64,8 +38,8 @@ Firehose::Firehose()
     p.setBrush( QPalette::Text, p.windowText() );
     p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
     setPalette( p );
-    view->setPalette( palette() );
-    view->setAutoFillBackground( true );
+    setPalette( palette() );
+    setAutoFillBackground( true );
 }
 
 
@@ -74,4 +48,20 @@ QSize
 Firehose::sizeHint() const
 {
     return QSize( 358, 600 );
+}
+
+
+void
+Firehose::setUserId( uint const id )
+{
+    qDebug() << id;
+    
+    ((FirehoseModel*)model)->setNozzle( "user/" + QString::number( id ) + "?rt=xml" );
+}
+
+
+void
+Firehose::setStaff()
+{
+    ((FirehoseModel*)model)->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
 }

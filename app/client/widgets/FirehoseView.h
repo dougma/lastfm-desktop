@@ -31,13 +31,15 @@
 class FirehoseView : public QAbstractScrollArea
 {
     Q_OBJECT
-    
-    class QAbstractItemDelegate* delegate;
-    class QTimeLine* timer;
-    class QAbstractItemModel* model;
 
+    class QTimeLine* timer;    
+    
     int h;
-    int offset;
+    int offset;    
+    
+protected:
+    class QAbstractItemDelegate* delegate;
+    class QAbstractItemModel* model;
 
 public:
     FirehoseView();
