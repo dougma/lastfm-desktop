@@ -32,6 +32,7 @@ public:
     QString passwordHash() const { return m_password; }
     QString username() const { return m_username; }
     QString sessionKey() const { return m_sessionKey; }
+    bool isSubscriber() const { return m_subscriber; }
     
 private slots:
     void onEdited();
@@ -43,8 +44,8 @@ private:
 
     Ui::LoginDialog ui;
 
-    bool m_bootstrap;
     QString m_username;
     QString m_password;
     QString m_sessionKey;
+    bool m_subscriber;
 };

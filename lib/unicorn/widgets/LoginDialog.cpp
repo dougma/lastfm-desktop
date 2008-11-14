@@ -27,7 +27,7 @@
 
 
 LoginDialog::LoginDialog()
-           : m_bootstrap( false )
+           : m_subscriber( true )
 {
     ui.setupUi( this );
     ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
@@ -92,6 +92,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
                     m_username = username;
                 
                 m_sessionKey = session["key"].nonEmptyText();
+                m_subscriber = session["subscriber"].text() != "0";
                 accept();
                 break;
             }

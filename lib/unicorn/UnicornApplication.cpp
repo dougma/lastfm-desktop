@@ -60,6 +60,8 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
             s.setValue( "Username", d.username() );
             s.setValue( "SessionKey", d.sessionKey() );
             s.setValue( "Password", d.passwordHash() );
+            
+            Unicorn::UserSettings().setValue( Unicorn::UserSettings::subscriptionKey(), d.isSubscriber() );
         }
         else
         {
@@ -106,5 +108,6 @@ Unicorn::Application::~Application()
         CoreSettings s;
         s.remove( "SessionKey" );
         s.remove( "Username" );
+        s.remove( "Password" );
     }
 }

@@ -34,7 +34,16 @@ namespace Unicorn
     class UserSettings : public CoreSettings
     {
     public:
-        UserSettings();
+        UserSettings()
+        {
+            QString const username = value( "Username" ).toString();
+            beginGroup( username );
+            // it shouldn't be possible, since Unicorn::Application enforces 
+            // assignment of the username parameter before anything else
+            Q_ASSERT( !username.isEmpty() );
+        }
+        
+        static const char* subscriptionKey() { return "subscription"; }
     };
 
     /** Settings that may be of use to the entire Last.fm suite 
@@ -48,16 +57,6 @@ namespace Unicorn
         // all Unicorn::Applications obey this
         bool logOutOnExit() const { return UserSettings().value( "LogOutOnExit", false ).toBool(); }
     };
-    
-
-    inline UserSettings::UserSettings()
-    {
-        QString const username = value( "Username" ).toString();
-        beginGroup( username );
-        // it shouldn't be possible, since Unicorn::Application enforces 
-        // assignment of the username parameter before anything else
-        Q_ASSERT( !username.isEmpty() );
-    }
 }
 
 #endif
