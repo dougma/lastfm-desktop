@@ -17,40 +17,5 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef RADIO_CONTROLS_H
-#define RADIO_CONTROLS_H
+#include "RadioProgressBar.h"
 
-#include "State.h"
-#include <QWidget>
-class ImageButton;
-
-
-class RadioControls : public QWidget
-{
-	Q_OBJECT
-
-public:
-    RadioControls();
-
-	struct Ui
-    {
-        ImageButton* play;
-        ImageButton* skip;
-    } 
-	ui;
-
-	
-private slots:
-	void onRadioStopped();
-    void onRadioTuningIn( const class RadioStation& );
-	void onPlayClicked();
-	
-signals:
-	void stop();
-    void play();
-    void skip();
-
-};
-
-
-#endif RADIO_CONTROLS_H

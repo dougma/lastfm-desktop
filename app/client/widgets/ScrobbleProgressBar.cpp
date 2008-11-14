@@ -90,7 +90,7 @@ ScrobbleProgressBar::paintEvent( QPaintEvent* )
     for (uint x = 0, n = qMin( m_scrobbleProgressTick, progressBarWidth() - 4 ); x < n; x += 2)
 	{
 		uint const i = x+x1+2;
-        p.drawLine( i, 3, i, h-4 );
+        p.drawLine( i, 3, i, i + h-4 );
 	}
 }
 

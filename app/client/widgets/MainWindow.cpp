@@ -40,6 +40,7 @@
 #include <QtGui>
 #include <QSplitter>
 #include <QPainter>
+#include "widgets/TrackDashboardHeader.h"
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -52,64 +53,6 @@
 #endif
 
 #define SETTINGS_POSITION_KEY "MainWindowPosition"
-
-struct SpecialSplitter : public QSplitter
-{
-    SpecialSplitter( Qt::Orientation o, QWidget* p ) : QSplitter( o, p )
-    {}
-    
-    struct cHandle : public QSplitterHandle
-    {
-        cHandle( Qt::Orientation o, QSplitter* parent ) : QSplitterHandle( o, parent )
-        {}
-        
-        virtual void paintEvent( QPaintEvent* event )
-        {
-            QPainter p( this );
-            p.setClipRect( event->rect() );
-            p.fillRect( rect(), palette().brush( QPalette::Window ));
-        }
-                                     
-    };
-    
-    //This merges the splitter handle into the widget
-    bool eventFilter( QObject* obj, QEvent* event )
-    {
-        if( event->type() != QEvent::Resize && event->type() != QEvent::Show )
-            return false;
-        
-        QWidget* w = qobject_cast< QWidget* >( obj );
-        if( !w )
-            return false;
-        
-        QPalette pal = w->palette();
-        const QGradient* grad = pal.brush( QPalette::Window ).gradient();
-        if( !grad || grad->type() != QGradient::LinearGradient )
-            return false;
-        
-        QLinearGradient lg = *((QLinearGradient*)grad);
-        lg.setFinalStop( lg.finalStop().x(), lg.finalStop().y() - handleWidth());
-        pal.setBrush( QPalette::Window, lg );
-        w->setPalette( pal );
-        
-        lg.setStart( 0, w->height() );
-        lg.setFinalStop( lg.finalStop().x(), 1 );
-        QPalette hpal = handle( count() - 1 )->palette();
-        hpal.setBrush( QPalette::Window, lg );
-        handle( count() - 1 )->setPalette( hpal );
-        return false;
-    }
-
-    //This widget will be merged into the splitter handle
-    // - only works for splitters with 2 widgets!
-    void addMergeWidget( QWidget* w )
-    {
-        addWidget( w );
-        w->installEventFilter( this );
-    }
-    
-    virtual QSplitterHandle* createHandle() { return new cHandle( orientation(), this ); }
-};
 
 
 MainWindow::MainWindow()
@@ -191,6 +134,7 @@ MainWindow::onStateChanged( State s )
 }
 
 
+#include "widgets/UnicornSizeGrip.h"
 void
 MainWindow::setupUi()
 {
@@ -199,35 +143,27 @@ MainWindow::setupUi()
     AuthenticatedUser user;
     ui.account->setTitle( user );
    	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
-    
+
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     setCentralWidget( new QWidget );
 
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
+    
+    v->addWidget( ui.dashboardHeader = new TrackDashboardHeader );
+
     v->addWidget( ui.messagebar = new MessageBar );
     v->addWidget( ui.dashboard = new TrackDashboard );
+ 
+    v->addWidget( ui.amp = new Amp );
     
-    {   
-        SpecialSplitter* s = new SpecialSplitter( Qt::Vertical, this );
-        s->addMergeWidget( ui.amp = new Amp );
-        s->addWidget( ui.sources = new Sources );
-        v->addWidget( s );
-        
-        s->setCollapsible( 0, false );
-        s->setCollapsible( 1, false );
-        
-        s->setStretchFactor( 0, 1 );
-        s->setStretchFactor( 1, 10 );
-    }
+    v->addWidget( ui.sources = new Sources );
     
     v->setSpacing( 0 );
     v->setMargin( 0 );
     
     ui.sources->connectToAmp( ui.amp );
-    ui.amp->scrobbleRatingUi.ban->setAction( ui.ban );
-    ui.amp->scrobbleRatingUi.tag->setAction( ui.tag );
-    ui.amp->scrobbleRatingUi.love->setAction( ui.love );
-    ui.amp->scrobbleRatingUi.share->setAction( ui.share );
+    ui.dashboardHeader->ui.ban->setAction( ui.ban );
+    ui.dashboardHeader->ui.love->setAction( ui.love );
 
     connect( ui.viewRadio, SIGNAL(triggered()), ui.amp, SLOT(show()) );
 

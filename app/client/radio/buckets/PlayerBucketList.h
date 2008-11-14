@@ -47,6 +47,7 @@ public:
     
 signals:
     void itemRemoved( QString, Seed::Type );
+    void itemAdded( QString, Seed::Type );
 	
 public slots:
     void play();

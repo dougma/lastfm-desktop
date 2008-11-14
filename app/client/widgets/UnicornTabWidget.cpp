@@ -49,7 +49,7 @@ Unicorn::TabBar::sizeHint() const
     return QSize( QTabBar::sizeHint().width(), m_active.height() - 2 );
 }
 
-#include <QDebug>
+
 void
 Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 {
@@ -62,7 +62,6 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
     int hOffset = (width() - minimumWidth()) / 2.0f;   
     int index = ( (e->pos().x() - hOffset) / (w + m_spacing ) );
     
-    qDebug() << "Tab:" << index;
     //ignore if the click was in the spacing between tabs
     if( e->pos().x() > ( hOffset + ((index + 1) *  (w + m_spacing)) ) )
         return;

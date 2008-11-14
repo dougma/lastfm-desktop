@@ -17,14 +17,13 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "Amp.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "Amp.h"
 #include "widgets/RadioControls.h"
-#include "widgets/ScrobbleButton.h"
 #include "widgets/UnicornWidget.h"
+#include "widgets/UnicornVolumeSlider.h"
 #include "the/radio.h"
 #include "the/MainWindow.h"
 #include "widgets/ImageButton.h"
@@ -40,11 +39,7 @@ Amp::Amp( QWidget* p )
     setupUi();
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
-    // set up window in default state
-    onTrackSpooled( Track() );
-    
-    setContextMenuPolicy( Qt::CustomContextMenu );
-    connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
+    onPlayerBucketChanged();
     
 }
 
@@ -53,15 +48,16 @@ void
 Amp::setupUi()
 {
     setAutoFillBackground( true );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     new QHBoxLayout( this );
     
     layout()->setSpacing( 5 );
-    layout()->setContentsMargins( 5, 6, 5, 3 );
+    layout()->setContentsMargins( 5, 6, 5, 8 );
 
     
     layout()->addWidget( ui.controls = new RadioControls );
     ui.controls->setAutoFillBackground( false );
-    ui.controls->layout()->setSizeConstraint( QLayout::SetFixedSize );
+    ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
     
     struct BorderedContainer : public QWidget
     {
@@ -83,21 +79,15 @@ Amp::setupUi()
             p.drawRoundedRect( rect(), 3, 3 );
             p.setPen( QPen( palette().brush( QPalette::Shadow ), 0.5));
             p.drawRoundedRect( rect().adjusted( 0.5, 0.5, -0.5, -0.5), 3, 3);
-
-//            QPen pen( QBrush(0x4e4e4e), 3, Qt::DashLine, Qt::RoundCap );
-//            pen.setDashPattern( QVector<qreal>() << 5 << 2 );
-//            pen.setWidth( 1 );
-//            p.setPen( pen );
-//            p.drawRoundedRect( rect().adjusted( 4, 4, -4, -4), 3, 3 );
         }
         
         void resizeEvent( QResizeEvent* e )
         {
-            QLinearGradient window( 0, 0, 0, height() );
+            QLinearGradient window( 0, 0, 0, e->size().height() );
             window.setColorAt( 0, 0x0e0e0e );
             window.setColorAt( 1, 0x292828 );
             
-            QLinearGradient shadow( 0, 0, 0, height() );
+            QLinearGradient shadow( 0, 0, 0, e->size().height() );
             shadow.setColorAt( 0, 0x0e0e0e );
             shadow.setColorAt( 1, 0x888888 );
                              
@@ -115,50 +105,56 @@ Amp::setupUi()
     layout()->addWidget( bc );
         
     layout()->addWidget( bucketLayoutWidget );
+    connect( ui.bucket, SIGNAL( itemAdded( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
+    connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
     
-    QWidget* scrobbleRatingControls = new QWidget( this );
-    {
-        QGridLayout* layout = new QGridLayout( scrobbleRatingControls );
-        layout->addWidget( scrobbleRatingUi.love = new ImageButton( ":/MainWindow/button/love/up.png" ), 0, 0, Qt::AlignRight | Qt::AlignBottom );
-        layout->addWidget( scrobbleRatingUi.ban = new ImageButton( ":/MainWindow/button/ban/up.png" ), 0, 1, Qt::AlignLeft | Qt::AlignBottom );
-        layout->addWidget( scrobbleRatingUi.tag = new ImageButton( ":/MainWindow/button/tag/up.png" ), 1, 0, Qt::AlignRight | Qt::AlignTop );
-        layout->addWidget( scrobbleRatingUi.share = new ImageButton( ":/MainWindow/button/share/up.png" ), 1, 1, Qt::AlignLeft | Qt::AlignTop );
-        
-        layout->setSizeConstraint( QLayout::SetFixedSize );
-        layout->setSpacing( 0 );
-        layout->setContentsMargins( 0, 0, 0, 0 );
-        
-        scrobbleRatingUi.ban->moveIcon( 0, 1, QIcon::Active );
-        scrobbleRatingUi.tag->moveIcon( 0, 1, QIcon::Active );
-        scrobbleRatingUi.love->moveIcon( 0, 1, QIcon::Active );
-        scrobbleRatingUi.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
-        scrobbleRatingUi.love->setCheckable( true );
-        scrobbleRatingUi.share->moveIcon( 0, 1, QIcon::Active );
-        
-    }
+//    QWidget* scrobbleRatingControls = new QWidget( this );
+//    {
+//        QGridLayout* layout = new QGridLayout( scrobbleRatingControls );
+//        layout->addWidget( scrobbleRatingUi.love = new ImageButton( ":/MainWindow/button/love/up.png" ), 0, 0, Qt::AlignRight | Qt::AlignBottom );
+//        layout->addWidget( scrobbleRatingUi.ban = new ImageButton( ":/MainWindow/button/ban/up.png" ), 0, 1, Qt::AlignLeft | Qt::AlignBottom );
+//        layout->addWidget( scrobbleRatingUi.tag = new ImageButton( ":/MainWindow/button/tag/up.png" ), 1, 0, Qt::AlignRight | Qt::AlignTop );
+//        layout->addWidget( scrobbleRatingUi.share = new ImageButton( ":/MainWindow/button/share/up.png" ), 1, 1, Qt::AlignLeft | Qt::AlignTop );
+//        
+//        layout->setSizeConstraint( QLayout::SetFixedSize );
+//        layout->setSpacing( 0 );
+//        layout->setContentsMargins( 0, 0, 0, 0 );
+//        
+//        scrobbleRatingUi.ban->moveIcon( 0, 1, QIcon::Active );
+//        scrobbleRatingUi.tag->moveIcon( 0, 1, QIcon::Active );
+//        scrobbleRatingUi.love->moveIcon( 0, 1, QIcon::Active );
+//        scrobbleRatingUi.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
+//        scrobbleRatingUi.love->setCheckable( true );
+//        scrobbleRatingUi.share->moveIcon( 0, 1, QIcon::Active );
+//        
+//    }
     
     
-    layout()->addWidget( scrobbleRatingControls );
+//    layout()->addWidget( scrobbleRatingControls );
     
-    QWidget* cogAndScrobble = new QWidget( this );
-    {
-        QVBoxLayout* layout = new QVBoxLayout( cogAndScrobble );
-        layout->setSizeConstraint( QLayout::SetFixedSize );
-        layout->setSpacing( 0 );
-        layout->setContentsMargins( 0, 0, 0, 0 );
-        layout->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
-        scrobbleRatingUi.cog->setCheckable( true );
-        connect( scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
+//    QWidget* cogAndScrobble = new QWidget( this );
+//    {
+//        QVBoxLayout* layout = new QVBoxLayout( cogAndScrobble );
+//        layout->setSizeConstraint( QLayout::SetFixedSize );
+//        layout->setSpacing( 0 );
+//        layout->setContentsMargins( 0, 0, 0, 0 );
+//        layout->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
+//        scrobbleRatingUi.cog->setCheckable( true );
+//        connect( scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
+//
+//        m_cogMenu = new QMenu( this );
+//        m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
+//        m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
+//        m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
+//        
+//        
+//        
+//    }
 
-        m_cogMenu = new QMenu( this );
-        m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
-        m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
-        m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
-        
-        layout->addWidget( new ScrobbleButton );
-    }
-    
-    layout()->addWidget( cogAndScrobble );
+    ui.volume = new UnicornVolumeSlider;
+    ui.volume->setAudioOutput( The::radio().audioOutput());
+    ui.volume->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
+    layout()->addWidget( ui.volume );
     
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
@@ -166,9 +162,27 @@ Amp::setupUi()
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
     
-    setMinimumHeight( 110 );
+    ui.controls->setMinimumWidth( ui.volume->sizeHint().width());
+    
     setMinimumWidth( 456 );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
+}
+
+
+void 
+Amp::onPlayerBucketChanged()
+{
+    if( ui.bucket->count() > 0 )
+    {
+        ui.controls->setFixedHeight( ui.controls->sizeHint().height());
+        ui.volume->setFixedHeight( ui.volume->sizeHint().height());
+    }
+    else
+    {
+        ui.controls->setFixedHeight( 0 );
+        ui.volume->setFixedHeight( 0 );
+    }
+    
+    ui.volume->resize( ui.volume->size());
 }
 
 
@@ -196,64 +210,4 @@ Amp::resizeEvent( QResizeEvent* event )
     window.setColorAt( 1, 0x282727 );
     p.setBrush( QPalette::Window, window );
     setPalette( p );
-}
-
-
-void 
-Amp::onTrackSpooled( Track t )
-{
-    m_track = t;
-    if( !t.isNull()) 
-        scrobbleRatingUi.cog->setEnabled( true ); 
-    else 
-        scrobbleRatingUi.cog->setEnabled( false ); 
-}
-
-
-void
-Amp::onCogMenuClicked()
-{
-    emit customContextMenuRequested( scrobbleRatingUi.cog->mapToGlobal( QPoint( 0, scrobbleRatingUi.cog->height()) ) );
-}
-
-
-void 
-Amp::onContextMenuRequested( const QPoint& pos )
-{
-    m_cogMenu->move( pos );
-    m_cogMenu->show();
-}
-
-
-void 
-Amp::showPlaylistDialog()
-{
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track );
-}
-
-
-#include <QtNetwork>
-#include "lib/lastfm/types/User.h"
-void
-Amp::onPraiseClientTeam()
-{
-    QStringList praises;
-    praises << "thinks you're all jolly good chaps"
-    << "wants to have your babies"
-    << "is amazed at your skills"
-    << "is gay and/or heterosexual for you (depending on gender)";
-    
-    uint random = QDateTime::currentDateTime().toTime_t();
-    QString praise = praises.value( random % praises.count() );
-    
-	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " " + praise;
-	(new WsAccessManager)->get( QNetworkRequest( url ) );
-}
-
-
-void
-Amp::onCurseClientTeam()
-{
-	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
-	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }

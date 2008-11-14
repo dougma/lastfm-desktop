@@ -32,14 +32,16 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
 {
     painter->save();
     
+    const QIcon icon = index.data( Qt::DecorationRole ).value<QIcon>();
+    
     int flashValue = index.data( moose::HighlightRole ).isValid() ? index.data( moose::HighlightRole ).toInt() : 0;
+
+    QRect iconRect = option.rect; //.adjusted( 1, 1, -1, -3 ); //allow margin between avatar and overlay
+    iconRect.setHeight( icon.actualSize( iconRect.size() ).height() );
     
-    QRect overlayRect = option.rect;
-    overlayRect.setHeight( m_overlay.height() );
-    QRect iconRect = overlayRect.adjusted( 1, 1, -1, -3 ); //allow margin between avatar and overlay
-    QRect textRect = option.rect.adjusted( 0, overlayRect.height(), 0, 0 );
+    QRect overlayRect = iconRect.adjusted( 1, 1, -1, -3 );
     
-    QIcon icon = index.data( Qt::DecorationRole ).value<QIcon>();
+    QRect textRect = option.rect.adjusted( 0, iconRect.height(), 0, 0 );
     
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
     
@@ -50,10 +52,6 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     if( option.state & QStyle::State_Selected )
     {
         painter->drawPixmap( overlayRect, m_selectedOverlay );
-    }
-    else
-    {
-        painter->drawPixmap( overlayRect, m_overlay );
     }
     
     if( flashValue > 0 )

@@ -175,7 +175,7 @@ PlayerBucketList::calculateLayout()
 
     delegatesY -= verticalScrollBar()->value();
     
-    QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
+    const QRect itemRect( delegatesX, delegatesY, k_itemSizeX, k_itemSizeY );
     
     m_itemRects.clear();
 	int index = 0;
@@ -430,6 +430,7 @@ PlayerBucketList::addItem( PlayableListItem* item )
     }
     
     addItem( (QListWidgetItem*)item );
+    emit itemAdded( item->text(), item->playableType());
     return true;
 }
 
@@ -455,8 +456,11 @@ void
 PlayerBucketList::removeItem( PlayableListItem* item )
 {
     setCurrentItem( NULL );
-    emit itemRemoved( item->text(), (Seed::Type)item->playableType());
+    const QString text = item->text();
+    const Seed::Type
+    type = item->playableType();
     delete item;
+    emit itemRemoved( text, type );
     calculateLayout();
     viewport()->update();
     return;   

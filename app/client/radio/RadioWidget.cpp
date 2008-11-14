@@ -35,7 +35,7 @@
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QTabWidget>
-#include <phonon/volumeslider.h>
+#include "widgets/UnicornVolumeSlider.h"
 
 
 RadioWidget::RadioWidget( QWidget* parent )
@@ -73,8 +73,6 @@ RadioWidget::RadioWidget( QWidget* parent )
 	v->addWidget( s );
     v->addWidget( ui.controls = new RadioControls );
 	
-    ui.controls->ui.volume->setAudioOutput( The::radio().audioOutput() );
-
 	connect( ui.controls, SIGNAL(stop()), &The::radio(), SLOT(stop()) );
     connect( ui.controls->ui.skip, SIGNAL(clicked()), &The::radio(), SLOT(skip()) );
     

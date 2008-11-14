@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <phonon/volumeslider.h>
+#include "widgets/UnicornVolumeSlider.h"
 #include "UnicornWidget.h"
 #include "the/radio.h"
 
@@ -32,7 +32,6 @@
 #include <QPaintEvent>
 
 RadioControls::RadioControls()
-              : m_volumeSlider( 0 )
 {
     QVBoxLayout* v = new QVBoxLayout( this );
     v->setContentsMargins( 0, 0, 0, 0 );
@@ -62,24 +61,6 @@ RadioControls::RadioControls()
     v->addWidget( hLayoutWidget );
     v->insertStretch( 0, 1 );
     v->insertStretch( -1, 1 );
-    
-    ui.volume = new Phonon::VolumeSlider;
-	ui.volume->setMinimumWidth( ui.play->sizeHint().width() + ui.skip->sizeHint().width() );
-    ui.volume->setMuteVisible( true );
-    ui.volume->setAudioOutput( The::radio().audioOutput());
-    
-    QToolButton* muteButton = ui.volume->findChild<QToolButton*>();
-    if( muteButton )
-        muteButton->installEventFilter( this );
-    
-    m_volumeSlider = ui.volume->findChild<QSlider*>();
-    if( m_volumeSlider )
-    {
-        m_volumeSlider->installEventFilter( this );
-        connect( m_volumeSlider, SIGNAL(valueChanged(int)), SLOT(onVolumeValueChanged(int)));
-    }
-	
-    v->addWidget( ui.volume );
 	
 	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
     connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
@@ -87,95 +68,6 @@ RadioControls::RadioControls()
     connect( ui.skip, SIGNAL( clicked()), SIGNAL(skip()));
     setAutoFillBackground( true );
     UnicornWidget::paintItBlack( this );
-}
-
-
-void
-RadioControls::onVolumeValueChanged( int v )
-{
-    static_cast<QWidget*>(sender()->parent())->update();
-}
-
-
-bool 
-RadioControls::eventFilter( QObject* watched, QEvent* event )
-{
-    if( QSlider* slider = qobject_cast<QSlider*>( watched ))
-    {
-        if( sliderEventFilter( slider, event ))
-            return true;
-    }
-    
-    if( QToolButton* button = qobject_cast<QToolButton*>( watched ))
-    {
-        if( toolButtonEventFilter( button, event ))
-            return true;
-    }
-
-   return QWidget::eventFilter( watched, event );
-}
-
-
-bool
-RadioControls::sliderEventFilter( QSlider* slider, QEvent* e ) const
-{
-    switch( e->type())
-    {
-        case QEvent::Paint:
-        {
-            QPaintEvent* event = static_cast< QPaintEvent*>(e);
-            QPainter p( slider );
-            p.setClipRect( event->rect());
-            
-            int midY = qRound( slider->rect().height() / 2.0f );
-            p.setPen( QColor( 0x0c, 0x0c, 0x0c ));
-            p.drawLine( slider->rect().left(), midY,
-                       slider->rect().right(), midY);
-            
-            p.setPen( QColor( 0x37, 0x37, 0x37 ));
-            p.drawLine( slider->rect().left(), midY + 1,
-                       slider->rect().right(), midY + 1 );
-            
-            
-            QPixmap pm( ":/RadioControls/volume/handle.png" );
-            
-            midY++;
-            int handleX = slider->rect().x() + ( pm.width() / 2.0f ) + ( (slider->rect().width() - qreal(pm.width())) * (qreal(slider->value()) / qreal(slider->maximum())));
-            QRect handleRect( handleX - (qreal(pm.width()) / 2.0f), midY - (qreal(pm.height()) / 2.0f ), pm.width(), pm.height());
-            p.drawPixmap( handleRect, pm );
-            
-            return true;
-        }
-            
-        default: return false;
-            
-    }
-}
-
-
-bool 
-RadioControls::toolButtonEventFilter( QToolButton* b, QEvent* e ) const
-{
-    switch( e->type())
-    {
-        case QEvent::Paint:
-        {
-            QPaintEvent* event = static_cast< QPaintEvent*>(e);
-            QPainter p( b );
-            p.setClipRect( event->rect());
-            
-            QPixmap pm( ":/RadioControls/volume/icon.png" );
-            
-            QRect pmRect = pm.rect().translated( (b->width() / 2) - (pm.width() / 2 ), 
-                                                 (b->height() / 2) - (pm.height() / 2 ) + 1);
-            
-            p.drawPixmap( pmRect, pm );
-            return true;
-        }
-            
-        default: return false;
-            
-    }
 }
 
 

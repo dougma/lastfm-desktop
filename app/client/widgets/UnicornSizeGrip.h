@@ -16,41 +16,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef UNICORN_SIZE_GRIP
+#define UNICORN_SIZE_GRIP
 
-#ifndef RADIO_CONTROLS_H
-#define RADIO_CONTROLS_H
+#include <QSizeGrip>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QDebug>
 
-#include "State.h"
-#include <QWidget>
-class ImageButton;
-
-
-class RadioControls : public QWidget
+class UnicornSizeGrip : public QSizeGrip
 {
-	Q_OBJECT
-
 public:
-    RadioControls();
+    UnicornSizeGrip( QWidget* w, Qt::Alignment o = Qt::AlignRight | Qt::AlignBottom );
+    
+protected:
+    Qt::Alignment m_orientation;
+    QTransform m_transformMatrix;
 
-	struct Ui
-    {
-        ImageButton* play;
-        ImageButton* skip;
-    } 
-	ui;
-
-	
-private slots:
-	void onRadioStopped();
-    void onRadioTuningIn( const class RadioStation& );
-	void onPlayClicked();
-	
-signals:
-	void stop();
-    void play();
-    void skip();
-
+    void paintEvent( QPaintEvent* );
+    bool eventFilter( QObject*, QEvent* );
+    
+    int m_xAdjust1, m_xAdjust2, m_yAdjust1, m_yAdjust2;
+    
+//    void mouseMoveEvent( QMouseEvent* e )
+//    {
+//        if( !(e->buttons() & Qt::LeftButton) )
+//            return QSizeGrip::mouseMoveEvent( e );
+//        
+//        foreach( QObject* o, parentWidget()->parentWidget()->children() )
+//        {
+//            QWidget* w;
+//            if( o == parentWidget() || !(w = qobject_cast< QWidget* >( o )) )
+//                continue;
+//            
+//            w->setFixedHeight( w->height() );
+//        }
+//        QSizeGrip::mouseMoveEvent( e );
+//    }
 };
 
-
-#endif RADIO_CONTROLS_H
+#endif //UNICORN_SIZE_GRIP

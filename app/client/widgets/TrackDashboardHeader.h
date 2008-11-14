@@ -16,78 +16,70 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef TRACK_DASHBOARD_HEADER_H
+#define TRACK_DASHBOARD_HEADER_H
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include <QWidget>
+#include <QMouseEvent>
+#include "the/mainWindow.h"
 
-#include "lib/lastfm/types/Track.h"
-#include <QSystemTrayIcon> // due to a poor design decision in Qt
-#include <QPointer>
-#include "State.h"
-#include "ui_MainWindow.h"
-#include "widgets/UnicornWidget.h"
-
-class ShareDialog;
-class TagDialog;
-class SettingsDialog;
-class DiagnosticsDialog;
-class PlaylistDialog;
-
-
-class MainWindow : public QMainWindow
+class TrackDashboardHeader : public QWidget
 {
     Q_OBJECT
-
-public:
-    MainWindow();
-    ~MainWindow();
     
-	struct Ui : ::Ui::MainWindow
-	{
-		class Amp* amp;
-        class Sources* sources;
-        class TrackDashboardHeader* dashboardHeader;
-        class TrackDashboard* dashboard;
+public:
+    TrackDashboardHeader();
+    void paintEvent( QPaintEvent* e );    
+    void resizeEvent( QResizeEvent* e );
+    
+    struct {
+        class ScrobbleButton* scrobbleButton;
+        class RadioProgressBar* radioProgress;
+        class ImageButton* love;
+        class ImageButton* ban;
         class ImageButton* cog;
-        class MessageBar* messagebar;
-        class Firehose* firehose;
+        class QLabel* track;
     } ui;
-
+    
 protected:
-#ifdef WIN32
-    virtual void closeEvent( QCloseEvent* );
-#endif
-
-public slots:
-    void showSettingsDialog();
-    void showDiagnosticsDialog();
-    void showAboutDialog();
-    void showShareDialog();
-	void showTagDialog();
-
-signals:
-	void loved();
-	void banned();
-	
+    QPoint m_mouseDownPos;
+    void mousePressEvent( QMouseEvent* e )
+    {
+        m_mouseDownPos = e->globalPos() - The::mainWindow().pos();
+    }
+    
+    void mouseMoveEvent( QMouseEvent* e )
+    {
+        if( !m_mouseDownPos.isNull())
+            The::mainWindow().move( e->globalPos() - m_mouseDownPos);
+    }
+    
+    void mouseReleaseEvent( QMouseEvent* e )
+    {
+        m_mouseDownPos = QPoint();
+    }
+    
 private slots:
-    void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-	void onUserGetInfoReturn( class WsReply* );
-    void onTrackSpooled( const Track& );
-    void onStateChanged( State );
+    void onTrackSpooled( const Track&, class StopWatch* );
+
+    void onContextMenuRequested( const QPoint& pos );
+    
+    void onPraiseClientTeam();
+    void onCurseClientTeam();
+    void onCogMenuClicked();
+    
+    void showPlaylistDialog();
+    void showTagDialog();
+    void showShareDialog();
     
 private:
-    void setupUi();
-    void setupInfoWidget();
-	
-	virtual void dragEnterEvent( QDragEnterEvent* );
-	virtual void dropEvent( QDropEvent* );
-    
+    class QMenu* m_cogMenu;
     Track m_track;
-	
-	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
 };
 
-#endif //MAINWINDOW_H
+
+#endif //TRACK_DASHBOARD_HEADER_H

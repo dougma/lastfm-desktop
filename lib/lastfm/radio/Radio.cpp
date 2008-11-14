@@ -41,10 +41,11 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
        m_resolver( resolver )
 {
     m_mediaObject = new Phonon::MediaObject;
-    m_mediaObject->setTickInterval( 1000 );
+    m_mediaObject->setTickInterval( 100 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
+    connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
     Phonon::createPath( m_mediaObject, m_audioOutput );    
     
     if (m_resolver)

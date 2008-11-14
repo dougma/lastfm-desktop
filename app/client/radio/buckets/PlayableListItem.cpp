@@ -127,7 +127,28 @@ PlayableListItem::setPixmap( const QPixmap& pm )
         iconPm = cropped;
     }
     
-    setIcon( iconPm );
+    QPixmap overlayedIcon( QPixmap( ":buckets/avatar_overlay.png" ).size());
+    {
+        QRect iRect = iconPm.rect().translated( 1, 1 );
+        overlayedIcon.fill( Qt::transparent );
+        QPainter p( &overlayedIcon );
+        p.setRenderHint( QPainter::SmoothPixmapTransform );
+        p.drawPixmap( iRect, iconPm );
+        p.drawPixmap( overlayedIcon.rect(), QPixmap( ":buckets/avatar_overlay.png" ));
+    }
+    
+    QIcon icon( overlayedIcon );
+    
+    QPixmap selectedIcon = overlayedIcon;
+    {
+        QRect selectRect = overlayedIcon.rect().adjusted( 1, 1, -1, -3 );
+        QPainter p( &selectedIcon );
+        p.drawPixmap( selectRect, QPixmap( ":buckets/avatar_overlay_selected.png" ) );
+    }
+    
+    icon.addPixmap( selectedIcon, QIcon::Selected );
+    setIcon( icon );
+    setData( Qt::DecorationRole, icon);
     
     if( listWidget())
         listWidget()->viewport()->update();

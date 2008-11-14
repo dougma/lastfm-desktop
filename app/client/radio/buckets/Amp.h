@@ -24,7 +24,6 @@
 #include "SeedTypes.h"
 #include "lib/lastfm/types/Track.h"
 #include "widgets/UnicornWidget.h"
-#include "widgets/PlaylistDialog.h"
 
 #include <QMouseEvent>
 #include "the/MainWindow.h"
@@ -36,18 +35,7 @@ public:
     
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );
-    
-    struct
-    {
-        class ImageButton* love;
-        class ImageButton* ban;
-        class ImageButton* share;
-        class ImageButton* tag;
-        class ImageButton* cog;
-    } scrobbleRatingUi;
-    
-public slots:
-    void showPlaylistDialog();
+
     
 signals:
     void itemRemoved( QString, Seed::Type );
@@ -57,38 +45,28 @@ protected:
     struct {
         class PlayerBucketList* bucket;
         class RadioControls* controls;
+        class UnicornVolumeSlider* volume;
     } ui;
     
     void resizeEvent( QResizeEvent* );
     void setupUi();
-    class QMenu* m_cogMenu;
-    Track m_track;
     
     QPoint m_mouseDownPos;
     void mousePressEvent( QMouseEvent* e )
     {
-        m_mouseDownPos = e->pos();
+        m_mouseDownPos = e->globalPos() - The::mainWindow().pos();
     }
     
     void mouseMoveEvent( QMouseEvent* e )
     {
         The::mainWindow().move( e->globalPos() 
-                                - m_mouseDownPos 
-                                - QPoint( 0, parentWidget()->mapToParent( mapToParent( pos() )).y() 
-                                             + The::mainWindow().frameGeometry().height() 
-                                             - The::mainWindow().height()) );
+                                - m_mouseDownPos);
     }
+    
+    QSize sizeHint() const{ return QSize( 0, 84 ); }
   
 protected slots:
-    void onTrackSpooled( Track );
-    void onContextMenuRequested( const QPoint& );
-
-    void onPraiseClientTeam();
-    void onCurseClientTeam();
-    void onCogMenuClicked();
-    
-private:
-    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
+    void onPlayerBucketChanged();
     
 };
 

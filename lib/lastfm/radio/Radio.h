@@ -77,6 +77,7 @@ signals:
 	/** the error is either one of Ws::Error, or if Ws::Unknown a fatal error
       * from Phonon with error message set in data */
 	void error( int, const QVariant& data = QVariant() );
+    void tick( qint64 );
 
 private slots:
     void enqueue( const QList<Track>& );
