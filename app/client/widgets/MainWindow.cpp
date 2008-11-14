@@ -233,12 +233,12 @@ MainWindow::setupUi()
 
     QDockWidget* dw = new QDockWidget;
     dw->setWindowTitle( "Friends" );
-    dw->setWidget( new Firehose );
+    dw->setWidget( ui.firehose = new Firehose );
     addDockWidget( Qt::RightDockWidgetArea, dw, Qt::Vertical );
     dw->hide();
     dw->setFloating( true );
     
-    connect( ui.viewInfo, SIGNAL(triggered()), dw, SLOT(show()) );
+    connect( ui.viewFirehose, SIGNAL(triggered()), dw, SLOT(show()) );
     
 #ifndef Q_WS_MAC
 	delete ui.windowMenu;
@@ -407,16 +407,48 @@ MainWindow::dropEvent( QDropEvent* e )
 void
 MainWindow::onUserGetInfoReturn( WsReply* reply )
 {
+    qDebug() << reply;
+    
 	try
 	{
+        class Gender
+        {
+            QString s;
+            
+        public:
+            Gender( const QString& ss ) :s( ss.toLower() )
+            {}
+            
+            bool known() const { return male() || female(); }
+            bool male() const { return s == "m"; }
+            bool female() const { return s == "f"; }
+            
+            QString toString()
+            {
+                QStringList list;
+                if (male())
+                {
+                    list << tr("boy") << tr("lad") << tr("chap") << tr("guy");
+                }
+                else if (female())
+                    // I'm not sexist, it's just I'm gutless and couldn't think
+                    // of any other non offensive terms for women!
+                    return tr("lady");
+                else 
+                    return tr("person");
+                    
+                return list.value( QDateTime::currentDateTime().toTime_t() % list.count() );
+            }
+        };
+        
 		CoreDomElement e = reply->lfm()["user"];
-		QString gender = e["gender"].text();
+		Gender gender = e["gender"].text();
 		QString age = e["age"].text();
 		uint const scrobbles = e["playcount"].text().toUInt();
-		if (gender.size() && age.size() && scrobbles > 0)
+		if (gender.known() && age.size() && scrobbles > 0)
 		{
 			QString text = tr("A %1, %2 years of age with %L3 scrobbles")
-					.arg( gender == "m" ? tr("boy") : tr("girl") )
+					.arg( gender.toString() )
 					.arg( age )
 					.arg( scrobbles );
 
@@ -426,6 +458,20 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
 		{
 			ui.account->addAction( tr("%L1 scrobbles").arg( scrobbles ) )->setEnabled( false );
 		}
+        
+        if (e["bootstrap"].text() != "0")
+        {
+            //TODO bootstrap!
+        }
+        
+        uint const id = e["id"].text().toInt();
+        
+        if (id)
+        {
+            ui.firehose->setUserId( id );
+        }
+        else
+            ui.firehose->setStaff();
     }
 	catch (CoreDomElement::Exception&)
 	{}

@@ -49,6 +49,7 @@ public:
         class TrackDashboard* dashboard;
         class ImageButton* cog;
         class MessageBar* messagebar;
+        class Firehose* firehose;
     } ui;
 
 protected:
