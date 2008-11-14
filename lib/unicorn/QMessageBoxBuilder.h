@@ -20,11 +20,11 @@
 #ifndef MESSAGE_BOX_BUILDER_H
 #define MESSAGE_BOX_BUILDER_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lib/DllExportMacro.h>
 #include <QtGui/QMessageBox>
 
 
-class LASTFM_CORE_DLLEXPORT MessageBoxBuilder
+class UNICORN_DLLEXPORT MessageBoxBuilder
 {
     QMessageBox box;
 
