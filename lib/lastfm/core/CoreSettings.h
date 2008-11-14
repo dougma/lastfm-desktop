@@ -28,6 +28,8 @@
 class CoreSettings : public QSettings
 {
 public:
+    /** applicationName allows you to create arbituary settings for other 
+      * Last.fm applications, but don't use it pls */
 	CoreSettings( const QString& applicationName = "" ) : QSettings( organizationName(), applicationName )
 	{}
     
