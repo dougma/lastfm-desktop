@@ -23,8 +23,7 @@
 
 
 PrettyCoverWidget::PrettyCoverWidget()
-                 : m_rendered_width( 0 )
-                 , m_reflection_height( 75 )
+                 : m_reflection_height( 75 )
                  , m_showArtist( true )
 {
     QFont font = this->font();
@@ -52,7 +51,6 @@ PrettyCoverWidget::setTrack( const Track& t )
 	if (m_track.album() != t.album())
 	{
 		m_cover = QImage();
-		update();
 		
 		qDeleteAll( findChildren<AlbumImageFetcher*>() );
 		QObject* o = new AlbumImageFetcher( t.album(), Album::ExtraLarge );
@@ -61,6 +59,8 @@ PrettyCoverWidget::setTrack( const Track& t )
 	}
 
 	m_track = t;
+
+    update();
 }
 
 
@@ -136,8 +136,6 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
         r.setTop( r.bottom() - m_reflection_height );
         p.drawText( r, Qt::AlignCenter, text );
     }
-    
-    m_rendered_width = scale * m_cover.width();
 }
 
 

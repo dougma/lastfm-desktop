@@ -305,7 +305,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setShowArtist( true );
         ui.cover->raise();
         
-        w = qMax( ui.cover->coverWidth(), uint(180) );
+        w = qMax( ui.cover->widthForHeight( height() - 12 ), 180 );
         int const x = (width() - w) / 2;
 
         ui.cover->resize( ui.papyrus->width(), height() - 12 );

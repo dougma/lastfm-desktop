@@ -53,8 +53,6 @@ public:
         setMinimumSize( w, heightForWidth( w ) );
     }
     
-    uint coverWidth() const { return m_rendered_width; }
-    
     void setShowArtist( bool b ) { m_showArtist = b; }
 	
 private slots:
@@ -65,7 +63,6 @@ private:
 
     QImage m_cover;
 	Track m_track;
-    uint m_rendered_width;
     uint m_reflection_height;
     bool m_showArtist;
 	
