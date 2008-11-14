@@ -20,6 +20,7 @@
 #include "WsReply.h"
 #include <QCoreApplication>
 #include <QEventLoop>
+#include <QLocale>
 
 
 WsReply::WsReply( QNetworkReply* r )
@@ -154,3 +155,59 @@ WsReply::method() const
 {
 	return m_reply->url().queryItemValue( "method" );
 }
+
+void 
+WsReply::abort()
+{
+    m_reply->abort();
+}
+
+QVariant
+WsReply::header( QNetworkRequest::KnownHeaders header ) const
+{
+    return m_reply->header( header );
+}
+
+QDateTime
+WsReply::expires() const
+{
+    return fromHttpDate( m_reply->rawHeader( "Expires" ) );
+}
+
+
+// This useful function, fromHttpDate, comes from QNetworkHeadersPrivate
+// in qnetworkrequest.cpp.  Qt copyright and license apply:
+
+//static 
+QDateTime 
+WsReply::fromHttpDate(const QByteArray &value)
+{
+    // HTTP dates have three possible formats:
+    //  RFC 1123/822      -   ddd, dd MMM yyyy hh:mm:ss "GMT"
+    //  RFC 850           -   dddd, dd-MMM-yy hh:mm:ss "GMT"
+    //  ANSI C's asctime  -   ddd MMM d hh:mm:ss yyyy
+    // We only handle them exactly. If they deviate, we bail out.
+
+    int pos = value.indexOf(',');
+    QDateTime dt;
+    if (pos == -1) {
+        // no comma -> asctime(3) format
+        dt = QDateTime::fromString(QString::fromLatin1(value), Qt::TextDate);
+    } else {
+        // eat the weekday, the comma and the space following it
+        QString sansWeekday = QString::fromLatin1(value.constData() + pos + 2);
+
+        QLocale c = QLocale::c();
+        if (pos == 3)
+            // must be RFC 1123 date
+            dt = c.toDateTime(sansWeekday, QLatin1String("dd MMM yyyy hh:mm:ss 'GMT"));
+        else
+            // must be RFC 850 date
+            dt = c.toDateTime(sansWeekday, QLatin1String("dd-MMM-yy hh:mm:ss 'GMT'"));
+    }
+
+    if (dt.isValid())
+        dt.setTimeSpec(Qt::UTC);
+    return dt;
+}
+

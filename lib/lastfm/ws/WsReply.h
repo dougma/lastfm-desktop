@@ -61,6 +61,14 @@ public:
     static QString networkErrorString( QNetworkReply::NetworkError );
 
 	QString method() const;
+
+    /** expose some QNetworkReply methods of the same name: **/
+    QVariant header( QNetworkRequest::KnownHeaders ) const;
+    void abort();
+
+    /* returns the value of the "Expires" response header, or an
+     * invalid QDateTime for a missing or invalid Expires header */
+    QDateTime expires() const;
     
     /** use the metadata component to remind you what wsreply this is */
     void setAssociatedData( const QVariant& v ) { m_associatedData = v; }
@@ -78,6 +86,9 @@ public:
     QByteArray data() const { return m_data; }
 	
 	bool failed() const { return m_error != Ws::NoError; }
+
+    /* this is a useful function, why doesn't Qt expose it? */
+    static QDateTime fromHttpDate(const QByteArray &value);
 
 signals:
     /** we call deleteLater() immediately after emitting this signal, so don't
