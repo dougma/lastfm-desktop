@@ -55,6 +55,12 @@ Artist::getTags() const
 	return WsRequestBuilder( "artist.getTags" ).add( "artist", m_name ).get();
 }
 
+WsReply* 
+Artist::getTopTags() const
+{
+	return WsRequestBuilder( "artist.getTopTags" ).add( "artist", m_name ).get();
+}
+
 
 WsReply* 
 Artist::getSimilar() const

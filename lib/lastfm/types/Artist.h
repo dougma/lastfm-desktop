@@ -64,6 +64,7 @@ public:
     
     /** use Tag::list to get the tag list out of the finished reply */
     WsReply* getTags() const;
+    WsReply* getTopTags() const;
     
     /** Last.fm dictates that you may submit at most 10 of these */
     WsReply* addTags( const QStringList& ) const;
