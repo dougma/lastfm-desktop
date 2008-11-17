@@ -47,3 +47,8 @@ release:win32 {
 	system( perl -pi -e        's!\@QT_DIR\@!$$qt!g' client.iss )
 	system( perl -pi -e       's!\@BIN_DIR\@!$$root/_bin!g' client.iss )
 }
+
+linux* {
+    SOURCES -= $$findSources( cpp, bootstrap )
+    HEADERS -= $$findSources( h, bootstrap )
+}

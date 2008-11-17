@@ -67,12 +67,42 @@ struct HklmSettings : QSettings
 };
 
 
-struct PluginSettings : HklmSettings
+struct Plugin
 {
-	PluginSettings()
-	{
-		beginGroup( "Plugins" );
-	}
+    QString name;
+    QString version;
+    
+    struct Settings : HklmSettings
+    {
+        Settings()
+        {
+            beginGroup( "Plugins" );
+        }
+    };
+    
+    static QList<Plugin> installed()
+    {
+        QList<Plugin> plugins;
+        
+        foreach (QString group, s.childGroups())
+        {            
+            Settings s;
+            s.beginGroup( group );
+
+            Plugin p;            
+            p.name = s.value( "Name" ).toString();
+            
+            //If the plugin has been added but not installed name.size() == 0
+            if (p.name.isEmpty())
+                continue;
+
+            p.version = s.value( "Version" ).toString();
+            
+            plugins += p;
+        }
+        
+        return plugins;
+    };
 };
 #endif //WIN32
 
