@@ -23,6 +23,8 @@
 #include <lastfm/DllExportMacro.h>
 #include <lastfm/ws/WsReply.h> //for your convenience
 #include <lastfm/ws/WsRequestParameters.h>
+#include <QThreadStorage>
+
    
 
 /** A convenience class to create a WsReply for Last.fm webservices.
@@ -37,7 +39,7 @@ class LASTFM_WS_DLLEXPORT WsRequestBuilder
 
     /** DO NOT MAKE THIS ACCESSIBLE TO OTHER PARTS OF THE APPLICATION 
       * Talk to max if you wanted to */
-    static class WsAccessManager* nam;
+    static QThreadStorage<class WsAccessManager*> nam;  // one per thread
 
     RequestMethod request_method;
     WsRequestParameters params;

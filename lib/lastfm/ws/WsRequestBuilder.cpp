@@ -23,13 +23,25 @@
 #include "WsAccessManager.h"
 #include <QCoreApplication>
 #include <QEventLoop>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QThread>
 
-WsAccessManager* WsRequestBuilder::nam = 0;
+
+QThreadStorage<class WsAccessManager*> WsRequestBuilder::nam;
 
 
 WsRequestBuilder::WsRequestBuilder( const QString& method )
 {
-    if (!nam) nam = new WsAccessManager( qApp );
+    static QMutex lock;
+    QMutexLocker locker( &lock );
+
+    if ( !nam.hasLocalData() ) 
+    {
+        // WsAccessManager will be unparented, but it
+        // does gets cleaned up when this thread ends
+        nam.setLocalData( new WsAccessManager( 0 ) );
+    }
     
     params.add( "method", method );
 }
@@ -41,7 +53,6 @@ WsRequestBuilder::start()
     #define MAKE_REQUEST \
         QNetworkRequest request( url ); \
         request.setRawHeader( "User-Agent", Ws::UserAgent );
-
 
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
@@ -62,7 +73,7 @@ WsRequestBuilder::start()
                 url.addEncodedQueryItem( key, value );
             }
             MAKE_REQUEST
-            return new WsReply( nam->get( request ) );
+            return new WsReply( nam.localData()->get( request ) );
         }
 
         case POST:
@@ -76,7 +87,7 @@ WsRequestBuilder::start()
 					  + "&";
 			}
             MAKE_REQUEST
-			return new WsReply( nam->post( request, query ) );
+			return new WsReply( nam.localData()->post( request, query ) );
 		}
     }
 	return 0;
