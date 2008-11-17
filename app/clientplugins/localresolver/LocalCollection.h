@@ -23,14 +23,17 @@
     Db stores metadata for on-disk media
 */
 
-#ifndef LOCOCOLLECTION_H
-#define LOCOCOLLECTION_H
+#ifndef LOCAL_COLLECTION_H
+#define LOCAL_COLLECTION_H
 
 #include <QObject>
 #include <QMutex>
+#include <QDateTime>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include "ChainableQuery.h"
+#include "lib/lastfm/core/WeightedStringList.h"
 
 
 class LocalCollection : public QObject
@@ -105,105 +108,95 @@ public:
     {
     public:
         ResolveResult(
-            const QString& artist, const QString& album, const QString& title, const QString& filename, 
-            unsigned kbps, unsigned duration, const QString& path, const QString& sourcename)
+            const QString& artist, 
+            const QString& album, 
+            const QString& title, 
+            float artistMatch, 
+            float titleMatch,
+            const QString& filename, 
+            unsigned kbps, 
+            unsigned duration, 
+            const QString& path, 
+            const QString& sourcename)
             : FileMeta( artist, album, title, kbps, duration )
+            , m_matchQuality ( artistMatch * titleMatch )
             , m_filename( filename )
             , m_path( path )
             , m_sourcename ( sourcename )
         {}
 
+        float m_matchQuality;
         QString m_filename;
         QString m_path;
         QString m_sourcename;
     };
 
+    static LocalCollection* create(QString connectionName);
+    ~LocalCollection();
 
-
-    /** \brief Returns the singleton instance to the controller. */
-    static LocalCollection&
-    instance();
-
-    /** \brief Terminates and deletes the collection instance. */
-    void
-    destroy();
+    void versionCheck();
 
     /** \brief Temp method: Gets a fingerprint id. Returns -1 if none found. */
-    QString
-    getFingerprint( const QString& filePath );
-
+    QString getFingerprint( const QString& filePath );
     /** \brief Temp method: Sets a fingerprint id. */
-    bool
-    setFingerprint( const QString& filePath, QString fpId );
+    void setFingerprint( const QString& filePath, QString fpId );
 
-    int
-    addSource(const QString& volume);
+    LocalCollection::Source addSource(const QString& volume);
+    QList<Source> getAllSources();
+    void setSourceAvailability(int sourceId, bool bAvailable);
+    bool removeSource();
+    bool getSourceId(QString name, int &result);
 
-    QList<Source> 
-    getAllSources();
+    bool getDirectoryId(int sourceId, QString path, int &result);
 
-    void
-    setSourceAvailability(int sourceId, bool bAvailable);
+    int getArtistId(QString artistName, bool bCreate);
+    void updateArtist(int artistId);
 
-    bool
-    removeSource();
+    bool addDirectory(int sourceId, QString path, int &resultId);
+    void removeDirectory(int directoryId);
+    QList<Exclusion> getExcludedDirectories(int sourceId);
+    QList<QString> getStartDirectories(int sourceId);
 
-    bool 
-    getSourceId(QString name, int &result);
+    QList<File> getFiles(int directoryId);
+    void updateFile(int fileId, unsigned lastModified, const FileMeta& info);
+    void addFile(int directoryId, QString name, unsigned lastModified, const FileMeta& info);
+    void removeFiles(QList<int> ids);
 
-    bool 
-    getDirectoryId(int sourceId, QString path, int &result);
+    QList<LocalCollection::ResolveResult> resolve(const QString artist, const QString album, const QString title);
 
-    bool 
-    addDirectory(int sourceId, QString path, int &resultId);
+    // tag handling
+    int getTagId(QString tag, bool bCreate);
+    QStringList artistsWithExpiredTags();
+    QStringList artistsNeedingTagUpdate();
 
-    void
-    removeDirectory(int directoryId);
+    void setGlobalTagsForArtist(QString artist, WeightedStringList globalTags);
+    void setUserTagsForArtist(QString artist, QStringList userTags, unsigned userId);
+    void updateArtistDownload(QString artist, QDateTime nextDlTime, QDateTime dlTime = QDateTime());
 
-    QList<Exclusion>
-    getExcludedDirectories(int sourceId);
+    void deleteUserTrackTagsForArtist(int artistId, unsigned userId);
+    void deleteGlobalTrackTagsForArtist(int artistId);
+    void deleteTrackTagsForArtist(int artistId, unsigned userId);
 
-    QList<QString>
-    getStartDirectories(int sourceId);
+    void insertUserArtistTag(int artistId, int tagId, unsigned userId);
+    void insertGlobalArtistTag(int artistId, int tagId, int weight);
+    void insertTrackTag(int artistId, int tagId, unsigned userId, int weight);
 
-    QList<File> 
-    getFiles(int directoryId);
-
-    bool 
-    updateFile(int fileId, unsigned lastModified, const FileMeta& info);
-
-    bool
-    addFile(int directoryId, QString name, unsigned lastModified, const FileMeta& info);
-
-    void
-    removeFiles(QList<int> ids);
-
-    QList<LocalCollection::ResolveResult>
-    resolve(const QString artist, const QString album, const QString title);
 
 private:
-    LocalCollection();
-    ~LocalCollection();
+    LocalCollection(QString connectionName);
 
     /** the database version
         * version 1: from 2.?.? */
-    int
-    version() const;
+    int version() const;
+    void initDatabase();
+    QSqlQuery query( const QString& sql ) const;
+    ChainableQuery prepare( const QString& sql ) const;
 
-    bool
-    initDatabase();
+    static QMutex m_mutex;
 
-    bool
-    query( const QString& queryToken );
-
-    QString
-    fileURI( const QString& filePath );
-
-    static LocalCollection* s_instance;
-
-    QMutex m_mutex;
     QSqlDatabase m_db;
     QString m_dbPath;
+    QString m_connectionName;
 };
 
 #endif // COLLECTION_H

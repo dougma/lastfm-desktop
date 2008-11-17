@@ -66,6 +66,10 @@ CONFIG( samplerate ) {
     }
 }
 
+CONFIG( sqlite3 ) {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += sqlite3
+}
 
 defineTest( generateVersionHeader ) {
 	DEFINE = $${LITERAL_HASH}define

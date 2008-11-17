@@ -28,16 +28,20 @@
 class TrackResolver : public ITrackResolverPlugin
 {
     QString m_dbPath;
-	class QThreadPool *m_queryPool;
-	class LocalContentScanner *m_scanner;
+	class QThreadPool* m_queryPool;
+	class LocalContentScanner* m_scanner;
+    class LocalCollection* m_collection;
+    bool m_bStopping;
 
     // each resolve request gets sent to the threadpool:
 	class RequestRunnable : public QRunnable
 	{
         QString m_dbPath;
-		class ITrackResolveRequest *m_req;
+		class ITrackResolveRequest* m_req;
+        class LocalCollection* m_collection;
+        class TrackResolver* m_trackResolver;
 	public:
-		RequestRunnable(ITrackResolveRequest *, const QString &dbPath);
+		RequestRunnable(class TrackResolver*, LocalCollection*, ITrackResolveRequest*, const QString& dbPath);
 		void run();
 	};
 
@@ -54,13 +58,13 @@ class TrackResolver : public ITrackResolverPlugin
         unsigned m_duration;
         unsigned m_kbps;
     public:
-        Response(const LocalCollection::ResolveResult &r);
+        Response(const LocalCollection::ResolveResult& r);
 	    virtual float matchQuality() const;
-	    virtual const char *url() const;
-	    virtual const char *artist() const;
-	    virtual const char *album() const;
-	    virtual const char *title() const;
-	    virtual const char *filetype() const;
+	    virtual const char* url() const;
+	    virtual const char* artist() const;
+	    virtual const char* album() const;
+	    virtual const char* title() const;
+	    virtual const char* filetype() const;
 	    virtual unsigned duration() const;
 	    virtual unsigned kbps() const;
 	    virtual void finished();
@@ -71,8 +75,9 @@ public:
 	~TrackResolver();
 
     virtual void init();
-	virtual void resolve(class ITrackResolveRequest *req);
+	virtual void resolve(class ITrackResolveRequest* req);
     virtual void finished();
+    bool stopping();
 };
 
 

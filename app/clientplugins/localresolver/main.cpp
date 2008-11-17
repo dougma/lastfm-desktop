@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include "TrackResolver.h"
+#include "LocalRqlPlugin.h"
 
 
 /** always exporting, never importing  **/
@@ -29,31 +30,19 @@
 #endif
 
 
-// creation and deletion always occurs on the same thread
-// todo: put some asserts in to maintain this
-static TrackResolver *g_trackResolver = 0;
-static unsigned g_refCount = 0;
-
-void release()
-{
-    if (0 == --g_refCount) {
-        delete g_trackResolver;
-    }
-}
-
 extern "C" {
 
 RESOLVER_DLLEXPORT
 void *
 lastfm_getService(const char *service)
 {
-	if (0 != strcmp("TrackResolver", service))
-		return 0;
-
-	if (0 == g_refCount++)
-		g_trackResolver = new TrackResolver();
-
-	return g_trackResolver;
+    if (0 == strcmp("TrackResolver", service)) {
+        return new TrackResolver();
+    }
+    if (0 == strcmp("LocalRql", service)) {
+        return new LocalRqlPlugin();
+    }
+    return 0;
 }
 
 }

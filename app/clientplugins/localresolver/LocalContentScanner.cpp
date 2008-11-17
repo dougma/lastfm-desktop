@@ -26,19 +26,22 @@
 #include <memory>
 
 // we make use of QThreadPool priorities to allow some tasks to queue jump
-#define PRIORITY_VOLUMEAVAILABLE 0
-#define PRIORITY_FULLSCAN 1
+#define PRIORITY_INIT 0
+#define PRIORITY_VOLUMEAVAILABLE 1
+#define PRIORITY_FULLSCAN 2
 
 QStringList getAvailableVolumes();
 bool isVolumeImplicitlyAvailable(const QString& volume);
 
 LocalContentScanner::LocalContentScanner()
-    : m_col( LocalCollection::instance() )
+    : m_pCol( 0 )
     , m_bStopping( false )
 {
     m_pool = new QThreadPool();
-    m_pool->setMaxThreadCount(1);       // todo: LocalCollection needs work before removing this line.
-    startFullScan();
+    // just 1 thread in the pool because the db connection 
+    // shouldn't be shared between threads
+    m_pool->setMaxThreadCount(1);       
+    m_pool->start(new Init(this), PRIORITY_INIT);
 }
 
 LocalContentScanner::~LocalContentScanner()
@@ -53,15 +56,14 @@ LocalContentScanner::startFullScan()
 {
     QStringList volumes = getAvailableVolumes();
 
-    foreach(const LocalCollection::Source &src, m_col.getAllSources()) 
-    {
+    foreach(const LocalCollection::Source &src, m_pCol->getAllSources()) {
         bool available = volumes.contains(src.m_volume) || isVolumeImplicitlyAvailable(src.m_volume);
         if (available != src.m_available) {
-            m_col.setSourceAvailability(src.m_id, available);
+            m_pCol->setSourceAvailability(src.m_id, available);
         }
         if (available) {
-            Exclusions exclusions(m_col.getExcludedDirectories(src.m_id));
-            QStringList startdirs(m_col.getStartDirectories(src.m_id));
+            Exclusions exclusions(m_pCol->getExcludedDirectories(src.m_id));
+            QStringList startdirs(m_pCol->getStartDirectories(src.m_id));
             if (startdirs.isEmpty()) {
                 startdirs << "";    // scan from the root
             }
@@ -78,18 +80,11 @@ LocalContentScanner::startFullScan()
     bool bAddNewVolumesAutomatically = true;    // todo... optional?
     if (bAddNewVolumesAutomatically) {
         foreach(const QString v, volumes) {
-            m_col.addSource(v);
+            LocalCollection::Source src(m_pCol->addSource(v));
+            m_pool->start(
+                new FullScan(SearchLocation(src, "", Exclusions()), this),
+                PRIORITY_FULLSCAN );
         }
-    }
-}
-
-void
-LocalContentScanner::test_initSources()
-{
-    int id;
-    QStringList volumes = getAvailableVolumes();
-    foreach(QString v, volumes) {
-        id = m_col.addSource(v);
     }
 }
 
@@ -106,21 +101,21 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
     SearchLocation::FileTimeMap map(sl.audioFiles(path));
 
     int directoryId;
-    bool dirInDb = m_col.getDirectoryId(sourceId, path, directoryId);
+    bool dirInDb = m_pCol->getDirectoryId(sourceId, path, directoryId);
     if (map.isEmpty()) {
         if (dirInDb)
-            m_col.removeDirectory(directoryId);
+            m_pCol->removeDirectory(directoryId);
         return;
     }
 
-    if (dirInDb || m_col.addDirectory(sourceId, path, directoryId)) {
+    if (dirInDb || m_pCol->addDirectory(sourceId, path, directoryId)) {
 		// loop over all files (for this directory) in the db:
 		// rescan those that are newer on disk,
 		// and build a list of those missing from disk
 
 		QList<int> missing;		// missing files (db id's)
 
-		foreach (const LocalCollection::File& file, m_col.getFiles(directoryId)) {
+		foreach (const LocalCollection::File& file, m_pCol->getFiles(directoryId)) {
 			SearchLocation::FileTimeMap::iterator it(map.find(file.name()));
 			if (it == map.end()) {
 				// file not found in this directory
@@ -140,7 +135,7 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 		}
 
 		// files not found on disk, are removed from the db:
-        m_col.removeFiles(missing);
+        m_pCol->removeFiles(missing);
 
 		// files remaining in the map are new:
         for (SearchLocation::FileTimeMap::const_iterator it = map.constBegin(); 
@@ -167,7 +162,7 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
             std::auto_ptr<MediaMetaInfo> p( MediaMetaInfo::create( pathname ) );
             MediaMetaInfo *info = p.get();
             if (info) {
-                m_col.addFile(
+                m_pCol->addFile(
 					directoryId,
 					filename,
 					lastModified, 
@@ -175,6 +170,9 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
                 good = true;
             }
+        }
+        catch (QSqlError &e) {
+            exception("QSqlError: " + e.text());
         }
         catch (...) {
             exception("NewFileScan::run scanning file");
@@ -196,13 +194,16 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
             std::auto_ptr<MediaMetaInfo> p(MediaMetaInfo::create(pathname));
             MediaMetaInfo *info = p.get();
             if (info) {
-                m_col.updateFile(
+                m_pCol->updateFile(
 					fileId, 
 					lastModified, 
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
                 good = true;
             }
+        }
+        catch (QSqlError& e) {
+            exception("QSqlError: " + e.text());
         }
         catch (...) {
             exception("OldFileRescan::run scanning file");
@@ -215,12 +216,36 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
 }
 
 void 
-LocalContentScanner::exception(const char *msg) const
+LocalContentScanner::exception(const QString& msg) const
 {
     // todo: something useful
     msg;
 }
 
+void
+LocalContentScanner::init()
+{
+    m_pCol = LocalCollection::create("LocalContentScanner");
+    startFullScan();
+}
+
+////////////////////////////////////////////////////////////////////
+
+LocalContentScanner::Init::Init(LocalContentScanner* lcs)
+:m_lcs(lcs)
+{}
+
+void 
+LocalContentScanner::Init::run()
+{
+	try {
+        m_lcs->init();
+    } catch (QSqlError& e) {
+        m_lcs->exception("QSqlError: " + e.text());
+	} catch (...) {
+		m_lcs->exception("unknown exception in ThreadInit::run");
+	}
+}
 
 ////////////////////////////////////////////////////////////////////
 
@@ -234,9 +259,12 @@ LocalContentScanner::FullScan::run()
 {
     bool completed;
 	try {
+        QThread::currentThread()->setPriority(QThread::LowPriority);
         completed = m_sl.recurseDirs(*this);
+    } catch (QSqlError& e) {
+        m_lcs->exception("QSqlError: " + e.text());
 	} catch (...) {
-		m_lcs->exception("Fullscan::run");
+		m_lcs->exception("unknown exception in Fullscan::run");
 	}
     emit m_lcs->fullScanFinished(m_sl, completed);
 }

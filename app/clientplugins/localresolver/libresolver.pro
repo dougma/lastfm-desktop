@@ -2,7 +2,7 @@ TARGET = resolver
 TEMPLATE = lib
 CONFIG += qt dll core
 QT += sql
-CONFIG += taglib
+CONFIG += taglib ws types sqlite3
 
 #TODO rename localresolver.pro
 

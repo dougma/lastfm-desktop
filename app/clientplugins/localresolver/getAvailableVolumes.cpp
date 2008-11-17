@@ -103,6 +103,73 @@ QStringList getAvailableVolumes()
 }
 
 
+// on windows this is for mapping UNC names and big ugly volume names back to drive letters
+// necessary because URLs seem to work better with drive letters...
+// eg: \\?\volume{1DD57AA2-D680-4542-8F6C-CC1311D1BEDC}\  --> "C:\"
+// on other platforms, it's an identity mapping.
+QString 
+remapVolumeName(const QString& volume)
+{
+    QString result = volume;
+
+#ifdef WIN32
+    DWORD drives = GetLogicalDrives();
+    DWORD mask = 1;
+    WCHAR drive[4];
+    FailCriticalErrors errMode;   // stop error popup for missing cd-roms, floppies, etc
+    for (wcscpy(drive, L"A:\\"); drive[0] <= 'Z'; mask <<= 1, drive[0]++) 
+    {
+        if (drives & mask) 
+        {
+            UINT driveType = GetDriveTypeW(drive);
+            if (driveType == DRIVE_REMOVABLE || driveType == DRIVE_FIXED)
+            {
+                WCHAR volumeName[256];
+                if (GetVolumeNameForVolumeMountPointW(&drive[0], &volumeName[0], 255))
+                {
+                    if (QString::fromUtf16(volumeName) == volume) 
+                    {
+                        result = QString::fromUtf16(drive);
+                        break;
+                    }
+                }
+            }
+            else if (driveType == DRIVE_REMOTE)
+            {
+                // WNetGetUniversalName is one ugly call
+                #define BUFFERSIZE 512
+                char buffer[BUFFERSIZE];
+                DWORD bytes = BUFFERSIZE;
+                if (NO_ERROR == WNetGetUniversalName(drive, UNIVERSAL_NAME_INFO_LEVEL, buffer, &bytes))
+                {
+                    UNIVERSAL_NAME_INFO *punc = (UNIVERSAL_NAME_INFO *) &buffer;
+                    QString unc = QString::fromUtf16(punc->lpUniversalName);
+                    if (!unc.endsWith("\\")) 
+                    {
+                        unc += "\\";
+                    }
+                    if (unc == volume) 
+                    {
+                        result = QString::fromUtf16(drive);
+                        break;
+                    }
+                } 
+            }
+            else
+            {
+                // ignore driveType == DRIVE_CDROM (also applies to Dvd-drives)
+                int ii = 0;  // todo... check to see where usb memory keys and usb hard-drives turn up
+            }
+        }
+    }
+#elif defined(Q_WS_MAC)
+    // not necessary on mac...
+#endif
+
+    return result;
+}
+
+
 // recognise the sources which don't appear in
 // getAvailableVolumes(), but are available
 bool

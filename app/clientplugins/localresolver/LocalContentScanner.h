@@ -32,7 +32,18 @@ class LocalContentScanner : public QObject
 
     volatile bool m_bStopping;
     class QThreadPool* m_pool;
-    class LocalCollection& m_col;
+    class LocalCollection* m_pCol;
+
+
+    class Init : public QRunnable
+    {
+    public:
+        Init(LocalContentScanner* lcs);
+        void run();
+
+    private:
+        LocalContentScanner *m_lcs;
+    };
 
     class ChangeNotification : public QRunnable
     {
@@ -56,19 +67,17 @@ class LocalContentScanner : public QObject
         LocalContentScanner *m_lcs;
     };
 
+    void init();
     void startFullScan();
     void dirScan(const SearchLocation& sl, const QString& path);
     void newFileScan(const QString& fullpath, const QString& filename, int directoryId, unsigned lastModified);
     void oldFileRescan(const QString& pathname, int fileId, unsigned lastModified);
-    void exception(const char *msg) const;
+    void exception(const QString&) const;
     bool stopping() { return m_bStopping; }
-    LocalCollection& collection() { return m_col; }
 
 public:
     LocalContentScanner();
     ~LocalContentScanner();
-
-    void test_initSources();
 
 signals:
     void fullScanStart(const SearchLocation&);

@@ -43,6 +43,7 @@ public:
 	/** if it isn't a lastfm url, we'll try to start it anyway, but it won't
 	  * work, and the user will get an error message */
     void open( const class QUrl& url );
+    void openXspf( const class QUrl& url );
     
 signals:
     /** documented in PlayerManager */

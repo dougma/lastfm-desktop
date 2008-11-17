@@ -81,6 +81,8 @@ MainWindow::MainWindow()
 
     QVariant v = QSettings().value( SETTINGS_POSITION_KEY );
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
+
+	setAcceptDrops( true );
 }
 
 
@@ -319,6 +321,19 @@ static QList<QUrl> lastfmUrls( QList<QUrl> urls )
 	return urls;
 }
 
+static
+bool
+couldBeXspf( const QMimeData* md )
+{
+    if (md->hasFormat("application/xspf+xml"))
+        return true;
+    foreach(QUrl q, md->urls()) {
+        QString path(q.path());
+        if (q.path().endsWith(".xspf"))
+            return true;
+    }
+    return false;
+}
 
 void
 MainWindow::dragEnterEvent( QDragEnterEvent* e )
@@ -327,6 +342,8 @@ MainWindow::dragEnterEvent( QDragEnterEvent* e )
 		return;
 	if (lastfmUrls( e->mimeData()->urls() ).count())
 		e->accept();
+    if (couldBeXspf(e->mimeData()))
+        e->accept();
 }
 
 
@@ -334,9 +351,16 @@ void
 MainWindow::dropEvent( QDropEvent* e )
 {
 	QList<QUrl> const urls = lastfmUrls( e->mimeData()->urls() );
-	
 	if (urls.count())
 		The::app().open( urls[0] );
+    else {
+        foreach(QUrl q, e->mimeData()->urls()) {
+            if (q.path().endsWith(".xspf")) {
+                The::app().openXspf( q );
+                break;
+            }
+        }
+    }
 }
 
 

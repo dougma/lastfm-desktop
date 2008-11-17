@@ -40,6 +40,7 @@
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include <QThreadPool>
+#include <XspfPlayer.h>
 #include <phonon/audiooutput.h>
 
 #ifdef WIN32
@@ -49,6 +50,26 @@
     extern void qt_mac_set_menubar_icons( bool );
 #endif
 
+
+#include "app/clientplugins/ILocalRql.h"
+
+void localRqlTest(const QList<ILocalRqlPlugin*>& plugins)
+{
+    if (plugins.size()) {
+        plugins[0]->init();
+        ILocalRqlPull* rql = plugins[0]->play("");
+        if (rql) {
+            unsigned trackCount = rql->trackCount();
+            if (trackCount) {
+                const char *track = rql->nextTrack();
+                while (track) {
+                    const char *track = rql->nextTrack();
+                }
+            }
+            rql->finished();
+        }
+    }
+}
 
 App::App( int& argc, char** argv ) 
    : Unicorn::Application( argc, argv )
@@ -121,6 +142,7 @@ App::App( int& argc, char** argv )
 
     PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
+    localRqlTest( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
 
 	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
@@ -336,6 +358,20 @@ App::open( const QUrl& url )
     m_radio->play( RadioStation( url.toString() ) );
 }
 
+void
+App::openXspf( const QUrl& url )
+{
+    XspfPlayer *player = new XspfPlayer( new Phonon::AudioOutput, m_resolver );
+
+	connect( player, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
+    connect( player, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
+    connect( player, SIGNAL(trackStarted( Track )), m_playerMediator, SLOT(onRadioTrackStarted( Track )) );
+    connect( player, SIGNAL(stopped()), m_playerMediator, SLOT(onRadioStopped()) );
+
+    // connect( m_playerMediator, SIGNAL(), player, SLOT(stop()) ); // ?
+  
+    player->play( url );
+}
 
 namespace //anonymous namespace, keep to this file
 {

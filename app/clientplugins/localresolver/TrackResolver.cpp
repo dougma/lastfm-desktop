@@ -19,24 +19,36 @@
 
 #include "TrackResolver.h"
 #include "LocalContentScanner.h"
+#include "LocalCollection.h"
 #include <QThreadPool>
+
+extern QString remapVolumeName(const QString& volume);
 
 
 TrackResolver::TrackResolver()
 : m_queryPool(0)
 , m_scanner(0)
+, m_bStopping(false)
+, m_collection(LocalCollection::create("TrackResolverConnection"))
 {}
 
 TrackResolver::~TrackResolver()
 {
+    delete m_collection;
     delete m_scanner;
+    m_bStopping = true;     // cause runnables to exit
     delete m_queryPool;
 }
 
 void
 TrackResolver::init()
 {
+    // 1 thread. 
+    // Don't change; 
+    // m_collection not thread-safe
     m_queryPool = new QThreadPool();
+    m_queryPool->setMaxThreadCount(1);      
+
     m_scanner = new LocalContentScanner;
 }
 
@@ -46,7 +58,7 @@ TrackResolver::resolve(class ITrackResolveRequest *req)
     Q_ASSERT(m_queryPool && req);
     if (req) {
         if (m_queryPool)
-	        m_queryPool->start(new RequestRunnable(req, m_dbPath));
+	        m_queryPool->start(new RequestRunnable(this, m_collection, req, m_dbPath));
         else
             req->finished();
     }
@@ -58,25 +70,25 @@ TrackResolver::finished()
     delete this;
 }
 
+bool
+TrackResolver::stopping()
+{
+    return m_bStopping;
+}
+
 //////////////////////////////////////////////////////////////////////
 
     
 TrackResolver::Response::Response(const LocalCollection::ResolveResult &r)
-:   m_matchQuality( 1 ),
+:   m_matchQuality( r.m_matchQuality ),
     m_artist( r.m_artist.toUtf8() ),
     m_album( r.m_album.toUtf8() ),
     m_title( r.m_title.toUtf8() ),
     m_duration( r.m_duration ),
     m_kbps( r.m_kbps )
 {
-#ifdef WIN32
-    // win32 phonon doesn't like them converted to file:// urls
-    m_url = (r.m_sourcename + r.m_path + r.m_filename).toUtf8();
-#else
-    // and mac/linux prefers them as file:// urls
-    QUrl url = QUrl::fromLocalFile(r.m_sourcename + r.m_path + r.m_filename);
-    m_url = url.toString().toUtf8();
-#endif
+    // create a nice file:// url, remap the volume name along the way...
+    m_url = QUrl::fromLocalFile(remapVolumeName(r.m_sourcename) + r.m_path + r.m_filename).toEncoded();
 }
 
 float
@@ -138,8 +150,10 @@ TrackResolver::Response::finished()
 //////////////////////////////////////////////////////////////////////
 
 
-TrackResolver::RequestRunnable::RequestRunnable(ITrackResolveRequest *r, const QString &dbPath)
-:   m_req(r),
+TrackResolver::RequestRunnable::RequestRunnable(TrackResolver *trackResolver, LocalCollection* collection, ITrackResolveRequest *r, const QString &dbPath)
+:   m_trackResolver(trackResolver),
+    m_collection(collection),
+    m_req(r),
     m_dbPath(dbPath)
 {}
 
@@ -148,25 +162,29 @@ TrackResolver::RequestRunnable::run()
 {
 	try 
 	{
-        QList<LocalCollection::ResolveResult> results = 
-            LocalCollection::instance().resolve(
-                QString::fromUtf8(m_req->artist()),
-                QString::fromUtf8(m_req->album()),
-                QString::fromUtf8(m_req->title()));
+        if (!m_trackResolver->stopping()) {
+            QTime start(QTime::currentTime());
+            QList<LocalCollection::ResolveResult> results = 
+                m_collection->resolve(
+                    QString::fromUtf8(m_req->artist()),
+                    QString::fromUtf8(m_req->album()),
+                    QString::fromUtf8(m_req->title()));
 
-        foreach (const LocalCollection::ResolveResult &r, results) {
-            bool bLooksReadable;
-            {
-                QFile test(r.m_sourcename + r.m_path + r.m_filename);
-                bLooksReadable = test.open(QIODevice::ReadOnly);
+            foreach (const LocalCollection::ResolveResult &r, results) {
+                QString filename(r.m_sourcename + r.m_path + r.m_filename);
+                if (true /*bLooksReadable*/)
+                    m_req->result(new Response(r));
             }
-            if (bLooksReadable)
-                m_req->result(new Response(r));
+            qDebug() << "resolve complete: " << start.msecsTo(QTime::currentTime()) << "ms";
         }
 	} 
-	catch(...)
+	catch(QSqlError &e)
 	{
         // todo
 	}
+    catch(...)
+    {
+
+    }
 	m_req->finished();
 }
