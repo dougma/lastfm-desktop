@@ -20,7 +20,6 @@
 #ifndef RADIO_CONTROLS_H
 #define RADIO_CONTROLS_H
 
-#include "State.h"
 #include <QWidget>
 class ImageButton;
 
@@ -39,11 +38,14 @@ public:
     } 
 	ui;
 
-	
+	void paintEvent( QPaintEvent* );
+    void resizeEvent( QResizeEvent* );
+
 private slots:
 	void onRadioStopped();
     void onRadioTuningIn( const class RadioStation& );
 	void onPlayClicked();
+    
 	
 signals:
 	void stop();

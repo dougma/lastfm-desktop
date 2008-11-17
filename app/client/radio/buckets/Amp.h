@@ -35,6 +35,8 @@ public:
     
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );
+    
+    void paintEvent( QPaintEvent* );
 
     
 signals:
@@ -59,14 +61,26 @@ protected:
     
     void mouseMoveEvent( QMouseEvent* e )
     {
-        The::mainWindow().move( e->globalPos() 
-                                - m_mouseDownPos);
+        if( !m_mouseDownPos.isNull())
+            The::mainWindow().move( e->globalPos() 
+                                    - m_mouseDownPos);
     }
     
-    QSize sizeHint() const{ return QSize( 0, 84 ); }
+    void mouseReleaseEvent( QMouseEvent* e )
+    {
+        m_mouseDownPos = QPoint();
+    }
+    
+    enum AnimationPosition { Left = 0, Right };
+    
+    void showWidgetAnimated( QWidget* w, AnimationPosition );
+    void hideWidgetAnimated( QWidget* w, AnimationPosition );
+    
+    QSize sizeHint() const{ return QSize( 0, 86 ); }
   
 protected slots:
     void onPlayerBucketChanged();
+    void onWidgetAnimationFrameChanged( int );
     
 };
 

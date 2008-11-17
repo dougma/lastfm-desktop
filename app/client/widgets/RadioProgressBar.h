@@ -97,21 +97,20 @@ private slots:
     void onRadioTick(qint64 tick )
     {
         m_scrobbleProgressTick = tick / 1000;
+        QTime t( 0, 0 );
+        t = t.addSecs( m_scrobbleProgressTick );
+        ui.time->setText( t.toString( "mm:ss" ));
         if( m_scrobbleProgressTick > 0 )
-        {
-            QTime t( 0, 0 );
-            t = t.addSecs( m_scrobbleProgressTick );
-            ui.time->setText( t.toString( "mm:ss" ));
             update();
-        }
-        else
-            ui.time->clear();
     }
     
     void onTrackSpooled( const Track& track, class StopWatch* watch )
     {
         if( !track.isNull() && track.source() == Track::LastFmRadio )
         {
+            ui.time->setVisible( true );
+            ui.timeToGo->setVisible( true );
+            
             m_currentTrackDuration = track.duration();
             QTime t( 0, 0 );
             t = t.addSecs( m_currentTrackDuration );
@@ -128,8 +127,9 @@ private slots:
             if( !ui.time->text().isEmpty())
                 update();
                 
-            ui.time->clear();
-            ui.timeToGo->clear();
+            ui.time->setHidden( true );
+            ui.timeToGo->setHidden( true );
+            
         }
         update();
     }

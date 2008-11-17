@@ -45,6 +45,9 @@ public:
     bool sliderEventFilter( class QSlider*, QEvent* ) const;
     bool toolButtonEventFilter( class QToolButton*, QEvent* ) const;
     
+    void paintEvent( QPaintEvent* );
+    void resizeEvent( QResizeEvent* );
+    
 protected slots:
     void onVolumeValueChanged( int )
     {

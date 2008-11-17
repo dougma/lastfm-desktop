@@ -32,6 +32,7 @@
 
 #include <QPaintEvent>
 #include <QPainter>
+#include <QTimeLine>
 
 Amp::Amp( QWidget* p )
     :QWidget( p )
@@ -52,19 +53,15 @@ Amp::setupUi()
     new QHBoxLayout( this );
     
     layout()->setSpacing( 5 );
-    layout()->setContentsMargins( 5, 6, 5, 8 );
+    layout()->setContentsMargins( 5, 6, 5, 5 );
 
-    
-    layout()->addWidget( ui.controls = new RadioControls );
-    ui.controls->setAutoFillBackground( false );
-    ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
     
     struct BorderedContainer : public QWidget
     {
         BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
         { 
-            setLayout( new QVBoxLayout ); 
-            layout()->setContentsMargins( 3, 3, 3, 3 ); 
+            setLayout( new QHBoxLayout ); 
+            layout()->setContentsMargins( 1, 1, 1, 1 ); 
             setAutoFillBackground( false ); 
         }
         
@@ -76,20 +73,21 @@ Amp::setupUi()
 
             p.setPen( Qt::transparent );
             p.setBrush( palette().brush( QPalette::Window ));
-            p.drawRoundedRect( rect(), 3, 3 );
-            p.setPen( QPen( palette().brush( QPalette::Shadow ), 0.5));
-            p.drawRoundedRect( rect().adjusted( 0.5, 0.5, -0.5, -0.5), 3, 3);
+            p.drawRoundedRect( rect(), 6, 6 );
+            p.setPen( QPen( palette().brush( QPalette::Shadow ), 0));
+            p.drawRoundedRect( rect().adjusted( 0.9, 0.9, -0.9, -0.75), 6, 6);
         }
         
         void resizeEvent( QResizeEvent* e )
         {
             QLinearGradient window( 0, 0, 0, e->size().height() );
-            window.setColorAt( 0, 0x0e0e0e );
-            window.setColorAt( 1, 0x292828 );
+            window.setColorAt( 0, Qt::black );
+            window.setColorAt( 1, 0x2b2929 );
             
             QLinearGradient shadow( 0, 0, 0, e->size().height() );
-            shadow.setColorAt( 0, 0x0e0e0e );
-            shadow.setColorAt( 1, 0x888888 );
+            shadow.setColorAt( 0, 0x0d0c0c );
+            shadow.setColorAt( 0.5, 0x1c1b1b );
+            shadow.setColorAt( 1, 0x5e5e5e );
                              
             QPalette p = palette();
             p.setBrush( QPalette::Window, window );
@@ -101,70 +99,46 @@ Amp::setupUi()
     
     QWidget* bucketLayoutWidget = new QWidget( this );
     BorderedContainer* bc = new BorderedContainer( this );
-    bc->layout()->addWidget( ui.bucket = new PlayerBucketList( bc ));
+    
+    {
+        //Radio and volume controls need to be embedded in a parent QWidget
+        //in order to properly mask when animating out / into view.
+        QWidget* controls = new QWidget(bc);
+        new QHBoxLayout( controls );
+        controls->layout()->setSpacing( 0 );
+        controls->layout()->setContentsMargins( 0, 0, 0, 0 );
+        controls->layout()->addWidget( ui.controls = new RadioControls );
+        bc->layout()->addWidget( controls );
+    }
+    {
+        QWidget* volume = new QWidget(bc);
+        new QHBoxLayout( volume );
+        volume->layout()->setSpacing( 0 );
+        volume->layout()->setContentsMargins( 0, 0, 0, 0 );
+        volume->layout()->addWidget( ui.volume = new UnicornVolumeSlider );
+        bc->layout()->addWidget( volume );
+    }
+    
+    ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
+    
+    ((QBoxLayout*)bc->layout())->insertWidget( 1, ui.bucket = new PlayerBucketList( bc ));
     layout()->addWidget( bc );
         
     layout()->addWidget( bucketLayoutWidget );
     connect( ui.bucket, SIGNAL( itemAdded( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
-    
-//    QWidget* scrobbleRatingControls = new QWidget( this );
-//    {
-//        QGridLayout* layout = new QGridLayout( scrobbleRatingControls );
-//        layout->addWidget( scrobbleRatingUi.love = new ImageButton( ":/MainWindow/button/love/up.png" ), 0, 0, Qt::AlignRight | Qt::AlignBottom );
-//        layout->addWidget( scrobbleRatingUi.ban = new ImageButton( ":/MainWindow/button/ban/up.png" ), 0, 1, Qt::AlignLeft | Qt::AlignBottom );
-//        layout->addWidget( scrobbleRatingUi.tag = new ImageButton( ":/MainWindow/button/tag/up.png" ), 1, 0, Qt::AlignRight | Qt::AlignTop );
-//        layout->addWidget( scrobbleRatingUi.share = new ImageButton( ":/MainWindow/button/share/up.png" ), 1, 1, Qt::AlignLeft | Qt::AlignTop );
-//        
-//        layout->setSizeConstraint( QLayout::SetFixedSize );
-//        layout->setSpacing( 0 );
-//        layout->setContentsMargins( 0, 0, 0, 0 );
-//        
-//        scrobbleRatingUi.ban->moveIcon( 0, 1, QIcon::Active );
-//        scrobbleRatingUi.tag->moveIcon( 0, 1, QIcon::Active );
-//        scrobbleRatingUi.love->moveIcon( 0, 1, QIcon::Active );
-//        scrobbleRatingUi.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
-//        scrobbleRatingUi.love->setCheckable( true );
-//        scrobbleRatingUi.share->moveIcon( 0, 1, QIcon::Active );
-//        
-//    }
-    
-    
-//    layout()->addWidget( scrobbleRatingControls );
-    
-//    QWidget* cogAndScrobble = new QWidget( this );
-//    {
-//        QVBoxLayout* layout = new QVBoxLayout( cogAndScrobble );
-//        layout->setSizeConstraint( QLayout::SetFixedSize );
-//        layout->setSpacing( 0 );
-//        layout->setContentsMargins( 0, 0, 0, 0 );
-//        layout->addWidget( scrobbleRatingUi.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ));
-//        scrobbleRatingUi.cog->setCheckable( true );
-//        connect( scrobbleRatingUi.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
-//
-//        m_cogMenu = new QMenu( this );
-//        m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
-//        m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
-//        m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
-//        
-//        
-//        
-//    }
 
-    ui.volume = new UnicornVolumeSlider;
     ui.volume->setAudioOutput( The::radio().audioOutput());
     ui.volume->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
-    layout()->addWidget( ui.volume );
-    
+
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SIGNAL( itemRemoved( QString, Seed::Type)));
     
     connect( ui.controls, SIGNAL( skip()), &The::radio(), SLOT( skip()) );
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
-    
-    ui.controls->setMinimumWidth( ui.volume->sizeHint().width());
-    
+
     setMinimumWidth( 456 );
+    setFixedHeight( 86 );
 }
 
 
@@ -173,16 +147,14 @@ Amp::onPlayerBucketChanged()
 {
     if( ui.bucket->count() > 0 )
     {
-        ui.controls->setFixedHeight( ui.controls->sizeHint().height());
-        ui.volume->setFixedHeight( ui.volume->sizeHint().height());
+        showWidgetAnimated( ui.controls, Left );
+        showWidgetAnimated( ui.volume, Right );
     }
     else
     {
-        ui.controls->setFixedHeight( 0 );
-        ui.volume->setFixedHeight( 0 );
+        hideWidgetAnimated( ui.controls, Left );
+        hideWidgetAnimated( ui.volume, Right );
     }
-    
-    ui.volume->resize( ui.volume->size());
 }
 
 
@@ -206,8 +178,95 @@ Amp::resizeEvent( QResizeEvent* event )
 {
     QPalette p = palette();
     QLinearGradient window( 0, 0, 0, event->size().height() );
-    window.setColorAt( 0, 0x4c4a4a );
-    window.setColorAt( 1, 0x282727 );
+    window.setColorAt( 0, 0x383737 );
+    window.setColorAt( 1, 0x161616 );
     p.setBrush( QPalette::Window, window );
     setPalette( p );
+}
+
+
+void 
+Amp::paintEvent( QPaintEvent* event )
+{
+    QPainter p( this );
+    p.setClipRect( event
+                  ->rect() );
+    
+    p.setPen( Qt::black );
+    p.drawLine( rect().topLeft(), rect().topRight() );
+    p.setPen( 0x4c4b4b );
+    p.drawLine( rect().topLeft() + QPoint(0,1), rect().topRight() + QPoint(0,1) );
+    p.setPen( Qt::black );
+    p.drawLine( rect().bottomLeft(), rect().bottomRight() );
+}
+
+
+
+
+void 
+Amp::showWidgetAnimated( QWidget* w, AnimationPosition p )
+{
+    if( w->pos().x() == 0 )
+        return;
+    
+    const int time = w->rect().width() * 5;
+    
+    QTimeLine* tl = new QTimeLine( 500, w );
+    tl->setUpdateInterval( 10 );
+    switch( p )
+    {
+        case Left:       
+            tl->setFrameRange( -w->rect().width(), 0 );
+            break;
+        case Right:
+            tl->setFrameRange( w->rect().width(), 0 );
+            break;
+        default:
+            Q_ASSERT( !"Unknown animation position" );
+            break;
+    }
+    connect( tl, SIGNAL( frameChanged( int )), this, SLOT( onWidgetAnimationFrameChanged( int )));
+    connect( tl, SIGNAL( finished()), tl, SLOT( deleteLater()));
+    tl->start();
+}
+
+
+void 
+Amp::hideWidgetAnimated( QWidget* w, AnimationPosition p )
+{
+    if( w->pos().x() > 0 || w->pos().x() < 0 )
+        return;
+
+    const int time = w->rect().width() * 5;
+    
+    QTimeLine* tl = new QTimeLine( 500, w );
+    tl->setUpdateInterval( 10 );
+    switch( p )
+    {
+        case Left:       
+            tl->setFrameRange( 0, -w->rect().width() );
+            break;
+        case Right:
+            tl->setFrameRange( 0, w->rect().width() );
+            break;
+        default:
+            Q_ASSERT( !"Unknown animation position" );
+            break;
+    }
+
+    connect( tl, SIGNAL( frameChanged( int )), this, SLOT( onWidgetAnimationFrameChanged( int )));
+    connect( tl, SIGNAL( finished()), tl, SLOT( deleteLater()));
+    tl->start();
+}
+
+
+void 
+Amp::onWidgetAnimationFrameChanged( int frame )
+{
+    QTimeLine* tl = qobject_cast<QTimeLine*>(sender());
+    QWidget* w = qobject_cast<QWidget*>(tl->parent());
+    if( !w )
+        return;
+    
+    w->move( frame, w->pos().y());
 }
