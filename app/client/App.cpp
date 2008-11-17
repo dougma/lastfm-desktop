@@ -163,7 +163,7 @@ App::App( int& argc, char** argv )
     DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
-	
+
 #ifdef WIN32
     //TODO do only once?
     Legacy::disableHelperApp();
@@ -270,7 +270,7 @@ App::onScrobblerStatusChanged( int e )
 
     switch (e)
     {
-        case Scrobbler::ErrorBannedClient:
+        case Scrobbler::ErrorBannedClientVersion:
             MessageBoxBuilder( m_mainWindow )
                 .setIcon( QMessageBox::Warning )
                 .setTitle( tr("Upgrade Required") )
@@ -354,7 +354,7 @@ App::logout()
 
 void
 App::open( const QUrl& url )
-{
+{    
     m_radio->play( RadioStation( url.toString() ) );
 }
 

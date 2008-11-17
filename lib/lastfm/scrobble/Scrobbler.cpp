@@ -110,7 +110,7 @@ Scrobbler::onError( Scrobbler::Error code )
 
     switch (code)
     {
-        case Scrobbler::ErrorBannedClient:
+        case Scrobbler::ErrorBannedClientVersion:
         case Scrobbler::ErrorInvalidSessionKey:
         case Scrobbler::ErrorBadTime:
             // np and submitter are in invalid state and won't send any requests
@@ -153,7 +153,7 @@ Scrobbler::onHandshakeReturn( const QByteArray& result ) //TODO trim before pass
     }
     else if (code == "BANNED")
     {
-        onError( Scrobbler::ErrorBannedClient );
+        onError( Scrobbler::ErrorBannedClientVersion );
     }
     else if (code == "BADAUTH")
     {

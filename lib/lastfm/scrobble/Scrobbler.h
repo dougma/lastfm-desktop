@@ -68,7 +68,7 @@ public:
         /** the following will show via the status signal, the scrobbler will
         * not submit this session (np too), however caching will continue */
         ErrorBadSession = StatusMax,
-        ErrorBannedClient,
+        ErrorBannedClientVersion,
         ErrorInvalidSessionKey,
         ErrorBadTime,
         ErrorThreeHardFailures,

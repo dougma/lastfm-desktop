@@ -48,7 +48,7 @@ DrWatson::onScrobblerStatusChanged( int const new_status )
         switch (old_status)
         {
             case Scrobbler::ErrorBadSession:
-            case Scrobbler::ErrorBannedClient:
+            case Scrobbler::ErrorBannedClientVersion:
             case Scrobbler::ErrorInvalidSessionKey:
             case Scrobbler::ErrorBadTime:
             case Scrobbler::ErrorThreeHardFailures:
@@ -176,7 +176,7 @@ static QString scrobblerStatusText( int const i )
     switch (i)
     {
         case Scrobbler::ErrorBadSession: return tr( "Your session expired, it is being renewed." );
-        case Scrobbler::ErrorBannedClient: return tr( "Your client too old, you must upgrade." );
+        case Scrobbler::ErrorBannedClientVersion: return tr( "Your client too old, you must upgrade." );
         case Scrobbler::ErrorInvalidSessionKey: return tr( "Your username or password is incorrect" );
         case Scrobbler::ErrorBadTime: return tr( "Your timezone or date are incorrect" );
         case Scrobbler::ErrorThreeHardFailures: return tr( "The submissions server is down" );
@@ -220,7 +220,7 @@ DiagnosticsDialog::onScrobblerStatusChanged( int v )
             ui.subsLight->setColor( Qt::green );
             break;
         
-        case Scrobbler::ErrorBannedClient:
+        case Scrobbler::ErrorBannedClientVersion:
         case Scrobbler::ErrorInvalidSessionKey:
         case Scrobbler::ErrorBadTime:
         case Scrobbler::ErrorThreeHardFailures:
