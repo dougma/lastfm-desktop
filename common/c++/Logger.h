@@ -43,7 +43,7 @@ public:
 
     /** Sets the Logger instance to this, so only call once, and make it exist
       * as long as the application does */
-    Logger( const COMMON_CHAR* filename, Severity severity = Info );
+    explicit Logger( const COMMON_CHAR* filename, Severity severity = Info );
     ~Logger();
 
     static Logger& the() { return *instance; }
@@ -51,7 +51,7 @@ public:
     void log( Severity level, const std::string& message, const char* function, int line );
     void log( Severity level, const std::wstring& message, const char* function, int line );
     
-    /** plain write + flush */
+    /** plain write + flush, we suggest utf8 */
     void log( const char* message );
 
 private:

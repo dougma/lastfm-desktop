@@ -86,7 +86,7 @@ class LASTFM_TYPES_DLLEXPORT AlbumImageFetcher : public QObject
     bool m_nocover;
     
 public:
-	AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
+	explicit AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
 	
     /** if Last.fm doesn't know the album, or has no cover, this @returns false */
     bool isValid() const;

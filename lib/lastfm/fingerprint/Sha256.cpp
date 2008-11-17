@@ -428,7 +428,6 @@ SHA256Final (SHA256Context *sc, uint8_t hash[SHA256_HASH_SIZE])
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 int
 main (int argc, char *argv[])
