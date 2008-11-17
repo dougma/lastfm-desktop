@@ -166,6 +166,7 @@ TrackDashboard::setTrack( const Track& t )
     }
 
     ui.cover->setTrack( t );
+    ui.spinner->show();
 
     m_track = t;
 
@@ -267,6 +268,8 @@ TrackDashboard::onArtistImageDownloaded()
     ui.artist->setPixmap( p2 );
 
     sender()->deleteLater();
+    
+    ui.spinner->hide();
 }
 
 
@@ -342,10 +345,10 @@ TrackDashboard::resizeEvent( QResizeEvent* )
 void
 TrackDashboard::setPapyrusPosition( int y )
 {
-    int const fudge = orientation() == Qt::Horizontal ? -2 : 15;
-    
+    int const fudge = orientation() == Qt::Horizontal ? -2 : 15;    
     ui.papyrus->move( 0, fudge - y );
 }
+
 
 bool
 TrackDashboard::event( QEvent* e )

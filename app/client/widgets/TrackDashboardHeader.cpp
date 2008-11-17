@@ -29,9 +29,40 @@
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "the/radio.h"
 #include <QPainter>
+
+
+struct ThreeColumnLayout : QHBoxLayout
+{
+    ThreeColumnLayout( QWidget* parent ) : QHBoxLayout( parent ), middle( 0 )
+    {}
+    
+    void setMiddle( QWidget* w )
+    {
+        middle = w;
+        middle->setParent( parentWidget() );
+        addStretch();
+    }
+    
+    QWidget* middle;
+    
+private:
+    virtual void setGeometry( const QRect& rr )
+    {        
+        QHBoxLayout::setGeometry( rr );
+        
+        int const w = middle->sizeHint().width();
+        
+        QRect r = parentWidget()->rect();
+        int const x = (r.width() - w) / 2;
+        middle->setGeometry( x, 0, w, r.height() );
+    }
+};
+
+
+
 TrackDashboardHeader::TrackDashboardHeader()
 {
-    new QHBoxLayout( this );
+    new ThreeColumnLayout( this );
     layout()->addWidget( ui.scrobbleButton = new ScrobbleButton );
     {
         QWidget* w = new QWidget;
@@ -54,7 +85,7 @@ TrackDashboardHeader::TrackDashboardHeader()
         UnicornWidget::paintItBlack( ui.track );
         
         l->addWidget( ui.radioProgress = new RadioProgressBar, 0, Qt::AlignCenter );
-        ((QBoxLayout*)layout())->addWidget( w, 1 );
+        ((ThreeColumnLayout*)layout())->setMiddle( w );
     }
     layout()->addWidget( ui.love = new ImageButton( ":/MainWindow/button/love/up.png" ));
     layout()->addWidget( ui.ban = new ImageButton( ":/MainWindow/button/ban/up.png" ));
