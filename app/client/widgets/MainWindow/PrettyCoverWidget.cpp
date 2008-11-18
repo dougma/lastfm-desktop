@@ -23,7 +23,7 @@
 
 
 PrettyCoverWidget::PrettyCoverWidget()
-                 : m_reflection_height( 75 )
+                 : m_reflection_height( 30 )
                  , m_showArtist( true )
 {
     QFont font = this->font();

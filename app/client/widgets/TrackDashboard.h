@@ -53,10 +53,8 @@ public:
         QWidget* papyrus;
         QWidget* info;
         class PrettyCoverWidget* cover;
-        class QTextBrowser* bio;
+        class QWebView* bio;
         class FadingScrollBar* scrollbar;
-        class QLabel* artist;
-        class QLabel* artist_text;
         class SpinnerLabel* spinner;
         class QListWidget *tags;
         class QListWidget *similarArtists;
@@ -69,6 +67,7 @@ private slots:
     void onArtistGotInfo( WsReply* );
     void onArtistGotTopTags( WsReply* );
     void onArtistImageDownloaded();
+    void openExternally( const QUrl& );
     
 private:
     virtual void paintEvent( QPaintEvent* );

@@ -32,24 +32,7 @@
 
 #define HEADING "<div style='color:white;font-size:large'><b>"
 
-
-namespace mxcl
-{
-    struct TextBrowser : QTextBrowser
-    {
-        TextBrowser()
-        {
-            setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-            setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-        }
-        
-        virtual QSize sizeHint() const
-        {
-            return QSize( width(), document()->size().height() );
-        }
-    };
-}
-
+#include <QtWebKit>
 
 struct Line : QWidget
 {
@@ -91,9 +74,7 @@ TrackDashboard::TrackDashboard()
     
     ui.info = new QWidget( ui.papyrus );
     QVBoxLayout* v = new QVBoxLayout( ui.info );
-    v->addWidget( ui.artist_text = new QLabel );
-    v->addSpacing( 10 );
-    v->addWidget( ui.bio = new mxcl::TextBrowser);
+    v->addWidget( ui.bio = new QWebView );
     v->addSpacing( 10 );
     v->addWidget( new Line );
     v->addSpacing( 10 );
@@ -108,6 +89,10 @@ TrackDashboard::TrackDashboard()
     v->addSpacing( 10 );
     v->setMargin( 0 );
     v->setSpacing( 0 );
+    
+    ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
+    ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+    ui.bio->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
 
     ui.scrollbar = new FadingScrollBar( this );
     ui.scrollbar->setVisible( false );
@@ -133,11 +118,6 @@ TrackDashboard::TrackDashboard()
     QFont font = this->font();
     font.setPointSize( 11 );
 
-    ui.bio->document()->setDefaultFont( font );
-    ui.bio->setOpenExternalLinks( true );
-    ui.bio->document()->setDefaultStyleSheet( css );
-    ui.bio->setAutoFillBackground( false );
-    
 	ui.spinner = new SpinnerLabel( this );
     ui.spinner->move( 10, 10 );
     
@@ -182,12 +162,13 @@ void
 TrackDashboard::clear()
 {
     ui.cover->clear();
-    ui.bio->clear();
+    ui.bio->setHtml( "<body></body>" );
     ui.scrollbar->setRange( 0, 0 );
-    ui.artist_text->clear();
 	ui.spinner->hide();
     ui.info->hide();
-                 
+    
+    ui.scrollbar->hide();
+    
     qDeleteAll( findChildren<WsReply*>() );
     
     m_track = Track();
@@ -206,8 +187,8 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		CoreDomElement e = reply->lfm()["artist"];
 		QString name = e["name"].text();
 		QString url = e["url"].text();
-		QString	plays = e["stats"]["playcount"].text();
-		QString listeners = e["stats"]["listeners"].text();
+		uint plays = e["stats"]["playcount"].text().toUInt();
+		uint listeners = e["stats"]["listeners"].text().toUInt();
 		QString content = e["bio"]["content"].text();
 		QString editmessage = tr("Edit it too!");
 
@@ -220,16 +201,30 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         }
         else
             QTextStream( &html ) <<
-                    "<p id=content>" << content.replace(QRegExp("\r+"), "<p>") << "</p>"
+                    "<h1>" << name << "</h1>"
+                    "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
+                                   << tr( "%L1 plays" ).arg( plays ) <<
+                    "<p id=content>" << content.replace(QRegExp("\r+"), "<p>") <<
                     "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ") <<
                     "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
-        ui.bio->setHtml( html );
-        resizeEvent( 0 );
         
-        ui.artist_text->setText( HEADING + name + "</b></div>" + 
-                                 "<div style='color:#a3a5a8;font-size:small'>" +
-                                 tr( "%L1 listeners").arg( listeners.toUInt() ) + "<br>" + 
-                                 tr( "%L1 plays").arg( plays.toUInt() ) );
+        
+        QString css = 
+            "<style>"
+                "body{padding:0;margin:0;color:#bbb}"
+                "#stats{color:#444444;margin:0;line-height:1.3;font-weight:bold}"
+                "p{line-height:1.6em}"
+                "h1{color:#fff;margin:0 0 2px 0}"
+                "a{color:#00aeef;text-decoration:none}"
+                "a:hover{text-decoration:underline}"
+            #ifdef Q_WS_MAC
+                "body{font-family:Lucida Grande;font-size:11px}"
+                "h1{font-size:18px}"
+            #endif
+            "</style>";
+        
+        ui.bio->setHtml( css + html );
+        resizeEvent( 0 );
         
         QNetworkRequest request( e["image size=large"].text() );
         QNetworkReply* reply = nam->get( request );
@@ -261,26 +256,6 @@ TrackDashboard::onArtistGotTopTags( WsReply* reply )
 void
 TrackDashboard::onArtistImageDownloaded()
 {
-    return;
-    
-    QByteArray data = ((QNetworkReply*)sender())->readAll();
-    QPixmap p;
-    p.loadFromData( data );
-    
-    p = p.scaledToHeight( ui.artist->height(), Qt::SmoothTransformation );
-    
-    QPixmap p2( p.width(), p.height() + 13 );
-    p2.fill( Qt::transparent );
-    
-    QPainter painter( &p2 );
-    painter.drawPixmap( 0, 13, p );
-    painter.setPen( Qt::black );
-    painter.drawRect( 0, 13, p2.width() - 1, p.height() - 1 );
-
-    ui.artist->setFixedSize( p2.size() );
-    ui.artist->setPixmap( p2 );
-
-    sender()->deleteLater();
 }
 
 
@@ -301,12 +276,12 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->show();
         ui.cover->raise();
         ui.cover->setShowArtist( false );
-        ui.cover->move( 12, 12 );
+        ui.cover->move( 15, 12 );
 
         int h = height() - 12;
         ui.cover->resize( ui.cover->widthForHeight( h ), h );
         
-        ui.info->move( ui.cover->geometry().right() + 12, 0 );
+        ui.info->move( ui.cover->geometry().right() + 16, 0 );
         
         w = width() - ui.info->geometry().x() - ui.scrollbar->sizeHint().width() - 12;
     }
@@ -327,8 +302,9 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     }
 
     ui.info->setFixedWidth( w );
-    ui.bio->document()->setTextWidth( w );
-    ui.bio->setFixedSize( ui.bio->sizeHint() );
+    ui.bio->page()->setViewportSize( QSize(w, height()) );
+    const int h = ui.bio->page()->mainFrame()->contentsSize().height();
+    ui.bio->setFixedSize( w, h );
     ui.info->adjustSize();
 
     ui.papyrus->resize( 0xff, ui.info->height() + ui.info->geometry().y() );
@@ -404,4 +380,11 @@ TrackDashboard::paintEvent( QPaintEvent* e )
     
     p.setOpacity( qreal(40)/255 );
     svg.render( &p, r );    
+}
+
+
+void
+TrackDashboard::openExternally( const QUrl& url )
+{
+    QDesktopServices::openUrl( url );
 }
