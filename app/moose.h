@@ -26,11 +26,11 @@
 
 namespace moose 
 {
-    static const char* id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
+    static inline const char* id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
     /** passed to QCoreApplication::setApplicationName() */
-    static const char* applicationName() { return "Last.fm"; }
+    static inline const char* applicationName() { return "Last.fm"; }
 
-    static QString path()
+    static inline QString path()
     {
         QString path = CoreSettings( applicationName() ).value( "/Path" ).toString();
         if (path.size())

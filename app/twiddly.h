@@ -26,14 +26,14 @@
   */
 namespace twiddly
 {
-	static const char* id() { return "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0"; }
+	static inline const char* id() { return "Twiddly-05F67299-64CC-4775-A10B-0FBF41B6C4D0"; }
     /** passed to QCoreApplication::setApplicationName() */
-    static const char* applicationName() { return "Twiddly"; }
+    static inline const char* applicationName() { return "Twiddly"; }
 
     /** returns the path to the executable, if we know it, or a guess, if we
       * don't, we generally know the path on eg. Windows. Or if the client has 
       * been run at least once. */
-    static QString path()
+    static inline QString path()
     {
     #ifdef __APPLE__
         return QFileInfo( moose::path() + "../Resources/twiddly" ).absoluteFilePath();
