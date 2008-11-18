@@ -41,8 +41,8 @@ public:
 	
 	QLocale qlocale() const { return QLocale( m_language ); }
 	
-	/** this is the system locale, or the user specified locale, the user can
-	  * change this from the official last.fm client */
+	/** this is the system locale, we reimplement it because on OS X it is
+      * broken */
 	static CoreLocale system();
 };
 

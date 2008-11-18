@@ -21,7 +21,7 @@
 #include "Settings.h"
 
 #define NEW_STOP_WATCH_MACRO() { \
-    ScrobblePoint sp( m_track.duration() * Settings().scrobblePoint() / 100 ); \
+    ScrobblePoint sp( m_track.duration() * moose::Settings().scrobblePoint() / 100 ); \
     m_watch = new StopWatch( sp ); \
     connect( m_watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()) ); }
 
@@ -178,11 +178,38 @@ PlayerMediator::replay( const PlayerConnection& connection )
 void
 PlayerMediator::endTrack()
 {
-    delete m_watch; //do always just in case
+    // always scrobble if the track almost played enough time.
+    // we do this because, the durations reported by media players are not
+    // reliable. And some media players cross fade early. And also we have a 
+    // resolution of one second, so errors of one second are very likely.
+    // This usually only matters when the scrobble point is set to something
+    // close to 100%.
     
+    //FIXME ideally we'd only do this if the track changes naturally
+    // but scrobsub has no facility to notify us of that.
+    
+    if (m_watch && !m_watch->isTimedOut() && !m_track.isNull())
+    {
+        qDebug() << "Watch didn't timeout, checking if we should scrobble anyway..";
+        
+        uint const elapsed = m_watch->elapsed();
+        
+        // cater to iTunes crossfade
+        if (elapsed >= m_track.duration() - 12 
+                && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
+                && (m_connection.id == "osx" || m_connection.id == "itw"))
+            emit m_watch->timeout();
+
+        // allow 4 seconds of leeway, to allow for various inaccuracies
+        else if (elapsed + 4 > m_watch->scrobblePoint())
+            emit m_watch->timeout();
+    }
+
+    delete m_watch; //do always just in case
+        
     if (m_track.isNull())
         return;
-
+   
     Track oldtrack = m_track;
     m_track = Track();
     emit trackUnspooled( oldtrack );
@@ -205,7 +232,7 @@ PlayerMediator::changeState( State newstate )
 {
     State oldstate = m_state;    
     
-    if (m_track.isNull())
+    if (m_track.isNull() && !m_radioIsActive)
         switch (newstate)
         {
             case Stopped:

@@ -54,7 +54,7 @@ static QString clientInformationString()
     s += "User: " + QString(Ws::Username) + "\n";
     s += "Path: " + QCoreApplication::applicationFilePath() + "\n";
     s += "Version: " + QCoreApplication::applicationVersion() + "\n";
-    s += "Scrobble Point: " + QString::number( Settings().scrobblePoint() ) + "\n";
+    s += "Scrobble Point: " + QString::number( moose::Settings().scrobblePoint() ) + "\n";
 
 	s += "Plugin paths:\n";
 	foreach (QString path, qApp->libraryPaths())

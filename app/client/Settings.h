@@ -20,53 +20,62 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "lib/unicorn/UnicornSettings.h"
+#include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/scrobble/ScrobblePoint.h"
+#include "lib/unicorn/UnicornSettings.h"
 
 
-/** Usage: only put interesting settings in here, which mostly means ones set in
-  * in the settings dialog. For class local settings, just make a small 
-  * QSettings local derived class.
-  */
-struct Settings
+namespace moose
 {
-    int scrobblePoint() const { return QSettings().value( "ScrobblePoint", ScrobblePoint::kDefaultScrobblePoint ).toInt(); }
-    bool alwaysConfirmIPodScrobbles() const { return true; }
-};
-
-
-struct MutableSettings
-{
-    void setLanguage( QString langCode ) { CoreSettings().setValue( "AppLanguage", langCode ); }
-    void setLogOutOnExit( bool );
-    void setScrobblePoint( int scrobblePoint ) { QSettings().setValue( "ScrobblePoint", scrobblePoint ); }
-};
-
-
-/** Clearly no use until a username() has been assigned. But this is 
-  * automatic if you use Unicorn::Application anyway. */
-class UserSettings : public QSettings
-{
-public:
-    UserSettings()
+    /** Clearly no use until a username() has been assigned. But this is 
+      * automatic if you use Unicorn::Application anyway. 
+      */
+    class UserSettings : public QSettings
     {
-        QString const username = CoreSettings().value( "Username" ).toString();
-        beginGroup( username );
-        // it shouldn't be possible, since Unicorn::Application enforces 
-        // assignment of the username parameter before anything else
-        Q_ASSERT( !username.isEmpty() );
-    }
-};
+    public:
+        UserSettings()
+        {
+            QString const username = CoreSettings().value( "Username" ).toString();
+            beginGroup( username );
+            // it shouldn't be possible, since Unicorn::Application enforces 
+            // assignment of the username parameter before anything else
+            Q_ASSERT( !username.isEmpty() );
+        }
+    };
+
+
+    /** Usage: only put interesting settings in here, which mostly means ones set in
+      * in the settings dialog. For class local settings, just make a small 
+      * QSettings local derived class.
+      */
+    struct Settings
+    {
+        int scrobblePoint() const { return UserSettings().value( "ScrobblePoint", ScrobblePoint::kDefaultScrobblePoint ).toInt(); }
+        bool alwaysConfirmIPodScrobbles() const { return UserSettings().value( "AlwaysConfirmIPodScrobbles", true ).toBool(); }
+        bool fingerprintingEnabled() const { return UserSettings().value( "FingerprintingEnabled", true ).toBool(); }
+        bool iPodScrobblingEnabled() const { return UserSettings().value( "iPodScrobblingEnabled", true ).toBool(); }
+    };
+
+    struct MutableSettings
+    {
+        void setLogOutOnExit( bool b ) { Unicorn::UserSettings().setValue( "LogOutOnExit", b ); }
+        void setScrobblePoint( int scrobblePoint ) { UserSettings().setValue( "ScrobblePoint", scrobblePoint ); }
+        void setIPodScrobblingEnabled( bool b ) { UserSettings().setValue( "iPodScrobblingEnabled", b ); }
+        void setAlwaysConfirmIPodScrobbles( bool b ) { UserSettings().setValue( "AlwaysConfirmIPodScrobbles", b ); }
+        void setFingerprintingEnabled( bool b ) { UserSettings().setValue( "FingerprintingEnabled", b ); }
+    };
+
+#ifdef WIN32
+    struct HklmSettings : QSettings
+    {
+        HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
+        {}
+    };
+#endif
+}
 
 
 #ifdef WIN32
-struct HklmSettings : QSettings
-{
-	HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
-	{}
-};
-
-
 struct Plugin
 {
     QString name;
@@ -105,12 +114,5 @@ struct Plugin
     };
 };
 #endif //WIN32
-
-
-inline void 
-MutableSettings::setLogOutOnExit( bool b )
-{
-    UserSettings().setValue( "LogOutOnExit", b ); 
-}
 
 #endif

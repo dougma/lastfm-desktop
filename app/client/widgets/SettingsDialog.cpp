@@ -19,7 +19,9 @@
 
 #include "SettingsDialog.h"
 #include "Settings.h"
+#include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreLocale.h"
+#include <QtGui>
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
@@ -54,6 +56,11 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 
     ui.logOutOnExit->setChecked( Unicorn::Settings().logOutOnExit() );
 
+    moose::Settings s;
+    ui.fingerprintingEnabled->setChecked( s.fingerprintingEnabled() );
+    ui.iPodScrobblingEnabled->setChecked( s.iPodScrobblingEnabled() );
+    ui.alwaysConfirmIPodScrobbles->setChecked( s.alwaysConfirmIPodScrobbles() );
+    
     // make OK button enable if something changes
     //NOTE we don't store initial value, so as a result if user changes the thing back, we do nothing..
     foreach (QLineEdit* o, ui.pageStack->findChildren<QLineEdit*>())
@@ -72,11 +79,17 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 void //virtual
 SettingsDialog::accept()
 {
-    MutableSettings s;
+    moose::MutableSettings s;
 
     // note, don't delete the username/password from the settings yet, do that
     // at exit, in case the user changes his/her mind
     s.setLogOutOnExit( ui.logOutOnExit->isChecked() );
+    s.setFingerprintingEnabled( ui.fingerprintingEnabled->isChecked() );
+    s.setAlwaysConfirmIPodScrobbles( ui.alwaysConfirmIPodScrobbles->isChecked() );
+
+    int const i = ui.languages->currentIndex();
+    if (i != -1)
+        CoreSettings().setValue( "Locale", ui.languages->itemData( i ).toInt() );
 
     QDialog::accept();
 }

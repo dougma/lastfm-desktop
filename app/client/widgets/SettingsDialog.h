@@ -19,6 +19,7 @@
 
 #include "ui_SettingsDialog.h"
 #include <QDialog>
+#include <QPushButton>
 
 
 class SettingsDialog : public QDialog

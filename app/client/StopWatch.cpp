@@ -46,9 +46,13 @@ StopWatch::pause()
 {
     if (!m_timer->isActive() || !m_remaining)
         return;
-    
-    m_remaining -= m_elapsed.elapsed();
+
     m_timer->stop();
+    
+    // cater to potentially having more elapsed time than remaining time
+    uint const remaining = m_remaining - m_elapsed.elapsed();
+    m_remaining = (remaining <= m_remaining) ? remaining : 0;
+
     emit paused( true );
 }
 

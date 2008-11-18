@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
-    <height>412</height>
+    <width>486</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -124,14 +124,14 @@
       <bool>false</bool>
      </property>
      <property name="currentRow" >
-      <number>0</number>
+      <number>-1</number>
      </property>
      <item>
       <property name="text" >
        <string>General</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >
+       <iconset resource="widgets.qrc" >
         <normaloff>:/SettingsDialog/account.png</normaloff>:/SettingsDialog/account.png</iconset>
       </property>
      </item>
@@ -140,7 +140,7 @@
        <string>Radio</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >
+       <iconset resource="widgets.qrc" >
         <normaloff>:/SettingsDialog/radio.png</normaloff>:/SettingsDialog/radio.png</iconset>
       </property>
      </item>
@@ -149,17 +149,8 @@
        <string>Scrobbling</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >
+       <iconset resource="widgets.qrc" >
         <normaloff>:/SettingsDialog/scrobbling.png</normaloff>:/SettingsDialog/scrobbling.png</iconset>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Connection</string>
-      </property>
-      <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >
-        <normaloff>:/SettingsDialog/connection.png</normaloff>:/SettingsDialog/connection.png</iconset>
       </property>
      </item>
      <item>
@@ -167,7 +158,7 @@
        <string>iPod</string>
       </property>
       <property name="icon" >
-       <iconset resource="SettingsDialog.qrc" >
+       <iconset resource="widgets.qrc" >
         <normaloff>:/SettingsDialog/ipod.png</normaloff>:/SettingsDialog/ipod.png</iconset>
       </property>
      </item>
@@ -194,96 +185,74 @@
      <widget class="QWidget" name="accountPage" >
       <layout class="QVBoxLayout" >
        <item>
-        <widget class="QGroupBox" name="accountBox" >
-         <property name="title" >
-          <string>Last.fm Account</string>
+        <widget class="QCheckBox" name="logOutOnExit" >
+         <property name="text" >
+          <string>Log out on exit</string>
          </property>
-         <layout class="QVBoxLayout" >
-          <item>
-           <widget class="QLabel" name="label_6" >
-            <property name="text" >
-             <string>In order to change user, you must log out from the main menu.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="logOutOnExit" >
-            <property name="text" >
-             <string>Log out on exit</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" >
-         <property name="leftMargin" >
-          <number>9</number>
+        <widget class="QCheckBox" name="sendCrashReportsToLastFm" >
+         <property name="text" >
+          <string>Send crash reports to Last.fm</string>
          </property>
-         <property name="topMargin" >
-          <number>9</number>
-         </property>
-         <property name="rightMargin" >
-          <number>9</number>
-         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
          <item>
-          <layout class="QHBoxLayout" >
-           <item>
-            <widget class="QLabel" name="languageLabel" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text" >
-              <string>Language:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="languages" >
-             <property name="minimumSize" >
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="modelColumn" >
-              <number>0</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer>
-             <property name="orientation" >
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0" >
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QLabel" name="languageLabel" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Language:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="languages" >
+           <property name="minimumSize" >
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="modelColumn" >
+            <number>0</number>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer>
            <property name="orientation" >
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0" >
             <size>
-             <width>20</width>
-             <height>181</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
         </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>181</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -291,6 +260,9 @@
       <layout class="QVBoxLayout" >
        <item>
         <widget class="QGroupBox" name="groupBox" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="title" >
           <string>Soundcard</string>
          </property>
@@ -375,6 +347,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="isManuallyManageInputBuffer" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="title" >
           <string>Manually Manage HTTP Input Buffer</string>
          </property>
@@ -435,6 +410,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="isUseOutputProxy" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="title" >
           <string>Stream to External Player</string>
          </property>
@@ -551,7 +529,7 @@
           </sizepolicy>
          </property>
          <property name="text" >
-          <string>Please note that tracks longer than 8 minutes will still scrobble at 4 minutes.</string>
+          <string>Please note that the maximum scrobble point is 4 minutes</string>
          </property>
          <property name="wordWrap" >
           <bool>true</bool>
@@ -575,16 +553,16 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="launchWithMediaPlayerCheck_2" >
+        <widget class="QCheckBox" name="launchWithMediaPlayers" >
          <property name="text" >
           <string>Launch with media players</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="fingerprintCheckBox_2" >
+        <widget class="QCheckBox" name="fingerprintingEnabled" >
          <property name="text" >
-          <string>Allow Last.fm to fingerprint your tracks</string>
+          <string>Enable fingerprinting</string>
          </property>
         </widget>
        </item>
@@ -602,330 +580,40 @@
         </spacer>
        </item>
       </layout>
+      <zorder>label_13</zorder>
+      <zorder>label</zorder>
+      <zorder>launchWithMediaPlayers</zorder>
+      <zorder>fingerprintingEnabled</zorder>
+      <zorder></zorder>
      </widget>
-     <widget class="QWidget" name="connectionPage" >
+     <widget class="QWidget" name="iPodPage" >
       <layout class="QVBoxLayout" >
        <item>
-        <widget class="QGroupBox" name="proxyBox" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Minimum" hsizetype="MinimumExpanding" >
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title" >
-          <string>Proxy Settings</string>
-         </property>
-         <property name="checkable" >
-          <bool>false</bool>
-         </property>
-         <property name="checked" >
-          <bool>false</bool>
-         </property>
-         <layout class="QVBoxLayout" >
-          <item>
-           <widget class="QRadioButton" name="automaticProxyButton" >
-            <property name="text" >
-             <string>Automatic</string>
-            </property>
-            <property name="checked" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="manualProxyButton" >
-            <property name="text" >
-             <string>Manual</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QWidget" native="1" name="manualProxyBox" >
-            <property name="enabled" >
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <layout class="QGridLayout" >
-             <property name="leftMargin" >
-              <number>20</number>
-             </property>
-             <property name="topMargin" >
-              <number>0</number>
-             </property>
-             <property name="rightMargin" >
-              <number>0</number>
-             </property>
-             <property name="bottomMargin" >
-              <number>0</number>
-             </property>
-             <property name="horizontalSpacing" >
-              <number>4</number>
-             </property>
-             <property name="verticalSpacing" >
-              <number>6</number>
-             </property>
-             <item row="0" column="0" >
-              <widget class="QLabel" name="label_2_2_2_2" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text" >
-                <string>Host:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1" >
-              <layout class="QHBoxLayout" >
-               <item>
-                <widget class="QLineEdit" name="proxyHostEdit" >
-                 <property name="enabled" >
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy" >
-                  <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="echoMode" >
-                  <enum>QLineEdit::Normal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_2_2_2_2_2" >
-                 <property name="text" >
-                  <string>Port:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="proxyPortEdit" >
-                 <property name="enabled" >
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy" >
-                  <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="inputMask" >
-                  <string>00000; </string>
-                 </property>
-                 <property name="echoMode" >
-                  <enum>QLineEdit::Normal</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0" >
-              <widget class="QLabel" name="label_2_2_2" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text" >
-                <string>Username:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1" >
-              <widget class="QLineEdit" name="proxyUsernameEdit" >
-               <property name="enabled" >
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="echoMode" >
-                <enum>QLineEdit::Normal</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" >
-              <widget class="QLabel" name="label_2_2" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text" >
-                <string>Password:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1" >
-              <widget class="QLineEdit" name="proxyPasswordEdit" >
-               <property name="enabled" >
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="echoMode" >
-                <enum>QLineEdit::Password</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1" >
-              <widget class="QLabel" name="noProxyTipLabel" >
-               <property name="enabled" >
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text" >
-                <string>Leave fields blank to use a direct connection</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2" >
-         <property name="title" >
-          <string>Bandwidth Usage</string>
-         </property>
-         <layout class="QGridLayout" >
-          <item row="0" column="0" >
-           <widget class="QCheckBox" name="downloadMetadataCheck" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text" >
-             <string>Download artist images and info</string>
-            </property>
-            <property name="checked" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item rowspan="2" row="0" column="1" >
-           <widget class="QPushButton" name="clearCache" >
-            <property name="text" >
-             <string>Clear cache</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" >
-           <widget class="QCheckBox" name="crashReportCheck" >
-            <property name="text" >
-             <string>Send crash diagnostics on crashing</string>
-            </property>
-            <property name="checked" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page" >
-      <layout class="QVBoxLayout" >
-       <item>
-        <widget class="QGroupBox" name="isIPodScrobblingEnabled" >
-         <property name="title" >
+        <widget class="QCheckBox" name="iPodScrobblingEnabled" >
+         <property name="text" >
           <string>Enable iPod Scrobbling</string>
          </property>
-         <property name="checkable" >
-          <bool>true</bool>
-         </property>
-         <layout class="QVBoxLayout" >
-          <item>
-           <widget class="QCheckBox" name="alwaysConfirmIPodScrobbles" >
-            <property name="text" >
-             <string>Always confirm iPod scrobbles</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="giveMoreFeedback" >
-            <property name="text" >
-             <string>Give more feedback</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTreeWidget" name="deviceWidget" >
-            <property name="focusPolicy" >
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="selectionMode" >
-             <enum>QAbstractItemView::NoSelection</enum>
-            </property>
-            <property name="selectionBehavior" >
-             <enum>QAbstractItemView::SelectColumns</enum>
-            </property>
-            <property name="rootIsDecorated" >
-             <bool>false</bool>
-            </property>
-            <property name="uniformRowHeights" >
-             <bool>true</bool>
-            </property>
-            <property name="itemsExpandable" >
-             <bool>false</bool>
-            </property>
-            <property name="allColumnsShowFocus" >
-             <bool>false</bool>
-            </property>
-            <property name="columnCount" >
-             <number>1</number>
-            </property>
-            <column>
-             <property name="text" >
-              <string>Known iPods</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
         </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="alwaysConfirmIPodScrobbles" >
+         <property name="text" >
+          <string>Always confirm iPod scrobbles</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer" >
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -941,7 +629,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="SettingsDialog.qrc" />
+  <include location="widgets.qrc" />
  </resources>
  <connections>
   <connection>
@@ -989,22 +677,6 @@
     <hint type="destinationlabel" >
      <x>361</x>
      <y>69</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>manualProxyButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>manualProxyBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>56</x>
-     <y>129</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>31</x>
-     <y>186</y>
     </hint>
    </hints>
   </connection>

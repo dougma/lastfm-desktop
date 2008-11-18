@@ -58,13 +58,16 @@ public:
         class QLabel* artist;
         class QLabel* artist_text;
         class SpinnerLabel* spinner;
+        class QListWidget *tags;
+        class QListWidget *similarArtists;
     } ui;
     
 public slots:
     void setPapyrusPosition( int );
     
 private slots:
-    void onArtistGotInfo( class WsReply* );
+    void onArtistGotInfo( WsReply* );
+    void onArtistGotTopTags( WsReply* );
     void onArtistImageDownloaded();
     
 private:

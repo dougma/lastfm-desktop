@@ -309,7 +309,7 @@ App::onTrackSpooled( const Track& t )
     if (t.isNull()) return;
     
 #ifdef Q_OS_MAC
-    if (t.source() == Track::Player && t.isMp3())
+    if (t.source() == Track::Player && t.isMp3() && moose::Settings().fingerprintingEnabled())
     {
         FingerprintId fpid = Fingerprint( t ).id();
         
@@ -432,7 +432,7 @@ App::parseArguments( const QStringList& args )
                 if (tracks.isEmpty())
                     qWarning() << "Empty iPod scrobble cache, but that shouldn't be possible!";
 
-                if (cache.insane() || Settings().alwaysConfirmIPodScrobbles())
+                if (cache.insane() || moose::Settings().alwaysConfirmIPodScrobbles())
                 {
                     BatchScrobbleDialog d( m_mainWindow );
                     d.setTracks( tracks );

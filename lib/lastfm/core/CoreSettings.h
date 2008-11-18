@@ -53,8 +53,8 @@ public:
 
 	CoreLocale locale() const
 	{
-		QVariant const v = value( "locale" );
-		return v.isValid() ? QLocale( v.toString() ) : CoreLocale::system();
+		QVariant const v = value( "Locale" );
+		return v.isValid() ? QLocale( QLocale::Language(v.toInt()) ) : CoreLocale::system();
 	}
 };
 

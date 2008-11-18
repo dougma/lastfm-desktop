@@ -26,6 +26,19 @@
 #include <QTimer>
 
 
+namespace mxcl
+{
+    struct Time : private QTime
+    {
+        using QTime::start;
+        using QTime::restart;
+
+        /** A stupid decision by Trolltech. Disallow negative time */
+        uint elapsed() const { return qMax( 0, QTime::elapsed() ); }
+    };
+}
+
+
 /** Emits timeout() after seconds specified to start. 
   * Emits tick every second.
   * Continues to measure time after that point until object death.
@@ -35,17 +48,22 @@ class StopWatch : public QObject
     Q_OBJECT
     Q_DISABLE_COPY( StopWatch )
 
+    /** for access to timeout() signal */
+    friend class PlayerMediator;
+    
 public:
     /** the StopWatch starts off paused, call resume() to start */
     StopWatch( const ScrobblePoint& timeout_in_seconds );
-    
-    bool isFinished() const { return m_remaining == 0 && !m_timer->isActive(); }
-    
+
+    bool isTimedOut() const { return m_remaining == 0 && !m_timer->isActive(); }
+
     void pause();
     void resume();
     
-    ScrobblePoint scrobblePoint() const { return m_point; }
+    uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()) / 1000; }
 
+    ScrobblePoint scrobblePoint() const { return m_point; }
+    
 signals:
     void paused( bool );
     void timeout();
@@ -58,7 +76,7 @@ private:
     
     class QTimer* m_timer;
     uint m_remaining;
-    QTime m_elapsed;
+    mxcl::Time m_elapsed;
     ScrobblePoint m_point;
 };
 
