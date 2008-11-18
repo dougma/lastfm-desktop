@@ -19,8 +19,9 @@
  ***************************************************************************/
 
 /*! \class LocalCollection
-    \brief Local Content Resolution db interface.
-    Db stores metadata for on-disk media
+    \brief Represents a connection to the Local Collection db
+           Instances of this class should not be shared across threads
+           (due to limitations of QSqlDatabase class)
 */
 
 #ifndef LOCAL_COLLECTION_H
@@ -191,8 +192,6 @@ private:
     void initDatabase();
     QSqlQuery query( const QString& sql ) const;
     ChainableQuery prepare( const QString& sql ) const;
-
-    static QMutex m_mutex;
 
     QSqlDatabase m_db;
     QString m_dbPath;

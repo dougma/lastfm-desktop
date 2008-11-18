@@ -29,10 +29,6 @@
 
 extern int addUserFuncs(QSqlDatabase db);
 
-QMutex LocalCollection::m_mutex;
-
-#define LOCK QMutexLocker locker( &m_mutex )
-
 #define LOCAL_COLLECTION_SCHEMA_VERSION_INT 2
 #define LOCAL_COLLECTION_SCHEMA_VERSION_STR "2"
 
@@ -40,7 +36,8 @@ QMutex LocalCollection::m_mutex;
 LocalCollection*
 LocalCollection::create(QString connectionName)
 {
-    LOCK;
+    static QMutex createMutex;
+    QMutexLocker locker( &createMutex );
     return new LocalCollection( connectionName );
 }
 
@@ -201,7 +198,6 @@ LocalCollection::setFingerprint( const QString& filePath, QString fpId )
 QList<LocalCollection::Source>
 LocalCollection::getAllSources()
 {
-    LOCK;
     QSqlQuery q = query( "SELECT id, volume, available FROM sources" );
 
     QList<LocalCollection::Source> result;
@@ -222,7 +218,6 @@ LocalCollection::getAllSources()
 void
 LocalCollection::setSourceAvailability(int sourceId, bool available)
 {
-    LOCK;
     prepare( "UPDATE sources SET available = :available WHERE id = :sourceId" ).
     bindValue( ":available", available ? 1 : 0 ).
     bindValue( ":sourceId", sourceId ).
@@ -232,7 +227,6 @@ LocalCollection::setSourceAvailability(int sourceId, bool available)
 QList<LocalCollection::Exclusion>
 LocalCollection::getExcludedDirectories(int sourceId)
 {
-    LOCK;
     QSqlQuery query = prepare(
         "SELECT exclusions.path, exclusions.subDirs "
         "FROM exclusions "
@@ -255,7 +249,6 @@ LocalCollection::getExcludedDirectories(int sourceId)
 QList<QString>
 LocalCollection::getStartDirectories(int sourceId)
 {
-    LOCK;
     QSqlQuery query = prepare( 
         "SELECT path FROM startDirs "
         "WHERE source = :sourceId" ).
@@ -272,7 +265,6 @@ LocalCollection::getStartDirectories(int sourceId)
 bool
 LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 {
-    LOCK;
     QSqlQuery query = prepare(
         "SELECT id FROM directories "
         "WHERE path = :path AND source = :sourceId" ).
@@ -290,7 +282,6 @@ LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 bool 
 LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 {
-    LOCK;
     bool ok;
     resultId = prepare(
         "INSERT into directories ( id, source, path ) "
@@ -305,7 +296,6 @@ LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 QList<LocalCollection::File> 
 LocalCollection::getFiles(int directoryId)
 {
-    LOCK;
     QSqlQuery query = prepare(
         "SELECT id, filename, modification_date "
         "FROM files "
@@ -330,7 +320,6 @@ LocalCollection::getFiles(int directoryId)
 QList<LocalCollection::ResolveResult>
 LocalCollection::resolve(const QString artist, const QString album, const QString title)
 {
-    LOCK;
     if ( artist.isEmpty() || title.isEmpty() )
         return QList<LocalCollection::ResolveResult>();
 
@@ -403,7 +392,6 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
 void
 LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& info)
 {
-    LOCK;
     QSqlQuery query = 
     prepare(
         "UPDATE files SET "
@@ -428,7 +416,6 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
 int
 LocalCollection::getArtistId(QString artistName, bool bCreate)
 {
-    LOCK;
     QString lowercase_name( artistName.simplified().toLower() );
 
     {
@@ -461,7 +448,6 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
 void
 LocalCollection::addFile(int directoryId, QString filename, unsigned lastModified, const FileMeta& info)
 {
-    LOCK;
     int artistId = getArtistId( info.m_artist, true );
     Q_ASSERT( artistId > 0 );
 
@@ -484,7 +470,6 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
 void
 LocalCollection::updateArtist(int artistId)
 {
-    LOCK;
     prepare(
         "UPDATE artists SET updates_since_dl = updates_since_dl + 1 "
         "WHERE id = :artistId" ).
@@ -495,7 +480,6 @@ LocalCollection::updateArtist(int artistId)
 LocalCollection::Source
 LocalCollection::addSource(const QString& volume)
 {
-    LOCK;
     int id = prepare(
         "INSERT INTO sources (id, volume, available) "
         "VALUES (NULL, :volume, 1)" ).
@@ -510,7 +494,6 @@ LocalCollection::addSource(const QString& volume)
 void
 LocalCollection::removeDirectory(int directoryId)
 {
-    LOCK;
     prepare( "DELETE FROM directories WHERE id = :directoryId" ).
     bindValue( ":directoryId", directoryId ).
     exec();
@@ -519,7 +502,6 @@ LocalCollection::removeDirectory(int directoryId)
 void 
 LocalCollection::removeFiles(QList<int> ids)
 {
-    LOCK;
     if ( !ids.isEmpty() ) {
         bool first = true;
         QString s = "";
@@ -538,7 +520,6 @@ LocalCollection::removeFiles(QList<int> ids)
 int
 LocalCollection::getTagId(QString tag, bool bCreate)
 {
-    LOCK;
     tag = tag.simplified().toLower();
 
     {
@@ -569,7 +550,6 @@ LocalCollection::getTagId(QString tag, bool bCreate)
 QStringList
 LocalCollection::artistsWithExpiredTags()
 {
-    LOCK;
     uint now = QDateTime::currentDateTime().toUTC().toTime_t();
 
     QSqlQuery query = prepare( 
@@ -597,7 +577,6 @@ LocalCollection::artistsWithExpiredTags()
 QStringList
 LocalCollection::artistsNeedingTagUpdate()
 {
-    LOCK;
     QSqlQuery q = query( 
         "SELECT lowercase_name "
         "FROM artists WHERE "
@@ -628,7 +607,6 @@ LocalCollection::deleteGlobalTrackTagsForArtist(int artistId)
 void
 LocalCollection::deleteTrackTagsForArtist(int artistId, unsigned userId)
 {
-    LOCK;
     Q_ASSERT( artistId > 0 );
     prepare( 
         "DELETE FROM tracktags "
@@ -682,7 +660,7 @@ void
 LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int weight)
 {
     Q_ASSERT(artistId > 0 && tagId > 0);
-    LOCK;
+
     prepare(
         "INSERT INTO tracktags (file, tag, weight, user_id) "
         "SELECT id, :tagId, :weight, :userId "
@@ -698,7 +676,6 @@ void
 LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDateTime dlTime /* = QDateTime() */)
 {
     Q_ASSERT(nextDlTime.isValid());
-    LOCK;
 
     if (dlTime.isValid()) {
         prepare(
