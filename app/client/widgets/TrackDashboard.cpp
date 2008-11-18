@@ -23,6 +23,8 @@
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
+#include "lib/lastfm/types/Artist.h"
+#include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QtGui>
@@ -69,11 +71,10 @@ struct ListView : QListWidget
     {
         QPalette p = palette();
         p.setColor( QPalette::AlternateBase, QColor( 0x1d, 0x1d, 0x1e ) );
+        p.setColor( QPalette::Text, Qt::white );
         setPalette( p );
         setAlternatingRowColors( true );
         setAttribute( Qt::WA_MacShowFocusRect, false );
-        for (int x = 0; x < 6; ++x)
-            new QListWidgetItem( this );
     }
 };
 
@@ -88,28 +89,21 @@ TrackDashboard::TrackDashboard()
     
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     
-    QHBoxLayout* h = new QHBoxLayout;
-    h->addWidget( ui.artist = new QLabel );
-    h->addWidget( ui.artist_text = new QLabel );
-    h->setStretchFactor( ui.artist_text, 1 );
-    h->setMargin( 0 );
-    h->setSpacing( 9 );
-
     ui.info = new QWidget( ui.papyrus );
     QVBoxLayout* v = new QVBoxLayout( ui.info );
-    v->addLayout( h );
+    v->addWidget( ui.artist_text = new QLabel );
     v->addSpacing( 10 );
     v->addWidget( ui.bio = new mxcl::TextBrowser);
     v->addSpacing( 10 );
     v->addWidget( new Line );
     v->addSpacing( 10 );
     v->addWidget( new QLabel( HEADING "Tags" ) );
-    v->addWidget( new ListView );
+    v->addWidget( ui.tags = new ListView );
     v->addSpacing( 10 );
     v->addWidget( new Line );
     v->addSpacing( 10 );
-    v->addWidget( new QLabel( HEADING "Top Listeners" ) );
-    v->addWidget( new ListView );
+    v->addWidget( new QLabel( HEADING "Similar Artists" ) );
+    v->addWidget( ui.similarArtists = new ListView );
     v->addWidget( new Line );
     v->addSpacing( 10 );
     v->setMargin( 0 );
@@ -163,10 +157,13 @@ TrackDashboard::setTrack( const Track& t )
         r = t.artist().getInfo();
 
         connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
+        
+        ui.spinner->show();
+        
+        connect( t.artist().getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onArtistGotTopTags( WsReply* )) );
     }
 
     ui.cover->setTrack( t );
-    ui.spinner->show();
 
     m_track = t;
 
@@ -187,10 +184,11 @@ TrackDashboard::clear()
     ui.cover->clear();
     ui.bio->clear();
     ui.scrollbar->setRange( 0, 0 );
-    ui.artist->clear();
     ui.artist_text->clear();
-	ui.spinner->hide();    
+	ui.spinner->hide();
     ui.info->hide();
+                 
+    qDeleteAll( findChildren<WsReply*>() );
     
     m_track = Track();
 }
@@ -199,6 +197,10 @@ TrackDashboard::clear()
 void
 TrackDashboard::onArtistGotInfo( WsReply* reply )
 {
+    qDebug() << reply;
+    
+    ui.spinner->hide();
+    
 	try
     {
 		CoreDomElement e = reply->lfm()["artist"];
@@ -232,12 +234,13 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         QNetworkRequest request( e["image size=large"].text() );
         QNetworkReply* reply = nam->get( request );
         connect( reply, SIGNAL(finished()), SLOT(onArtistImageDownloaded()) );
-        
-        ui.artist->setFixedHeight( ui.artist_text->sizeHint().height() + 10 );
 
+        foreach (CoreDomElement artist, e["similar"].children( "artist" ))
+            ui.similarArtists->addItem( artist["name"].text() );
+        
         ui.info->show();
         
-        ui.cover->setMinimumWidth( ui.artist->height() );
+//        ui.cover->setMinimumWidth( ui.artist->height() );
 	}
 	catch (CoreDomElement::Exception& e)
 	{
@@ -247,14 +250,24 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 
 
 void
+TrackDashboard::onArtistGotTopTags( WsReply* reply )
+{
+    WeightedStringList tags = Tag::list( reply );
+    for (int x = 0, n = qMin( tags.size(), 8 ); x < n; ++x)
+        ui.tags->addItem( tags[x] );
+}
+
+
+void
 TrackDashboard::onArtistImageDownloaded()
 {
+    return;
+    
     QByteArray data = ((QNetworkReply*)sender())->readAll();
     QPixmap p;
     p.loadFromData( data );
     
     p = p.scaledToHeight( ui.artist->height(), Qt::SmoothTransformation );
-    
     
     QPixmap p2( p.width(), p.height() + 13 );
     p2.fill( Qt::transparent );
@@ -268,14 +281,12 @@ TrackDashboard::onArtistImageDownloaded()
     ui.artist->setPixmap( p2 );
 
     sender()->deleteLater();
-    
-    ui.spinner->hide();
 }
 
 
 void
 TrackDashboard::resizeEvent( QResizeEvent* )
-{
+{    
     if (m_track.isNull())
         return;
     
@@ -292,12 +303,12 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setShowArtist( false );
         ui.cover->move( 12, 12 );
 
-        int h = height() - 24;
+        int h = height() - 12;
         ui.cover->resize( ui.cover->widthForHeight( h ), h );
         
         ui.info->move( ui.cover->geometry().right() + 12, 0 );
         
-        w = width() - ui.info->geometry().x() - ui.scrollbar->width() - 12;
+        w = width() - ui.info->geometry().x() - ui.scrollbar->sizeHint().width() - 12;
     }
     else
     {
@@ -318,7 +329,6 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     ui.info->setFixedWidth( w );
     ui.bio->document()->setTextWidth( w );
     ui.bio->setFixedSize( ui.bio->sizeHint() );
-    ui.bio->adjustSize();
     ui.info->adjustSize();
 
     ui.papyrus->resize( 0xff, ui.info->height() + ui.info->geometry().y() );
@@ -345,7 +355,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
 void
 TrackDashboard::setPapyrusPosition( int y )
 {
-    int const fudge = orientation() == Qt::Horizontal ? -2 : 15;    
+    int const fudge = orientation() == Qt::Horizontal ? 10 : 15;    
     ui.papyrus->move( 0, fudge - y );
 }
 

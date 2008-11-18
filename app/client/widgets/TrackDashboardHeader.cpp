@@ -207,9 +207,9 @@ TrackDashboardHeader::onPraiseClientTeam()
 {
     QStringList praises;
     praises << "thinks you're all jolly good chaps"
-    << "wants to have your babies"
-    << "is amazed at your skills"
-    << "is gay and/or heterosexual for you (depending on gender)";
+            << "wants to have your babies"
+            << "is amazed at your skills"
+            << "is gay and/or heterosexual for you (depending on gender)";
     
     uint random = QDateTime::currentDateTime().toTime_t();
     QString praise = praises.value( random % praises.count() );
@@ -222,6 +222,11 @@ TrackDashboardHeader::onPraiseClientTeam()
 void
 TrackDashboardHeader::onCurseClientTeam()
 {
-	QUrl url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
+    QUrl url;
+    if (Ws::Username == "jonocole")
+        url = "http://oops.last.fm/talk/Jono is teh ghae";
+    else
+        url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
+
 	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
 }

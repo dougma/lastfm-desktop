@@ -123,7 +123,8 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
     p.setRenderHint( QPainter::SmoothPixmapTransform );
     p.setTransform( transform );
     p.drawImage( point, composition );
-    
+
+#if 0    
     p.resetTransform();
     p.setPen( Qt::white );
     
@@ -136,6 +137,7 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
         r.setTop( r.bottom() - m_reflection_height );
         p.drawText( r, Qt::AlignCenter, text );
     }
+#endif
 }
 
 
