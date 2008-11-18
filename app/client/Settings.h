@@ -76,12 +76,15 @@ namespace moose
 
 
 #ifdef WIN32
+
+#include <QStringList>
+
 struct Plugin
 {
     QString name;
     QString version;
     
-    struct Settings : HklmSettings
+    struct Settings : moose::HklmSettings
     {
         Settings()
         {
@@ -92,10 +95,10 @@ struct Plugin
     static QList<Plugin> installed()
     {
         QList<Plugin> plugins;
-        
+        Settings s;
+
         foreach (QString group, s.childGroups())
         {            
-            Settings s;
             s.beginGroup( group );
 
             Plugin p;            
@@ -108,6 +111,8 @@ struct Plugin
             p.version = s.value( "Version" ).toString();
             
             plugins += p;
+
+            s.endGroup();
         }
         
         return plugins;

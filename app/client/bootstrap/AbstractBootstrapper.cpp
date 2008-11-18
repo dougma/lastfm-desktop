@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QtNetwork/QHttp>
 #include <QTextStream>
+#include <time.h>
 
 #define ZLIB_WINAPI
 #include "zlib.h"

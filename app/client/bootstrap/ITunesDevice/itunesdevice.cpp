@@ -62,7 +62,7 @@ ITunesDevice::LibraryPath()
         if ( h == S_OK )
             path = QString::fromLocal8Bit( acPath );
         else
-            LOG( 1, "Couldn't get My Music path\n" );
+            qWarning() << "Couldn't get My Music path";
 
         qDebug() << "CSIDL_MYMUSIC path: " << path;
     }
@@ -76,7 +76,7 @@ ITunesDevice::LibraryPath()
         if ( h == S_OK )
             confPath = QString::fromLocal8Bit( acPath );
         else
-            LOG( 1, "Couldn't get Local Application Data path\n" );
+            qWarning() << "Couldn't get Local Application Data path";
 
         qDebug() << "CSIDL_LOCAL_APPDATA path: " << confPath;
     }

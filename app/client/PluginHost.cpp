@@ -32,19 +32,12 @@ PluginHost::PluginHost(const QString& pluginPath)
             QLibrary lib(pluginDir.filePath(f));
             P_getService get = (P_getService) lib.resolve(PLUGIN_ENTRYPOINT);
             if (get) {
-                m_plugins << new Plugin(get, this);
+                m_plugins << get;
                 // and the lib will remain loaded until app terminates. ok?
             } else {
                 lib.unload();
             }
         }
     }
-}
-
-
-Plugin::Plugin(P_getService getService, QObject *parent)
-: QObject(parent)
-, m_getService(getService)
-{
 }
 

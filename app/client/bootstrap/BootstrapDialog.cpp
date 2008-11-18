@@ -44,7 +44,7 @@ BootstrapDialog::exec()
     foreach (Plugin p, Plugin::installed())
     {
 //        PluginBootstrapper bootstrapper( p.id );
-        qDebug() << p.id;
+//        qDebug() << p.id;
     }
 #endif
 }

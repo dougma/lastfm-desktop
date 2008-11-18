@@ -57,7 +57,9 @@ PlayerListener::onDisconnection()
     
     m_connections[socket].clear();
     m_connections[socket].command = PlayerCommandParser::Term;
+#ifndef _WIN32
     emit playerCommand( m_connections[socket] );
+#endif
 
     term( socket );
 }
