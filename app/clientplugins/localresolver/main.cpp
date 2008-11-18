@@ -37,7 +37,7 @@ void *
 lastfm_getService(const char *service)
 {
     if (0 == strcmp("TrackResolver", service)) {
-        return new TrackResolver();
+        return static_cast<ITrackResolverPlugin*>(new TrackResolver());
     }
     if (0 == strcmp("LocalRql", service)) {
         return new LocalRqlPlugin();

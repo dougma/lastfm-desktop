@@ -26,41 +26,31 @@ extern QString remapVolumeName(const QString& volume);
 
 
 TrackResolver::TrackResolver()
-: m_queryPool(0)
+: m_query(0)
 , m_scanner(0)
-, m_bStopping(false)
-, m_collection(LocalCollection::create("TrackResolverConnection"))
 {}
 
 TrackResolver::~TrackResolver()
 {
-    delete m_collection;
     delete m_scanner;
-    m_bStopping = true;     // cause runnables to exit
-    delete m_queryPool;
+    delete m_query;
 }
 
 void
 TrackResolver::init()
 {
-    // 1 thread. 
-    // Don't change; 
-    // m_collection not thread-safe
-    m_queryPool = new QThreadPool();
-    m_queryPool->setMaxThreadCount(1);      
-
+    //qRegisterMetaType<ITrackResolveRequest *>("ITrackResolveRequest *");
+    m_query = QueryThread::create();
+    connect(this, SIGNAL(enqueue(ITrackResolveRequest *)), m_query, SLOT(onEnqueue(ITrackResolveRequest *)), Qt::QueuedConnection);
     m_scanner = new LocalContentScanner;
 }
 
 void 
 TrackResolver::resolve(class ITrackResolveRequest *req)
 {
-    Q_ASSERT(m_queryPool && req);
+    Q_ASSERT(req && m_query);
     if (req) {
-        if (m_queryPool)
-	        m_queryPool->start(new RequestRunnable(this, m_collection, req, m_dbPath));
-        else
-            req->finished();
+        emit enqueue(req);
     }
 }
 
@@ -70,16 +60,11 @@ TrackResolver::finished()
     delete this;
 }
 
-bool
-TrackResolver::stopping()
-{
-    return m_bStopping;
-}
 
 //////////////////////////////////////////////////////////////////////
 
     
-TrackResolver::Response::Response(const LocalCollection::ResolveResult &r)
+Response::Response(const LocalCollection::ResolveResult &r)
 :   m_matchQuality( r.m_matchQuality ),
     m_artist( r.m_artist.toUtf8() ),
     m_album( r.m_album.toUtf8() ),
@@ -92,56 +77,55 @@ TrackResolver::Response::Response(const LocalCollection::ResolveResult &r)
 }
 
 float
-TrackResolver::Response::matchQuality() const
+Response::matchQuality() const
 {
     return m_matchQuality;
 }
 
 const char *
-TrackResolver::Response::url() const
+Response::url() const
 {
     return m_url.constData();
 }
 
 const char *
-TrackResolver::Response::artist() const
+Response::artist() const
 {
     return m_artist.constData();
 }
 
 const char *
-TrackResolver::Response::album() const
+Response::album() const
 {
     return m_album.constData();
 }
 
 const char *
-TrackResolver::Response::title() const
+Response::title() const
 {
     return m_title.constData();
 }
 
 const char *
-TrackResolver::Response::filetype() const
+Response::filetype() const
 {
     return "audio/mpeg";    // yes this is mp3, todo: the others
 }
 
 unsigned 
-TrackResolver::Response::duration() const
+Response::duration() const
 {
     return m_duration;
 }
 
 unsigned 
-TrackResolver::Response::kbps() const
+Response::kbps() const
 {
     return m_kbps;
 }
 
-
 void 
-TrackResolver::Response::finished()
+Response::finished()
 {
     delete this;
 }
@@ -149,42 +133,90 @@ TrackResolver::Response::finished()
 
 //////////////////////////////////////////////////////////////////////
 
+QueryThread*
+QueryThread::create()
+{
+    QueryThread* a = new QueryThread;
+    a->moveToThread(a);
+    a->start();
+    return a;
+}
 
-TrackResolver::RequestRunnable::RequestRunnable(TrackResolver *trackResolver, LocalCollection* collection, ITrackResolveRequest *r, const QString &dbPath)
-:   m_trackResolver(trackResolver),
-    m_collection(collection),
-    m_req(r),
-    m_dbPath(dbPath)
-{}
+
+QueryThread::~QueryThread()
+{
+    onStop();
+    wait();
+}
+
+void 
+QueryThread::run()
+{
+    try {
+        LocalCollection *pCollection = LocalCollection::create("TrackResolverConnection");
+
+        while (exec()) {
+            while (!m_queue.isEmpty()) {
+                doRequest(pCollection, m_queue.takeFirst());
+            }
+        }
+
+        // finish any remaining requests without actually doing anything:
+        while (!m_queue.isEmpty()) {
+            m_queue.takeFirst()->finished();
+        }
+
+        delete pCollection;
+    } 
+    catch (QSqlError &e) {
+        // todo
+    }
+    catch (...) {
+        // todo
+    }
+}
+
 
 void
-TrackResolver::RequestRunnable::run()
+QueryThread::doRequest(LocalCollection *pCollection, ITrackResolveRequest* req)
 {
 	try 
 	{
-        if (!m_trackResolver->stopping()) {
-            QTime start(QTime::currentTime());
-            QList<LocalCollection::ResolveResult> results = 
-                m_collection->resolve(
-                    QString::fromUtf8(m_req->artist()),
-                    QString::fromUtf8(m_req->album()),
-                    QString::fromUtf8(m_req->title()));
+        QTime start(QTime::currentTime());
+        QList<LocalCollection::ResolveResult> results = 
+            pCollection->resolve(
+                QString::fromUtf8(req->artist()),
+                QString::fromUtf8(req->album()),
+                QString::fromUtf8(req->title()));
 
-            foreach (const LocalCollection::ResolveResult &r, results) {
-                QString filename(r.m_sourcename + r.m_path + r.m_filename);
-                if (true /*bLooksReadable*/)
-                    m_req->result(new Response(r));
-            }
-            qDebug() << "resolve complete: " << start.msecsTo(QTime::currentTime()) << "ms";
+        foreach (const LocalCollection::ResolveResult &r, results) {
+            QString filename(r.m_sourcename + r.m_path + r.m_filename);
+            if (true /*bLooksReadable*/)
+                req->result(new Response(r));
         }
+        qDebug() << "resolve complete: " << start.msecsTo(QTime::currentTime()) << "ms";
 	} 
-	catch(QSqlError &e)
-	{
+	catch(QSqlError &e) {
         // todo
 	}
-    catch(...)
-    {
+    catch(...) {
 
     }
-	m_req->finished();
+	req->finished();
+}
+
+void 
+QueryThread::onEnqueue(ITrackResolveRequest* req)
+{
+    Q_ASSERT(req);
+    if (req) {
+        m_queue.append(req);
+        exit(1);    // break out of exec
+    }
+}
+
+void 
+QueryThread::onStop()
+{
+    exit(0);    // break out of exec, and break out of our run loop
 }

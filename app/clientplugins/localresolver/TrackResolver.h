@@ -22,53 +22,16 @@
 
 #include "../ITrackResolver.h"
 #include "LocalCollection.h"
-#include <QRunnable>
+#include <QThread>
 
 
-class TrackResolver : public ITrackResolverPlugin
+class TrackResolver : public QObject, public ITrackResolverPlugin
 {
+    Q_OBJECT;
+
     QString m_dbPath;
-	class QThreadPool* m_queryPool;
+	class QueryThread* m_query;
 	class LocalContentScanner* m_scanner;
-    class LocalCollection* m_collection;
-    bool m_bStopping;
-
-    // each resolve request gets sent to the threadpool:
-	class RequestRunnable : public QRunnable
-	{
-        QString m_dbPath;
-		class ITrackResolveRequest* m_req;
-        class LocalCollection* m_collection;
-        class TrackResolver* m_trackResolver;
-	public:
-		RequestRunnable(class TrackResolver*, LocalCollection*, ITrackResolveRequest*, const QString& dbPath);
-		void run();
-	};
-
-    // one of these turns a LocalCollection::ResolveResult into 
-    // something 'simpler' for the plugin interface
-    class Response : public ITrackResolveResponse
-    {
-        float m_matchQuality;
-        QByteArray m_url;
-        QByteArray m_artist;
-        QByteArray m_album;
-        QByteArray m_title;
-        //QByteArray m_filetype;
-        unsigned m_duration;
-        unsigned m_kbps;
-    public:
-        Response(const LocalCollection::ResolveResult& r);
-	    virtual float matchQuality() const;
-	    virtual const char* url() const;
-	    virtual const char* artist() const;
-	    virtual const char* album() const;
-	    virtual const char* title() const;
-	    virtual const char* filetype() const;
-	    virtual unsigned duration() const;
-	    virtual unsigned kbps() const;
-	    virtual void finished();
-    };
 
 public:
     TrackResolver();
@@ -77,8 +40,56 @@ public:
     virtual void init();
 	virtual void resolve(class ITrackResolveRequest* req);
     virtual void finished();
-    bool stopping();
+
+signals:
+    void enqueue(class ITrackResolveRequest*);
 };
 
+
+// one of these turns a LocalCollection::ResolveResult into 
+// something 'simpler' for the plugin interface
+class Response : public ITrackResolveResponse
+{
+    float m_matchQuality;
+    QByteArray m_url;
+    QByteArray m_artist;
+    QByteArray m_album;
+    QByteArray m_title;
+    //QByteArray m_filetype;
+    unsigned m_duration;
+    unsigned m_kbps;
+public:
+    Response(const LocalCollection::ResolveResult& r);
+    virtual float matchQuality() const;
+    virtual const char* url() const;
+    virtual const char* artist() const;
+    virtual const char* album() const;
+    virtual const char* title() const;
+    virtual const char* filetype() const;
+    virtual unsigned duration() const;
+    virtual unsigned kbps() const;
+    virtual void finished();
+};
+
+
+class QueryThread : public QThread
+{
+    Q_OBJECT;
+
+    QList<class ITrackResolveRequest*> m_queue;
+
+    void doRequest(LocalCollection *pCollection, ITrackResolveRequest* req);
+
+    QueryThread() {}
+
+public:
+    static QueryThread* create();
+    ~QueryThread();
+    virtual void run();
+
+public slots:
+    void onEnqueue(class ITrackResolveRequest* req);
+    void onStop();
+};
 
 #endif
