@@ -38,7 +38,7 @@ class SearchLocation
     Exclusions m_exclusions;
 
 public:
-    SearchLocation(const LocalCollection::Source& src, const QString& startPath, Exclusions& exclusions);
+    SearchLocation(const LocalCollection::Source& src, const QString& startPath, const Exclusions& exclusions);
 
     // for mapping file names to their last modified times:
     typedef QMap<QString, unsigned> FileTimeMap;

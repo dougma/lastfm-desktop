@@ -67,8 +67,11 @@ CONFIG( samplerate ) {
 }
 
 CONFIG( sqlite3 ) {
-    CONFIG += link_pkgconfig
-    PKGCONFIG += sqlite3
+    !macx*{
+        CONFIG += link_pkgconfig
+        PKGCONFIG += sqlite3
+    }
+    else:LIBS += -lsqlite3
 }
 
 defineTest( generateVersionHeader ) {

@@ -45,7 +45,7 @@ fileTimeToUnixTime32(FILETIME * pft)
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-SearchLocation::SearchLocation(const LocalCollection::Source& src, const QString& startPath, Exclusions& exclusions)
+SearchLocation::SearchLocation(const LocalCollection::Source& src, const QString& startPath, const Exclusions& exclusions)
 :m_src(src)
 ,m_startPath(startPath)
 ,m_exclusions(exclusions)
