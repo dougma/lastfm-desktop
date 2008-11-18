@@ -17,8 +17,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-
 #include <QVariant>
+#include <QSqlError>
 #include <QSqlDriver>
 #include <QSqlDatabase>
 #include <QThreadStorage>
@@ -33,7 +33,7 @@ size_t string_length(const unsigned char* s)
     return strlen((const char*) s);
 }
 
-size_t string_length(const unsigned short* s)
+size_t string_length(const wchar_t* s)
 {
     return wcslen(s);
 }
@@ -114,8 +114,8 @@ void
 user_levenshtein16(sqlite3_context* ctx, int argc, sqlite3_value** argv)
 {
     if (argc == 2) {
-        const unsigned short *a = static_cast<const unsigned short*>(sqlite3_value_text16(argv[0]));
-        const unsigned short *b = static_cast<const unsigned short*>(sqlite3_value_text16(argv[1]));
+        const wchar_t *a = static_cast<const wchar_t*>(sqlite3_value_text16(argv[0]));
+        const wchar_t *b = static_cast<const wchar_t*>(sqlite3_value_text16(argv[1]));
 
         if (a && b) {
             float r = normalized_levenshtein(a, b);
@@ -153,16 +153,31 @@ addUserFuncs_sqlite(sqlite3* handle)
 }
 
 
-int 
+void
 addUserFuncs(QSqlDatabase db)
 {
+    // now we want to start calling sqlite3 directly.
+    // does the header we used when building match 
+    // the version of the loaded library?
+    int loadedVersion = sqlite3_libversion_number();
+    if (loadedVersion != SQLITE_VERSION_NUMBER) {
+        QString error = QObject::tr("sqlite3 loaded version %1 does not match %2")
+            .arg(loadedVersion)
+            .arg(SQLITE_VERSION_NUMBER);
+        throw QSqlError(error);
+    }
+
     QString driver = db.driverName();
     QVariant v = db.driver()->handle();
     if (v.isValid() && qstrcmp(v.typeName(), "sqlite3*")==0) {
         sqlite3* handle = *static_cast<sqlite3 **>(v.data());
+
         if (handle) {
-            return addUserFuncs_sqlite(handle);
+            if (addUserFuncs_sqlite(handle)) {
+                return;
+            }
         }
     }
-    return -1;
+    
+    throw QSqlError(QObject::tr("couldn't install sqlite user functions"));
 }

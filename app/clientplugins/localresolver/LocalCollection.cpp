@@ -27,7 +27,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
-extern int addUserFuncs(QSqlDatabase db);
+extern void addUserFuncs(QSqlDatabase db);
 
 #define LOCAL_COLLECTION_SCHEMA_VERSION_INT 2
 #define LOCAL_COLLECTION_SCHEMA_VERSION_STR "2"
