@@ -26,10 +26,6 @@
 #include <QFileInfo>
 #include <shlobj.h>
 #include <atlbase.h> // For the COM shortcut stuff
-#include <string>
-
-using std::string;
-using std::vector;
 
 
 bool
@@ -78,7 +74,7 @@ HRESULT
 Utils::createShortcut( LPCTSTR lpszFileName, 
                 LPCTSTR lpszDesc, 
                 LPCTSTR lpszShortcutPath )
-{
+{    
     HRESULT hRes = E_FAIL;
     DWORD dwRet = 0;
     CComPtr<IShellLink> ipShellLink;
