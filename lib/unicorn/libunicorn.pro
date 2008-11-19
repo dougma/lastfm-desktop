@@ -1,7 +1,7 @@
 TARGET = unicorn
 TEMPLATE = lib
 QT = core gui
-CONFIG += ws core
+CONFIG += ws core types
 
 include( $$ROOT_DIR/common/qmake/include.pro )
 

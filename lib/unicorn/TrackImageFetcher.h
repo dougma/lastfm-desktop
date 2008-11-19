@@ -21,13 +21,14 @@
 #define TRACK_IMAGE_FETCHER_H
 
 #include <QObject>
+#include <lib/DllExportMacro.h>
 #include "lib/lastfm/types/Track.h"
 
 
 /** @author <max@last.fm>
   * Fetches the album art for an album, via album.getInfo
   */
-class TrackImageFetcher : public QObject
+class UNICORN_DLLEXPORT TrackImageFetcher : public QObject
 {
     Q_OBJECT
 
