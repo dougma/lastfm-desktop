@@ -32,7 +32,6 @@
 #include <QDateTime>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QSqlError>
 #include "ChainableQuery.h"
 #include "lib/lastfm/core/WeightedStringList.h"
 
@@ -190,8 +189,8 @@ private:
         * version 1: from 2.?.? */
     int version() const;
     void initDatabase();
-    QSqlQuery query( const QString& sql ) const;
-    ChainableQuery prepare( const QString& sql ) const;
+    QSqlQuery query( const QString& sql, const char *funcName ) const;
+    ChainableQuery prepare( const QString& sql, const char *funcName ) const;
 
     QSqlDatabase m_db;
     QString m_dbPath;

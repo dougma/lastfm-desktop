@@ -20,7 +20,7 @@
 #include "TrackResolver.h"
 #include "LocalContentScanner.h"
 #include "LocalCollection.h"
-#include <QThreadPool>
+#include "QueryError.h"
 
 extern QString remapVolumeName(const QString& volume);
 
@@ -168,11 +168,11 @@ QueryThread::run()
 
         delete pCollection;
     } 
-    catch (QSqlError &e) {
-        // todo
+    catch (QueryError &e) {
+        qCritical() << "QueryThread::run: " + e.text();
     }
     catch (...) {
-        // todo
+        qCritical() << "QueryThread::run: unhandled exception";
     }
 }
 
@@ -196,11 +196,11 @@ QueryThread::doRequest(LocalCollection *pCollection, ITrackResolveRequest* req)
         }
         qDebug() << "resolve complete: " << start.msecsTo(QTime::currentTime()) << "ms";
 	} 
-	catch(QSqlError &e) {
-        // todo
+	catch(QueryError &e) {
+        qWarning() << "QueryThread::doRequest: " + e.text();
 	}
     catch(...) {
-
+        qWarning() << "QueryThread::doRequest: unhandled exception";
     }
 	req->finished();
 }

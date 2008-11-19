@@ -18,12 +18,14 @@
  ***************************************************************************/
 
 #include "TagUpdater.h"
+#include "QueryError.h"
 #include "LocalCollection.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/types/Artist.h"
 #include "lib/lastfm/types/Tag.h"
 #include <QDateTime>
 #include <QTimer>
+
 
 #define TAGUPDATER_ARTIST_TAG_LIMIT 10          
 #define TAGUPDATER_LOWEST_ARTIST_TAG_WEIGHT 10  /* out of 100 */
@@ -46,23 +48,32 @@ TagUpdater::~TagUpdater()
 void
 TagUpdater::run()
 {
-    m_collection = LocalCollection::create("TagUpdaterConnection");
-    m_timer = new QTimer();
-    m_timer->setSingleShot(true);
-    connect(m_timer, SIGNAL(timeout()), SLOT(launchNextBatch()));
+    try {
+        m_collection = LocalCollection::create("TagUpdaterConnection");
+        m_timer = new QTimer();
+        m_timer->setSingleShot(true);
+        connect(m_timer, SIGNAL(timeout()), SLOT(launchNextBatch()));
 
-    launchNextBatch();
-    exec();
+        launchNextBatch();
+        exec();
 
-    // kill the timer and active requests
-    m_timer->stop();
-    foreach (WsReply* r, m_activeRequests) {
-        disconnect(r, SIGNAL(finished(WsReply*)), this, SLOT(onWsFinished(WsReply*)));
-        r->abort();
+        // kill the timer and active requests
+        m_timer->stop();
+        foreach (WsReply* r, m_activeRequests) {
+            disconnect(r, SIGNAL(finished(WsReply*)), this, SLOT(onWsFinished(WsReply*)));
+            r->abort();
+        }
+        m_activeRequests.clear();
+    } 
+    catch (QueryError &e) {
+        critical(e.text());
     }
-    m_activeRequests.clear();
-    delete m_timer;
-    delete m_collection;
+    catch (...) {
+        critical("unexpected exception");
+    }
+
+    if (m_timer) delete m_timer;
+    if (m_collection) delete m_collection;
 }
 
 void
@@ -136,15 +147,14 @@ TagUpdater::onWsFinished(WsReply* r)
             warning("error: " + err);
         }
     } 
-    catch (QSqlError& e) {
-        exception(e.text());
+    catch (QueryError& e) {
+        warning(e.text());
     }
     catch (...) {
-        exception("unexpected");
+        warning("unexpected");
     }
     
     try {
-        // an exception now is fatal to the TagUpdater
         if (!next.isValid()) {
             // this would mean a failed request, or 
             // failed handling of the response. So,
@@ -162,32 +172,24 @@ TagUpdater::onWsFinished(WsReply* r)
             launchNextBatch();
         }
     } 
-    catch (QSqlError& e) {
-        fatal(e.text());
+    // exceptions in there are more serious 
+    catch (QueryError& e) {
+        critical(e.text());
     }
     catch (...) {
-        fatal("unexpected");
+        critical("unexpected");
     }
 }
 
 void
 TagUpdater::warning(const QString& msg)
 {
-    //todo: log
-    int ii = 0;
+    qWarning() << "TagUpdater: " + msg;
 }
 
 void
-TagUpdater::exception(const QString& msg)
+TagUpdater::critical(const QString& msg)
 {
-    //todo: log
-    int ii = 0;
-}
-
-void
-TagUpdater::fatal(const QString& msg)
-{
-    //todo: log
-    quit();
+    qCritical() << "TagUpdater: " + msg;
 }
 

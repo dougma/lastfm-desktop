@@ -18,34 +18,44 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CHAINABLE_QUERY_H
-#define CHAINABLE_QUERY_H
+#ifndef QUERY_ERROR_H
+#define QUERY_ERROR_H
 
-#include <QSqlDatabase>
-#include <QSqlQuery>
+#include "ChainableQuery.h"
+#include <QSqlError>
 
-// ChainableQuery allows us to chain calls to 
-// (QSqlQuery's) prepare(), bindValue() and exec().
-//
-// exec() ends the chain by returning a QSqlQuery
-
-// All errors are thrown as type QueryError
-
-class ChainableQuery : public QSqlQuery
+// extends QSqlError with more info about the source of the error
+class QueryError : public QSqlError
 {
     const char *m_func;
     QString m_sql;
 
-    friend class QueryError;
-
 public:
-    ChainableQuery(QSqlDatabase db);
-    ChainableQuery prepare(const QString& sql, const char *funcName = 0);
-    ChainableQuery bindValue(const QString& name, const QVariant& value);
-    ChainableQuery setForwardOnly(bool forward);
-    QSqlQuery exec();
+    QueryError(const QString& s)
+        : QSqlError(s)
+        , m_func("")
+    {}
+
+    QueryError(const QSqlError &error, const ChainableQuery& query)
+        : QSqlError(error)
+        , m_func(query.m_func)
+        , m_sql(query.m_sql)
+    {}
+
+    const char* function() const 
+    { 
+        return m_func; 
+    }
+
+    QString sql() const 
+    { 
+        return m_sql; 
+    }
+
+    QString text() const 
+    { 
+        return QSqlError::text() + " function: " + function() + " sql: " + sql().simplified();
+    }
 };
-
-
 
 #endif

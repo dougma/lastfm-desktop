@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include "ChainableQuery.h"
-#include <QSqlError>
+#include "QueryError.h"
 
 
 ChainableQuery::ChainableQuery(QSqlDatabase db)
@@ -28,10 +28,13 @@ ChainableQuery::ChainableQuery(QSqlDatabase db)
 }
 
 ChainableQuery 
-ChainableQuery::prepare(const QString& sql)
+ChainableQuery::prepare(const QString& sql, const char *funcName)
 {
+    m_sql = sql;
+    m_func = funcName;
+
     if (!QSqlQuery::prepare(sql))
-        throw lastError();
+        throw QueryError(lastError(), *this);
     return *this;
 }
 
@@ -53,6 +56,6 @@ QSqlQuery
 ChainableQuery::exec()
 {
     if (!QSqlQuery::exec())
-        throw lastError();
+        throw QueryError(lastError(), *this);
     return *this;
 }

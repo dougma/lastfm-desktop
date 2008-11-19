@@ -23,6 +23,7 @@
 #include "LocalCollection.h"
 #include "MediaMetaInfo.h"
 #include "SearchLocation.h"
+#include "QueryError.h"
 #include <memory>
 
 // we make use of QThreadPool priorities to allow some tasks to queue jump
@@ -171,8 +172,8 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
                 good = true;
             }
         }
-        catch (QSqlError &e) {
-            exception("QSqlError: " + e.text());
+        catch (QueryError &e) {
+            exception("QueryError: " + e.text());
         }
         catch (...) {
             exception("NewFileScan::run scanning file");
@@ -202,8 +203,8 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
                 good = true;
             }
         }
-        catch (QSqlError& e) {
-            exception("QSqlError: " + e.text());
+        catch (QueryError& e) {
+            exception("QueryError: " + e.text());
         }
         catch (...) {
             exception("OldFileRescan::run scanning file");
@@ -240,8 +241,8 @@ LocalContentScanner::Init::run()
 {
 	try {
         m_lcs->init();
-    } catch (QSqlError& e) {
-        m_lcs->exception("QSqlError: " + e.text());
+    } catch (QueryError& e) {
+        m_lcs->exception("QueryError: " + e.text());
 	} catch (...) {
 		m_lcs->exception("unknown exception in ThreadInit::run");
 	}
@@ -261,8 +262,8 @@ LocalContentScanner::FullScan::run()
 	try {
         QThread::currentThread()->setPriority(QThread::LowPriority);
         completed = m_sl.recurseDirs(*this);
-    } catch (QSqlError& e) {
-        m_lcs->exception("QSqlError: " + e.text());
+    } catch (QueryError& e) {
+        m_lcs->exception(" " + e.text());
 	} catch (...) {
 		m_lcs->exception("unknown exception in Fullscan::run");
 	}

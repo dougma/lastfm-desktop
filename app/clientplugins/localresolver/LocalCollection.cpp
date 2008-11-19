@@ -19,18 +19,24 @@
  ***************************************************************************/
 
 #include "LocalCollection.h"
+#include "QueryError.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include <QStringList>
 #include <QFileInfo>
 #include <QVariant>
 #include <QSqlDriver>
 #include <QSqlQuery>
-#include <QSqlError>
+#include <QtDebug>
 
 extern void addUserFuncs(QSqlDatabase db);
 
 #define LOCAL_COLLECTION_SCHEMA_VERSION_INT 2
 #define LOCAL_COLLECTION_SCHEMA_VERSION_STR "2"
+
+// these macros add-in the function name for 
+// the call to the method of the same name
+#define PREPARE(a) prepare((a),(Q_FUNC_INFO))
+#define QUERY(a) query((a),(Q_FUNC_INFO))
 
 
 LocalCollection*
@@ -56,15 +62,15 @@ LocalCollection::~LocalCollection()
 }
 
 QSqlQuery
-LocalCollection::query( const QString& sql ) const
+LocalCollection::query( const QString& sql, const char *funcName ) const
 {
-    return prepare( sql ).exec();
+    return prepare( sql, funcName ).exec();
 }
 
 ChainableQuery 
-LocalCollection::prepare( const QString& sql ) const 
+LocalCollection::prepare( const QString& sql, const char *funcName ) const 
 {
-    return ChainableQuery( m_db ).prepare( sql );
+    return ChainableQuery( m_db ).prepare( sql, funcName );
 }
 
 void
@@ -76,7 +82,7 @@ LocalCollection::versionCheck()
         // upgrading!
         // until release we will just blow away the old db and recreate
         foreach ( QString table, m_db.tables() ) {
-            query( "DROP TABLE " + table );
+            QUERY( "DROP TABLE " + table );
         }
         initDatabase();
     }
@@ -91,8 +97,10 @@ LocalCollection::initDatabase()
     }
     m_db.open();
 
+    qDebug() << "here!";
+
     if ( !m_db.tables().contains( "metadata" ) ) {
-        query( "CREATE TABLE files ("
+        QUERY( "CREATE TABLE files ("
                     "id                INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "directory         INTEGER NOT NULL,"
                     "filename          TEXT NOT NULL,"
@@ -105,64 +113,64 @@ LocalCollection::initDatabase()
                     "mbid              VARCHAR( 36 ),"
                     "puid              VARCHAR( 36 ),"
                     "lastfm_fpid       INTEGER );" );
-        query( "CREATE INDEX files_directory_idx ON files ( directory );" );
-        query( "CREATE INDEX files_artist_idx ON files ( artist );" );
+        QUERY( "CREATE INDEX files_directory_idx ON files ( directory );" );
+        QUERY( "CREATE INDEX files_artist_idx ON files ( artist );" );
 
-        query( "CREATE TABLE artists ("
+        QUERY( "CREATE TABLE artists ("
                     "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "lowercase_name     TEXT NOT NULL UNIQUE,"
                     "updates_since_dl   INTEGER NOT NULL,"   // count of files added since last_dl
                     "dl_time            INTEGER,"
                     "next_dl_time       INTEGER );" );
-        query( "CREATE INDEX artists_name_idx ON artists ( lowercase_name );" );
+        QUERY( "CREATE INDEX artists_name_idx ON artists ( lowercase_name );" );
 
         // artist a has similar artist b with weight
-        query( "CREATE TABLE simartists ("
+        QUERY( "CREATE TABLE simartists ("
                     "artist_a           INTEGER,"
                     "artist_b           INTEGER,"
                     "weight             INTEGER );" );
-        query( "CREATE INDEX simartists_artist_a_idx ON simartists ( artist_a );" );
+        QUERY( "CREATE INDEX simartists_artist_a_idx ON simartists ( artist_a );" );
 
-        query( "CREATE TABLE tags ("
+        QUERY( "CREATE TABLE tags ("
                     "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "name               TEXT UNIQUE NOT NULL );" );
-        query( "CREATE INDEX tags_name_idx ON tags ( name );" );
+        QUERY( "CREATE INDEX tags_name_idx ON tags ( name );" );
 
         // file has tag with weight, and source indicates user tag or dl'd tag
-        query( "CREATE TABLE tracktags ("
+        QUERY( "CREATE TABLE tracktags ("
                     "file               INTEGER NOT NULL,"      // files foreign key
                     "tag                INTEGER NOT NULL,"      // tags foreign key
                     "weight             INTEGER NOT NULL,"      // 0-100
                     "user_id            INTEGER NOT NULL);" );  // lastfm user id (0 = global)
 
-        query( "CREATE TABLE directories ("
+        QUERY( "CREATE TABLE directories ("
                     "id          INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "source      INTEGER,"          // sources foreign key
                     "path        TEXT NON NULL );" );
 
-        query( "CREATE INDEX directories_path_idx ON directories ( path );" );
+        QUERY( "CREATE INDEX directories_path_idx ON directories ( path );" );
 
-        query( "CREATE TABLE sources ("
+        QUERY( "CREATE TABLE sources ("
                     "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "volume     TEXT UNIQUE NOT NULL,"  // on unix: "/", on windows: "\\?volume\..."
                     "available  INTEGER NOT NULL);" );
 
-        query( "CREATE TABLE startDirs ("
+        QUERY( "CREATE TABLE startDirs ("
                     "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "path       TEXT NON NULL,"
                     "source     INTEGER );" );      // sources foreign key
 
-        query( "CREATE TABLE exclusions ("
+        QUERY( "CREATE TABLE exclusions ("
                     "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "path       TEXT NON NULL,"           
                     "startDir   INTEGER,"           // startDirs foreign key
                     "subDirs    INTEGER );" );     
 
-        query( "CREATE TABLE metadata ("
+        QUERY( "CREATE TABLE metadata ("
                     "key         TEXT UNIQUE NOT NULL,"
                     "value       TEXT );" );
 
-        query( "INSERT INTO metadata (key, value) VALUES ('version', '" LOCAL_COLLECTION_SCHEMA_VERSION_STR "');" );
+        QUERY( "INSERT INTO metadata (key, value) VALUES ('version', '" LOCAL_COLLECTION_SCHEMA_VERSION_STR "');" );
     }
 
     versionCheck();
@@ -173,14 +181,14 @@ LocalCollection::initDatabase()
 int
 LocalCollection::version() const 
 {   
-    QSqlQuery q = query( "SELECT value FROM metadata WHERE key='version'" );
+    QSqlQuery q = QUERY( "SELECT value FROM metadata WHERE key='version'" );
     if ( q.next() ) {
         bool ok = false;
         int version = q.value( 0 ).toInt( &ok );
         if ( ok )
             return version;
     }
-    throw q.lastError();
+    throw QueryError("no version");
 }
 
 QString
@@ -199,7 +207,7 @@ LocalCollection::setFingerprint( const QString& filePath, QString fpId )
 QList<LocalCollection::Source>
 LocalCollection::getAllSources()
 {
-    QSqlQuery q = query( "SELECT id, volume, available FROM sources" );
+    QSqlQuery q = QUERY( "SELECT id, volume, available FROM sources" );
 
     QList<LocalCollection::Source> result;
     while ( q.next() ) {
@@ -219,7 +227,7 @@ LocalCollection::getAllSources()
 void
 LocalCollection::setSourceAvailability(int sourceId, bool available)
 {
-    prepare( "UPDATE sources SET available = :available WHERE id = :sourceId" ).
+    PREPARE( "UPDATE sources SET available = :available WHERE id = :sourceId" ).
     bindValue( ":available", available ? 1 : 0 ).
     bindValue( ":sourceId", sourceId ).
     exec();
@@ -228,7 +236,7 @@ LocalCollection::setSourceAvailability(int sourceId, bool available)
 QList<LocalCollection::Exclusion>
 LocalCollection::getExcludedDirectories(int sourceId)
 {
-    QSqlQuery query = prepare(
+    QSqlQuery query = PREPARE(
         "SELECT exclusions.path, exclusions.subDirs "
         "FROM exclusions "
         "INNER JOIN startDirs ON exclusions.startDir = startDirs.id "
@@ -250,7 +258,7 @@ LocalCollection::getExcludedDirectories(int sourceId)
 QList<QString>
 LocalCollection::getStartDirectories(int sourceId)
 {
-    QSqlQuery query = prepare( 
+    QSqlQuery query = PREPARE( 
         "SELECT path FROM startDirs "
         "WHERE source = :sourceId" ).
     bindValue( ":sourceId", sourceId ).
@@ -266,7 +274,7 @@ LocalCollection::getStartDirectories(int sourceId)
 bool
 LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 {
-    QSqlQuery query = prepare(
+    QSqlQuery query = PREPARE(
         "SELECT id FROM directories "
         "WHERE path = :path AND source = :sourceId" ).
     bindValue( ":path", path ).
@@ -284,7 +292,7 @@ bool
 LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 {
     bool ok;
-    resultId = prepare(
+    resultId = PREPARE(
         "INSERT into directories ( id, source, path ) "
         "VALUES ( NULL, :sourceId, :path )" ).
     bindValue( ":sourceId", sourceId ).
@@ -297,7 +305,7 @@ LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 QList<LocalCollection::File> 
 LocalCollection::getFiles(int directoryId)
 {
-    QSqlQuery query = prepare(
+    QSqlQuery query = PREPARE(
         "SELECT id, filename, modification_date "
         "FROM files "
         "WHERE directory = :directoryId" ).
@@ -324,7 +332,7 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
     if ( artist.isEmpty() || title.isEmpty() )
         return QList<LocalCollection::ResolveResult>();
 
-    QSqlQuery query = prepare(
+    QSqlQuery query = PREPARE(
         "SELECT a.lowercase_name, f.album, f.lowercase_title, "
         "   levenshtein(a.lowercase_name, :artist) AS aq, "
         "   levenshtein(f.lowercase_title, :title) AS tq, "
@@ -394,7 +402,7 @@ void
 LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& info)
 {
     QSqlQuery query = 
-    prepare(
+    PREPARE(
         "UPDATE files SET "
         "modification_date = :modification_date , "
         "lowercase_title = :lowercase_title , "
@@ -420,7 +428,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
     QString lowercase_name( artistName.simplified().toLower() );
 
     {
-        QSqlQuery query = prepare( "SELECT id FROM artists where lowercase_name = :lowercase_name" ).
+        QSqlQuery query = PREPARE( "SELECT id FROM artists where lowercase_name = :lowercase_name" ).
         bindValue( ":lowercase_name", lowercase_name ).
         exec();
         if ( query.next() ) {
@@ -432,7 +440,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
 
     if ( bCreate ) {
         int artistId = 
-        prepare(
+        PREPARE(
             "INSERT INTO artists (lowercase_name, updates_since_dl) "
             "VALUES (:lowercase_name, 0)" ).
         bindValue( ":lowercase_name", lowercase_name ).
@@ -452,7 +460,7 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
     int artistId = getArtistId( info.m_artist, true );
     Q_ASSERT( artistId > 0 );
 
-    prepare(
+    PREPARE(
         "INSERT INTO files (id, directory, filename, modification_date, lowercase_title, artist, album, kbps, duration) "
         "VALUES (NULL, :directory, :filename, :modification_date, :lowercase_title, :artist, :album, :kbps, :duration)" ).
     bindValue( ":directory", directoryId ).
@@ -471,7 +479,7 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
 void
 LocalCollection::updateArtist(int artistId)
 {
-    prepare(
+    PREPARE(
         "UPDATE artists SET updates_since_dl = updates_since_dl + 1 "
         "WHERE id = :artistId" ).
     bindValue( ":artistId", artistId ).
@@ -481,7 +489,7 @@ LocalCollection::updateArtist(int artistId)
 LocalCollection::Source
 LocalCollection::addSource(const QString& volume)
 {
-    int id = prepare(
+    int id = PREPARE(
         "INSERT INTO sources (id, volume, available) "
         "VALUES (NULL, :volume, 1)" ).
     bindValue( ":volume", volume ).
@@ -495,7 +503,7 @@ LocalCollection::addSource(const QString& volume)
 void
 LocalCollection::removeDirectory(int directoryId)
 {
-    prepare( "DELETE FROM directories WHERE id = :directoryId" ).
+    PREPARE( "DELETE FROM directories WHERE id = :directoryId" ).
     bindValue( ":directoryId", directoryId ).
     exec();
 }
@@ -514,7 +522,7 @@ LocalCollection::removeFiles(QList<int> ids)
             }
             s.append( QString::number( i ) );
         }
-        query( "DELETE FROM files where id IN (" + s + ")" );
+        QUERY( "DELETE FROM files where id IN (" + s + ")" );
     }
 }
 
@@ -524,7 +532,7 @@ LocalCollection::getTagId(QString tag, bool bCreate)
     tag = tag.simplified().toLower();
 
     {
-        QSqlQuery query = prepare( "SELECT id FROM tags WHERE name = :name" ).
+        QSqlQuery query = PREPARE( "SELECT id FROM tags WHERE name = :name" ).
         bindValue( ":name", tag ).
         exec();
         if ( query.next() ) {
@@ -535,7 +543,7 @@ LocalCollection::getTagId(QString tag, bool bCreate)
     }
 
     if ( bCreate ) {
-        int id = prepare( "INSERT INTO tags (name) VALUES (:name)" ).
+        int id = PREPARE( "INSERT INTO tags (name) VALUES (:name)" ).
         bindValue( ":name", tag ).
         exec().
         lastInsertId().toInt();
@@ -553,7 +561,7 @@ LocalCollection::artistsWithExpiredTags()
 {
     uint now = QDateTime::currentDateTime().toUTC().toTime_t();
 
-    QSqlQuery query = prepare( 
+    QSqlQuery query = PREPARE( 
         "SELECT lowercase_name "
         "FROM artists "
         "WHERE ( next_dl_time IS NULL "
@@ -578,7 +586,7 @@ LocalCollection::artistsWithExpiredTags()
 QStringList
 LocalCollection::artistsNeedingTagUpdate()
 {
-    QSqlQuery q = query( 
+    QSqlQuery q = QUERY( 
         "SELECT lowercase_name "
         "FROM artists WHERE "
         "lowercase_name != '' "
@@ -609,7 +617,7 @@ void
 LocalCollection::deleteTrackTagsForArtist(int artistId, unsigned userId)
 {
     Q_ASSERT( artistId > 0 );
-    prepare( 
+    PREPARE( 
         "DELETE FROM tracktags "
         "WHERE user_id == :userId "
         "AND file IN "
@@ -662,7 +670,7 @@ LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int we
 {
     Q_ASSERT(artistId > 0 && tagId > 0);
 
-    prepare(
+    PREPARE(
         "INSERT INTO tracktags (file, tag, weight, user_id) "
         "SELECT id, :tagId, :weight, :userId "
         "FROM files WHERE artist == :artistId " ).
@@ -679,7 +687,7 @@ LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDat
     Q_ASSERT(nextDlTime.isValid());
 
     if (dlTime.isValid()) {
-        prepare(
+        PREPARE(
             "UPDATE artists SET "
             "updates_since_dl = 0, "
             "dl_time = :dl_time, "
@@ -690,7 +698,7 @@ LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDat
         bindValue( ":next_dl_time", nextDlTime.toUTC().toTime_t() ).
         exec();
     } else {
-        prepare(
+        PREPARE(
             "UPDATE artists SET "
             "next_dl_time = :next_dl_time "
             "WHERE lowercase_name == :artist" ).

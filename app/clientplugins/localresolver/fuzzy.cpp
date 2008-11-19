@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include <QVariant>
-#include <QSqlError>
 #include <QSqlDriver>
 #include <QSqlDatabase>
 #include <QThreadStorage>
@@ -156,22 +155,9 @@ addUserFuncs_sqlite(sqlite3* handle)
 void
 addUserFuncs(QSqlDatabase db)
 {
-    // now we want to start calling sqlite3 directly.
-    // does the header we used when building match 
-    // the version of the loaded library?
-
-    // todo: i don't think really need to do this.
-
-    //int loadedVersion = sqlite3_libversion_number();
-    //if (loadedVersion != SQLITE_VERSION_NUMBER) {
-    //    QString error = QObject::tr("sqlite3 loaded version %1 does not match %2")
-    //        .arg(loadedVersion)
-    //        .arg(SQLITE_VERSION_NUMBER);
-    //    throw QSqlError(error);
-    //}
-
-    // todo: rather, we want to check that qt's sqlite driver is using the "system"
+    // todo: need to check that qt's sqlite driver is using the "system"
     // sqlite dll, because we are too.
+    // how?
 
     QString driver = db.driverName();
     QVariant v = db.driver()->handle();
@@ -179,11 +165,10 @@ addUserFuncs(QSqlDatabase db)
         sqlite3* handle = *static_cast<sqlite3 **>(v.data());
 
         if (handle) {
-            if (addUserFuncs_sqlite(handle)) {
-                return;
-            }
+            addUserFuncs_sqlite(handle);
+            // We don't handle an error return result here.
+            // The sql query will fail down the track when 
+            // we come to use a non existent function.
         }
     }
-    
-    throw QSqlError(QObject::tr("couldn't install sqlite user functions"));
 }

@@ -36,9 +36,8 @@ class TagUpdater : public QThread
     void run();
 
     int startRequests(QStringList artists);
-    void exception(const QString& msg);
     void warning(const QString& msg);
-    void fatal(const QString& msg);
+    void critical(const QString& msg);
 
 public:
     TagUpdater();
