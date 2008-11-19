@@ -22,7 +22,7 @@
 
 #include <QWidget>
 #include <QMouseEvent>
-#include "the/mainWindow.h"
+
 
 class TrackDashboardHeader : public QWidget
 {
@@ -30,8 +30,8 @@ class TrackDashboardHeader : public QWidget
     
 public:
     TrackDashboardHeader();
-    void paintEvent( QPaintEvent* e );    
-    void resizeEvent( QResizeEvent* e );
+    
+    void setCogMenu( class QMenu* menu );
     
     struct {
         class ScrobbleButton* scrobbleButton;
@@ -43,16 +43,19 @@ public:
     } ui;
     
 protected:
+    void paintEvent( QPaintEvent* e );    
+    void resizeEvent( QResizeEvent* e );
+
     QPoint m_mouseDownPos;
     void mousePressEvent( QMouseEvent* e )
     {
-        m_mouseDownPos = e->globalPos() - The::mainWindow().pos();
+        m_mouseDownPos = e->globalPos() - window()->pos();
     }
     
     void mouseMoveEvent( QMouseEvent* e )
     {
         if( !m_mouseDownPos.isNull())
-            The::mainWindow().move( e->globalPos() - m_mouseDownPos);
+            window()->move( e->globalPos() - m_mouseDownPos);
     }
     
     void mouseReleaseEvent( QMouseEvent* e )
@@ -61,24 +64,15 @@ protected:
     }
     
 private slots:
-    void onTrackSpooled( const Track&, class StopWatch* );
-
+    void onTrackSpooled( const class Track&, class StopWatch* );
     void onContextMenuRequested( const QPoint& pos );
     
     void onPraiseClientTeam();
     void onCurseClientTeam();
     void onCogMenuClicked();
     
-    void showPlaylistDialog();
-    void showTagDialog();
-    void showShareDialog();
-    
 private:
     class QMenu* m_cogMenu;
-    Track m_track;
-    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
-    UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
-    UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
 };
 
 

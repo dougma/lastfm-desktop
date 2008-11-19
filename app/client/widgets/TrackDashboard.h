@@ -32,11 +32,12 @@ class TrackDashboard : public QWidget
 
     Track m_track;
     class QNetworkAccessManager* nam;
+    QUrl m_artist_image_url;
     
 public:
     TrackDashboard();
 
-    void beginLoadingAnimation();
+    void tuningIn();
     void setTrack( const class Track& );
     void clear();
 
@@ -66,7 +67,6 @@ public slots:
 private slots:
     void onArtistGotInfo( WsReply* );
     void onArtistGotTopTags( WsReply* );
-    void onArtistImageDownloaded();
     void openExternally( const QUrl& );
     
 private:

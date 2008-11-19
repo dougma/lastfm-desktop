@@ -21,7 +21,6 @@
 #include "Artist.h"
 #include "User.h"
 #include "../core/CoreUrl.h"
-#include "../ws/WsAccessManager.h"
 #include "../ws/WsRequestBuilder.h"
 #include <QFile>
 #include <QTimer>
@@ -83,74 +82,3 @@ Album::addTags( const QStringList& tags ) const
 }
 
 
-
-/** @author <max@last.fm> 
-  */
-
-AlbumImageFetcher::AlbumImageFetcher( const Album& album, Album::ImageSize size )
-				 : m_size( (int)size ),
-				   m_manager( 0 ),
-                   m_nocover( false )
-{	
-    if (album.isNull()) {
-        QTimer::singleShot( 0, this, SLOT(fail()) );
-        return;
-    }
-    
-    WsReply* reply = album.getInfo();
-	connect( reply, SIGNAL(finished( WsReply* )), SLOT(onGetInfoFinished( WsReply* )) );
-}
-
-
-void
-AlbumImageFetcher::onGetInfoFinished( WsReply* reply )
-{
-	if (!reply->failed())
-	    for (; m_size >= 0; --m_size)
-        {
-            try
-            {
-                QUrl const url = reply->lfm()["album"]["image size="+size()].text();
-                
-                // we seem to get a load of album.getInfos where the node exists
-                // but the value is ""
-                if (!url.isValid())
-                    continue;
-
-                m_manager = new WsAccessManager( this );
-
-                QNetworkReply* get = m_manager->get( QNetworkRequest( url ) );
-                connect( get, SIGNAL(finished()), SLOT(onImageDataDownloaded()) );
-                return;
-            }
-            catch (CoreDomElement::Exception& e)
-            {}
-        }
-
-    fail();
-}
-
-
-void
-AlbumImageFetcher::onImageDataDownloaded()
-{
-	QNetworkReply* reply = (QNetworkReply*)sender();
-    QByteArray const data = reply->readAll();
-    if (data.isEmpty())
-        fail();
-    else
-        emit finished( data );
-    
-	reply->deleteLater(); //never delete an object in a slot connected to it
-						  //always call deleteLater _after_ emit
-}
-
-
-void
-AlbumImageFetcher::fail()
-{
-    m_nocover = true;
-    QFile f( ":/lastfm/no/cover.png" );
-    f.open( QFile::ReadOnly );
-    emit finished( f.readAll() );
-}

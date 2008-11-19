@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,39 +17,46 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef RADIO_WIDGET_H
-#define RADIO_WIDGET_H
+#ifndef TRACK_IMAGE_FETCHER_H
+#define TRACK_IMAGE_FETCHER_H
 
-#include <QMainWindow>
+#include <QObject>
+#include "lib/lastfm/types/Track.h"
 
 
-class RadioWidget : public QMainWindow
+/** @author <max@last.fm>
+  * Fetches the album art for an album, via album.getInfo
+  */
+class TrackImageFetcher : public QObject
 {
     Q_OBJECT
-	
-public:
-    RadioWidget( QWidget* parent = 0 );
-	
-	struct 
-	{
-		class QTabWidget* tabWidget;
-        class RadioControls* controls;
-	} ui;
-	
-protected:
-	virtual void hideEvent( QHideEvent* )
-	{
-		emit hideEvent();
-	}
-	
-signals:
-	void hideEvent();
-	
-private slots:
-    void onTune( const class RadioStation& );
 
-public slots:
-	void addTab( QWidget*, const QString );
+    class QNetworkAccessManager* nam;    
+    Track m_track;
+    
+    void artistGetInfo();
+    void fail();
+    bool downloadImage( WsReply*, const QString& root_node_name );
+    
+    Album album() const { return m_track.album(); }
+    Artist artist() const { return m_track.artist(); }
+    
+public:
+    TrackImageFetcher( const Track& t, class QNetworkAccessManager* n ) 
+            : m_track( t )
+            , nam( n )
+    {}
+    
+    void start();
+
+signals:
+    void finished( const class QImage& );
+    
+private slots:
+    void onAlbumGotInfo( WsReply* );
+    void onArtistGotInfo( WsReply* );
+    void onAlbumImageDownloaded();
+    void onArtistImageDownloaded();
 };
 
-#endif //RADIO_WIDGET_H
+#endif

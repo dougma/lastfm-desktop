@@ -28,7 +28,6 @@
 #include "mac/ITunesPluginInstaller.h"
 #include "player/PlayerListener.h"
 #include "player/PlayerMediator.h"
-#include "radio/RadioWidget.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
 #include "app/twiddly/IPodScrobble.h"

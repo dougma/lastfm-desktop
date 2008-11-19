@@ -29,6 +29,7 @@
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "the/radio.h"
 #include <QPainter>
+#include <QMenu>
 
 
 struct ThreeColumnLayout : QHBoxLayout
@@ -96,20 +97,13 @@ TrackDashboardHeader::TrackDashboardHeader()
     ui.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
     ui.love->setCheckable( true );
     
-    
     setContentsMargins( 6, 0, 10, 0 );
     layout()->setMargin( 0 );
     layout()->setSpacing( 10 );
     
     connect( ui.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
-    m_cogMenu = new QMenu( this );
-    m_cogMenu->addAction( tr( "Tag this track/album/artist"), this, SLOT( showTagDialog()) );
-    m_cogMenu->addAction( tr( "Share this track/album/artist"), this, SLOT( showShareDialog()) );
-    m_cogMenu->addAction( tr( "Add to playlist" ), this, SLOT( showPlaylistDialog()) );
-    m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
-    m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
     connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
-    
+
     setAutoFillBackground( true );
     setFixedHeight( 39 );
     
@@ -117,6 +111,16 @@ TrackDashboardHeader::TrackDashboardHeader()
 
     //Set ui to correct initial state
     onTrackSpooled( Track(), 0 );
+}
+
+
+void
+TrackDashboardHeader::setCogMenu( QMenu* menu )
+{
+    m_cogMenu = menu;
+    m_cogMenu->addSeparator();
+    m_cogMenu->addAction( tr( "Praise the Client Team" ), this, SLOT( onPraiseClientTeam()) );
+    m_cogMenu->addAction( tr( "Gently, Curse the Client Team" ), this, SLOT( onCurseClientTeam()) );
 }
 
 
@@ -150,7 +154,6 @@ TrackDashboardHeader::resizeEvent( QResizeEvent* e )
 void 
 TrackDashboardHeader::onTrackSpooled( const Track& t, class StopWatch* )
 {
-    m_track = t;
     if( t.isNull() )
     {
         ui.track->clear();
@@ -158,30 +161,9 @@ TrackDashboardHeader::onTrackSpooled( const Track& t, class StopWatch* )
     }
     else
     {
-        ui.track->setText( QString( "%1 - %2" ).arg( t.artist() ).arg( t.title() ));
+        ui.track->setText( t.toString() );
         ui.cog->setEnabled( true );
     }
-}
-
-
-void 
-TrackDashboardHeader::showShareDialog()
-{
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( ShareDialog, m_track );
-}
-
-
-void 
-TrackDashboardHeader::showTagDialog()
-{
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( TagDialog, m_track );
-}
-
-
-void 
-TrackDashboardHeader::showPlaylistDialog()
-{
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track );
 }
 
 

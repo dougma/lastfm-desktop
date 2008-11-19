@@ -28,11 +28,10 @@
 class PrettyCoverWidget : public QWidget
 {
     Q_OBJECT
-
+    
 public:
     PrettyCoverWidget();
 
-	void setTrack( const Track& );
 	void clear();
     
     void setReflectionHeight( uint h ) { m_reflection_height = h; }
@@ -52,21 +51,15 @@ public:
     {
         setMinimumSize( w, heightForWidth( w ) );
     }
-    
-    void setShowArtist( bool b ) { m_showArtist = b; }
-	
-private slots:
-	void onAlbumImageDownloaded( const QByteArray& );
 
+public slots:
+    void setImage( const QImage& );
+    
 private:
     void paintEvent( QPaintEvent* );
 
     QImage m_cover;
-	Track m_track;
     uint m_reflection_height;
-    bool m_showArtist;
-	
-	static QImage addReflection( const QImage& );
 };
 
 #endif //TRACK_INFO_WIDGET_H

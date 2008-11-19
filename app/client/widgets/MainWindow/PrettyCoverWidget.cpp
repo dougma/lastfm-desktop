@@ -24,7 +24,6 @@
 
 PrettyCoverWidget::PrettyCoverWidget()
                  : m_reflection_height( 30 )
-                 , m_showArtist( true )
 {
     QFont font = this->font();
     font.setBold( true );
@@ -37,43 +36,30 @@ PrettyCoverWidget::PrettyCoverWidget()
 void
 PrettyCoverWidget::clear()
 {
-	m_track = Track();
-	qDeleteAll( findChildren<AlbumImageFetcher*>() );   
     m_cover = QImage();
     update();
 }
 
 
 void
-PrettyCoverWidget::setTrack( const Track& t )
+PrettyCoverWidget::setImage( const QImage& in )
 {
-	//TODO for scrobbled tracks we should get the artwork out of the track
-	if (m_track.album() != t.album())
-	{
-		m_cover = QImage();
-		
-		qDeleteAll( findChildren<AlbumImageFetcher*>() );
-		QObject* o = new AlbumImageFetcher( t.album(), Album::ExtraLarge );
-		connect( o, SIGNAL(finished( QByteArray )), SLOT(onAlbumImageDownloaded( QByteArray )) );
-		o->setParent( this );
-	}
-
-	m_track = t;
+    const uint H = in.height();
+	
+    m_cover = QImage( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
+    
+	QImage in2 = in;
+	in2.convertToFormat( QImage::Format_ARGB32_Premultiplied );
+    
+    QImage reflection = in.copy( 0, in.height() - H, in.width(), H );
+    reflection = reflection.mirrored( false, true /*vertical only*/ );
+    
+    QPainter p( &m_cover );
+    p.drawImage( 0, 0, in2 );
+    p.drawImage( 0, in.height(), reflection );
+    p.end();
 
     update();
-}
-
-
-void
-PrettyCoverWidget::onAlbumImageDownloaded( const QByteArray& data )
-{
-    m_cover.loadFromData( data );
-    qDebug() << "Image dimensions:" << m_cover.size();
-
-	m_cover = addReflection( m_cover );
-	update();
-
-	sender()->deleteLater();
 }
 
 
@@ -138,25 +124,4 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
         p.drawText( r, Qt::AlignCenter, text );
     }
 #endif
-}
-
-
-QImage //static
-PrettyCoverWidget::addReflection( const QImage &in )
-{
-    const uint H = in.height();
-	
-    QImage out( in.width(), in.height() + H, QImage::Format_ARGB32_Premultiplied );
-
-	QImage in2 = in;
-	in2.convertToFormat( QImage::Format_ARGB32_Premultiplied );
-    
-    QImage reflection = in.copy( 0, in.height() - H, in.width(), H );
-    reflection = reflection.mirrored( false, true /*vertical only*/ );
-		
-    QPainter p( &out );
-    p.drawImage( 0, 0, in2 );
-    p.drawImage( 0, in.height(), reflection );
-	
-    return out;
 }

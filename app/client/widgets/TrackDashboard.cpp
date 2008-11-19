@@ -22,17 +22,17 @@
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
+#include "lib/unicorn/TrackImageFetcher.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "lib/lastfm/types/Artist.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QtGui>
 #include <QSvgRenderer>
+#include <QtWebKit>
 
 #define HEADING "<div style='color:white;font-size:large'><b>"
 
-#include <QtWebKit>
 
 struct Line : QWidget
 {
@@ -60,6 +60,8 @@ struct ListView : QListWidget
         setAttribute( Qt::WA_MacShowFocusRect, false );
     }
 };
+
+
 
 
 TrackDashboard::TrackDashboard()
@@ -132,18 +134,31 @@ TrackDashboard::setTrack( const Track& t )
     {
         ui.info->hide();
 
-        static QPointer<WsReply> r;
-        delete r; //only one at a time please
+        qDeleteAll( findChildren<WsReply*>() );
+        
+        WsReply* r;
         r = t.artist().getInfo();
-
+        r->setParent( this );
         connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
         
         ui.spinner->show();
         
-        connect( t.artist().getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onArtistGotTopTags( WsReply* )) );
+        r = t.artist().getTopTags();
+        connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotTopTags( WsReply* )) );
+        r->setParent( this );
     }
 
-    ui.cover->setTrack( t );
+    if (m_track.album() != t.album())
+    {
+        ui.cover->clear();
+        
+        qDeleteAll( findChildren<TrackImageFetcher*>() );
+
+        TrackImageFetcher* fetch = new TrackImageFetcher( t, nam );
+        fetch->setParent( this );
+        connect( fetch, SIGNAL(finished( QImage )), ui.cover, SLOT(setImage( QImage )) );
+        fetch->start();
+    }
 
     m_track = t;
 
@@ -152,8 +167,9 @@ TrackDashboard::setTrack( const Track& t )
 
 
 void
-TrackDashboard::beginLoadingAnimation()
+TrackDashboard::tuningIn()
 {
+    clear();
     ui.spinner->show();
 }
 
@@ -162,14 +178,14 @@ void
 TrackDashboard::clear()
 {
     ui.cover->clear();
-    ui.bio->setHtml( "<body></body>" );
+    ui.bio->setUrl( QUrl("about:blank") );
     ui.scrollbar->setRange( 0, 0 );
 	ui.spinner->hide();
-    ui.info->hide();
-    
+    ui.info->hide();    
     ui.scrollbar->hide();
     
     qDeleteAll( findChildren<WsReply*>() );
+    qDeleteAll( findChildren<TrackImageFetcher*>() );
     
     m_track = Track();
 }
@@ -177,9 +193,7 @@ TrackDashboard::clear()
 
 void
 TrackDashboard::onArtistGotInfo( WsReply* reply )
-{
-    qDebug() << reply;
-    
+{    
     ui.spinner->hide();
     
 	try
@@ -196,7 +210,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         if (content.isEmpty())
         {
             // this should be all one tr, but meh.
-            html = tr("We don't have a description for this artist yet.") + "<a href='" + 
+            html = "<p>" + tr("We don't have a description for this artist yet.") + "<p><a href='" + 
                    url + "/+wiki/edit'>" + tr("Why not write one?") + "</a>";
         }
         else
@@ -226,14 +240,12 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         ui.bio->setHtml( css + html );
         resizeEvent( 0 );
         
-        QNetworkRequest request( e["image size=large"].text() );
-        QNetworkReply* reply = nam->get( request );
-        connect( reply, SIGNAL(finished()), SLOT(onArtistImageDownloaded()) );
-
         foreach (CoreDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
         
         ui.info->show();
+        
+        m_artist_image_url = e["image size=large"].text();
         
 //        ui.cover->setMinimumWidth( ui.artist->height() );
 	}
@@ -254,12 +266,6 @@ TrackDashboard::onArtistGotTopTags( WsReply* reply )
 
 
 void
-TrackDashboard::onArtistImageDownloaded()
-{
-}
-
-
-void
 TrackDashboard::resizeEvent( QResizeEvent* )
 {    
     if (m_track.isNull())
@@ -275,7 +281,6 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setParent( this );
         ui.cover->show();
         ui.cover->raise();
-        ui.cover->setShowArtist( false );
         ui.cover->move( 15, 12 );
 
         int h = height() - 12;
@@ -291,7 +296,6 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setParent( ui.papyrus );
         ui.cover->move( 0, 0 );
         ui.cover->show();
-        ui.cover->setShowArtist( true );
         ui.cover->raise();
         
         w = qMax( ui.cover->widthForHeight( height() - 12 ), 180 );

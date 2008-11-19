@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "radio/RadioWidget.h"
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/Sources.h"
 #include "Settings.h"
@@ -68,6 +67,7 @@ MainWindow::MainWindow()
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
+    connect( ui.playlist, SIGNAL(triggered()), SLOT(showPlaylistDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
@@ -101,9 +101,10 @@ MainWindow::onTrackSpooled( const Track& t )
     {
         ui.share->setEnabled( true );
         ui.tag->setEnabled( true );
+        ui.playlist->setEnabled( true );
         ui.love->setEnabled( true );
 		ui.love->setChecked( false );
-        
+
         if (t.source() == Track::LastFmRadio)
             ui.ban->setEnabled( true );
 
@@ -113,6 +114,7 @@ MainWindow::onTrackSpooled( const Track& t )
         ui.share->setEnabled( false );
         ui.tag->setEnabled( false );
         ui.love->setEnabled( false );
+        ui.playlist->setEnabled( false );
         ui.ban->setEnabled( false );
         
         ui.dashboard->clear();
@@ -132,7 +134,7 @@ void
 MainWindow::onStateChanged( State s )
 {
 	if (s == TuningIn)
-        ui.dashboard->beginLoadingAnimation();
+        ui.dashboard->tuningIn();
 }
 
 
@@ -166,6 +168,13 @@ MainWindow::setupUi()
     ui.sources->connectToAmp( ui.amp );
     ui.dashboardHeader->ui.ban->setAction( ui.ban );
     ui.dashboardHeader->ui.love->setAction( ui.love );
+    
+    
+    QMenu* menu = new QMenu( this );
+    menu->addAction( ui.tag );
+    menu->addAction( ui.share );
+    menu->addAction( ui.playlist );
+    ui.dashboardHeader->setCogMenu( menu );
 
     connect( ui.viewRadio, SIGNAL(triggered()), ui.amp, SLOT(show()) );
 
@@ -216,6 +225,13 @@ void
 MainWindow::showTagDialog()
 {
 	UNICORN_UNIQUE_PER_TRACK_DIALOG( TagDialog, m_track )
+}
+
+
+void 
+MainWindow::showPlaylistDialog()
+{
+    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track );
 }
 
 
@@ -321,9 +337,8 @@ static QList<QUrl> lastfmUrls( QList<QUrl> urls )
 	return urls;
 }
 
-static
-bool
-couldBeXspf( const QMimeData* md )
+
+static bool couldBeXspf( const QMimeData* md )
 {
     if (md->hasFormat("application/xspf+xml"))
         return true;
@@ -334,6 +349,7 @@ couldBeXspf( const QMimeData* md )
     }
     return false;
 }
+
 
 void
 MainWindow::dragEnterEvent( QDragEnterEvent* e )
@@ -393,7 +409,7 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
                 else if (female())
                     // I'm not sexist, it's just I'm gutless and couldn't think
                     // of any other non offensive terms for women!
-                    return tr("lady");
+                    list << tr("girl") << tr("lady") << tr("lass");
                 else 
                     return tr("person");
                     

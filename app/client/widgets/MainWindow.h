@@ -64,6 +64,7 @@ public slots:
     void showAboutDialog();
     void showShareDialog();
 	void showTagDialog();
+    void showPlaylistDialog();
 
 signals:
 	void loved();
@@ -88,6 +89,7 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
 };
 
 #endif //MAINWINDOW_H

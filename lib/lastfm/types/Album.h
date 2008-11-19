@@ -75,45 +75,4 @@ public:
 	};
 };
 
-
-/** fetches the album art for an album, via album.getInfo */
-class LASTFM_TYPES_DLLEXPORT AlbumImageFetcher : public QObject
-{
-	Q_OBJECT
-
-	int m_size;
-	class WsAccessManager* m_manager;
-    bool m_nocover;
-    
-public:
-	explicit AlbumImageFetcher( const Album&, Album::ImageSize = Album::Small );
-	
-    /** if Last.fm doesn't know the album, or has no cover, this @returns false */
-    bool isValid() const;
-    
-signals:
-	/** you can init a QPixmap or QImage with this 
-      * if the image download fails, you get our default cover image 
-      * so this is guarenteed to provide an image */
-	void finished( const QByteArray& );
-	
-private slots:
-	void onGetInfoFinished( WsReply* );
-	void onImageDataDownloaded();
-    void fail();
-	
-private:
-	QString size() const
-	{
-		switch ((Album::ImageSize) m_size)
-		{
-			default:
-			case Album::Small:return"small";
-			case Album::Medium:return"medium";
-			case Album::Large:return"large";
-            case Album::ExtraLarge:return"extralarge";
-		}
-	}
-};
-
 #endif

@@ -38,9 +38,6 @@ TrackWidget::TrackWidget()
 void
 TrackWidget::setTrack( const Track& track )
 {
-    AlbumImageFetcher* f = new AlbumImageFetcher( track.album(), Album::Medium );
-    connect( f, SIGNAL(finished( QByteArray )), SLOT(onCoverDownloaded( QByteArray )) );
-
     QString title = track.title();
     QString artist = track.artist();
     QString album = track.album();
