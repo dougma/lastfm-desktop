@@ -99,7 +99,8 @@ private slots:
         m_scrobbleProgressTick = tick / 1000;
         QTime t( 0, 0 );
         t = t.addSecs( m_scrobbleProgressTick );
-        ui.time->setText( t.toString( "mm:ss" ));
+        if( tick > 0 )
+            ui.time->setText( t.toString( "mm:ss" ));
         if( m_scrobbleProgressTick > 0 )
             update();
     }

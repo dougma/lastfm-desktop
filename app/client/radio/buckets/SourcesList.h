@@ -16,37 +16,68 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef SOURCES_LIST_H
+#define SOURCES_LIST_H
 
-#ifndef MULTI_BUTTON_POPUP_H
-#define MULTI_BUTTON_POPUP_H
+#include <QListWidget>
 
-#include <QWidget>
-
-
-class CogButtonPopup : public QWidget
+class SourcesList : public QListWidget
 {
     Q_OBJECT
     
-    class QTimeLine* m_timeline;
+    friend class Sources;
     
 public:
-    CogButtonPopup( const int width, QWidget* parent );   
+    SourcesList( QWidget* parent );
     
-public slots:
-    void move( int i )
+    void refresh()
     {
-        QWidget::move( x(), parentWidget()->height() - i );
+        if( viewMode() == QListView::IconMode )
+            setGridSize( QSize( 70, 70 ) );
+        else
+            setGridSize( QSize() );
     }
 
-    void praise();
-    void curse();
-    void bye();
-
-signals:
-    void addToPlaylistClicked();
+    enum ViewMode {
+        ListMode = QListView::ListMode,
+        IconMode = QListView::IconMode,
+        CustomMode = 1000
+    };
+    
+    ViewMode sourcesViewMode()
+    {
+        if( !m_customModeEnabled )
+            return (ViewMode)QListWidget::viewMode();
+        else
+            return CustomMode;
+    }
+    
+    void setSourcesViewMode( ViewMode m );
+    
+    void addCustomWidget( QWidget* w );
+    
+protected:
+    QMimeData* mimeData( const QList<QListWidgetItem *> items ) const;
+    
+    void focusOutEvent( QFocusEvent* event )
+    {
+        clearSelection();
+        update();
+    }
+    
+private slots:
+    void onDataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight )
+    {
+        scheduleDelayedItemsLayout();
+    }
     
 private:
-    virtual void paintEvent( QPaintEvent* );
+    QMap< QModelIndex, QRect > m_itemRects;
+    QSize m_itemSizeHint;
+    bool m_customModeEnabled;
+    QWidget* m_customWidget;
+    
 };
 
-#endif
+#endif //SOURCES_LIST_H

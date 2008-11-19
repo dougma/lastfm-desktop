@@ -32,12 +32,14 @@
 #include "the/mainWindow.h"
 #include "the/radio.h"
 #include "lib/lastfm/radio/RadioStation.h"
+#include "SourcesList.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
 #include "widgets/RadioControls.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "widgets/Firehose.h"
 
 #include <phonon/volumeslider.h>
 
@@ -80,7 +82,6 @@ Sources::Sources()
         n->setRQL( station.second );
         n->setPlayableType( Seed::PreDefinedType );
         QRect textRect = QFontMetrics( n->font()).boundingRect( station.first );
-        n->setSizeHint( QSize( textRect.width() + 20 , 70));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
 
@@ -99,10 +100,39 @@ Sources::setupUi()
     layout()->setSpacing( 0 );
     
     ui.tabWidget = new Unicorn::TabWidget;
-    ui.tabWidget->bar()->setMinimumHeight( 26 );
+
+    ui.tabWidget->bar()->addWidget( ui.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ) );
+    connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
+    m_cogMenu = new QMenu( this );
+    
+    ui.actions.iconView = new QAction( tr( "Icon View"), this );
+    ui.actions.iconView->setCheckable( true );
+    ui.actions.iconView->setChecked( true );
+    
+    ui.actions.listView = new QAction( tr( "List View" ), this );
+    ui.actions.listView->setCheckable( true );
+    
+    ui.actions.firehoseView = new QAction( tr( "Firehose View" ), this );
+    ui.actions.firehoseView->setEnabled( false );
+    ui.actions.firehoseView->setCheckable( true );
+    
+    QActionGroup* aGroup = new QActionGroup( this );
+    
+    aGroup->addAction( ui.actions.iconView );
+    aGroup->addAction( ui.actions.listView );
+    aGroup->addAction( ui.actions.firehoseView );
+    
+    m_cogMenu->addAction( ui.actions.iconView );
+    m_cogMenu->addAction( ui.actions.listView );
+    m_cogMenu->addAction( ui.actions.firehoseView );
+    
+    connect( m_cogMenu, SIGNAL( triggered( QAction*)), SLOT( onCogMenuAction( QAction* )));    
+    connect( ui.tabWidget, SIGNAL( currentChanged( int )), SLOT( onTabChanged()));
+    connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
+    
     layout()->addWidget( ui.tabWidget );
     
-    ui.stationsBucket = new PrimaryListView( this );
+    ui.stationsBucket = new SourcesList( this );
     ui.stationsBucket->setAlternatingRowColors( true );
     ui.stationsBucket->setDragEnabled( true );
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -111,16 +141,19 @@ Sources::setupUi()
     ui.stationsBucket->setAlternatingRowColors( false );
     ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
     
-    ui.friendsBucket = new PrimaryListView( this );
+    ui.friendsBucket = new SourcesList( this );
     ui.friendsBucket->setAlternatingRowColors( true );
     ui.friendsBucket->setDragEnabled( true );
     ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    Firehose* hose;
+    ui.friendsBucket->addCustomWidget( hose = new Firehose );
+    hose->setStaff();
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
     ui.friendsBucket->setAlternatingRowColors( false );
     ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
     
-	ui.tagsBucket = new PrimaryListView( this );
+	ui.tagsBucket = new SourcesList( this );
     ui.tagsBucket->setAlternatingRowColors( true );
     ui.tagsBucket->setDragEnabled( true );
     ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -185,7 +218,6 @@ Sources::onUserGetFriendsReturn( WsReply* r )
         QNetworkReply* r = m_accessManager->get( QNetworkRequest( user.mediumImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
-        n->setSizeHint( QSize( 70, 70));
         n->setPlayableType( Seed::UserType );	
     }
 }
@@ -199,7 +231,6 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
-        n->setSizeHint( QSize( 70, 70));
         n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
         n->setPlayableType( Seed::TagType );
     }
@@ -209,6 +240,7 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
 void 
 Sources::onUserGetPlaylistsReturn( WsReply* r )
 {
+Q_UNUSED( r )
 #if 0 //FIXME: No RQL for playlists yet!
     QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
     foreach( CoreDomElement playlist, playlists )
@@ -237,7 +269,7 @@ Sources::onItemDoubleClicked( const QModelIndex& index )
     if( !m_connectedAmp )
         return;
     
-    PrimaryListView* itemView = dynamic_cast< PrimaryListView*>( sender() );
+    SourcesList* itemView = dynamic_cast< SourcesList*>( sender() );
     Q_ASSERT( itemView );
 
     if( !(itemView->itemFromIndex( index )->flags() & Qt::ItemIsEnabled) )
@@ -338,4 +370,81 @@ Sources::authUserIconDataDownloaded()
         
         pitem->setPixmap( pm );
     }
+}
+
+
+void 
+Sources::onContextMenuRequested( const QPoint& pos )
+{
+    m_cogMenu->move( pos );
+    m_cogMenu->show();
+}
+
+
+void 
+Sources::onCogMenuClicked()
+{
+    emit customContextMenuRequested( ui.cog->mapToGlobal( QPoint( ui.cog->geometry().width() - m_cogMenu->sizeHint().width(), ui.cog->height()) ) );
+}
+
+
+void 
+Sources::onCogMenuAction( QAction* a )
+{
+    SourcesList* listView = qobject_cast< SourcesList* >( ui.tabWidget->currentWidget() );
+    if( !listView )
+        return;
+    
+    if( a == ui.actions.listView )
+    {
+        listView->setMovement( QListView::Free );
+        listView->setFlow( QListView::TopToBottom );
+        listView->setUniformItemSizes( false );
+        listView->setAlternatingRowColors( true );
+        listView->setIconSize( QSize( 19, 42 ) );
+        listView->setSourcesViewMode( SourcesList::ListMode );
+    }
+    
+    else if( a == ui.actions.iconView )
+    {
+        listView->setSourcesViewMode( SourcesList::IconMode );
+        listView->setFlow( QListView::LeftToRight );
+        listView->setUniformItemSizes( true );
+        listView->setAlternatingRowColors( false );
+        listView->setIconSize( QSize( 36, 38 ) );
+    }    
+    
+    else if( a == ui.actions.firehoseView )
+    {
+        listView->setSourcesViewMode( SourcesList::CustomMode );
+        listView->setFlow( QListView::LeftToRight );
+        listView->setUniformItemSizes( true );
+        listView->setAlternatingRowColors( false );
+        listView->setIconSize( QSize( 36, 38 ) );
+    }
+ 
+    listView->refresh();
+}
+
+
+void 
+Sources::onTabChanged()
+{
+    SourcesList* listView = qobject_cast< SourcesList* >( ui.tabWidget->currentWidget() );
+    if( !listView )
+        return;
+    
+    if( listView == ui.friendsBucket )
+        ui.actions.firehoseView->setEnabled( true );
+    else 
+        ui.actions.firehoseView->setEnabled( false );
+
+    switch( listView->sourcesViewMode() )
+    {
+        case SourcesList::ListMode: ui.actions.listView->setChecked( true ); break;
+        case SourcesList::IconMode: ui.actions.iconView->setChecked( true ); break;
+        case SourcesList::CustomMode: ui.actions.firehoseView->setChecked( true ); break;
+        default: Q_ASSERT( !"Unimplemented viewmode - cannot set action on cog" ); break;
+    }
+        
 }

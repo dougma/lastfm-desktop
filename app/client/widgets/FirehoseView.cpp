@@ -22,8 +22,8 @@
 #include <QtGui>
 #include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
-#include "radio/buckets/Sources.h"
 #include "radio/buckets/Amp.h"
+#include "PlayableMimeData.h"
 
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            

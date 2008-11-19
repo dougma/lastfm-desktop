@@ -48,6 +48,7 @@ PlayableListItem::iconDataDownloaded()
     pixmap.loadFromData( reply->readAll() );
     
     setPixmap( pixmap );
+    const QRect textRect = listWidget()->fontMetrics().boundingRect( text() );
 }
 
 
@@ -122,7 +123,7 @@ PlayableListItem::setPixmap( const QPixmap& pm )
     //crop the avatar to a 34x34 square
     if( diff.height() > 0 || diff.width() > 0 )
     {
-        const QPixmap scaled = pm.scaled( 34, 34, Qt::KeepAspectRatioByExpanding );
+        const QPixmap scaled = pm.scaled( 34, 34, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
         const QPixmap cropped = scaled.copy( ((scaled.width() - 34) / 2), ((scaled.height() - 34) / 2), 34, 34);
         iconPm = cropped;
     }
@@ -148,10 +149,6 @@ PlayableListItem::setPixmap( const QPixmap& pm )
     
     icon.addPixmap( selectedIcon, QIcon::Selected );
     setIcon( icon );
-    setData( Qt::DecorationRole, icon);
-    
-    if( listWidget())
-        listWidget()->viewport()->update();
 }
 
 

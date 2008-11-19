@@ -30,8 +30,9 @@ Firehose::Firehose()
     setFrameStyle( QFrame::NoFrame );
     setModel( model = new FirehoseModel );
     setDelegate( new FirehoseDelegate );
-    setMinimumWidth( 250 );
 
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    
     UnicornWidget::paintItBlack( this );
     QPalette p = palette();
     p.setBrush( QPalette::Base, p.window() );

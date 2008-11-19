@@ -39,7 +39,7 @@ public:
     {
         QFont f = font();
         f.setPointSize( 10 );
-        setFont( f );   
+        setFont( f );
     }
     
 	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );

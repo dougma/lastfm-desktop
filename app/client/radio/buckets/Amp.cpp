@@ -209,8 +209,6 @@ Amp::showWidgetAnimated( QWidget* w, AnimationPosition p )
     if( w->pos().x() == 0 )
         return;
     
-    const int time = w->rect().width() * 5;
-    
     QTimeLine* tl = new QTimeLine( 500, w );
     tl->setUpdateInterval( 10 );
     switch( p )
@@ -237,8 +235,6 @@ Amp::hideWidgetAnimated( QWidget* w, AnimationPosition p )
     if( w->pos().x() > 0 || w->pos().x() < 0 )
         return;
 
-    const int time = w->rect().width() * 5;
-    
     QTimeLine* tl = new QTimeLine( 500, w );
     tl->setUpdateInterval( 10 );
     switch( p )

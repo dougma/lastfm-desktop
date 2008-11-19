@@ -58,7 +58,7 @@ protected:
             window()->move( e->globalPos() - m_mouseDownPos);
     }
     
-    void mouseReleaseEvent( QMouseEvent* e )
+    void mouseReleaseEvent( QMouseEvent* )
     {
         m_mouseDownPos = QPoint();
     }

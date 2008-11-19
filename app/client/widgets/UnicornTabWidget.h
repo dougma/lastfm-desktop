@@ -24,7 +24,7 @@
 #include <QStackedWidget>
 #include <QTabBar>
 
-
+#include <QDebug>
 namespace Unicorn
 {
     class TabBar : public QTabBar
@@ -33,13 +33,11 @@ namespace Unicorn
 
         
     public:
-        QPixmap m_active;
-        QPixmap m_inactive;
         TabBar();
         
         virtual QSize sizeHint() const;
-        
         void setSpacing( int );
+        void addWidget( QWidget* w );
         
     protected:
         virtual void mousePressEvent( QMouseEvent* );
@@ -48,11 +46,13 @@ namespace Unicorn
         virtual void tabRemoved( int );
 
         int m_spacing;
+        const QPixmap m_active;
     };
     
     
     class TabWidget : public QWidget
     {
+        Q_OBJECT
         QStackedWidget* m_stack;
         TabBar* m_bar;
         
@@ -65,6 +65,9 @@ namespace Unicorn
         QWidget* currentWidget() const { return m_stack->currentWidget(); }
         
         void setTabEnabled( int index, bool );
+
+    signals:
+        void currentChanged( int );
     };
 }
 

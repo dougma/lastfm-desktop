@@ -37,10 +37,10 @@ UnicornWidget::paintItBlack( QWidget* w )
     if (qobject_cast<QAbstractItemView*>(w))
     {
         // reinterpret cast didn't work. Lol.
-        p.setBrush( QPalette::Base, QColor( 0x2d2d2e ) );
+        p.setBrush( QPalette::Base, QColor( 0x0e0e0e ) );
         p.setBrush( QPalette::Text, Qt::white );
         p.setBrush( QPalette::Disabled, QPalette::Text, Qt::darkGray );
-        p.setBrush( QPalette::AlternateBase, QColor( 39, 38, 38 ) );
+        p.setBrush( QPalette::AlternateBase, QColor( 12, 12, 12 ) );
     }
     
     if (qobject_cast<QTextEdit*>(w))

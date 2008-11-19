@@ -28,6 +28,7 @@ namespace Unicorn{ class TabWidget; }
 class Sources : public QWidget
 {
 	Q_OBJECT
+
 public:
 	Sources();
     
@@ -35,12 +36,18 @@ public:
 
 	struct {
 		class Unicorn::TabWidget* tabWidget;
-        class PrimaryListView* stationsBucket;
-		class PrimaryListView* friendsBucket;
-		class PrimaryListView* tagsBucket;
+        class SourcesList* stationsBucket;
+		class SourcesList* friendsBucket;
+		class SourcesList* tagsBucket;
         class RadioControls* controls;
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;
+        class ImageButton* cog;
+        struct {
+            class QAction* iconView;
+            class QAction* listView;
+            class QAction* firehoseView;
+        } actions;
 	} ui;
     
     void connectToAmp( class Amp* amp );
@@ -53,6 +60,7 @@ public:
 protected:
     class WsAccessManager* m_accessManager;
     class Amp* m_connectedAmp;
+    class QMenu* m_cogMenu;
 	
 protected slots:
     void onAmpSeedRemoved( QString, Seed::Type );
@@ -69,57 +77,11 @@ protected slots:
     
     void onAmpDestroyed(){ m_connectedAmp = 0; }
 
-};
+    void onContextMenuRequested( const QPoint& pos );
+    void onCogMenuClicked();
+    void onCogMenuAction( QAction* );
+    void onTabChanged();
 
-
-#include <QMouseEvent>
-#include <QModelIndex>
-#include <QListWidget>
-#include "PlayableListItem.h"
-#include "PlayableMimeData.h"
-#include <QDebug>
-
-class PrimaryListView : public QListWidget
-{
-    Q_OBJECT
-    
-    friend class Sources;
-public:
-	PrimaryListView( QWidget* parent ): QListWidget( parent )
-    {
-        setViewMode( QListView::IconMode );
-        setFlow( QListView::LeftToRight );
-        setResizeMode( QListView::Adjust );
-        setIconSize( QSize( 36, 38 ) );
-        setUniformItemSizes( true );
-        setDragDropMode( QAbstractItemView::DragOnly );
-        model()->setSupportedDragActions( Qt::CopyAction );
-    }
-    
-protected:
-    QMimeData* mimeData( const QList<QListWidgetItem *> items ) const
-    {
-        if( items.isEmpty() )
-            return 0;
-
-        PlayableListItem* item = dynamic_cast<PlayableListItem*>( items.first() );
-        
-        PlayableMimeData* data = new PlayableMimeData;
-        data->setType( item->playableType() );
-        data->setText( item->text() );
-        data->setImageData( item->icon().pixmap(iconSize()).toImage() );
-        
-        if( item->playableType() == Seed::PreDefinedType )
-            data->setRQL( item->rql() );
-        return data;
-    }
-    
-    void focusOutEvent( QFocusEvent* event )
-    {
-        clearSelection();
-        QListWidget::focusOutEvent( event );
-    }
-	
 };
 
 #endif //SOURCES_H

@@ -101,7 +101,7 @@ TrackDashboardHeader::TrackDashboardHeader()
     layout()->setMargin( 0 );
     layout()->setSpacing( 10 );
     
-    connect( ui.cog, SIGNAL(clicked()), SLOT(onCogMenuClicked()) );
+    connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
     connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
 
     setAutoFillBackground( true );
@@ -205,8 +205,8 @@ void
 TrackDashboardHeader::onCurseClientTeam()
 {
     QUrl url;
-    if (Ws::Username == "jonocole")
-        url = "http://oops.last.fm/talk/Jono is teh ghae";
+    if (Ws::Username == "mxcl")
+        url = "http://oops.last.fm/talk/mxcl is teh ghae";
     else
         url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
 
