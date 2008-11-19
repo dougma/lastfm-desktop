@@ -36,7 +36,7 @@ class ChainableQuery : public QSqlQuery
 public:
     ChainableQuery(QSqlDatabase db);
     ChainableQuery prepare(const QString& sql);
-    ChainableQuery bindValue(const QString& sql, const QVariant& v);
+    ChainableQuery bindValue(const QString& name, const QVariant& value);
     ChainableQuery setForwardOnly(bool forward);
     QSqlQuery exec();
 };

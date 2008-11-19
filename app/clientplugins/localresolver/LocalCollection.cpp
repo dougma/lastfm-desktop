@@ -78,6 +78,7 @@ LocalCollection::versionCheck()
         foreach ( QString table, m_db.tables() ) {
             query( "DROP TABLE " + table );
         }
+        initDatabase();
     }
 }
 
@@ -90,9 +91,7 @@ LocalCollection::initDatabase()
     }
     m_db.open();
 
-    versionCheck();
-
-    if ( !m_db.tables().contains( "files" ) ) {
+    if ( !m_db.tables().contains( "metadata" ) ) {
         query( "CREATE TABLE files ("
                     "id                INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "directory         INTEGER NOT NULL,"
@@ -127,7 +126,7 @@ LocalCollection::initDatabase()
         query( "CREATE TABLE tags ("
                     "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
                     "name               TEXT UNIQUE NOT NULL );" );
-        query( "CREATE INDEX tags_name_idx ( name );" );
+        query( "CREATE INDEX tags_name_idx ON tags ( name );" );
 
         // file has tag with weight, and source indicates user tag or dl'd tag
         query( "CREATE TABLE tracktags ("
@@ -141,7 +140,7 @@ LocalCollection::initDatabase()
                     "source      INTEGER,"          // sources foreign key
                     "path        TEXT NON NULL );" );
 
-        query( "CREATE INDEX UNIQUE directories_path_idx ON directories ( path );" );
+        query( "CREATE INDEX directories_path_idx ON directories ( path );" );
 
         query( "CREATE TABLE sources ("
                     "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -165,14 +164,16 @@ LocalCollection::initDatabase()
 
         query( "INSERT INTO metadata (key, value) VALUES ('version', '" LOCAL_COLLECTION_SCHEMA_VERSION_STR "');" );
     }
-    
+
+    versionCheck();
+
     addUserFuncs(m_db);
 }
 
 int
 LocalCollection::version() const 
 {   
-    QSqlQuery q = query( "SELECT value FROM metadata WHERE key='version';" );
+    QSqlQuery q = query( "SELECT value FROM metadata WHERE key='version'" );
     if ( q.next() ) {
         bool ok = false;
         int version = q.value( 0 ).toInt( &ok );

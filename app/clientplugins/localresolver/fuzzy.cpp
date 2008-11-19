@@ -126,7 +126,7 @@ user_levenshtein16(sqlite3_context* ctx, int argc, sqlite3_value** argv)
 }
 
 
-int 
+bool 
 addUserFuncs_sqlite(sqlite3* handle)
 {
     int r1 = sqlite3_create_function(
@@ -149,7 +149,7 @@ addUserFuncs_sqlite(sqlite3* handle)
         NULL,                   // xStep (for aggregate func)
         NULL);                  // xFinal (for aggregate func)
 
-    return r1 | r2;
+    return (SQLITE_OK == r1) || (SQLITE_OK == r2);
 }
 
 
@@ -159,13 +159,19 @@ addUserFuncs(QSqlDatabase db)
     // now we want to start calling sqlite3 directly.
     // does the header we used when building match 
     // the version of the loaded library?
-    int loadedVersion = sqlite3_libversion_number();
-    if (loadedVersion != SQLITE_VERSION_NUMBER) {
-        QString error = QObject::tr("sqlite3 loaded version %1 does not match %2")
-            .arg(loadedVersion)
-            .arg(SQLITE_VERSION_NUMBER);
-        throw QSqlError(error);
-    }
+
+    // todo: i don't think really need to do this.
+
+    //int loadedVersion = sqlite3_libversion_number();
+    //if (loadedVersion != SQLITE_VERSION_NUMBER) {
+    //    QString error = QObject::tr("sqlite3 loaded version %1 does not match %2")
+    //        .arg(loadedVersion)
+    //        .arg(SQLITE_VERSION_NUMBER);
+    //    throw QSqlError(error);
+    //}
+
+    // todo: rather, we want to check that qt's sqlite driver is using the "system"
+    // sqlite dll, because we are too.
 
     QString driver = db.driverName();
     QVariant v = db.driver()->handle();

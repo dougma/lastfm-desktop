@@ -36,9 +36,9 @@ ChainableQuery::prepare(const QString& sql)
 }
 
 ChainableQuery 
-ChainableQuery::bindValue(const QString& sql, const QVariant& v)
+ChainableQuery::bindValue(const QString& name, const QVariant& value)
 {
-    QSqlQuery::bindValue(sql, v);
+    QSqlQuery::bindValue(name, value);
     return *this;
 }
 
