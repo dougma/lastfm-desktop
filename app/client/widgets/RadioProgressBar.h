@@ -29,6 +29,7 @@
 #include "widgets/UnicornWidget.h"
 #include "the/radio.h"
 
+
 class RadioProgressBar : public QWidget
 {
     Q_OBJECT
@@ -60,10 +61,15 @@ public:
         connect( qApp, SIGNAL( trackSpooled(const Track&, StopWatch* )), this, SLOT( onTrackSpooled( const Track&, StopWatch*)) );
         connect( &The::radio(), SIGNAL(tick(qint64)), this, SLOT( onRadioTick(qint64)));
 
+        onTrackSpooled( Track(), 0 );
     }
     
     void paintEvent( QPaintEvent* e )
     {
+        // not a great check for "nothing playing" but works as the code is currently --mxcl
+        if (ui.timeToGo->isHidden())
+            return;
+        
         uint const progressHeight = 10;
         uint const vOffset = (height() / 2) - ( progressHeight / 2 );
         
