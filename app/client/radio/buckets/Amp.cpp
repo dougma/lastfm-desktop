@@ -191,6 +191,16 @@ Amp::resizeEvent( QResizeEvent* event )
     window.setColorAt( 1, 0x161616 );
     p.setBrush( QPalette::Window, window );
     setPalette( p );
+    
+    if( event->size().width() == event->oldSize().width() )
+        return;
+    
+    if( ui.bucket->count() == 0 )
+    {
+        ui.controls->move( -ui.controls->rect().width(), 0);
+        ui.volume->move( ui.volume->rect().width(), 0);
+    }
+        
 }
 
 

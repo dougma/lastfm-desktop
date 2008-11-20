@@ -48,6 +48,11 @@ else {
                app/clientplugins/localresolver/libresolver.pro
 
 	# make the app client the default project in visual studio
+    
+    win32 {
+        RC_FILE = app/client/win/client.rc
+    }
+
 	debug:win32 {
 		SUBDIRS -= app/client
 		SUBDIRS = app/client $$SUBDIRS
