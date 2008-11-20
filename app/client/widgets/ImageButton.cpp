@@ -91,7 +91,6 @@ ImageButton::paintEvent( QPaintEvent* event )
     }
     
     icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
-    p.setPen( Qt::green );
 }
 
 

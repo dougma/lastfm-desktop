@@ -39,7 +39,7 @@ struct BorderedContainer : public QWidget
     BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
     { 
         (new QHBoxLayout( this ))->setContentsMargins( 1, 1, 1, 1 );
-        setAutoFillBackground( true ); 
+        setAutoFillBackground( false ); 
         QPalette p = palette();
         p.setBrush( QPalette::Text, QBrush( 0x777777));
         setPalette( p );
