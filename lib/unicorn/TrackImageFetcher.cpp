@@ -38,19 +38,6 @@ TrackImageFetcher::start()
 
 
 void
-TrackImageFetcher::artistGetInfo()
-{
-    if (!artist().isNull())
-    {
-        WsReply* reply = artist().getInfo();
-        connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAlbumGotInfo( WsReply* )) );
-    }
-    else
-        fail();
-}
-
-
-void
 TrackImageFetcher::onAlbumGotInfo( WsReply* reply )
 {
 	if (!downloadImage( reply, "album" ))
@@ -72,9 +59,44 @@ TrackImageFetcher::onAlbumImageDownloaded()
 }
 
 
+void
+TrackImageFetcher::artistGetInfo()
+{
+    if (!artist().isNull())
+    {
+        WsReply* reply = artist().getInfo();
+        connect( reply, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
+    }
+    else
+        fail();
+}
+
+
+void
+TrackImageFetcher::onArtistGotInfo( WsReply* reply )
+{
+    if (!downloadImage( reply, "artist" ))
+        fail();
+}
+
+
+void
+TrackImageFetcher::onArtistImageDownloaded()
+{
+    QImage i;
+    i.loadFromData( ((QNetworkReply*)sender())->readAll() );
+    if (!i.isNull())
+        emit finished( i );
+    else
+        fail();
+    
+    sender()->deleteLater(); //always deleteLater from slots connected to sender()
+}
+
+
 bool
 TrackImageFetcher::downloadImage( WsReply* reply, const QString& root_node )
-{
+{    
     if (reply->failed())
         return false;
     
@@ -98,28 +120,6 @@ TrackImageFetcher::downloadImage( WsReply* reply, const QString& root_node )
     }
     
     return false;
-}
-
-
-void
-TrackImageFetcher::onArtistGotInfo( WsReply* reply )
-{
-    if (!downloadImage( reply, "album" ))
-        fail();
-}
-
-
-void
-TrackImageFetcher::onArtistImageDownloaded()
-{
-    QImage i;
-    i.loadFromData( ((QNetworkReply*)sender())->readAll() );
-    if (!i.isNull())
-        emit finished( i );
-    else
-        fail();
-    
-    sender()->deleteLater(); //always deleteLater from slots connected to sender()
 }
 
 

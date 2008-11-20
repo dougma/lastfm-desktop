@@ -47,7 +47,7 @@ public:
             : m_track( t )
             , nam( n )
     {}
-    
+
     void start();
 
 signals:
