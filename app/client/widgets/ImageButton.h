@@ -29,39 +29,29 @@
 class ImageButton : public QAbstractButton
 {
 	Q_OBJECT
+    
+    void init( const QPixmap& );
 	
 public:
-    ImageButton( QWidget* parent = 0 );
-	ImageButton( const QString& path, QWidget* parent = 0 );
-
+    /** this pixmap becomes the rest state pixmap and defines the size of the eventual widget */
+    explicit ImageButton( const QPixmap& pixmap, QWidget* parent = 0 );
+    explicit ImageButton( const QString& pixmap_path, QWidget* parent = 0 );
+    
 	void setAction( class QAction* );
-    
-	virtual void paintEvent ( QPaintEvent* event );
-	
-	virtual QSize sizeHint() const;
-    
-    void setPixmap( const QPixmap&, const QIcon::State = QIcon::Off );
-    void setPixmap( const QPixmap&, const QIcon::Mode m );
-    void setPixmap( const QPixmap&, const QIcon::State, const QIcon::Mode );
-    
-	inline void setPixmap( const QString& s, const QIcon::State st = QIcon::Off ){ setPixmap( QPixmap( s ), st );  }
-    inline void setPixmap( const QString& s, const QIcon::Mode m ){ setPixmap( QPixmap( s ), m ); }
-    inline void setPixmap( const QString& s, const QIcon::State st, const QIcon::Mode m ){ setPixmap( QPixmap( s ), st, m ); }
-
-	void setBackgroundPixmap( const QString&, const QIcon::Mode = QIcon::Normal );
+    void setPixmap( const QPixmap&, const QIcon::State = QIcon::Off, QIcon::Mode = QIcon::Normal );
 	void moveIcon( int x, int y, QIcon::Mode = QIcon::Normal );
     
+	virtual QSize sizeHint() const { return m_sizeHint; }    
+    
+protected:
+	virtual void paintEvent( QPaintEvent* event );
+    
 private:
-	QIcon m_backgroundIcon;
+    QSize m_sizeHint;
 	QMap< QIcon::Mode, QPoint > m_iconOffsets;
-	
-    void setIconSize( const QSize& s )
-    {
-        setProperty( "iconSize", s );
-    }    
     
 private slots:
-	void actionChanged();
+	void onActionChanged( QAction* = 0 );
 };
 
 #endif //IMAGE_BUTTON_H

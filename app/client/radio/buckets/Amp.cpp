@@ -34,34 +34,45 @@
 #include <QPainter>
 #include <QTimeLine>
 
-Amp::Amp( QWidget* p )
-    :QWidget( p )
+
+Amp::Amp()
 {
     setupUi();
-    connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
-    
     onPlayerBucketChanged();
-    
 }
 
 
 void 
 Amp::setupUi()
 {
-    setAutoFillBackground( true );
-    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
     new QHBoxLayout( this );
     
-    layout()->setSpacing( 5 );
-    layout()->setContentsMargins( 5, 6, 5, 5 );
-
+    layout()->setSpacing( 13 );
+    layout()->setContentsMargins( 11, 9, 12, 11 );
     
+    {
+        QVBoxLayout* v = new QVBoxLayout;
+        v->addStretch();
+        v->addWidget( ui.dashboardButton = new ImageButton( QPixmap(":/Amp/button/dashboard/rest.png") ) );
+        v->addWidget( ui.bucketsButton = new ImageButton( QPixmap(":/Amp/button/buckets/rest.png") ) );
+        v->addStretch();
+        v->setMargin( 0 );
+        v->setSpacing( 0 );
+        ((QBoxLayout*)layout())->addLayout( v );
+        
+        QPixmap p1( ":/Amp/button/buckets/checked.png" );
+        QPixmap p2( ":/Amp/button/dashboard/checked.png" );
+        ui.bucketsButton->setPixmap( p1, QIcon::On );
+        ui.dashboardButton->setPixmap( p2, QIcon::On );
+        ui.bucketsButton->setPixmap( p1, QIcon::Off, QIcon::Active );
+        ui.dashboardButton->setPixmap( p2, QIcon::Off, QIcon::Active );
+    }
+
     struct BorderedContainer : public QWidget
     {
         BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
         { 
-            setLayout( new QHBoxLayout ); 
-            layout()->setContentsMargins( 1, 1, 1, 1 ); 
+            (new QHBoxLayout( this ))->setContentsMargins( 1, 1, 1, 1 );
             setAutoFillBackground( false ); 
         }
         
@@ -75,7 +86,7 @@ Amp::setupUi()
             p.setBrush( palette().brush( QPalette::Window ));
             p.drawRoundedRect( rect(), 6, 6 );
             p.setPen( QPen( palette().brush( QPalette::Shadow ), 0));
-            p.drawRoundedRect( rect().adjusted( 0.9, 0.9, -0.9, -0.75), 6, 6);
+            p.drawRoundedRect( rect(), 6, 6 );
         }
         
         void resizeEvent( QResizeEvent* e )
@@ -97,7 +108,6 @@ Amp::setupUi()
         
     };
     
-    QWidget* bucketLayoutWidget = new QWidget( this );
     BorderedContainer* bc = new BorderedContainer( this );
     
     {
@@ -124,7 +134,6 @@ Amp::setupUi()
     ((QBoxLayout*)bc->layout())->insertWidget( 1, ui.bucket = new PlayerBucketList( bc ));
     layout()->addWidget( bc );
         
-    layout()->addWidget( bucketLayoutWidget );
     connect( ui.bucket, SIGNAL( itemAdded( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
 
@@ -137,8 +146,8 @@ Amp::setupUi()
     connect( ui.controls, SIGNAL( stop()), &The::radio(), SLOT( stop()));
     connect( ui.controls, SIGNAL( play()), ui.bucket, SLOT( play()));
 
-    setMinimumWidth( 456 );
     setFixedHeight( 86 );
+    setAutoFillBackground( true );
 }
 
 

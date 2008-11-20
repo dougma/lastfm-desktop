@@ -30,6 +30,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 
+
 RadioControls::RadioControls()
 {
     QHBoxLayout* h = new QHBoxLayout( this );
@@ -37,16 +38,16 @@ RadioControls::RadioControls()
     h->setSpacing( 5 );
     
     h->addWidget( ui.play = new ImageButton( ":/RadioControls/play/rest.png" ) );
-    ui.play->setPixmap( ":/RadioControls/play/onpress.png", QIcon::Active );
+    ui.play->setPixmap( QPixmap(":/RadioControls/play/onpress.png"), QIcon::Off, QIcon::Active );
     
-    ui.play->setPixmap( ":/RadioControls/stop/rest.png", QIcon::On );
-    ui.play->setPixmap( ":/RadioControls/stop/onpress.png", QIcon::On, QIcon::Active );
+    ui.play->setPixmap( QPixmap(":/RadioControls/stop/rest.png"), QIcon::On );
+    ui.play->setPixmap( QPixmap(":/RadioControls/stop/onpress.png"), QIcon::On, QIcon::Active );
     ui.play->setCheckable( true );
     ui.play->setChecked( false );
     
     h->addWidget( ui.skip = new ImageButton( ":/RadioControls/skip/rest.png" ) );
 
-    ui.skip->setPixmap( ":/RadioControls/skip/onpress.png", QIcon::Active );
+    ui.skip->setPixmap( QPixmap(":/RadioControls/skip/onpress.png"), QIcon::Off, QIcon::Active );
     ui.play->setCheckable( true );
     ui.play->setChecked( false );
 

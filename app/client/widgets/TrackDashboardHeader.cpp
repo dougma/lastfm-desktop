@@ -94,7 +94,7 @@ TrackDashboardHeader::TrackDashboardHeader()
     
     ui.ban->moveIcon( 0, 1, QIcon::Active );
     ui.love->moveIcon( 0, 1, QIcon::Active );
-    ui.love->setPixmap( ":/MainWindow/button/love/checked.png", QIcon::On );
+    ui.love->setPixmap( QPixmap(":/MainWindow/button/love/checked.png"), QIcon::On );
     ui.love->setCheckable( true );
     
     setContentsMargins( 6, 0, 10, 0 );
@@ -105,7 +105,7 @@ TrackDashboardHeader::TrackDashboardHeader()
     connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
 
     setAutoFillBackground( true );
-    setFixedHeight( 39 );
+    setFixedHeight( 38 );
     
     connect( qApp, SIGNAL( trackSpooled( const Track&, StopWatch* )), SLOT( onTrackSpooled( const Track&, StopWatch* )));
 
@@ -128,23 +128,22 @@ void
 TrackDashboardHeader::paintEvent( QPaintEvent* e )
 {
     QWidget::paintEvent( e );
-    QPainter p( this );
-    p.setPen( QColor( 0, 0, 0 ));
-    p.drawLine( rect().translated( 0, -1 ).bottomLeft(), rect().translated( 0, -1 ).bottomRight());
-    p.setPen( QColor( 0x1a1a1a) );
-    p.drawLine( rect().bottomLeft(), rect().bottomRight());
     
+    QPainter p( this );
+    p.setPen( Qt::black );
+    p.drawLine( 0, height()-1, width(), height()-1 );
 }
 
 
 void 
 TrackDashboardHeader::resizeEvent( QResizeEvent* e )
 {
-    QLinearGradient lg( 0, 0, 0, e->size().height());
+    QLinearGradient lg( 0, 0, 0, e->size().height() );
     lg.setColorAt( 0, 0x3a3a3a );
-    lg.setColorAt( 0.42, 0x191919 );
-    lg.setColorAt( 0.45, 0x0b0b0b );
+    lg.setColorAt( 0.45, 0x191919 );
+    lg.setColorAt( 0.48, 0x0b0b0b );
     lg.setColorAt( 1, 0x0b0b0b );
+    
     QPalette p = palette();
     p.setBrush( QPalette::Window, lg );
     setPalette( p );

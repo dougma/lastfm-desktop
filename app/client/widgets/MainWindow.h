@@ -34,13 +34,24 @@ class DiagnosticsDialog;
 class PlaylistDialog;
 
 
-class MainWindow : public QMainWindow
+/** ok it's private, that's insane yeah? Yeah. But this is a global singleton
+  * and I had a bug where some stupid insignificant class was manipulating the size
+  * of the window! And I spent ages tracing it. So now only a small amount of stuff
+  * is public, add what you need, but be conservative! */
+class MainWindow : private QMainWindow
 {
     Q_OBJECT
+    
+    friend class App;
 
 public:
     MainWindow();
     ~MainWindow();
+    
+    using QMainWindow::move;
+    using QMainWindow::show;
+    using QMainWindow::raise;
+    using QMainWindow::setWindowTitle;
     
 	struct Ui : ::Ui::MainWindow
 	{
@@ -48,9 +59,7 @@ public:
         class Sources* sources;
         class TrackDashboardHeader* dashboardHeader;
         class TrackDashboard* dashboard;
-        class ImageButton* cog;
         class MessageBar* messagebar;
-        class Firehose* firehose;
     } ui;
 
 protected:
@@ -66,6 +75,9 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showPlaylistDialog();
+    
+    // true = open it up
+    void animate( bool = true );
 
 signals:
 	void loved();
@@ -79,13 +91,14 @@ private slots:
     
 private:
     void setupUi();
-    void setupInfoWidget();
     
     /** add this widget as a drag handle to move the window */
     void addDragHandleWidget( QWidget* );
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
+    virtual void resizeEvent( QResizeEvent* );
+    virtual QSize sizeHint() const;
     
     Track m_track;
     
@@ -96,6 +109,14 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
+
+    bool m_animatingDashboard;
+    bool m_animatingSources;
+    bool m_animating;
+
+private slots:    
+    void onAnimateFrame( int );
+    void onAnimationFinished();
 };
 
 #endif //MAINWINDOW_H

@@ -28,34 +28,42 @@
 #include <QDebug>
 
 
-ImageButton::ImageButton( QWidget* parent )
+ImageButton::ImageButton( const QPixmap& rest, QWidget* parent )
            : QAbstractButton( parent )
 {
-    resize( 0, 0 );
+    init( rest );
 }
 
 
 ImageButton::ImageButton( const QString& path, QWidget* parent )
-            : QAbstractButton( parent )
-{   
-    resize( 0, 0 );
-    setPixmap( path );
-    
-    QPixmap disabled( path.left( path.length() - 6 ) + "disabled.png" );
-    if (!disabled.isNull())
-    {
-        setPixmap( disabled, QIcon::Disabled );
-    }
+           : QAbstractButton( parent )
+{
+    init( QPixmap( path ) );
+}
+
+
+void
+ImageButton::init( const QPixmap& p )
+{
+    setPixmap( p );
+    m_sizeHint = p.size();
 }
 
 
 void
 ImageButton::setAction( QAction* action )
 {
-    connect( this, SIGNAL(clicked()), action, SLOT(trigger()) );
-    connect( action, SIGNAL(changed()), SLOT( actionChanged()) );
-    setEnabled( action->isEnabled() );
-    setChecked( action->isChecked() );
+    const bool b = action->isCheckable();
+    setCheckable( b );
+    
+    // only do one or the other or you trigger it all twice
+    if (b)
+        connect( this, SIGNAL(toggled( bool )), action, SLOT(setChecked( bool )) );
+    else
+        connect( this, SIGNAL(clicked()), action, SLOT(trigger()) );
+
+    connect( action, SIGNAL(changed()), SLOT(onActionChanged()) );
+    onActionChanged( action );
 }
 
 
@@ -63,16 +71,17 @@ void
 ImageButton::paintEvent( QPaintEvent* event )
 {
     QPainter p( this );
-    
-    QIcon::Mode mode = isEnabled() ? QIcon::Normal : QIcon::Disabled;
-    if( isDown() )
-        mode = QIcon::Active;
-    
-    QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
-    
     p.setClipRect( event->rect() );
     
-    m_backgroundIcon.paint( &p, rect(), Qt::AlignCenter, mode, state );
+    QIcon::Mode mode = isDown()
+        ? QIcon::Active
+        : isEnabled() 
+            ? QIcon::Normal 
+            : QIcon::Disabled;
+    
+    QIcon::State state = isChecked()
+        ? QIcon::On 
+        : QIcon::Off;
     
     QRect iconRect = rect();
     if( m_iconOffsets.contains( mode ) )
@@ -82,68 +91,15 @@ ImageButton::paintEvent( QPaintEvent* event )
     }
     
     icon().paint( &p, iconRect, Qt::AlignCenter, mode, state );
-    
-}
-
-
-QSize
-ImageButton::sizeHint() const
-{
-    return size();
 }
 
 
 void
-ImageButton::setPixmap( const QPixmap& p, const QIcon::State st )
-{
-    
-    resize( p.size().expandedTo( size()) );
-    
-    setIconSize( p.size().expandedTo( iconSize() ) );
-    
+ImageButton::setPixmap( const QPixmap& p, const QIcon::State state, const QIcon::Mode mode )
+{      
     QIcon i = icon();
-    i.addPixmap( p, QIcon::Normal, st );
+    i.addPixmap( p, mode, state );
     setIcon( i );
-}
-
-
-void 
-ImageButton::setPixmap( const QPixmap& p, const QIcon::Mode m )
-{
-    
-    resize( p.size().expandedTo( size()) );
-    
-    setIconSize( p.size().expandedTo( iconSize() ) );
-    
-    QIcon i = icon();
-    i.addPixmap( p, m );
-    setIcon( i );
-}
-
-
-void 
-ImageButton::setPixmap( const QPixmap& p, const QIcon::State s, const QIcon::Mode m )
-{
-    
-    resize( p.size().expandedTo( size()) );
-    
-    setIconSize( p.size().expandedTo( iconSize() ) );
-    
-    QIcon i = icon();
-    i.addPixmap( p, m, s );
-    setIcon( i );
-}
-
-
-void
-ImageButton::setBackgroundPixmap( const QString& path, const QIcon::Mode m )
-{
-    QPixmap p( path );
-    
-    resize( p.size().expandedTo( size()) );
-    
-    setIconSize( p.size().expandedTo( iconSize() ) );
-    m_backgroundIcon.addPixmap( p, m );
 }
 
 
@@ -155,9 +111,9 @@ ImageButton::moveIcon( int x, int y, QIcon::Mode m )
 
 
 void
-ImageButton::actionChanged()
+ImageButton::onActionChanged( QAction* action )
 {
-    QAction* action = static_cast<QAction*>(sender());
+    if (!action) action = (QAction*) sender();
     setEnabled( action->isEnabled());
     setChecked( action->isChecked());
 }

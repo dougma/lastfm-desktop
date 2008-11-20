@@ -374,10 +374,15 @@ TrackDashboard::event( QEvent* e )
 void
 TrackDashboard::paintEvent( QPaintEvent* e )
 {
+    QPainter p( this );
+    p.setPen( QColor( 0x161616 ) );
+    p.drawLine( 0, 0, width(), 0 );
+    p.setPen( QColor( 0x101010 ) );    
+    p.drawLine( 0, 1, width(), 1 );
+    
     if (!m_track.isNull())
         return;
     
-    QPainter p( this );
     p.setClipRect( e->rect() );
     p.setRenderHint( QPainter::Antialiasing );
     p.setRenderHint( QPainter::SmoothPixmapTransform );

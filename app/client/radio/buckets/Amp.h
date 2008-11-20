@@ -24,46 +24,47 @@
 #include "SeedTypes.h"
 #include "lib/lastfm/types/Track.h"
 #include "widgets/UnicornWidget.h"
-
 #include <QMouseEvent>
-#include "the/MainWindow.h"
+
+
 class Amp : public QWidget
 {
     Q_OBJECT
+
 public:
-    Amp( QWidget* parent = 0 );
+    Amp();
     
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );
     
-    void paintEvent( QPaintEvent* );
+    QSize sizeHint() const { return QSize( 300, 86 ); }
 
-    
-signals:
-    void itemRemoved( QString, Seed::Type );
-
-protected:
-    
     struct {
         class PlayerBucketList* bucket;
         class RadioControls* controls;
         class UnicornVolumeSlider* volume;
+        class ImageButton* bucketsButton;
+        class ImageButton* dashboardButton;
     } ui;
-    
-    void resizeEvent( QResizeEvent* );
-    void setupUi();
+
+signals:
+    void itemRemoved( QString, Seed::Type );
+
+protected:
+    virtual void paintEvent( QPaintEvent* );   
+    virtual void resizeEvent( QResizeEvent* );
     
     enum AnimationPosition { Left = 0, Right };
     
     void showWidgetAnimated( QWidget* w, AnimationPosition );
     void hideWidgetAnimated( QWidget* w, AnimationPosition );
-    
-    QSize sizeHint() const{ return QSize( 0, 86 ); }
-  
+
 protected slots:
     void onPlayerBucketChanged();
     void onWidgetAnimationFrameChanged( int );
     
+private:
+    void setupUi();
 };
 
-#endif //AMP_H
+#endif

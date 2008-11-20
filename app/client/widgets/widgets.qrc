@@ -14,20 +14,10 @@
     <file>DockWindow/splitter/knob.png</file>
   </qresource>
   <qresource>
-    <file>BottomBar/button/left/down.png</file>
-    <file>BottomBar/button/left/up.png</file>
-    <file>BottomBar/button/middle/down.png</file>
-    <file>BottomBar/button/middle/up.png</file>
-    <file>BottomBar/button/right/down.png</file>
-    <file>BottomBar/button/right/up.png</file>
-    <file>BottomBar/icon/friends/on.png</file>
-    <file>BottomBar/icon/friends/off.png</file>
-    <file>BottomBar/icon/info/on.png</file>
-    <file>BottomBar/icon/info/off.png</file>
-    <file>BottomBar/icon/library/on.png</file>
-    <file>BottomBar/icon/library/off.png</file>
-    <file>BottomBar/icon/radio/on.png</file>
-    <file>BottomBar/icon/radio/off.png</file>
+    <file>Amp/button/buckets/checked.png</file>
+    <file>Amp/button/buckets/rest.png</file>
+    <file>Amp/button/dashboard/checked.png</file>
+    <file>Amp/button/dashboard/rest.png</file>
   </qresource>
   <qresource>
       <file>SettingsDialog/account.png</file>
@@ -45,14 +35,8 @@
       <file>RadioControls/volume/icon.png</file>
       <file>RadioControls/volume/rail.png</file>
       <file>RadioControls/volume/handle.png</file>
-  </qresource>
-  <qresource>
       <file>RadioControls/stop/rest.png</file>
-  </qresource>
-  <qresource>
       <file>RadioControls/play/rest.png</file>
-  </qresource>
-  <qresource>
       <file>RadioControls/skip/rest.png</file>
   </qresource>
 </RCC>
