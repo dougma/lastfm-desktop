@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "SeedDelegate.h"
+#include "SeedTypes.h"
 
 SeedDelegate::SeedDelegate( QObject* parent )
              :QAbstractItemDelegate( parent )
@@ -36,8 +37,9 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     int flashValue = index.data( moose::HighlightRole ).isValid() ? index.data( moose::HighlightRole ).toInt() : 0;
 
-    QRect iconRect = option.rect; //.adjusted( 1, 1, -1, -3 ); //allow margin between avatar and overlay
-    iconRect.setHeight( icon.actualSize( iconRect.size() ).height() );
+    QRect iconRect = option.rect;
+    iconRect.setSize( icon.actualSize( iconRect.size()));
+    iconRect.translate( -(iconRect.width() - option.rect.width())/2, 0);
     
     QRect overlayRect = iconRect.adjusted( 1, 1, -1, -3 );
     
@@ -45,11 +47,10 @@ SeedDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, cons
     
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
     
-    //FIXME: why isn't the icon painting at 64x64? - this works around it 
-    //       for now but the avatar is slightly blurry.
     icon.paint( painter, iconRect);
     
-    if( option.state & QStyle::State_Selected )
+    if( option.state & QStyle::State_Selected &&
+        index.data( moose::TypeRole ) != Seed::TagType)
     {
         painter->drawPixmap( overlayRect, m_selectedOverlay );
     }

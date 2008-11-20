@@ -43,25 +43,8 @@ public:
     } ui;
     
 protected:
-    void paintEvent( QPaintEvent* e );    
+    void paintEvent( QPaintEvent* e );
     void resizeEvent( QResizeEvent* e );
-
-    QPoint m_mouseDownPos;
-    void mousePressEvent( QMouseEvent* e )
-    {
-        m_mouseDownPos = e->globalPos() - window()->pos();
-    }
-    
-    void mouseMoveEvent( QMouseEvent* e )
-    {
-        if( !m_mouseDownPos.isNull())
-            window()->move( e->globalPos() - m_mouseDownPos);
-    }
-    
-    void mouseReleaseEvent( QMouseEvent* )
-    {
-        m_mouseDownPos = QPoint();
-    }
     
 private slots:
     void onTrackSpooled( const class Track&, class StopWatch* );

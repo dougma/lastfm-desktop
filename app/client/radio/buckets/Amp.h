@@ -53,24 +53,6 @@ protected:
     void resizeEvent( QResizeEvent* );
     void setupUi();
     
-    QPoint m_mouseDownPos;
-    void mousePressEvent( QMouseEvent* e )
-    {
-        m_mouseDownPos = e->globalPos() - The::mainWindow().pos();
-    }
-    
-    void mouseMoveEvent( QMouseEvent* e )
-    {
-        if( !m_mouseDownPos.isNull())
-            The::mainWindow().move( e->globalPos() 
-                                    - m_mouseDownPos);
-    }
-    
-    void mouseReleaseEvent( QMouseEvent* )
-    {
-        m_mouseDownPos = QPoint();
-    }
-    
     enum AnimationPosition { Left = 0, Right };
     
     void showWidgetAnimated( QWidget* w, AnimationPosition );

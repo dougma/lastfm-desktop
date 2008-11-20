@@ -57,6 +57,7 @@ protected:
 #ifdef WIN32
     virtual void closeEvent( QCloseEvent* );
 #endif
+    virtual bool eventFilter( QObject*, QEvent* );
 
 public slots:
     void showSettingsDialog();
@@ -79,11 +80,16 @@ private slots:
 private:
     void setupUi();
     void setupInfoWidget();
+    
+    /** add this widget as a drag handle to move the window */
+    void addDragHandleWidget( QWidget* );
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
     
     Track m_track;
+    
+    QMap< QWidget*, QPoint > m_dragHandleMouseDownPos;
 	
 	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );

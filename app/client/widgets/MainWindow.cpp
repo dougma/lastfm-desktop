@@ -21,7 +21,7 @@
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/Sources.h"
 #include "Settings.h"
-#include "the/app.h"
+#include "the/app.h" 
 #include "widgets/BottomBar.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
@@ -154,11 +154,13 @@ MainWindow::setupUi()
     QVBoxLayout* v = new QVBoxLayout( centralWidget() );
     
     v->addWidget( ui.dashboardHeader = new TrackDashboardHeader );
-
+    addDragHandleWidget( ui.dashboardHeader );
+    
     v->addWidget( ui.messagebar = new MessageBar );
     v->addWidget( ui.dashboard = new TrackDashboard );
  
     v->addWidget( ui.amp = new Amp );
+    addDragHandleWidget( ui.amp );
     
     v->addWidget( ui.sources = new Sources );
     
@@ -447,8 +449,50 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
             ui.firehose->setUserId( id );
         }
         else
-            ui.firehose->setStaff();
+            ui.firehose ->setStaff();
     }
 	catch (CoreDomElement::Exception&)
 	{}
+}
+
+bool 
+MainWindow::eventFilter( QObject* o, QEvent* event )
+{
+    QWidget* obj = qobject_cast<QWidget*>( o );
+    if( !obj )
+        return false;
+    
+    switch( event->type() )
+    {
+        case QEvent::MouseButtonPress:
+        {
+            QMouseEvent* e = static_cast<QMouseEvent*>( event );
+            m_dragHandleMouseDownPos[ obj ] = e->globalPos() - pos();
+        }
+        break;
+        
+        case QEvent::MouseButtonRelease:
+        {
+            m_dragHandleMouseDownPos[ obj ] = QPoint();
+        }
+        break;
+            
+        case QEvent::MouseMove:
+        {
+            QMouseEvent* e = static_cast<QMouseEvent*>( event );
+            if( m_dragHandleMouseDownPos.contains( obj ) &&
+                !m_dragHandleMouseDownPos[ obj ].isNull())
+                move( e->globalPos() - m_dragHandleMouseDownPos[ obj ]);
+        }
+        break;
+        default: break;
+    }
+    return false;
+}
+
+
+void 
+MainWindow::addDragHandleWidget( QWidget* w )
+{
+    w->installEventFilter( this );
 }

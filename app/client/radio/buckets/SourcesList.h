@@ -21,6 +21,8 @@
 #define SOURCES_LIST_H
 
 #include <QListWidget>
+#include <QStyledItemDelegate>
+#include <QResizeEvent>
 
 class SourcesList : public QListWidget
 {
@@ -30,14 +32,6 @@ class SourcesList : public QListWidget
     
 public:
     SourcesList( QWidget* parent );
-    
-    void refresh()
-    {
-        if( viewMode() == QListView::IconMode )
-            setGridSize( QSize( 70, 70 ) );
-        else
-            setGridSize( QSize() );
-    }
 
     enum ViewMode {
         ListMode = QListView::ListMode,
@@ -60,14 +54,14 @@ public:
 protected:
     QMimeData* mimeData( const QList<QListWidgetItem *> items ) const;
     
-    void focusOutEvent( QFocusEvent* event )
+    void focusOutEvent( QFocusEvent* )
     {
         clearSelection();
         update();
     }
     
 private slots:
-    void onDataChanged( const QModelIndex& topLeft, const QModelIndex& bottomRight )
+    void onDataChanged( const QModelIndex&, const QModelIndex& )
     {
         scheduleDelayedItemsLayout();
     }
@@ -77,6 +71,26 @@ private:
     QSize m_itemSizeHint;
     bool m_customModeEnabled;
     QWidget* m_customWidget;
+    
+    class SourcesListDelegate : public QStyledItemDelegate
+    {
+    public:
+        SourcesListDelegate( QObject* parent = 0 ): QStyledItemDelegate( parent ){}
+        virtual QSize sizeHint ( const QStyleOptionViewItem& option, const QModelIndex& index ) const
+        {
+            QStyleOptionViewItemV4 opt = option;
+            initStyleOption( &opt, index );
+            if( opt.decorationPosition == QStyleOptionViewItem::Left )
+            {
+                //Add 10px padding when in ListView mode
+                return QStyledItemDelegate::sizeHint( option, index ) + QSize( 0, -10 );
+            }
+            else 
+            {
+                return QStyledItemDelegate::sizeHint( option, index ) + QSize( 20, 0 );
+            }
+        }
+    };
     
 };
 

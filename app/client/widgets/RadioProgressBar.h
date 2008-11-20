@@ -111,7 +111,7 @@ private slots:
             update();
     }
     
-    void onTrackSpooled( const Track& track, class StopWatch* watch )
+    void onTrackSpooled( const Track& track, class StopWatch* )
     {
         if( !track.isNull() && track.source() == Track::LastFmRadio )
         {

@@ -19,8 +19,8 @@
 
 #ifndef UNICORN_WIDGET_H
 #define UNICORN_WIDGET_H
-
-class UnicornWidget
+#include <QObject>
+class UnicornWidget : public QObject
 {
     //<undefined>
     UnicornWidget();

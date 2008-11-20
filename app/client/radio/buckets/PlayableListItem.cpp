@@ -115,40 +115,66 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
 
 
 void 
-PlayableListItem::setPixmap( const QPixmap& pm )
+PlayableListItem::setPixmap( const QPixmap pm )
 {
-    QPixmap iconPm = pm;
-    QSize diff = pm.size() - QSize( 34, 34 );
+    const QPixmap pm34 = cropToSize( pm, QSize( 34, 34 ));
+    const QPixmap pm17 = cropToSize( pm, QSize( 17, 17 ));
+    
+    const QPixmap overlayedIcon34 = overlayPixmap( pm34, QPixmap( ":buckets/avatar_overlay_34.png" ), QPoint( 1, 1 ));
+    const QPixmap overlayedIcon17 = overlayPixmap( pm17, QPixmap( ":buckets/avatar_overlay_17.png" ), QPoint( 1, 1 ));
+    
+    QPixmap selectedIcon34 = overlayedIcon34;
+    {
+        QRect selectRect = overlayedIcon34.rect().adjusted( 1, 1, -1, -3 );
+        QPainter p( &selectedIcon34 );
+        p.drawPixmap( selectRect, QPixmap( ":buckets/avatar_overlay_selected.png" ) );
+    }
 
-    //crop the avatar to a 34x34 square
-    if( diff.height() > 0 || diff.width() > 0 )
+    QPixmap selectedIcon17 = overlayedIcon17;
     {
-        const QPixmap scaled = pm.scaled( 34, 34, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
-        const QPixmap cropped = scaled.copy( ((scaled.width() - 34) / 2), ((scaled.height() - 34) / 2), 34, 34);
-        iconPm = cropped;
-    }
-    
-    QPixmap overlayedIcon( QPixmap( ":buckets/avatar_overlay.png" ).size());
-    {
-        QRect iRect = iconPm.rect().translated( 1, 1 );
-        overlayedIcon.fill( Qt::transparent );
-        QPainter p( &overlayedIcon );
-        p.setRenderHint( QPainter::SmoothPixmapTransform );
-        p.drawPixmap( iRect, iconPm );
-        p.drawPixmap( overlayedIcon.rect(), QPixmap( ":buckets/avatar_overlay.png" ));
-    }
-    
-    QIcon icon( overlayedIcon );
-    
-    QPixmap selectedIcon = overlayedIcon;
-    {
-        QRect selectRect = overlayedIcon.rect().adjusted( 1, 1, -1, -3 );
-        QPainter p( &selectedIcon );
+        QRect selectRect = overlayedIcon17.rect().adjusted( 1, 1, -1, -3 );
+        QPainter p( &selectedIcon17 );
         p.drawPixmap( selectRect, QPixmap( ":buckets/avatar_overlay_selected.png" ) );
     }
     
-    icon.addPixmap( selectedIcon, QIcon::Selected );
+    QIcon icon;
+    icon.addPixmap( overlayedIcon34 );
+    icon.addPixmap( selectedIcon34, QIcon::Selected );
+    icon.addPixmap( overlayedIcon17 );
+    icon.addPixmap( selectedIcon17, QIcon::Selected );
     setIcon( icon );
+}
+
+
+QPixmap 
+PlayableListItem::overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset ) const
+{
+    QPixmap output( source.size().expandedTo( overlay.size()));
+
+    QRect iRect = source.rect().translated( offset );
+    output.fill( Qt::transparent );
+    QPainter p( &output );
+    p.setRenderHint( QPainter::SmoothPixmapTransform );
+    p.drawPixmap( iRect, source );
+    p.drawPixmap( output.rect(), overlay);
+
+    return output;
+}
+
+
+QPixmap 
+PlayableListItem::cropToSize( const QPixmap input, const QSize& size ) const
+{
+    QPixmap output = input;
+    QSize diff = input.size() - size;
+    
+    if( diff.height() > 0 || diff.width() > 0 )
+    {
+        const QPixmap scaled = input.scaled( size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
+        const QPixmap cropped = scaled.copy( ((scaled.width() - size.width()) / 2), ((scaled.height() - size.height()) / 2), size.width(), size.height());
+        output = cropped;
+    }
+    return output;
 }
 
 

@@ -40,6 +40,9 @@ public:
         QFont f = font();
         f.setPointSize( 10 );
         setFont( f );
+        setIcon( QPixmap( 36, 38 ) );
+        
+        setSizeHint( QSize( 60, 60) );
     }
     
 	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
@@ -53,7 +56,8 @@ public:
     
     void fetchImage();
     
-    void setPixmap( const QPixmap& icon );
+    void setPixmap( const QPixmap );
+    
     void setRQL( const QString& rql ){ m_rql = rql; }
     
     void flash();
@@ -67,6 +71,8 @@ private slots:
     void onFlashFinished();
     
 private:
+    QPixmap cropToSize( const QPixmap, const QSize& ) const;
+    QPixmap overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset = QPoint( 0, 0)) const;
     class WsAccessManager* m_networkManager;
     QString m_rql;
     

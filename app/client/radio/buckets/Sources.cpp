@@ -71,9 +71,9 @@ Sources::Sources()
     typedef QPair<QString, QString> StringPair;
     typedef QList<StringPair > PairList;
     StringPair station;
-    foreach( station, PairList() << StringPair( tr("My Library"), QString("library:%1").arg(name))
-                                 << StringPair( tr("My Loved Tracks"), QString("loved:%1").arg(name))
-                                 << StringPair( tr("My Recommendations"), QString( "recs:%1" ).arg(name)))
+    foreach( station, PairList() << StringPair( tr("Your Library"), QString("library:%1").arg(name))
+                                 << StringPair( tr("Your\xa0Loved Tracks"), QString("loved:%1").arg(name))
+                                 << StringPair( tr("Recommended"), QString( "recs:%1" ).arg(name)))
                                // FIXME: Neighbours not implemented in RQL yet!
                                //  << StringPair( tr("My Neighbours"), QString( "neighbours:%1" ).arg(name)))
 
@@ -81,7 +81,8 @@ Sources::Sources()
         PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
         n->setRQL( station.second );
         n->setPlayableType( Seed::PreDefinedType );
-        QRect textRect = QFontMetrics( n->font()).boundingRect( station.first );
+        QRect textRect = QFontMetrics( n->font()).boundingRect( QRect( QPoint(0, 0), n->sizeHint()), Qt::AlignHCenter | Qt::TextWordWrap, station.first );
+        n->setSizeHint( QSize( 90, n->sizeHint().height()+20));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
 
@@ -136,6 +137,7 @@ Sources::setupUi()
     ui.stationsBucket->setAlternatingRowColors( true );
     ui.stationsBucket->setDragEnabled( true );
     ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
+    ui.stationsBucket->setWordWrap( true );
     connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.stationsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
     ui.stationsBucket->setAlternatingRowColors( false );
@@ -220,6 +222,7 @@ Sources::onUserGetFriendsReturn( WsReply* r )
         
         n->setPlayableType( Seed::UserType );	
     }
+    ui.friendsBucket->reset();
 }
 
 
@@ -227,16 +230,36 @@ void
 Sources::onUserGetTopTagsReturn( WsReply* r )
 {
     WeightedStringList tags = Tag::list( r );
+    if( tags.count() < 1 )
+        return;
     
+    QIcon tagIcon;
+    tagIcon.addPixmap( QPixmap( ":/buckets/tag_39.png" ) );
+    tagIcon.addPixmap( QPixmap( ":/buckets/tag_39.png" ), QIcon::Selected );
+    tagIcon.addPixmap( QPixmap( ":/buckets/tag_21.png" ) );
+    tagIcon.addPixmap( QPixmap( ":/buckets/tag_21.png" ), QIcon::Selected );
     foreach( WeightedString tag, tags )
     {
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
-        n->setPixmap( QPixmap( ":/buckets/tag.png" ) );
+        n->setIcon( tagIcon );
         n->setPlayableType( Seed::TagType );
     }
 }
-            
-            
+
+
+void
+Sources::onAuthUserInfoReturn( WsReply* r )
+{
+    QList<CoreDomElement> images = r->lfm().children( "image" );
+    if( images.isEmpty() )
+        return;
+    
+    QNetworkReply* reply = m_accessManager->get( QNetworkRequest( images.first().text() ));
+    
+    connect( reply, SIGNAL( finished()), SLOT( authUserIconDataDownloaded()));
+}
+
+
 void 
 Sources::onUserGetPlaylistsReturn( WsReply* r )
 {
@@ -341,19 +364,6 @@ Sources::connectToAmp( Amp* amp )
 }
 
 
-void
-Sources::onAuthUserInfoReturn( WsReply* r )
-{
-    QList<CoreDomElement> images = r->lfm().children( "image" );
-    if( images.isEmpty() )
-        return;
-
-    QNetworkReply* reply = m_accessManager->get( QNetworkRequest( images.first().text() ));
-
-    connect( reply, SIGNAL( finished()), SLOT( authUserIconDataDownloaded()));
-}
-
-
 void 
 Sources::authUserIconDataDownloaded()
 {
@@ -401,7 +411,7 @@ Sources::onCogMenuAction( QAction* a )
         listView->setFlow( QListView::TopToBottom );
         listView->setUniformItemSizes( false );
         listView->setAlternatingRowColors( true );
-        listView->setIconSize( QSize( 19, 42 ) );
+        listView->setIconSize( QSize( 19, 30 ) );
         listView->setSourcesViewMode( SourcesList::ListMode );
     }
     
@@ -423,7 +433,6 @@ Sources::onCogMenuAction( QAction* a )
         listView->setIconSize( QSize( 36, 38 ) );
     }
  
-    listView->refresh();
 }
 
 

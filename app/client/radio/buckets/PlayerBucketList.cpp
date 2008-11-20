@@ -31,6 +31,7 @@
 #include "widgets/UnicornWidget.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "the/radio.h"
+#include "app/moose.h"
 
 Q_DECLARE_METATYPE( PlayableListItem* )
 
@@ -39,7 +40,7 @@ const int PlayerBucketList::k_itemMargin = 4;
 //These should be based on the delegate's sizeHint - this requires
 //the delegate to calculate the sizeHint correctly however and this 
 //is not currently done!
-const int PlayerBucketList::k_itemSizeX = 36;
+const int PlayerBucketList::k_itemSizeX = 60;
 const int PlayerBucketList::k_itemSizeY = 50;
 
 
@@ -66,8 +67,8 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
     ui.queryEdit = new QLineEdit( this );
     ui.queryEdit->setAttribute( Qt::WA_MacShowFocusRect, false );
     QPalette queryPalette = ui.queryEdit->palette();
-    queryPalette.setBrush( QPalette::Base, Qt::transparent );
-    queryPalette.setBrush( QPalette::Text, Qt::white );
+    queryPalette.setBrush( QPalette::Base, QColor( 255, 255, 255, 200 ) );
+    queryPalette.setBrush( QPalette::Text, Qt::black );
     ui.queryEdit->setPalette( queryPalette );
     ui.queryEdit->setAlignment( Qt::AlignCenter );
     ui.queryEdit->setFrame( false );
@@ -246,9 +247,14 @@ PlayerBucketList::calculateItemRemoveLayout()
     //move the remove button to correct position
     if( currentIndex().isValid() )
     {
-        QRect curRect = m_itemRects[ currentIndex() ];
+        const QIcon icon = currentIndex().data( Qt::DecorationRole ).value<QIcon>();
+        const QRect curRect = m_itemRects[ currentIndex() ];
+        const QSize iconSize = icon.actualSize( curRect.size() );
         ui.removeButton->show();
-        ui.removeButton->move( curRect.topRight() - QPoint( ui.removeButton->width() +2,  -4 ));
+        QPoint offset( -(curRect.width() - iconSize.width())/2, 0);
+        if( currentIndex().data( moose::TypeRole ) == Seed::TagType )
+           offset += QPoint( 0, -1 );
+        ui.removeButton->move( curRect.topRight() - QPoint( ui.removeButton->width() +2,  -4 ) + offset );
     }
     else
         ui.removeButton->hide();   
@@ -286,7 +292,7 @@ PlayerBucketList::addFromMimeData( const QMimeData* d )
     if( !addItem( item ) )
         return false;
 
-	calculateLayout();	
+	calculateLayout();
     
 	//Send query
 	QString query = queryString( model()->index( 0, 0 ), false );
@@ -498,6 +504,7 @@ PlayerBucketList::showQuery()
     else
     {
         ui.queryEdit->show();
+        ui.queryEdit->setFocus();
         calculateLayout();
     }
 }

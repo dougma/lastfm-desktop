@@ -20,27 +20,28 @@
 #include "SourcesList.h"
 #include "PlayableListItem.h"
 #include <QStackedLayout>
+#include <QStyledItemDelegate>
 
 SourcesList::SourcesList( QWidget* parent )
             : QListWidget( parent ),
               m_customModeEnabled( false )
 {
-    setViewMode( QListView::IconMode );
+    QStackedLayout* l = new QStackedLayout( this );
+    
+    setItemDelegate( new SourcesListDelegate( this ) );
+    setSourcesViewMode( IconMode );
     setFlow( QListView::LeftToRight );
     setResizeMode( QListView::Adjust );
     setIconSize( QSize( 36, 38 ) );
     setLayoutMode( QListView::SinglePass );
-    setUniformItemSizes( false );
     setDragEnabled( true );
     setDragDropMode( QAbstractItemView::DragOnly );
-    setMovement( QListView::Free );
+    setAutoScroll( false );
+    setUniformItemSizes( false );
     model()->setSupportedDragActions( Qt::CopyAction );
-    setContentsMargins( 5, 5, 5, 5 );
-    refresh();
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     
-    setViewportMargins( 10, 10, 10, 10 );
     
-    QStackedLayout* l = new QStackedLayout( this );
     l->addWidget( viewport() );
     connect( model(), SIGNAL( dataChanged( const QModelIndex, const QModelIndex)), SLOT( onDataChanged( const QModelIndex, const QModelIndex )));
 }
@@ -57,7 +58,7 @@ SourcesList::mimeData( const QList<QListWidgetItem *> items ) const
     PlayableMimeData* data = new PlayableMimeData;
     data->setType( item->playableType() );
     data->setText( item->text() );
-    data->setImageData( item->icon().pixmap(iconSize()).toImage() );
+    data->setImageData( item->icon().pixmap( QSize( 36, 38 )).toImage() );
     
     if( item->playableType() == Seed::PreDefinedType )
         data->setRQL( item->rql() );
@@ -70,10 +71,16 @@ SourcesList::setSourcesViewMode( ViewMode m )
 {
     if( m < CustomMode )
     {
+        if( m == IconMode )
+            setSpacing( 5 );
+        else
+            setSpacing( 0 );
+        
         QListView::setViewMode( (QListView::ViewMode)m );
-        ((QStackedLayout*)layout())->setCurrentWidget( viewport() );
+        QStackedLayout* l;
+        if( layout() && (l = dynamic_cast<QStackedLayout*>(layout())))
+            l->setCurrentWidget( viewport() );
         setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-        setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
     }
     else
     {
