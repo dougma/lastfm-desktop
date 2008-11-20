@@ -197,7 +197,9 @@ MainWindow::setupUi()
 	adjustSize();
 
     ui.sources->resize( width(), 0 );
-    ui.dashboard->resize( width(), 0 );
+    ui.dashboard->resize( width(), 250 );
+    
+    setMinimumWidth( 337 );
 }
 
 
@@ -491,12 +493,13 @@ MainWindow::animate( bool b )
     m_animating = true;
     
     QWidget* w;
-    if (sender() == ui.viewSources)
-        m_animatingSources = true,
+    if (sender() == ui.viewSources) {
+        m_animatingSources = true;
         w = ui.sources;
-    else
-        m_animatingDashboard = true,
+    } else {
+        m_animatingDashboard = true;
         w = ui.dashboard;
+    }
 
     w->show();
 
@@ -514,7 +517,12 @@ MainWindow::onAnimateFrame( int new_height )
 {
     if (m_animatingDashboard)
     {
-        ui.amp->move( 0, new_height - ui.sources->geometry().x() - ui.amp->height() );
+        int y = new_height - ui.amp->height();
+        
+        if (ui.sources->isVisible())
+            y -= ui.sources->geometry().y();
+        
+        ui.amp->move( 0, y );
     }
     else
         ui.sources->move( 0, new_height - ui.sources->height() );
@@ -535,7 +543,7 @@ MainWindow::onAnimationFinished()
     
     m_animating = m_animatingDashboard = m_animatingSources = false;
     
-    int h = ui.amp->height() + ui.dashboardHeader->height();
+    int h = sizeHint().height();
     
     if (ui.dashboard->isHidden() && ui.sources->isHidden())
         setFixedHeight( h );
@@ -551,17 +559,16 @@ MainWindow::onAnimationFinished()
 void
 MainWindow::resizeEvent( QResizeEvent* e )
 {
-    if (m_animating) return;
+    qDebug() << size();
     
-    #define RECT( x ) x->isVisible() ? x->geometry() : QRect()
-    QRect r1 = RECT( ui.dashboard );
-    QRect r2 = RECT( ui.sources );
-    #undef RECT
+    if (m_animating) return;
     
     int const new_height = height() - e->oldSize().height();
     int const w = width();
     
-    if (ui.sources->isVisible())
+    int new_sources_height = ui.sources->height() + new_height;
+    
+    if (ui.sources->isVisible() && new_sources_height >= ui.sources->minimumHeight())
     {
         ui.dashboard->resize( w, ui.dashboard->height() );
         ui.sources->resize( w, ui.sources->height() + new_height );
@@ -581,6 +588,11 @@ MainWindow::resizeEvent( QResizeEvent* e )
     int const h2 = ui.amp->sizeHint().height();
     
     int const available_height = height() - h1 - h2;
+
+#define RECT( x ) x->isVisible() ? x->geometry() : QRect()
+    QRect r1 = RECT( ui.dashboard );
+    QRect r2 = RECT( ui.sources );
+#undef RECT
     
     ui.dashboardHeader->setGeometry( 0, 0, w, h1 );
     ui.dashboard->move( 0, h1 + 1 );
