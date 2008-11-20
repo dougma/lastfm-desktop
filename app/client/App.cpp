@@ -357,6 +357,7 @@ App::open( const QUrl& url )
     m_radio->play( RadioStation( url.toString() ) );
 }
 
+
 void
 App::openXspf( const QUrl& url )
 {
@@ -371,6 +372,7 @@ App::openXspf( const QUrl& url )
   
     player->play( url );
 }
+
 
 namespace //anonymous namespace, keep to this file
 {
