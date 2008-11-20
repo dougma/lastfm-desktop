@@ -100,6 +100,11 @@ TrackDashboard::TrackDashboard()
     ui.scrollbar->setVisible( false );
     connect( ui.scrollbar, SIGNAL(valueChanged( int )), SLOT(setPapyrusPosition( int )) );
         
+#ifndef Q_WS_MAC
+    // mac has finer grained scrolling, and acceleration
+    ui.scrollbar->setSingleStep( 9 );
+#endif
+    
     UnicornWidget::paintItBlack( this );
     UnicornWidget::paintItBlack( ui.bio );
     setAutoFillBackground( true );
@@ -157,6 +162,7 @@ TrackDashboard::setTrack( const Track& t )
         TrackImageFetcher* fetch = new TrackImageFetcher( t, nam );
         fetch->setParent( this );
         connect( fetch, SIGNAL(finished( QImage )), ui.cover, SLOT(setImage( QImage )) );
+        connect( fetch, SIGNAL(finished( QImage )), fetch, SLOT(deleteLater()) );
         fetch->start();
     }
 
