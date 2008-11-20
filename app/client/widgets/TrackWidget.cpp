@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 #include "TrackWidget.h"
+#include "lib/unicorn/TrackImageFetcher.h"
 #include "lib/lastfm/types/Track.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -38,6 +40,12 @@ TrackWidget::TrackWidget()
 void
 TrackWidget::setTrack( const Track& track )
 {
+    QNetworkAccessManager* nam = new WsAccessManager;
+    TrackImageFetcher* fetcher = new TrackImageFetcher( track, nam );
+    connect( fetcher, SIGNAL(finished( QImage )), SLOT(onCoverDownloaded( QImage )) );
+    fetcher->start();
+    nam->setParent( fetcher );
+    
     QString title = track.title();
     QString artist = track.artist();
     QString album = track.album();
@@ -63,9 +71,8 @@ TrackWidget::setTrack( const Track& track )
 
 
 void
-TrackWidget::onCoverDownloaded( const QByteArray& data )
+TrackWidget::onCoverDownloaded( const QImage& image )
 {
-    QPixmap p;
-    p.loadFromData( data );
-    ui.cover->setPixmap( p );
+    ui.cover->setPixmap( QPixmap::fromImage( image ) );
+    sender()->deleteLater();
 }

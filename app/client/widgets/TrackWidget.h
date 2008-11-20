@@ -38,7 +38,7 @@ public:
     void setTrack( const class Track& );
     
 private slots:
-    void onCoverDownloaded( const QByteArray& );
+    void onCoverDownloaded( const class QImage& );
 };
 
 #endif
