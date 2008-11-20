@@ -53,7 +53,6 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
     m_networkManager = new WsAccessManager( this );
 
     ui.clearButton = new ImageButton( ":buckets/radio_clear_all_x.png", this );
-    ui.clearButton->resize( ui.clearButton->size());
     connect( ui.clearButton, SIGNAL( clicked()), SLOT( clearItems()));
 
     ui.removeButton = new ImageButton( ":buckets/x_button.png", this );
@@ -105,18 +104,6 @@ PlayerBucketList::paintEvent( QPaintEvent* event )
     QPainter p( viewport() );
    
     QAbstractItemModel* itemModel = model();
-	if( !itemModel->rowCount() )
-	{
-        QFont f = p.font();
-        f.setBold( true );
-        f.setPointSize( 12 );
-        p.setFont( f );
-
-		p.drawText( viewport()->rect(), 
-		            Qt::AlignCenter | Qt::TextWordWrap, 
-		            tr("Drag something in here to play it.") );
-		return;
-	}
 	
     //draw delegate items
 	foreach ( const QModelIndex& i, m_itemRects.keys() )
@@ -225,7 +212,7 @@ PlayerBucketList::calculateToolIconsLayout()
     const int scrollbarOffset = verticalScrollBar()->isVisible() ? verticalScrollBar()->width() : 0;
     const int iconSpacing = 5;
     
-    ui.clearButton->move( rect().right() - ui.clearButton->width(), rect().center().y() - (ui.clearButton->height() / 2.0f ));
+    ui.clearButton->move( rect().right() - ui.clearButton->rect().width(), rect().center().y() - (ui.clearButton->height() / 2.0f ));
     ui.clearButton->show();
     if( !ui.queryEdit->isVisible())
     {

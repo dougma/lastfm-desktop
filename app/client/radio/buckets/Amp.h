@@ -45,6 +45,7 @@ public:
         class UnicornVolumeSlider* volume;
         class ImageButton* bucketsButton;
         class ImageButton* dashboardButton;
+        class BorderedContainer* borderWidget;
     } ui;
 
 signals:
@@ -65,6 +66,7 @@ protected slots:
     
 private:
     void setupUi();
+    
 };
 
 #endif

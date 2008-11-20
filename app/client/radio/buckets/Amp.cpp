@@ -34,6 +34,65 @@
 #include <QPainter>
 #include <QTimeLine>
 
+struct BorderedContainer : public QWidget
+{
+    BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
+    { 
+        (new QHBoxLayout( this ))->setContentsMargins( 1, 1, 1, 1 );
+        setAutoFillBackground( true ); 
+        QPalette p = palette();
+        p.setBrush( QPalette::Text, QBrush( 0x777777));
+        setPalette( p );
+    }
+    
+    void paintEvent( QPaintEvent* e )
+    {
+        QPainter p( this );
+        p.setClipRect( e->rect() );
+        p.setRenderHint( QPainter::Antialiasing );
+        
+        p.setPen( Qt::transparent );
+        p.setBrush( palette().brush( QPalette::Window ));
+        p.drawRoundedRect( rect(), 6, 6 );
+        p.setPen( QPen( palette().brush( QPalette::Shadow ), 0));
+        p.drawRoundedRect( rect(), 6, 6 );
+
+        p.setPen( QPen( palette().brush( QPalette::Text).color()) );
+        if( !m_text.isEmpty() )
+        {
+            QFont f = p.font();
+            f.setBold( true );
+            f.setPointSize( 12 );
+            p.setFont( f );
+            
+            p.drawText( rect(), 
+                       Qt::AlignCenter | Qt::TextWordWrap, 
+                       m_text );
+        }
+    }
+    
+    void resizeEvent( QResizeEvent* e )
+    {
+        QLinearGradient window( 0, 0, 0, e->size().height() );
+        window.setColorAt( 0, Qt::black );
+        window.setColorAt( 1, 0x2b2929 );
+        
+        QLinearGradient shadow( 0, 0, 0, e->size().height() );
+        shadow.setColorAt( 0, 0x0d0c0c );
+        shadow.setColorAt( 0.5, 0x1c1b1b );
+        shadow.setColorAt( 1, 0x5e5e5e );
+        
+        QPalette p = palette();
+        p.setBrush( QPalette::Window, window );
+        p.setBrush( QPalette::Shadow, shadow );
+        setPalette( p );
+    }
+    
+    void setText( const QString& s ){ m_text = s; update(); }
+    
+private: QString m_text;
+};
+
 
 Amp::Amp()
 {
@@ -67,72 +126,32 @@ Amp::setupUi()
         ui.bucketsButton->setPixmap( p1, QIcon::Off, QIcon::Active );
         ui.dashboardButton->setPixmap( p2, QIcon::Off, QIcon::Active );
     }
-
-    struct BorderedContainer : public QWidget
-    {
-        BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
-        { 
-            (new QHBoxLayout( this ))->setContentsMargins( 1, 1, 1, 1 );
-            setAutoFillBackground( false ); 
-        }
-        
-        void paintEvent( QPaintEvent* e )
-        {
-            QPainter p( this );
-            p.setClipRect( e->rect() );
-            p.setRenderHint( QPainter::Antialiasing );
-
-            p.setPen( Qt::transparent );
-            p.setBrush( palette().brush( QPalette::Window ));
-            p.drawRoundedRect( rect(), 6, 6 );
-            p.setPen( QPen( palette().brush( QPalette::Shadow ), 0));
-            p.drawRoundedRect( rect(), 6, 6 );
-        }
-        
-        void resizeEvent( QResizeEvent* e )
-        {
-            QLinearGradient window( 0, 0, 0, e->size().height() );
-            window.setColorAt( 0, Qt::black );
-            window.setColorAt( 1, 0x2b2929 );
-            
-            QLinearGradient shadow( 0, 0, 0, e->size().height() );
-            shadow.setColorAt( 0, 0x0d0c0c );
-            shadow.setColorAt( 0.5, 0x1c1b1b );
-            shadow.setColorAt( 1, 0x5e5e5e );
-                             
-            QPalette p = palette();
-            p.setBrush( QPalette::Window, window );
-            p.setBrush( QPalette::Shadow, shadow );
-            setPalette( p );
-        }
-        
-    };
     
-    BorderedContainer* bc = new BorderedContainer( this );
+    ui.borderWidget = new BorderedContainer( this );
     
     {
         //Radio and volume controls need to be embedded in a parent QWidget
         //in order to properly mask when animating out / into view.
-        QWidget* controls = new QWidget(bc);
+        QWidget* controls = new QWidget(ui.borderWidget);
         new QHBoxLayout( controls );
         controls->layout()->setSpacing( 0 );
         controls->layout()->setContentsMargins( 0, 0, 0, 0 );
         controls->layout()->addWidget( ui.controls = new RadioControls );
-        bc->layout()->addWidget( controls );
+        ui.borderWidget->layout()->addWidget( controls );
     }
     {
-        QWidget* volume = new QWidget(bc);
+        QWidget* volume = new QWidget(ui.borderWidget);
         new QHBoxLayout( volume );
         volume->layout()->setSpacing( 0 );
         volume->layout()->setContentsMargins( 0, 0, 0, 0 );
         volume->layout()->addWidget( ui.volume = new UnicornVolumeSlider );
-        bc->layout()->addWidget( volume );
+        ui.borderWidget->layout()->addWidget( volume );
     }
     
     ui.controls->setSizePolicy( QSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred ) );
     
-    ((QBoxLayout*)bc->layout())->insertWidget( 1, ui.bucket = new PlayerBucketList( bc ));
-    layout()->addWidget( bc );
+    ((QBoxLayout*)ui.borderWidget->layout())->insertWidget( 1, ui.bucket = new PlayerBucketList( ui.borderWidget ));
+    layout()->addWidget( ui.borderWidget );
         
     connect( ui.bucket, SIGNAL( itemAdded( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
     connect( ui.bucket, SIGNAL( itemRemoved( QString, Seed::Type)), SLOT( onPlayerBucketChanged()));
@@ -158,11 +177,13 @@ Amp::onPlayerBucketChanged()
     {
         showWidgetAnimated( ui.controls, Left );
         showWidgetAnimated( ui.volume, Right );
+        ui.borderWidget->setText( "" );
     }
     else
     {
         hideWidgetAnimated( ui.controls, Left );
         hideWidgetAnimated( ui.volume, Right );
+        ui.borderWidget->setText( tr("Drag something in here to play it.") );
     }
 }
 
