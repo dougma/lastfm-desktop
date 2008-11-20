@@ -121,8 +121,8 @@ Amp::setupUi()
         
         QPixmap p1( ":/Amp/button/buckets/checked.png" );
         QPixmap p2( ":/Amp/button/dashboard/checked.png" );
-        ui.bucketsButton->setPixmap( p1, QIcon::On );
-        ui.dashboardButton->setPixmap( p2, QIcon::On );
+//        ui.bucketsButton->setPixmap( p1, QIcon::On );
+//        ui.dashboardButton->setPixmap( p2, QIcon::On );
         ui.bucketsButton->setPixmap( p1, QIcon::Off, QIcon::Active );
         ui.dashboardButton->setPixmap( p2, QIcon::Off, QIcon::Active );
     }

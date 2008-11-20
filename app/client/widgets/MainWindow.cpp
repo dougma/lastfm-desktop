@@ -477,7 +477,7 @@ MainWindow::animate( bool b )
     static QTimeLine* m_timeline = 0;
     
     if (!m_timeline) {
-        m_timeline = new QTimeLine( 2000 );
+        m_timeline = new QTimeLine( 400 );
         connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(onAnimateFrame( int )) );
         connect( m_timeline, SIGNAL(finished()), SLOT(onAnimationFinished()) );
         m_timeline->setUpdateInterval( 10 );
@@ -501,14 +501,18 @@ MainWindow::animate( bool b )
         w = ui.dashboard;
     }
 
-    w->show();
-
+    setFixedHeight( height() ); //this one to work around qt bug
     setMaximumHeight( 20 * 1000 );
+    setMinimumHeight( 0 ); //this one too
+    // the bug is that setMinimumHeight doesn't work in onAnimateFinished() 
+    // unless we do those two things here first. WTF!? QtSucks
     
-    int const operand = b ? w->height() : -w->height();
-    
+    int const operand = b ? w->height() : -(w->height());
+ 
     m_timeline->setFrameRange( height(), height() + operand );
     m_timeline->start();
+
+    w->show();
 }
 
 
@@ -517,12 +521,15 @@ MainWindow::onAnimateFrame( int new_height )
 {
     if (m_animatingDashboard)
     {
-        int y = new_height - ui.amp->height();
-        
+        int y = new_height;
+
         if (ui.sources->isVisible())
-            y -= ui.sources->geometry().y();
-        
-        ui.amp->move( 0, y );
+        {
+            y -= ui.sources->geometry().height();
+            ui.sources->move( 0, y );
+        }
+
+        ui.amp->move( 0, y - ui.amp->height() );
     }
     else
         ui.sources->move( 0, new_height - ui.sources->height() );
@@ -559,8 +566,6 @@ MainWindow::onAnimationFinished()
 void
 MainWindow::resizeEvent( QResizeEvent* e )
 {
-    qDebug() << size();
-    
     if (m_animating) return;
     
     int const new_height = height() - e->oldSize().height();
@@ -572,7 +577,7 @@ MainWindow::resizeEvent( QResizeEvent* e )
     {
         ui.dashboard->resize( w, ui.dashboard->height() );
         ui.sources->resize( w, ui.sources->height() + new_height );
-    } 
+    }
     else if (ui.dashboard->isVisible())
     {
         ui.dashboard->resize( w, ui.dashboard->height() + new_height );
