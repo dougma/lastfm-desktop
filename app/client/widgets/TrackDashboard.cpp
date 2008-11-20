@@ -194,6 +194,8 @@ TrackDashboard::clear()
     qDeleteAll( findChildren<TrackImageFetcher*>() );
     
     m_track = Track();
+    
+    update();
 }
 
 
@@ -246,6 +248,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         ui.bio->setHtml( css + html );
         resizeEvent( 0 );
         
+        ui.similarArtists->clear();
         foreach (CoreDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
         
@@ -265,6 +268,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 void
 TrackDashboard::onArtistGotTopTags( WsReply* reply )
 {
+    ui.tags->clear();
     WeightedStringList tags = Tag::list( reply );
     for (int x = 0, n = qMin( tags.size(), 8 ); x < n; ++x)
         ui.tags->addItem( tags[x] );
