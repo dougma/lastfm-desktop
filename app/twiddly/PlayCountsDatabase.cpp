@@ -265,7 +265,7 @@ pluginPath()
     path += "/Library/iTunes/iTunes Plug-ins/AudioScrobbler.bundle/Contents/MacOS/AudioScrobbler";
     return path;
   #else
-	QString path = PluginSettings().value( "itw/Path" ).toString();
+	QString path = Plugin::Settings().value( "itw/Path" ).toString();
     if (path.isEmpty())
         throw "Unknown iTunes plugin path";
     return path;
