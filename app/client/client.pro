@@ -34,6 +34,10 @@ else {
     win32:LIBS += -lshell32 -luser32
 }
 
+win32 {
+	RC_FILE = win/client.rc
+}
+
 release:win32 {
 	root = $$system( cygpath -m '$$ROOT_DIR' )
 	qt = $$system( cygpath -m '$$QMAKE_LIBDIR_QT\\..' )

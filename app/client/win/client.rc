@@ -1,4 +1,4 @@
-IDI_ICON1 ICON DISCARDABLE "as.ico"
+IDI_ICON1 ICON DISCARDABLE "client.ico"
 
 // The first entry ('1') on the below line is normally written as the define
 // VS_VERSION_INFO, but we can't always be sure that value has been included
@@ -25,7 +25,7 @@ BEGIN
             VALUE "FileDescription", "Last.fm"
             VALUE "FileVersion", "0.0.0.0\0"
             VALUE "InternalName", "Last.fm"
-            VALUE "LegalCopyright", "Copyright (C) 2007"
+            VALUE "LegalCopyright", "Copyright © 2008"
             VALUE "OriginalFilename", "LastFM.exe"
             VALUE "ProductName", "Last.fm"
             VALUE "ProductVersion", "0.0.0.0\0"
