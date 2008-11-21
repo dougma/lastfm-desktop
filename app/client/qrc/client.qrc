@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
     <file>station.png</file>
+	<file>16x16.png</file>
   </qresource>
 </RCC>
