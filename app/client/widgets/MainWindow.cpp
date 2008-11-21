@@ -524,6 +524,12 @@ MainWindow::animate( bool b )
 void
 MainWindow::onAnimateFrame( int new_height )
 {
+    resize( width(), new_height );
+
+#ifndef Q_WS_MAC
+	new_height -= ui.menubar->height();
+#endif
+
     if (m_animatingDashboard)
     {
         int y = new_height;
@@ -538,8 +544,6 @@ MainWindow::onAnimateFrame( int new_height )
     }
     else
         ui.sources->move( 0, new_height - ui.sources->height() );
-
-    resize( width(), new_height );
 }
 
 
