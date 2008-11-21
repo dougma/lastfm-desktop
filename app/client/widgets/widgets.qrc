@@ -38,5 +38,8 @@
       <file>RadioControls/stop/rest.png</file>
       <file>RadioControls/play/rest.png</file>
       <file>RadioControls/skip/rest.png</file>
+      <file>RadioControls/stop/onpress.png</file>
+      <file>RadioControls/play/onpress.png</file>
+      <file>RadioControls/skip/onpress.png</file>
   </qresource>
 </RCC>
