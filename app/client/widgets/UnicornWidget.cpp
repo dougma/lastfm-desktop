@@ -31,7 +31,7 @@ void //static
 UnicornWidget::paintItBlack( QWidget* w )
 {
     QPalette p = w->palette();
-    p.setBrush( QPalette::Window, QColor( 0x0e, 0x0e, 0x0e ) );
+    p.setBrush( QPalette::Window, QColor( 0x0e0e0e ) );
     p.setBrush( QPalette::WindowText, QColor( 84, 84, 84 ) );
     
     if (qobject_cast<QAbstractItemView*>(w))
@@ -40,7 +40,7 @@ UnicornWidget::paintItBlack( QWidget* w )
         p.setBrush( QPalette::Base, QColor( 0x0e0e0e ) );
         p.setBrush( QPalette::Text, Qt::white );
         p.setBrush( QPalette::Disabled, QPalette::Text, Qt::darkGray );
-        p.setBrush( QPalette::AlternateBase, QColor( 12, 12, 12 ) );
+        p.setBrush( QPalette::AlternateBase, QColor( 0x0c0c0c ) );
     }
     
     if (qobject_cast<QTextEdit*>(w))
