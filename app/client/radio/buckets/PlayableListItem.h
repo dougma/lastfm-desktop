@@ -40,9 +40,7 @@ public:
         QFont f = font();
         f.setPointSize( 10 );
         setFont( f );
-        QPixmap p( 36, 38);
-        p.fill( Qt::transparent );
-        setIcon( p );
+        setPixmap( QPixmap( ":/lastfm/no/user.png" ) );
         setSizeHint( QSize( 60, 60) );
     }
     

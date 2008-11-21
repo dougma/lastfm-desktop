@@ -433,6 +433,7 @@ PlayerBucketList::addItem( QListWidgetItem* item )
 {
     QListWidget::addItem( item );
     calculateLayout();
+
 }
 
 

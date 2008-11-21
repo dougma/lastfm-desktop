@@ -47,6 +47,9 @@ PlayableListItem::iconDataDownloaded()
     QPixmap pixmap;
     pixmap.loadFromData( reply->readAll() );
     
+    if( pixmap.isNull() )
+        return;
+    
     setPixmap( pixmap );
     const QRect textRect = listWidget()->fontMetrics().boundingRect( text() );
 }

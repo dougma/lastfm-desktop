@@ -24,6 +24,7 @@
 #include "SeedTypes.h"
 #include "lib/lastfm/types/Track.h"
 #include "widgets/UnicornWidget.h"
+#include "State.h"
 #include <QMouseEvent>
 
 
@@ -63,6 +64,9 @@ protected:
 protected slots:
     void onPlayerBucketChanged();
     void onWidgetAnimationFrameChanged( int );
+    void onPlayerChanged( const QString& );
+    void onTrackSpooled( const Track&, class StopWatch* );
+    void onStateChanged( State, const Track& );
     
 private:
     void setupUi();

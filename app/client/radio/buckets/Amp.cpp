@@ -36,7 +36,7 @@
 
 struct BorderedContainer : public QWidget
 {
-    BorderedContainer( QWidget* parent = 0 ) : QWidget( parent )
+    BorderedContainer( QWidget* parent = 0 ) : QWidget( parent ), m_showText( false )
     { 
         (new QHBoxLayout( this ))->setContentsMargins( 1, 1, 1, 1 );
         setAutoFillBackground( false ); 
@@ -58,7 +58,7 @@ struct BorderedContainer : public QWidget
         p.drawRoundedRect( rect(), 6, 6 );
 
         p.setPen( QPen( palette().brush( QPalette::Text).color()) );
-        if( !m_text.isEmpty() )
+        if( m_showText )
         {
 		#ifndef WIN32
 			QFont f = p.font();
@@ -73,6 +73,8 @@ struct BorderedContainer : public QWidget
                        m_text );
         }
     }
+    
+    void showText( bool b ){ m_showText = b; update();}
     
     void resizeEvent( QResizeEvent* e )
     {
@@ -93,13 +95,18 @@ struct BorderedContainer : public QWidget
     
     void setText( const QString& s ){ m_text = s; update(); }
     
-private: QString m_text;
+private: QString m_text; bool m_showText;
 };
 
 
 Amp::Amp()
 {
     setupUi();
+    
+    connect( qApp, SIGNAL(trackSpooled( const Track&, StopWatch*)), SLOT( onTrackSpooled(const Track&, StopWatch*)) );
+    connect( qApp, SIGNAL(stateChanged( State, Track)), SLOT( onStateChanged(  State, Track)) );
+    connect( qApp, SIGNAL(playerChanged( QString )), SLOT( onPlayerChanged( QString )));
+    
     onPlayerBucketChanged();
 }
 
@@ -186,7 +193,6 @@ Amp::onPlayerBucketChanged()
     {
         hideWidgetAnimated( ui.controls, Left );
         hideWidgetAnimated( ui.volume, Right );
-        ui.borderWidget->setText( tr("Drag something in here to play it.") );
     }
 }
 
@@ -307,4 +313,36 @@ Amp::onWidgetAnimationFrameChanged( int frame )
         return;
     
     w->move( frame, w->pos().y());
+}
+
+
+void 
+Amp::onTrackSpooled( const Track& t, StopWatch* )
+{
+    if( t.source() != Track::LastFmRadio )
+    {
+        if( t.isNull() )
+            ui.borderWidget->showText( false );
+        else
+        {
+            ui.borderWidget->showText( true );
+        }
+    }
+}
+
+
+void 
+Amp::onStateChanged( State s, const Track& t )
+{
+    if( t.source() != Track::LastFmRadio && s == Paused )
+        ui.borderWidget->showText( false );
+    else if( s == Playing )
+        onTrackSpooled( t, 0 );
+}
+
+
+void 
+Amp::onPlayerChanged( const QString& name )
+{
+    ui.borderWidget->setText( tr( "%1 is now playing." ).arg( name ) );
 }

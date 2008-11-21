@@ -131,6 +131,8 @@ public:
     QString toString( const QChar& separator = QChar(8211) ) const;
     /** the standard representation of this object as an XML node */
     QDomElement toDomElement( class QDomDocument& ) const;
+    
+    QString extras( const QString& key ) const{ return d->extras[ key ]; }
 
     bool operator<( const Track &that ) const
     {
