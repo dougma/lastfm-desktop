@@ -30,7 +30,7 @@ MessageBar::MessageBar()
     ui.papyrus = new QWidget( this );
 
     QPalette p = palette();
-    p.setColor( QPalette::WindowText, Qt::black );
+    p.setColor( QPalette::Text, Qt::black );
     p.setColor( QPalette::Window, QColor( 0xfa, 0xfa, 0xc7 ) );
     setPalette( p );
     setAutoFillBackground( true );
