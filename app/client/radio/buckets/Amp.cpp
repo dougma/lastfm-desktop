@@ -60,10 +60,13 @@ struct BorderedContainer : public QWidget
         p.setPen( QPen( palette().brush( QPalette::Text).color()) );
         if( !m_text.isEmpty() )
         {
-            QFont f = p.font();
+		#ifndef WIN32
+			QFont f = p.font();
+		
             f.setBold( true );
             f.setPointSize( 12 );
-            p.setFont( f );
+			p.setFont( f );
+		#endif
             
             p.drawText( rect(), 
                        Qt::AlignCenter | Qt::TextWordWrap, 
@@ -229,8 +232,7 @@ void
 Amp::paintEvent( QPaintEvent* event )
 {
     QPainter p( this );
-    p.setClipRect( event
-                  ->rect() );
+    p.setClipRect( event->rect() );
     
     p.setPen( Qt::black );
     p.drawLine( rect().topLeft(), rect().topRight() );

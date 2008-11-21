@@ -50,12 +50,12 @@ public:
         
         ui.time->setMargin( 0 );
         ui.timeToGo->setMargin( 0 );
- 
+#ifndef WIN32
         QFont f = ui.time->font();
         f.setPointSize( 9 );
         ui.time->setFont( f );
         ui.timeToGo->setFont( f );
-
+#endif
         setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
         
         connect( qApp, SIGNAL( trackSpooled(const Track&, StopWatch* )), this, SLOT( onTrackSpooled( const Track&, StopWatch*)) );
@@ -121,7 +121,7 @@ private slots:
             m_currentTrackDuration = track.duration();
             QTime t( 0, 0 );
             t = t.addSecs( m_currentTrackDuration );
-            if( ui.timeToGo->text() != t.toString( "mm:ss" ));
+            if( ui.timeToGo->text() != t.toString( "mm:ss" ))
             {
                 ui.timeToGo->setText( t.toString( "mm:ss" ));
                 update();

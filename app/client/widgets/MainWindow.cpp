@@ -490,6 +490,8 @@ MainWindow::animate( bool b )
         return;
     }
     
+	ui.viewSources->setEnabled( false );
+	ui.viewDashboard->setEnabled( false );
     m_animating = true;
     
     QWidget* w, *wother;
@@ -550,6 +552,9 @@ MainWindow::onAnimateFrame( int new_height )
 void
 MainWindow::onAnimationFinished()
 {
+	ui.viewSources->setEnabled( true );
+	ui.viewDashboard->setEnabled( true );
+
     QTimeLine* timeline = (QTimeLine*)sender();
     
     if (timeline->startFrame() > timeline->endFrame())

@@ -71,11 +71,12 @@ TrackDashboardHeader::TrackDashboardHeader()
         l->setSpacing( 0 );
         l->setContentsMargins( 0, 0, 0, 0 );
         l->addWidget( ui.track = new QLabel );
-        
+	#ifndef WIN32
         QFont f = ui.track->font();
         f.setPointSize( 11 );
         f.setBold( true );
         ui.track->setFont( f );
+	#endif
         ui.track->setAlignment( Qt::AlignCenter );
         
         QPalette p = ui.track->palette();

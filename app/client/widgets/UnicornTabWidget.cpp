@@ -26,11 +26,13 @@
 Unicorn::TabBar::TabBar()
         :m_active( ":/DockWindow/tab/active.png" )
 {
+#ifndef WIN32
     QFont f = font();
     f.setPointSize( 10 );
     f.setBold( true );
     setFont( f );
-    
+#endif
+
     QPalette p = palette();
     
     QLinearGradient window( 0, 0, 0, sizeHint().height());
