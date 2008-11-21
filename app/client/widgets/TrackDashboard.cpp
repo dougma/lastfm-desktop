@@ -95,6 +95,7 @@ TrackDashboard::TrackDashboard()
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
+    connect( ui.bio, SIGNAL(linkClicked( const QUrl& )), SLOT(openExternally( const QUrl& )) );
 
     ui.scrollbar = new FadingScrollBar( this );
     ui.scrollbar->setVisible( false );
