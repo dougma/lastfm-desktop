@@ -492,14 +492,19 @@ MainWindow::animate( bool b )
     
     m_animating = true;
     
-    QWidget* w;
+    QWidget* w, *wother;
     if (sender() == ui.viewSources) {
         m_animatingSources = true;
         w = ui.sources;
+        wother = ui.dashboard;
     } else {
         m_animatingDashboard = true;
         w = ui.dashboard;
+        wother = ui.sources;
     }
+    
+    // raise to avoid sliding above other widget
+    w->stackUnder( wother );
 
     setFixedHeight( height() ); //this one to work around qt bug
     setMaximumHeight( 20 * 1000 );
