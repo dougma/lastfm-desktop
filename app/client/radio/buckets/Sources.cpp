@@ -149,6 +149,8 @@ Sources::setupUi()
     ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     Firehose* hose;
     ui.friendsBucket->addCustomWidget( hose = new Firehose );
+    ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
+    
     hose->setStaff();
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
