@@ -187,12 +187,13 @@ Amp::onPlayerBucketChanged()
     {
         showWidgetAnimated( ui.controls, Left );
         showWidgetAnimated( ui.volume, Right );
-        ui.borderWidget->setText( "" );
+        ui.borderWidget->showText( false );
     }
     else
     {
         hideWidgetAnimated( ui.controls, Left );
         hideWidgetAnimated( ui.volume, Right );
+        ui.borderWidget->showText( true );
     }
 }
 
@@ -323,7 +324,7 @@ Amp::onTrackSpooled( const Track& t, StopWatch* )
     {
         if( t.isNull() )
             ui.borderWidget->showText( false );
-        else
+        else if( ui.bucket->count() == 0 )
         {
             ui.borderWidget->showText( true );
         }
