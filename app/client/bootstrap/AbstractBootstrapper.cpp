@@ -27,7 +27,6 @@
 #include <QTextStream>
 #include <time.h>
 
-#define ZLIB_WINAPI
 #include "zlib.h"
 
 static const QString k_host = "bootstrap.last.fm";
