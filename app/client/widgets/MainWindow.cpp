@@ -86,6 +86,8 @@ MainWindow::MainWindow()
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
 
 	setAcceptDrops( true );
+    
+    QTimer::singleShot( 0, ui.viewDashboard, SLOT(trigger()) );
 }
 
 
@@ -156,11 +158,16 @@ MainWindow::setupUi()
     #define T( x, y ) x = y; x->setParent( centralWidget() );
     T( ui.sources, new Sources );
     T( ui.dashboard, new TrackDashboard );
-    T( ui.messagebar, new MessageBar );
     // these ones should be on top, so created last
     T( ui.dashboardHeader, new TrackDashboardHeader );
     T( ui.amp, new Amp );
     #undef T
+    
+    QVBoxLayout* v = new QVBoxLayout( ui.dashboard );
+    v->addWidget( ui.messagebar = new MessageBar );
+    v->addStretch();
+    v->setMargin( 0 );
+    v->setSpacing( 0 );
 
     addDragHandleWidget( ui.dashboardHeader );
     addDragHandleWidget( ui.amp );
