@@ -37,7 +37,7 @@ public:
     /** add the item to the bucket and load any associated data (ie image) */
     void addAndLoadItem( const QString& item, const Seed::Type );
     
-    QSize sizeHint() const { return QSize( 300, 86 ); }
+    QSize sizeHint() const { return QSize( 366, 86 ); }
 
     struct {
         class PlayerBucketList* bucket;

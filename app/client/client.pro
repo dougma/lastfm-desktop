@@ -19,7 +19,6 @@ SOURCES   += $$findSources( cpp )
 HEADERS   += $$findSources( h )
 FORMS     += $$findSources( ui )
 RESOURCES += $$findSources( qrc )
-RESOURCES += $$ROOT_DIR/common/qrc/common.qrc
 
 # included directly into App.cpp, so avoid link error
 SOURCES -= legacy/disableHelperApp.cpp

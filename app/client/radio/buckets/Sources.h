@@ -22,7 +22,7 @@
 
 #include <QMainWindow>
 #include "SeedTypes.h"
-
+#include <QDebug>
 namespace Unicorn{ class TabWidget; }
 
 class Sources : public QWidget
@@ -54,8 +54,14 @@ public:
     
     QSize sizeHint() const
     {
-        return QSize( 0, 200 );
+        return QSize( 366, 216 );
     }
+    
+    virtual void resizeEvent( QResizeEvent* )
+    {
+        qDebug() << size();
+    }
+    
     
 protected:
     class WsAccessManager* m_accessManager;

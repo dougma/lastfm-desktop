@@ -34,28 +34,16 @@
 #define HEADING "<div style='color:white;font-size:large'><b>"
 
 
-struct Line : QWidget
-{
-    Line()
-    {
-        setFixedHeight( 1 );
-    }
-    
-    virtual void paintEvent( QPaintEvent* )
-    {
-        QPainter( this ).fillRect( 0, 0, width(), 1, QColor( 0x3a, 0x3b, 0x3c ) );
-    }
-};
-
-
 struct ListView : QListWidget
 {
     ListView()
     {
+        UnicornWidget::paintItBlack( this );
+        
         QPalette p = palette();
-        p.setColor( QPalette::AlternateBase, QColor( 0x1d, 0x1d, 0x1e ) );
-        p.setColor( QPalette::Text, Qt::white );
+        p.setColor( QPalette::Text, QColor( 0xb0b0b0 ) );
         setPalette( p );
+        
         setAlternatingRowColors( true );
         setAttribute( Qt::WA_MacShowFocusRect, false );
     }
@@ -78,17 +66,13 @@ TrackDashboard::TrackDashboard()
     QVBoxLayout* v = new QVBoxLayout( ui.info );
     v->addWidget( ui.bio = new QWebView );
     v->addSpacing( 10 );
-    v->addWidget( new Line );
-    v->addSpacing( 10 );
     v->addWidget( new QLabel( HEADING "Tags" ) );
+    v->addSpacing( 3 );
     v->addWidget( ui.tags = new ListView );
     v->addSpacing( 10 );
-    v->addWidget( new Line );
-    v->addSpacing( 10 );
     v->addWidget( new QLabel( HEADING "Similar Artists" ) );
+    v->addSpacing( 3 );
     v->addWidget( ui.similarArtists = new ListView );
-    v->addWidget( new Line );
-    v->addSpacing( 10 );
     v->setMargin( 0 );
     v->setSpacing( 0 );
     
@@ -313,7 +297,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         int const x = (width() - w) / 2;
 
         ui.cover->resize( ui.papyrus->width(), height() - 12 );
-        ui.info->move( x, ui.cover->height() );
+        ui.info->move( x, ui.cover->height() + 12 );
     }
 
     ui.info->setFixedWidth( w );

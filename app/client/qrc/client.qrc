@@ -1,10 +1,5 @@
 <RCC>
   <qresource>
     <file>station.png</file>
-    <file>black.css</file>
-  </qresource>
-  <qresource prefix="controls">
-    <file>active/tab.png</file>
-    <file>inactive/tab.png</file>
   </qresource>
 </RCC>

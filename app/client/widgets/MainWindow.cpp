@@ -196,10 +196,10 @@ MainWindow::setupUi()
     // The generated ui_MainWindow does a resize for us! FFS
 	adjustSize();
 
-    ui.sources->resize( width(), 0 );
+    ui.sources->adjustSize();
     ui.dashboard->resize( width(), 250 );
     
-    setMinimumWidth( 337 );
+    setMinimumWidth( 300 );
 }
 
 
@@ -393,8 +393,6 @@ MainWindow::dropEvent( QDropEvent* e )
 void
 MainWindow::onUserGetInfoReturn( WsReply* reply )
 {
-    qDebug() << reply;
-    
 	try
 	{
         class Gender
