@@ -208,6 +208,7 @@ FirehoseView::mouseMoveEvent( QMouseEvent* event )
     {
         QImage image( m_itemRects[ i ].size(), QImage::Format_ARGB32_Premultiplied );
         QPainter painter( &image );
+        painter.eraseRect( image.rect() );
         QStyleOptionViewItem opt;
         opt.font = font();
         opt.palette = palette();
