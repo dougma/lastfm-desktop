@@ -78,6 +78,10 @@ PlayerListener::onDataReady()
             PlayerCommandParser parser( QString::fromUtf8( socket->readLine() ) );
             PlayerConnection& connection = m_connections[socket];
             connection.command = parser.command();
+
+            // FIXME: windows needs these because of no persistent sockets.
+            connection.id = parser.playerId();
+            connection.name = connection.determineName();
             
             switch ((int)connection.command)
             {
@@ -93,8 +97,6 @@ PlayerListener::onDataReady()
             switch (connection.command)
             {
                 case PlayerCommandParser::Init:
-                    connection.id = parser.playerId();
-                    connection.name = connection.determineName();
                     connection.clear();
                     break;
                     

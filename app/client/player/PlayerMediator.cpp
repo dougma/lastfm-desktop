@@ -38,10 +38,18 @@ PlayerMediator::PlayerMediator( PlayerListener* listener )
 void
 PlayerMediator::onPlayerConnectionCommandReceived( const PlayerConnection& connection )
 {
+    // FIXME: need to handle Init command not happening
+    if (m_connection.name != connection.name &&
+        connection.command != PlayerCommandParser::Init)
+    {
+        emit playerChanged( connection.name );
+    }
+
     m_connection = connection;
     
     if (m_radioIsActive)
         return;
+
 
     switch (connection.command)
     {
