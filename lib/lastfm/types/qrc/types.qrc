@@ -2,6 +2,5 @@
   <qresource prefix="lastfm">
     <file alias="no/cover.png">nocover.png</file>
     <file alias="no/user.png">nouser.png</file>
-    <file alias="no/user_64.png">nouser_64.png</file>
   </qresource>
 </RCC>

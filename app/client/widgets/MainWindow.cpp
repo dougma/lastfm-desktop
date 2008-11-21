@@ -86,8 +86,6 @@ MainWindow::MainWindow()
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
 
 	setAcceptDrops( true );
-    
-    QTimer::singleShot( 0, ui.viewDashboard, SLOT(trigger()) );
 }
 
 
@@ -194,19 +192,35 @@ MainWindow::setupUi()
 
     ui.sources->setMinimumHeight( 200 );
     ui.dashboard->setMinimumHeight( 100 );
-    ui.dashboard->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::MinimumExpanding );
     
-    ui.sources->hide();
-    ui.dashboard->hide();
-    setFixedHeight( sizeHint().height() );
-    
-    // The generated ui_MainWindow does a resize for us! FFS
-	adjustSize();
-
     ui.sources->adjustSize();
-    ui.dashboard->resize( width(), 250 );
-    
+    ui.dashboard->resize( ui.sources->width(), 250 );
+
     setMinimumWidth( 300 );
+
+    ui.sources->show();
+    ui.dashboard->show();
+
+	adjustSize(); // Qt Designer makes this essential
+    resize( width(), height() + ui.sources->height() + ui.dashboard->height() );
+    
+    //duplicated because Qt is shit
+    QRect r1 = ui.dashboard->geometry();
+    QRect r2 = ui.sources->geometry();
+
+    
+    int h1 = ui.dashboardHeader->sizeHint().height();
+    int h2 = ui.sources->sizeHint().height();
+    int const w = width();
+    
+    ui.dashboardHeader->setGeometry( 0, 0, w, h1 );
+    ui.dashboard->move( 0, h1 + 1 );
+    ui.amp->setGeometry( 0, h1 + r1.height(), w, h2 );
+    int const y = ui.amp->geometry().bottom() + 1;
+    ui.sources->move( 0, y );
+    
+    ui.viewDashboard->setChecked( true );
+    ui.viewSources->setChecked( true );
 }
 
 
@@ -585,33 +599,40 @@ MainWindow::onAnimationFinished()
 void
 MainWindow::resizeEvent( QResizeEvent* e )
 {
+    static bool b = true;
+    if (b) { b = false; return; }
+    
     if (m_animating) return;
     
-    int const new_height = height() - e->oldSize().height();
+    qDebug() << e->oldSize() << e->size();
+    
     int const w = width();
     
-    int new_sources_height = ui.sources->height() + new_height;
-    
-    if (ui.sources->isVisible() && new_sources_height >= ui.sources->minimumHeight())
+    if (e->oldSize().isValid())
     {
-        ui.dashboard->resize( w, ui.dashboard->height() );
-        ui.sources->resize( w, ui.sources->height() + new_height );
-    }
-    else if (ui.dashboard->isVisible())
-    {
-        ui.dashboard->resize( w, ui.dashboard->height() + new_height );
-        ui.sources->resize( w, ui.sources->height() );
-    }
-    else
-    {
-        ui.dashboard->resize( w, ui.dashboard->height() );
-        ui.sources->resize( w, ui.sources->height() );
+        int const new_height = height() - e->oldSize().height();
+        
+        int new_sources_height = ui.sources->height() + new_height;
+        
+        if (ui.sources->isVisible() && new_sources_height >= ui.sources->minimumHeight())
+        {
+            ui.dashboard->resize( w, ui.dashboard->height() );
+            ui.sources->resize( w, ui.sources->height() + new_height );
+        }
+        else if (ui.dashboard->isVisible())
+        {
+            ui.dashboard->resize( w, ui.dashboard->height() + new_height );
+            ui.sources->resize( w, ui.sources->height() );
+        }
+        else
+        {
+            ui.dashboard->resize( w, ui.dashboard->height() );
+            ui.sources->resize( w, ui.sources->height() );
+        }
     }
     
     int const h1 = ui.dashboardHeader->sizeHint().height();
     int const h2 = ui.amp->sizeHint().height();
-    
-    int const available_height = height() - h1 - h2;
 
 #define RECT( x ) x->isVisible() ? x->geometry() : QRect()
     QRect r1 = RECT( ui.dashboard );
