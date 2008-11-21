@@ -40,25 +40,30 @@ FirehoseModel::setNozzle( const QString& nozzle )
     reset();
     
     delete m_socket;
+
+    m_nozzle = nozzle;
     
     // using a socket as WsAccessManager stopped after the HEADERS were returned
     // for some reason
     m_socket = new QTcpSocket( this );
+    connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );    
     m_socket->connectToHost( "firehose.last.fm", 80 );
-    m_socket->waitForConnected( 1000 ); //FIXME
-    
+}
+
+void
+FirehoseModel::onConnect()
+{
+    connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
+    connect( m_socket, SIGNAL(aboutToClose()), SLOT(onFinished()) );    
+
     QByteArray headers = 
-    "GET /stream/"+nozzle.toUtf8()+"\r\n"
+    "GET /stream/" + m_nozzle.toUtf8() + "\r\n"
     "Host: firehose.last.fm\r\n"
     "Connection: keep-alive\r\n\r\n";
     
     m_socket->write( headers );
     m_socket->flush();
-    
-    connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
-    connect( m_socket, SIGNAL(aboutToClose()), SLOT(onFinished()) );    
 }
-
 
 void
 FirehoseModel::onData()

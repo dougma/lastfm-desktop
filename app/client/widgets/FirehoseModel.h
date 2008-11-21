@@ -45,7 +45,8 @@ class FirehoseModel : public QAbstractItemModel
     QList<QDateTime> m_timestamps;
     
     class QTcpSocket* m_socket;
-    
+    QString m_nozzle;
+
     /** used to figure out the zebra stripe */
     uint m_cumulative_count;
     
@@ -54,6 +55,7 @@ public slots:
     void prune(); //prunes the list to 20
     
 private slots:
+    void onConnect();
     void onData();
     void onFinished();
     void onItemReady( class FirehoseItem* );
