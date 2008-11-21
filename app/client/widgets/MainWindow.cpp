@@ -611,7 +611,11 @@ QSize
 MainWindow::sizeHint() const
 {
     QSize s = ui.amp->sizeHint();
-    s.setHeight( s.height() + ui.dashboardHeader->sizeHint().height() );
+    s.setHeight( s.height() + ui.dashboardHeader->sizeHint().height() 
+#ifdef WIN32
+		+ menuBar()->sizeHint().height()
+#endif	
+	);
     return s;
 }
 
