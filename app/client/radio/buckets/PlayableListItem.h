@@ -40,8 +40,9 @@ public:
         QFont f = font();
         f.setPointSize( 10 );
         setFont( f );
-        setIcon( QPixmap( 36, 38 ) );
-        
+        QPixmap p( 36, 38);
+        p.fill( Qt::transparent );
+        setIcon( p );
         setSizeHint( QSize( 60, 60) );
     }
     

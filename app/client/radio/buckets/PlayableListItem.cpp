@@ -74,7 +74,7 @@ PlayableListItem::fetchImage()
         
         case Seed::TagType:
         {
-            setIcon( QIcon( ":/buckets/tag.png" ) );
+            setIcon( QIcon( ":/buckets/tag_39.png" ) );
             return;
         }
     }
