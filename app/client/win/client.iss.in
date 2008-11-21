@@ -60,13 +60,18 @@ Name: "sv"; MessagesFile: "win\Swedish-10-5.1.12.isl"
 [Files]
 ; Main files
 Source: "@BIN_DIR@\Last.fm.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\twiddly.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@BIN_DIR@\core.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@BIN_DIR@\scrobble.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\fingerprint.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\libfftw3f-3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@BIN_DIR@\radio.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\scrobble.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\tag.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\types.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@BIN_DIR@\unicorn.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@BIN_DIR@\ws.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@BIN_DIR@\types.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "@BIN_DIR@\moose.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@BIN_DIR@\resolver.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "@BIN_DIR@\sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\QtCore4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\QtGui4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\QtNetwork4.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -76,6 +81,7 @@ Source: "@QT_DIR@\bin\QtWebKit4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\QtSvg4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\phonon4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@QT_DIR@\bin\QtOpenGL4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "@QT_DIR@\plugins\sqldrivers\qsqlite4.dll"; DestDir: "{app}\sqldrivers"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qjpeg4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qgif4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 Source: "@QT_DIR@\plugins\imageformats\qmng4.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
