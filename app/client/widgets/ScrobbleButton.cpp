@@ -87,13 +87,11 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
     }
     else if (m_track.isValid())
     {
-        m_timer = new QTimeLine;
-        m_timer->setParent( this );
-        m_timer->setCurveShape( QTimeLine::LinearCurve );
-        connect( m_timer, SIGNAL(frameChanged( int )), SLOT(setFrame( int )) );
-        
-        m_timer->setFrameRange( 0, 23 );
-        m_timer->setDuration( watch->scrobblePoint() * 1000 );
+        m_timer = new QTimer;
+        m_timer->setParent( watch );
+        connect( m_timer, SIGNAL(timeout()), SLOT(advanceFrame()) );
+		m_timer->setObjectName( "ScrobbleButton QTimer" );
+        m_timer->setInterval( (watch->scrobblePoint() * 1000) / 23 );
         m_timer->start();
 
         connect( watch, SIGNAL(paused( bool )), m_timer, SLOT(setPaused( bool )) );
@@ -111,9 +109,9 @@ ScrobbleButton::onScrobbled()
 
 
 void
-ScrobbleButton::setFrame( int i )
+ScrobbleButton::advanceFrame()
 {
-    m_movie->jumpToFrame( i );
+    m_movie->jumpToFrame( m_movie->currentFrameNumber() + 1 );
 }
 
 
