@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "TrackDashboard.h"
-#include "FadingScrollbar.h"
+#include "FadingScrollBar.h"
 #include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
