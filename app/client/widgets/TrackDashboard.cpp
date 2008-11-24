@@ -27,6 +27,8 @@
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "radio/buckets/SeedTypes.h"
+#include "PlayableMimeData.h"
 #include <QtGui>
 #include <QSvgRenderer>
 #include <QtWebKit>
@@ -36,7 +38,7 @@
 
 struct ListView : QListWidget
 {
-    ListView()
+    ListView() : m_sType( Seed::Undefined )
     {
         UnicornWidget::paintItBlack( this );
         
@@ -46,7 +48,29 @@ struct ListView : QListWidget
         
         setAlternatingRowColors( true );
         setAttribute( Qt::WA_MacShowFocusRect, false );
+        
+        setDragEnabled( true );
     }
+    
+    QMimeData* mimeData( const QList<QListWidgetItem*> l ) const
+    {
+        if( m_sType < 0 || l.isEmpty() )
+            return 0;
+        
+        QListWidgetItem* item = l.first();
+        
+        switch ( m_sType ) 
+        {
+            case Seed::ArtistType: return PlayableMimeData::createFromArtist( item->text());
+            case Seed::TagType: return PlayableMimeData::createFromTag( item->text());
+            default: return NULL;
+        }
+    }
+    
+    void setSeedType( Seed::Type t ){ m_sType = t; }
+    
+private:
+    Seed::Type m_sType;
 };
 
 
@@ -64,15 +88,18 @@ TrackDashboard::TrackDashboard()
     
     ui.info = new QWidget( ui.papyrus );
     QVBoxLayout* v = new QVBoxLayout( ui.info );
+    
     v->addWidget( ui.bio = new QWebView );
     v->addSpacing( 10 );
-    v->addWidget( new QLabel( HEADING "Tags" ) );
+    v->addWidget( new QLabel( tr( HEADING "Tags") ) );
     v->addSpacing( 3 );
     v->addWidget( ui.tags = new ListView );
+    ((ListView*)ui.tags)->setSeedType( Seed::TagType );
     v->addSpacing( 10 );
-    v->addWidget( new QLabel( HEADING "Similar Artists" ) );
+    v->addWidget( new QLabel( tr( HEADING "Similar Artists") ) );
     v->addSpacing( 3 );
     v->addWidget( ui.similarArtists = new ListView );
+    ((ListView*)ui.similarArtists)->setSeedType( Seed::ArtistType );
     v->setMargin( 0 );
     v->setSpacing( 0 );
     

@@ -48,7 +48,8 @@ PlayerBucketList::PlayerBucketList( QWidget* w )
 			: QListWidget( w ),
 			  m_showDropText( true)
 {
-    connect( this, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT( onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+    connect( this, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
+                   SLOT( onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
     setIconSize( QSize( 33, 38 ));
     m_networkManager = new WsAccessManager( this );
 
@@ -103,8 +104,6 @@ PlayerBucketList::paintEvent( QPaintEvent* event )
     Q_UNUSED( event );
     QPainter p( viewport() );
    
-    QAbstractItemModel* itemModel = model();
-	
     //draw delegate items
 	foreach ( const QModelIndex& i, m_itemRects.keys() )
 	{
@@ -209,10 +208,8 @@ PlayerBucketList::calculateToolIconsLayout()
         return;
     }
     
-    const int scrollbarOffset = verticalScrollBar()->isVisible() ? verticalScrollBar()->width() : 0;
-    const int iconSpacing = 5;
-    
-    ui.clearButton->move( rect().right() - ui.clearButton->rect().width(), rect().center().y() - (ui.clearButton->height() / 2.0f ));
+    ui.clearButton->move( rect().right() - ui.clearButton->rect().width(), 
+                          rect().center().y() - (ui.clearButton->height() / 2.0f ));
     ui.clearButton->show();
     if( !ui.queryEdit->isVisible())
     {

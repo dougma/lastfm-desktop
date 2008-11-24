@@ -31,10 +31,13 @@ PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget*
     
     item->setText( data->text() );
     
+    item->setData( moose::TypeRole, data->type() );
+    
     if( data->hasImage() )
         item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
+    else
+        item->fetchImage();
     
-    item->setData( moose::TypeRole, data->type() );
     return item;
 };
 

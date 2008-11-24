@@ -25,6 +25,7 @@
 namespace Seed
 {
     enum Type { 
+        Undefined = -1,
         ArtistType = 0, 
         TagType, 
         UserType, 

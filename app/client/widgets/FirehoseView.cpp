@@ -211,7 +211,7 @@ FirehoseView::mouseMoveEvent( QMouseEvent* event )
         painter.eraseRect( image.rect() );
         QStyleOptionViewItem opt;
         opt.font = font();
-        opt.palette = palette();
+        opt.palette = viewport()->palette();
         opt.state = QStyle::State_Active;
         opt.rect = m_itemRects[ i ];
         opt.rect.moveTo( 0, 0 );
