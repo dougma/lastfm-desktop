@@ -70,6 +70,7 @@ protected slots:
     
 private:
     void setupUi();
+    State m_playerState;
     
 };
 

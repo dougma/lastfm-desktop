@@ -193,7 +193,8 @@ Amp::onPlayerBucketChanged()
     {
         hideWidgetAnimated( ui.controls, Left );
         hideWidgetAnimated( ui.volume, Right );
-        ui.borderWidget->showText( true );
+        if( m_playerState != Paused )
+            ui.borderWidget->showText( true );
     }
 }
 
@@ -335,10 +336,11 @@ Amp::onTrackSpooled( const Track& t, StopWatch* )
 void 
 Amp::onStateChanged( State s, const Track& t )
 {
+    m_playerState = s;
     if( t.source() != Track::LastFmRadio && s == Paused )
         ui.borderWidget->showText( false );
-    else if( s == Playing )
-        onTrackSpooled( t, 0 );
+    else if( s == Playing && ui.bucket->count() == 0 )
+        ui.borderWidget->showText( true );
 }
 
 
@@ -346,4 +348,6 @@ void
 Amp::onPlayerChanged( const QString& name )
 {
     ui.borderWidget->setText( tr( "%1 is now playing." ).arg( name ) );
+    ui.borderWidget->showText( false );
+    m_playerState = Paused;
 }
