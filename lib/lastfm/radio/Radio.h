@@ -61,7 +61,7 @@ public:
     Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
 
 public slots:
-    void play( const RadioStation& station );
+    void play( const RadioStation& station, bool resolving = true, class AbstractTrackSource* = 0 );
     void skip();
     void stop();
 
@@ -107,6 +107,7 @@ private:
 	Track m_track;
 	RadioStation m_station;
     class Resolver *m_resolver;
+    bool m_resolving;
 
     QList<Track> m_queue;
 };

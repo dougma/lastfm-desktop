@@ -48,7 +48,7 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
     connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
     Phonon::createPath( m_mediaObject, m_audioOutput );    
     
-    if (m_resolver)
+    if ( m_resolver )
         connect( m_resolver, SIGNAL(resolveComplete( Track )), SLOT(onResolveComplete( Track )) );    
 }
 
@@ -78,7 +78,7 @@ Radio::~Radio()
 
 
 void
-Radio::play( const RadioStation& station )
+Radio::play( const RadioStation& station, bool resolving, AbstractTrackSource* ats )
 {
     if (m_state != Stopped)
     {
@@ -91,11 +91,19 @@ Radio::play( const RadioStation& station )
     }
 
 	m_station = station;
+    m_resolving = resolving;
 	delete m_tuner;
 
-    m_tuner = station.isLegacyPlaylist()
-            ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
-            : (AbstractTrackSource*) new Tuner( station );
+    if ( ats )
+    {
+        m_tuner = ats;
+    }
+    else
+    {
+        m_tuner = station.isLegacyPlaylist()
+                ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
+                : (AbstractTrackSource*) new Tuner( station );
+    }
 
 	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
@@ -124,15 +132,15 @@ Radio::enqueue( const QList<Track>& tracks )
 	
     foreach (const Track& t, tracks)
     {
-        if (m_resolver) {
-            m_resolver->resolve(t);
+        if ( m_resolver && m_resolving ) {
+            m_resolver->resolve( t );
         }
         m_queue += t;
     }
 
     if (m_state == TuningIn) {
         // we need to kick off phonon
-        if (m_resolver) {
+        if ( m_resolver && m_resolving ) {
             // give the resolver a chance with the first track
             QTimer::singleShot( TUNING_RESOLVER_WAIT_MS, this, SLOT(phononEnqueue()) );
         } else {
@@ -202,9 +210,9 @@ Radio::stop()
 void
 Radio::clear()
 {
-    if (m_resolver) {
-        foreach(const Track& t, m_queue) {
-            m_resolver->stopResolving(t);
+    if ( m_resolver && m_resolving ) {
+        foreach( const Track& t, m_queue ) {
+            m_resolver->stopResolving( t );
         }
     }
     m_queue.clear();
@@ -266,7 +274,7 @@ Radio::phononEnqueue()
     // only keep one track in the phononQueue
     if (!m_queue.isEmpty() && m_mediaObject->queue().isEmpty()) {
         Track t = m_queue.first();
-        if (m_resolver) 
+        if ( m_resolver && m_resolving ) 
             m_resolver->stopResolving( t );
 
         m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
