@@ -749,40 +749,6 @@ LocalCollection::filesByArtist(QString artist)
 }
 
 
-//// return a new vector with duplicate tags replaced 
-//// with a single tag having their average weight
-//// static
-//QVector< QPair<int, float> > 
-//averageTagWeights(const QVector< QPair<int, float> >& tags)
-//{
-//    QVector< QPair<int, float> > result;
-//
-//    int prev = 0;
-//    int count = 0;
-//    float total = 0;
-//
-//    foreach(QPair<int, float>& pair, tags) {
-//        if (prev == 0)
-//            prev = pair.first;
-//
-//        if (pair.first != prevTag) {
-//            Q_ASSERT(count == 0);
-//            result << QPair(prev, total / count);
-//            count = 0;
-//            total = 0;
-//            prev = pair.first;
-//        }
-//
-//        count++;
-//        total += pair.second;
-//    }
-//
-//    if (count)
-//        result << QPait(prev, total / count);
-//
-//    return result;
-//}
-
 // returns
 // a list of pairs of 
 //  artist id and 
