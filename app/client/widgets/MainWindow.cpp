@@ -406,11 +406,11 @@ MainWindow::dropEvent( QDropEvent* e )
 {
 	QList<QUrl> const urls = lastfmUrls( e->mimeData()->urls() );
 	if (urls.count())
-		The::app().play( urls[0].toString() );
+		The::app().open( urls[0] );
     else {
         foreach(QUrl q, e->mimeData()->urls()) {
             if (q.path().endsWith(".xspf")) {
-                The::app().playXspf( q );
+                The::app().openXspf( q );
                 break;
             }
         }
