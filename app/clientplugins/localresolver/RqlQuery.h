@@ -17,63 +17,23 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef RQL_QUERY_H
+#define RQL_SUERY_H
 
-#ifndef RESULT_SET_H
-#define RESULT_SET_H
-
+#include "SimilarArtists.h"
 #include <QSet>
 
-class ResultSet : public QSet<uint>
-{
-    // marks a special kind of result set which 
-    // has come from an unsupported rql service name.
-    // it behaves differently depending on the operation
-    // so as not to ruin the whole query.  :)
 
-protected:
-    bool m_unsupported; 
+class RqlQuery
+{
+    class LocalCollection *m_collection;
+    SimilarArtists m_similarArtists;
 
 public:
-    ResultSet()
-        :m_unsupported(false)
-    {
-    }
+    RqlQuery();
+    ~RqlQuery();
 
-    ResultSet(const QSet<uint>& set)
-        :QSet<uint>(set)
-    {
-    }
-
-    ResultSet and(const ResultSet &other)
-    {
-        intersect(other);
-        return *this;
-    }
-
-    ResultSet or(const ResultSet &other)
-    {
-        unite(other);
-        return *this;
-    }
-
-    ResultSet and_not(const ResultSet &other)
-    {
-        subtract(other);
-        return *this;
-    }
-
+    QSet<uint> doQuery(const char *rql);
 };
-
-
-struct UnsupportedResultSet : public ResultSet
-{
-    UnsupportedResultSet()
-    {
-        m_unsupported = true;
-    }
-};
-
-
-
 
 #endif

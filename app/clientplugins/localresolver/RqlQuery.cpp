@@ -17,63 +17,70 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include "RqlQuery.h"
+#include "LocalCollection.h"
+#include "RqlOpProcessor.h"
+#include "rqlParser/parser.h"
 
-#ifndef RESULT_SET_H
-#define RESULT_SET_H
+using namespace std;
+using namespace fm::last::query_parser;
 
-#include <QSet>
 
-class ResultSet : public QSet<uint>
+RqlOp root2op( const querynode_data& node )
 {
-    // marks a special kind of result set which 
-    // has come from an unsupported rql service name.
-    // it behaves differently depending on the operation
-    // so as not to ruin the whole query.  :)
+   RqlOp op;
+   op.isRoot = true;
+   op.name = node.name;
+   op.type = node.type;
+   op.weight = node.weight;
 
-protected:
-    bool m_unsupported; 
-
-public:
-    ResultSet()
-        :m_unsupported(false)
-    {
-    }
-
-    ResultSet(const QSet<uint>& set)
-        :QSet<uint>(set)
-    {
-    }
-
-    ResultSet and(const ResultSet &other)
-    {
-        intersect(other);
-        return *this;
-    }
-
-    ResultSet or(const ResultSet &other)
-    {
-        unite(other);
-        return *this;
-    }
-
-    ResultSet and_not(const ResultSet &other)
-    {
-        subtract(other);
-        return *this;
-    }
-
-};
+   return op;
+}
 
 
-struct UnsupportedResultSet : public ResultSet
+RqlOp leaf2op( const querynode_data& node )
 {
-    UnsupportedResultSet()
-    {
-        m_unsupported = true;
+   RqlOp op;
+   op.isRoot = false;
+
+   if ( node.ID < 0 )
+      op.name = node.name;
+   else
+   {
+      ostringstream oss;
+      oss << '<' << node.ID << '>';
+      op.name = oss.str();
+   }
+   op.type = node.type;
+   op.weight = node.weight;
+
+   return op;
+}
+
+
+
+RqlQuery::RqlQuery()
+:m_collection(0)
+{
+}
+
+RqlQuery::~RqlQuery()
+{
+    delete m_collection;
+}
+
+QSet<uint>
+RqlQuery::doQuery(const char *rql)
+{
+    if (!m_collection)
+        m_collection = LocalCollection::create("RqlQuery");
+
+    parser p;
+    if (p.parse(string(rql))) {
+        vector<RqlOp> ops;
+        p.getOperations<RqlOp>(ops, &root2op, &leaf2op);
+        return RqlOpProcessor::process(ops, *m_collection, m_similarArtists);
     }
-};
 
-
-
-
-#endif
+    return QSet<uint>();
+}

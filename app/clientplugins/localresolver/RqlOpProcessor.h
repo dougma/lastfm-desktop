@@ -17,63 +17,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef RQL_OP_PROCESSOR_H
+#define RQL_OP_PROCESSOR_H
 
-#ifndef RESULT_SET_H
-#define RESULT_SET_H
+#include "RqlOp.h"
+#include "ResultSet.h"
+#include <vector>
 
-#include <QSet>
-
-class ResultSet : public QSet<uint>
+class RqlOpProcessor
 {
-    // marks a special kind of result set which 
-    // has come from an unsupported rql service name.
-    // it behaves differently depending on the operation
-    // so as not to ruin the whole query.  :)
+    std::vector<RqlOp>::iterator m_it, m_end;
+    class LocalCollection& m_collection;
+    class SimilarArtists& m_similarArtists;
 
-protected:
-    bool m_unsupported; 
+    RqlOpProcessor(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
+    void next();
+    ResultSet process();
+    ResultSet unsupported();
+    ResultSet globalTag();
+    ResultSet userTag();
+    ResultSet artist();
+    ResultSet similarArtist();
 
 public:
-    ResultSet()
-        :m_unsupported(false)
-    {
-    }
-
-    ResultSet(const QSet<uint>& set)
-        :QSet<uint>(set)
-    {
-    }
-
-    ResultSet and(const ResultSet &other)
-    {
-        intersect(other);
-        return *this;
-    }
-
-    ResultSet or(const ResultSet &other)
-    {
-        unite(other);
-        return *this;
-    }
-
-    ResultSet and_not(const ResultSet &other)
-    {
-        subtract(other);
-        return *this;
-    }
+    static ResultSet process(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
 
 };
-
-
-struct UnsupportedResultSet : public ResultSet
-{
-    UnsupportedResultSet()
-    {
-        m_unsupported = true;
-    }
-};
-
-
-
 
 #endif

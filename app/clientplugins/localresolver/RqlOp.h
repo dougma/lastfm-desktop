@@ -17,63 +17,19 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef RQL_OP_H
+#define RQL_OP_H
 
-#ifndef RESULT_SET_H
-#define RESULT_SET_H
 
-#include <QSet>
+#include <string>
 
-class ResultSet : public QSet<uint>
+struct RqlOp
 {
-    // marks a special kind of result set which 
-    // has come from an unsupported rql service name.
-    // it behaves differently depending on the operation
-    // so as not to ruin the whole query.  :)
-
-protected:
-    bool m_unsupported; 
-
-public:
-    ResultSet()
-        :m_unsupported(false)
-    {
-    }
-
-    ResultSet(const QSet<uint>& set)
-        :QSet<uint>(set)
-    {
-    }
-
-    ResultSet and(const ResultSet &other)
-    {
-        intersect(other);
-        return *this;
-    }
-
-    ResultSet or(const ResultSet &other)
-    {
-        unite(other);
-        return *this;
-    }
-
-    ResultSet and_not(const ResultSet &other)
-    {
-        subtract(other);
-        return *this;
-    }
-
+   bool isRoot;
+   int type;            // OpType from rqlparser/enums.h
+   double weight;
+   std::string name;
 };
-
-
-struct UnsupportedResultSet : public ResultSet
-{
-    UnsupportedResultSet()
-    {
-        m_unsupported = true;
-    }
-};
-
-
 
 
 #endif

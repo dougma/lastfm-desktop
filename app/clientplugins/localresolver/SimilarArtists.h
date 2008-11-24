@@ -82,6 +82,7 @@ struct TagDataset
 
     float get_norm(const Entry& entry) const
     { 
+        // todo: need to precalculate this 
         float sum = 0;
         typedef QPair< TagId, TagWeight > Tag;
         foreach(const Tag& tag, entry.second) {
