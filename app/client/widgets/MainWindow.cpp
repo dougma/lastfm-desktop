@@ -28,6 +28,7 @@
 #include "widgets/MessageBar.h"
 #include "widgets/PlaylistDialog.h"
 #include "widgets/SettingsDialog.h"
+#include "widgets/LocalRqlDialog.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "widgets/TrackDashboard.h"
@@ -64,6 +65,7 @@ MainWindow::MainWindow()
 
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
+    connect( ui.viewLocalRql, SIGNAL(triggered()), SLOT(showLocalRqlDialog()) );
     connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
@@ -237,6 +239,11 @@ MainWindow::showDiagnosticsDialog()
     UNICORN_UNIQUE_DIALOG( DiagnosticsDialog )
 }
 
+void
+MainWindow::showLocalRqlDialog()
+{
+    UNICORN_UNIQUE_DIALOG( LocalRqlDialog )
+}
 
 void
 MainWindow::showAboutDialog()
@@ -399,11 +406,11 @@ MainWindow::dropEvent( QDropEvent* e )
 {
 	QList<QUrl> const urls = lastfmUrls( e->mimeData()->urls() );
 	if (urls.count())
-		The::app().open( urls[0] );
+		The::app().play( urls[0].toString() );
     else {
         foreach(QUrl q, e->mimeData()->urls()) {
             if (q.path().endsWith(".xspf")) {
-                The::app().openXspf( q );
+                The::app().playXspf( q );
                 break;
             }
         }

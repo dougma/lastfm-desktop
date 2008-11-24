@@ -50,6 +50,7 @@
     <addaction name="viewSources" />
     <addaction name="separator" />
     <addaction name="settings" />
+    <addaction name="viewLocalRql" />
    </widget>
    <widget class="QMenu" name="windowMenu" >
     <property name="title" >
@@ -194,6 +195,11 @@
    </property>
    <property name="text" >
     <string>Ban</string>
+   </property>
+  </action>
+  <action name="viewLocalRql" >
+   <property name="text" >
+    <string>Local &amp;Rql</string>
    </property>
   </action>
  </widget>

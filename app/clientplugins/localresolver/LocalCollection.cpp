@@ -97,8 +97,6 @@ LocalCollection::initDatabase()
     }
     m_db.open();
 
-    qDebug() << "here!";
-
     if ( !m_db.tables().contains( "metadata" ) ) {
         QUERY( "CREATE TABLE files ("
                     "id                INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -706,6 +704,135 @@ LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDat
         bindValue( ":next_dl_time", nextDlTime.toUTC().toTime_t() ).
         exec();
     }
+}
+
+QSet<unsigned>
+LocalCollection::filesWithTag(QString tag)
+{
+    QSet<unsigned> result;
+
+    int tagId = getTagId( tag.simplified().toLower(), false );
+    if ( tagId > 0 ) {
+        QSqlQuery query = 
+            PREPARE( "SELECT file FROM tracktags WHERE tag == :tagId" ).
+            setForwardOnly( true ).
+            bindValue( ":tagId", tagId ).
+            exec();
+        while ( query.next() ) {
+            uint id = query.value( 0 ).toUInt();
+            result << id;
+        }
+    }
+
+    return result;
+}
+
+QSet<unsigned> 
+LocalCollection::filesByArtist(QString artist)
+{
+    QSet<unsigned> result;
+
+    int artistId = getArtistId( artist.simplified().toLower(), false );
+    if ( artistId > 0 ) {
+        QSqlQuery query = 
+            PREPARE( "SELECT id FROM files WHERE artist == :artistId" ).
+            setForwardOnly( true ).
+            bindValue( ":artistId", artistId ).
+            exec();
+        while ( query.next() ) {
+            uint id = query.value( 0 ).toUInt();
+            result << id;
+        }
+    }
+
+    return result;
+}
+
+
+//// return a new vector with duplicate tags replaced 
+//// with a single tag having their average weight
+//// static
+//QVector< QPair<int, float> > 
+//averageTagWeights(const QVector< QPair<int, float> >& tags)
+//{
+//    QVector< QPair<int, float> > result;
+//
+//    int prev = 0;
+//    int count = 0;
+//    float total = 0;
+//
+//    foreach(QPair<int, float>& pair, tags) {
+//        if (prev == 0)
+//            prev = pair.first;
+//
+//        if (pair.first != prevTag) {
+//            Q_ASSERT(count == 0);
+//            result << QPair(prev, total / count);
+//            count = 0;
+//            total = 0;
+//            prev = pair.first;
+//        }
+//
+//        count++;
+//        total += pair.second;
+//    }
+//
+//    if (count)
+//        result << QPait(prev, total / count);
+//
+//    return result;
+//}
+
+// returns
+// a list of pairs of 
+//  artist id and 
+//  vector of 
+//   pairs of 
+//    tag id and 
+//    tag weight
+QList< QPair<int, QVector< QPair<int, float> > > >
+LocalCollection::allTags()
+{
+    QSqlQuery query =
+        PREPARE( "SELECT artist, tag, avg(weight) "
+            "FROM tracktags "
+            "INNER JOIN files on tracktags.file = files.id "
+            "GROUP BY artist, tag "
+            "ORDER BY artist, tag ").
+        setForwardOnly( true ).
+        exec();
+
+    typedef QVector< QPair<int, float> > TagVec;
+    typedef QList< QPair<int, TagVec> > ArtistTagVec;
+
+    ArtistTagVec result;
+    {
+        int prevArtistId = 0;
+        TagVec currentArtistTags;
+
+        while ( query.next() ) {
+            int artistId = query.value(0).toInt();
+            int tag = query.value(1).toInt();
+            float weight = query.value(2).toDouble() / 100;
+
+            if (prevArtistId == 0) // first run through the loop
+                prevArtistId = artistId;
+
+            if (prevArtistId != artistId) {
+                result << qMakePair(prevArtistId, currentArtistTags);
+                currentArtistTags = TagVec();
+                prevArtistId = artistId;
+            }
+
+            currentArtistTags << qMakePair(tag, weight);
+        }
+
+        if (currentArtistTags.size()) {
+            result << qMakePair(prevArtistId, currentArtistTags);
+        }
+    }
+
+    return result;
 }
 
 

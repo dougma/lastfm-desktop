@@ -32,7 +32,7 @@ class TagDialog;
 class SettingsDialog;
 class DiagnosticsDialog;
 class PlaylistDialog;
-
+class LocalRqlDialog;
 
 /** ok it's private, that's insane yeah? Yeah. But this is a global singleton
   * and I had a bug where some stupid insignificant class was manipulating the size
@@ -75,6 +75,7 @@ public slots:
     void showShareDialog();
 	void showTagDialog();
     void showPlaylistDialog();
+    void showLocalRqlDialog();
     
     // true = open it up
     void animate( bool = true );
@@ -109,6 +110,7 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
+    UNICORN_UNIQUE_DIALOG_DECL( LocalRqlDialog );
 
     bool m_animatingDashboard;
     bool m_animatingSources;

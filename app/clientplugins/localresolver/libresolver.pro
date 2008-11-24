@@ -14,3 +14,6 @@ HEADERS  = $$findSources( h )
 SOURCES -= test.cpp
 
 win32:LIBS += -lmpr
+
+QMAKE_CXXFLAGS += -Zi 
+QMAKE_LFLAGS += /DEBUG /OPT:ICF /OPT:REF

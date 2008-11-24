@@ -40,7 +40,7 @@ lastfm_getService(const char *service)
         return static_cast<ITrackResolverPlugin*>(new TrackResolver());
     }
     if (0 == strcmp("LocalRql", service)) {
-        return new LocalRqlPlugin();
+        return static_cast<ILocalRqlPlugin*>(new LocalRqlPlugin());
     }
     return 0;
 }

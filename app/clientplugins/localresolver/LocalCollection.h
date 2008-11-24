@@ -32,6 +32,9 @@
 #include <QDateTime>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QPair>
+#include <QList>
+#include <QVector>
 #include "ChainableQuery.h"
 #include "lib/lastfm/core/WeightedStringList.h"
 
@@ -163,6 +166,11 @@ public:
     void removeFiles(QList<int> ids);
 
     QList<LocalCollection::ResolveResult> resolve(const QString artist, const QString album, const QString title);
+
+    // rql support
+    QSet<unsigned> filesWithTag(QString tag);
+    QSet<unsigned> filesByArtist(QString artist);
+    QList< QPair< int, QVector< QPair< int, float > > > > allTags();
 
     // tag handling
     int getTagId(QString tag, bool bCreate);
