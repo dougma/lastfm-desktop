@@ -369,18 +369,20 @@ Sources::connectToAmp( Amp* amp )
 void 
 Sources::authUserIconDataDownloaded()
 {
-    QNetworkReply* reply = static_cast< QNetworkReply* >( sender());
+    QNetworkReply* reply = static_cast< QNetworkReply* >( sender() );
 
     QPixmap pm;
-    pm.loadFromData( reply->readAll()); 
-    QListWidgetItem* item;
-    for( int i = 0; (item = ui.stationsBucket->item( i )); i++ )
+    if ( pm.loadFromData( reply->readAll()) ) 
     {
-        PlayableListItem* pitem;
-        if( !(pitem = dynamic_cast< PlayableListItem*>( item )))
-            continue;
-        
-        pitem->setPixmap( pm );
+        QListWidgetItem* item;
+        for( int i = 0; (item = ui.stationsBucket->item( i )); i++ )
+        {
+            PlayableListItem* pitem;
+            if( !(pitem = dynamic_cast< PlayableListItem*>( item )))
+                continue;
+            
+            pitem->setPixmap( pm );
+        }
     }
 }
 
