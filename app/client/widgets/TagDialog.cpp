@@ -76,9 +76,16 @@ TagDialog::setupUi()
     
     WATCH_LIST( ui.trackTags );
     WATCH_LIST( ui.artistTags );
-    WATCH_LIST( ui.artistTags );
+    WATCH_LIST( ui.albumTags );
     
 #undef WATCH_LIST
+
+    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+    connect( new QShortcut( QKeySequence("Backspace"), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+    connect( new QShortcut( QKeySequence("Backspace"), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+    connect( new QShortcut( QKeySequence("Backspace"), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
     
     ui.tabs2 = new Unicorn::TabWidget;
     ui.tabs2->addTab( tr("Suggested Tags"), ui.suggestedTags = new TagListWidget );
@@ -186,5 +193,20 @@ TagDialog::onListItemsChanged( const QModelIndex&, int, int )
 {
     ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( ui.trackTags->topLevelItemCount() +
                                                             ui.artistTags->topLevelItemCount() + 
-                                                            ui.albumTags->topLevelItemCount () );
+                                                            ui.albumTags->topLevelItemCount() );
+}
+
+
+void 
+TagDialog::removeCurrentTag()
+{
+    QShortcut* sc = qobject_cast<QShortcut*>(sender());
+    if( !sc )
+        return;
+    QTreeWidget* list = qobject_cast<QTreeWidget*>(sc->parentWidget());
+    if( !list )
+        return;
+    
+    if( list->hasFocus())
+        delete list->currentItem();
 }

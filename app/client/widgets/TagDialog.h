@@ -47,6 +47,8 @@ private slots:
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
     void onListItemsChanged( const QModelIndex&, int, int );
+    
+    void removeCurrentTag();
 
 private:
     struct Ui
