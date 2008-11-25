@@ -801,6 +801,32 @@ LocalCollection::allTags()
     return result;
 }
 
+bool 
+LocalCollection::getFileById(int fileId, LocalCollection::FileResult &out)
+{
+    QSqlQuery query = PREPARE(
+        "SELECT album, artists.lowercase_name, lowercase_title, "
+        "sources.volume, directories.path, filename, duration "
+        "FROM files "
+        "INNER JOIN artists on files.artist = artists.id "
+        "INNER JOIN directories on files.directory = directories.id "
+        "INNER JOIN sources on directories.source = sources.id "
+        "WHERE files.id = :fileId" ).
+        bindValue(":fileId", fileId).
+        exec();
+    if (query.next()) {
+        out.m_album = query.value(0).toString();
+        out.m_artist = query.value(1).toString();
+        out.m_title = query.value(2).toString();
+        out.m_sourcename = query.value(3).toString();
+        out.m_path = query.value(4).toString();
+        out.m_filename = query.value(5).toString();
+        out.m_duration = query.value(6).toUInt();
+        return true;
+    }
+    return false;
+}
+
 
 //////////////////////////////////////////////////////////////
 

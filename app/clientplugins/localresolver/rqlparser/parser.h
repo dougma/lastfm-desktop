@@ -13,8 +13,9 @@
 #include <string>
 #include <map>
 
-#include <map>
+//#include <google/sparse_hash_map>
 #include <boost/functional/hash.hpp>
+#include <boost/function.hpp>
 
 /**
  * \namespace fm::last::query_parser
@@ -80,17 +81,38 @@ class parser
 {
 public:
 
-   /// Shorthand notation for a Google dense hash map mapping from string to int with Boost's string hash function
-   /**
-    * These hash maps are used extensively when mapping user/tag/artist names
-    * to their IDs, hence the typedef.
-    */
-  typedef std::map< std::string, int> hashMap_t;
-
-public:
-
    /// Constructs the parser
    parser();
+
+   /// Sets the mapping function from tag names to IDs
+   /** 
+   * \param  func  the map function to use (must get a const std::string& and return int)
+   * \note you can use boost::bind to set the function!
+   * \important must return -1 if there's no valid mapping
+   */
+   template <typename TFunc>
+   void setTagMappings(TFunc func)
+   { m_tagMappingsFunc = func; }
+
+   /// Sets the mapping function from artist names to IDs
+   /** 
+   * \param  func  the map function to use (must get a const std::string& and return int)
+   * \note you can use boost::bind to set the function!
+   * \important must return -1 if there's no valid mapping
+   */
+   template <typename TFunc>
+   void setArtistMappings(TFunc func)
+   { m_artistMappingsFunc = func; }
+
+   /// Sets the mapping function from user names to IDs
+   /** 
+   * \param  func  the map function to use (must get a const std::string& and return int)
+   * \note you can use boost::bind to set the function!
+   * \important must return -1 if there's no valid mapping
+   */
+   template <typename TFunc>
+   void setUserMappings(TFunc func)
+   { m_userMappingsFunc = func; }
 
    /// Parses the given \c radioql query
    /** \param  str  the query to be parsed
@@ -129,12 +151,18 @@ public:
     *                           node to an operator for the vector representation
     * \param[in]   leafToOpFun  Boost function that tells us how to turn a leaf
     *                           node to an operator for the vector representation
+    * \param[in]   swapTagBranches make sure that in case a branch contains only tags
+    *                              and the operation is an AND/ANDNOT, the tag is set
+    *                              on the right side of the branch. This is useful when
+    *                              the tag operation act as "filter" over what has been
+    *                              fetched.
     */
    template <typename T>
    void getOperations(
-      std::vector<T>& ops,
+      const boost::function< void( const T& t )>& accumulateFun,
       const boost::function< T( const querynode_data& node )>& rootToOpFun,
-      const boost::function< T( const querynode_data& node )>& leafToOpFun );
+      const boost::function< T( const querynode_data& node )>& leafToOpFun,
+      bool swapTagBranches = false );
 
    /// Returns the name of an operator, given the operator type
    /**
@@ -167,21 +195,18 @@ private:
     *                           node to an operator for the vector representation
     * \param       it           iterator pointing to the node of the tree that is
     *                           the root of the expression we are processing
+    * \param[in]   swapTagBranches make sure that in case a branch contains only tags
+    *                              and the operation is an AND/ANDNOT, the tag is set
+    *                              on the right side of the branch. This is useful when
+    *                              the tag operation act as "filter" over what has been
+    *                              fetched.
     */
    template <typename T>
-   void eval_expression( std::vector<T>& ops,
+   void eval_expression( const boost::function< void( const T& t )>& accumulateFun,
                          const boost::function< T( const querynode_data& node )>& rootToOpFun,
                          const boost::function< T( const querynode_data& node )>& leafToOpFun,
-                         tree_iter_t const& it );
-
-   /// Copies the next token from a <tt>char*</tt> line into a <tt>char*</tt> buffer
-   /**
-    * \param[out]    pBuf      the next token is returned here
-    * \param[in]     pLine     the line being parsed
-    * \param[in]     lineSize  length of the line we have (used as a max value for \a lineIt)
-    * \param[in,out] lineIt    the current position in the line (will be updated)
-    */
-   static void getToken(char* pBuf, const char* pLine, const int lineSize, int& lineIt);
+                         tree_iter_t const& it,
+                         bool swapTagBranches );
 
    /// Returns the ID corresponding to the given key from the given map
    /**
@@ -190,9 +215,20 @@ private:
     * \param  forceLowerCase will convert the key to lowercase before checking
     * \return  the ID or -1 if the key was not found
     */
-   int  getID( boost::shared_ptr<const hashMap_t>& pItemMapper, const std::string& key, bool forceLowerCase = true );
+   int  getID( boost::function< int(const std::string&) >& mapperFunc, 
+               const std::string& key, bool forceLowerCase = true );
+
+   /// returns true if the given branch contains only tag-based leaves
+   inline bool isTagBranch( tree_iter_t const& it );
 
 private:
+
+   /// Function storing the mapping from tag names to IDs
+   boost::function< int(const std::string&) > m_tagMappingsFunc;
+   /// Function storing the mapping from artist names to IDs
+   boost::function< int(const std::string&) > m_artistMappingsFunc;
+   /// Function storing the mapping from user names to IDs
+   boost::function< int(const std::string&) > m_userMappingsFunc;
 
    /// Iterator of the string we are parsing (or that we parsed the last time)
    iterator_t  m_pStringToParse;
@@ -209,12 +245,12 @@ private:
 
 template <typename T>
 void parser::getOperations(
-   std::vector<T>& ops,
+   const boost::function< void( const T& t )>& accumulateFun,
    const boost::function< T( const querynode_data& node )>& rootToOpFun,
-   const boost::function< T( const querynode_data& node )>& leafToOpFun )
+   const boost::function< T( const querynode_data& node )>& leafToOpFun,
+   bool swapTagBranches /*= true */)
 {
-   ops.clear();
-   eval_expression(ops, rootToOpFun, leafToOpFun, m_pi.trees.begin());
+   eval_expression(accumulateFun, rootToOpFun, leafToOpFun, m_pi.trees.begin(), swapTagBranches);
 }
 
 // -----------------------------------------------------------------------------
@@ -222,10 +258,11 @@ void parser::getOperations(
 
 template <typename T>
 void parser::eval_expression(
-   std::vector<T>& ops,
+   const boost::function< void( const T& t )>& accumulateFun,
    const boost::function< T( const querynode_data& node )>& rootToOpFun,
    const boost::function< T( const querynode_data& node )>& leafToOpFun,
-   tree_iter_t const& it )
+   tree_iter_t const& it,
+   bool swapTagBranches )
 {
    T op;
    querynode_data currNode = it->value.value(); // make a copy
@@ -236,16 +273,28 @@ void parser::eval_expression(
       //if ( currNode.name.empty() )
       //   currNode.name = getOpName(currNode.type);
 
-      ops.push_back(op);
+      accumulateFun(op);
       if ( it->children.size() != 2 )
          throw std::runtime_error("radioql_parser: Invalid number of children for operator!");
 
-      eval_expression(ops, rootToOpFun, leafToOpFun, it->children.begin());
-      eval_expression(ops, rootToOpFun, leafToOpFun, it->children.begin()+1);
+      if ( swapTagBranches && 
+           currNode.type != OT_OR &&
+           isTagBranch(it->children.begin()) )
+      {
+         // swap branches!
+         eval_expression(accumulateFun, rootToOpFun, leafToOpFun, it->children.begin()+1, swapTagBranches);
+         eval_expression(accumulateFun, rootToOpFun, leafToOpFun, it->children.begin()  , swapTagBranches);
+      }
+      else
+      {
+         eval_expression(accumulateFun, rootToOpFun, leafToOpFun, it->children.begin(),   swapTagBranches);
+         eval_expression(accumulateFun, rootToOpFun, leafToOpFun, it->children.begin()+1, swapTagBranches);
+      }
+
    }
    else if ( it->value.id() == querynode_data::tokenID )
    {
-/*
+
       if ( currNode.ID < 0 )
       { // no ID specified: let's try to set it from the mappings
          switch ( currNode.type )
@@ -254,26 +303,49 @@ void parser::eval_expression(
          case RS_LOVED:
          case RS_NEIGHBORS:
          case RS_RECOMMENDED:
-            currNode.ID = getID(m_pUserMappings, currNode.name);
+            currNode.ID = getID(m_userMappingsFunc, currNode.name);
             break;
 
          case RS_GLOBAL_TAG:
-            currNode.ID = getID(m_pTagMappings, currNode.name);
+            currNode.ID = getID(m_tagMappingsFunc, currNode.name);
             break;
 
          case RS_SIMILAR_ARTISTS:
-            currNode.ID = getID(m_pArtistMappings, currNode.name);
+         case RS_ARTIST:
+            currNode.ID = getID(m_artistMappingsFunc, currNode.name);
             break;
          }
       }
-*/
+
       op = leafToOpFun(currNode);
-      ops.push_back(op);
+      accumulateFun(op);
    }
    else
       throw std::runtime_error("radioql_parser: Invalid node ID!");
 }
 
+// -----------------------------------------------------------------------------
+
+bool parser::isTagBranch( tree_iter_t const& it )
+{
+   if ( it->value.id() == querynode_data::operationID )
+   {
+      return isTagBranch(it->children.begin()) && 
+             isTagBranch(it->children.begin()+1);
+   }
+   else if ( it->value.id() == querynode_data::tokenID )
+   {
+      const querynode_data& currNode = it->value.value(); //ref!
+      if ( currNode.type == RS_GLOBAL_TAG )
+         return true;
+      else
+         return false;
+   }
+   else
+      throw std::runtime_error("radioql_parser: Invalid node ID!");
+
+   return false;
+}
 
 // -----------------------------------------------------------------------------
 

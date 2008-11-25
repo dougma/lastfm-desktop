@@ -26,7 +26,7 @@
 using namespace fm::last::query_parser;
 
 
-RqlOpProcessor::RqlOpProcessor(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists)
+RqlOpProcessor::RqlOpProcessor(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists)
     : m_collection(collection)
     , m_similarArtists(similarArtists)
     , m_it(ops.begin())
@@ -124,7 +124,7 @@ RqlOpProcessor::similarArtist()
 
 // static
 ResultSet 
-RqlOpProcessor::process(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists)
+RqlOpProcessor::process(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists)
 {
     return RqlOpProcessor(ops, collection, similarArtists).process();
 }

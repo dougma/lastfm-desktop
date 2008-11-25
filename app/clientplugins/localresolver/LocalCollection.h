@@ -107,6 +107,17 @@ public:
         unsigned m_duration;
     };
 
+    struct FileResult
+    {
+        QString m_artist;
+        QString m_album;
+        QString m_title;
+        QString m_filename;
+        QString m_path;
+        QString m_sourcename;
+        unsigned m_duration;
+    };
+
     class ResolveResult : public FileMeta
     {
     public:
@@ -171,6 +182,7 @@ public:
     QSet<unsigned> filesWithTag(QString tag);
     QSet<unsigned> filesByArtist(QString artist);
     QList< QPair< int, QVector< QPair< int, float > > > > allTags();
+    bool getFileById(int fileId, LocalCollection::FileResult &out);
 
     // tag handling
     int getTagId(QString tag, bool bCreate);

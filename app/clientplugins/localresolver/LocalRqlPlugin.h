@@ -21,12 +21,14 @@
 #define LOCAL_RQL_H
 
 #include "../ILocalRql.h"
+#include "SimilarArtists.h"
 
 
 class LocalRqlPlugin : public ILocalRqlPlugin
 {
     class TagUpdater* m_tagUpdater;
-    class RqlQuery* m_query;
+    class LocalCollection* m_localCollection;
+    SimilarArtists m_sa;
 
 public:
     LocalRqlPlugin();
@@ -34,8 +36,8 @@ public:
 
     // ILocalRqlPlugin:
     void init();
-	ILocalRqlPull* play(const char *rql);
-    void finished(ILocalRqlPull* radio);
+	void parse(const char *rql, ILocalRqlParseCallback *);
+    void finished();
 };
 
 

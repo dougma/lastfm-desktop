@@ -15,6 +15,8 @@ using namespace boost::spirit;
 
 namespace fm { namespace last { namespace query_parser {
 
+// -----------------------------------------------------------------------------
+
 parser::parser( )
 {
    m_pGrammar.reset( new query_grammar() );
@@ -32,8 +34,8 @@ bool parser::parse( const string& str )
    try
    {
       m_pi = ast_parse<factory_t>(
-         m_pStringToParse, m_pStringToParse + str.length(),
-         *m_pGrammar, space_p);
+                  m_pStringToParse, m_pStringToParse + str.length(),
+                  *m_pGrammar, space_p);
    }
    catch (const parser_error<string, iterator_t> & e)
    {
@@ -105,27 +107,11 @@ std::string parser::getErrorLine()
 
 // -----------------------------------------------------------------------------
 
-void parser::getToken(char* pBuf, const char* pLine, const int lineSize, int& lineIt)
-{
-   int bufPos = 0;
-
-   for (; lineIt < lineSize; ++lineIt)
-   {
-      if ( pLine[lineIt] == '\t' || pLine[lineIt] == '\0' )
-         break;
-      pBuf[bufPos++] = pLine[lineIt];
-   }
-   ++lineIt;
-   pBuf[bufPos] = '\0'; // terminate string
-}
-
-// -----------------------------------------------------------------------------
-
-int parser::getID( boost::shared_ptr<const hashMap_t>& pItemMapper, 
+int parser::getID( boost::function< int(const string&) >& mapperFunc, 
                    const std::string& key, 
                    bool forceLowerCase )
 {
-   if ( !pItemMapper )
+   if ( !mapperFunc )
       return -1;
 
    string localKey = key;
@@ -135,14 +121,7 @@ int parser::getID( boost::shared_ptr<const hashMap_t>& pItemMapper,
                       localKey.begin(), (int(*)(int)) std::tolower);
    }
 
-
-   hashMap_t::const_iterator mapIt;
-   mapIt = pItemMapper->find(localKey);
-
-   if ( mapIt != pItemMapper->end() )
-      return mapIt->second;
-   else
-      return -1;
+   return mapperFunc(localKey);
 }
 
 // -----------------------------------------------------------------------------
@@ -201,12 +180,12 @@ std::string parser::getServiceName( int serviceType )
       case RS_EVENT:
          return "event";
          break;
-      case RS_ARTIST:
-         return "art";
-         break;
+
       default:
          return "<unknown>";
    }
 }
 
 }}} // end of namespaces
+
+// -----------------------------------------------------------------------------

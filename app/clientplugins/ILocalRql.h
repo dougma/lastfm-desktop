@@ -21,22 +21,43 @@
 #ifndef ILOCALRQL_H
 #define ILOCALRQL_H
 
-/*** early days, v.experimental ***/
+// callback interfaces are only valid for the duration of the call
 
-class ILocalRqlPull
+
+class ILocalRqlTrackCallback
 {
 public:
-    virtual unsigned trackCount();
-    virtual const char* nextTrack();
-    virtual void finished();
+    virtual void title(const char*) = 0;
+    virtual void album(const char*) = 0;
+    virtual void artist(const char*) = 0;
+    virtual void url(const char*) = 0;
+    virtual void duration(unsigned) = 0;
+};
+
+class ILocalRqlParseCallback
+{
+public:
+    virtual void parseOk(class ILocalRqlTrackSource*) = 0;
+    virtual void parseFail(int errorLineNumber, const char *errorLine, int errorOffset) = 0;
+};
+
+
+// these ones need to be finished() when they're done with
+
+class ILocalRqlTrackSource
+{
+public:
+    virtual unsigned tracksLeft() = 0;
+    virtual bool nextTrack(ILocalRqlTrackCallback*) = 0;
+    virtual void finished() = 0;
 };
 
 class ILocalRqlPlugin
 {
 public:
     virtual void init() = 0;
-	virtual ILocalRqlPull* play(const char *rql) = 0;
-    virtual void finished(ILocalRqlPull* radio) = 0;
+	virtual void parse(const char *rql, ILocalRqlParseCallback *) = 0;
+    virtual void finished() = 0;
 };
 
 #endif

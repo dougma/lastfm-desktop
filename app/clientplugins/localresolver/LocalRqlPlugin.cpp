@@ -17,41 +17,104 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include <QDebug>
 #include "LocalRqlPlugin.h"
 #include "TagUpdater.h"
 #include "RqlQuery.h"
 
+#include "RqlOpProcessor.h"
+#include "rqlParser/parser.h"
+#include <boost/bind.hpp>
+
+#include <vector>
+
+using namespace std;
+using namespace fm::last::query_parser;
+
+
+RqlOp root2op( const querynode_data& node )
+{
+   RqlOp op;
+   op.isRoot = true;
+   op.name = node.name;
+   op.type = node.type;
+   op.weight = node.weight;
+
+   return op;
+}
+
+
+RqlOp leaf2op( const querynode_data& node )
+{
+   RqlOp op;
+   op.isRoot = false;
+
+   if ( node.ID < 0 )
+      op.name = node.name;
+   else
+   {
+      ostringstream oss;
+      oss << '<' << node.ID << '>';
+      op.name = oss.str();
+   }
+   op.type = node.type;
+   op.weight = node.weight;
+
+   return op;
+}
+
+
 
 LocalRqlPlugin::LocalRqlPlugin()
 : m_tagUpdater(0)
-, m_query(0)
+, m_localCollection(0)
 {
 }
 
 void 
 LocalRqlPlugin::init()
 {
+    m_localCollection = LocalCollection::create("RqlQuery");
     m_tagUpdater = new TagUpdater();
 // todo: replace this
 //    m_tagUpdater->start();
 }
 
-ILocalRqlPull* 
-LocalRqlPlugin::play(const char *rql)
+void
+LocalRqlPlugin::parse(const char *rql, ILocalRqlParseCallback *cb)
 {
-    if (!m_query)
-        m_query = new RqlQuery();
-    
-    QSet<uint> results = m_query->doQuery(rql);
+    Q_ASSERT(rql && cb);
 
-    int i = results.size();
+    try {
+        string srql(rql);   // needs to exist for the life of p
+        parser p;
+        if (p.parse(srql)) {
+            QList<RqlOp> ops;
 
-    return 0;
+            p.getOperations<RqlOp>(
+                boost::bind(&QList<RqlOp>::push_back, boost::ref(ops), _1),
+                &root2op, 
+                &leaf2op);
+            
+            cb->parseOk(
+                new RqlQuery(
+                    *m_localCollection,
+                    RqlOpProcessor::process(ops, *m_localCollection, m_sa) ) );
+        } else {
+            cb->parseFail(
+                p.getErrorLineNumber(),
+                p.getErrorLine().data(),
+                p.getErrorOffset() );
+        }
+    } 
+    catch (...) {
+        qCritical() << "unexpected exception LocalRqlPlugin::parse";
+    }
 }
 
 void 
-LocalRqlPlugin::finished(ILocalRqlPull* todo)
+LocalRqlPlugin::finished()
 {
     delete m_tagUpdater;
-    delete m_query;
+    delete m_localCollection;
 }

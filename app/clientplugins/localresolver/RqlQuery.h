@@ -21,19 +21,22 @@
 #define RQL_SUERY_H
 
 #include "SimilarArtists.h"
+#include "../ILocalRql.h"
 #include <QSet>
 
 
-class RqlQuery
+class RqlQuery : public ILocalRqlTrackSource
 {
-    class LocalCollection *m_collection;
-    SimilarArtists m_similarArtists;
+    class LocalCollection &m_collection;
+    QSet<uint> m_tracks;
 
 public:
-    RqlQuery();
-    ~RqlQuery();
+    RqlQuery(LocalCollection& lc, QSet<uint> tracks);
 
-    QSet<uint> doQuery(const char *rql);
+    // ILocalRqlTrackSource
+    virtual unsigned tracksLeft();
+    virtual bool nextTrack(ILocalRqlTrackCallback*);
+    virtual void finished();
 };
 
 #endif

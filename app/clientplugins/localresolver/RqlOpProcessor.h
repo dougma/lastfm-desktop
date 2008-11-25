@@ -22,15 +22,15 @@
 
 #include "RqlOp.h"
 #include "ResultSet.h"
-#include <vector>
+#include <QList>
 
 class RqlOpProcessor
 {
-    std::vector<RqlOp>::iterator m_it, m_end;
+    QList<RqlOp>::iterator m_it, m_end;
     class LocalCollection& m_collection;
     class SimilarArtists& m_similarArtists;
 
-    RqlOpProcessor(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
+    RqlOpProcessor(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
     void next();
     ResultSet process();
     ResultSet unsupported();
@@ -40,7 +40,7 @@ class RqlOpProcessor
     ResultSet similarArtist();
 
 public:
-    static ResultSet process(std::vector<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
+    static ResultSet process(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
 
 };
 

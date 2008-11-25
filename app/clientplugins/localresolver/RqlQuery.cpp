@@ -19,68 +19,52 @@
 
 #include "RqlQuery.h"
 #include "LocalCollection.h"
-#include "RqlOpProcessor.h"
-#include "rqlParser/parser.h"
+#include <QUrl>
 
-using namespace std;
-using namespace fm::last::query_parser;
+extern QString remapVolumeName(const QString& volume);
 
 
-RqlOp root2op( const querynode_data& node )
-{
-   RqlOp op;
-   op.isRoot = true;
-   op.name = node.name;
-   op.type = node.type;
-   op.weight = node.weight;
-
-   return op;
-}
-
-
-RqlOp leaf2op( const querynode_data& node )
-{
-   RqlOp op;
-   op.isRoot = false;
-
-   if ( node.ID < 0 )
-      op.name = node.name;
-   else
-   {
-      ostringstream oss;
-      oss << '<' << node.ID << '>';
-      op.name = oss.str();
-   }
-   op.type = node.type;
-   op.weight = node.weight;
-
-   return op;
-}
-
-
-
-RqlQuery::RqlQuery()
-:m_collection(0)
+RqlQuery::RqlQuery(LocalCollection& lc, QSet<uint> tracks)
+:m_collection(lc)
+,m_tracks(tracks)
 {
 }
 
-RqlQuery::~RqlQuery()
+
+unsigned 
+RqlQuery::tracksLeft()
 {
-    delete m_collection;
+    return m_tracks.size();
 }
 
-QSet<uint>
-RqlQuery::doQuery(const char *rql)
+bool 
+RqlQuery::nextTrack(ILocalRqlTrackCallback* cb)
 {
-    if (!m_collection)
-        m_collection = LocalCollection::create("RqlQuery");
+    Q_ASSERT(cb);
+    if (cb) {
+        while (m_tracks.size()) {
+            int fileId = *m_tracks.begin();
+            m_tracks.remove(fileId);
 
-    parser p;
-    if (p.parse(string(rql))) {
-        vector<RqlOp> ops;
-        p.getOperations<RqlOp>(ops, &root2op, &leaf2op);
-        return RqlOpProcessor::process(ops, *m_collection, m_similarArtists);
+            LocalCollection::FileResult result;
+            if (m_collection.getFileById(fileId, result)) {
+                cb->title(result.m_title.toUtf8());
+                cb->album(result.m_album.toUtf8());
+                cb->artist(result.m_artist.toUtf8());
+                cb->duration(result.m_duration);
+                cb->url(
+                    QUrl::fromLocalFile(
+                        remapVolumeName(result.m_sourcename) + result.m_path + result.m_filename).toEncoded() );
+                return true;
+            }
+        }
     }
-
-    return QSet<uint>();
+    return false;
 }
+
+void
+RqlQuery::finished()
+{
+    delete this;
+}
+
