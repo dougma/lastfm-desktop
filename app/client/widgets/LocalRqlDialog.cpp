@@ -1,6 +1,7 @@
 #include "LocalRqlDialog.h"
 #include "PluginHost.h"
-#include "../clientplugins/ILocalRql.h"
+#include "the/app.h"
+
 
 LocalRqlDialog::LocalRqlDialog( QWidget *parent )
 : QDialog( parent )
@@ -26,6 +27,22 @@ void LocalRqlDialog::accept()
         return;
 
     QString s = ui.lineEdit->text();
-    plugins[0]->play(s.toUtf8());
 
+    plugins[0]->init();
+    plugins[0]->parse(s.toUtf8(), this);
+}
+
+void 
+LocalRqlDialog::parseOk(ILocalRqlTrackSource* trackSource)
+{
+    Q_ASSERT(trackSource);
+    if (trackSource) {
+//        The::app().playLocal(trackSource);
+    }
+}
+
+void 
+LocalRqlDialog::parseFail(int errorLineNumber, const char *errorLine, int errorOffset)
+{
+    int ii = 0;
 }
