@@ -92,7 +92,7 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
 {
     try
     {
-        QList<Artist> results = Artist::search( r );
+        QList<Artist> results = Artist::list( r );
         
         if( results.isEmpty() )
             return;

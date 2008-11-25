@@ -244,3 +244,4 @@ Track::clone() const
     TrackData* d = new TrackData( *this->d );
     return Track( d );
 }
+

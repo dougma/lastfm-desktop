@@ -104,7 +104,7 @@ Artist::getSimilar( WsReply* r )
 
 
 QList<Artist> /* static */
-Artist::search( WsReply* r )
+Artist::list( WsReply* r )
 {
 	QList<Artist> results;
 	try

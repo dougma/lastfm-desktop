@@ -39,6 +39,7 @@ public:
         class SourcesList* stationsBucket;
 		class SourcesList* friendsBucket;
 		class SourcesList* tagsBucket;
+        class SourcesList* artistsBucket;
         class RadioControls* controls;
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;
@@ -67,6 +68,7 @@ protected slots:
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
     void onUserGetPlaylistsReturn( class WsReply* );
+    void onUserGetTopArtistsReturn( WsReply* );
 
     void onAuthUserInfoReturn( class WsReply* );
     void authUserIconDataDownloaded();

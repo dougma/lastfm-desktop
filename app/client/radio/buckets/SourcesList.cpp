@@ -35,6 +35,9 @@ SourcesList::SourcesList( QWidget* parent )
     setIconSize( QSize( 36, 38 ) );
     setLayoutMode( QListView::SinglePass );
     setDragEnabled( true );
+    setAlternatingRowColors( true );
+    setWordWrap( true );
+    setAttribute( Qt::WA_MacShowFocusRect, false );
     setDragDropMode( QAbstractItemView::DragOnly );
     setAutoScroll( false );
     setUniformItemSizes( false );

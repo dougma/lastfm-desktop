@@ -37,6 +37,13 @@ User::getTopTags() const
 
 
 WsReply* 
+User::getTopArtists() const
+{
+    return WsRequestBuilder( "user.getTopArtists" ).add( "user", m_name ).get();
+}
+
+
+WsReply* 
 User::getNeighbours() const
 {
 	return WsRequestBuilder( "user.getNeighbours" ).add( "user", m_name ).get();

@@ -81,7 +81,6 @@ Sources::Sources()
         PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
         n->setRQL( station.second );
         n->setPlayableType( Seed::PreDefinedType );
-        QRect textRect = QFontMetrics( n->font()).boundingRect( QRect( QPoint(0, 0), n->sizeHint()), Qt::AlignHCenter | Qt::TextWordWrap, station.first );
         n->setSizeHint( QSize( 90, n->sizeHint().height()+20));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
@@ -89,6 +88,7 @@ Sources::Sources()
     connect( authUser.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
     connect( authUser.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
     connect( authUser.getPlaylists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetPlaylistsReturn( WsReply* )) );
+    connect( authUser.getTopArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopArtistsReturn( WsReply* )) );
 	
 }
 
@@ -134,19 +134,11 @@ Sources::setupUi()
     layout()->addWidget( ui.tabWidget );
     
     ui.stationsBucket = new SourcesList( this );
-    ui.stationsBucket->setAlternatingRowColors( true );
-    ui.stationsBucket->setDragEnabled( true );
-    ui.stationsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
-    ui.stationsBucket->setWordWrap( true );
     connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.stationsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
-    ui.stationsBucket->setAlternatingRowColors( false );
-    ui.tabWidget->addTab( "Your Stations", ui.stationsBucket );
+    ui.tabWidget->addTab( tr( "Stations" ), ui.stationsBucket );
     
     ui.friendsBucket = new SourcesList( this );
-    ui.friendsBucket->setAlternatingRowColors( true );
-    ui.friendsBucket->setDragEnabled( true );
-    ui.friendsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     Firehose* hose;
     ui.friendsBucket->addCustomWidget( hose = new Firehose );
     ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
@@ -154,18 +146,18 @@ Sources::setupUi()
     hose->setStaff();
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
-    ui.friendsBucket->setAlternatingRowColors( false );
-    ui.tabWidget->addTab( "Your Friends", ui.friendsBucket );
+    ui.tabWidget->addTab( tr( "Friends" ), ui.friendsBucket );
     
 	ui.tagsBucket = new SourcesList( this );
-    ui.tagsBucket->setAlternatingRowColors( true );
-    ui.tagsBucket->setDragEnabled( true );
-    ui.tagsBucket->setAttribute( Qt::WA_MacShowFocusRect, false );
     connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
-    ui.tagsBucket->setAlternatingRowColors( false );
-    ui.tabWidget->addTab( "Your Tags", ui.tagsBucket );
-    
+    ui.tabWidget->addTab( tr( "Tags" ), ui.tagsBucket );
+
+	ui.artistsBucket = new SourcesList( this );
+    connect( ui.artistsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
+    UnicornWidget::paintItBlack( ui.artistsBucket );    //as above
+    ui.tabWidget->addTab( tr( "Artists" ), ui.artistsBucket );
+   
     QWidget* freeInputWidget = new SpecialWidget;
     new QHBoxLayout( freeInputWidget );
     freeInputWidget->layout()->addWidget( ui.freeInput = new QLineEdit );
@@ -245,6 +237,19 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
         PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
         n->setIcon( tagIcon );
         n->setPlayableType( Seed::TagType );
+    }
+}
+
+
+void 
+Sources::onUserGetTopArtistsReturn( WsReply* r )
+{
+    QList<Artist> artists = Artist::list( r );
+    foreach( Artist a, artists )
+    {
+        PlayableListItem* n = new PlayableListItem( a, ui.artistsBucket );
+        QNetworkReply* r = m_accessManager->get( QNetworkRequest( a.imageUrl()));
+        connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
     }
 }
 

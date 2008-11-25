@@ -70,7 +70,7 @@ public:
     WsReply* addTags( const QStringList& ) const;
 	
 	WsReply* search( int limit = -1 ) const;
-	static QList<Artist> search( WsReply* );
+	static QList<Artist> list( WsReply* );
     
 private:
 	QUrl m_smallImage;

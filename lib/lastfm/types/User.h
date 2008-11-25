@@ -46,6 +46,7 @@ public:
 	WsReply* getNeighbours() const;
     
     WsReply* getPlaylists() const;
+    WsReply* getTopArtists() const;
     
     static QList<User> list( WsReply* );
     
