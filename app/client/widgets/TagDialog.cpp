@@ -66,9 +66,26 @@ TagDialog::setupUi()
     ui.tabs1->addTab( tr("Artist"), ui.artistTags = new TagIconView );
     ui.tabs1->addTab( tr("Album"), ui.albumTags = new TagIconView );
     
+    ui.trackTags->setAcceptDrops( true );
+    ui.artistTags->setAcceptDrops( true );
+    ui.artistTags->setAcceptDrops( true );
+    
+#define WATCH_LIST( x ) \
+    connect( x->model(), SIGNAL( rowsInserted(QModelIndex, int, int)), SLOT( onListItemsChanged(QModelIndex, int, int))); \
+    connect( x->model(), SIGNAL( rowsRemoved(QModelIndex, int, int)), SLOT( onListItemsChanged(QModelIndex, int, int)));
+    
+    WATCH_LIST( ui.trackTags );
+    WATCH_LIST( ui.artistTags );
+    WATCH_LIST( ui.artistTags );
+    
+#undef WATCH_LIST
+    
     ui.tabs2 = new Unicorn::TabWidget;
     ui.tabs2->addTab( tr("Suggested Tags"), ui.suggestedTags = new TagListWidget );
     ui.tabs2->addTab( tr("Your Tags"), ui.yourTags = new TagListWidget );
+    
+    ui.suggestedTags->setDragEnabled( true );
+    ui.yourTags->setDragEnabled( true );
     
     QHBoxLayout* h2 = new QHBoxLayout;
     h2->addWidget( ui.edit = new QLineEdit );
@@ -150,7 +167,6 @@ TagDialog::onAddClicked()
 {
     if (currentTagListWidget()->add( ui.edit->text() ))
     {
-        ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( true );
         ui.edit->clear();
     }
     else
@@ -162,4 +178,13 @@ TagListWidget*
 TagDialog::currentTagListWidget() const
 {
     return static_cast<TagListWidget*>(ui.tabs1->currentWidget());
+}
+
+
+void 
+TagDialog::onListItemsChanged( const QModelIndex&, int, int )
+{
+    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( ui.trackTags->topLevelItemCount() +
+                                                            ui.artistTags->topLevelItemCount() + 
+                                                            ui.albumTags->topLevelItemCount () );
 }

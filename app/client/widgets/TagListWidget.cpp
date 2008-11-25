@@ -159,33 +159,6 @@ TagListWidget::onTagsRequestFinished( WsReply* r )
 }
 
 
-void
-TagListWidget::onDoubleClicked ( const QModelIndex& index )
-{
-    PlayableMimeData* data = PlayableMimeData::createFromTag( model()->data( index, Qt::DisplayRole ).toString());
-
-    QStyleOptionViewItem options;
-    options.initFrom( this );
-    options.rect = visualRect( index );
-    DelegateDragHint* dragHint = new DelegateDragHint( itemDelegate(), index, options, this );
-    dragHint->setMimeData( data );
-    
-    dragHint->dragTo( The::mainWindow().ui.amp );
-}
-
-
-QMimeData* 
-TagListWidget::mimeData( const QList<QTreeWidgetItem *> items ) const
-{
-    if( items.empty() )
-        return 0;
-    
-    QTreeWidgetItem* item = items.first();
-    PlayableMimeData* data = PlayableMimeData::createFromTag( item->data( 0, Qt::DisplayRole ).toString() );
-    data->setImageData( QImage( ":buckets/tag_white_on_blue.png" ));
-    return data;
-}
-
 
 #include <QPainter>
 TagIconView::TagIconView()

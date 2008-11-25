@@ -21,6 +21,7 @@
 #define TAG_DIALOG_H
 
 #include "lib/lastfm/types/Track.h"
+#include <QModelIndex>
 #include <QDialog>
 
 namespace Unicorn 
@@ -45,6 +46,7 @@ private slots:
     void onWsFinished( WsReply* );
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
+    void onListItemsChanged( const QModelIndex&, int, int );
 
 private:
     struct Ui

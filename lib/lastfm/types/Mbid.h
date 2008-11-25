@@ -32,7 +32,7 @@ public:
     explicit Mbid( const QString& p = "" ) : id( p )
     {}
     
-	bool isNull() const { return id.isNull(); }
+	bool isNull() const { return id.isNull() || id.isEmpty(); }
     operator QString() const { return id; }
 
     /** if this is not an mp3 file you will be wasting time, as it won't work
