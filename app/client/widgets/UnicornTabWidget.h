@@ -37,16 +37,25 @@ namespace Unicorn
         
         virtual QSize sizeHint() const;
         void setSpacing( int );
+        void setTearable( bool t ){ m_tearable = t; }
         void addWidget( QWidget* w );
         
     protected:
         virtual void mousePressEvent( QMouseEvent* );
+        virtual void mouseReleaseEvent( QMouseEvent* );
+        virtual void mouseMoveEvent( QMouseEvent* );
         virtual void paintEvent( QPaintEvent* );
         virtual void tabInserted( int );
         virtual void tabRemoved( int );
-
+        virtual bool eventFilter(QObject* , QEvent* );
+        
         int m_spacing;
+        const int m_leftMargin;
         const QPixmap m_active;
+        
+    private:
+        QPoint m_mouseDownPos;
+        bool m_tearable;
     };
     
     
@@ -62,12 +71,16 @@ namespace Unicorn
         TabBar* bar() const { return m_bar; }
         
         void addTab( const QString& title, QWidget* );
+        void addTab( QWidget* );
         QWidget* currentWidget() const { return m_stack->currentWidget(); }
         
         void setTabEnabled( int index, bool );
+        void setTearable( bool t ){ bar()->setTearable( t ); }
+        QWidget* widget( int index ) const;
 
     signals:
         void currentChanged( int );
+
     };
 }
 

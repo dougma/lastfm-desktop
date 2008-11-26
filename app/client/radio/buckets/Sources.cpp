@@ -101,6 +101,7 @@ Sources::setupUi()
     layout()->setSpacing( 0 );
     
     ui.tabWidget = new Unicorn::TabWidget;
+    ui.tabWidget->bar()->setTearable( true );
 
     ui.tabWidget->bar()->addWidget( ui.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ) );
     connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
@@ -134,11 +135,14 @@ Sources::setupUi()
     layout()->addWidget( ui.tabWidget );
     
     ui.stationsBucket = new SourcesList( this );
+    ui.stationsBucket->setWindowTitle( tr( "Stations" ) );
     connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.stationsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
-    ui.tabWidget->addTab( tr( "Stations" ), ui.stationsBucket );
+    ui.tabWidget->addTab( ui.stationsBucket );
     
     ui.friendsBucket = new SourcesList( this );
+    ui.friendsBucket->setWindowTitle( tr( "Friends" ));
+    
     Firehose* hose;
     ui.friendsBucket->addCustomWidget( hose = new Firehose );
     ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
@@ -146,17 +150,20 @@ Sources::setupUi()
     hose->setStaff();
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
-    ui.tabWidget->addTab( tr( "Friends" ), ui.friendsBucket );
+    ui.tabWidget->addTab( ui.friendsBucket );
     
 	ui.tagsBucket = new SourcesList( this );
+    ui.tagsBucket->setWindowTitle( tr( "Tags" ));
+    
     connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
-    ui.tabWidget->addTab( tr( "Tags" ), ui.tagsBucket );
+    ui.tabWidget->addTab( ui.tagsBucket );
 
 	ui.artistsBucket = new SourcesList( this );
+    ui.artistsBucket->setWindowTitle( tr( "Artists" ));
     connect( ui.artistsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.artistsBucket );    //as above
-    ui.tabWidget->addTab( tr( "Artists" ), ui.artistsBucket );
+    ui.tabWidget->addTab( ui.artistsBucket );
    
     QWidget* freeInputWidget = new SpecialWidget;
     new QHBoxLayout( freeInputWidget );
@@ -165,9 +172,9 @@ Sources::setupUi()
     connect( ui.freeInput, SIGNAL( returnPressed()), SLOT( onFreeInputReturn()));
     
     freeInputWidget->layout()->addWidget( ui.inputSelector = new QComboBox );
-    ui.inputSelector->addItem( "Artist", QVariant::fromValue(Seed::ArtistType) );
-    ui.inputSelector->addItem( "Tag", QVariant::fromValue(Seed::TagType) );
-    ui.inputSelector->addItem( "User", QVariant::fromValue(Seed::UserType) );
+    ui.inputSelector->addItem( tr( "Artist" ), QVariant::fromValue(Seed::ArtistType) );
+    ui.inputSelector->addItem( tr( "Tag" ), QVariant::fromValue(Seed::TagType) );
+    ui.inputSelector->addItem( tr( "User" ), QVariant::fromValue(Seed::UserType) );
     ui.inputSelector->setAttribute( Qt::WA_MacNormalSize ); //wtf? needed tho, when floating
     
     layout()->addWidget( freeInputWidget );

@@ -24,7 +24,9 @@
 #include <QHBoxLayout>
 
 Unicorn::TabBar::TabBar()
-        :m_active( ":/DockWindow/tab/active.png" )
+        :m_active( ":/DockWindow/tab/active.png" ),
+         m_spacing( 0 ),
+         m_leftMargin( 5 )
 {
 #ifndef WIN32
     QFont f = font();
@@ -79,12 +81,63 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
         return;
     }
     
-    int leftMargin = 5;
+    m_mouseDownPos = e->pos();
+    
     int w = minimumWidth() / count();
-    int index = ( qreal(e->pos().x() - leftMargin) / (w + m_spacing ));
+    int index = ( (e->pos().x() - m_leftMargin) / (w + m_spacing ));
 
     if( index < count() )
         setCurrentIndex( index );
+}
+
+
+void 
+Unicorn::TabBar::mouseReleaseEvent( QMouseEvent* e )
+{
+    m_mouseDownPos = QPoint();
+}
+
+
+#include <QApplication>
+void 
+Unicorn::TabBar::mouseMoveEvent( QMouseEvent* e )
+{
+    if( !m_tearable )
+        return;
+        
+    if( !(e->buttons() & Qt::LeftButton) || m_mouseDownPos.isNull() )
+        return;
+        
+    if( (e->pos() - m_mouseDownPos ).manhattanLength() < 
+        QApplication::startDragDistance())
+        return;
+        
+    TabWidget* tabWidget = qobject_cast<TabWidget*>( parentWidget() );
+    if( !tabWidget )
+        return;
+        
+    int index = currentIndex();
+    removeTab( index );
+
+    QWidget* curWidget = tabWidget->widget( index );
+    if( !curWidget )
+        return;
+        
+    QPoint offset = curWidget->mapToGlobal(curWidget->pos()) - QCursor::pos();
+    curWidget->setParent( 0, Qt::Tool );
+    curWidget->move( QCursor::pos() + QPoint(offset.x(), 0));
+    curWidget->resize( tabWidget->size());
+    curWidget->show();
+    m_tearable = false;
+    while( QApplication::mouseButtons() & Qt::LeftButton )
+    {
+        if( curWidget->pos() != QCursor::pos())
+            curWidget->move( QCursor::pos() + QPoint(offset.x(), 0));
+        QApplication::processEvents( QEventLoop::WaitForMoreEvents );
+    }
+    curWidget->installEventFilter( this );
+    m_tearable = true;
+    m_mouseDownPos = QPoint();
 }
 
 
@@ -94,7 +147,7 @@ Unicorn::TabBar::tabInserted( int )
     int w = 0;
     for (int i = 0; i < count(); ++i)
         w = qMax( fontMetrics().width( tabText( i ) ), w );
-    setMinimumWidth( (w+10) * count() + layout()->minimumSize().width());
+    setMinimumWidth( ( w + 10 ) * count() + layout()->minimumSize().width());
 }
 
 
@@ -118,12 +171,13 @@ Unicorn::TabBar::paintEvent( QPaintEvent* e )
     QPainter p( this );
     
     p.setClipRect( e->rect());
-
+    if( count() <= 0 )
+        return;
+        
     int w = minimumWidth() / count();
-    int leftMargin = 5;
     for (int i = 0; i < count(); ++i)
     {
-        int const x = leftMargin + (i * ( w + m_spacing ));
+        int const x = m_leftMargin + (i * ( w + m_spacing ));
         
         if (i == count() - 1)
             w += minimumWidth() % w;
@@ -158,11 +212,31 @@ Unicorn::TabBar::setSpacing( int spacing )
 }
 
 
+bool 
+Unicorn::TabBar::eventFilter( QObject* o, QEvent* e )
+{
+    if( e->type() != QEvent::Close )
+        return false;
+    
+    QWidget* w;
+    if( !( w = qobject_cast< QWidget* >( o )))
+        return false;
+        
+    if( w->windowTitle().isEmpty())
+        return false;
+        
+    ((TabWidget*)parentWidget())->addTab( w );
+    w->removeEventFilter( this );
+    return true;
+}
+
+
+
 Unicorn::TabWidget::TabWidget()
 {
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( m_bar = new TabBar );
-    m_bar->setSpacing( 3 );
+//    m_bar->setSpacing( 3 );
     v->addWidget( m_stack = new QStackedWidget );
     v->setSpacing( 0 );
     v->setMargin( 0 );
@@ -188,7 +262,22 @@ Unicorn::TabWidget::addTab( const QString& title, QWidget* w )
 
 
 void 
+Unicorn::TabWidget::addTab( QWidget* w )
+{
+    Q_ASSERT( !w->windowTitle().isEmpty());
+    addTab( w->windowTitle(), w );
+}
+
+
+void 
 Unicorn::TabWidget::setTabEnabled( int index, bool b )
 {
     m_bar->setTabEnabled( index, b );
+}
+
+
+QWidget* 
+Unicorn::TabWidget::widget( int index ) const
+{
+    return m_stack->widget( index );
 }

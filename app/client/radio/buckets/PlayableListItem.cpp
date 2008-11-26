@@ -174,7 +174,7 @@ PlayableListItem::cropToSize( const QPixmap input, const QSize& size ) const
     QPixmap output = input;
     QSize diff = input.size() - size;
     
-    if( diff.height() > 0 || diff.width() > 0 )
+    if( abs(diff.height()) > 0 || abs(diff.width()) > 0 )
     {
         const QPixmap scaled = input.scaled( size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
         const QPixmap cropped = scaled.copy( ((scaled.width() - size.width()) / 2), ((scaled.height() - size.height()) / 2), size.width(), size.height());
