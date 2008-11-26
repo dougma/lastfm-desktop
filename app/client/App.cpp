@@ -50,25 +50,6 @@
 #endif
 
 
-#include "app/clientplugins/ILocalRql.h"
-
-void localRqlTest(const QList<ILocalRqlPlugin*>& plugins)
-{
-    if (plugins.size()) {
-        plugins[0]->init();
-        ILocalRqlPull* rql = plugins[0]->play("");
-        if (rql) {
-            unsigned trackCount = rql->trackCount();
-            if (trackCount) {
-                const char *track = rql->nextTrack();
-                while (track) {
-                    const char *track = rql->nextTrack();
-                }
-            }
-            rql->finished();
-        }
-    }
-}
 
 App::App( int& argc, char** argv ) 
    : Unicorn::Application( argc, argv )
@@ -141,8 +122,6 @@ App::App( int& argc, char** argv )
 
     PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
-    localRqlTest( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
-
 	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
