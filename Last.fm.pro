@@ -3,7 +3,7 @@ debug:macx-xcode {
 
     TEMPLATE = app
     TARGET = Last.fm
-    ICON = app/client/mac/client.icns
+    ICON = app/client/mac/client_debug.icns
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 
