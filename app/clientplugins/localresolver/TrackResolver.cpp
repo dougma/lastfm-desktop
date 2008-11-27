@@ -142,10 +142,15 @@ QueryThread::create()
     return a;
 }
 
+QueryThread::QueryThread()
+:m_stopping(false)
+{
+}
 
 QueryThread::~QueryThread()
 {
-    onStop();
+    m_stopping = true;
+    QMetaObject::invokeMethod(this, SLOT("onStop()"), Qt::QueuedConnection);
     wait();
 }
 
@@ -155,8 +160,8 @@ QueryThread::run()
     try {
         LocalCollection *pCollection = LocalCollection::create("TrackResolverConnection");
 
-        while (exec()) {
-            while (!m_queue.isEmpty()) {
+        while (!m_stopping && exec()) {
+            while (!m_queue.isEmpty() && !m_stopping) {
                 doRequest(pCollection, m_queue.takeFirst());
             }
         }

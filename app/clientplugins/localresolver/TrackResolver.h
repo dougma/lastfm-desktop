@@ -76,11 +76,12 @@ class QueryThread : public QThread
 {
     Q_OBJECT;
 
+    bool m_stopping;
     QList<class ITrackResolveRequest*> m_queue;
 
     void doRequest(LocalCollection *pCollection, ITrackResolveRequest* req);
 
-    QueryThread() {}
+    QueryThread();
 
 public:
     static QueryThread* create();
