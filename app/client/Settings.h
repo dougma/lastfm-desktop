@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef MOOSE_SETTINGS_H
+#define MOOSE_SETTINGS_H
 
 #include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/scrobble/ScrobblePoint.h"

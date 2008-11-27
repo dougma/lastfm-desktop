@@ -120,7 +120,7 @@ class ITunesParser : public QXmlContentHandler
 
             if ( localName == "dict" )
             {
-                if ( !m_track.isNull() && IPodScrobble( m_track ).playCount() > 0 )
+                if ( !m_track.isNull() )
                 {
                     MutableTrack( m_track ).setSource( Track::MediaDevice );
                     m_tracks << m_track;

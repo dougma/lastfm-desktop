@@ -70,7 +70,7 @@ AbstractBootstrapper::sendZip( const QString& inFile )
     QString username = CoreSettings().value( "Username" ).toString();
     QString passMd5 = CoreSettings().value( "Password" ).toString();
 
-     delete m_http;
+    delete m_http;
 
     m_http = new QHttp( k_host, 80, this );
     connect( m_http, SIGNAL(requestFinished( int, bool )), SLOT(onUploadDone( int, bool )), Qt::QueuedConnection );
@@ -88,8 +88,7 @@ AbstractBootstrapper::sendZip( const QString& inFile )
     QString authMd5 = Qt::md5( auth.toUtf8() );
     QString authMd5Lower = Qt::md5( authLower.toUtf8() );
 
-    QString path = QString( "/bootstrap/index.php?user=%1&time=%2&auth=%3&authlower=%4" )
-        .arg( username, time, authMd5, authMd5Lower );
+    QString const path = "/bootstrap/index.php?user="+username+"&time="+time+"&auth="+authMd5+"&authlower="+authMd5Lower;
 
     QFile* zipFile = new QFile( this );
     zipFile->setFileName( inFile );

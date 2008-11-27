@@ -18,34 +18,37 @@
  ***************************************************************************/
 
 #include "BootstrapDialog.h"
-#include "Settings.h"
 #include "iTunesBootstrapper.h"
-#include "PluginBootstrapper.h"
 #include "lib/lastfm/types/Track.h"
 
+#ifdef WIN32
+#include "PluginBootstrapper.h"
+#include "win/CKillProcessHelper.h"
+#endif
 
-BootstrapDialog::BootstrapDialog( QWidget* parent )
+
+BootstrapDialog::BootstrapDialog( PlayerListener* listener, QWidget* parent )
                : QProgressDialog( parent )
-{}
+{
+#ifdef WIN32
+    m_plugins = Plugin::installed();
+    connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+#endif
+}
 
 
 void
 BootstrapDialog::exec()
 {
     show();
-    
-    {
-        iTunesBootstrapper iTunes;
-        connect( &iTunes, SIGNAL(trackProcessed( int, Track )), SLOT(onITunesTrackProcessed( int, Track )) );        
-        iTunes.bootStrap();
-    }
+
+    iTunesBootstrapper iTunes;
+    connect( &iTunes, SIGNAL(trackProcessed( int, Track )), SLOT(onITunesTrackProcessed( int, Track )) );        
+    iTunes.bootStrap();
 
 #ifdef WIN32
-    foreach (Plugin p, Plugin::installed())
-    {
-//        PluginBootstrapper bootstrapper( p.id );
-//        qDebug() << p.id;
-    }
+    nextPluginBootstrap();
+    QProgressDialog::exec();
 #endif
 }
 
@@ -55,4 +58,25 @@ BootstrapDialog::onITunesTrackProcessed( int percent, const Track& t )
 {
     setLabelText( t.toString() );
     setValue( percent );
+}
+
+
+void
+BootstrapDialog::nextPluginBootstrap()
+{
+#ifdef WIN32
+    if (m_plugins.isEmpty()) return;
+    
+    Plugin p = m_plugins.pop_front();
+    PluginBootstrapper( p.id ).bootStrap();
+    setLabelText( "Basically I can't complete this code until the new Windows installer is built. Restarting the media player will bootstrap it, sorta. Tho." );
+#endif
+}
+
+
+void
+BootstrapDialog::onBootstrapCompleted( const QString& )
+{
+    // technically wrong, but this code should be gone soon... *crosses fingers*
+    nextPluginBootstrap();
 }

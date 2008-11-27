@@ -57,7 +57,7 @@ AbstractFileBootstrapper::appendTrack( const Track& t )
         return false;
     }
 
-    QDomElement i = track.toDomElement( m_xmlDoc );
+    QDomElement i = toDomElement( m_xmlDoc, track );
     m_bootstrapElement.appendChild( i );
     return true;
 }
@@ -80,4 +80,29 @@ AbstractFileBootstrapper::zipAndSend()
     zipFiles( m_savePath, zipPath );
 
     sendZip( zipPath );
+}
+
+
+QDomElement
+AbstractFileBootstrapper::toDomElement( QDomDocument& document, const IPodScrobble& t )
+{
+    QDomElement item = document.createElement( "item" );
+    
+    #define makeElement( tagname, getter ) \
+        { \
+            QDomElement e = document.createElement( tagname ); \
+            e.appendChild( document.createTextNode( getter ) ); \
+            item.appendChild( e ); \
+        }
+
+    makeElement( "artist", t.artist() );
+    makeElement( "album", t.album() );
+    makeElement( "track", t.title() );
+    makeElement( "duration", QString::number( t.duration() ) );
+    makeElement( "playcount", QString::number( t.playCount() ) );
+    makeElement( "filename", t.url().path() );
+    makeElement( "timestamp", QString::number( t.timestamp().toTime_t() ) );
+    makeElement( "mbId", t.mbid() );
+
+    return item;
 }

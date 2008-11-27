@@ -21,6 +21,7 @@
 #include "Settings.h"
 #include "Resolver.h"
 #include "PluginHost.h"
+#include "bootstrap/BootstrapDialog.h"
 #include "XspfResolvingTrackSource.h"
 #include "ExtractIdentifiersJob.h"
 #include "ipod/BatchScrobbleDialog.h"
@@ -39,6 +40,7 @@
 #include "lib/lastfm/radio/Radio.h"
 #include "lib/lastfm/radio/Tuner.h"
 #include "lib/lastfm/radio/LegacyTuner.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include <QThreadPool>
@@ -54,7 +56,7 @@
 
 
 App::App( int& argc, char** argv ) 
-   : Unicorn::Application( argc, argv )
+   : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_listener( 0 )
 {
 #ifdef Q_WS_MAC
     // I have to set it on the whole application as QMainWindow grabs some
@@ -80,10 +82,9 @@ App::App( int& argc, char** argv )
     s.setValue( "Path", applicationFilePath() );
 #endif
     
-    PlayerListener* listener = 0;
     try {
-        listener = new PlayerListener( this );
-        connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+        m_listener = new PlayerListener( this );
+        connect( m_listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
     }
     catch (PlayerListener::SocketFailure& e)
     {
@@ -93,7 +94,7 @@ App::App( int& argc, char** argv )
                 .exec();
     }
     
-    m_playerMediator = new PlayerMediator( listener );
+    m_playerMediator = new PlayerMediator( m_listener );
     connect( m_playerMediator, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
     connect( m_playerMediator, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
     connect( m_playerMediator, SIGNAL(stopped()), SIGNAL(stopped()) );
@@ -104,7 +105,7 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
 #ifdef Q_WS_MAC
-    new ITunesListener( listener->port(), this );
+    new ITunesListener( m_listener->port(), this );
 #endif
     
     m_scrobbler = new Scrobbler( "ass" );
@@ -148,6 +149,10 @@ App::App( int& argc, char** argv )
     //TODO do only once?
     Legacy::disableHelperApp();
 #endif
+    
+    connect(AuthenticatedUser().getInfo(),
+            SIGNAL(finished( WsReply* )),
+            SLOT(onUserGotInfo( WsReply* )));
 }
 
 
@@ -269,18 +274,28 @@ App::onScrobblerStatusChanged( int e )
                 .setText( tr("<p>Last.fm cannot authorise any scrobbling! :("
                              "<p>It appears your computer disagrees with us about what the time is."
                              "<p>If you are sure the time is right, check the <b>date</b> is correct and check your "
-                             "<b>timezone</b> is not set to something miles away, like Mars." 
-                             "<p>We're sorry about this restriction, but we impose it to help prevent "
-                                "scrobble spamming.") )
+                             "<b>timezone</b> is not set to something miles away, like Mars.") )
                 .exec();
             break;
     }
 }
 
 
-void 
-App::onBootstrapCompleted( const QString& playerId )
-{}
+void
+App::onUserGotInfo( WsReply* reply )
+{
+    try
+    {
+        if (reply->lfm()["user"]["bootstrap"].text() != "0")
+        {
+            BootstrapDialog( m_listener, m_mainWindow ).exec();
+        }
+    }
+    catch (CoreDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }
+}
 
 
 void

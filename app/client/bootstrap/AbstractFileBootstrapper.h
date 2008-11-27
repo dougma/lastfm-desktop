@@ -46,6 +46,9 @@ private:
     QString m_savePath;
 
     int m_runningPlayCount;
+
+    static QDomElement toDomElement( QDomDocument& document, const class IPodScrobble& );
+
 };
 
 #endif //ABSTRACTFILEBOOTSTRAPPER_H

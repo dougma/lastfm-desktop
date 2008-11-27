@@ -19,17 +19,30 @@
 
 #include <QProgressDialog>
 #include <QList>
+#ifdef WIN32
+#include "Settings.h"
+#endif
 
 
 class BootstrapDialog : public QProgressDialog
 {
     Q_OBJECT
-
-public:
-    BootstrapDialog( QWidget* parent );
     
+#ifdef WIN32
+    QList<Plugin> m_plugins;
+#endif
+    
+public:
+    BootstrapDialog( class PlayerListener*, QWidget* parent );
+
     void exec();
     
 private slots:
     void onITunesTrackProcessed( int, const class Track& );
+    // private and passed to ctor because without it, the class would completely
+    // fail to work
+    void onBootstrapCompleted( const QString& plugin_id );
+    
+private:
+    void nextPluginBootstrap();
 };

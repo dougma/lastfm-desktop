@@ -76,9 +76,9 @@ public slots:
     
 private slots:
 	void onScrobblerStatusChanged( int );
-    void onBootstrapCompleted( const QString& playerId );
     void onTrackSpooled( const Track& t );
-
+    void onUserGotInfo( WsReply* );
+    
 private:
     class PlayerMediator* m_playerMediator;
     class Scrobbler* m_scrobbler;
@@ -86,6 +86,7 @@ private:
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
     class Resolver *m_resolver;
+    class PlayerListener* m_listener;
 
     class QSystemTrayIcon* m_trayIcon;
 };
