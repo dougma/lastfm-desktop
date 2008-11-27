@@ -23,6 +23,7 @@
 
 #ifdef WIN32
 #include "PluginBootstrapper.h"
+#include "player/PlayerListener.h"
 #include "win/CKillProcessHelper.h"
 #endif
 
@@ -67,8 +68,8 @@ BootstrapDialog::nextPluginBootstrap()
 #ifdef WIN32
     if (m_plugins.isEmpty()) return;
     
-    Plugin p = m_plugins.pop_front();
-    PluginBootstrapper( p.id ).bootStrap();
+    Plugin p = m_plugins.takeFirst();
+    PluginBootstrapper( p.name ).bootStrap();
     setLabelText( "Basically I can't complete this code until the new Windows installer is built. Restarting the media player will bootstrap it, sorta. Tho." );
 #endif
 }
