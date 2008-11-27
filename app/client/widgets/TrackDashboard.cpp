@@ -163,6 +163,8 @@ TrackDashboard::setTrack( const Track& t )
         r = t.artist().getTopTags();
         connect( r, SIGNAL(finished( WsReply* )), SLOT(onArtistGotTopTags( WsReply* )) );
         r->setParent( this );
+
+        resizeEvent( 0 );
     }
 
     if (m_track.album() != t.album())
@@ -179,8 +181,6 @@ TrackDashboard::setTrack( const Track& t )
     }
 
     m_track = t;
-
-    resizeEvent( 0 );
 }
 
 
@@ -391,6 +391,9 @@ void
 TrackDashboard::paintEvent( QPaintEvent* e )
 {
     QPainter p( this );
+    
+    p.setClipRect( e->rect() );
+    
     p.setPen( QColor( 0x161616 ) );
     p.drawLine( 0, 0, width(), 0 );
     p.setPen( QColor( 0x101010 ) );    
