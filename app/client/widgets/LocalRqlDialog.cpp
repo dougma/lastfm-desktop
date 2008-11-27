@@ -1,6 +1,9 @@
 #include "LocalRqlDialog.h"
 #include "PluginHost.h"
+#include "LocalRadioTrackSource.h"
 #include "the/app.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
+
 
 
 LocalRqlDialog::LocalRqlDialog( QWidget *parent )
@@ -33,16 +36,18 @@ void LocalRqlDialog::accept()
 }
 
 void 
-LocalRqlDialog::parseOk(ILocalRqlTrackSource* trackSource)
+LocalRqlDialog::parseOk(ILocalRqlTrackSource* rqlSource)
 {
-    Q_ASSERT(trackSource);
-    if (trackSource) {
-//        The::app().playLocal(trackSource);
+    Q_ASSERT(rqlSource);
+    if (rqlSource) {
+        LocalRadioTrackSource* lrts = new LocalRadioTrackSource(rqlSource);
+        The::app().openLocalContent(lrts);
+        lrts->start();
     }
 }
 
 void 
 LocalRqlDialog::parseFail(int errorLineNumber, const char *errorLine, int errorOffset)
 {
-    int ii = 0;
+    QMessageBox::critical(this, "RQL parse error", errorLine, QMessageBox::Cancel, QMessageBox::Cancel);
 }

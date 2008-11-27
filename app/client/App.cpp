@@ -373,6 +373,13 @@ App::openXspf( const QUrl& url )
     src->start();
 }
 
+// todo: change the param to be the rql string
+void
+App::openLocalContent( class AbstractTrackSource* trackSource )
+{
+    m_radio->play( RadioStation( "Local Content" ), trackSource );
+}
+
 
 namespace //anonymous namespace, keep to this file
 {

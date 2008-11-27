@@ -45,6 +45,7 @@ public:
     void open( const class QUrl& );
     void open( const class RadioStation& );
     void openXspf( const class QUrl& );
+    void openLocalContent( class AbstractTrackSource* trackSource );
     
 signals:
     /** documented in PlayerManager */
