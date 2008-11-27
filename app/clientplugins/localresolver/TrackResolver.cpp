@@ -39,9 +39,7 @@ TrackResolver::~TrackResolver()
 void
 TrackResolver::init()
 {
-    //qRegisterMetaType<ITrackResolveRequest *>("ITrackResolveRequest *");
     m_query = QueryThread::create();
-    connect(this, SIGNAL(enqueue(ITrackResolveRequest *)), m_query, SLOT(onEnqueue(ITrackResolveRequest *)), Qt::QueuedConnection);
     m_scanner = new LocalContentScanner;
 }
 
@@ -50,7 +48,7 @@ TrackResolver::resolve(class ITrackResolveRequest *req)
 {
     Q_ASSERT(req && m_query);
     if (req) {
-        emit enqueue(req);
+        m_query->enqueue(req);
     }
 }
 
@@ -137,7 +135,6 @@ QueryThread*
 QueryThread::create()
 {
     QueryThread* a = new QueryThread;
-    a->moveToThread(a);
     a->start();
     return a;
 }
@@ -150,7 +147,9 @@ QueryThread::QueryThread()
 QueryThread::~QueryThread()
 {
     m_stopping = true;
-    QMetaObject::invokeMethod(this, SLOT("onStop()"), Qt::QueuedConnection);
+    m_mutex.lock();
+    m_wakeUp.wakeAll();
+    m_mutex.unlock();
     wait();
 }
 
@@ -160,9 +159,21 @@ QueryThread::run()
     try {
         LocalCollection *pCollection = LocalCollection::create("TrackResolverConnection");
 
-        while (!m_stopping && exec()) {
-            while (!m_queue.isEmpty() && !m_stopping) {
-                doRequest(pCollection, m_queue.takeFirst());
+        while (!m_stopping) {
+            m_mutex.lock();
+            m_wakeUp.wait(&m_mutex);
+            m_mutex.unlock();
+
+            for(;;) {
+                ITrackResolveRequest *req = 0;
+                m_mutex.lock();
+                if (!m_queue.isEmpty()) 
+                    req = m_queue.takeFirst();
+                m_mutex.unlock();
+                    
+                if (req == 0 || m_stopping) break;
+
+                doRequest(pCollection, req);
             }
         }
 
@@ -211,17 +222,14 @@ QueryThread::doRequest(LocalCollection *pCollection, ITrackResolveRequest* req)
 }
 
 void 
-QueryThread::onEnqueue(ITrackResolveRequest* req)
+QueryThread::enqueue(ITrackResolveRequest* req)
 {
     Q_ASSERT(req);
     if (req) {
+        m_mutex.lock();
         m_queue.append(req);
-        exit(1);    // break out of exec
+        m_wakeUp.wakeAll();
+        m_mutex.unlock();
     }
 }
 
-void 
-QueryThread::onStop()
-{
-    exit(0);    // break out of exec, and break out of our run loop
-}

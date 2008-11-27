@@ -23,7 +23,7 @@
 #include "../ITrackResolver.h"
 #include "LocalCollection.h"
 #include <QThread>
-
+#include <QWaitCondition>
 
 class TrackResolver : public QObject, public ITrackResolverPlugin
 {
@@ -76,8 +76,10 @@ class QueryThread : public QThread
 {
     Q_OBJECT;
 
-    bool m_stopping;
+    QMutex m_mutex;
+    QWaitCondition m_wakeUp;
     QList<class ITrackResolveRequest*> m_queue;
+    bool m_stopping;
 
     void doRequest(LocalCollection *pCollection, ITrackResolveRequest* req);
 
@@ -88,9 +90,7 @@ public:
     ~QueryThread();
     virtual void run();
 
-public slots:
-    void onEnqueue(class ITrackResolveRequest* req);
-    void onStop();
+    void enqueue(class ITrackResolveRequest* req);
 };
 
 #endif
