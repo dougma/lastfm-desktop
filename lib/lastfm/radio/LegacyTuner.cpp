@@ -142,6 +142,8 @@ LegacyTuner::takeNextTrack()
 bool
 LegacyTuner::fetchFiveMoreTracks()
 {
+    // legacy playlists return all tracks in the first xspf, so we can't ever
+    // fetch more tracks
     if (m_station.isLegacyPlaylist())
         return false;
     
