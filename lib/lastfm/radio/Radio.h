@@ -43,7 +43,7 @@ class QAction;
 class LASTFM_RADIO_DLLEXPORT Radio : public QObject
 {
     Q_OBJECT
-
+    
 public:
     Radio( Phonon::AudioOutput* );
     ~Radio();

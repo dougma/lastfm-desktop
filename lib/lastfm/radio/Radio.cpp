@@ -224,29 +224,29 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
 void
 Radio::phononEnqueue()
 {
-    // keep only one track in the phononQueue
-    if ( m_mediaObject->queue().isEmpty() ) {
-        // Loop until we get a null url or a valid url.
-        while (1)
-        {
-            Track t = m_trackSource->takeNextTrack();
-            if (t.isNull()) break;
-            // Invalid urls won't trigger the correct phonon
-            // state changes, so we must filter them.
-            if (t.url().isValid()) {
-                m_track = t;
-                Phonon::MediaSource ms( t.url() );
+    if (m_mediaObject->queue().size() || !m_trackSource) return;
 
-                // it seems important to make this distinction:
-                if (m_mediaObject->state() == Phonon::PlayingState) {
-                    m_mediaObject->enqueue( ms );
-                } else {
-                    m_mediaObject->setCurrentSource( ms );
-                }
-                m_mediaObject->play();
-                break;
-            }
+    // keep only one track in the phononQueue
+    // Loop until we get a null url or a valid url.
+    for (;;)
+    {
+        Track t = m_trackSource->takeNextTrack();
+        if (t.isNull()) break;
+        // Invalid urls won't trigger the correct phonon
+        // state changes, so we must filter them.
+        if (!t.url().isValid()) continue;
+        
+        m_track = t;
+        Phonon::MediaSource ms( t.url() );
+
+        // it seems important to make this distinction:
+        if (m_mediaObject->state() == Phonon::PlayingState) {
+            m_mediaObject->enqueue( ms );
+        } else {
+            m_mediaObject->setCurrentSource( ms );
         }
+        m_mediaObject->play();
+        break;
     }
 }
 
