@@ -146,8 +146,7 @@ Sources::setupUi()
     Firehose* hose;
     ui.friendsBucket->addCustomWidget( hose = new Firehose );
     ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
-    
-    hose->setStaff();
+
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
     ui.tabWidget->addTab( ui.friendsBucket );

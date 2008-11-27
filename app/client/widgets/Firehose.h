@@ -25,13 +25,19 @@
 
 class Firehose : public FirehoseView
 {
+    Q_OBJECT
+    
 public:
     Firehose();
+       
+    virtual QSize sizeHint() const;
     
+private slots:
+    void onUserGotInfo( class WsReply* );
+    
+private:
     void setUserId( uint id );
     void setStaff();
-    
-    virtual QSize sizeHint() const;
 };
 
 #endif

@@ -22,6 +22,8 @@
 #include "FirehoseModel.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
+#include "lib/lastfm/types/User.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QVBoxLayout>
 
 
@@ -40,8 +42,9 @@ Firehose::Firehose()
     setPalette( p );
     setPalette( palette() );
     setAutoFillBackground( true );
+    
+    connect( AuthenticatedUser().getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 }
-
 
 
 QSize
@@ -64,4 +67,21 @@ void
 Firehose::setStaff()
 {
     ((FirehoseModel*)model)->setNozzle( "user/1000002?rt=xml&special=staffmembers" );
+}
+
+
+void
+Firehose::onUserGotInfo( WsReply* reply )
+{
+    qDebug() << reply;
+    
+    try
+    {
+        uint const id = reply->lfm()["user"]["id"].text().toInt();
+        setUserId( id );
+    }
+    catch (CoreDomElement::Exception&)
+    {
+        setStaff();
+    }
 }

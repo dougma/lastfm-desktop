@@ -477,20 +477,6 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
             act->setEnabled( false );
             ui.account->insertAction( ui.profile, act );
         }
-        
-        if (e["bootstrap"].text() != "0")
-        {
-            //TODO bootstrap!
-        }
-        
-        uint const id = e["id"].text().toInt();
-        
-        if (id)
-        {
-//            ui.firehose->setUserId( id );
-        }
-//        else
-//            ui.firehose->setStaff();
     }
 	catch (CoreDomElement::Exception&)
 	{}
@@ -610,9 +596,7 @@ MainWindow::resizeEvent( QResizeEvent* e )
     if (b) { b = false; return; }
     
     if (m_animating) return;
-    
-    qDebug() << e->oldSize() << e->size();
-    
+        
     int const w = width();
     
     if (e->oldSize().isValid())
