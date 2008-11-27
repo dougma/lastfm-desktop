@@ -51,12 +51,11 @@ RadioControls::RadioControls()
     ui.play->setCheckable( true );
     ui.play->setChecked( false );
 
-
 	connect( &The::radio(), SIGNAL(stopped()), SLOT(onRadioStopped()) );
     connect( &The::radio(), SIGNAL(tuningIn( const RadioStation&)), SLOT( onRadioTuningIn( const RadioStation&)));
 	connect( ui.play, SIGNAL( clicked()), SLOT( onPlayClicked()) );
     connect( ui.skip, SIGNAL( clicked()), SIGNAL(skip()));
-    
+
     setFixedWidth( sizeHint().width() );
 
     setAutoFillBackground( false );

@@ -353,6 +353,7 @@ App::open( const QUrl& url )
     open( RadioStation( url.toString() ) );
 }
 
+
 void
 App::open( const RadioStation& station )
 {
@@ -362,6 +363,7 @@ App::open( const RadioStation& station )
                 ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
                 : (AbstractTrackSource*) new Tuner( station ) );
 }
+
 
 void
 App::openXspf( const QUrl& url )
@@ -485,7 +487,7 @@ App::parseArguments( const QStringList& args )
         }
 }
 
-#include "the/app.h"
+
 namespace The
 {
     Radio& radio() { return *app().m_radio; }

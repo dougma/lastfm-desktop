@@ -25,7 +25,6 @@
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornVolumeSlider.h"
 #include "the/radio.h"
-#include "the/mainWindow.h"
 #include "widgets/ImageButton.h"
 #include "PlayableListItem.h"
 #include "PlayerBucketList.h"

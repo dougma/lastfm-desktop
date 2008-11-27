@@ -27,9 +27,10 @@
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
-#include "the/radio.h"
-#include <QPainter>
+#include <QApplication>
+#include <QLabel>
 #include <QMenu>
+#include <QPainter>
 
 
 struct ThreeColumnLayout : QHBoxLayout
