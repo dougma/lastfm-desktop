@@ -124,7 +124,7 @@ Unicorn::TabBar::mouseMoveEvent( QMouseEvent* e )
         return;
         
     QPoint offset = curWidget->mapToGlobal(curWidget->pos()) - QCursor::pos();
-    curWidget->setParent( 0, Qt::Tool );
+    curWidget->setParent( window(), Qt::Tool );
     curWidget->move( QCursor::pos() + QPoint(offset.x(), 0));
     curWidget->resize( tabWidget->size());
     curWidget->show();
