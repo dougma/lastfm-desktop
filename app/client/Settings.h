@@ -81,6 +81,7 @@ namespace moose
 
 struct Plugin
 {
+    QString id;
     QString name;
     QString version;
     
@@ -109,6 +110,7 @@ struct Plugin
                 continue;
 
             p.version = s.value( "Version" ).toString();
+            p.id = group;
             
             plugins += p;
 

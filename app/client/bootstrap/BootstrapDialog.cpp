@@ -69,7 +69,7 @@ BootstrapDialog::nextPluginBootstrap()
     if (m_plugins.isEmpty()) return;
     
     Plugin p = m_plugins.takeFirst();
-    PluginBootstrapper( p.name ).bootStrap();
+    PluginBootstrapper( p.id ).bootStrap();
     setLabelText( "Basically I can't complete this code until the new Windows installer is built. Restarting the media player will bootstrap it, sorta. Tho." );
 #endif
 }
