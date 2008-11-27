@@ -1,12 +1,12 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -14,31 +14,50 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TRACK_SOURCE_H
-#define TRACK_SOURCE_H
+#ifndef RESOLVING_TRACK_SOURCE_H
+#define RESOLVING_TRACK_SOURCE_H
 
-#include <lastfm/types/Track.h>
-#include <lastfm/ws/WsError.h>
-#include <QObject>
+#include "lib/lastfm/radio/AbstractTrackSource.h"
 #include <QList>
 
-
-class LASTFM_RADIO_DLLEXPORT AbstractTrackSource : public QObject
+class ResolvingTrackSource : public AbstractTrackSource
 {
     Q_OBJECT
+
+    class Resolver* m_resolver;
+    AbstractTrackSource* m_src;
+    QList<Track> m_queue;
+    Track m_delaying;
+    bool m_firstDelay;
+    bool m_waiting;
+    bool m_started;
+
+    unsigned m_maxQueue;
+    unsigned m_minQueue;
+    int m_initialResolveDelay;
+    int m_interTrackResolveDelay;
     
+    void fill();
+    void startResolveTimer(Track t);
+
+private slots:
+    void onTrackAvailable();
+    void onResolveComplete(const Track);
+    void onResolveTimeout();
+
 public:
-    // returns a null track if there's nothing available; in 
-    // which case trackAvailable() will be signalled, later.
-    virtual Track takeNextTrack() { return Track(); };
-    
-signals:
-	void title( const QString& );
-	void trackAvailable();
-    void error( Ws::Error );
+    ResolvingTrackSource(class Resolver* resolver, AbstractTrackSource *src);
+    ~ResolvingTrackSource();
+    void setMaxQueueSize(unsigned);
+    void setMinQueueSize(unsigned);
+    void setInitialResolveDelay(int);
+    void setInterTrackResolveDelay(int);
+    void start();
+
+    virtual Track takeNextTrack();
 };
 
 #endif

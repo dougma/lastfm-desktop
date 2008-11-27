@@ -42,7 +42,7 @@ public:
 
 
 // Resolver class is used for starting the track resolution requests
-class LASTFM_RADIO_DLLEXPORT Resolver : public QObject
+class Resolver : public QObject
 {
     Q_OBJECT;
 

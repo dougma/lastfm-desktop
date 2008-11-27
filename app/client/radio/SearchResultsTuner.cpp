@@ -21,7 +21,7 @@
 #include <QListWidget>
 #include "StationDelegate.h"
 #include "lib/lastfm/radio/RadioStation.h"
-#include "the/radio.h"
+#include "the/app.h"
 #include <QListWidgetItem>
 
 SearchResultsTuner::SearchResultsTuner()
@@ -58,7 +58,7 @@ SearchResultsTuner::onArtistClicked( QListWidgetItem* i )
 {
 	i->setSelected( false );
 	Artist artist = i->data( Qt::DisplayRole ).toString();
-	The::radio().play( RadioStation::similar( artist ) );
+	The::app().open( RadioStation::similar( artist ) );
 }
 
 
@@ -66,6 +66,6 @@ void
 SearchResultsTuner::onTagClicked( QListWidgetItem* i )
 {
 	Tag tag = i->data( Qt::DisplayRole ).toString();
-	The::radio().play( RadioStation::globalTag( tag ) );
+	The::app().open( RadioStation::globalTag( tag ) );
 	i->setSelected( false );
 }

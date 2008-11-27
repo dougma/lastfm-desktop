@@ -17,66 +17,57 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef XSPF_PLAYER_H
-#define XSPF_PLAYER_H
+#include "XspfTrackSource.h"
+#include <QNetworkRequest>
+#include "lib/lastfm/ws/WsReply.h"
 
-#include <QList>
-#include <QObject>
-#include <phonon/phononnamespace.h>
-#include <lastfm/types/Track.h>
-#include <lastfm/radio/RadioStation.h>
 
-namespace Phonon
+ XspfTrackSource::XspfTrackSource(QUrl url)
+: m_url(url)
+, m_requested(false)
 {
-	class MediaObject;
-	class AudioOutput;
-	class MediaSource;
 }
 
-
-class XspfPlayer : public QObject
+Track
+XspfTrackSource::takeNextTrack()
 {
-    Q_OBJECT;
+    if (!m_requested) {
+        m_requested = true;
+        m_reply = (new WsAccessManager(this))->get(QNetworkRequest(m_url));
+        connect(m_reply, SIGNAL(finished()), SLOT(onFinished()));
+        return Track();
+    }
+    if (m_queue.isEmpty()) {
+        return Track();
+    }
+    return m_queue.takeFirst();
+}
 
-public:
-    XspfPlayer(Phonon::AudioOutput*, class Resolver* resolver = 0);
-    ~XspfPlayer();
+void
+XspfTrackSource::onFinished()
+{
+    QDomDocument xmldoc;
+    xmldoc.setContent(m_reply);
+    QDomElement docElement(xmldoc.documentElement());
+    if (docElement.tagName() == "playlist") {
+        handleXspf(docElement);
+    } else if (docElement.tagName() == "lfm") {
+        handleXspf(docElement.firstChildElement("playlist"));
+    } else {
+        // todo
+    }
+    delete m_reply;
+    m_reply = 0;
+}
 
-    void play(QUrl);
-    void play(QString xml);
+void 
+XspfTrackSource::handleXspf(const QDomElement& playlistElement)
+{
+    Xspf xspf(playlistElement, Track::Player);
+    emit title(xspf.title());
 
-public slots:
-//    void play( const RadioStation& );
-    void skip();
-    void stop();
-
-signals:
-    void tuningIn(const RadioStation&);
-    void trackSpooled(const Track&); /** and we're now prebuffering */
-    void trackStarted(const Track&);
-    void buffering(int);
-    void stopped();
-
-private slots:
-    void onFinished();
-    void phononEnqueue();
-    void onPhononStateChanged(Phonon::State, Phonon::State);
-    void onPhononCurrentSourceChanged(const Phonon::MediaSource&);
-    void onResolveComplete(const Track&);
-
-private:
-    void handleXspf(const QDomElement& playlistElement);
-    void clear();
-
-	Phonon::AudioOutput* m_audioOutput;
-	Phonon::MediaObject* m_mediaObject;
-	Track m_track;
-	RadioStation m_station;
-    class Resolver *m_resolver;
-    class QNetworkReply *m_reply;
-
-    bool m_bErrorRecover;
-    QList<Track> m_queue;
-};
-
-#endif
+    m_queue = xspf.tracks();
+    if (m_queue.size()) {
+        emit trackAvailable();
+    }
+}

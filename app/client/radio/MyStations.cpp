@@ -20,7 +20,7 @@
 #include "MyStations.h"
 #include "MyStationsDelegate.h"
 #include "SearchResultsTuner.h"
-#include "the/radio.h"
+#include "the/app.h"
 #include "the/mainWindow.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
@@ -97,7 +97,7 @@ void
 MyStations::onItemClicked( QListWidgetItem* i )
 {
 	RadioStation r = i->data( Qt::UserRole ).value< RadioStation >();
-	The::radio().play( r );
+	The::app().open( r );
 }
 
 
@@ -108,7 +108,7 @@ MyStations::onSearch()
 	
 	if( searchTerm.startsWith( "lastfm://", Qt::CaseInsensitive ))
 	{
-		The::radio().play( searchTerm );
+        The::app().open( QUrl(searchTerm) );
 		return;
 	}
 	

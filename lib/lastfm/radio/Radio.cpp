@@ -19,26 +19,19 @@
 
 #include "Radio.h"
 #include "AbstractTrackSource.h"
-#include "LegacyTuner.h"
-#include "Resolver.h"
-#include "Tuner.h"
-#include "common/qt/md5.cpp"
-#include "lib/lastfm/core/CoreSettings.h"
-#include <QThread>
-#include <QTimer>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
+#include <QThread>
+#include <QTimer>
 #include <cmath>
 
-#define TUNING_RESOLVER_WAIT_MS 500
 
-
-Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
-     : m_tuner( 0 ),
+Radio::Radio( Phonon::AudioOutput* output )
+     : m_trackSource( 0 ),
        m_audioOutput( output ),
        m_mediaObject( 0 ),
        m_state( Radio::Stopped ),
-       m_resolver( resolver )
+       m_bErrorRecover( false )
 {
     m_mediaObject = new Phonon::MediaObject;
     m_mediaObject->setTickInterval( 100 );
@@ -47,9 +40,6 @@ Radio::Radio( Phonon::AudioOutput* output, Resolver* resolver )
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
     connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
     Phonon::createPath( m_mediaObject, m_audioOutput );    
-    
-    if ( m_resolver )
-        connect( m_resolver, SIGNAL(resolveComplete( Track )), SLOT(onResolveComplete( Track )) );    
 }
 
     
@@ -78,7 +68,7 @@ Radio::~Radio()
 
 
 void
-Radio::play( const RadioStation& station, bool resolving, AbstractTrackSource* ats )
+Radio::play( const RadioStation& station, AbstractTrackSource* trackSource )
 {
     if (m_state != Stopped)
     {
@@ -91,30 +81,19 @@ Radio::play( const RadioStation& station, bool resolving, AbstractTrackSource* a
     }
 
 	m_station = station;
-    m_resolving = resolving;
-	delete m_tuner;
+	delete m_trackSource;
+    m_trackSource = trackSource;
 
-    if ( ats )
-    {
-        m_tuner = ats;
-    }
-    else
-    {
-        m_tuner = station.isLegacyPlaylist()
-                ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
-                : (AbstractTrackSource*) new Tuner( station );
-    }
-
-	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
-	connect( m_tuner, SIGNAL(tracks( QList<Track> )), SLOT(enqueue( QList<Track> )) );
-	connect( m_tuner, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
+	connect( m_trackSource, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
+	connect( m_trackSource, SIGNAL(trackAvailable()), SLOT(enqueue()) );
+	connect( m_trackSource, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
 
     changeState( TuningIn );
 }
 
 
 void
-Radio::enqueue( const QList<Track>& tracks )
+Radio::enqueue()
 {  
     if (m_state == Stopped) {
         // this should be impossible. If we are stopped, then the GUI looks
@@ -124,29 +103,13 @@ Radio::enqueue( const QList<Track>& tracks )
         return;
     }
     
-	if (tracks.isEmpty()) {
-		qWarning() << "Received blank playlist, Last.fm is b0rked";
-		stop();
-		return;
-	}
+	//if (tracks.isEmpty()) {
+	//	qWarning() << "Received blank playlist, Last.fm is b0rked";
+	//	stop();
+	//	return;
+	//}
 	
-    foreach (const Track& t, tracks)
-    {
-        if ( m_resolver && m_resolving ) {
-            m_resolver->resolve( t );
-        }
-        m_queue += t;
-    }
-
-    if (m_state == TuningIn) {
-        // we need to kick off phonon
-        if ( m_resolver && m_resolving ) {
-            // give the resolver a chance with the first track
-            QTimer::singleShot( TUNING_RESOLVER_WAIT_MS, this, SLOT(phononEnqueue()) );
-        } else {
-            phononEnqueue();
-        }
-    }
+    phononEnqueue();
 }
 
 
@@ -160,7 +123,7 @@ Radio::skip()
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
     if (q.size())
 	{
-		Phonon::MediaSource source = q.front();
+		Phonon::MediaSource source = q.takeFirst();
 		m_mediaObject->setQueue( q );
 		m_mediaObject->setCurrentSource( source );
 		m_mediaObject->play();
@@ -168,8 +131,7 @@ Radio::skip()
     else if (m_state != Stopped)
     {
 	    // we are still waiting for a playlist to come back from the tuner
-		
-	    m_mediaObject->blockSignals( true ); //dont' tell outside world that we stopped
+	    m_mediaObject->blockSignals( true );    //don't tell outside world that we stopped
 	    m_mediaObject->stop();
 	    m_mediaObject->setCurrentSource( QUrl() );
 	    m_mediaObject->blockSignals( false );
@@ -192,8 +154,8 @@ Radio::onTunerError( Ws::Error e )
 void
 Radio::stop()
 {
-    delete m_tuner;
-    m_tuner = 0;
+    delete m_trackSource;
+    m_trackSource = 0;
     
     m_mediaObject->blockSignals( true ); //prevent the error state due to setting current source to null
 	m_mediaObject->stop();
@@ -201,7 +163,7 @@ Radio::stop()
 	m_mediaObject->setCurrentSource( QUrl() );
     m_mediaObject->blockSignals( false );
 
-    clear();	
+    clear();
     
     changeState( Stopped );
 }
@@ -210,17 +172,10 @@ Radio::stop()
 void
 Radio::clear()
 {
-    if ( m_resolver && m_resolving ) {
-        foreach( const Track& t, m_queue ) {
-            m_resolver->stopResolving( t );
-        }
-    }
-    m_queue.clear();
-
     m_track = Track();
     m_station = RadioStation();
-    delete m_tuner;
-    m_tuner = 0;    
+    delete m_trackSource;
+    m_trackSource = 0;    
 }
 
 
@@ -232,7 +187,9 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
         case Phonon::ErrorState:
 			if (m_mediaObject->errorType() == Phonon::FatalError)
 				emit error( Ws::UnknownError, m_mediaObject->errorString() );
-            skip(); // maybe the next track will be better
+            // seems we need to clear the error state before trying to play again.
+            m_bErrorRecover = true;
+            m_mediaObject->stop();
             break;
 			
 		case Phonon::PausedState:
@@ -244,9 +201,10 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
 			break;
 			
         case Phonon::StoppedState:
-            // yeah, really, we always ignore it
-            // we handle our own stop state, and in all other cases we go
-            // to TuningIn
+            if (m_bErrorRecover) {
+                m_bErrorRecover = false;
+                skip();
+            }
             break;
 			
         case Phonon::BufferingState:
@@ -254,31 +212,41 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
             break;
 
 		case Phonon::PlayingState:
-            fetchMoreTracks();
             changeState( Playing );
             break;
 
 		case Phonon::LoadingState:
-            fetchMoreTracks();
 			break;
     }
 }
 
 
-// Looks at the head of the playqueue, makes a MediaSource object 
-// and places that in the phonon queue.
-// The track at the playqueue head remains until onPhononCurrentSourceChanged.
 void
 Radio::phononEnqueue()
 {
-    // only keep one track in the phononQueue
-    if (!m_queue.isEmpty() && m_mediaObject->queue().isEmpty()) {
-        Track t = m_queue.first();
-        if ( m_resolver && m_resolving ) 
-            m_resolver->stopResolving( t );
+    // keep only one track in the phononQueue
+    if ( m_mediaObject->queue().isEmpty() ) {
+        // Loop until we get a null url or a valid url.
+        while (1)
+        {
+            Track t = m_trackSource->takeNextTrack();
+            if (t.isNull()) break;
+            // Invalid urls won't trigger the correct phonon
+            // state changes, so we must filter them.
+            if (t.url().isValid()) {
+                m_track = t;
+                Phonon::MediaSource ms( t.url() );
 
-        m_mediaObject->enqueue( Phonon::MediaSource(t.url()) );
-        m_mediaObject->play();
+                // it seems important to make this distinction:
+                if (m_mediaObject->state() == Phonon::PlayingState) {
+                    m_mediaObject->enqueue( ms );
+                } else {
+                    m_mediaObject->setCurrentSource( ms );
+                }
+                m_mediaObject->play();
+                break;
+            }
+        }
     }
 }
 
@@ -288,20 +256,9 @@ Radio::phononEnqueue()
 void
 Radio::onPhononCurrentSourceChanged( const Phonon::MediaSource& )
 {
-    m_track = m_queue.takeFirst();
     MutableTrack( m_track ).stamp();
     changeState( Buffering );
     emit trackSpooled( m_track );
-    phononEnqueue();
-}
-
-
-void
-Radio::fetchMoreTracks()
-{
-    // todo: we _may_ already have a tuner request outstanding.. is this a problem?
-    if (m_queue.isEmpty() && m_tuner)
-        m_tuner->fetchFiveMoreTracks();
 }
 
 
@@ -346,18 +303,6 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
     {
         m_station.setTitle( s );
         emit tuningIn( m_station );
-    }
-}
-
-
-void 
-Radio::onResolveComplete( const Track t )
-{
-    if (!m_queue.isEmpty() && t == m_queue[0]) 
-    {
-        // resolve completed for the head of the queue
-        // maybe ahead of TUNING_RESOLVER_WAIT_MS timeout:
-        phononEnqueue();
     }
 }
 

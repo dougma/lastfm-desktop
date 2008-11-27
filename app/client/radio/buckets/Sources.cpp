@@ -30,7 +30,7 @@
 #include "Sources.h"
 #include "Amp.h"
 #include "the/mainWindow.h"
-#include "the/radio.h"
+#include "the/app.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "SourcesList.h"
 #include "PlayableListItem.h"
@@ -192,7 +192,7 @@ Sources::onFreeInputReturn()
     if( ui.freeInput->text().trimmed().startsWith( "lastfm://" ))
     {
         RadioStation s( ui.freeInput->text() );
-        The::radio().play( s );
+        The::app().open( s );
         ui.freeInput->clear();
         return;
     }

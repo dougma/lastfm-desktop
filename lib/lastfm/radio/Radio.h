@@ -45,7 +45,7 @@ class LASTFM_RADIO_DLLEXPORT Radio : public QObject
     Q_OBJECT
 
 public:
-    Radio( Phonon::AudioOutput*, class Resolver* resolver = 0 );
+    Radio( Phonon::AudioOutput* );
     ~Radio();
 	
 	enum State
@@ -61,7 +61,7 @@ public:
     Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
 
 public slots:
-    void play( const RadioStation& station, bool resolving = true, class AbstractTrackSource* = 0 );
+    void play( const RadioStation& station, class AbstractTrackSource* );
     void skip();
     void stop();
 
@@ -80,12 +80,11 @@ signals:
     void tick( qint64 );
 
 private slots:
-    void enqueue( const QList<Track>& );
+    void enqueue();
     void onPhononStateChanged( Phonon::State, Phonon::State );
 	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
 	void onTunerError( Ws::Error );
     void phononEnqueue();
-    void onResolveComplete( const Track t );
     void onBuffering( int );
 
 	/** we get a "proper" station name from the tune webservice */
@@ -95,21 +94,16 @@ private:
     /** resets internals to what Stopped means, used by changeState() */
     void clear();
     
-    void fetchMoreTracks();
-
 	/** emits signals if appropriate */
 	void changeState( State );
 	
-	class AbstractTrackSource* m_tuner;
+	class AbstractTrackSource* m_trackSource;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
 	Radio::State m_state;
 	Track m_track;
 	RadioStation m_station;
-    class Resolver *m_resolver;
-    bool m_resolving;
-
-    QList<Track> m_queue;
+    bool m_bErrorRecover;
 };
 
 

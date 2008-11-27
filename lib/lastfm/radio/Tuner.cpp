@@ -34,6 +34,7 @@
 
 Tuner::Tuner( const RadioStation& station )
      : m_retry_counter( 0 )
+     , m_minQueue( 0 )
 {
     WsReply* reply = WsRequestBuilder( "radio.tune" )
 			.add( "station", station.url() )
@@ -105,7 +106,8 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
     {
         Xspf xspf( reply->lfm()["playlist"] );
 
-        if (xspf.tracks().isEmpty())
+        QList<Track> tracks( xspf.tracks() );
+        if (tracks.isEmpty())
         {
             // sometimes the recs service craps out and gives us a blank playlist
             
@@ -118,7 +120,8 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
         }
         else {
             m_retry_counter = 0;
-            emit tracks( xspf.tracks() );
+            m_queue += tracks;
+            emit trackAvailable();
         }
     }
     catch (CoreDomElement::Exception& e)
@@ -127,4 +130,17 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
         if (!tryAgain())
             emit error( Ws::TryAgainLater );
     }
+}
+
+Track 
+Tuner::takeNextTrack()
+{
+    if (m_queue.isEmpty())
+        return Track();
+    
+    Track result = m_queue.takeFirst();
+    if (m_queue.size() == m_minQueue)
+        fetchFiveMoreTracks();
+
+    return result;
 }

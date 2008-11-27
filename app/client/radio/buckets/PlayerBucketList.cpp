@@ -30,7 +30,6 @@
 #include "widgets/ImageButton.h"
 #include "widgets/UnicornWidget.h"
 #include "lib/lastfm/radio/RadioStation.h"
-#include "the/radio.h"
 #include "app/moose.h"
 
 Q_DECLARE_METATYPE( PlayableListItem* )
@@ -392,7 +391,7 @@ PlayerBucketList::play()
     RadioStation station = RadioStation::rql( queryString() );
     
     station.setTitle( "" );
-    The::radio().play( station );
+    The::app().open( station );
 }
 
 
@@ -531,5 +530,5 @@ PlayerBucketList::onQueryEditReturn()
     RadioStation station = RadioStation::rql( ui.queryEdit->text() );
     
     station.setTitle( "" );
-    The::radio().play( station );
+    The::app().open( station );
 }

@@ -30,7 +30,8 @@
 LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
      : m_nam( new WsAccessManager( this ) ),
        m_retry_counter( 0 ),
-       m_station( station )
+       m_station( station ),
+       m_minQueue( 0 )
 {    
 #ifdef WIN32
     static const char *PLATFORM = "win32";
@@ -126,6 +127,18 @@ LegacyTuner::onAdjustReturn()
 }
 
 
+Track
+LegacyTuner::takeNextTrack()
+{
+    Track t;
+    if (!m_queue.isEmpty()) {
+        t = m_queue.takeFirst();
+        if (m_queue.size() == m_minQueue)
+            fetchFiveMoreTracks();
+    }
+    return t;
+}
+
 bool
 LegacyTuner::fetchFiveMoreTracks()
 {
@@ -170,8 +183,8 @@ LegacyTuner::onGetPlaylistReturn()
     xml.setContent( data );
 
     Xspf xspf( xml.documentElement() );
-
-    if (xspf.tracks().isEmpty())
+    QList<Track> tracks( xspf.tracks() );
+    if (tracks.isEmpty())
     {
         // sometimes the recs service craps out and gives us a blank playlist
 
@@ -184,6 +197,7 @@ LegacyTuner::onGetPlaylistReturn()
     }
     else {
         m_retry_counter = 0;
-        emit tracks( xspf.tracks() );
+        m_queue << tracks;
+        emit trackAvailable();
     }
 }

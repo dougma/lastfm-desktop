@@ -18,9 +18,11 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "ExtractIdentifiersJob.h"
 #include "Settings.h"
+#include "Resolver.h"
 #include "PluginHost.h"
+#include "XspfResolvingTrackSource.h"
+#include "ExtractIdentifiersJob.h"
 #include "ipod/BatchScrobbleDialog.h"
 #include "ipod/IPodScrobbleCache.h"
 #include "mac/MacStyle.h"
@@ -35,11 +37,11 @@
 #include "lib/lastfm/fingerprint/Fingerprint.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/radio/Radio.h"
-#include "lib/lastfm/radio/Resolver.h"
+#include "lib/lastfm/radio/Tuner.h"
+#include "lib/lastfm/radio/LegacyTuner.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
 #include <QThreadPool>
-#include <XspfPlayer.h>
 #include <phonon/audiooutput.h>
 
 #ifdef WIN32
@@ -122,7 +124,7 @@ App::App( int& argc, char** argv )
 
     PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
-	m_radio = new Radio( new Phonon::AudioOutput, m_resolver );
+	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
 
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
@@ -332,24 +334,28 @@ App::logout()
 
 void
 App::open( const QUrl& url )
-{    
-    m_radio->play( RadioStation( url.toString() ) );
+{
+    open( RadioStation( url.toString() ) );
 }
 
+void
+App::open( const RadioStation& station )
+{
+    m_radio->play( 
+        station, 
+        station.isLegacyPlaylist()
+                ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
+                : (AbstractTrackSource*) new Tuner( station ) );
+}
 
 void
 App::openXspf( const QUrl& url )
 {
-    XspfPlayer *player = new XspfPlayer( new Phonon::AudioOutput, m_resolver );
-
-	connect( player, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
-    connect( player, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
-    connect( player, SIGNAL(trackStarted( Track )), m_playerMediator, SLOT(onRadioTrackStarted( Track )) );
-    connect( player, SIGNAL(stopped()), m_playerMediator, SLOT(onRadioStopped()) );
-
-    // connect( m_playerMediator, SIGNAL(), player, SLOT(stop()) ); // ?
-  
-    player->play( url );
+    XspfResolvingTrackSource* src = new XspfResolvingTrackSource( m_resolver, url );
+    m_radio->play( 
+        RadioStation( "XSPF" ), 
+        src );
+    src->start();
 }
 
 

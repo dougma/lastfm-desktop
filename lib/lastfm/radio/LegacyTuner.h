@@ -24,7 +24,7 @@
 #include <lastfm/radio/RadioStation.h>
 
 
-class LegacyTuner : public AbstractTrackSource
+class LASTFM_RADIO_DLLEXPORT LegacyTuner : public AbstractTrackSource
 {
 	Q_OBJECT
 	
@@ -33,7 +33,7 @@ public:
 	  * automatically fetches the first 5 tracks for the station */
     LegacyTuner( const RadioStation&, const QString& password_md5 );
 
-    virtual bool fetchFiveMoreTracks();
+    virtual Track takeNextTrack();
 
 private slots:
 	void onHandshakeReturn();
@@ -44,11 +44,14 @@ private:
 	/** Tries again up to 5 times
 	  * @returns true if we tried again, otherwise you should emit error */
 	bool tryAgain();
+    bool fetchFiveMoreTracks();
 
     class QNetworkAccessManager* m_nam;
 	uint m_retry_counter;
     RadioStation m_station;
     QByteArray m_session;
+    unsigned m_minQueue;
+    QList<Track> m_queue;
 };
 
 #endif

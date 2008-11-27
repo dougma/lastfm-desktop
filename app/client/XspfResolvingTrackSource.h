@@ -1,12 +1,12 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -14,31 +14,19 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TRACK_SOURCE_H
-#define TRACK_SOURCE_H
+#ifndef XSPF_RESOLVING_TRACK_SOURCE_H
+#define XSPF_RESOLVING_TRACK_SOURCE_H
 
-#include <lastfm/types/Track.h>
-#include <lastfm/ws/WsError.h>
-#include <QObject>
-#include <QList>
+#include "ResolvingTrackSource.h"
+#include <QUrl>
 
-
-class LASTFM_RADIO_DLLEXPORT AbstractTrackSource : public QObject
+class XspfResolvingTrackSource : public ResolvingTrackSource
 {
-    Q_OBJECT
-    
 public:
-    // returns a null track if there's nothing available; in 
-    // which case trackAvailable() will be signalled, later.
-    virtual Track takeNextTrack() { return Track(); };
-    
-signals:
-	void title( const QString& );
-	void trackAvailable();
-    void error( Ws::Error );
+    XspfResolvingTrackSource(class Resolver* resolver, QUrl xspfUrl);
 };
 
 #endif
