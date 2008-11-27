@@ -113,6 +113,8 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
+    connect( this, SIGNAL(internetConnectionRestored()), m_scrobbler, SLOT(submit()) );
+    
 #ifndef NDEBUG
     QString plugins_path = qApp->applicationDirPath();
 #else
@@ -435,40 +437,7 @@ App::parseArguments( const QStringList& args )
             {
                 emit status( tr("iPod scrobbling complete."), "twiddling" ); // clear status for ipod scrobbling
                 emit status( "", "twiddling" ); // removes message after small delay
-
-                IPodScrobbleCache cache( args.value( 2 ) );
-                QList<Track> tracks = cache.tracks();
-
-                if (tracks.isEmpty())
-                    qWarning() << "Empty iPod scrobble cache, but that shouldn't be possible!";
-
-                if (cache.insane() || moose::Settings().alwaysConfirmIPodScrobbles())
-                {
-                    BatchScrobbleDialog d( m_mainWindow );
-                    d.setTracks( tracks );
-                    d.exec();
-                    
-                    tracks = d.tracks();
-                }
-                
-                // the scrobbler doesn't understand the playcount parameter
-                // this results in a series of scrobbles with identical timestamps
-                // but well. We can't do anything good about that.
-                QMutableListIterator<Track> i( tracks );
-                while (i.hasNext())
-                {
-                    IPodScrobble s = i.next();
-					int const n = s.playCount();
-					MutableTrack( s ).removeExtra( "playCount" );
-                    for (int y = 1; y < n; --y)
-                        i.insert( s );
-                }
-
-                m_scrobbler->cache( tracks );
-                cache.remove(); //ie. filesystem delete
-
-                //TODO message "Your iPod tracks will be submitted at the end of this track"
-                
+                submitTwiddleCache( args.value( 2 ) );
 				return;
             }
 
@@ -485,6 +454,44 @@ App::parseArguments( const QStringList& args )
                 qDebug() << "Unknown argument:" << arg;
                 break;
         }
+}
+
+
+void
+App::submitTwiddleCache( const QString& path )
+{    
+    IPodScrobbleCache cache( path );
+    QList<Track> tracks = cache.tracks();
+    
+    if (tracks.isEmpty())
+        qWarning() << "Empty iPod scrobble cache, but that shouldn't be possible!";
+    
+    if (cache.insane() || moose::Settings().alwaysConfirmIPodScrobbles())
+    {
+        BatchScrobbleDialog d( m_mainWindow );
+        d.setTracks( tracks );
+        d.exec();
+        
+        tracks = d.tracks();
+    }
+    
+    // the scrobbler doesn't understand the playcount parameter
+    // this results in a series of scrobbles with identical timestamps
+    // but well. We can't do anything good about that.
+    QMutableListIterator<Track> i( tracks );
+    while (i.hasNext())
+    {
+        IPodScrobble s = i.next();
+        int const n = s.playCount();
+        MutableTrack( s ).removeExtra( "playCount" );
+        for (int y = 1; y < n; --y)
+            i.insert( s );
+    }
+    
+    m_scrobbler->cache( tracks );
+    cache.remove(); //ie. filesystem delete
+    
+    //TODO message "Your iPod tracks will be submitted at the end of this track"
 }
 
 

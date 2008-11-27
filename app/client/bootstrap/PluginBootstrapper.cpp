@@ -38,7 +38,6 @@ PluginBootstrapper::PluginBootstrapper( QString pluginId, QObject* parent )
 void
 PluginBootstrapper::bootStrap()
 {
-    #undef QSettings
     QSettings bootstrap( QSettings::NativeFormat, QSettings::UserScope, "Last.fm", "Bootstrap", this );
 
     bootstrap.setValue( m_pluginId, Ws::Username );

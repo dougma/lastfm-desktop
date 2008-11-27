@@ -19,7 +19,6 @@
 
 #include "TrackDashboard.h"
 #include "FadingScrollBar.h"
-#include "MainWindow/MediaPlayerIndicator.h"
 #include "MainWindow/PrettyCoverWidget.h"
 #include "UnicornWidget.h"
 #include "lib/unicorn/TrackImageFetcher.h"
@@ -227,20 +226,23 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		QString editmessage = tr("Edit it too!");
 
 		QString html;        
+        QTextStream stream( &html );
+        
+        stream << "<h1>" << name << "</h1>"
+               << "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
+               << tr( "%L1 plays" ).arg( plays );
+        
         if (content.isEmpty())
         {
             // this should be all one tr, but meh.
-            html = "<p>" + tr("We don't have a description for this artist yet.") + "<p><a href='" + 
-                   url + "/+wiki/edit'>" + tr("Why not write one?") + "</a>";
+            stream << "<p>" << tr("We don't have a description for this artist yet.")
+                   << "<p><a href='" << url << "/+wiki/edit'>"
+                   << tr("Why not write one?") << "</a>";
         }
         else
-            QTextStream( &html ) <<
-                    "<h1>" << name << "</h1>"
-                    "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
-                                   << tr( "%L1 plays" ).arg( plays ) <<
-                    "<p id=content>" << content.replace(QRegExp("\r+"), "<p>") <<
-                    "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ") <<
-                    "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
+            stream << "<p id=content>" << content.replace(QRegExp("\r+"), "<p>")
+                   << "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ")
+                   << "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
         
         
         QString css = 
