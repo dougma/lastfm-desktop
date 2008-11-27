@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "../core/CoreSettings.h"
 #include "WsRequestParameters.h"
 #include "WsKeys.h"
 #include "common/qt/md5.cpp"
@@ -26,6 +27,7 @@
 WsRequestParameters::WsRequestParameters()
 {
     add( "api_key", Ws::ApiKey );
+    add( "lang", CoreSettings().locale().iso639() );
     if (Ws::SessionKey.size()) add( "sk", Ws::SessionKey );
 }
 
