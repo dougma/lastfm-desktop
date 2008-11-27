@@ -65,7 +65,10 @@ public:
       {
          simVal = getCosOfAngle(base, *cIt, accessPolicy);
          if ( simVal > minSim )
-            res.push_back( std::make_pair(*cIt, static_cast<float>(simVal)) );
+         {
+            std::pair<TEntry, float> pair = std::make_pair(*cIt, static_cast<float>(simVal));
+            res.push_back( pair );
+         }
       }
 
       // sort
@@ -90,7 +93,7 @@ public:
 private:
 
    template <typename TEntry>
-   static bool comparer( std::pair<TEntry, float>& p1, std::pair<TEntry, float>& p2 )
+   static bool comparer( const std::pair<TEntry, float>& p1, const std::pair<TEntry, float>& p2 )
    { return p1.second > p2.second; }
 
    //////////////////////////////////////////////////////////////////////////

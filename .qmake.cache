@@ -18,6 +18,9 @@ INCLUDEPATH += $$ROOT_DIR
 
 win32:DEFINES += _CRT_SECURE_NO_WARNINGS WIN32_LEAN_AND_MEAN
 
+# allow use of and, or, etc. as symbols
+unix:QMAKE_CXXFLAGS = $$QMAKE_CXXFLAGS -fno-operator-names
+
 macx* {
 	QMAKE_PKGINFO_TYPEINFO = last
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4

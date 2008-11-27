@@ -48,6 +48,9 @@ CONFIG( mad ) {
     } 
 }
 
+CONFIG( boost ) {
+    macx*:INCLUDEPATH += /opt/local/include
+}
 
 CONFIG( fftw3f ) {
     win32: LIBS += -L$$COMMON_LIBS_DIR/libfftw -lfftw3f
