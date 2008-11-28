@@ -47,6 +47,8 @@ public:
     
     WsReply* getPlaylists() const;
     WsReply* getTopArtists() const;
+    WsReply* getRecentArtists() const;
+    WsReply* getRecentTracks() const;
     
     static QList<User> list( WsReply* );
     

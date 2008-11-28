@@ -44,6 +44,20 @@ User::getTopArtists() const
 
 
 WsReply* 
+User::getRecentArtists() const
+{
+    return WsRequestBuilder( "user.getRecentArtists" ).add( "user", m_name ).get();
+}
+
+
+WsReply* 
+User::getRecentTracks() const
+{
+    return WsRequestBuilder( "user.getRecentTracks" ).add( "user", m_name ).get();
+}
+
+
+WsReply* 
 User::getNeighbours() const
 {
 	return WsRequestBuilder( "user.getNeighbours" ).add( "user", m_name ).get();

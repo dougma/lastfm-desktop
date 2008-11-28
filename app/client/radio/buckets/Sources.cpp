@@ -28,11 +28,11 @@
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
 #include "Sources.h"
+#include "SourcesList.h"
 #include "Amp.h"
 #include "the/mainWindow.h"
 #include "the/app.h"
 #include "lib/lastfm/radio/RadioStation.h"
-#include "SourcesList.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
 #include "widgets/RadioControls.h"
@@ -40,7 +40,6 @@
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "widgets/Firehose.h"
-
 #include <phonon/volumeslider.h>
 
 struct SpecialWidget : QWidget
@@ -84,11 +83,13 @@ Sources::Sources()
         n->setSizeHint( QSize( 90, n->sizeHint().height()+20));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
+    
+    onTabChanged();
 
     connect( authUser.getFriends(), SIGNAL(finished( WsReply* )), SLOT(onUserGetFriendsReturn( WsReply* )) );
     connect( authUser.getTopTags(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopTagsReturn( WsReply* )) );
     connect( authUser.getPlaylists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetPlaylistsReturn( WsReply* )) );
-    connect( authUser.getTopArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetTopArtistsReturn( WsReply* )) );
+    connect( authUser.getTopArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetArtistsReturn( WsReply* )) );
 	
 }
 
@@ -107,28 +108,6 @@ Sources::setupUi()
     connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
     m_cogMenu = new QMenu( this );
     
-    ui.actions.iconView = new QAction( tr( "Icon View"), this );
-    ui.actions.iconView->setCheckable( true );
-    ui.actions.iconView->setChecked( true );
-    
-    ui.actions.listView = new QAction( tr( "List View" ), this );
-    ui.actions.listView->setCheckable( true );
-    
-    ui.actions.firehoseView = new QAction( tr( "Firehose View" ), this );
-    ui.actions.firehoseView->setEnabled( false );
-    ui.actions.firehoseView->setCheckable( true );
-    
-    QActionGroup* aGroup = new QActionGroup( this );
-    
-    aGroup->addAction( ui.actions.iconView );
-    aGroup->addAction( ui.actions.listView );
-    aGroup->addAction( ui.actions.firehoseView );
-    
-    m_cogMenu->addAction( ui.actions.iconView );
-    m_cogMenu->addAction( ui.actions.listView );
-    m_cogMenu->addAction( ui.actions.firehoseView );
-    
-    connect( m_cogMenu, SIGNAL( triggered( QAction*)), SLOT( onCogMenuAction( QAction* )));    
     connect( ui.tabWidget, SIGNAL( currentChanged( int )), SLOT( onTabChanged()));
     connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
     
@@ -144,7 +123,7 @@ Sources::setupUi()
     ui.friendsBucket->setWindowTitle( tr( "Friends" ));
     
     Firehose* hose;
-    ui.friendsBucket->addCustomWidget( hose = new Firehose );
+    ui.friendsBucket->addCustomWidget( hose = new Firehose, tr( "Firehose View" ) );
     ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
 
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
@@ -163,7 +142,35 @@ Sources::setupUi()
     connect( ui.artistsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.artistsBucket );    //as above
     ui.tabWidget->addTab( ui.artistsBucket );
-   
+    
+#if 0
+    //
+    //TODO: Uncomment when we have a recentArtists webservice
+    //
+    
+    QAction* topArtists = new QAction( tr( "Top Artists" ), ui.artistsBucket );
+    topArtists->setCheckable( true );
+    topArtists->setChecked( true );
+    
+    QAction* recentArtists = new QAction( tr( "Recent Artists" ), ui.artistsBucket );
+    recentArtists->setCheckable( true );
+    
+    QActionGroup* artistGroup = new QActionGroup( ui.artistsBucket );
+    artistGroup->addAction( topArtists );
+    artistGroup->addAction( recentArtists );
+    
+    QAction* sep = new QAction( ui.artistsBucket );
+    sep->setSeparator( true );
+
+    ui.artistsBucket->addAction( sep );
+    ui.artistsBucket->addAction( topArtists );
+    ui.artistsBucket->addAction( recentArtists );
+    
+    connect( topArtists, SIGNAL( toggled( bool)), SLOT( onTopArtistsToggled( bool )));
+    connect( recentArtists, SIGNAL( toggled( bool)), SLOT( onRecentArtistsToggled( bool )));
+#endif
+
+    
     QWidget* freeInputWidget = new SpecialWidget;
     new QHBoxLayout( freeInputWidget );
     freeInputWidget->layout()->addWidget( ui.freeInput = new QLineEdit );
@@ -248,7 +255,7 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
 
 
 void 
-Sources::onUserGetTopArtistsReturn( WsReply* r )
+Sources::onUserGetArtistsReturn( WsReply* r )
 {
     QList<Artist> artists = Artist::list( r );
     foreach( Artist a, artists )
@@ -414,61 +421,42 @@ Sources::onCogMenuClicked()
 
 
 void 
-Sources::onCogMenuAction( QAction* a )
-{
-    SourcesList* listView = qobject_cast< SourcesList* >( ui.tabWidget->currentWidget() );
-    if( !listView )
-        return;
-    
-    if( a == ui.actions.listView )
-    {
-        listView->setMovement( QListView::Free );
-        listView->setFlow( QListView::TopToBottom );
-        listView->setUniformItemSizes( false );
-        listView->setAlternatingRowColors( true );
-        listView->setIconSize( QSize( 19, 30 ) );
-        listView->setSourcesViewMode( SourcesList::ListMode );
-    }
-    
-    else if( a == ui.actions.iconView )
-    {
-        listView->setSourcesViewMode( SourcesList::IconMode );
-        listView->setFlow( QListView::LeftToRight );
-        listView->setUniformItemSizes( true );
-        listView->setAlternatingRowColors( false );
-        listView->setIconSize( QSize( 36, 38 ) );
-    }    
-    
-    else if( a == ui.actions.firehoseView )
-    {
-        listView->setSourcesViewMode( SourcesList::CustomMode );
-        listView->setFlow( QListView::LeftToRight );
-        listView->setUniformItemSizes( true );
-        listView->setAlternatingRowColors( false );
-        listView->setIconSize( QSize( 36, 38 ) );
-    }
- 
-}
-
-
-void 
 Sources::onTabChanged()
 {
     SourcesList* listView = qobject_cast< SourcesList* >( ui.tabWidget->currentWidget() );
     if( !listView )
         return;
     
-    if( listView == ui.friendsBucket )
-        ui.actions.firehoseView->setEnabled( true );
-    else 
-        ui.actions.firehoseView->setEnabled( false );
-
-    switch( listView->sourcesViewMode() )
+    m_cogMenu->clear();
+    
+    foreach( QAction* a, listView->actions() )
     {
-        case SourcesList::ListMode: ui.actions.listView->setChecked( true ); break;
-        case SourcesList::IconMode: ui.actions.iconView->setChecked( true ); break;
-        case SourcesList::CustomMode: ui.actions.firehoseView->setChecked( true ); break;
-        default: Q_ASSERT( !"Unimplemented viewmode - cannot set action on cog" ); break;
+        m_cogMenu->addAction( a );
     }
-        
+       
+}
+
+
+void 
+Sources::onTopArtistsToggled( bool b )
+{
+    if( !b )
+        return;
+    
+    AuthenticatedUser authUser;
+    ui.artistsBucket->clear();
+    connect( authUser.getTopArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetArtistsReturn( WsReply* )) );
+    
+}
+
+
+void 
+Sources::onRecentArtistsToggled( bool b )
+{
+    if( !b )
+        return;
+    
+    AuthenticatedUser authUser;
+    ui.artistsBucket->clear();
+    connect( authUser.getRecentArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetArtistsReturn( WsReply* )) );
 }

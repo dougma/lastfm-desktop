@@ -21,9 +21,12 @@
 #include "PlayableListItem.h"
 #include <QStackedLayout>
 #include <QStyledItemDelegate>
+#include <QAction>
+#include <QActionGroup>
 
 SourcesList::SourcesList( QWidget* parent )
             : QListWidget( parent ),
+              m_customWidget( 0 ),
               m_customModeEnabled( false )
 {
     QStackedLayout* l = new QStackedLayout( this );
@@ -47,6 +50,20 @@ SourcesList::SourcesList( QWidget* parent )
     
     l->addWidget( viewport() );
     connect( model(), SIGNAL( dataChanged( const QModelIndex, const QModelIndex)), SLOT( onDataChanged( const QModelIndex, const QModelIndex )));
+    
+    ui.actions.listView = new QAction( tr( "List View" ), this );
+    ui.actions.listView->setCheckable( true );
+    ui.actions.iconView = new QAction( tr( "Icon View" ), this );
+    ui.actions.iconView->setCheckable( true );
+    connect( ui.actions.listView, SIGNAL(toggled( bool )), SLOT( onViewModeAction( bool ))); 
+    connect( ui.actions.iconView, SIGNAL(toggled( bool )), SLOT( onViewModeAction( bool )));
+    
+    QActionGroup* viewGroup = new QActionGroup( this );
+    viewGroup->addAction( ui.actions.listView );
+    viewGroup->addAction( ui.actions.iconView );
+    
+    addAction( ui.actions.listView );
+    addAction( ui.actions.iconView );
 }
 
 
@@ -74,10 +91,24 @@ SourcesList::setSourcesViewMode( ViewMode m )
 {
     if( m < CustomMode )
     {
+        m_customModeEnabled = false;
         if( m == IconMode )
-            setSpacing( 5 );
-        else
+        {
             setSpacing( 0 );
+            setFlow( QListView::LeftToRight );
+            setUniformItemSizes( true );
+            setAlternatingRowColors( false );
+            setIconSize( QSize( 36, 38 ) );
+        }
+        else
+        {
+            setSpacing( 5 );
+            setMovement( QListView::Free );
+            setFlow( QListView::TopToBottom );
+            setUniformItemSizes( false );
+            setAlternatingRowColors( true );
+            setIconSize( QSize( 19, 30 ) );
+        }
         
         QListView::setViewMode( (QListView::ViewMode)m );
         QStackedLayout* l;
@@ -99,8 +130,54 @@ SourcesList::setSourcesViewMode( ViewMode m )
 
 
 void 
-SourcesList::addCustomWidget( QWidget* w )
+SourcesList::addCustomWidget( QWidget* w, QString title )
 {
     m_customWidget = w;
     ((QStackedLayout*)layout())->addWidget( m_customWidget );
+    if( !title.isEmpty() )
+    {
+        ui.actions.customView = new QAction( title, w );
+        ui.actions.customView->setCheckable( true );
+        w->addAction( ui.actions.customView );
+        ui.actions.listView->actionGroup()->addAction( ui.actions.customView );
+        addAction( ui.actions.customView );
+        connect( ui.actions.customView, SIGNAL(toggled( bool )), SLOT( onViewModeAction( bool )));
+    }
+}
+
+
+void 
+SourcesList::showCustomWidget( bool show )
+{
+    if( show )
+        setSourcesViewMode( CustomMode );
+}
+
+
+void 
+SourcesList::onViewModeAction( bool b )
+{
+    if( !b )
+        return;
+    
+    if( sender() == ui.actions.listView )
+        setSourcesViewMode( ListMode );
+    else if( sender() == ui.actions.iconView )
+        setSourcesViewMode( IconMode );
+    else if( sender() == ui.actions.customView )
+        setSourcesViewMode( CustomMode );
+}
+
+
+void 
+SourcesList::showEvent( QShowEvent* )
+{
+    switch( sourcesViewMode() )
+    {
+        case ListMode: ui.actions.listView->setChecked( true ); break;
+        
+        case IconMode: ui.actions.iconView->setChecked( true ); break;
+        
+        case CustomMode: ui.actions.customView->setChecked( true ); break;
+    }
 }

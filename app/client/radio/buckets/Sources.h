@@ -21,6 +21,7 @@
 #define SOURCES_H
 
 #include <QMainWindow>
+#include <QActionGroup>
 #include "SeedTypes.h"
 namespace Unicorn{ class TabWidget; }
 
@@ -47,7 +48,6 @@ public:
         struct {
             class QAction* iconView;
             class QAction* listView;
-            class QAction* firehoseView;
         } actions;
 	} ui;
     
@@ -62,13 +62,18 @@ protected:
     class WsAccessManager* m_accessManager;
     class Amp* m_connectedAmp;
     class QMenu* m_cogMenu;
+
+    //QMap< QWidget*, QActionGroup* > m_contextualCogActions;
+    
+    /** Adds a contextual menu item to the cog menu when the QWidget tab is shown */
+    //void addContextualCogAction( QWidget*, QAction* );
 	
 protected slots:
     void onAmpSeedRemoved( QString, Seed::Type );
     void onUserGetFriendsReturn( class WsReply* );
     void onUserGetTopTagsReturn( class WsReply* );
     void onUserGetPlaylistsReturn( class WsReply* );
-    void onUserGetTopArtistsReturn( WsReply* );
+    void onUserGetArtistsReturn( WsReply* );
 
     void onAuthUserInfoReturn( class WsReply* );
     void authUserIconDataDownloaded();
@@ -81,8 +86,10 @@ protected slots:
 
     void onContextMenuRequested( const QPoint& pos );
     void onCogMenuClicked();
-    void onCogMenuAction( QAction* );
     void onTabChanged();
+    
+    void onTopArtistsToggled( bool );
+    void onRecentArtistsToggled( bool );
 
 };
 

@@ -23,6 +23,7 @@
 #include <QListWidget>
 #include <QStyledItemDelegate>
 #include <QResizeEvent>
+#include <QAction>
 
 class SourcesList : public QListWidget
 {
@@ -47,9 +48,12 @@ public:
             return CustomMode;
     }
     
+    void addCustomWidget( QWidget* w, QString title = "" );
+    
     void setSourcesViewMode( ViewMode m );
     
-    void addCustomWidget( QWidget* w );
+public slots:
+    void showCustomWidget( bool );
     
 protected:
     QMimeData* mimeData( const QList<QListWidgetItem *> items ) const;
@@ -60,17 +64,29 @@ protected:
         update();
     }
     
+    virtual void showEvent( QShowEvent* );
+    
 private slots:
     void onDataChanged( const QModelIndex&, const QModelIndex& )
     {
         scheduleDelayedItemsLayout();
     }
+
+    void onViewModeAction( bool );
     
 private:
     QMap< QModelIndex, QRect > m_itemRects;
     QSize m_itemSizeHint;
-    bool m_customModeEnabled;
     QWidget* m_customWidget;
+    bool m_customModeEnabled;
+    
+    struct {
+        struct {
+        class QAction* listView;
+        class QAction* iconView;
+        class QAction* customView;
+        } actions;
+    } ui;
     
     class SourcesListDelegate : public QStyledItemDelegate
     {
