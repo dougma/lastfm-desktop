@@ -55,6 +55,8 @@ public slots:
     void prune(); //prunes the list to 20
     
 private slots:
+    void reconnect();
+
     void onConnect();
     void onData();
     void onFinished();

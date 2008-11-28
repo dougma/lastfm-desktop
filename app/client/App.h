@@ -56,9 +56,6 @@ signals:
     void stateChanged( State newstate, const Track& = Track() ); //convenience
     void scrobblePointReached( const Track& );
     
-    void internetConnectionLost();
-    void internetConnectionRestored();
-
     /** something should show it. Currently MainWindow does */
     void error( const QString& message );
     void status( const QString& message, const QString& id );

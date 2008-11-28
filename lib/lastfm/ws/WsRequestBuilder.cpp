@@ -55,7 +55,7 @@ WsRequestBuilder::start()
         request.setRawHeader( "User-Agent", Ws::UserAgent );
 
     QUrl url( !qApp->arguments().contains( "--debug")
-            ? "http://ws.audioscrobbler.com/2.0/"
+            ? "http://" LASTFM_WS_HOSTNAME "/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
 
     typedef QPair<QString, QString> Pair; // don't break foreach macro

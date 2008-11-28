@@ -21,14 +21,18 @@
 #include "app/moose.h"
 #include "lib/lastfm/core/CoreDomElement.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
+#include "lib/lastfm/ws/WsConnectionMonitor.h"
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTcpSocket>
 
 
 FirehoseModel::FirehoseModel()
-             : m_socket( 0 ), m_cumulative_count( 0 )
-{}
+             : m_socket( 0 )
+             , m_cumulative_count( 0 )
+{
+    connect( new WsConnectionMonitor( this ), SIGNAL(up()), SLOT(reconnect()) );
+}
 
 
 void
@@ -38,32 +42,39 @@ FirehoseModel::setNozzle( const QString& nozzle )
     m_avatars.clear();
     m_users.clear();
     reset();
-    
-    delete m_socket;
 
     m_nozzle = nozzle;
     
+    reconnect();
+}
+
+
+void
+FirehoseModel::reconnect()
+{
+    if (m_nozzle.isEmpty()) return;
+
     // using a socket as WsAccessManager stopped after the HEADERS were returned
     // for some reason
+    if (m_socket) m_socket->blockSignals( true );
+    delete m_socket;
     m_socket = new QTcpSocket( this );
     connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );    
-    m_socket->connectToHost( "firehose.last.fm", 80 );
+    connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
+    connect( m_socket, SIGNAL(disconnected()), SLOT(onFinished()) );
+    m_socket->connectToHost( "firehose.last.fm", 80 );    
 }
+
 
 void
 FirehoseModel::onConnect()
 {
-    connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
-    connect( m_socket, SIGNAL(aboutToClose()), SLOT(onFinished()) );    
-
-    QByteArray headers = 
-    "GET /stream/" + m_nozzle.toUtf8() + "\r\n"
-    "Host: firehose.last.fm\r\n"
-    "Connection: keep-alive\r\n\r\n";
-    
-    m_socket->write( headers );
+    m_socket->write( "GET /stream/" + m_nozzle.toUtf8() + "\r\n"
+                     "Host: firehose.last.fm\r\n"
+                     "Connection: keep-alive\r\n\r\n" );
     m_socket->flush();
 }
+
 
 void
 FirehoseModel::onData()
@@ -138,7 +149,8 @@ FirehoseModel::onItemReady( FirehoseItem* item )
 void
 FirehoseModel::onFinished()
 {
-    qDebug() << "OHAI! We d/c'd. I guess you put your laptop to sleep or sumfink?";
+    qDebug() << "Firehose disconnected. Reconnecting.";
+    reconnect();
 }
 
 

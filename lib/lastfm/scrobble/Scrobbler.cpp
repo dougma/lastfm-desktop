@@ -23,7 +23,6 @@
 #include "ScrobblerHandshake.h"
 #include "ScrobblerSubmission.h"
 #include "lib/lastfm/ws/WsKeys.h"
-#include "lib/lastfm/ws/WsNetEvent.h"
 
 
 Scrobbler::Scrobbler( const QString& clientId )
@@ -34,8 +33,6 @@ Scrobbler::Scrobbler( const QString& clientId )
           m_hard_failures( 0 )
 {
     m_cache = new ScrobbleCache( Ws::Username );
-	m_netEvent = new WsNetEvent( this );
-	connect( m_netEvent, SIGNAL(connectionUp(QString)), SLOT(submit()) );
 
     handshake();
     submit(); // will submit what's there once the handshake completes

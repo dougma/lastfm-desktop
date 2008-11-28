@@ -17,14 +17,54 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#include "WsNetEvent.h"
+#ifndef WS_CONNECTION_MONITOR_H
+#define WS_CONNECTION_MONITOR_H
+
+#include "lib/lastfm/DllExportMacro.h"
+#include <QObject>
+#ifdef WIN32
+#include "win/NdisEvents.h"
+#endif
+#ifdef __APPLE__
+#include <SystemConfiguration/SCNetwork.h>
+typedef const struct __SCNetworkReachability * SCNetworkReachabilityRef;
+#endif
 
 
-WsNetEvent::WsNetEvent(QObject *parent) :
-	QObject(parent)
+class LASTFM_WS_DLLEXPORT WsConnectionMonitor
+        : public QObject
+#ifdef WIN32
+        , NdisEvents
+#endif
 {
-	m_adapter = new WsNetEventAdapter(parent);
-	connect(m_adapter, SIGNAL(connectionUp(QString)), this, SIGNAL(connectionUp(QString)) );
-	connect(m_adapter, SIGNAL(connectionDown(QString)), this, SIGNAL(connectionDown(QString)) );
-}
+	Q_OBJECT
 
+#ifdef WIN32
+    // WmiSink callbacks:
+    virtual void onConnectionUp( BSTR name )
+    {
+        emit up( QString::fromUtf16(name) );
+    }
+    
+    virtual void onConnectionDown( BSTR name )
+    {
+        emit down( QString::fromUtf16(name) );
+    }
+#endif
+#ifdef __APPLE__
+    static void callback( SCNetworkReachabilityRef, SCNetworkConnectionFlags, void* );
+#endif
+
+public:
+	WsConnectionMonitor( QObject *parent = 0 );
+
+signals:
+    /** yay! internet has returned */
+	void up( const QString& connectionName = "" );
+    
+    /** we think the internet is unavailable, but well, still try, but show
+      * an unhappy face in the statusbar or something */
+	void down( const QString& connectionName = "" );
+};
+
+#endif

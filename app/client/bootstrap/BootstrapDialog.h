@@ -42,6 +42,7 @@ private slots:
     // private and passed to ctor because without it, the class would completely
     // fail to work
     void onBootstrapCompleted( const QString& plugin_id );
+    void onITunesBootstrapDone( int );
     
 private:
     void nextPluginBootstrap();

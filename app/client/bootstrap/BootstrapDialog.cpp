@@ -43,14 +43,25 @@ BootstrapDialog::exec()
 {
     show();
 
-    iTunesBootstrapper iTunes;
-    connect( &iTunes, SIGNAL(trackProcessed( int, Track )), SLOT(onITunesTrackProcessed( int, Track )) );        
-    iTunes.bootStrap();
+    iTunesBootstrapper* iTunes = new iTunesBootstrapper( this );
+    connect( iTunes, SIGNAL(trackProcessed( int, Track )), SLOT(onITunesTrackProcessed( int, Track )) );        
+    iTunes->bootStrap();
+    
+    connect( iTunes, SIGNAL(percentageUploaded( int )), SLOT(setValue( int )) );
+    connect( iTunes, SIGNAL(done( int )), SLOT(onITunesBootstrapDone( int )) );
+
+    QProgressDialog::exec();
+}
+
+
+void
+BootstrapDialog::onITunesBootstrapDone( int status )
+{
+    Q_UNUSED( status );
 
 #ifdef WIN32
     nextPluginBootstrap();
-    QProgressDialog::exec();
-#endif
+#endif    
 }
 
 

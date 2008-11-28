@@ -40,6 +40,7 @@
 #include "lib/lastfm/radio/Radio.h"
 #include "lib/lastfm/radio/Tuner.h"
 #include "lib/lastfm/radio/LegacyTuner.h"
+#include "lib/lastfm/ws/WsConnectionMonitor.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include <QLineEdit>
 #include <QSystemTrayIcon>
@@ -88,6 +89,7 @@ App::App( int& argc, char** argv )
     }
     catch (PlayerListener::SocketFailure& e)
     {
+        //FIXME
         MessageBoxBuilder( 0 )
                 .setTitle( "Sorry" )
                 .setText( "You can't run the old client and the new client at once yet! We'll stay open, but scrobbling won't work." )
@@ -105,16 +107,16 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
 #ifdef Q_WS_MAC
-    new ITunesListener( m_listener->port(), this );
+    if (m_listener) new ITunesListener( m_listener->port(), this );
 #endif
-    
+
     m_scrobbler = new Scrobbler( "ass" );
     connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
-    connect( this, SIGNAL(internetConnectionRestored()), m_scrobbler, SLOT(submit()) );
-    
+    connect( new WsConnectionMonitor( this ), SIGNAL(up()), m_scrobbler, SLOT(submit()) );
+
 #ifndef NDEBUG
     QString plugins_path = qApp->applicationDirPath();
 #else
@@ -495,6 +497,7 @@ App::submitTwiddleCache( const QString& path )
 }
 
 
+#include "the/app.h"
 namespace The
 {
     Radio& radio() { return *app().m_radio; }

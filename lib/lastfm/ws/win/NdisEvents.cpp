@@ -23,8 +23,8 @@
 // Link to wbemuuid.lib to resolve IWbemObjectSink and IWbemClassObject
 // interface definitions.
 
-#include "NdisEvents_win.h"
-#include "WmiSink_win.h"
+#include "NdisEvents.h"
+#include "WmiSink.h"
 
 
 NdisEvents::NdisEvents()

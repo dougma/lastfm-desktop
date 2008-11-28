@@ -20,7 +20,6 @@
 #include "WsAccessManager.h"
 #include "WsKeys.h"
 #include "WsProxy.h"
-#include "WsNetEvent.h"
 #include <QtNetwork>
 
 
