@@ -34,6 +34,10 @@ class CosSimilarity
 
 public:
 
+   // Compare 'base' to 'candidates'; callback on 'resultFun' to deliver 
+   // the similarity score.  Uses accessPolicy to access a TEntry.
+   // TEntry is effectively opaque to findSimilar.
+   //
    // TEntryAccessPolicy has to implement
    //
    // TEntryIterator get_begin(const TEntry&)
@@ -49,44 +53,30 @@ public:
    //
    // note: the EntryAccessPolicy can contain other stuff as it is always copied by ref and
    //       treated as const
-   template< typename TEntry, typename TCandContainer, typename TEntryAccessPolicy>
-   static void findSimilar( std::vector< std::pair<TEntry, float> >& res,
-                            const TEntry& base,
-                            const TCandContainer& candidates,
-                            const TEntryAccessPolicy& accessPolicy,
-                            double minSim = 0,
-                            size_t maxRet = (std::numeric_limits<size_t>::max)() )
+   //
+   // TCandContainer must support begin() and end() methods
+   //
+   // 
+   template< typename TResultFun, typename TEntry, typename TCandContainer, typename TEntryAccessPolicy>
+   static void findSimilar( 
+      TResultFun resultFun,
+      const TEntry& base,
+      const TCandContainer& candidates,
+      const TEntryAccessPolicy& accessPolicy )
    {
-      res.clear();
-      double simVal;
-
       typename TCandContainer::const_iterator cIt;
       for ( cIt = candidates.begin(); cIt != candidates.end(); ++cIt )
       {
-         simVal = getCosOfAngle(base, *cIt, accessPolicy);
-         if ( simVal > minSim )
-         {
-            std::pair<TEntry, float> pair = std::make_pair(*cIt, static_cast<float>(simVal));
-            res.push_back( pair );
-         }
+         resultFun( *cIt, (float) getCosOfAngle(base, *cIt, accessPolicy) );
       }
-
-      // sort
-      if ( maxRet < res.size() / 2 )
-         partial_sort(res.begin(), res.begin() + maxRet, res.end(), CosSimilarity::comparer<TEntry>);
-      else
-         sort (res.begin(), res.end(), CosSimilarity::comparer<TEntry>);
-
-      if ( maxRet < res.size() )
-         res.resize( maxRet );
    }
 
    //////////////////////////////////////////////////////////////////////////
-   template< typename TEntry, typename TEntryAccessPolicy>
-   static double getNorm( const TEntry& entry, const TEntryAccessPolicy& accessPolicy )
-   {
-      return getNorm( accessPolicy.get_begin(entry), accessPolicy.get_end(entry), accessPolicy );
-   }
+   //template< typename TEntry, typename TEntryAccessPolicy>
+   //static double getNorm( const TEntry& entry, const TEntryAccessPolicy& accessPolicy )
+   //{
+   //   return getNorm( accessPolicy.get_begin(entry), accessPolicy.get_end(entry), accessPolicy );
+   //}
 
    //////////////////////////////////////////////////////////////////////////
    //////////////////////////////////////////////////////////////////////////

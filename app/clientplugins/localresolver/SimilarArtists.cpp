@@ -19,29 +19,33 @@
 
 #include "SimilarArtists.h"
 #include "similarity/CosSimilarity.h"
-
-
+#include <boost/bind.hpp>
 
 
 
 bool operator<(TagDataset::ArtistId i, const TagDataset::Entry& e)
 {
-    return i < e.first;
+    return i < e.artistId;
 }
 
 bool operator<(const TagDataset::Entry& e, TagDataset::ArtistId i)
 {
-    return e.first < i;
+    return e.artistId < i;
 }
 
 
 void
-SimilarArtists::similarArtists(LocalCollection& coll, const char* artist)
+resultCb(QList<SimilarArtists::Result>& results, const TagDataset::Entry& entry, float score)
 {
-    int artistId = coll.getArtistId(QString(artist).simplified().toLower(), false);
+    if (score > 0.1) {
+        results.push_back(qMakePair(entry.artistId, score));
+    }
+}
 
-    typedef std::pair<TagDataset::Entry, float> Result;
-    std::vector<Result> results;
+QList<SimilarArtists::Result>
+SimilarArtists::similarArtists(LocalCollection& coll, int artistId)
+{
+    QList<Result> results;
 
     m_dataset.load(coll);
     TagDataset::Entry *pArtist = m_dataset.findArtist(artistId);
@@ -49,29 +53,49 @@ SimilarArtists::similarArtists(LocalCollection& coll, const char* artist)
     if (pArtist && m_dataset.m_allArtists.size()) {
         if (m_dataset.m_allArtists.size()) {
             moost::algo::CosSimilarity::findSimilar/*<TagDataset::Entry, TagDataset::EntryList, TagDataset>*/(
-                results,
+                boost::bind(resultCb, boost::ref(results), _1, _2),
                 *pArtist,
                 m_dataset.m_allArtists,
-                m_dataset,
-                0.0);       // minsim
+                m_dataset);
         }
     }
 
+    return results;
+}
 
-
-    foreach (const Result& result, results) {
-        int artistId = result.first.first;
-        float score = result.second;
-
-        int ii = 0;
-    }
+bool operator<(const SimilarArtists::Result& a, const SimilarArtists::Result& b)
+{
+    // yes, we want it in "reverse" order, ie: bigger things at the top.
+    return a.second > b.second;
 }
 
 
 ResultSet
 SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 {
-    similarArtists(coll, artist);
+    int artistId = coll.getArtistId(QString(artist).simplified().toLower(), false);
 
-    return ResultSet();
+    QList<SimilarArtists::Result> artistList = similarArtists(coll, artistId);
+
+    // todo: carry the weights through into ResultSet
+    // for now: just tracks from the top similar artists 
+    // (excluding the artist in question!)
+    ResultSet result;
+    qSort(artistList.begin(), artistList.end());
+
+    QList<SimilarArtists::Result>::iterator pArtist = artistList.begin();
+    int artistCount = 0;
+    int trackCount = 0;
+    while ((trackCount < 100 || artistCount < 5) && pArtist != artistList.end())
+    {
+        if (pArtist->first != artistId) {
+            QSet<uint> tracks = coll.allTracksByArtistId(pArtist->first) ;
+            result.unite(tracks);
+            trackCount += tracks.size();
+            artistCount++;
+        }
+        pArtist++;
+    }
+
+    return result;
 }

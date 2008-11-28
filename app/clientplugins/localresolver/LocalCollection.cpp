@@ -749,14 +749,7 @@ LocalCollection::filesByArtist(QString artist)
 }
 
 
-// returns
-// a list of pairs of 
-//  artist id and 
-//  vector of 
-//   pairs of 
-//    tag id and 
-//    tag weight
-QList< QPair<int, QVector< QPair<int, float> > > >
+LocalCollection::EntryList
 LocalCollection::allTags()
 {
     QSqlQuery query =
@@ -768,10 +761,7 @@ LocalCollection::allTags()
         setForwardOnly( true ).
         exec();
 
-    typedef QVector< QPair<int, float> > TagVec;
-    typedef QList< QPair<int, TagVec> > ArtistTagVec;
-
-    ArtistTagVec result;
+    EntryList result;
     {
         int prevArtistId = 0;
         TagVec currentArtistTags;
@@ -785,7 +775,10 @@ LocalCollection::allTags()
                 prevArtistId = artistId;
 
             if (prevArtistId != artistId) {
-                result << qMakePair(prevArtistId, currentArtistTags);
+                Entry e;
+                e.artistId = prevArtistId;
+                e.tagVec = currentArtistTags;
+                result << e;
                 currentArtistTags = TagVec();
                 prevArtistId = artistId;
             }
@@ -794,10 +787,12 @@ LocalCollection::allTags()
         }
 
         if (currentArtistTags.size()) {
-            result << qMakePair(prevArtistId, currentArtistTags);
+            Entry e;
+            e.artistId = prevArtistId;
+            e.tagVec = currentArtistTags;
+            result << e;
         }
     }
-
     return result;
 }
 
@@ -827,6 +822,20 @@ LocalCollection::getFileById(int fileId, LocalCollection::FileResult &out)
     return false;
 }
 
+QSet<unsigned> 
+LocalCollection::allTracksByArtistId(int artistId)
+{
+    QSqlQuery query = PREPARE(
+        "SELECT id FROM files WHERE artist == :artistId").
+        setForwardOnly( true ).
+        bindValue( ":artistId", artistId ).
+        exec();
+    QSet<unsigned> results;
+    while (query.next()) {
+        results << query.value( 0 ).toUInt();
+    }
+    return results;
+}
 
 //////////////////////////////////////////////////////////////
 

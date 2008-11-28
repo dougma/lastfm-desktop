@@ -145,6 +145,19 @@ public:
         QString m_sourcename;
     };
 
+    // these types culminate in EntryList, as returned by allTags()
+    typedef int ArtistId;
+    typedef int TagId;
+    typedef float TagWeight;
+    typedef QVector< QPair< TagId, TagWeight > > TagVec;
+    struct Entry {
+        ArtistId artistId;
+        TagVec tagVec;
+        float norm;
+    };
+    typedef QList< Entry > EntryList;
+
+
     static LocalCollection* create(QString connectionName);
     ~LocalCollection();
 
@@ -181,8 +194,9 @@ public:
     // rql support
     QSet<unsigned> filesWithTag(QString tag);
     QSet<unsigned> filesByArtist(QString artist);
-    QList< QPair< int, QVector< QPair< int, float > > > > allTags();
+    EntryList allTags();
     bool getFileById(int fileId, LocalCollection::FileResult &out);
+    QSet<unsigned> allTracksByArtistId(int artistId);
 
     // tag handling
     int getTagId(QString tag, bool bCreate);

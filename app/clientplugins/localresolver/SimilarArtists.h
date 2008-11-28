@@ -30,14 +30,12 @@
 
 struct TagDataset
 {
-    typedef int ArtistId;
-    typedef int TagId;
-    typedef float TagWeight;
-    typedef QVector< QPair< TagId, TagWeight > > TagVec;
-    typedef QPair< ArtistId, TagVec > Entry;
-    typedef QList< Entry > EntryList;
-    
-    //////////////////////////////////////////
+    typedef LocalCollection::ArtistId ArtistId;
+    typedef LocalCollection::TagId TagId;
+    typedef LocalCollection::TagWeight TagWeight;
+    typedef LocalCollection::TagVec TagVec;
+    typedef LocalCollection::Entry Entry;
+    typedef LocalCollection::EntryList EntryList;
 
     EntryList m_allArtists;
 
@@ -45,6 +43,16 @@ struct TagDataset
     {
         if (0 == m_allArtists.size()) {
             m_allArtists = collection.allTags();
+
+            // precalculate the normals for each artist
+            for(EntryList::iterator pIt = m_allArtists.begin(); pIt != m_allArtists.end(); pIt++) {
+                float sum = 0;
+                typedef QPair< TagId, TagWeight > Tag;
+                foreach(const Tag& tag, pIt->tagVec) {
+                    sum += (tag.second * tag.second);
+                }
+                pIt->norm = sqrt(sum); 
+            }
         }
 
         return true;
@@ -62,12 +70,12 @@ struct TagDataset
 
     TagVec::const_iterator get_begin(const Entry& entry) const
     {
-        return entry.second.begin(); 
+        return entry.tagVec.begin(); 
     }
 
     TagVec::const_iterator get_end(const Entry& entry) const
     { 
-        return entry.second.end(); 
+        return entry.tagVec.end(); 
     }
 
     int get_id(const TagVec::const_iterator& it) const
@@ -81,19 +89,14 @@ struct TagDataset
     }
 
     float get_norm(const Entry& entry) const
-    { 
-        // todo: need to precalculate this 
-        float sum = 0;
-        typedef QPair< TagId, TagWeight > Tag;
-        foreach(const Tag& tag, entry.second) {
-            sum += (tag.second * tag.second);
-        }
-        return sqrt(sum); 
+    {
+        return entry.norm;
     }
 
     double apply_post_process( const Entry& entryA, const Entry& entryB, 
                               const std::pair<double, int>& simVal) const
-    { 
+    {
+        entryA; entryB; // unused
         if ( simVal.second < 5 )
             return simVal.first * ( static_cast<double>(simVal.second) / 5 );
         else
@@ -102,6 +105,7 @@ struct TagDataset
 
 };
 
+// these two are to support qBinaryFind as used by TagDataset::findArtist
 bool operator<(TagDataset::ArtistId i, const TagDataset::Entry& e);
 bool operator<(const TagDataset::Entry& e, TagDataset::ArtistId i);
 
@@ -110,10 +114,13 @@ class SimilarArtists
 {
     TagDataset m_dataset;
 
-    void similarArtists(LocalCollection& coll, const char *artist);
-
 public:
+    typedef QPair<TagDataset::ArtistId, float> Result;
+
     ResultSet filesBySimilarArtist(LocalCollection& coll, const char *artist);
+
+private:
+    QList<Result> similarArtists(LocalCollection& coll, int artistId);
 };
 
 
