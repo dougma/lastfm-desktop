@@ -56,7 +56,7 @@ WsRequestBuilder::start()
 
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://ws.audioscrobbler.com/2.0/"
-            : "http://tester:futureofmusic@ws.jono.dev.last.fm:8090/2.0/" );
+            : "http://ws.staging.audioscrobbler.com/2.0/" );
 
     typedef QPair<QString, QString> Pair; // don't break foreach macro
     QList<Pair> params = this->params;
