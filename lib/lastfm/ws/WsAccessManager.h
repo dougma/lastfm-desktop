@@ -34,20 +34,20 @@ class LASTFM_WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
     Q_OBJECT
 
 #ifdef WIN32
-	class Pac *m_proxy;
+	class Pac *m_pac;
     class WsConnectionMonitor* m_monitor;
 #endif
 
  	/** called for every request since we support PAC, it's worth noting that 
 	  * this function calls QNetworkAccessManager::setProxy */
-	void applyProxy(const QNetworkRequest&);
+	void applyProxy( const QNetworkRequest& );
 
 public:
-	WsAccessManager(QObject *parent = 0);
+	WsAccessManager( QObject *parent = 0 );
     ~WsAccessManager();
 
 protected:
-	virtual QNetworkReply* createRequest(Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0);
+	virtual QNetworkReply* createRequest( Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0 );
 
 private slots:
     void onConnectivityChanged( bool );

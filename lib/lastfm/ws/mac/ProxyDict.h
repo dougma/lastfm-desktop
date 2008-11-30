@@ -30,21 +30,19 @@ struct ProxyDict
 };
 
 
-inline ProxyDict::ProxyDict()
+inline ProxyDict::ProxyDict() : port( 0 )
 {
-    CFNumberRef enableNum;
-    int enable;
-
     // Get the dictionary.
     CFDictionaryRef proxyDict = SCDynamicStoreCopyProxies( NULL );
     bool result = (proxyDict != NULL);
 
     // Get the enable flag.  This isn't a CFBoolean, but a CFNumber.
+    CFNumberRef enableNum;
+    int enable;
     if (result) {
         enableNum = (CFNumberRef) CFDictionaryGetValue( proxyDict, kSCPropNetProxiesHTTPEnable );
         result = (enableNum != NULL) && (CFGetTypeID(enableNum) == CFNumberGetTypeID());
     }
-
     if (result)
         result = CFNumberGetValue( enableNum, kCFNumberIntType, &enable ) && (enable != 0);
 
@@ -72,5 +70,5 @@ inline ProxyDict::ProxyDict()
 
     // clean up.
     if (proxyDict != NULL)
-    CFRelease( proxyDict );
+        CFRelease( proxyDict );
 }

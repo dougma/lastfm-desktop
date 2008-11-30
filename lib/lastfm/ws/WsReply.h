@@ -71,7 +71,7 @@ public:
      * invalid QDateTime for a missing or invalid Expires header */
     QDateTime expires() const;
     
-    /** use the metadata component to remind you what wsreply this is */
+    /** use this metadata component to remind you what wsreply this is */
     void setAssociatedData( const QVariant& v ) { m_associatedData = v; }
     QVariant associatedData() const { return m_associatedData; }
 	
@@ -110,36 +110,17 @@ inline QDebug operator<<( QDebug d, WsReply* r )
 }
 
 
+#include <QMetaEnum>
 inline QDebug operator<<( QDebug d, QNetworkReply::NetworkError e )
 {    
-#define CASE( x ) case x: return d << #x;
-    switch (e)
-    {
-	    CASE( QNetworkReply::NoError )
-	    CASE( QNetworkReply::ConnectionRefusedError )
-	    CASE( QNetworkReply::RemoteHostClosedError )
-	    CASE( QNetworkReply::HostNotFoundError )
-	    CASE( QNetworkReply::TimeoutError )
-	    CASE( QNetworkReply::OperationCanceledError )
-	    CASE( QNetworkReply::SslHandshakeFailedError )
-	    CASE( QNetworkReply::ProxyConnectionRefusedError )
-	    CASE( QNetworkReply::ProxyConnectionClosedError )
-	    CASE( QNetworkReply::ProxyNotFoundError )
-	    CASE( QNetworkReply::ProxyTimeoutError )
-	    CASE( QNetworkReply::ProxyAuthenticationRequiredError )
-	    CASE( QNetworkReply::ContentAccessDenied )
-	    CASE( QNetworkReply::ContentOperationNotPermittedError )
-	    CASE( QNetworkReply::ContentNotFoundError )
-	    CASE( QNetworkReply::AuthenticationRequiredError )
-	    CASE( QNetworkReply::ProtocolUnknownError )
-	    CASE( QNetworkReply::ProtocolInvalidOperationError )
-	    CASE( QNetworkReply::UnknownNetworkError )
-	    CASE( QNetworkReply::UnknownProxyError )
-	    CASE( QNetworkReply::UnknownContentError )
-	    CASE( QNetworkReply::ProtocolFailure )    
-		default: return d << "Unknown error";
+    QMetaObject meta = QNetworkReply::staticMetaObject;
+    for (int i=0; i < meta.enumeratorCount(); ++i) {
+        QMetaEnum m = meta.enumerator(i);
+        if (m.name() == QLatin1String("NetworkError"))
+            return d << QLatin1String(m.valueToKey(e));
     }
-#undef CASE
+    
+    return d << "Unknown error";
 }
 
 #endif
