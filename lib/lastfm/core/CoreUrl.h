@@ -43,8 +43,6 @@ struct LASTFM_CORE_DLLEXPORT CoreUrl : public QUrl
 	 *
 	 * Use for any urls that go to www.last.fm
 	 * Do not use for ws.audioscrobbler.com
-	 *
-	 * @param[in] str String to encode.
 	 */
 	static QString encode( QString );
 	static QString decode( QString );

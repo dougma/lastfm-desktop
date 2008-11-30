@@ -5,9 +5,6 @@ QT = core xml
 # UniqueApplication on Windows needs QWidget sadly
 win32: QT += gui
 
-# AppleScript stuff
-macx*: LIBS += -framework Carbon
-
 include( $$ROOT_DIR/common/qmake/include.pro )
 
 SOURCES = $$findSources( cpp )
@@ -19,9 +16,9 @@ DEFINES += _CORE_DLLEXPORT
     SOURCES -= mac/AppleScript.cpp mac/Growl.cpp mac/CFStringToQString.cpp
 	HEADERS -= mac/AppleScript.h mac/Growl.h mac/CFStringToQString.h
 }
-!win32 {
-    SOURCES -= win/Utils.cpp
-	HEADERS -= win/Utils.h
+else {
+	# AppleScript stuff
+	LIBS += -framework Carbon
 }
 
 headers.files = $$HEADERS
