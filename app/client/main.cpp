@@ -25,7 +25,6 @@
 #endif
 
 #include "App.h"
-#include "player/PlayerListener.h"
 #include "Settings.h"
 #include "widgets/MainWindow.h"
 #include "version.h"
@@ -67,8 +66,8 @@ int main( int argc, char** argv )
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
     uapp.init1();
-#endif
-
+#endif	
+	
     try
     {
         App app( argc, argv );
@@ -90,22 +89,16 @@ int main( int argc, char** argv )
         window.setWindowTitle( "Last.am" );
       #endif
 
+        if (!app.arguments().contains( "--tray" ))
       #ifdef Q_WS_X11 // HACK: Should not be needed. But otherwise crashes. Qt bug?
-        QTimer::singleShot( 0, &window, SLOT( show() ) );
+            QTimer::singleShot( 0, &window, SLOT( show() ) );
       #else
-        window.show();
+            window.show();
       #endif
         
         app.parseArguments( app.arguments() );
 
         return app.exec();
-    }
-    catch (PlayerListener::SocketFailure& e)
-    {
-        //TODO message to user
-        //FIXME can't have it so that there is no radio option if listener socket fails!
-        qDebug() << "Socket failure:" << e.what();		
-        return 1;
     }
     catch (Unicorn::Application::UnsupportedPlatformException&)
     {
