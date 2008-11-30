@@ -57,7 +57,7 @@ parsePacResult(const QString &pacResult)
 	QStringList proxies = pacResult.split(QRegExp("[\\s;]"), QString::SkipEmptyParts);
 	foreach(const QString &s, proxies)
 	{
-		QNetworkProxy proxy;
+		QNetworkProxy proxy( QNetworkProxy::HttpProxy );
 		if (parsePacServer(s, proxy))
 		{
 			result << proxy;

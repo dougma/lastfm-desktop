@@ -27,6 +27,8 @@ struct ProxyDict
 
     int port;
     QString host;
+    
+    bool isProxyEnabled() const { return port > 0 && host.size(); }
 };
 
 

@@ -31,13 +31,53 @@
 #endif
 
 
-WsAccessManager::WsAccessManager(QObject *parent)
-               : QNetworkAccessManager(parent)
+struct WsAccessManagerInit
+{
+    // We do this upfront because then our Firehose QTcpSocket will have a proxy 
+    // set by default. As well as any plain QNetworkAcessManager stuff, and the
+    // scrobbler
+    // In theory we should do this every request in case the configuration 
+    // changes but that is fairly unlikely use case, init? Maybe we should 
+    // anyway..
+
+    WsAccessManagerInit()
+    {
+    #ifdef WIN32
+        IeSettings s;
+        // if it's autodetect, we determine the proxy everytime in proxy()
+        if (!s.fAutoDetect && s.lpszProxy)
+        {
+            QUrl url( QString::fromUtf16(s.lpszProxy) );
+            QNetworkProxy proxy( QNetworkProxy::HttpProxy );
+            proxy.setHostName( url.host() );
+            proxy.setPort( url.port() );
+            QNetworkProxy::setApplicationProxy( proxy );
+        }
+    #endif
+    #ifdef __APPLE__
+        ProxyDict dict;
+        if (dict.isProxyEnabled())
+        {
+            QNetworkProxy proxy( QNetworkProxy::HttpProxy );
+            proxy.setHostName( dict.host );
+            proxy.setPort( dict.port );
+
+            QNetworkProxy::setApplicationProxy( proxy );
+        }
+    #endif
+    }
+};
+static WsAccessManagerInit init;    
+
+
+WsAccessManager::WsAccessManager( QObject* parent )
+               : QNetworkAccessManager( parent )
             #ifdef WIN32
                , m_pac( 0 )
                , m_monitor( 0 )
             #endif
 {
+    // can't be done in above init, as applicationName() won't be set
 	if (!Ws::UserAgent)
 		Ws::UserAgent = qstrdup(QCoreApplication::applicationName().toAscii()); //has to be latin1 I believe
 }
@@ -52,9 +92,9 @@ WsAccessManager::~WsAccessManager()
 
 
 QNetworkProxy
-WsAccessManager::proxy( const QNetworkRequest &request ) const
-{
-    QNetworkProxy proxy;
+WsAccessManager::proxy( const QNetworkRequest& request ) const
+{   
+    Q_UNUSED( request );
     
 #ifdef WIN32
 	IeSettings s;
@@ -67,21 +107,9 @@ WsAccessManager::proxy( const QNetworkRequest &request ) const
         }
 		proxy = m_pac->resolve( request, s.lpszAutoConfigUrl );
 	} 
-    else if (s.lpszProxy)
-    {
-		// manual proxy
-		QUrl url( QString::fromUtf16(s.lpszProxy) );
-		proxy.setHostName( url.host() );
-		proxy.setPort( url.port() );
-	}
 #endif
-#ifdef __APPLE__
-    static ProxyDict dict;
-    proxy.setHostName( dict.host );
-    proxy.setPort( dict.port );
-#endif
-
-    return proxy;
+    
+    return QNetworkProxy::applicationProxy();
 }
 
 
