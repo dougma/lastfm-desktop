@@ -1,6 +1,14 @@
 <ui version="4.0" >
  <class>LoginDialog</class>
  <widget class="QDialog" name="LoginDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>342</width>
+    <height>140</height>
+   </rect>
+  </property>
   <property name="sizePolicy" >
    <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
     <horstretch>0</horstretch>
@@ -11,6 +19,9 @@
    <string>Log in to Last.fm</string>
   </property>
   <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>0</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" >
      <property name="spacing" >
@@ -19,7 +30,7 @@
      <item>
       <layout class="QGridLayout" >
        <property name="rightMargin" >
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="spacing" >
         <number>6</number>
@@ -56,22 +67,10 @@
        <item row="1" column="1" >
         <widget class="QLineEdit" name="password" >
          <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="minimumSize" >
-          <size>
-           <width>190</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize" >
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
          </property>
          <property name="echoMode" >
           <enum>QLineEdit::Password</enum>
@@ -88,18 +87,30 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0" >
         <size>
          <width>16</width>
-         <height>48</height>
+         <height>16</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
       <layout class="QVBoxLayout" >
+       <property name="spacing" >
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QLabel" name="spinner" >
+        <widget class="SpinnerLabel" name="spinner" >
+         <property name="minimumSize" >
+          <size>
+           <width>16</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text" >
           <string/>
          </property>
@@ -112,7 +123,7 @@
          </property>
          <property name="sizeHint" stdset="0" >
           <size>
-           <width>20</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
@@ -158,6 +169,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SpinnerLabel</class>
+   <extends>QLabel</extends>
+   <header>lib/unicorn/widgets/SpinnerLabel.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>username</tabstop>
   <tabstop>password</tabstop>

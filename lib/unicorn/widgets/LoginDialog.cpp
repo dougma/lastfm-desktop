@@ -24,18 +24,48 @@
 #include "lib/lastfm/ws/WsReply.h"
 #include <QMovie>
 #include <QPushButton>
+#include <QtGui>
 
 
 LoginDialog::LoginDialog()
            : m_subscriber( true )
 {
     ui.setupUi( this );
-    ui.spinner->setMovie( new QMovie( ":/spinner.mng" ) );
-    ui.spinner->movie()->setParent( this );
+	
+#ifdef Q_WS_MAC
+	ui.spacerItem->changeSize( 0, 0 );
+	ui.spinner->hide();
+	
+	QVBoxLayout* v = new QVBoxLayout( ui.transient = new QDialog( this, Qt::Sheet ) );
+	v->addWidget( ui.text = new QLabel( tr("Authenticating") ) );
+	v->addWidget( ui.progress = new QProgressBar );
+	v->addWidget( ui.cancel = new QPushButton( ' ' + tr("Cancel") + ' ' ) );
+	v->setAlignment( ui.cancel, Qt::AlignRight );
+	v->setSizeConstraint( QLayout::SetFixedSize );
+	ui.text->setWordWrap( true );
+	ui.cancel->setMinimumWidth( ui.cancel->sizeHint().width() );
+	ui.transient->setModal( true );
+	ui.progress->setRange( 0, 0 );
+	ui.text->setFixedWidth( ui.text->sizeHint().width() * 2.5 );
+
+	connect( ui.cancel, SIGNAL(clicked()), ui.transient, SLOT(reject()) );
+	connect( ui.transient, SIGNAL(rejected()), SLOT(cancel()) );
+
+	//Qt is shit
+	ui.buttonBox->layout()->setMargin( 0 );
+	ui.buttonBox->setContentsMargins( 0, 0, -5, -7 );
+	ui.buttonBox->layout()->setContentsMargins( 0, 0, 0, 0 );
+	int left, top, right, bottom;
+	layout()->getContentsMargins ( &left, &top, &right, &bottom );
+	layout()->setContentsMargins( left, top, right, bottom - 10 );
+	//Qt is shit
+#else
     ui.spinner->hide();
+#endif
     
     ui.urls->setAttribute( Qt::WA_MacSmallSize );
 
+	ok()->setText( tr("Log In") );
     ok()->setDisabled( true );
 
     connect( ui.buttonBox, SIGNAL(accepted()), SLOT(authenticate()) );
@@ -56,11 +86,6 @@ LoginDialog::onEdited()
 void
 LoginDialog::authenticate()
 {
-    setWindowTitle( tr("Verifying Login Credentials...") );
-    ok()->setEnabled( false );
-    ui.spinner->show();
-    ui.spinner->movie()->start(); //TODO spinner widget, integrate with QDesigner, stop and start on hide/show
-
     m_username = ui.username->text();
     m_password = Qt::md5( ui.password->text().toUtf8() );
 
@@ -69,8 +94,28 @@ LoginDialog::authenticate()
             // always lowercase the username before generating the md5
             .add( "authToken", Qt::md5( (m_username + m_password).toLower().toUtf8() ) )
             .get();
+	reply->setParent( this );
 
     connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAuthenticated( WsReply* )) );
+	
+#ifdef Q_OS_MAC
+	ui.transient->show();
+#else
+    ui.spinner->show();
+    setWindowTitle( tr("Verifying Login Credentials...") );
+    ok()->setEnabled( false );
+#endif
+}
+
+
+void
+LoginDialog::cancel()
+{
+	qDeleteAll( findChildren<WsReply*>() );
+
+#ifdef Q_WS_MAC
+	ui.transient->hide();
+#endif
 }
 
 
@@ -94,49 +139,57 @@ LoginDialog::onAuthenticated( WsReply* reply )
                 m_sessionKey = session["key"].nonEmptyText();
                 m_subscriber = session["subscriber"].text() != "0";
                 accept();
+				
+			#ifdef Q_WS_MAC
+				ui.text->setText( "<b>Authentication successful" );
+			#endif
                 break;
             }
             catch (CoreDomElement::Exception& e)
             {
                 qWarning() << e;
             }
-
+			
             // FALL THROUGH!
         }
-        
+			
         case Ws::AuthenticationFailed:
             // COPYTODO
             MessageBoxBuilder( this )
-                .setIcon( QMessageBox::Critical )
-                .setTitle( tr("Login Failed") )
-                .setText( tr("Sorry, we don't recognise that username, or you typed the password wrongly.") )
-                .exec();
+					.setIcon( QMessageBox::Critical )
+					.setTitle( tr("Login Failed") )
+					.setText( tr("Sorry, we don't recognise that username, or you typed the password wrongly.") )
+					.exec();
             break;
-        
+			
         default:
             // COPYTODO
             MessageBoxBuilder( this )
-                .setIcon( QMessageBox::Critical )
-                .setTitle( tr("Last.fm Unavailable") )
-                .setTitle( tr("There was a problem communicating with the Last.fm services. Please try again later.") )
-                .exec();
+					.setIcon( QMessageBox::Critical )
+					.setTitle( tr("Last.fm Unavailable") )
+					.setText( tr("There was a problem communicating with the Last.fm services. Please try again later.") )
+					.exec();
             break;
-
+			
         case Ws::UrProxyIsFuckedLol:
         case Ws::UrLocalNetworkIsFuckedLol:
             // TODO proxy prompting?
             // COPYTODO
             MessageBoxBuilder( this )
-                .setIcon( QMessageBox::Critical )
-                .setTitle( tr("Cannot connect to Last.fm") )
-                .setText( tr("Last.fm cannot be reached. Please check your firewall settings.") )
-                .exec();
+					.setIcon( QMessageBox::Critical )
+					.setTitle( tr("Cannot connect to Last.fm") )
+					.setText( tr("Last.fm cannot be reached. Please check your firewall or proxy settings.") )
+					.exec();
             break;
     }
     
+    
+#ifdef Q_WS_MAC
+	ui.transient->hide();
+#else
     // do last, otherwise it looks weird
     ui.retranslateUi( this ); //resets Window title
     ok()->setEnabled( true );
     ui.spinner->hide();
-    ui.spinner->movie()->stop();
+#endif
 }

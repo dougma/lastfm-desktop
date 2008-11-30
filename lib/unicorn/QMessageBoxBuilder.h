@@ -39,6 +39,14 @@ public:
     MessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
 
     int exec();
+	
+	MessageBoxBuilder& sheet()
+	{
+	#ifdef Q_WS_MAC
+		box.setWindowFlags( Qt::Sheet | (box.windowFlags() & ~Qt::Drawer) );
+		return *this;
+	#endif
+	}
 };
 
 #endif // MESSAGEBOX_H

@@ -38,11 +38,23 @@ private slots:
     void onEdited();
     void authenticate();
     void onAuthenticated( class WsReply* );
+	void cancel();
 
 private:
     QPushButton* ok() const { return ui.buttonBox->button( QDialogButtonBox::Ok ); }
 
-    Ui::LoginDialog ui;
+#ifdef Q_WS_MAC
+    struct : Ui::LoginDialog 
+	{
+		class QDialog* transient;
+		class QPushButton* cancel;
+		class QProgressBar* progress;
+		class QLabel* text;
+	}
+	ui;
+#else
+	Ui::LoginDialog ui;
+#endif
 
     QString m_username;
     QString m_password;
