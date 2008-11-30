@@ -26,7 +26,6 @@
 #include "ExtractIdentifiersJob.h"
 #include "ipod/BatchScrobbleDialog.h"
 #include "ipod/IPodScrobbleCache.h"
-#include "mac/MacStyle.h"
 #include "mac/ITunesListener.h"
 #include "mac/ITunesPluginInstaller.h"
 #include "player/PlayerListener.h"
@@ -56,14 +55,11 @@
 
 
 
+
 App::App( int& argc, char** argv ) 
    : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_listener( 0 )
 {
 #ifdef Q_WS_MAC
-    // I have to set it on the whole application as QMainWindow grabs some
-    // pixelmetrics when it is created, which means a post setStyle doesn't
-    // work
-    setStyle( new UnicornMacStyle );
     qt_mac_set_menubar_icons( false );
 #endif
     
@@ -77,7 +73,7 @@ App::App( int& argc, char** argv )
 #endif
    
 	QSettings s;
-    bool updgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
+    bool upgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
 	s.setValue( "Version", applicationVersion() );
 #ifdef NDEBUG
     s.setValue( "Path", applicationFilePath() );
@@ -436,7 +432,7 @@ App::parseArguments( const QStringList& args )
 				return;
 
 			case Twiddled:
-            {
+            {	
                 emit status( tr("iPod scrobbling complete."), "twiddling" ); // clear status for ipod scrobbling
                 emit status( "", "twiddling" ); // removes message after small delay
                 submitTwiddleCache( args.value( 2 ) );

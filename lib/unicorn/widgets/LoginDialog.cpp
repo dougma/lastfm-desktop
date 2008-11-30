@@ -22,9 +22,10 @@
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/ws/WsRequestBuilder.h"
 #include "lib/lastfm/ws/WsReply.h"
-#include <QMovie>
-#include <QPushButton>
 #include <QtGui>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 
 LoginDialog::LoginDialog()
@@ -180,6 +181,14 @@ LoginDialog::onAuthenticated( WsReply* reply )
 					.setTitle( tr("Cannot connect to Last.fm") )
 					.setText( tr("Last.fm cannot be reached. Please check your firewall or proxy settings.") )
 					.exec();
+        #ifdef WIN32
+            // show Internet Settings Control Panel
+            HMODULE h = LoadLibraryA( "InetCpl.cpl" );
+            if (!h) break;
+            LAUNCHCPL cpl = (BOOL (WINAPI *)(HWND)) GetProcAddress( h, "LaunchConnectionDialog" );
+            if (cpl) cpl( winId() );
+            FreeLibrary(m_hMod);
+        #endif
             break;
     }
     

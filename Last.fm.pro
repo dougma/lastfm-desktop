@@ -27,7 +27,7 @@ debug:macx-xcode {
 
     SOURCES += common/c++/Logger.cpp
     SOURCES -= lib/lastfm/core/win/Utils.cpp
-	SOURCES -= lib/lastfm/ws/sens_win.cpp lib/lastfm/ws/win/NdisEvents.cpp lib/lastfm/ws/win/WmiSink.cpp
+	SOURCES -= lib/lastfm/ws/win/Pac.cpp lib/lastfm/ws/win/NdisEvents.cpp lib/lastfm/ws/win/WmiSink.cpp lib/lastfm/ws/win/WsAccessManagerInit.cpp
 
     INCLUDEPATH += app/client lib
     LIBS += -framework SystemConfiguration -framework CoreServices

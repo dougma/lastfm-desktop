@@ -1,100 +1,110 @@
 /***************************************************************************
-*   Copyright 2005-2008 Last.fm Ltd.                                      *
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-*   This program is distributed in the hope that it will be useful,       *
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-*   GNU General Public License for more details.                          *
-*                                                                         *
-*   You should have received a copy of the GNU General Public License     *
-*   along with this program; if not, write to the                         *
-*   Free Software Foundation, Inc.,                                       *
-*   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
-***************************************************************************/
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ ***************************************************************************/
 
 #include "WsAccessManager.h"
+#include "WsConnectionMonitor.h"
 #include "WsKeys.h"
-#include "WsProxy.h"
-#include <QtNetwork>
+#include <QCoreApplication>
+#include <QNetworkProxy>
+#include <QNetworkRequest>
+#ifdef WIN32
+#include "win/IeSettings.h"
+#include "win/Pac.h"
+#endif
+#ifdef __APPLE__
+#include "mac/ProxyDict.h"
+#endif
 
 
 WsAccessManager::WsAccessManager(QObject *parent)
                : QNetworkAccessManager(parent)
+            #ifdef WIN32
+               , m_pac( 0 )
+               , m_monitor( 0 )
+            #endif
 {
-	m_proxy = new WsProxy(this);
-
-    static QMutex lock;
-    {
-        QMutexLocker locker(&lock);
-        if (!Ws::UserAgent) 
-            Ws::UserAgent = qstrdup(QCoreApplication::applicationName().toAscii());
-    }
+	if (!Ws::UserAgent)
+		Ws::UserAgent = qstrdup(QCoreApplication::applicationName().toAscii()); //has to be latin1 I believe
 }
+
+
+WsAccessManager::~WsAccessManager()
+{
+#ifdef WIN32
+    delete m_pac;
+#endif
+}
+
 
 void
 WsAccessManager::applyProxy(const QNetworkRequest &request)
 {
-	if (m_proxy)
+    QNetworkProxy proxy;
+    
+#ifdef WIN32
+	IeSettings s;
+    if (s.fAutoDetect) 
+    {
+        if (!m_pac) {
+            m_pac = new Pac;
+            m_monitor = new WsConnectionMonitor( this );
+            connect( m_monitor, SIGNAL(connectivityChanged( bool )), SLOT(onConnectivityChanged( bool )) );
+        }
+		proxy = m_pac->resolve( request, s.lpszAutoConfigUrl );
+	} 
+    else if (s.lpszProxy)
+    {
+		// manual proxy
+		QUrl url( QString::fromUtf16(s.lpszProxy) );
+		proxy.setHostName( url.host() );
+		proxy.setPort( url.port() );
+	}
+#endif
+#ifdef __APPLE__
+    static ProxyDict dict;
+    proxy.setHostName( dict.host );
+    proxy.setPort( dict.port );
+#endif
+
+	if (proxy.type() != QNetworkProxy::NoProxy)
 	{
-		QNetworkProxy p;
-		bool gotProxy = m_proxy->getProxyFor(
-			request.url().toString(), 
-			request.rawHeader("user-agent"), p);
-		if (gotProxy)
-			QNetworkAccessManager::setProxy(p);
+        QNetworkAccessManager::setProxy( proxy );
 	}
 }
 
-QNetworkReply *
-WsAccessManager::monitor(QNetworkReply *reply)
+
+QNetworkReply*
+WsAccessManager::createRequest( Operation op, const QNetworkRequest& request_, QIODevice* outgoingData )
 {
-	// todo: a convenient place to connect to all network replies
-	return reply;
+    QNetworkRequest request = request_;
+	applyProxy( request );
+    request.setRawHeader( "User-Agent", Ws::UserAgent );
+	return QNetworkAccessManager::createRequest( op, request, outgoingData );
 }
 
-QNetworkReply *
-WsAccessManager::head(const QNetworkRequest &request)
-{
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::head(request));
-}
 
-QNetworkReply *
-WsAccessManager::get(const QNetworkRequest &request)
+void
+WsAccessManager::onConnectivityChanged( bool up )
 {
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::get(request));
-}
-
-QNetworkReply *
-WsAccessManager::post(const QNetworkRequest &request, QIODevice *data)
-{
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::post(request, data));
-}
-
-QNetworkReply *
-WsAccessManager::post(const QNetworkRequest &request, const QByteArray &data)
-{
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::post(request, data));
-}
-
-QNetworkReply *
-WsAccessManager::put(const QNetworkRequest &request, QIODevice *data)
-{
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::put(request, data));
-}
-
-QNetworkReply *
-WsAccessManager::put(const QNetworkRequest &request, const QByteArray &data)
-{
-	applyProxy(request);
-	return monitor(QNetworkAccessManager::put(request, data));
+    Q_UNUSED( up );
+    
+#ifdef WIN32
+    if (up && m_pac) m_pac->resetFailureState();
+#endif
 }

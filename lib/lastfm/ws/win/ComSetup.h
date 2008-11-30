@@ -17,40 +17,47 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_ACCESS_MANAGER_H
-#define LASTFM_WS_ACCESS_MANAGER_H
+#ifndef _WIN32_WINNT
+// bring in CoInitializeSecurity from objbase.h
+#define _WIN32_WINNT 0x0400
+#endif
 
-#include <lastfm/DllExportMacro.h>
-#include <QtNetwork/QNetworkAccessManager>
+#include <objbase.h>
+#include <atlbase.h>
+#include <atlcom.h>
 
 
-/** Sets useragent and correctly sets the proxy stuff, all beautifully and 
-  * perfectly ;)
-  *
-  * TODO KDE/Gnome settings
+/** @brief WsConnectionMonitor needs Com to work as early as possible so we do this
+  * @author <doug@last.fm> 
   */
-class LASTFM_WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
+class ComSetup
 {
-    Q_OBJECT
-
-#ifdef WIN32
-	class Pac *m_proxy;
-    class WsConnectionMonitor* m_monitor;
-#endif
-
- 	/** called for every request since we support PAC, it's worth noting that 
-	  * this function calls QNetworkAccessManager::setProxy */
-	void applyProxy(const QNetworkRequest&);
-
 public:
-	WsAccessManager(QObject *parent = 0);
-    ~WsAccessManager();
-
-protected:
-	virtual QNetworkReply* createRequest(Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0);
-
-private slots:
-    void onConnectivityChanged( bool );
+    ComSetup()
+    {
+        HRESULT hr = CoInitialize(0);
+        m_bComInitialised = SUCCEEDED(hr);
+        _ASSERT(m_bComInitialised);
+        if (m_bComInitialised) {
+            setupSecurity();
+        }
+    }
+    
+    void setupSecurity()
+    {
+        CSecurityDescriptor sd;
+        sd.InitializeFromThreadToken();
+        HRESULT hr = CoInitializeSecurity(sd, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_PKT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL); 
+        _ASSERT(SUCCEEDED(hr));
+    }
+    
+    ~ComSetup()
+    {
+        if (m_bComInitialised) {
+            CoUninitialize();
+        }
+    }
+    
+private:
+    bool m_bComInitialised;
 };
-
-#endif

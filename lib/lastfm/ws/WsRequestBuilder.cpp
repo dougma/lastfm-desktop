@@ -28,7 +28,7 @@
 #include <QThread>
 
 
-QThreadStorage<class WsAccessManager*> WsRequestBuilder::nam;
+QThreadStorage<WsAccessManager*> WsRequestBuilder::nam;
 
 
 WsRequestBuilder::WsRequestBuilder( const QString& method )
@@ -36,7 +36,7 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
     static QMutex lock;
     QMutexLocker locker( &lock );
 
-    if ( !nam.hasLocalData() ) 
+    if (!nam.hasLocalData())
     {
         // WsAccessManager will be unparented, but it
         // does gets cleaned up when this thread ends
@@ -50,17 +50,13 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
 WsReply*
 WsRequestBuilder::start()
 {
-    #define MAKE_REQUEST \
-        QNetworkRequest request( url ); \
-        request.setRawHeader( "User-Agent", Ws::UserAgent );
-
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://" LASTFM_WS_HOSTNAME "/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
 
     typedef QPair<QString, QString> Pair; // don't break foreach macro
     QList<Pair> params = this->params;
-    
+
     switch (request_method)
     {
         case GET:
@@ -72,8 +68,7 @@ WsRequestBuilder::start()
                 QByteArray const value = QUrl::toPercentEncoding( pair.second );
                 url.addEncodedQueryItem( key, value );
             }
-            MAKE_REQUEST
-            return new WsReply( nam.localData()->get( request ) );
+            return new WsReply( nam.localData()->get( QNetworkRequest( url ) ) );
         }
 
         case POST:
@@ -86,8 +81,7 @@ WsRequestBuilder::start()
 					  + QUrl::toPercentEncoding( param.second )
 					  + "&";
 			}
-            MAKE_REQUEST
-			return new WsReply( nam.localData()->post( request, query ) );
+			return new WsReply( nam.localData()->post( QNetworkRequest( url ), query ) );
 		}
     }
 	return 0;

@@ -20,15 +20,24 @@
 #include "WsConnectionMonitor.h"
 #include "WsKeys.h"
 #include <QDebug>
+
 #ifdef __APPLE__
 #include <QPointer>
 #include <SystemConfiguration/SCNetworkReachability.h>
 QList<QPointer<WsConnectionMonitor> > monitors;
 #endif
 
+#ifdef WIN32
+// WsAccessManager needs special init (on Windows), and it needs to be done
+// early, so be careful about moving this
+#include "win/ComSetup.h"
+static ComSetup com_setup;
+#endif
+
 
 WsConnectionMonitor::WsConnectionMonitor( QObject *parent )
                    : QObject( parent )
+				   , m_up( true )
 {
 #ifdef __APPLE__
     if (monitors.isEmpty())
@@ -56,7 +65,7 @@ WsConnectionMonitor::callback( SCNetworkReachabilityRef, SCNetworkConnectionFlag
     // I couldn't find any diffinitive usage examples for these flags
     // so I had to guess, since I can't test, eg. dial up :(
     
-    bool b;
+	bool b;
     if (flags & kSCNetworkFlagsConnectionRequired)
         b = false;
     else
@@ -69,10 +78,16 @@ WsConnectionMonitor::callback( SCNetworkReachabilityRef, SCNetworkConnectionFlag
     up = b;
     
     foreach (WsConnectionMonitor* monitor, monitors)
-        if (monitor)
+		if (monitor) 
+		{
+			monitor->m_up = b;
+			
             if (b)
                 emit monitor->up();
             else
                 emit monitor->down();
+
+			emit monitor->connectivityChanged( b );
+		}
 }
 #endif

@@ -17,40 +17,32 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_ACCESS_MANAGER_H
-#define LASTFM_WS_ACCESS_MANAGER_H
+#ifndef WS_AUTOPROXY_H
+#define WS_AUTOPROXY_H
 
-#include <lastfm/DllExportMacro.h>
-#include <QtNetwork/QNetworkAccessManager>
+#include <windows.h>
+#include <winhttp.h>
 
 
-/** Sets useragent and correctly sets the proxy stuff, all beautifully and 
-  * perfectly ;)
-  *
-  * TODO KDE/Gnome settings
+/** @brief simple wrapper to do per url automatic proxy detection 
+  * @author <doug@last.fm>
   */
-class LASTFM_WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
-{
-    Q_OBJECT
-
-#ifdef WIN32
-	class Pac *m_proxy;
-    class WsConnectionMonitor* m_monitor;
-#endif
-
- 	/** called for every request since we support PAC, it's worth noting that 
-	  * this function calls QNetworkAccessManager::setProxy */
-	void applyProxy(const QNetworkRequest&);
+class Pac
+{    
+	HINTERNET m_hSession;
+    bool m_bFailed;
 
 public:
-	WsAccessManager(QObject *parent = 0);
-    ~WsAccessManager();
+	Pac();
+	~Pac();
 
-protected:
-	virtual QNetworkReply* createRequest(Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0);
+	QNetworkProxy resolve( const class QNetworkRequest& url, const class QUrl& pacUrl );
 
-private slots:
-    void onConnectivityChanged( bool );
+    void resetFailedState() { m_bFailed = false; }
+
+private:
+    Pac( const Pac& ); //undefined
+    Pac operator=( const Pac& ); //undefined
 };
 
-#endif
+#endif 

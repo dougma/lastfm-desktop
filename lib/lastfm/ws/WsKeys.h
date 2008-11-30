@@ -32,22 +32,22 @@
   * convenience respectively.
   */
 namespace Ws
-{    
+{
     /** both of these are provided when you register at http://last.fm/api */
     LASTFM_WS_DLLEXPORT extern const char* SharedSecret;
     LASTFM_WS_DLLEXPORT extern const char* ApiKey;
 
-	/** if you don't assign this, we create one for you, this is so we can
-	  * create pretty logs with your app's usage information */
+	/** optional, if you don't assign this, we create one for you, this is so
+	  * we can create pretty logs with your app's usage information */
 	LASTFM_WS_DLLEXPORT extern const char* UserAgent;
 
     /** You will need to assign this before using any webservices */
 	LASTFM_WS_DLLEXPORT extern QString Username;
 
-    /** Some webservices require authentication. See the following 
+    /** Some webservices require authentication. See the following
       * documentation:
       * http://www.last.fm/api/authentication
-      * http://www.last.fm/api/desktopauth 
+      * http://www.last.fm/api/desktopauth
       * You have to authenticate and then assign to SessionKey, liblastfm does
       * not do that for you.
       */

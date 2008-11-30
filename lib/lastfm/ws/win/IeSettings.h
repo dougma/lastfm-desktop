@@ -17,35 +17,27 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef WS_AUTOPROXY_H
-#define WS_AUTOPROXY_H
-
-#ifdef WIN32
 #include <windows.h>
 #include <winhttp.h>
-#endif
 
 
-/** @brief simple wrapper to do per url automatic proxy detection 
+/** @brief memory managing wrapper for WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
   * @author <doug@last.fm>
   */
-class WsAutoProxy
+struct IeSettings : WINHTTP_CURRENT_USER_IE_PROXY_CONFIG
 {
-#ifdef WIN32
-	HINTERNET m_hSession;
-#endif
-    bool m_bFailed;
-
-public:
-	WsAutoProxy();
-	~WsAutoProxy();
-
-	bool getProxyFor( const class QString &url, 
-                      const class QByteArray &userAgent, 
-                      class QNetworkProxy &out,
-                      const QString &pacUrl );
-
-    void resetFailedState();
+    IeSettings::IeSettings()
+    {
+        if (!WinHttpGetIEProxyConfigForCurrentUser(this)) {
+            fAutoDetect = FALSE;
+            lpszAutoConfigUrl =	lpszProxy = lpszProxyBypass = 0;
+        }
+    }
+    
+    IeSettings::~IeSettings()
+    {
+        if (lpszAutoConfigUrl) GlobalFree(lpszAutoConfigUrl);
+        if (lpszProxy) GlobalFree(lpszProxy);
+        if (lpszProxyBypass) GlobalFree(lpszProxyBypass);
+    }
 };
-
-#endif 

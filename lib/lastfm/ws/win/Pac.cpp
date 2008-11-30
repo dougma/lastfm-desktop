@@ -70,35 +70,32 @@ parsePacResult(const QString &pacResult)
 ////////////////
 
 
-WsAutoProxy::WsAutoProxy()
-: m_bFailed( false )
-#ifdef WIN32
-, m_hSession( 0 )
-#endif
-{
-}
+Pac::Pac()
+    : m_bFailed( false )
+    , m_hSession( 0 )
+{}
 
-WsAutoProxy::~WsAutoProxy()
+Pac::~WsAutoProxy()
 {
-#ifdef WIN32
 	if (m_hSession)
 		WinHttpCloseHandle(m_hSession);
-#endif
 }
 
-bool
-WsAutoProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetworkProxy &out, const QString &pacUrl)
+QNetworkProxy
+Pac::resolve(const QNetworkRequest &request, const QUrl &pacUrl_)
 {
-    if (m_bFailed) return false;        // fail fast
+    QNetworkProxy out;
+    if (m_bFailed) return out;
 
-	bool result = false;
-#ifdef WIN32
     if (!m_hSession)
     {
-	    m_hSession = WinHttpOpen(CA2W(userAgent), WINHTTP_ACCESS_TYPE_NO_PROXY, 0, 0, WINHTTP_FLAG_ASYNC);
+        QByteArray user_agent = request.rawHeader("user-agent");
+	    m_hSession = WinHttpOpen(CA2W(user_agent), WINHTTP_ACCESS_TYPE_NO_PROXY, 0, 0, WINHTTP_FLAG_ASYNC);
     }
     if (m_hSession)
     {
+        QString const pacUrl = pacUrl_.toString();
+        
 	    WINHTTP_PROXY_INFO info;
 	    WINHTTP_AUTOPROXY_OPTIONS opts;
 	    memset(&opts, 0, sizeof(opts));
@@ -114,14 +111,13 @@ WsAutoProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetwo
 	    }
 	    opts.fAutoLogonIfChallenged = TRUE;
 		
-	    if (WinHttpGetProxyForUrl(m_hSession, url.utf16(), &opts, &info)) {
+	    if (WinHttpGetProxyForUrl(m_hSession, request.url().utf16(), &opts, &info)) {
 		    if (info.lpszProxy) 
 		    {
 			    QList<QNetworkProxy> proxies = parsePacResult(QString::fromUtf16(info.lpszProxy));
 			    if (!proxies.empty())
 			    {
 				    out = proxies.at(0);
-				    result = true;
 			    }
 			    GlobalFree(info.lpszProxy);
 		    }
@@ -133,16 +129,6 @@ WsAutoProxy::getProxyFor(const QString &url, const QByteArray &userAgent, QNetwo
             m_bFailed = true;
         }
     }
-#elif defined(Q_WS_MAC)
-	// todo
-#elif defined(Q_WS_X11)
-	// todo
-#endif
 
-	return result;
-}
-
-void WsAutoProxy::resetFailedState()
-{
-    m_bFailed = false;
+	return out;
 }

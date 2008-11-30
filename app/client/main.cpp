@@ -31,7 +31,6 @@
 #include "app/moose.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/UniqueApplication.h"
-#include "lib/lastfm/ws/WsAccessManagerInit.h"
 #include <QDir>
 #include <QTimer>
 
@@ -57,10 +56,6 @@ int main( int argc, char** argv )
     QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
     QCoreApplication::setOrganizationDomain( CoreSettings::organizationDomain() );
 
-    // WsAccessManager needs special init (on windows), and it
-    // needs to be done early, so be careful about moving this:
-    WsAccessManagerInit init;
-
 #ifdef NDEBUG
     UniqueApplication uapp( moose::id() );
     if (uapp.isAlreadyRunning())
@@ -71,10 +66,10 @@ int main( int argc, char** argv )
     try
     {
         App app( argc, argv );
-#ifdef NDEBUG
+      #ifdef NDEBUG
 		uapp.init2( &app );
         app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
-#endif
+      #endif
 
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
@@ -103,7 +98,7 @@ int main( int argc, char** argv )
     catch (Unicorn::Application::UnsupportedPlatformException&)
     {
         // a message box was displayed to the user by Unicorn::Application
-        qDebug() << "Unsupport platform"; 
+        qCritical() << "Unsupported platform"; 
         return 2;
     }
     catch (Unicorn::Application::StubbornUserException&)
