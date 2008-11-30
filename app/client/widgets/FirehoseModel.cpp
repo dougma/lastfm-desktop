@@ -54,15 +54,18 @@ FirehoseModel::reconnect()
 {
     if (m_nozzle.isEmpty()) return;
 
-    // using a socket as WsAccessManager stopped after the HEADERS were returned
-    // for some reason
+    // using WsAccessManager stopped after the HEADERS were returned
+    // for some reason. We block signals to prevent recursively calling this 
+    // function
     if (m_socket) m_socket->blockSignals( true );
     delete m_socket;
     m_socket = new QTcpSocket( this );
-    connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );    
+    connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );
     connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
     connect( m_socket, SIGNAL(disconnected()), SLOT(onFinished()) );
-    m_socket->connectToHost( "firehose.last.fm", 80 );    
+    QUrl url( "http://firehose.last.fm" );
+    m_socket->setProxy( WsAccessManager().proxy( QNetworkRequest(url) ) );
+    m_socket->connectToHost( url.host(), url.port() );
 }
 
 

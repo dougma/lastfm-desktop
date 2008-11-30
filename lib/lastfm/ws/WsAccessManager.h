@@ -22,6 +22,8 @@
 
 #include <lastfm/DllExportMacro.h>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkProxy>
 
 
 /** Sets useragent and correctly sets the proxy stuff, all beautifully and 
@@ -38,19 +40,25 @@ class LASTFM_WS_DLLEXPORT WsAccessManager : public QNetworkAccessManager
     class WsConnectionMonitor* m_monitor;
 #endif
 
- 	/** called for every request since we support PAC, it's worth noting that 
-	  * this function calls QNetworkAccessManager::setProxy */
-	void applyProxy( const QNetworkRequest& );
-
 public:
 	WsAccessManager( QObject *parent = 0 );
     ~WsAccessManager();
+
+    /** PAC allows different proxy configurations depending on the request
+      * URL and even UserAgent! Thus we allow you to pass that in */
+    QNetworkProxy proxy( const QNetworkRequest& = QNetworkRequest() ) const;
 
 protected:
 	virtual QNetworkReply* createRequest( Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0 );
 
 private slots:
     void onConnectivityChanged( bool );
+
+private:
+    /** this function calls QNetworkAccessManager::setProxy, and thus 
+      * configures the proxy correctly for the next request created by
+      * createRequest. This is necessary due */
+	void applyProxy( const QNetworkRequest& );
 };
 
 #endif

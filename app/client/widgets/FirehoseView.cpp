@@ -28,6 +28,7 @@
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
     timer = new QTimeLine( 1200, this );
+	timer->setUpdateInterval( 25 );
     connect( timer, SIGNAL(frameChanged( int )), SLOT(onFrameChange( int )) );
     
     setAttribute( Qt::WA_MacShowFocusRect, false );
@@ -190,11 +191,10 @@ FirehoseView::mousePressEvent( QMouseEvent* event )
 void
 FirehoseView::mouseMoveEvent( QMouseEvent* event )
 {
-    if( !(event->buttons() & Qt::LeftButton) )
+    if (!(event->buttons() & Qt::LeftButton))
         return;
     
-    if( (event->pos() - m_dragStartPosition).manhattanLength()
-        < QApplication::startDragDistance() )
+    if ((event->pos() - m_dragStartPosition).manhattanLength() < QApplication::startDragDistance())
         return;
        
     QDrag *drag = new QDrag( this );

@@ -21,7 +21,6 @@
 #include "WsConnectionMonitor.h"
 #include "WsKeys.h"
 #include <QCoreApplication>
-#include <QNetworkProxy>
 #include <QNetworkRequest>
 #ifdef WIN32
 #include "win/IeSettings.h"
@@ -52,8 +51,8 @@ WsAccessManager::~WsAccessManager()
 }
 
 
-void
-WsAccessManager::applyProxy(const QNetworkRequest &request)
+QNetworkProxy
+WsAccessManager::proxy( const QNetworkRequest &request ) const
 {
     QNetworkProxy proxy;
     
@@ -82,10 +81,7 @@ WsAccessManager::applyProxy(const QNetworkRequest &request)
     proxy.setPort( dict.port );
 #endif
 
-	if (proxy.type() != QNetworkProxy::NoProxy)
-	{
-        QNetworkAccessManager::setProxy( proxy );
-	}
+    return proxy;
 }
 
 
@@ -93,8 +89,11 @@ QNetworkReply*
 WsAccessManager::createRequest( Operation op, const QNetworkRequest& request_, QIODevice* outgoingData )
 {
     QNetworkRequest request = request_;
-	applyProxy( request );
+
     request.setRawHeader( "User-Agent", Ws::UserAgent );
+    QNetworkProxy proxy = this->proxy( request );
+    if (proxy.type() != QNetworkProxy::NoProxy)
+        QNetworkAccessManager::setProxy( proxy );
 	return QNetworkAccessManager::createRequest( op, request, outgoingData );
 }
 
