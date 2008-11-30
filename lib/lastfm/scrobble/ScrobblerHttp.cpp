@@ -43,8 +43,6 @@ ScrobblerHttp::onRequestFinished( int id, bool error )
     {
 		if (error && this->error() == QHttp::Aborted)
 			return;
-		
-        QByteArray const data = readAll();
 
         if (error)
         {
@@ -53,8 +51,11 @@ ScrobblerHttp::onRequestFinished( int id, bool error )
         }
         else
         {
-            resetRetryTimer();
-            emit done( data );
+            emit done( readAll() );
+
+            // if it is running then we called retry(), so don't reset it, init
+            if (!m_retry_timer->isActive())
+                resetRetryTimer();
         }
 		
 		// just in case
