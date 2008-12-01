@@ -63,9 +63,7 @@ FirehoseModel::reconnect()
     connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );
     connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
     connect( m_socket, SIGNAL(disconnected()), SLOT(onFinished()) );
-    QUrl url( "http://firehose.last.fm" );
-    m_socket->setProxy( WsAccessManager().proxy( QNetworkRequest(url) ) );
-    m_socket->connectToHost( url.host(), url.port() );
+    m_socket->connectToHost( "firehose.last.fm", 80 );
 }
 
 
