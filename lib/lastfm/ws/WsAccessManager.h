@@ -46,7 +46,7 @@ public:
 
     /** PAC allows different proxy configurations depending on the request
       * URL and even UserAgent! Thus we allow you to pass that in */
-    QNetworkProxy proxy( const QNetworkRequest& = QNetworkRequest() ) const;
+    QNetworkProxy proxy( const QNetworkRequest& = QNetworkRequest() );
 
 protected:
 	virtual QNetworkReply* createRequest( Operation, const QNetworkRequest&, QIODevice* outgoingdata = 0 );

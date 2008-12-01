@@ -44,8 +44,8 @@ public:
 	{
 	#ifdef Q_WS_MAC
 		box.setWindowFlags( Qt::Sheet | (box.windowFlags() & ~Qt::Drawer) );
-		return *this;
 	#endif
+		return *this;
 	}
 };
 

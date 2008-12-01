@@ -17,10 +17,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "WsAutoProxy.h"
-#include "WsRequestBuilder.h"
-#include <QNetworkProxy>
-#include <QString>
+#include "Pac.h"
+#include <QNetworkRequest>
+#include <QStringList>
 #include <QUrl>
 
 #ifdef WIN32
@@ -75,14 +74,14 @@ Pac::Pac()
     , m_hSession( 0 )
 {}
 
-Pac::~WsAutoProxy()
+Pac::~Pac()
 {
 	if (m_hSession)
 		WinHttpCloseHandle(m_hSession);
 }
 
 QNetworkProxy
-Pac::resolve(const QNetworkRequest &request, const QUrl &pacUrl_)
+Pac::resolve(const QNetworkRequest &request, const wchar_t* pacUrl)
 {
     QNetworkProxy out;
     if (m_bFailed) return out;
@@ -94,15 +93,13 @@ Pac::resolve(const QNetworkRequest &request, const QUrl &pacUrl_)
     }
     if (m_hSession)
     {
-        QString const pacUrl = pacUrl_.toString();
-        
 	    WINHTTP_PROXY_INFO info;
 	    WINHTTP_AUTOPROXY_OPTIONS opts;
 	    memset(&opts, 0, sizeof(opts));
-	    if (pacUrl.length()) 
+	    if (pacUrl) 
 	    {
 		    opts.dwFlags = WINHTTP_AUTOPROXY_CONFIG_URL;
-		    opts.lpszAutoConfigUrl = pacUrl.utf16();
+		    opts.lpszAutoConfigUrl = pacUrl;
 	    } 
 	    else
 	    {
@@ -111,7 +108,7 @@ Pac::resolve(const QNetworkRequest &request, const QUrl &pacUrl_)
 	    }
 	    opts.fAutoLogonIfChallenged = TRUE;
 		
-	    if (WinHttpGetProxyForUrl(m_hSession, request.url().utf16(), &opts, &info)) {
+	    if (WinHttpGetProxyForUrl(m_hSession, request.url().toString().utf16(), &opts, &info)) {
 		    if (info.lpszProxy) 
 		    {
 			    QList<QNetworkProxy> proxies = parsePacResult(QString::fromUtf16(info.lpszProxy));

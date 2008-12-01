@@ -20,6 +20,7 @@
 #ifndef WS_AUTOPROXY_H
 #define WS_AUTOPROXY_H
 
+#include <QNetworkProxy>
 #include <windows.h>
 #include <winhttp.h>
 
@@ -36,7 +37,7 @@ public:
 	Pac();
 	~Pac();
 
-	QNetworkProxy resolve( const class QNetworkRequest& url, const class QUrl& pacUrl );
+	QNetworkProxy resolve( const class QNetworkRequest& url, const wchar_t* pacUrl );
 
     void resetFailedState() { m_bFailed = false; }
 

@@ -185,9 +185,9 @@ LoginDialog::onAuthenticated( WsReply* reply )
             // show Internet Settings Control Panel
             HMODULE h = LoadLibraryA( "InetCpl.cpl" );
             if (!h) break;
-            LAUNCHCPL cpl = (BOOL (WINAPI *)(HWND)) GetProcAddress( h, "LaunchConnectionDialog" );
+			BOOL (WINAPI *cpl)(HWND) = (BOOL (WINAPI *)(HWND)) GetProcAddress( h, "LaunchConnectionDialog" );
             if (cpl) cpl( winId() );
-            FreeLibrary(m_hMod);
+            FreeLibrary( h );
         #endif
             break;
     }

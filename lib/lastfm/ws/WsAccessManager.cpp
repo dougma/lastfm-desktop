@@ -92,7 +92,7 @@ WsAccessManager::~WsAccessManager()
 
 
 QNetworkProxy
-WsAccessManager::proxy( const QNetworkRequest& request ) const
+WsAccessManager::proxy( const QNetworkRequest& request )
 {   
     Q_UNUSED( request );
     
@@ -105,7 +105,7 @@ WsAccessManager::proxy( const QNetworkRequest& request ) const
             m_monitor = new WsConnectionMonitor( this );
             connect( m_monitor, SIGNAL(connectivityChanged( bool )), SLOT(onConnectivityChanged( bool )) );
         }
-		proxy = m_pac->resolve( request, s.lpszAutoConfigUrl );
+		return m_pac->resolve( request, s.lpszAutoConfigUrl );
 	} 
 #endif
     
@@ -132,6 +132,6 @@ WsAccessManager::onConnectivityChanged( bool up )
     Q_UNUSED( up );
     
 #ifdef WIN32
-    if (up && m_pac) m_pac->resetFailureState();
+    if (up && m_pac) m_pac->resetFailedState();
 #endif
 }

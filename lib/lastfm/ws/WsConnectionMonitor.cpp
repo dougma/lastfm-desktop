@@ -17,6 +17,13 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
+#ifdef WIN32
+// WsAccessManager needs special init (on Windows), and it needs to be done
+// early, so be careful about moving this
+#include "win/ComSetup.h" //,ust be first header or compile fail results!
+static ComSetup com_setup;
+#endif
+
 #include "WsConnectionMonitor.h"
 #include "WsKeys.h"
 #include <QDebug>
@@ -25,13 +32,6 @@
 #include <QPointer>
 #include <SystemConfiguration/SCNetworkReachability.h>
 QList<QPointer<WsConnectionMonitor> > monitors;
-#endif
-
-#ifdef WIN32
-// WsAccessManager needs special init (on Windows), and it needs to be done
-// early, so be careful about moving this
-#include "win/ComSetup.h"
-static ComSetup com_setup;
 #endif
 
 
