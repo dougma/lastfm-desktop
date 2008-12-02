@@ -47,7 +47,10 @@ public:
 
 inline QDebug operator<<( QDebug d, FingerprintId id)
 {
-    return d << int(id);
+    if (id.isNull())
+        return d << "(null)";
+    else
+        return d << int(id);
 }
 
 #endif
