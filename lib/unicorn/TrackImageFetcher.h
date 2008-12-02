@@ -32,9 +32,9 @@ class UNICORN_DLLEXPORT TrackImageFetcher : public QObject
 {
     Q_OBJECT
 
-    class QNetworkAccessManager* nam;    
+    class QNetworkAccessManager* nam;
     Track m_track;
-    
+
     void artistGetInfo();
     void fail();
     bool downloadImage( WsReply*, const QString& root_node_name );
@@ -44,8 +44,8 @@ class UNICORN_DLLEXPORT TrackImageFetcher : public QObject
     
 public:
     TrackImageFetcher( const Track& t, class QNetworkAccessManager* n ) 
-            : m_track( t )
-            , nam( n )
+            : nam( n )
+            , m_track( t )
     {}
 
     void start();
