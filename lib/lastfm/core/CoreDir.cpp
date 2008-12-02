@@ -24,7 +24,7 @@
     #include <shlobj.h>
 #endif
 #ifdef Q_WS_MAC
-    #include <QCoreApplication>
+    #include "mac/CFStringToQString.h"
     #include <Carbon/Carbon.h>
 #endif
 
@@ -33,7 +33,17 @@
 QDir
 CoreDir::bundle()
 {
+    // Trolltech provided example
+    CFURLRef appUrlRef = CFBundleCopyBundleURL( CFBundleGetMainBundle() );
+    CFStringRef macPath = CFURLCopyFileSystemPath( appUrlRef, kCFURLPOSIXPathStyle );
+    QString path = CFStringToQString( macPath );
+    CFRelease(appUrlRef);
+    CFRelease(macPath);
+    return QDir( path );
+
+#if 0 // old code
     return QDir( qApp->applicationDirPath() ).absoluteFilePath( "../.." );
+#endif
 }
 #endif
 
