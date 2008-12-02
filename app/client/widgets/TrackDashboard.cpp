@@ -152,6 +152,8 @@ TrackDashboard::TrackDashboard()
     ui.spinner->move( 10, 10 );
     
     clear();
+    
+    setAttribute( Qt::WA_MacNoClickThrough );
 }
 
 
