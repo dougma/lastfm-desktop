@@ -54,6 +54,8 @@ private slots:
     void onCurseClientTeam();
     void onCogMenuClicked();
     
+    void onTrackLinkActivated( QString );
+    
 private:
     class QMenu* m_cogMenu;
 };

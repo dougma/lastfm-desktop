@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QPainter>
+#include <QDesktopServices>
 
 
 struct ThreeColumnLayout : QHBoxLayout
@@ -103,6 +104,7 @@ TrackDashboardHeader::TrackDashboardHeader()
     layout()->setMargin( 0 );
     layout()->setSpacing( 10 );
     
+    connect( ui.track, SIGNAL(linkActivated( QString )), SLOT( onTrackLinkActivated( QString )));
     connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
     connect( this, SIGNAL( customContextMenuRequested( const QPoint& )), SLOT( onContextMenuRequested( const QPoint& )));
 
@@ -162,7 +164,20 @@ TrackDashboardHeader::onTrackSpooled( const Track& t, class StopWatch* )
     }
     else
     {
-        ui.track->setText( t.toString() );
+        QString txt;
+        QTextStream( &txt ) << "<style>"
+                            "a { color: " << ui.track->palette().text().color().name() << ";"
+                                "text-decoration: none;"
+                            "}"
+                         "</style>"
+                         "<a href=\"" << t.artist().www().toString() << "\">" <<
+                            t.artist() <<
+                         "</a>"
+                         " - "
+                         "<a href=\"" << t.www().toString() << "\">" <<
+                            t.title() << 
+                         "</a>";
+        ui.track->setText( txt );
         ui.cog->setEnabled( true );
     }
 }
@@ -212,4 +227,11 @@ TrackDashboardHeader::onCurseClientTeam()
         url = "http://oops.last.fm/talk/" + AuthenticatedUser() + " thinks y'all suck";
 
 	(new QNetworkAccessManager)->get( QNetworkRequest( url ) );
+}
+
+
+void 
+TrackDashboardHeader::onTrackLinkActivated( QString link )
+{
+    QDesktopServices::openUrl( link );
 }

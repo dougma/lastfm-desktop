@@ -73,6 +73,15 @@ private:
 };
 
 
+struct BioWebView : QWebView
+{
+    //The scrollwheel is disabled as the parent "papyrus" widget scrolls for us
+    virtual void wheelEvent( QWheelEvent* e )
+    {   
+        e->ignore();
+    }
+};
+
 
 
 TrackDashboard::TrackDashboard()
@@ -82,6 +91,9 @@ TrackDashboard::TrackDashboard()
     ui.papyrus = new QWidget( this );    
     ui.cover = new PrettyCoverWidget;
     ui.cover->setParent( ui.papyrus );
+    
+    ui.cover->setCursor( Qt::PointingHandCursor );
+    connect( ui.cover, SIGNAL( clicked()), SLOT( onCoverClicked()));
     
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     
@@ -228,7 +240,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		QString html;        
         QTextStream stream( &html );
         
-        stream << "<h1>" << name << "</h1>"
+        stream << "<h1><a href=\"" << url << "\">" << name << "</a></h1>"
                << "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
                << tr( "%L1 plays" ).arg( plays );
         
@@ -250,7 +262,8 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
                 "body{padding:0;margin:0;color:#bbb}"
                 "#stats{color:#444444;margin:0;line-height:1.3;font-weight:bold}"
                 "p{line-height:1.6em}"
-                "h1{color:#fff;margin:0 0 2px 0}"
+                "h1 a{color:#fff;margin:0 0 2px 0}"
+                "h1 a:hover{text-decoration:none}"
                 "a{color:#00aeef;text-decoration:none}"
                 "a:hover{text-decoration:underline}"
             #ifdef Q_WS_MAC
@@ -301,10 +314,11 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     
     if (width() > ui.cover->widthForHeight( height() ) * 2)
     {
+        //Side By Side Layout
+        
         ui.scrollbar->fadeIn();
         ui.cover->setParent( this );
         ui.cover->show();
-        ui.cover->raise();
         ui.cover->move( 15, 12 );
 
         int h = height() - 12;
@@ -316,16 +330,21 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     }
     else
     {
+        //Vertical Layout
+        
+        int coverWidth = ui.cover->widthForHeight( height() - 12 );
+        
         ui.scrollbar->fadeOutLater();
         ui.cover->setParent( ui.papyrus );
-        ui.cover->move( 0, 0 );
+        ui.cover->move(((ui.papyrus->width() - coverWidth) / 2), 0 );
         ui.cover->show();
-        ui.cover->raise();
         
-        w = qMax( ui.cover->widthForHeight( height() - 12 ), 180 );
+
+        w = qMax( coverWidth, 180 );
+
         int const x = (width() - w) / 2;
 
-        ui.cover->resize( ui.papyrus->width(), height() - 12 );
+        ui.cover->resize( coverWidth, height() - 12 );
         ui.info->move( x, ui.cover->height() + 12 );
     }
 
@@ -423,4 +442,11 @@ void
 TrackDashboard::openExternally( const QUrl& url )
 {
     QDesktopServices::openUrl( url );
+}
+
+
+void 
+TrackDashboard::onCoverClicked()
+{
+    QDesktopServices::openUrl( m_track.album().www() );
 }

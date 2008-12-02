@@ -69,6 +69,8 @@ private slots:
     void onArtistGotTopTags( WsReply* );
     void openExternally( const QUrl& );
     
+    void onCoverClicked();
+    
 private:
     virtual void paintEvent( QPaintEvent* );
     virtual void resizeEvent( QResizeEvent* );

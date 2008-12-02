@@ -125,3 +125,31 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
     }
 #endif
 }
+
+
+void 
+PrettyCoverWidget::mousePressEvent( QMouseEvent* e )
+{
+    if( e->button() != Qt::LeftButton )
+        return;
+
+    m_mouseDown = true;
+}
+
+void 
+PrettyCoverWidget::mouseReleaseEvent( QMouseEvent* e )
+{
+    if (e->button() != Qt::LeftButton)
+    {
+        e->ignore();
+        return;
+    }
+    
+    if( rect().contains( e->pos()) && m_mouseDown )
+    {
+        emit clicked();
+    }
+    
+    m_mouseDown = false;
+    
+}
