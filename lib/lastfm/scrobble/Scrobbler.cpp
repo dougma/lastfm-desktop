@@ -49,7 +49,7 @@ Scrobbler::~Scrobbler()
 
 
 void
-Scrobbler::handshake()
+Scrobbler::handshake() //private
 {
     m_hard_failures = 0;
 
@@ -68,6 +68,20 @@ Scrobbler::handshake()
     m_submitter = new ScrobblerSubmission;
     connect( m_submitter, SIGNAL(done( QByteArray )), SLOT(onSubmissionReturn( QByteArray )), Qt::QueuedConnection );
     connect( m_submitter, SIGNAL(requestStarted( int )), SLOT(onSubmissionStarted( int )) );
+}
+
+
+void
+Scrobbler::rehandshake() //public
+{
+    if (!m_submitter->hasSession())
+    {
+        m_handshake->request();
+    }
+    else
+        // if we still have a valid session, np may have been failing, so just
+        // send it as it doesn't hurt
+        m_np->request();
 }
 
 

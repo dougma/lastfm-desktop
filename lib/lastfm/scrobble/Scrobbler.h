@@ -52,6 +52,12 @@ public slots:
     void cache( const QList<Track>& );
     /** will submit the submission cache for this user */
     void submit();
+
+    /** provided the current session is invalid, we will rehandshake.
+      * if the current session is valid, we do nothing. Basically, I don't want
+      * to write the code to safely delete currently executing submission
+      * requests */
+    void rehandshake();
     
 public:
     enum Status

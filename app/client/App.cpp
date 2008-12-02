@@ -79,10 +79,7 @@ App::App( int& argc, char** argv )
     s.setValue( "Path", applicationFilePath() );
 #endif
     
-    try {
-        m_listener = new PlayerListener( this );
-        connect( m_listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
-    }
+    try { m_listener = new PlayerListener( this ); }
     catch (PlayerListener::SocketFailure& e)
     {
         //FIXME
@@ -111,7 +108,7 @@ App::App( int& argc, char** argv )
     connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
     connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
 
-    connect( new WsConnectionMonitor( this ), SIGNAL(up()), m_scrobbler, SLOT(submit()) );
+    connect( new WsConnectionMonitor( this ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
 
 #ifndef NDEBUG
     QString plugins_path = qApp->applicationDirPath();

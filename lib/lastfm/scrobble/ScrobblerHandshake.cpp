@@ -36,6 +36,8 @@ ScrobblerHandshake::ScrobblerHandshake( const QString& clientId )
 void
 ScrobblerHandshake::request()
 {
+    if (isActive()) return;
+    
     QString timestamp = QString::number( QDateTime::currentDateTime().toTime_t() );
     QString auth_token = Qt::md5( (Ws::SharedSecret + timestamp).toUtf8() );
 

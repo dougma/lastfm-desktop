@@ -33,6 +33,8 @@ class ScrobblerHttp : public QHttp
 public:
     void retry();
     int requestId() const { return m_id; }
+    
+    bool isActive() const { return m_id != -1; }
 
     QString host() const { return m_host; }
 
@@ -81,6 +83,8 @@ public:
     void setUrl( const QUrl& );
 
     QByteArray postData() const { return m_data; }
+    
+    bool hasSession() const { return m_session.size(); }
 };
 
 

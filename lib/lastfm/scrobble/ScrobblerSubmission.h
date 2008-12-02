@@ -34,4 +34,9 @@ public:
     void submitNextBatch();
     /** the batch that is being submitted currently */
     QList<Track> batch() const { return m_batch; }
+    
+    virtual void request()
+    {
+        if (!isActive()) ScrobblerPostHttp::request();
+    }
 };

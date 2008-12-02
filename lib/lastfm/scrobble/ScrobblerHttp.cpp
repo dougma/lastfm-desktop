@@ -39,27 +39,26 @@ ScrobblerHttp::ScrobblerHttp( QObject* parent )
 void
 ScrobblerHttp::onRequestFinished( int id, bool error )
 {
-    if (id == m_id)
+    if (id != m_id) return;
+
+    // set not active for signal handlers
+    m_id = -1;
+    
+    if (error && this->error() == QHttp::Aborted)
+        return;
+    
+    if (error)
     {
-		if (error && this->error() == QHttp::Aborted)
-			return;
+        qWarning() << "ERROR!" << this;
+        emit done( QByteArray() );
+    }
+    else
+    {
+        emit done( readAll() );
 
-        if (error)
-        {
-            qDebug() << "ERROR!" << this;
-            emit done( QByteArray() );
-        }
-        else
-        {
-            emit done( readAll() );
-
-            // if it is running then we called retry(), so don't reset it, init
-            if (!m_retry_timer->isActive())
-                resetRetryTimer();
-        }
-		
-		// just in case
-        m_id = -1;
+        // if it is running then we called retry(), so don't reset it, init
+        if (!m_retry_timer->isActive())
+            resetRetryTimer();
     }
 }
 
@@ -75,9 +74,12 @@ ScrobblerPostHttp::setUrl( const QUrl& url )
 void 
 ScrobblerHttp::retry()
 {
-    int const i = m_retry_timer->interval();
-    if (i < 120 * 60 * 1000)
-        m_retry_timer->setInterval( i * 2 );
+    if (!m_retry_timer->isActive())
+    {
+        int const i = m_retry_timer->interval();
+        if (i < 120 * 60 * 1000)
+            m_retry_timer->setInterval( i * 2 );
+    }
 
     qDebug() << "Will retry in" << m_retry_timer->interval() / 1000 << "seconds";
 
@@ -106,7 +108,7 @@ ScrobblerPostHttp::request()
         return;
 
     QHttpRequestHeader header( "POST", m_path );
-    header.setValue( "Host", host() ); //Qt makes me LOL today
+    header.setValue( "Host", host() ); //dumb but necessary
     header.setContentType( "application/x-www-form-urlencoded" );
 
     qDebug() << "HTTP POST:" << host() + m_path + m_data;
