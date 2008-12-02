@@ -40,7 +40,6 @@ namespace mxcl
 
 
 /** Emits timeout() after seconds specified to start. 
-  * Emits tick every second.
   * Continues to measure time after that point until object death.
   */
 class StopWatch : public QObject

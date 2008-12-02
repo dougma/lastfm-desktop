@@ -28,12 +28,11 @@ StopWatch::StopWatch( const ScrobblePoint& timeout ) : m_point( timeout )
     m_remaining = m_point * 1000;
 
     connect( m_timer, SIGNAL(timeout()), SLOT(finished()) );
-    start();
 }
 
 
 void
-StopWatch::start()
+StopWatch::start() //private
 {
     m_elapsed.restart();
     m_timer->setInterval( m_remaining );
@@ -60,7 +59,7 @@ StopWatch::pause()
 void
 StopWatch::resume()
 {
-    if (!m_remaining) 
+    if (!m_remaining || m_timer->isActive())
         return;
 
     start();

@@ -62,8 +62,8 @@ PlayerMediator::onPlayerConnectionCommandReceived( const PlayerConnection& conne
             m_track = connection.track;
             NEW_STOP_WATCH_MACRO();
             emit trackSpooled( m_track, m_watch );
+            m_watch->resume(); //do after trackSpooled() as will emit paused( bool ) now
             changeState( Playing );
-            m_watch->resume();
             break;
         
         case PlayerCommandParser::Stop:
