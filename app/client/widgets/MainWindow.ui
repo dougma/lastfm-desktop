@@ -29,6 +29,7 @@
      <string>Account</string>
     </property>
     <addaction name="profile" />
+    <addaction name="scrobble" />
     <addaction name="separator" />
     <addaction name="logout" />
     <addaction name="separator" />
@@ -200,6 +201,17 @@
   <action name="viewLocalRql" >
    <property name="text" >
     <string>Local &amp;Rql</string>
+   </property>
+  </action>
+  <action name="scrobble" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Scrobble</string>
    </property>
   </action>
  </widget>
