@@ -52,6 +52,8 @@ struct TrackData : QSharedData
 
     //FIXME I hate this, but is used for radio trackauth etc.
     QMap<QString,QString> extras;
+    
+    bool null;
 };
 
 
@@ -102,10 +104,8 @@ public:
         return !operator==( that );
     }
 
-    /** not a great isEmpty check, but most services will complain if these two
-      * are empty */
-    bool isNull() const { return d->artist.isEmpty() && d->title.isEmpty(); }
-
+    /** only a Track() is null */
+    bool isNull() const { return d->null; }
 
     Artist artist() const { return Artist( d->artist ); }
     Album album() const { return Album( artist(), d->album ); }
@@ -158,6 +158,9 @@ public:
 	QUrl www() const;
 	
 protected:
+    friend class MutableTrack;
+    // we couldn't just make this protected because c++ is stupid
+    // and you can't reference the d pointer from a copy of the baseclass
     QExplicitlySharedDataPointer<TrackData> d;
     
 private:
@@ -174,11 +177,19 @@ class LASTFM_TYPES_DLLEXPORT MutableTrack : public Track
 {
 public:
     MutableTrack()
-    {}
+    {
+        d->null = false;
+    }
 
+    /** NOTE that passing a Track() to this ctor will automatically make it non
+      * null. Which may not be what you want. So be careful
+      * Rationale: this is the most maintainable way to do it 
+      */
     MutableTrack( const Track& that ) : Track( that )
-    {}
-
+    {
+        d->null = false;
+    }
+    
     void setArtist( QString artist ) { d->artist = artist.trimmed(); }
     void setAlbum( QString album ) { d->album = album.trimmed(); }
     void setTitle( QString title ) { d->title = title.trimmed(); }
@@ -210,7 +221,8 @@ TrackData::TrackData()
                duration( 0 ),
                source( Track::Unknown ),
                rating( 0 ),
-               fpid( -1 )
+               fpid( -1 ),
+               null( false )
 {}
 
 

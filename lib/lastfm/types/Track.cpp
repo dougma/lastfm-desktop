@@ -28,6 +28,7 @@
 Track::Track()
 {
     d = new TrackData;
+    d->null = true;
 }
 
 
@@ -35,6 +36,8 @@ Track::Track( const QDomElement& e )
 {
     d = new TrackData;
 
+    if (e.isNull()) { d->null = true; return; }
+    
     d->artist = e.namedItem( "artist" ).toElement().text();
     d->album =  e.namedItem( "album" ).toElement().text();
     d->title = e.namedItem( "track" ).toElement().text();
@@ -52,8 +55,6 @@ Track::Track( const QDomElement& e )
         QString key = n.nodeName();
         d->extras[key] = n.toElement().text();
     }
-    
-    qDebug() << d->extras;
 }
 
 
@@ -61,7 +62,7 @@ QDomElement
 Track::toDomElement( QDomDocument& xml ) const
 {
     QDomElement item = xml.createElement( "track" );
-
+    
     #define makeElement( tagname, getter ) { \
 		QString v = getter; \
 		if (!v.isEmpty()) \
@@ -241,7 +242,7 @@ Track::isMp3() const
 Track
 Track::clone() const
 {
-    TrackData* d = new TrackData( *this->d );
-    return Track( d );
+    Track copy;
+    copy.d.detach();
+    return copy;
 }
-
