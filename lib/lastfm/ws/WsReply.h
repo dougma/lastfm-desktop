@@ -27,7 +27,7 @@
 #include <QDomDocument>
 
 
-/** @brief Essentially our QNetworkReply, hence the name 
+/** @brief A Last.fm wrapper around a QNetworkReply
   * @author <max@last.fm>
   *
   * When you get this back from WsRequestBuilder the request has already been
@@ -74,15 +74,6 @@ public:
     /** use this metadata component to remind you what wsreply this is */
     void setAssociatedData( const QVariant& v ) { m_associatedData = v; }
     QVariant associatedData() const { return m_associatedData; }
-	
-#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH
-    /** blocks until complete
-      * SERIOUSLY NEVER USE THIS APART FROM FOR EXPERIMENTATION!
-      * It crashes like crazy!
-      * As all sorts of things break when you start running your own event loop
-      * sadly, especially don't chain WsReplys since they do deleteLater() */
-    void finish();
-#endif
 
     QByteArray data() const { return m_data; }
 	

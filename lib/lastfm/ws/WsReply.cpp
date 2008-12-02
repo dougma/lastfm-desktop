@@ -34,19 +34,6 @@ WsReply::WsReply( QNetworkReply* r )
 }
 
 
-#ifdef OH_MY_GOLLY_GOSH___I_SO_HAVE_A_DEATH_WISH
-#ifndef NDEBUG
-void
-WsReply::finish()
-{
-    QEventLoop eventLoop;
-    QObject::connect( m_reply, SIGNAL(finished()), &eventLoop, SLOT(quit()) );
-    eventLoop.exec();
-}
-#endif
-#endif
-
-
 void
 WsReply::onFinished()
 {
