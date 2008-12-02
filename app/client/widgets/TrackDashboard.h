@@ -32,7 +32,6 @@ class TrackDashboard : public QWidget
 
     Track m_track;
     class QNetworkAccessManager* nam;
-    QUrl m_artist_image_url;
     
 public:
     TrackDashboard();

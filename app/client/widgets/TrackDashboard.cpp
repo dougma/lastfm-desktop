@@ -226,7 +226,26 @@ void
 TrackDashboard::onArtistGotInfo( WsReply* reply )
 {    
     ui.spinner->hide();
+    ui.similarArtists->clear();
     
+    QString css =
+        "<style>"
+            "body{padding:0;margin:0;color:#bbb}"
+            "#stats{color:#444444;margin:0;line-height:1.3;font-weight:bold}"
+            "p{line-height:1.6em}"
+            "h1 a{color:#fff;margin:0 0 2px 0}"
+            "h1 a:hover{text-decoration:underline}"
+            "a{color:#00aeef;text-decoration:none}"
+            "a:hover{text-decoration:underline}"
+            "body{font-size:11px}"
+            "h1{font-size:18px}"
+    #ifdef Q_WS_MAC
+            "body{font-family:Lucida Grande}"
+    #endif
+        "</style>";
+    
+    QTextStream html( &css, QIODevice::Append );
+
 	try
     {
 		CoreDomElement e = reply->lfm()["artist"];
@@ -236,59 +255,38 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		uint listeners = e["stats"]["listeners"].text().toUInt();
 		QString content = e["bio"]["content"].text();
 		QString editmessage = tr("Edit it too!");
-
-		QString html;        
-        QTextStream stream( &html );
         
-        stream << "<h1><a href=\"" << url << "\">" << name << "</a></h1>"
-               << "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
-               << tr( "%L1 plays" ).arg( plays );
+        html << "<h1><a href=\"" << url << "\">" << name << "</a></h1>"
+             << "<p id=stats>" << tr( "%L1 listeners" ).arg( listeners ) << "<br>"
+             << tr( "%L1 plays" ).arg( plays );
         
         if (content.isEmpty())
         {
             // this should be all one tr, but meh.
-            stream << "<p>" << tr("We don't have a description for this artist yet.")
-                   << "<p><a href='" << url << "/+wiki/edit'>"
-                   << tr("Why not write one?") << "</a>";
+            html << "<p>" << tr("We don't have a description for this artist yet.")
+                 << "<p><a href='" << url << "/+wiki/edit'>"
+                 << tr("Why not write one?") << "</a>";
         }
         else
-            stream << "<p id=content>" << content.replace(QRegExp("\r+"), "<p>")
-                   << "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ")
-                   << "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
-        
-        
-        QString css = 
-            "<style>"
-                "body{padding:0;margin:0;color:#bbb}"
-                "#stats{color:#444444;margin:0;line-height:1.3;font-weight:bold}"
-                "p{line-height:1.6em}"
-                "h1 a{color:#fff;margin:0 0 2px 0}"
-                "h1 a:hover{text-decoration:none}"
-                "a{color:#00aeef;text-decoration:none}"
-                "a:hover{text-decoration:underline}"
-            #ifdef Q_WS_MAC
-                "body{font-family:Lucida Grande;font-size:11px}"
-                "h1{font-size:18px}"
-            #endif
-            "</style>";
-        
-        ui.bio->setHtml( css + html );
-        resizeEvent( 0 );
-        
-        ui.similarArtists->clear();
+            html << "<p id=content>" << content.replace(QRegExp("\r+"), "<p>")
+                 << "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ")
+                 << "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
+
         foreach (CoreDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
-        
-        ui.info->show();
-        
-        m_artist_image_url = e["image size=large"].text();
-        
-//        ui.cover->setMinimumWidth( ui.artist->height() );
-	}
+    }
 	catch (CoreDomElement::Exception& e)
 	{
 		qWarning() << e;
+
+        html << "<h1>" << m_track.artist() << "</h1>"
+             << "<p>" << tr("Unable to contact Last.fm.<br>Your scrobbles are being cached.");
 	}
+
+    ui.bio->setHtml( *html.string()  );
+    resizeEvent( 0 );
+    
+    ui.info->show();
 }
 
 
