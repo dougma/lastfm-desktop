@@ -60,6 +60,8 @@ class LASTFM_WS_DLLEXPORT WsConnectionMonitor
 	bool m_up;
 	
 public:
+    /** if internet is unavailable you will get a down() signal soon, otherwise
+      * you won't get a signal until the net goes down */
 	WsConnectionMonitor( QObject *parent = 0 );
 
 	bool isDown() const { return !m_up; }
@@ -73,6 +75,7 @@ signals:
       * an unhappy face in the statusbar or something */
 	void down( const QString& connectionName = "" );
 	
+    /** emitted after the above */
 	void connectivityChanged( bool );
 };
 

@@ -59,9 +59,7 @@ void
 WsConnectionMonitor::callback( SCNetworkReachabilityRef, SCNetworkConnectionFlags flags, void* )
 {
     static bool up = true;
-    
-    qDebug() << flags;    
-    
+        
     // I couldn't find any diffinitive usage examples for these flags
     // so I had to guess, since I can't test, eg. dial up :(
     
@@ -71,7 +69,7 @@ WsConnectionMonitor::callback( SCNetworkReachabilityRef, SCNetworkConnectionFlag
     else
         b = flags & (kSCNetworkFlagsReachable | kSCNetworkFlagsTransientConnection | kSCNetworkFlagsConnectionAutomatic);
     
-    qDebug() << b;
+    qDebug() << "Can reach " LASTFM_WS_HOSTNAME ":" << b << ", flags:" << flags;
     
     // basically, avoids telling everyone that we're up already on startup
     if (up == b) return;
