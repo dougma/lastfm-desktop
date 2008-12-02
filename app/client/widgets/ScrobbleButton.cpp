@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "ScrobbleButton.h"
+#include "ScrobbleButton/PausableTimer.h"
 #include "StopWatch.h"
 #include <QApplication>
 #include <QPainter>
@@ -25,17 +26,9 @@
 #include <QTimeLine>
 
 
-class ScrobbleButtonToolTip : public QWidget
-{
-
-};
-
-
 ScrobbleButton::ScrobbleButton()
               : m_movie( new QMovie( this ) )
 {
-    m_timer = 0;
-    
     setCheckable( true );
     setChecked( true );
     setFixedSize( 51, 37 );
@@ -70,9 +63,7 @@ void
 ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
 {
     m_track = t;
-    
     delete m_timer;
-    m_timer = 0;
     
     //only way to make the movie restart with Qt 4.4.2
     //TODO optimise, this can't be cheap to do if unecessary
@@ -87,12 +78,9 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
     }
     else if (m_track.isValid())
     {
-        m_timer = new QTimer;
+        m_timer = new PausableTimer( watch->scrobblePoint() );
         m_timer->setParent( watch );
         connect( m_timer, SIGNAL(timeout()), SLOT(advanceFrame()) );
-		m_timer->setObjectName( "ScrobbleButton QTimer" );
-        m_timer->setInterval( (watch->scrobblePoint() * 1000) / 23 );
-        m_timer->start();
 
         connect( watch, SIGNAL(paused( bool )), m_timer, SLOT(setPaused( bool )) );
         connect( watch, SIGNAL(timeout()), SLOT(onScrobbled()) );

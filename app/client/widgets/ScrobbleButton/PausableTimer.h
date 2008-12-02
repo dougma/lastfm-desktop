@@ -17,30 +17,67 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QAbstractButton>
-#include <QPointer>
-#include "lib/lastfm/scrobble/Scrobble.h"
-class QMovie;
-class QTimeLine;
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
+#include <QBasicTimer>
+#include <QObject>
+#include <QTime>
 
 
-class ScrobbleButton : public QAbstractButton
+class PausableTimer : public QObject
 {
     Q_OBJECT
-
-    QMovie* m_movie;
-    QPointer<QObject> m_timer;
-    Scrobble m_track;
-
-public:
-    ScrobbleButton();
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
     
-private slots:
-    void onTrackSpooled( const class Track&, class StopWatch* );
-    void onScrobbled();
-    void advanceFrame();
-    void updateToolTip( int );
+    QBasicTimer timer;
+    QTime elapsed;
+    uint const interval;
+    uint next_interval;
+    uint iterations;
+    
+    static const uint STEPS = 23;
+    
+public:
+    PausableTimer( const ScrobblePoint& p ) 
+            : interval( (p*1000) / STEPS ),
+              next_interval( interval ),
+              iterations( 0 )
+    {
+        start( interval );
+    }
+    
+public slots:
+    void setPaused( bool b )
+    {
+        Q_ASSERT( iterations < STEPS );
+        if (b != timer.isActive()) return;
+        
+        if (b) {
+            timer.stop();
+            next_interval = qMin( next_interval - elapsed.elapsed(), next_interval );
+        }
+        else
+            start( next_interval );
+    }
+    
+signals:
+    void timeout();
+
+private:
+    void start(uint const time)
+    {
+        elapsed.start();
+        timer.start(time, this);
+    } 
+    
+    virtual void timerEvent(QTimerEvent*)
+    {
+        emit timeout();
+        
+        if (++iterations >= STEPS)
+            timer.stop();
+        else if (next_interval != interval)
+            // we don't just start() every interval, as this introduces creep
+            start(next_interval = interval);
+        else
+            elapsed.start();
+    }
 };
