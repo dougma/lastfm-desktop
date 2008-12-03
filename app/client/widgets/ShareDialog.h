@@ -38,10 +38,8 @@ class ShareDialog : public QDialog
     } ui;
     
 public:
-    ShareDialog( QWidget* parent );
+    ShareDialog( const Track&, QWidget* parent );
 
-    /** for the love of all that is holy, call this before show! */
-    void setTrack( const Track& );
 	Track track() const { return m_track; }
 
     void setupUi();

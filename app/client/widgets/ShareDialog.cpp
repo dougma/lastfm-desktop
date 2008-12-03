@@ -34,13 +34,16 @@
 #include <QEvent>
 
 
-ShareDialog::ShareDialog( QWidget* parent )
+ShareDialog::ShareDialog( const Track& t, QWidget* parent )
         : QDialog( parent )
 {
     setupUi();
     setWindowTitle( tr("Share") );    
     UnicornWidget::paintItBlack( this );
     enableDisableOk();
+    
+    m_track = t;
+    ui.track->setTrack( t );
     
     connect( ui.edit, SIGNAL(textChanged( QString )), SLOT(enableDisableOk()) );
     connect( ui.browseFriends, SIGNAL(clicked()), SLOT(browseFriends()) );
@@ -82,13 +85,6 @@ ShareDialog::setupUi()
     foreach (QLabel* l, findChildren<QLabel*>())
         l->setAttribute( Qt::WA_MacSmallSize );
 #endif
-}
-
-
-void
-ShareDialog::setTrack( const Track& t )
-{
-    ui.track->setTrack( t );
 }
 
 

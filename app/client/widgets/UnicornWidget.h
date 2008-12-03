@@ -56,9 +56,8 @@ public:
 
 #define UNICORN_UNIQUE_PER_TRACK_DIALOG( Type, t ) \
 	if (!t.isNull() && (!m_the##Type || m_the##Type->track() != t)) { \
-		m_the##Type = new Type( this ); \
+		m_the##Type = new Type( t, this ); \
 		PRIVATE_SETUP_UNICORN_UNIQUE_DIALOG( m_the##Type ); \
-		m_the##Type->setTrack( t ); \
 		m_the##Type->show(); \
 	} else \
 		m_the##Type->activateWindow();

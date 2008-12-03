@@ -36,9 +36,8 @@ class PlaylistDialog : public QDialog
     virtual void accept();
     
 public:
-	PlaylistDialog( QWidget* parent );
+	PlaylistDialog( const Track&, QWidget* parent );
 
-	void setTrack( const Track& );
     Track track() const { return m_track; }
 	
 	struct Ui

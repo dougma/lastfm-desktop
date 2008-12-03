@@ -108,12 +108,15 @@ struct PlaylistsView : QListView
 
 
 
-PlaylistDialog::PlaylistDialog( QWidget* parent )
+PlaylistDialog::PlaylistDialog( const Track& t, QWidget* parent )
               : QDialog( parent )
 {
 	setupUi();
     setWindowTitle( tr("Add to Playlist") );
-	
+
+    m_track = t;
+    ui.track->setTrack( t );	
+    
     delete ui.playlists->itemDelegate();
     ui.playlists->setItemDelegate( new FirehoseDelegate );
     ui.playlists->setModel( m_model = new UserPlaylistsModel );
@@ -145,14 +148,6 @@ PlaylistDialog::setupUi()
     
 	UnicornWidget::paintItBlack( this );
 	UnicornWidget::paintItBlack( ui.playlists );
-}
-
-
-void
-PlaylistDialog::setTrack( const Track& t )
-{
-    m_track = t;
-    ui.track->setTrack( t );
 }
 
 
