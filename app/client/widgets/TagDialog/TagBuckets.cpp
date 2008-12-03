@@ -128,6 +128,30 @@ TagBucket::TagBucket()
 }
 
 
+//////////////////////////
+//// Event Handling: /////
+//////////////////////////
+
+void 
+TagBucket::paintEvent( QPaintEvent* e )
+{
+    if( toPlainText().isEmpty() )
+    {
+        QPainter p( viewport() );
+        p.setClipRect( e->rect() );
+        QString noItemsText = tr( "Drag existing tags from the lists or type to invent your own." );
+        p.setBrush( Qt::darkGray );
+        p.setPen( Qt::darkGray );
+        
+        QRect r = viewport()->rect();
+        r.adjust( 10, 10, -10, -10 );
+        p.drawText( viewport()->rect(), Qt::AlignCenter|Qt::TextWordWrap, noItemsText);
+    }
+    
+    QTextEdit::paintEvent( e );
+}
+
+
 void 
 TagBucket::dropEvent( QDropEvent* e )
 {    

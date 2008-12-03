@@ -65,6 +65,7 @@ public slots:
     void onGotTags( class WsReply* );
     
 protected:
+    virtual void paintEvent( QPaintEvent* );
     virtual void dropEvent( QDropEvent* );
     virtual void dragMoveEvent( QDragMoveEvent* );
     virtual void dragEnterEvent( QDragEnterEvent* );
