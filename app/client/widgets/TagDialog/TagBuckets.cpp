@@ -162,7 +162,7 @@ TagBucket::paintEvent( QPaintEvent* e )
         
         QRect r = viewport()->rect();
         r.adjust( 10, 10, -10, -10 );
-        p.drawText( viewport()->rect(), Qt::AlignCenter|Qt::TextWordWrap, noItemsText);
+        p.drawText( r, Qt::AlignCenter|Qt::TextWordWrap, noItemsText);
     }
     
     QTextEdit::paintEvent( e );
