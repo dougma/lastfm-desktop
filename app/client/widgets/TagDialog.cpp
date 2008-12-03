@@ -57,15 +57,8 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     ui.yourTags->setTagsRequest( r );
     follow( r );
 	
-    QRegExp rx( "[a-zA-Z0-9\\-:,' ]{1,255}" );
-    ui.edit->setValidator( new QRegExpValidator( rx, this ) );
-    ui.edit->setCompleter( new QCompleter( ui.suggestedTags->model() ) );
-
     ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Tag") );
     ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( false );
-
-    connect( ui.edit, SIGNAL(returnPressed()), ui.add, SLOT(animateClick()) );
-    connect( ui.add, SIGNAL(clicked()), SLOT(onAddClicked()) );
 
     connect( ui.suggestedTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
     connect( ui.yourTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
@@ -90,14 +83,13 @@ TagDialog::setupUi()
     ui.yourTags->setDragEnabled( true );
     
     QHBoxLayout* h2 = new QHBoxLayout;
-    h2->addWidget( ui.edit = new QLineEdit );
-    h2->addWidget( ui.add = new QPushButton( tr("Add") ) );
 
     QVBoxLayout* v = new QVBoxLayout( this );
     v->setSpacing( 0 );
     v->setContentsMargins( 0, 0, 0, 0 );
     QHBoxLayout* h = new QHBoxLayout;
     h->setContentsMargins( 0, 0, 0, 0 );
+    h->setSpacing( 5 );
     QVBoxLayout* v2 = new QVBoxLayout;
     v2->setSpacing( 0 );
     v2->setContentsMargins( 0, 0, 0, 0 );

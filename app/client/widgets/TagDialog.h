@@ -51,8 +51,6 @@ private:
     {
         class TrackWidget* track;
         class SpinnerLabel* spinner;
-        class QLineEdit* edit;
-        class QPushButton* add;
         class TagBuckets* appliedTags;
         class TagListWidget* suggestedTags;
         class TagListWidget* yourTags;
