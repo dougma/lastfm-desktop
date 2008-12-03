@@ -27,12 +27,12 @@
 QString //static
 CoreUrl::encode( QString s )
 {
-    s.replace( "&", "%26" );
-    s.replace( "/", "%2F" );
-    s.replace( ";", "%3B" );
-    s.replace( "+", "%2B" );
-    s.replace( "#", "%23" );
-    return QString::fromAscii( QUrl::toPercentEncoding( s ) );
+    if( s.contains( QRegExp( "& | \\/ | ; | + | #" )))
+        s = QUrl::toPercentEncoding( s );
+
+    s = QString::fromAscii( QUrl::toPercentEncoding( s ));
+
+    return s;
 }
 
 
