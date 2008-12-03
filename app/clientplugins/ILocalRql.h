@@ -57,6 +57,7 @@ class ILocalRqlPlugin
 public:
     virtual void init() = 0;
 	virtual void parse(const char *rql, ILocalRqlParseCallback *) = 0;
+    virtual void testTag(const char *url) = 0;
     virtual void finished() = 0;
 };
 

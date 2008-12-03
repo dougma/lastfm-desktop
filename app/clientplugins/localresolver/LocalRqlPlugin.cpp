@@ -26,7 +26,8 @@
 #include "rqlParser/parser.h"
 #include <boost/bind.hpp>
 
-#include <vector>
+#include "TagifierRequest.h"
+#include "QueryError.h"
 
 using namespace std;
 using namespace fm::last::query_parser;
@@ -69,6 +70,12 @@ LocalRqlPlugin::LocalRqlPlugin()
 : m_tagUpdater(0)
 , m_localCollection(0)
 {
+}
+
+LocalRqlPlugin::~LocalRqlPlugin()
+{
+    delete m_tagUpdater;
+    delete m_localCollection;
 }
 
 void 
@@ -115,6 +122,18 @@ LocalRqlPlugin::parse(const char *rql, ILocalRqlParseCallback *cb)
 void 
 LocalRqlPlugin::finished()
 {
-    delete m_tagUpdater;
-    delete m_localCollection;
+    delete this;
+}
+
+void
+LocalRqlPlugin::testTag(const char *url)
+{
+    try {
+        m_pTagifier = new TagifierRequest(*m_localCollection, QString::fromUtf8(url));
+        bool requestedOk = m_pTagifier->makeRequest();
+        Q_ASSERT(requestedOk);
+    } catch (const QueryError& qe) {
+        QString err = qe.text();
+        int ii =0;
+    }
 }

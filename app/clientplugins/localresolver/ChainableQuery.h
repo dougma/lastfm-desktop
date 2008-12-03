@@ -44,6 +44,7 @@ public:
     ChainableQuery bindValue(const QString& name, const QVariant& value);
     ChainableQuery setForwardOnly(bool forward);
     QSqlQuery exec();
+    QSqlQuery execBatch(QSqlQuery::BatchExecutionMode mode = QSqlQuery::ValuesAsRows);
 };
 
 

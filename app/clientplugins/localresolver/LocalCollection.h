@@ -15,7 +15,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
 /*! \class LocalCollection
@@ -34,7 +34,10 @@
 #include <QSqlQuery>
 #include <QPair>
 #include <QList>
+#include <QMap>
 #include <QVector>
+#include <QStringList>
+#include <QVariantList>
 #include "ChainableQuery.h"
 #include "lib/lastfm/core/WeightedStringList.h"
 
@@ -145,6 +148,14 @@ public:
         QString m_sourcename;
     };
 
+    struct FilesToTagResult
+    {
+        unsigned fileId;
+        QString artist;
+        QString album;
+        QString title;
+    };
+
     // these types culminate in EntryList, as returned by allTags()
     typedef int ArtistId;
     typedef int TagId;
@@ -215,6 +226,16 @@ public:
     void insertGlobalArtistTag(int artistId, int tagId, int weight);
     void insertTrackTag(int artistId, int tagId, unsigned userId, int weight);
 
+    QList<FilesToTagResult> getFilesToTag();
+    void deleteTrackTags(QVariantList fileIds);
+    void updateTrackTags(QVariantList fileIds, QVariantList tagIds, QVariantList weights);
+    void setFileTagTime(QVariantList fileIds);
+    QVariantList resolveTags(QStringList tagNames);
+    QVariantList resolveTags(QStringList tagNames, QMap<QString, int>& map);
+
+    void transactionBegin();
+    void transactionCommit();
+    void transactionRollback();
 
 private:
     LocalCollection(QString connectionName);
@@ -226,9 +247,14 @@ private:
     QSqlQuery query( const QString& sql, const char *funcName ) const;
     ChainableQuery prepare( const QString& sql, const char *funcName ) const;
 
+    void batch(QVariantList ids, void (LocalCollection::*op)(QString) );
+    void deleteTrackTags_batch(QString ids);
+    void setFileTagTime_batch(QString ids);
+
     QSqlDatabase m_db;
     QString m_dbPath;
     QString m_connectionName;
 };
+
 
 #endif // COLLECTION_H

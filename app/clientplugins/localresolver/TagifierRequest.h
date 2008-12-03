@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2007 by                                                 *
- *      Last.fm Ltd <client@last.fm>                                       *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -15,57 +14,43 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "ChainableQuery.h"
-#include "QueryError.h"
+#ifndef TAGIFIER_REQUEST_H
+#define TAGIFIER_REQUEST_H
+
+#include <QUrl>
+#include <QByteArray>
+#include <QVariantList>
+#include "lib/lastfm/ws/WsAccessManager.h"
 
 
-ChainableQuery::ChainableQuery(QSqlDatabase db)
-:QSqlQuery(db)
+class TagifierRequest : public QObject
 {
-}
+    Q_OBJECT;
 
-ChainableQuery 
-ChainableQuery::prepare(const QString& sql, const char *funcName)
-{
-    m_sql = sql;
-    m_func = funcName;
+    QUrl m_url;
+    QByteArray m_body;
+    WsAccessManager m_wam;
+    class QNetworkReply* m_reply;
+    class LocalCollection& m_collection;
+    int m_requestIdCount, m_responseIdCount, m_responseTagCount;
+    QVariantList m_requestedFileIds;
 
-    if (!QSqlQuery::prepare(sql))
-        throw QueryError(lastError(), *this);
-    return *this;
-}
+    void handleResponse();
 
-ChainableQuery 
-ChainableQuery::bindValue(const QString& name, const QVariant& value)
-{
-    QSqlQuery::bindValue(name, value);
-    return *this;
-}
+private slots:
+    void onFinished();
 
-ChainableQuery 
-ChainableQuery::setForwardOnly(bool forward)
-{
-    QSqlQuery::setForwardOnly(forward);
-    return *this;
-}
+public:
+//  "http://compute1:8080/trackresolve"
 
-QSqlQuery
-ChainableQuery::exec()
-{
-    if (!QSqlQuery::exec())
-        throw QueryError(lastError(), *this);
-    return *this;
-}
+    TagifierRequest(LocalCollection& collection, QString url);
+    bool makeRequest();
 
+signals:
+    void finished(int requestIdCount, int responseIdCount, int responseTagCount);
+};
 
-QSqlQuery 
-ChainableQuery::execBatch(QSqlQuery::BatchExecutionMode mode /*= QSqlQuery::ValuesAsRows*/)
-{
-    if (!QSqlQuery::execBatch(mode))
-        throw QueryError(lastError(), *this);
-    return *this;
-}
-
+#endif

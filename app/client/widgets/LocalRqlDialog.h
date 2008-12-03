@@ -17,6 +17,7 @@ public:
     LocalRqlDialog( QWidget *parent );
 
 private slots:
-    void accept();
+    void onPlay();
+    void onTag();
 
 };

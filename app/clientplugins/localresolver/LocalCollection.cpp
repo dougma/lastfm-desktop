@@ -20,8 +20,8 @@
 
 #include "LocalCollection.h"
 #include "QueryError.h"
+#include "AutoTransaction.h"
 #include "lib/lastfm/core/CoreDir.h"
-#include <QStringList>
 #include <QFileInfo>
 #include <QVariant>
 #include <QSqlDriver>
@@ -30,8 +30,8 @@
 
 extern void addUserFuncs(QSqlDatabase db);
 
-#define LOCAL_COLLECTION_SCHEMA_VERSION_INT 2
-#define LOCAL_COLLECTION_SCHEMA_VERSION_STR "2"
+#define LOCAL_COLLECTION_SCHEMA_VERSION_INT 3
+#define LOCAL_COLLECTION_SCHEMA_VERSION_STR "3"
 
 // these macros add-in the function name for 
 // the call to the method of the same name
@@ -110,16 +110,14 @@ LocalCollection::initDatabase()
                     "duration          INTEGER,"
                     "mbid              VARCHAR( 36 ),"
                     "puid              VARCHAR( 36 ),"
-                    "lastfm_fpid       INTEGER );" );
+                    "lastfm_fpid       INTEGER, "
+                    "tag_time          INTEGER);" );
         QUERY( "CREATE INDEX files_directory_idx ON files ( directory );" );
         QUERY( "CREATE INDEX files_artist_idx ON files ( artist );" );
 
         QUERY( "CREATE TABLE artists ("
                     "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    "lowercase_name     TEXT NOT NULL UNIQUE,"
-                    "updates_since_dl   INTEGER NOT NULL,"   // count of files added since last_dl
-                    "dl_time            INTEGER,"
-                    "next_dl_time       INTEGER );" );
+                    "lowercase_name     TEXT NOT NULL UNIQUE );" );
         QUERY( "CREATE INDEX artists_name_idx ON artists ( lowercase_name );" );
 
         // artist a has similar artist b with weight
@@ -138,8 +136,8 @@ LocalCollection::initDatabase()
         QUERY( "CREATE TABLE tracktags ("
                     "file               INTEGER NOT NULL,"      // files foreign key
                     "tag                INTEGER NOT NULL,"      // tags foreign key
-                    "weight             INTEGER NOT NULL,"      // 0-100
-                    "user_id            INTEGER NOT NULL);" );  // lastfm user id (0 = global)
+                    "weight             INTEGER NOT NULL);" );  // 0-100
+        QUERY( "CREATE INDEX tracktags_file_idx ON tracktags ( file ); ");
 
         QUERY( "CREATE TABLE directories ("
                     "id          INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -835,6 +833,147 @@ LocalCollection::allTracksByArtistId(int artistId)
         results << query.value( 0 ).toUInt();
     }
     return results;
+}
+
+QList<LocalCollection::FilesToTagResult> 
+LocalCollection::getFilesToTag()
+{
+    QSqlQuery query = PREPARE(
+        "SELECT files.id, artists.lowercase_name, files.album, files.lowercase_title "
+        "FROM files "
+        "INNER JOIN artists ON artists.id = files.artist "
+        "WHERE tag_time IS NULL" ).
+        setForwardOnly( true ).
+        exec();
+    QList<FilesToTagResult> results;
+    while (query.next()) {
+        FilesToTagResult r;
+        r.fileId = query.value( 0 ).toUInt();
+        r.artist = query.value( 1 ).toString();
+        r.album = query.value( 2 ).toString();
+        r.title = query.value( 3 ).toString();
+        results << r;
+    }
+    return results;
+}
+
+void
+LocalCollection::deleteTrackTags_batch(QString ids)
+{
+    QUERY("DELETE FROM tracktags WHERE file IN (" + ids + ")" );
+}
+
+void
+LocalCollection::setFileTagTime_batch(QString ids)
+{
+    PREPARE(
+        "UPDATE files SET tag_time = :tagTime WHERE id IN (" + ids + ")" ).
+        bindValue( ":tagTime", QDateTime::currentDateTime().toUTC().toTime_t() ).
+        exec();
+}
+
+void
+LocalCollection::setFileTagTime(QVariantList fileIds)
+{
+    // do it in a transaction to attempt to speed it up
+    AutoTransaction<LocalCollection> trans(*this);
+    batch(fileIds, &LocalCollection::setFileTagTime_batch);
+    trans.commit();
+}
+
+void
+LocalCollection::deleteTrackTags(QVariantList fileIds)
+{
+    // do it in a transaction to attempt to speed it up
+    AutoTransaction<LocalCollection> trans(*this);
+    batch(fileIds, &LocalCollection::deleteTrackTags_batch);
+    trans.commit();
+}
+
+void 
+LocalCollection::batch(QVariantList fileIds, void (LocalCollection::*batchFunc)(QString))
+{
+    // sqlite driver turns some batchExec commands into a series of execs.
+    // eg, the command: DELETE FROM tracktags WHERE file IN (:fileIds)
+    // it's slow...
+    
+    int count = 0;
+    QString ids = "";
+    bool first = true;
+    foreach (const QVariant& v, fileIds) {
+        if (first) {
+            first = false;
+        } else {
+            ids.append(',');
+        }
+        ids.append(QString::number(v.toInt()));
+
+        if (++count % 100 == 0) {
+            (*this.*batchFunc)(ids);
+            first = true;
+            ids = "";
+        }
+    }
+    if (!first) {
+        (*this.*batchFunc)(ids);
+    }
+}
+
+
+void
+LocalCollection::updateTrackTags(QVariantList fileIds, QVariantList tagIds, QVariantList weights)
+{
+    PREPARE(
+        "INSERT INTO tracktags (file, tag, weight) "
+        "VALUES (:fileIds, :tags, :weights)" ).
+        bindValue( ":fileIds", fileIds ).
+        bindValue( ":tags", tagIds ).
+        bindValue( ":weights", weights ).
+        execBatch();
+}
+
+QVariantList
+LocalCollection::resolveTags(QStringList tags)
+{
+    QMap<QString, int> map;
+    return resolveTags(tags, map);
+}
+
+
+QVariantList
+LocalCollection::resolveTags(QStringList tags, QMap<QString, int>& map)
+{
+    // too slow hitting the db, build our own cache in front of it
+    QVariantList result;
+    foreach(const QString tag, tags) {
+        QMap<QString, int>::iterator it = map.find(tag);
+        if (it != map.end()) {
+            result << it.value();
+        } else {
+            int id = getTagId(tag, true);
+            map.insert(tag, id);
+            result << id;
+        }
+    }
+    return result;
+}
+
+void 
+LocalCollection::transactionBegin()
+{
+    QUERY("BEGIN IMMEDIATE");
+}
+
+void 
+LocalCollection::transactionCommit()
+{
+    QUERY("COMMIT");
+}
+
+void 
+LocalCollection::transactionRollback()
+{
+    QUERY("ROLLBACK");
 }
 
 //////////////////////////////////////////////////////////////
