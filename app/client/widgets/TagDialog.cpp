@@ -62,6 +62,9 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     connect( ui.suggestedTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
     connect( ui.yourTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
     
+    connect( ui.appliedTags, SIGNAL(suggestedTagsRequest( WsReply* )), ui.suggestedTags, SLOT(setTagsRequest( WsReply* )) ); 
+    connect( ui.appliedTags, SIGNAL(suggestedTagsRequest( WsReply* )), SLOT(follow( WsReply* )) ); 
+    
     connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
     connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
 }

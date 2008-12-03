@@ -43,7 +43,7 @@ private slots:
     void onWsFinished( WsReply* );
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
-    
+    void follow( WsReply* );
     void removeCurrentTag();
 
 private:
@@ -61,7 +61,6 @@ private:
     } ui;
 
     void setupUi();
-    void follow( WsReply* );
     
     virtual void accept();
     

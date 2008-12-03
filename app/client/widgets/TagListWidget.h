@@ -35,8 +35,10 @@ public:
     /** we won't add the tag if we already have it, and in that case we 
       * return false */
     bool add( QString );
-    void setTagsRequest( class WsReply* );
     QStringList newTags() const { return m_newTags; }
+
+public slots:
+    void setTagsRequest( class WsReply* );
     
 protected:
     virtual QMimeData* mimeData( const QList<QTreeWidgetItem *> items ) const;

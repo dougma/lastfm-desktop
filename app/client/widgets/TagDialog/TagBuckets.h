@@ -17,7 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/lastfm/types/Track.h"
 #include <QTextEdit>
+#include <QLayout>
 #include <QWidget>
 class TagBucket;
 
@@ -26,6 +28,7 @@ class TagBuckets : public QWidget
 {
     Q_OBJECT
     
+    Track m_track;
     int m_current_index;
     
 public:
@@ -36,6 +39,11 @@ public:
         TagBucket* artist;
         TagBucket* album;
     } ui;
+    
+    TagBucket* currentBucket() { return (TagBucket*)layout()->itemAt( m_current_index )->widget(); }
+
+signals:
+    void suggestedTagsRequest( class WsReply* );
     
 private slots:
     void onHeaderClicked();

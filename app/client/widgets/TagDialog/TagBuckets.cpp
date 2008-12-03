@@ -19,7 +19,6 @@
 
 #include "TagBuckets.h"
 #include "lib/lastfm/types/Tag.h"
-#include "lib/lastfm/types/Track.h"
 #include "PlayableMimeData.h"
 #include "SeedTypes.h"
 #include <QtGui>
@@ -61,6 +60,8 @@ struct Header : QAbstractButton
 
 TagBuckets::TagBuckets( const Track& t )
 {   
+    m_track = t;
+    
     Header* h1, *h2, *h3;
     
     QVBoxLayout* v = new QVBoxLayout( this );
@@ -92,6 +93,12 @@ TagBuckets::onHeaderClicked()
     layout()->itemAt( m_current_index )->widget()->hide();
     m_current_index = layout()->indexOf( (QWidget*)sender() ) + 1;
     layout()->itemAt( m_current_index )->widget()->show();
+    
+    switch (m_current_index / 3)
+    {
+        case 1: emit suggestedTagsRequest( m_track.artist().getTopTags() ); break;
+        case 2: emit suggestedTagsRequest( m_track.getTopTags() ); break;
+    };
 }
 
 
