@@ -22,6 +22,7 @@
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/TrackWidget.h"
+#include "TagBuckets.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/lastfm/ws/WsReply.h"
@@ -29,10 +30,30 @@
 #include <QtGui>
 
 
-TagDialog::TagDialog( QWidget *parent )
+TagDialog::TagDialog( const Track& track, QWidget *parent )
         : QDialog( parent, Qt::Dialog )
 {
+    m_track = track;
+    
     setupUi();
+    
+    //    ui.tabs1->setTabEnabled( 0, !track.isNull() );
+    //    ui.tabs1->setTabEnabled( 1, !track.artist().isNull() );
+    //    ui.tabs1->setTabEnabled( 2, !track.album().isNull() );
+    
+    {
+        WsReply* r;
+        follow( r = track.getTopTags() );
+        ui.suggestedTags->setTagsRequest( r );
+        follow( r = track.getTags() );
+        //    ui.trackTags->setTagsRequest( r );
+        follow( r = track.artist().getTags() );
+        //    ui.artistTags->setTagsRequest( r );
+        follow( r = track.album().getTags() );
+        //    ui.albumTags->setTagsRequest( r );
+    }
+    
+    
     setWindowTitle( tr("Tag") );
     UnicornWidget::paintItBlack( this );
     
@@ -61,31 +82,13 @@ TagDialog::TagDialog( QWidget *parent )
 void
 TagDialog::setupUi()
 {
-    ui.tabs1 = new Unicorn::TabWidget;
-    ui.tabs1->addTab( tr("Track"), ui.trackTags = new TagIconView );
-    ui.tabs1->addTab( tr("Artist"), ui.artistTags = new TagIconView );
-    ui.tabs1->addTab( tr("Album"), ui.albumTags = new TagIconView );
-    
-    ui.trackTags->setAcceptDrops( true );
-    ui.artistTags->setAcceptDrops( true );
-    ui.artistTags->setAcceptDrops( true );
-    
-#define WATCH_LIST( x ) \
-    connect( x->model(), SIGNAL( rowsInserted(QModelIndex, int, int)), SLOT( onListItemsChanged(QModelIndex, int, int))); \
-    connect( x->model(), SIGNAL( rowsRemoved(QModelIndex, int, int)), SLOT( onListItemsChanged(QModelIndex, int, int)));
-    
-    WATCH_LIST( ui.trackTags );
-    WATCH_LIST( ui.artistTags );
-    WATCH_LIST( ui.albumTags );
-    
-#undef WATCH_LIST
 
-    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-    connect( new QShortcut( QKeySequence("Backspace"), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-    connect( new QShortcut( QKeySequence("Backspace"), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-    connect( new QShortcut( QKeySequence("Backspace"), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence("Backspace"), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence("Backspace"), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
+//    connect( new QShortcut( QKeySequence("Backspace"), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
     
     ui.tabs2 = new Unicorn::TabWidget;
     ui.tabs2->addTab( tr("Suggested Tags"), ui.suggestedTags = new TagListWidget );
@@ -100,8 +103,9 @@ TagDialog::setupUi()
 
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( ui.track = new TrackWidget );
+    ui.track->setTrack( m_track );
     v->addLayout( h2 );
-    v->addWidget( ui.tabs1 );
+    v->addWidget( ui.appliedTags = new TagBuckets( m_track ));
     v->addWidget( ui.tabs2 );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
     
@@ -121,34 +125,11 @@ TagDialog::follow( WsReply* r )
 
 
 void
-TagDialog::setTrack( const Track& track )
-{
-    m_track = track;
-
-    ui.track->setTrack( track );
-
-    ui.tabs1->setTabEnabled( 0, !track.isNull() );
-    ui.tabs1->setTabEnabled( 1, !track.artist().isNull() );
-    ui.tabs1->setTabEnabled( 2, !track.album().isNull() );
-
-    WsReply* r;
-    follow( r = track.getTopTags() );
-    ui.suggestedTags->setTagsRequest( r );
-    follow( r = track.getTags() );
-    ui.trackTags->setTagsRequest( r );
-    follow( r = track.artist().getTags() );
-    ui.artistTags->setTagsRequest( r );
-    follow( r = track.album().getTags() );
-    ui.albumTags->setTagsRequest( r );
-}
-
-
-void
 TagDialog::accept()
 {
-    m_track.addTags( ui.trackTags->newTags() );
-    m_track.artist().addTags( ui.artistTags->newTags() );
-    m_track.album().addTags( ui.albumTags->newTags() );
+//    m_track.addTags( ui.trackTags->newTags() );
+//    m_track.artist().addTags( ui.artistTags->newTags() );
+//    m_track.album().addTags( ui.albumTags->newTags() );
     QDialog::accept();
 }
 
@@ -164,49 +145,32 @@ TagDialog::onWsFinished( WsReply *r )
 void
 TagDialog::onTagActivated( QTreeWidgetItem *item )
 {
-    QString const newtag = item->text( 0 ).trimmed();
-    currentTagListWidget()->add( newtag );
+
 }
 
 
 void
 TagDialog::onAddClicked()
 {
-    if (currentTagListWidget()->add( ui.edit->text() ))
-    {
-        ui.edit->clear();
-    }
-    else
-        QApplication::beep(); //TODO visually highlight the already entered one
-}
-
-
-TagListWidget*
-TagDialog::currentTagListWidget() const
-{
-    return static_cast<TagListWidget*>(ui.tabs1->currentWidget());
-}
-
-
-void 
-TagDialog::onListItemsChanged( const QModelIndex&, int, int )
-{
-    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( ui.trackTags->topLevelItemCount() +
-                                                            ui.artistTags->topLevelItemCount() + 
-                                                            ui.albumTags->topLevelItemCount() );
+//    if (currentTagListWidget()->add( ui.edit->text() ))
+//    {
+//        ui.edit->clear();
+//    }
+//    else
+//        QApplication::beep(); //TODO visually highlight the already entered one
 }
 
 
 void 
 TagDialog::removeCurrentTag()
 {
-    QShortcut* sc = qobject_cast<QShortcut*>(sender());
-    if( !sc )
-        return;
-    QTreeWidget* list = qobject_cast<QTreeWidget*>(sc->parentWidget());
-    if( !list )
-        return;
-    
-    if( list->hasFocus())
-        delete list->currentItem();
+//    QShortcut* sc = qobject_cast<QShortcut*>(sender());
+//    if( !sc )
+//        return;
+//    QTreeWidget* list = qobject_cast<QTreeWidget*>(sc->parentWidget());
+//    if( !list )
+//        return;
+//    
+//    if( list->hasFocus())
+//        delete list->currentItem();
 }

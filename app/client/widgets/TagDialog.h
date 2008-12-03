@@ -35,18 +35,14 @@ class TagDialog : public QDialog
     Q_OBJECT
 
 public:
-    TagDialog( QWidget *parent );
+    TagDialog( const Track&,QWidget *parent );
 
 	Track track() const { return m_track; }
-	
-	/** you can only call this once, and you must call it before you show or exec() */
-	void setTrack( const Track& t );
 
 private slots:
     void onWsFinished( WsReply* );
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
-    void onListItemsChanged( const QModelIndex&, int, int );
     
     void removeCurrentTag();
 
@@ -57,13 +53,10 @@ private:
         class SpinnerLabel* spinner;
         class QLineEdit* edit;
         class QPushButton* add;
-        class TagListWidget* artistTags;
-        class TagListWidget* albumTags;
-        class TagListWidget* trackTags;
+        class TagBuckets* appliedTags;
         class TagListWidget* suggestedTags;
         class TagListWidget* yourTags;
         class QDialogButtonBox* buttons;
-        Unicorn::TabWidget* tabs1;
         Unicorn::TabWidget* tabs2;
         
         void setupUi( QWidget* parent );
@@ -71,7 +64,6 @@ private:
 
     void setupUi();
     void follow( WsReply* );
-    TagListWidget* currentTagListWidget() const;
     
     virtual void accept();
     
