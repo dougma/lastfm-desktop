@@ -70,18 +70,30 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
 void
 TagDialog::setupUi()
 {
+    QLabel* l1, *l2;
+    
     QVBoxLayout* v = new QVBoxLayout;
-    v->addWidget( new QLabel( tr( "Suggested Tags" )));
+    v->addWidget( l1 = new QLabel( tr( "Suggested Tags" )));
     v->addWidget( ui.suggestedTags = new TagListWidget );
-    v->addWidget( new QLabel( tr( "Your Tags" )));
+    v->addSpacing( 8 );
+    v->addWidget( l2 = new QLabel( tr( "Your Tags" )));
     v->addWidget( ui.yourTags = new TagListWidget );
+    v->setSpacing( 4 );
+
+    for (int x = 0; x < v->count(); ++x)
+    {
+        QWidget* w = v->itemAt( x )->widget();
+        if (w) w->setAttribute( Qt::WA_MacSmallSize );
+    }
 
     QHBoxLayout* h = new QHBoxLayout;
     h->addLayout( v );
+    h->addSpacing( 12 );
     h->addWidget( ui.appliedTags = new TagBuckets( m_track ) );
     
     v = new QVBoxLayout( this );
     v->addWidget( ui.track = new TrackWidget );
+    v->addSpacing( 10 );
     v->addLayout( h );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
     

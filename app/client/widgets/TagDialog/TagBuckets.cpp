@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "TagBuckets.h"
-#include "UnicornTabWidget.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/types/Track.h"
 #include "PlayableMimeData.h"
@@ -26,19 +25,73 @@
 #include <QtGui>
 
 
-TagBuckets::TagBuckets( const Track& t )
+struct Header : QAbstractButton
 {
-    QPalette p = palette();
-    p.setColor( QPalette::ButtonText, Qt::white );
-    setPalette( p );
+    QString m_title, m_classification;
     
-    addItem( ui.album = new TagBucket, t.album() );
-    addItem( ui.artist = new TagBucket, t.artist() );
-    addItem( ui.track = new TagBucket, t.title() );
-    setCurrentIndex( 2 );
+    Header( const QString& title, const QString& classification )
+    {
+        m_title = title;
+        m_classification = classification;
+    }
+    
+    QSize sizeHint() const { return QSize( 100, 26 ); }
+    
+    virtual void paintEvent( QPaintEvent* )
+    {
+        QPainter p( this );
+        
+        QLinearGradient g( 0, 0, 0, sizeHint().height() );
+        g.setColorAt( 0, 0x3c3939 );
+        g.setColorAt( 1, 0x282727 );
+        p.fillRect( rect(), g );
+        
+        p.setPen( Qt::white );
+        p.drawText( rect(), Qt::AlignCenter, m_title );
+        
+        QFont f = p.font();
+        f.setPixelSize( 10 );
+        p.setFont( f );
+        
+        p.setPen( 0x848383 );
+        p.drawText( rect().translated( 5, 0 ), Qt::AlignVCenter | Qt::AlignLeft, m_classification );
+    }
+};
 
+
+TagBuckets::TagBuckets( const Track& t )
+{   
+    Header* h1, *h2, *h3;
+    
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addWidget( h1 = new Header( t.album(), tr("Album") ) );
+    v->addWidget( ui.album = new TagBucket );
+    v->addSpacing( 2 );
+    v->addWidget( h2 = new Header( t.artist(), tr("Artist") ) );
+    v->addWidget( ui.artist = new TagBucket );
+    v->addSpacing( 2 );
+    v->addWidget( h3 = new Header( t.title() + " (" + t.durationString() + ')', tr("Track") ) );
+    v->addWidget( ui.track = new TagBucket );
+    v->setSpacing( 0 );
+    v->setMargin( 0 );
+    
+    ui.album->hide();
+    ui.artist->hide();
+    ui.track->show();
+    
+    m_current_index = v->indexOf( ui.track );
+    
     foreach (QAbstractButton* button, findChildren<QAbstractButton*>())
-        button->setPalette( p );
+        connect( button, SIGNAL(clicked()), SLOT(onHeaderClicked()) );
+}
+
+
+void
+TagBuckets::onHeaderClicked()
+{
+    layout()->itemAt( m_current_index )->widget()->hide();
+    m_current_index = layout()->indexOf( (QWidget*)sender() ) + 1;
+    layout()->itemAt( m_current_index )->widget()->show();
 }
 
 
@@ -62,42 +115,9 @@ TagBucket::newTags() const
 }
 
 
-#if 0
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new TagBucket( t.album() ) );
-    v->addWidget( new TagBucket( t.artist() ) );
-    v->addWidget( new TagBucket( t.title() ) );
-    v->setMargin( 0 );
-}
-
-
-struct Header : QLabel
-{
-    QPushButton* toggle;
-
-    Header()
-    {
-        QHBoxLayout* h = new QHBoxLayout( this );
-        h->addStretch();
-        h->addWidget( toggle = new QPushButton( "+" ) );
-    }
-};
-#endif
-
 TagBucket::TagBucket()
 {    
     setAcceptDrops( true );
-#if 0
-    QLabel* header;
-    
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( header = new QLabel( title ) );
-    v->addWidget( new QTextEdit );
-    v->setSpacing( 0 );
-    v->setMargin( 0 );
-    
-    header->setPalette( Unicorn::TabWidget().palette() );
-#endif
 }
 
 

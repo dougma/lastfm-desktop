@@ -18,13 +18,15 @@
  ***************************************************************************/
 
 #include <QTextEdit>
-#include <QToolBox>
+#include <QWidget>
 class TagBucket;
 
 
-class TagBuckets : public QToolBox
+class TagBuckets : public QWidget
 {
     Q_OBJECT
+    
+    int m_current_index;
     
 public:
     TagBuckets( const class Track& );
@@ -34,17 +36,21 @@ public:
         TagBucket* artist;
         TagBucket* album;
     } ui;
+    
+private slots:
+    void onHeaderClicked();
 };
 
 
 class TagBucket : public QTextEdit
 {
     Q_OBJECT
+
+    QStringList m_existingTags;
+
 public:
     TagBucket();
-    
-    QStringList m_existingTags;
-    
+       
     QStringList newTags() const;
     
 public slots:
@@ -54,5 +60,4 @@ protected:
     virtual void dropEvent( QDropEvent* );
     virtual void dragMoveEvent( QDragMoveEvent* );
     virtual void dragEnterEvent( QDragEnterEvent* );
-
 };
