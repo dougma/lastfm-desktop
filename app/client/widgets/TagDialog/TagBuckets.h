@@ -41,6 +41,11 @@ class TagBucket : public QTextEdit
 {
     Q_OBJECT
     
+    QStringList m_existingTags;
+    
+public:
+    QStringList newTags() const;
+    
 public slots:
     void onGotTags( class WsReply* );
 };

@@ -26,10 +26,17 @@
 
 TagBuckets::TagBuckets( const Track& t )
 {
+    QPalette p = palette();
+    p.setColor( QPalette::ButtonText, Qt::white );
+    setPalette( p );    
+    
     addItem( ui.album = new TagBucket, t.album() );
     addItem( ui.artist = new TagBucket, t.artist() );
     addItem( ui.track = new TagBucket, t.title() );
     setCurrentIndex( 2 );
+
+    foreach (QAbstractButton* button, findChildren<QAbstractButton*>())
+        button->setPalette( p );
 }
 
 
@@ -37,6 +44,18 @@ void
 TagBucket::onGotTags( WsReply* r )
 {
     setText( QStringList(Tag::list( r )).join( ", " ) );
+}
+
+
+QStringList
+TagBucket::newTags() const 
+{
+    QStringList tags = toPlainText().split( QRegExp( "\\s*,\\s" ) );
+                                    
+    foreach (QString tag, m_existingTags)
+        tags.removeAll( tag );
+    
+    return tags;
 }
 
 

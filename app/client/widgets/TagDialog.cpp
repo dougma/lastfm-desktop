@@ -58,7 +58,6 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     follow( r );
 	
     ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Tag") );
-    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( false );
 
     connect( ui.suggestedTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
     connect( ui.yourTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
@@ -124,9 +123,9 @@ TagDialog::follow( WsReply* r )
 void
 TagDialog::accept()
 {
-//    m_track.addTags( ui.trackTags->newTags() );
-//    m_track.artist().addTags( ui.artistTags->newTags() );
-//    m_track.album().addTags( ui.albumTags->newTags() );
+    m_track.addTags( ui.appliedTags->ui.track->newTags() );
+    m_track.artist().addTags( ui.appliedTags->ui.artist->newTags() );
+    m_track.album().addTags( ui.appliedTags->ui.album->newTags() );
     QDialog::accept();
 }
 
