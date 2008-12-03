@@ -57,7 +57,7 @@ private:
         class TagListWidget* suggestedTags;
         class TagListWidget* yourTags;
         class QDialogButtonBox* buttons;
-        Unicorn::TabWidget* tabs2;
+        Unicorn::TabWidget* tabs;
         
         void setupUi( QWidget* parent );
     } ui;

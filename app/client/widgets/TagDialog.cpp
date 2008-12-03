@@ -37,10 +37,6 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     
     setupUi();
     
-    //    ui.tabs1->setTabEnabled( 0, !track.isNull() );
-    //    ui.tabs1->setTabEnabled( 1, !track.artist().isNull() );
-    //    ui.tabs1->setTabEnabled( 2, !track.album().isNull() );
-    
     {
         WsReply* r;
         follow( r = track.getTopTags() );
@@ -83,16 +79,12 @@ void
 TagDialog::setupUi()
 {
 
-//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-//    connect( new QShortcut( QKeySequence("Backspace"), ui.trackTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-//    connect( new QShortcut( QKeySequence("Backspace"), ui.artistTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-//    connect( new QShortcut( QKeySequence(QKeySequence::Delete), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
-//    connect( new QShortcut( QKeySequence("Backspace"), ui.albumTags), SIGNAL( activated()), SLOT( removeCurrentTag()));
     
-    ui.tabs2 = new Unicorn::TabWidget;
-    ui.tabs2->addTab( tr("Suggested Tags"), ui.suggestedTags = new TagListWidget );
-    ui.tabs2->addTab( tr("Your Tags"), ui.yourTags = new TagListWidget );
+    QVBoxLayout* v1 = new QVBoxLayout;
+    v1->addWidget( new QLabel( tr( "Suggested Tags" )));
+    v1->addWidget( ui.suggestedTags = new TagListWidget );
+    v1->addWidget( new QLabel( tr( "Your Tags" )));
+    v1->addWidget( ui.yourTags = new TagListWidget );
     
     ui.suggestedTags->setDragEnabled( true );
     ui.yourTags->setDragEnabled( true );
@@ -102,12 +94,25 @@ TagDialog::setupUi()
     h2->addWidget( ui.add = new QPushButton( tr("Add") ) );
 
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( ui.track = new TrackWidget );
+    v->setSpacing( 0 );
+    v->setContentsMargins( 0, 0, 0, 0 );
+    QHBoxLayout* h = new QHBoxLayout;
+    h->setContentsMargins( 0, 0, 0, 0 );
+    QVBoxLayout* v2 = new QVBoxLayout;
+    v2->setSpacing( 0 );
+    v2->setContentsMargins( 0, 0, 0, 0 );
+    v2->addWidget( ui.track = new TrackWidget );
     ui.track->setTrack( m_track );
-    v->addLayout( h2 );
-    v->addWidget( ui.appliedTags = new TagBuckets( m_track ));
-    v->addWidget( ui.tabs2 );
+    v2->addLayout( h2 );
+    v2->addWidget( ui.appliedTags = new TagBuckets( m_track ));
+
+    h->addLayout( v1 );
+    h->addLayout( v2 );
+
+    v->addLayout( h );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
+    
+
     
     ui.track->layout()->addWidget( ui.spinner = new SpinnerLabel );
     ui.spinner->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Maximum );
