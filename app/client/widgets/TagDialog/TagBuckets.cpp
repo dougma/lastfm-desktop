@@ -28,7 +28,7 @@ TagBuckets::TagBuckets( const Track& t )
 {
     QPalette p = palette();
     p.setColor( QPalette::ButtonText, Qt::white );
-    setPalette( p );    
+    setPalette( p );
     
     addItem( ui.album = new TagBucket, t.album() );
     addItem( ui.artist = new TagBucket, t.artist() );
@@ -50,7 +50,8 @@ TagBucket::onGotTags( WsReply* r )
 QStringList
 TagBucket::newTags() const 
 {
-    QStringList tags = toPlainText().split( QRegExp( "\\s*,\\s" ) );
+    //FIXME do properly!
+    QStringList tags = toPlainText().split( QRegExp( "[ \t]*(,|\n)[ \t]*" ) );
                                     
     foreach (QString tag, m_existingTags)
         tags.removeAll( tag );
