@@ -22,6 +22,7 @@
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/TrackWidget.h"
+#include "radio/buckets/DelegateDragHint.h"
 #include "TagBuckets.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
@@ -59,9 +60,9 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
 	
     ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Tag") );
 
-    connect( ui.suggestedTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
-    connect( ui.yourTags, SIGNAL(itemActivated( QTreeWidgetItem*, int )), SLOT(onTagActivated( QTreeWidgetItem* )) );
-    
+
+    connect( ui.suggestedTags, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int)), SLOT( onTagListItemDoubleClicked( QTreeWidgetItem*, int)));
+    connect( ui.yourTags, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int)), SLOT( onTagListItemDoubleClicked( QTreeWidgetItem*, int)));
     connect( ui.appliedTags, SIGNAL(suggestedTagsRequest( WsReply* )), ui.suggestedTags, SLOT(setTagsRequest( WsReply* )) ); 
     connect( ui.appliedTags, SIGNAL(suggestedTagsRequest( WsReply* )), SLOT(follow( WsReply* )) ); 
     
@@ -139,7 +140,6 @@ TagDialog::onWsFinished( WsReply *r )
 void
 TagDialog::onTagActivated( QTreeWidgetItem *item )
 {
-
 }
 
 
@@ -167,4 +167,26 @@ TagDialog::removeCurrentTag()
 //    
 //    if( list->hasFocus())
 //        delete list->currentItem();
+}
+
+
+void
+TagDialog::onTagListItemDoubleClicked( QTreeWidgetItem* item, int)
+{
+    TagListWidget* w = qobject_cast< TagListWidget*>( sender());
+    if( !w )
+        return;
+    
+    QModelIndex i = w->indexFromItem( item, 0 );
+    
+    QStyleOptionViewItem options;
+    options.initFrom( this );
+    options.showDecorationSelected = true;
+    options.state = QStyle::State_Selected;
+    options.rect = w->visualItemRect( item );
+    
+    DelegateDragHint* d = new DelegateDragHint( w->itemDelegate( i ), i, options, w );
+    d->setMimeData( PlayableMimeData::createFromTag( Tag( item->text(0)) ) );
+    
+    d->dragTo( ui.appliedTags->currentBucket());
 }

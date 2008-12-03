@@ -43,6 +43,17 @@ public:
     void paintEvent( QPaintEvent* e );
     
     void dragTo( QWidget* target );
+    
+    template<typename T> 
+    inline void dragToChild( QWidget* target )
+    {
+        QWidget* finalTarget = target->findChild<T>();
+        
+        if( !finalTarget )
+            return;
+        
+        dragTo( finalTarget );
+    }
    
     void setMimeData( QMimeData* data ){ m_mimeData = data; }
     

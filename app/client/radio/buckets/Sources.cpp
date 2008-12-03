@@ -31,7 +31,6 @@
 #include "SourcesList.h"
 #include "Amp.h"
 #include "the/mainWindow.h"
-#include "the/app.h"
 #include "lib/lastfm/radio/RadioStation.h"
 #include "PlayableListItem.h"
 #include "DelegateDragHint.h"
@@ -40,6 +39,7 @@
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "widgets/Firehose.h"
+#include "radio/buckets/PlayerBucketList.h"
 #include <phonon/volumeslider.h>
 
 struct SpecialWidget : QWidget
@@ -329,7 +329,7 @@ Sources::onItemDoubleClicked( const QModelIndex& index )
     
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
     w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
-    w->dragTo( m_connectedAmp );
+    w->dragToChild<QAbstractItemView*>( m_connectedAmp );
     connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
 }
 

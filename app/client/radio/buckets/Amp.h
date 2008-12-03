@@ -67,6 +67,7 @@ protected slots:
     void onPlayerChanged( const QString& );
     void onTrackSpooled( const Track&, class StopWatch* );
     void onStateChanged( State, const Track& );
+
     
 private:
     void setupUi();

@@ -53,14 +53,6 @@ DelegateDragHint::onDragFrameChanged( int frame )
 void
 DelegateDragHint::dragTo( QWidget* target )
 {
-
-    if( !qobject_cast< QAbstractItemView* >( target ))
-    {
-        target = target->findChild< QAbstractItemView* >();
-        if( !target )
-            return;
-    }
-    
     m_target = target;
 
     m_startPoint = pos();

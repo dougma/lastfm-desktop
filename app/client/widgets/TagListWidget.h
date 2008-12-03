@@ -32,6 +32,8 @@ class TagListWidget : public QTreeWidget
 public:
     TagListWidget( QWidget* parent = 0 );
     
+    using QTreeWidget::indexFromItem;
+    
     /** we won't add the tag if we already have it, and in that case we 
       * return false */
     bool add( QString );

@@ -43,6 +43,7 @@ private slots:
     void onWsFinished( WsReply* );
     void onTagActivated( class QTreeWidgetItem *item );
     void onAddClicked();
+    void onTagListItemDoubleClicked( QTreeWidgetItem*, int);
     void follow( WsReply* );
     void removeCurrentTag();
 
