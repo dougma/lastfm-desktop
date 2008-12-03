@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "TrackResolver.h"
+#include "TrackResolverThread.h"
 #include "LocalContentScanner.h"
 #include "LocalCollection.h"
 #include "QueryError.h"
@@ -39,7 +40,7 @@ TrackResolver::~TrackResolver()
 void
 TrackResolver::init()
 {
-    m_query = QueryThread::create();
+    m_query = TrackResolverThread::create();
     m_scanner = new LocalContentScanner;
 }
 
@@ -130,106 +131,4 @@ Response::finished()
 
 
 //////////////////////////////////////////////////////////////////////
-
-QueryThread*
-QueryThread::create()
-{
-    QueryThread* a = new QueryThread;
-    a->start();
-    return a;
-}
-
-QueryThread::QueryThread()
-:m_stopping(false)
-{
-}
-
-QueryThread::~QueryThread()
-{
-    m_stopping = true;
-    m_mutex.lock();
-    m_wakeUp.wakeAll();
-    m_mutex.unlock();
-    wait();
-}
-
-void 
-QueryThread::run()
-{
-    try {
-        LocalCollection *pCollection = LocalCollection::create("TrackResolverConnection");
-
-        while (!m_stopping) {
-            m_mutex.lock();
-            m_wakeUp.wait(&m_mutex);
-            m_mutex.unlock();
-
-            for(;;) {
-                ITrackResolveRequest *req = 0;
-                m_mutex.lock();
-                if (!m_queue.isEmpty()) 
-                    req = m_queue.takeFirst();
-                m_mutex.unlock();
-                    
-                if (req == 0 || m_stopping) break;
-
-                doRequest(pCollection, req);
-            }
-        }
-
-        // finish any remaining requests without actually doing anything:
-        while (!m_queue.isEmpty()) {
-            m_queue.takeFirst()->finished();
-        }
-
-        delete pCollection;
-    } 
-    catch (QueryError &e) {
-        qCritical() << "QueryThread::run: " + e.text();
-    }
-    catch (...) {
-        qCritical() << "QueryThread::run: unhandled exception";
-    }
-}
-
-
-void
-QueryThread::doRequest(LocalCollection *pCollection, ITrackResolveRequest* req)
-{
-	try 
-	{
-        QTime start(QTime::currentTime());
-        QList<LocalCollection::ResolveResult> results = 
-            pCollection->resolve(
-                QString::fromUtf8(req->artist()),
-                QString::fromUtf8(req->album()),
-                QString::fromUtf8(req->title()));
-
-        foreach (const LocalCollection::ResolveResult &r, results) {
-            QString filename(r.m_sourcename + r.m_path + r.m_filename);
-            if (true /*bLooksReadable*/)
-                req->result(new Response(r));
-        }
-        qDebug() << "resolve complete: " << start.msecsTo(QTime::currentTime()) << "ms";
-	} 
-	catch(QueryError &e) {
-        qWarning() << "QueryThread::doRequest: " + e.text();
-	}
-    catch(...) {
-        qWarning() << "QueryThread::doRequest: unhandled exception";
-    }
-	req->finished();
-}
-
-void 
-QueryThread::enqueue(ITrackResolveRequest* req)
-{
-    Q_ASSERT(req);
-    if (req) {
-        m_mutex.lock();
-        m_queue.append(req);
-        m_wakeUp.wakeAll();
-        m_mutex.unlock();
-    }
-}
 

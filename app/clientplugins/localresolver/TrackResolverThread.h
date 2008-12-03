@@ -17,58 +17,22 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#ifndef TRACK_RESOLVER_H
-#define TRACK_RESOLVER_H
+#ifndef TRACK_RESOLVER_THREAD_H
+#define TRACK_RESOLVER_THREAD_H
 
 #include "../ITrackResolver.h"
-#include "LocalCollection.h"
+#include "TRequestThread.h"
 
-
-class TrackResolver : public QObject, public ITrackResolverPlugin
+class TrackResolverThread : public TRequestThread<ITrackResolveRequest>
 {
-    Q_OBJECT;
+    class LocalCollection *m_pCollection;
 
-    QString m_dbPath;
-	class TrackResolverThread* m_query;
-	class LocalContentScanner* m_scanner;
+protected:
+    virtual void run();
+    virtual void doRequest(ITrackResolveRequest*);
 
 public:
-    TrackResolver();
-	~TrackResolver();
-
-    virtual void init();
-	virtual void resolve(class ITrackResolveRequest* req);
-    virtual void finished();
-
-signals:
-    void enqueue(class ITrackResolveRequest*);
+    static TrackResolverThread* create();
 };
-
-
-// one of these turns a LocalCollection::ResolveResult into 
-// something 'simpler' for the plugin interface
-class Response : public ITrackResolveResponse
-{
-    float m_matchQuality;
-    QByteArray m_url;
-    QByteArray m_artist;
-    QByteArray m_album;
-    QByteArray m_title;
-    //QByteArray m_filetype;
-    unsigned m_duration;
-    unsigned m_kbps;
-public:
-    Response(const LocalCollection::ResolveResult& r);
-    virtual float matchQuality() const;
-    virtual const char* url() const;
-    virtual const char* artist() const;
-    virtual const char* album() const;
-    virtual const char* title() const;
-    virtual const char* filetype() const;
-    virtual unsigned duration() const;
-    virtual unsigned kbps() const;
-    virtual void finished();
-};
-
 
 #endif

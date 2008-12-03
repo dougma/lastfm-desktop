@@ -17,58 +17,80 @@
 *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
 ***************************************************************************/
 
-#ifndef TRACK_RESOLVER_H
-#define TRACK_RESOLVER_H
+#ifndef T_REQUEST_THREAD_H
+#define T_REQUEST_THREAD_H
 
-#include "../ITrackResolver.h"
-#include "LocalCollection.h"
+#include <QThread>
+#include <QList>
+#include <QMutex>
+#include <QWaitCondition>
 
 
-class TrackResolver : public QObject, public ITrackResolverPlugin
+// TRequestThread queues up T* objects and calls doRequest 
+// within the thread.
+
+template <typename T>
+class TRequestThread : public QThread
 {
-    Q_OBJECT;
+    QMutex m_mutex;
+    QWaitCondition m_wakeUp;
+    QList<T*> m_queue;
+    bool m_stopping;
 
-    QString m_dbPath;
-	class TrackResolverThread* m_query;
-	class LocalContentScanner* m_scanner;
+    virtual void doRequest(T* req) = 0;
+
+protected:
+    T* takeNextFromQueue()
+    {
+        T* t = 0;
+        m_mutex.lock();
+        if (!m_queue.isEmpty()) 
+            t = m_queue.takeFirst();
+        m_mutex.unlock();
+        return t;
+    }
+
+    virtual void run()
+    {
+        while (!m_stopping) {
+            m_mutex.lock();
+            m_wakeUp.wait(&m_mutex);
+            m_mutex.unlock();
+
+            for(;;) {
+                T* req = takeNextFromQueue();
+                if (req == 0 || m_stopping) break;
+                doRequest(req);
+            }
+        }
+    }
 
 public:
-    TrackResolver();
-	~TrackResolver();
+    TRequestThread()
+    : m_stopping(false)
+    {
+    }
 
-    virtual void init();
-	virtual void resolve(class ITrackResolveRequest* req);
-    virtual void finished();
+    ~TRequestThread()
+    {
+        m_stopping = true;
+        m_mutex.lock();
+        m_wakeUp.wakeAll();
+        m_mutex.unlock();
+        wait();
+    }
 
-signals:
-    void enqueue(class ITrackResolveRequest*);
+    void enqueue(T* req)
+    {
+        Q_ASSERT(req);
+        if (req) {
+            m_mutex.lock();
+            m_queue.append(req);
+            m_wakeUp.wakeAll();
+            m_mutex.unlock();
+        }
+    }
+
 };
-
-
-// one of these turns a LocalCollection::ResolveResult into 
-// something 'simpler' for the plugin interface
-class Response : public ITrackResolveResponse
-{
-    float m_matchQuality;
-    QByteArray m_url;
-    QByteArray m_artist;
-    QByteArray m_album;
-    QByteArray m_title;
-    //QByteArray m_filetype;
-    unsigned m_duration;
-    unsigned m_kbps;
-public:
-    Response(const LocalCollection::ResolveResult& r);
-    virtual float matchQuality() const;
-    virtual const char* url() const;
-    virtual const char* artist() const;
-    virtual const char* album() const;
-    virtual const char* title() const;
-    virtual const char* filetype() const;
-    virtual unsigned duration() const;
-    virtual unsigned kbps() const;
-    virtual void finished();
-};
-
 
 #endif
