@@ -76,7 +76,6 @@ struct Header : QAbstractButton
     
     virtual void dragEnterEvent( QDragEnterEvent* e )
     {
-        m_dragTimer.setInterval( 1000 );
         m_dragTimer.start();
         e->accept();
     }
