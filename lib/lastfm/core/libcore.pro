@@ -12,11 +12,7 @@ HEADERS = $$findSources( h )
 
 DEFINES += _CORE_DLLEXPORT
 
-!macx {
-    SOURCES -= mac/AppleScript.cpp mac/Growl.cpp mac/CFStringToQString.cpp
-	HEADERS -= mac/AppleScript.h mac/Growl.h mac/CFStringToQString.h
-}
-else {
+macx {
 	# AppleScript stuff
 	LIBS += -framework Carbon
 }

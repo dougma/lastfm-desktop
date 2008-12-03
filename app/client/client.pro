@@ -28,7 +28,6 @@ macx* {
 	ICON = mac/client.icns
 }
 else {
-	SOURCES -= mac/ITunesListener.cpp mac/ITunesPluginInstaller.cpp
 	INCLUDEPATH += .
     win32:LIBS += -lshell32 -luser32
 }
