@@ -70,42 +70,25 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
 void
 TagDialog::setupUi()
 {
+    QVBoxLayout* v = new QVBoxLayout;
+    v->addWidget( new QLabel( tr( "Suggested Tags" )));
+    v->addWidget( ui.suggestedTags = new TagListWidget );
+    v->addWidget( new QLabel( tr( "Your Tags" )));
+    v->addWidget( ui.yourTags = new TagListWidget );
 
-    
-    QVBoxLayout* v1 = new QVBoxLayout;
-    v1->addWidget( new QLabel( tr( "Suggested Tags" )));
-    v1->addWidget( ui.suggestedTags = new TagListWidget );
-    v1->addWidget( new QLabel( tr( "Your Tags" )));
-    v1->addWidget( ui.yourTags = new TagListWidget );
-    
-    ui.suggestedTags->setDragEnabled( true );
-    ui.yourTags->setDragEnabled( true );
-    
-    QHBoxLayout* h2 = new QHBoxLayout;
-
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->setSpacing( 0 );
-    v->setContentsMargins( 0, 0, 0, 0 );
     QHBoxLayout* h = new QHBoxLayout;
-    h->setContentsMargins( 0, 0, 0, 0 );
-    h->setSpacing( 5 );
-    QVBoxLayout* v2 = new QVBoxLayout;
-    v2->setSpacing( 0 );
-    v2->setContentsMargins( 0, 0, 0, 0 );
-    v2->addWidget( ui.track = new TrackWidget );
-    ui.track->setTrack( m_track );
-    v2->addLayout( h2 );
-    v2->addWidget( ui.appliedTags = new TagBuckets( m_track ));
-
-    h->addLayout( v1 );
-    h->addLayout( v2 );
-
+    h->addLayout( v );
+    h->addWidget( ui.appliedTags = new TagBuckets( m_track ) );
+    
+    v = new QVBoxLayout( this );
+    v->addWidget( ui.track = new TrackWidget );
     v->addLayout( h );
     v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
     
-
-    
+    ui.suggestedTags->setDragEnabled( true );
+    ui.yourTags->setDragEnabled( true );
     ui.track->layout()->addWidget( ui.spinner = new SpinnerLabel );
+    ui.track->setTrack( m_track );
     ui.spinner->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Maximum );
 }
 
