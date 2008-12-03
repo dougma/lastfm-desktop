@@ -6,8 +6,6 @@ use Switch;
         
 my $ext = shift;
 
-find( \&find_sources, shift || '.' );
-
 my $exclude;
 switch ($^O)
 {
@@ -16,6 +14,9 @@ switch ($^O)
     case "darwin"  { $exclude = "win"; }
     else           { $exclude = "win"; }
 }
+
+find( \&find_sources, shift || '.' );
+
 
 sub find_sources 
 {
