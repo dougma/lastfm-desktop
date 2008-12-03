@@ -46,11 +46,11 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
         follow( r = track.getTopTags() );
         ui.suggestedTags->setTagsRequest( r );
         follow( r = track.getTags() );
-        //    ui.trackTags->setTagsRequest( r );
+        connect( r, SIGNAL(finished( WsReply* )), ui.appliedTags->ui.track, SLOT(onGotTags( WsReply* )) );
         follow( r = track.artist().getTags() );
-        //    ui.artistTags->setTagsRequest( r );
+        connect( r, SIGNAL(finished( WsReply* )), ui.appliedTags->ui.artist, SLOT(onGotTags( WsReply* )) );
         follow( r = track.album().getTags() );
-        //    ui.albumTags->setTagsRequest( r );
+        connect( r, SIGNAL(finished( WsReply* )), ui.appliedTags->ui.album, SLOT(onGotTags( WsReply* )) );
     }
     
     

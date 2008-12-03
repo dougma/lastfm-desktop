@@ -17,22 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QWidget>
+#include <QTextEdit>
+#include <QToolBox>
+class TagBucket;
 
 
-class TagBuckets : public QWidget
+class TagBuckets : public QToolBox
 {
     Q_OBJECT
     
 public:
     TagBuckets( const class Track& );
+
+    struct {
+        TagBucket* track;
+        TagBucket* artist;
+        TagBucket* album;
+    } ui;
 };
 
 
-class TagBucket : public QWidget
+class TagBucket : public QTextEdit
 {
     Q_OBJECT
-
-public:
-    TagBucket( const QString& title );
+    
+public slots:
+    void onGotTags( class WsReply* );
 };

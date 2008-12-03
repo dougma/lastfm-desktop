@@ -18,12 +18,29 @@
  ***************************************************************************/
 
 #include "TagBuckets.h"
+#include "UnicornTabWidget.h"
+#include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/types/Track.h"
 #include <QtGui>
 
 
 TagBuckets::TagBuckets( const Track& t )
 {
+    addItem( ui.album = new TagBucket, t.album() );
+    addItem( ui.artist = new TagBucket, t.artist() );
+    addItem( ui.track = new TagBucket, t.title() );
+    setCurrentIndex( 2 );
+}
+
+
+void
+TagBucket::onGotTags( WsReply* r )
+{
+    setText( QStringList(Tag::list( r )).join( ", " ) );
+}
+
+
+#if 0
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( new TagBucket( t.album() ) );
     v->addWidget( new TagBucket( t.artist() ) );
@@ -32,11 +49,29 @@ TagBuckets::TagBuckets( const Track& t )
 }
 
 
-TagBucket::TagBucket( const QString& title )
+struct Header : QLabel
 {
+    QPushButton* toggle;
+
+    Header()
+    {
+        QHBoxLayout* h = new QHBoxLayout( this );
+        h->addStretch();
+        h->addWidget( toggle = new QPushButton( "+" ) );
+    }
+};
+
+
+TagBucket::TagBucket( const QString& title )
+{    
+    QLabel* header;
+    
     QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new QLabel( title ) );
+    v->addWidget( header = new QLabel( title ) );
     v->addWidget( new QTextEdit );
     v->setSpacing( 0 );
     v->setMargin( 0 );
+    
+    header->setPalette( Unicorn::TabWidget().palette() );
 }
+#endif
