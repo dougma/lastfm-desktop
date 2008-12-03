@@ -23,9 +23,11 @@
 #include "SeedTypes.h"
 #include <QtGui>
 
+static int gint = 0;
+
 
 struct Header : QAbstractButton
-{
+{    
     QString m_title, m_classification;
     
     Header( const QString& title, const QString& classification )
@@ -34,7 +36,9 @@ struct Header : QAbstractButton
         m_classification = classification;
     }
     
+    QString classification() const { return m_classification; }
     QSize sizeHint() const { return QSize( 100, 26 ); }
+    static QFont smallFont() { QFont f; f.setPixelSize( 10 ); return f; }
     
     virtual void paintEvent( QPaintEvent* )
     {
@@ -45,13 +49,22 @@ struct Header : QAbstractButton
         g.setColorAt( 1, 0x282727 );
         p.fillRect( rect(), g );
         
+        int w = p.fontMetrics().width( m_title );
+        int maxw = width() - (gint + 10)*2; // two because text is aligned at the center
+        
         p.setPen( Qt::white );
-        p.drawText( rect(), Qt::AlignCenter, m_title );
         
-        QFont f = p.font();
-        f.setPixelSize( 10 );
-        p.setFont( f );
+        if (w >= maxw)
+        {
+            QString title = p.fontMetrics().elidedText( m_title, Qt::ElideRight, width() - gint - 18 );
+            QRect r = rect();
+            r.setLeft( gint + 10 );
+            p.drawText( r, Qt::AlignVCenter | Qt::AlignLeft, title );
+        }
+        else
+            p.drawText( rect(), Qt::AlignCenter, m_title );
         
+        p.setFont( smallFont() );        
         p.setPen( 0x848383 );
         p.drawText( rect().translated( 5, 0 ), Qt::AlignVCenter | Qt::AlignLeft, m_classification );
     }
@@ -75,6 +88,10 @@ TagBuckets::TagBuckets( const Track& t )
     v->addWidget( ui.track = new TagBucket );
     v->setSpacing( 0 );
     v->setMargin( 0 );
+    
+    QFontMetrics metrics( Header::smallFont() );
+    foreach (Header* header, QList<Header*>() << h1 << h2 << h3)   
+        gint = qMax( metrics.width( header->classification() ), gint );
     
     ui.album->hide();
     ui.artist->hide();
