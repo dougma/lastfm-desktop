@@ -186,7 +186,13 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
     {
         case Phonon::ErrorState:
 			if (m_mediaObject->errorType() == Phonon::FatalError)
-				emit error( Ws::UnknownError, m_mediaObject->errorString() );
+            {
+                QString error = m_mediaObject->errorString();                
+            #ifdef WIN32
+                if (error == "Unknown error 0x800C0008") error = tr("There was an error communicating with Last.fm");
+            #endif
+				emit this->error( Ws::UnknownError, error );
+            }
             // seems we need to clear the error state before trying to play again.
             m_bErrorRecover = true;
             m_mediaObject->stop();
