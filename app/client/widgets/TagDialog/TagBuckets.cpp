@@ -32,8 +32,13 @@ struct Header : QAbstractButton
     
     Header( const QString& title, const QString& classification )
     {
+        setAcceptDrops( true );
         m_title = title;
         m_classification = classification;
+        m_dragTimer.setInterval( 500 );
+        m_dragTimer.setSingleShot( true );
+        
+        connect( &m_dragTimer, SIGNAL( timeout()), SLOT( click()));
     }
     
     QString classification() const { return m_classification; }
@@ -68,6 +73,20 @@ struct Header : QAbstractButton
         p.setPen( 0x848383 );
         p.drawText( rect().translated( 5, 0 ), Qt::AlignVCenter | Qt::AlignLeft, m_classification );
     }
+    
+    virtual void dragEnterEvent( QDragEnterEvent* e )
+    {
+        m_dragTimer.setInterval( 1000 );
+        m_dragTimer.start();
+        e->accept();
+    }
+    
+    virtual void dragLeaveEvent( QDragLeaveEvent* )
+    {
+        m_dragTimer.stop();
+    }
+    
+    QTimer m_dragTimer;
 };
 
 
