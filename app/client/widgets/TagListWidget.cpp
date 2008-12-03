@@ -159,6 +159,18 @@ TagListWidget::onTagsRequestFinished( WsReply* r )
 }
 
 
+QMimeData* 
+TagListWidget::mimeData( const QList<QTreeWidgetItem *> items ) const
+{
+    if( items.count() < 1 )
+        return 0;
+    
+    Tag tag( items.first()->text( 0 ) );
+    PlayableMimeData* pData = PlayableMimeData::createFromTag( tag );
+    
+    return pData;
+}
+
 
 #include <QPainter>
 TagIconView::TagIconView()

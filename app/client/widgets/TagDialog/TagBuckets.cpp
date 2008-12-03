@@ -21,6 +21,8 @@
 #include "UnicornTabWidget.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/types/Track.h"
+#include "PlayableMimeData.h"
+#include "SeedTypes.h"
 #include <QtGui>
 
 
@@ -80,10 +82,12 @@ struct Header : QLabel
         h->addWidget( toggle = new QPushButton( "+" ) );
     }
 };
+#endif
 
-
-TagBucket::TagBucket( const QString& title )
+TagBucket::TagBucket()
 {    
+    setAcceptDrops( true );
+#if 0
     QLabel* header;
     
     QVBoxLayout* v = new QVBoxLayout( this );
@@ -93,5 +97,37 @@ TagBucket::TagBucket( const QString& title )
     v->setMargin( 0 );
     
     header->setPalette( Unicorn::TabWidget().palette() );
-}
 #endif
+}
+
+
+void 
+TagBucket::dropEvent( QDropEvent* e )
+{    
+    const PlayableMimeData* playableData;
+    if( !( playableData = dynamic_cast< const PlayableMimeData* >( e->mimeData() )))
+        return e->ignore();
+    
+    if( playableData->type() != Seed::TagType )
+        return e->ignore();
+    
+    setText( toPlainText() + 
+             (toPlainText().isEmpty() ? "" : ", ") +
+             playableData->text() );   
+    
+    e->accept();
+}
+
+
+void 
+TagBucket::dragMoveEvent( QDragMoveEvent* e )
+{
+    e->accept();
+}
+
+
+void 
+TagBucket::dragEnterEvent( QDragEnterEvent* e )
+{
+    e->accept();
+}

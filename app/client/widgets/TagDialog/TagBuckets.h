@@ -40,12 +40,19 @@ public:
 class TagBucket : public QTextEdit
 {
     Q_OBJECT
+public:
+    TagBucket();
     
     QStringList m_existingTags;
     
-public:
     QStringList newTags() const;
     
 public slots:
     void onGotTags( class WsReply* );
+    
+protected:
+    virtual void dropEvent( QDropEvent* );
+    virtual void dragMoveEvent( QDragMoveEvent* );
+    virtual void dragEnterEvent( QDragEnterEvent* );
+
 };
