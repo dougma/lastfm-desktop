@@ -100,7 +100,7 @@ TrackDashboard::TrackDashboard()
     ui.info = new QWidget( ui.papyrus );
     QVBoxLayout* v = new QVBoxLayout( ui.info );
     
-    v->addWidget( ui.bio = new QWebView );
+    v->addWidget( ui.bio = new BioWebView );
     v->addSpacing( 10 );
     v->addWidget( new QLabel( tr( HEADING "Tags") ) );
     v->addSpacing( 3 );
