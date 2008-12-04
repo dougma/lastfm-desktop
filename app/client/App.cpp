@@ -20,6 +20,7 @@
 #include "App.h"
 #include "Settings.h"
 #include "Resolver.h"
+#include "LocalRql.h"
 #include "PluginHost.h"
 #include "bootstrap/BootstrapDialog.h"
 #include "XspfResolvingTrackSource.h"
@@ -120,7 +121,8 @@ App::App( int& argc, char** argv )
 #endif
 #endif
 
-    PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it
+    PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it?
+    m_localRql = new LocalRql( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
@@ -489,6 +491,11 @@ App::submitTwiddleCache( const QString& path )
     //TODO message "Your iPod tracks will be submitted at the end of this track"
 }
 
+LocalRql*
+App::localRql()
+{
+    return m_localRql;
+}
 
 #include "the/app.h"
 namespace The

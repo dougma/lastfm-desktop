@@ -39,10 +39,10 @@ TrackResolverThread::run()
         TRequestThread<ITrackResolveRequest>::run();
     } 
     catch (QueryError &e) {
-        qCritical() << "QueryThread::run: " + e.text();
+        qCritical() << "TrackResolver::run: " + e.text();
     }
     catch (...) {
-        qCritical() << "QueryThread::run: unhandled exception";
+        qCritical() << "TrackResolver::run: unhandled exception";
     }
 
     try {

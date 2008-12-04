@@ -18,14 +18,15 @@
  ***************************************************************************/
 
 #include "RqlQuery.h"
+#include "RqlQueryThread.h"
 #include "LocalCollection.h"
 #include <QUrl>
 
 extern QString remapVolumeName(const QString& volume);
 
 
-RqlQuery::RqlQuery(LocalCollection& lc, QSet<uint> tracks)
-:m_collection(lc)
+RqlQuery::RqlQuery(RqlQueryThread* queryThread, QSet<uint> tracks)
+:m_queryThread(queryThread)
 ,m_tracks(tracks)
 {
 }
@@ -37,29 +38,34 @@ RqlQuery::tracksLeft()
     return m_tracks.size();
 }
 
-bool 
-RqlQuery::nextTrack(ILocalRqlTrackCallback* cb)
+void
+RqlQuery::getNextTrack(ILocalRqlTrackCallback* cb)
 {
     Q_ASSERT(cb);
     if (cb) {
-        while (m_tracks.size()) {
-            int fileId = *m_tracks.begin();
-            m_tracks.remove(fileId);
+        m_queryThread->enqueueGetNextTrack(this, cb);
+    }
+}
 
-            LocalCollection::FileResult result;
-            if (m_collection.getFileById(fileId, result)) {
-                cb->title(result.m_title.toUtf8());
-                cb->album(result.m_album.toUtf8());
-                cb->artist(result.m_artist.toUtf8());
-                cb->duration(result.m_duration);
-                cb->url(
-                    QUrl::fromLocalFile(
-                        remapVolumeName(result.m_sourcename) + result.m_path + result.m_filename).toEncoded() );
-                return true;
-            }
+void
+RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
+{
+    while (m_tracks.size()) {
+        int fileId = *m_tracks.begin();
+        m_tracks.remove(fileId);
+
+        LocalCollection::FileResult result;
+        if (collection.getFileById(fileId, result)) {
+            cb->trackOk(
+                result.m_title.toUtf8(),
+                result.m_album.toUtf8(),
+                result.m_artist.toUtf8(),
+                QUrl::fromLocalFile( remapVolumeName(result.m_sourcename) + result.m_path + result.m_filename).toEncoded(),
+                result.m_duration);
+            return;
         }
     }
-    return false;
+    cb->trackFail();
 }
 
 void
@@ -67,4 +73,3 @@ RqlQuery::finished()
 {
     delete this;
 }
-

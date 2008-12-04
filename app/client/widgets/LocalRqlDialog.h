@@ -3,15 +3,11 @@
 #include "app/clientplugins/ILocalRql.h"
 
 
-class LocalRqlDialog : public QDialog, ILocalRqlParseCallback
+class LocalRqlDialog : public QDialog
 {
     Q_OBJECT
 
     Ui::LocalRqlDialog ui;
-
-    // ILocalRqlParseCallback
-    void parseOk(class ILocalRqlTrackSource*);
-    void parseFail(int errorLineNumber, const char *errorLine, int errorOffset);
 
 public:
     LocalRqlDialog( QWidget *parent );
@@ -20,4 +16,6 @@ private slots:
     void onPlay();
     void onTag();
 
+    void onParseGood(unsigned trackCount);
+    void onParseBad(int errorLineNumber, QString errorLine, int errorOffset);
 };

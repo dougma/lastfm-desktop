@@ -25,12 +25,18 @@
 
 class LocalRadioTrackSource : public AbstractTrackSource
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    class ILocalRqlTrackSource* m_rqlSrc;
+    class LocalRqlResult* m_rqlResult;
+    QList<Track> m_buffer;
+
+private slots:
+    void onTrack(Track);
+    void onEndOfTracks();
 
 public:
-    LocalRadioTrackSource(ILocalRqlTrackSource*);
+    // takes ownership of rqlResult:
+    LocalRadioTrackSource(class LocalRqlResult* rqlResult);
     ~LocalRadioTrackSource();
 
     virtual Track takeNextTrack();

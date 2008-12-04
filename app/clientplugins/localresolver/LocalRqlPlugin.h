@@ -27,9 +27,7 @@
 class LocalRqlPlugin : public ILocalRqlPlugin
 {
     class TagifierRequest* m_pTagifier;
-    class TagUpdater* m_tagUpdater;
-    class LocalCollection* m_localCollection;
-    SimilarArtists m_sa;
+    class RqlQueryThread* m_queryThread;
 
 public:
     LocalRqlPlugin();

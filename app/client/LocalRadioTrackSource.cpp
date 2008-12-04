@@ -18,70 +18,54 @@
  ***************************************************************************/
 
 #include "LocalRadioTrackSource.h"
-#include "../clientplugins/ILocalRql.h"
-#include <phonon/mediaobject.h>
-#include <phonon/audiooutput.h>
+#include "LocalRql.h"
+#include "lib/lastfm/ws/WsError.h"
 
 
-class RqlTrackCallback : public MutableTrack, public ILocalRqlTrackCallback
+///////////////////////////////////////////////////////////////////////////
+
+
+LocalRadioTrackSource::LocalRadioTrackSource(LocalRqlResult* rqlResult)
+: m_rqlResult(rqlResult)
 {
-
-public:
-    RqlTrackCallback( Track& t )
-        : MutableTrack( t )
-    {
-    }
-
-    void title( const char* title )
-    {
-        setTitle( QString::fromUtf8( title ) );
-    }
-
-    void album( const char* album )
-    {
-        setAlbum( QString::fromUtf8( album ) );
-    }
-
-    void artist( const char* artist )
-    {
-        setArtist( QString::fromUtf8( artist ) );
-    }
-
-    void url( const char* url )
-    {
-        setUrl( QString::fromUtf8( url ) );
-    }
-
-    void duration( unsigned duration )
-    {
-        setDuration( duration );
-    }
-};
-
-
-
-LocalRadioTrackSource::LocalRadioTrackSource(ILocalRqlTrackSource* rqlSrc)
-: m_rqlSrc(rqlSrc)
-{
-    Q_ASSERT(rqlSrc);
+    Q_ASSERT(rqlResult);
+    // QueuedConnections are important here, see LocalRql.h
+    connect(rqlResult, SIGNAL(track(Track)), SLOT(onTrack(Track)), Qt::QueuedConnection);
+    connect(rqlResult, SIGNAL(endOfTracks()), SLOT(onEndOfTracks()), Qt::QueuedConnection);
 }
 
 LocalRadioTrackSource::~LocalRadioTrackSource()
 {
-    if (m_rqlSrc) m_rqlSrc->finished();
+    delete m_rqlResult;
 }
 
 Track
 LocalRadioTrackSource::takeNextTrack()
 {
-    Track t;
-    RqlTrackCallback callback( t );
-    if ( m_rqlSrc ) m_rqlSrc->nextTrack( &callback );
-    return t;
+    if (m_buffer.size()) {
+        return m_buffer.takeFirst();
+    }
+
+    m_rqlResult->getNextTrack();
+    return Track();
 }
 
 void 
 LocalRadioTrackSource::start()
 {
+    takeNextTrack();
+}
+
+void
+LocalRadioTrackSource::onTrack(Track t)
+{
+    m_buffer.push_back(t);
     emit trackAvailable();
 }
+
+void
+LocalRadioTrackSource::onEndOfTracks()
+{
+    emit error( Ws::NotEnoughContent );
+}
+

@@ -19,104 +19,37 @@
 
 #include <QDebug>
 #include "LocalRqlPlugin.h"
-#include "TagUpdater.h"
-#include "RqlQuery.h"
+#include "RqlQueryThread.h"
 
-#include "RqlOpProcessor.h"
-#include "rqlParser/parser.h"
-#include <boost/bind.hpp>
+//#include "TagUpdater.h"
 
 #include "TagifierRequest.h"
 #include "QueryError.h"
 
-using namespace std;
-using namespace fm::last::query_parser;
-
-
-RqlOp root2op( const querynode_data& node )
-{
-   RqlOp op;
-   op.isRoot = true;
-   op.name = node.name;
-   op.type = node.type;
-   op.weight = node.weight;
-
-   return op;
-}
-
-
-RqlOp leaf2op( const querynode_data& node )
-{
-   RqlOp op;
-   op.isRoot = false;
-
-   if ( node.ID < 0 )
-      op.name = node.name;
-   else
-   {
-      ostringstream oss;
-      oss << '<' << node.ID << '>';
-      op.name = oss.str();
-   }
-   op.type = node.type;
-   op.weight = node.weight;
-
-   return op;
-}
 
 
 
 LocalRqlPlugin::LocalRqlPlugin()
-: m_tagUpdater(0)
-, m_localCollection(0)
+:m_queryThread(0)
 {
 }
 
 LocalRqlPlugin::~LocalRqlPlugin()
 {
-    delete m_tagUpdater;
-    delete m_localCollection;
+    delete m_queryThread;
 }
 
 void 
 LocalRqlPlugin::init()
 {
-    m_localCollection = LocalCollection::create("RqlQuery");
-    m_tagUpdater = new TagUpdater();
-// todo: replace this
-//    m_tagUpdater->start();
+    m_queryThread = RqlQueryThread::create();
 }
 
 void
 LocalRqlPlugin::parse(const char *rql, ILocalRqlParseCallback *cb)
 {
     Q_ASSERT(rql && cb);
-
-    try {
-        string srql(rql);   // needs to exist for the life of p
-        parser p;
-        if (p.parse(srql)) {
-            QList<RqlOp> ops;
-
-            p.getOperations<RqlOp>(
-                boost::bind(&QList<RqlOp>::push_back, boost::ref(ops), _1),
-                &root2op, 
-                &leaf2op);
-            
-            cb->parseOk(
-                new RqlQuery(
-                    *m_localCollection,
-                    RqlOpProcessor::process(ops, *m_localCollection, m_sa) ) );
-        } else {
-            cb->parseFail(
-                p.getErrorLineNumber(),
-                p.getErrorLine().data(),
-                p.getErrorOffset() );
-        }
-    } 
-    catch (...) {
-        qCritical() << "unexpected exception LocalRqlPlugin::parse";
-    }
+    m_queryThread->enqueueParse(rql, cb);
 }
 
 void 
@@ -129,9 +62,12 @@ void
 LocalRqlPlugin::testTag(const char *url)
 {
     try {
-        m_pTagifier = new TagifierRequest(*m_localCollection, QString::fromUtf8(url));
-        bool requestedOk = m_pTagifier->makeRequest();
+        LocalCollection *pCollection = LocalCollection::create("TestTag");
+        TagifierRequest *pTagifier = new TagifierRequest(*pCollection, QString::fromUtf8(url));
+        bool requestedOk = pTagifier->makeRequest();
         Q_ASSERT(requestedOk);
+        delete pTagifier;
+        delete pCollection;
     } catch (const QueryError& qe) {
         QString err = qe.text();
         int ii =0;

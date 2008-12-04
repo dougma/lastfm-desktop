@@ -1,5 +1,5 @@
 #include "LocalRqlDialog.h"
-#include "PluginHost.h"
+#include "LocalRql.h"
 #include "LocalRadioTrackSource.h"
 #include "the/app.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
@@ -9,46 +9,40 @@ LocalRqlDialog::LocalRqlDialog( QWidget *parent )
 : QDialog( parent )
 {
     ui.setupUi( this );
-    connect(ui.playButton, SIGNAL(clicked()), this, SLOT(onPlay()));
-    connect(ui.tagButton, SIGNAL(clicked()), this, SLOT(onTag()));
+    
+    if (The::app().localRql()->isAvailable()) {
+        connect(ui.playButton, SIGNAL(clicked()), this, SLOT(onPlay()));
+        connect(ui.tagButton, SIGNAL(clicked()), this, SLOT(onTag()));
+    } else {
+        ui.playButton->setDisabled(true);
+        ui.tagButton->setDisabled(true);
+    }
 }
 
 void LocalRqlDialog::onPlay()
 {
-#ifndef NDEBUG
-    QString plugins_path = qApp->applicationDirPath();
-#else
-#ifdef Q_WS_X11
-    QString plugins_path = "/usr/lib/lastfm/";
-#else
-    QString plugins_path = qApp->applicationDirPath() + "/plugins";
-#endif
-#endif
-
-    PluginHost ph(plugins_path);
-    QList<ILocalRqlPlugin *> plugins = ph.getPlugins<ILocalRqlPlugin>("LocalRql");
-    if (plugins.empty())
-        return;
-
-    QString s = ui.lineEditRql->text();
-
-    plugins[0]->init();
-    plugins[0]->parse(s.toUtf8(), this);
+    QString rql = ui.lineEditRql->text();
+    LocalRqlResult* rqlResult = The::app().localRql()->startParse(rql);
+    if (rqlResult) {
+        // note: QueuedConnection is important here:
+        connect(rqlResult, SIGNAL(parseGood(unsigned)), SLOT(onParseGood(unsigned)), Qt::QueuedConnection);
+        connect(rqlResult, SIGNAL(parseBad(int,QString,int)), SLOT(onParseBad(int,QString,int)), Qt::QueuedConnection);
+    }
 }
 
 void 
-LocalRqlDialog::parseOk(ILocalRqlTrackSource* rqlSource)
+LocalRqlDialog::onParseGood(unsigned trackCount)
 {
-    Q_ASSERT(rqlSource);
-    if (rqlSource) {
-        LocalRadioTrackSource* lrts = new LocalRadioTrackSource(rqlSource);
+    LocalRqlResult* rqlResult = dynamic_cast<LocalRqlResult*>(sender());
+    if (rqlResult) {
+        LocalRadioTrackSource* lrts = new LocalRadioTrackSource(rqlResult);
         The::app().openLocalContent(lrts);
         lrts->start();
     }
 }
 
 void 
-LocalRqlDialog::parseFail(int errorLineNumber, const char *errorLine, int errorOffset)
+LocalRqlDialog::onParseBad(int errorLineNumber, QString errorLine, int errorOffset)
 {
     QMessageBox::critical(this, "RQL parse error", errorLine, QMessageBox::Cancel, QMessageBox::Cancel);
 }
@@ -56,24 +50,6 @@ LocalRqlDialog::parseFail(int errorLineNumber, const char *errorLine, int errorO
 void
 LocalRqlDialog::onTag()
 {
-#ifndef NDEBUG
-    QString plugins_path = qApp->applicationDirPath();
-#else
-#ifdef Q_WS_X11
-    QString plugins_path = "/usr/lib/lastfm/";
-#else
-    QString plugins_path = qApp->applicationDirPath() + "/plugins";
-#endif
-#endif
-
-    PluginHost ph(plugins_path);
-    QList<ILocalRqlPlugin *> plugins = ph.getPlugins<ILocalRqlPlugin>("LocalRql");
-    if (plugins.empty())
-        return;
-
-    QString s = ui.lineEditTagifierUrl->text();
-
-    plugins[0]->init();
-    plugins[0]->testTag(s.toUtf8());
- 
+    QString url = ui.lineEditTagifierUrl->text();
+    The::app().localRql()->testTag(url);
 }

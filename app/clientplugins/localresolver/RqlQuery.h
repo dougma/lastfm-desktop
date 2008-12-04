@@ -27,15 +27,17 @@
 
 class RqlQuery : public ILocalRqlTrackSource
 {
-    class LocalCollection &m_collection;
+    class RqlQueryThread* m_queryThread;
     QSet<uint> m_tracks;
 
 public:
-    RqlQuery(LocalCollection& lc, QSet<uint> tracks);
+    RqlQuery(class RqlQueryThread* queryThread, QSet<uint> tracks);
+
+    void getNextTrack(LocalCollection&, ILocalRqlTrackCallback*);
 
     // ILocalRqlTrackSource
     virtual unsigned tracksLeft();
-    virtual bool nextTrack(ILocalRqlTrackCallback*);
+    virtual void getNextTrack(ILocalRqlTrackCallback*);
     virtual void finished();
 };
 

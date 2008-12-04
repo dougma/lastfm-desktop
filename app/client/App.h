@@ -46,6 +46,7 @@ public:
     void open( const class RadioStation& );
     void openXspf( const class QUrl& );
     void openLocalContent( class AbstractTrackSource* trackSource );
+    class LocalRql* localRql();
     
 signals:
     /** documented in PlayerManager */
@@ -87,6 +88,7 @@ private:
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
     class Resolver *m_resolver;
+    class LocalRql *m_localRql;
     class PlayerListener* m_listener;
 
     class QSystemTrayIcon* m_trayIcon;

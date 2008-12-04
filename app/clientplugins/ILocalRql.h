@@ -21,44 +21,45 @@
 #ifndef ILOCALRQL_H
 #define ILOCALRQL_H
 
-// callback interfaces are only valid for the duration of the call
-
-
-class ILocalRqlTrackCallback
-{
-public:
-    virtual void title(const char*) = 0;
-    virtual void album(const char*) = 0;
-    virtual void artist(const char*) = 0;
-    virtual void url(const char*) = 0;
-    virtual void duration(unsigned) = 0;
-};
-
-class ILocalRqlParseCallback
-{
-public:
-    virtual void parseOk(class ILocalRqlTrackSource*) = 0;
-    virtual void parseFail(int errorLineNumber, const char *errorLine, int errorOffset) = 0;
-};
-
-
-// these ones need to be finished() when they're done with
-
-class ILocalRqlTrackSource
-{
-public:
-    virtual unsigned tracksLeft() = 0;
-    virtual bool nextTrack(ILocalRqlTrackCallback*) = 0;
-    virtual void finished() = 0;
-};
 
 class ILocalRqlPlugin
 {
 public:
     virtual void init() = 0;
-	virtual void parse(const char *rql, ILocalRqlParseCallback *) = 0;
+	virtual void parse(const char *rql, class ILocalRqlParseCallback *) = 0;
     virtual void testTag(const char *url) = 0;
     virtual void finished() = 0;
 };
+
+
+class ILocalRqlParseCallback
+{
+public:
+    virtual void parseOk(class ILocalRqlTrackSource*, unsigned trackCount) = 0;
+    virtual void parseFail(int errorLineNumber, const char *errorLine, int errorOffset) = 0;
+};
+
+
+class ILocalRqlTrackSource
+{
+public:
+    virtual void getNextTrack(class ILocalRqlTrackCallback*) = 0;
+    virtual void finished() = 0;
+};
+
+
+class ILocalRqlTrackCallback
+{
+public:
+    virtual void trackFail() = 0;
+    virtual void trackOk(
+        const char* title,
+        const char* album,
+        const char* artist,
+        const char* url,
+        unsigned duration) = 0;
+};
+
+
 
 #endif
