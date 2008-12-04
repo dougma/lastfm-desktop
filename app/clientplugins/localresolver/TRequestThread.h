@@ -23,7 +23,7 @@
 #include <QThread>
 #include <QList>
 #include <QMutex>
-#include <QWaitCondition>
+#include <QSemaphore>
 
 
 // TRequestThread queues up T* objects and calls doRequest 
@@ -33,7 +33,7 @@ template <typename T>
 class TRequestThread : public QThread
 {
     QMutex m_mutex;
-    QWaitCondition m_wakeUp;
+    QSemaphore m_wakeUp;
     QList<T*> m_queue;
     bool m_stopping;
 
@@ -53,15 +53,12 @@ protected:
     virtual void run()
     {
         while (!m_stopping) {
-            m_mutex.lock();
-            m_wakeUp.wait(&m_mutex);
-            m_mutex.unlock();
-
             for(;;) {
                 T* req = takeNextFromQueue();
                 if (req == 0 || m_stopping) break;
                 doRequest(req);
             }
+            m_wakeUp.acquire(1);
         }
     }
 
@@ -74,9 +71,7 @@ public:
     ~TRequestThread()
     {
         m_stopping = true;
-        m_mutex.lock();
-        m_wakeUp.wakeAll();
-        m_mutex.unlock();
+        m_wakeUp.release(1);
         wait();
     }
 
@@ -86,11 +81,23 @@ public:
         if (req) {
             m_mutex.lock();
             m_queue.append(req);
-            m_wakeUp.wakeAll();
             m_mutex.unlock();
+            m_wakeUp.release(1);
         }
     }
-
 };
+
+template<typename T>
+class TCreateThreadMixin
+{
+public:
+    static T* create()
+    {
+        T* result = new T();
+        result->start();
+        return result;
+    }
+};
+
 
 #endif
