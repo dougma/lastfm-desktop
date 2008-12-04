@@ -20,6 +20,11 @@
 #ifndef ITRACK_RESOLVER_H
 #define ITRACK_RESOLVER_H
 
+// prevent GCC from displaying warnings for this file
+// otherwise it whinges about non virtual dtors, for these PURE virtual classes
+#pragma GCC system_header
+
+
 class ITrackResolverPlugin
 {
 public:

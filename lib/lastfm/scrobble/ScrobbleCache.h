@@ -17,7 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "../DllExportMacro.h"
+#ifndef LASTFM_SCROBBLE_CACHE_H
+#define LASTFM_SCROBBLE_CACHE_H
+
+#include <DllExportMacro.h>
 #include "Scrobble.h"
 #include <QList>
 #include <QString>
@@ -59,3 +62,5 @@ public:
 private:
     bool operator==( const ScrobbleCache& ); //undefined
 };
+
+#endif

@@ -34,7 +34,6 @@
 
 Tuner::Tuner( const RadioStation& station )
      : m_retry_counter( 0 )
-     , m_minQueue( 0 )
 {
     WsReply* reply = WsRequestBuilder( "radio.tune" )
 			.add( "station", station.url() )
@@ -132,14 +131,16 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
     }
 }
 
-Track 
+
+Track
 Tuner::takeNextTrack()
 {
+    //TODO presumably, we should check if fetchMoreTracks is working?
     if (m_queue.isEmpty())
         return Track();
     
     Track result = m_queue.takeFirst();
-    if (m_queue.size() == m_minQueue)
+    if (m_queue.isEmpty())
         fetchFiveMoreTracks();
 
     return result;

@@ -496,7 +496,9 @@ PlayerBucketList::showQuery()
 
 void 
 PlayerBucketList::onCurrentItemChanged( QListWidgetItem* current, QListWidgetItem* previous )
-{
+{    
+    Q_UNUSED( previous )
+    
     if( current ) 
     {
         calculateLayout();

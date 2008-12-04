@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef LASTFM_SCROBBLER_HANDSHAKE_H
+#define LASTFM_SCROBBLER_HANDSHAKE_H
+
 #include "ScrobblerHttp.h"
 #include <QString>
 
@@ -30,3 +33,5 @@ public:
 
     virtual void request();
 };
+
+#endif

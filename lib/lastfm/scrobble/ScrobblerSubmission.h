@@ -17,6 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef LASTFM_SCROBBLER_SUBMISSION_H
+#define LASTFM_SCROBBLER_SUBMISSION_H
+
 #include "ScrobblerHttp.h"
 #include "lib/lastfm/types/Track.h"
 #include <QList>
@@ -34,9 +37,13 @@ public:
     void submitNextBatch();
     /** the batch that is being submitted currently */
     QList<Track> batch() const { return m_batch; }
-    
+    /** tracks that have not yet been removed due to an OK from Last.fm */
+    QList<Track> unsubmittedTracks() const { return m_tracks; }
+
     virtual void request()
     {
         if (!isActive()) ScrobblerPostHttp::request();
     }
 };
+
+#endif

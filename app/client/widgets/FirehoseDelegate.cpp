@@ -47,7 +47,6 @@ FirehoseDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, 
 {
     bool const isSelected = option.state & QStyle::State_Selected;
     bool const isActive = option.state & QStyle::State_Active;
-    bool const isEnabled = option.state & QStyle::State_Enabled;
     
     painter->save();
     

@@ -21,6 +21,8 @@
 #ifndef ILOCALRQL_H
 #define ILOCALRQL_H
 
+#pragma GCC system_header
+
 
 class ILocalRqlPlugin
 {

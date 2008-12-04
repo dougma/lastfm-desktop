@@ -17,12 +17,17 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef LASTFM_NOW_PLAYING_H
+#define LASTFM_NOW_PLAYING_H
+
 #include "ScrobblerHttp.h"
+#include <QTime>
 
 
 class NowPlaying : public ScrobblerPostHttp
 {
     class QTimer* m_timer;
+    QTime m_delay;
 
 public:
     NowPlaying( const QByteArray& );
@@ -31,3 +36,5 @@ public:
 
     using ScrobblerPostHttp::request;
 };
+
+#endif

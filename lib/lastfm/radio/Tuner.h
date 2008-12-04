@@ -63,7 +63,6 @@ private:
       */
     bool fetchFiveMoreTracks();
 
-    unsigned m_minQueue;
     QList<Track> m_queue;
 	uint m_retry_counter;
 };

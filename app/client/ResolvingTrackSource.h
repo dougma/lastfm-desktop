@@ -35,8 +35,8 @@ class ResolvingTrackSource : public AbstractTrackSource
     bool m_waiting;
     bool m_started;
 
-    unsigned m_maxQueue;
     unsigned m_minQueue;
+    unsigned m_maxQueue;
     int m_initialResolveDelay;
     int m_interTrackResolveDelay;
     

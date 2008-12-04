@@ -94,13 +94,6 @@ ScrobblerHttp::resetRetryTimer()
 }
 
 
-int
-ScrobblerHttp::get( QString url )
-{
-    return QHttp::get( url );
-}
-
-
 void
 ScrobblerPostHttp::request()
 {

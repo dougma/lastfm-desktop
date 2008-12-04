@@ -137,7 +137,7 @@ SendLogsRequest::onFinished()
 
 
 void
-SendLogsRequest::onError( QNetworkReply::NetworkError code )
+SendLogsRequest::onError( QNetworkReply::NetworkError )
 {
     m_error = true;
     emit error();

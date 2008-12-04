@@ -53,9 +53,15 @@ Scrobbler::handshake() //private
 {
     m_hard_failures = 0;
 
+    // if we are here due to hard failure then we need to save what we were 
+    // doing and load it back into the new requests
     QByteArray np_data;
+    QList<Track> tracks;
     if (m_np) np_data = m_np->postData();
+    if (m_submitter) tracks = m_submitter->unsubmittedTracks();
 
+    // we delete to be sure of the state of the QHttp objects, as they are 
+    // rather black box
     delete m_handshake;
     delete m_np;
     delete m_submitter;
@@ -66,6 +72,7 @@ Scrobbler::handshake() //private
     m_np = new NowPlaying( np_data );
     connect( m_np, SIGNAL(done( QByteArray )), SLOT(onNowPlayingReturn( QByteArray )), Qt::QueuedConnection );
     m_submitter = new ScrobblerSubmission;
+    m_submitter->setTracks( tracks );
     connect( m_submitter, SIGNAL(done( QByteArray )), SLOT(onSubmissionReturn( QByteArray )), Qt::QueuedConnection );
     connect( m_submitter, SIGNAL(requestStarted( int )), SLOT(onSubmissionStarted( int )) );
 }

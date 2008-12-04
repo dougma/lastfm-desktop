@@ -75,4 +75,4 @@ public:
 	};
 };
 
-#endif
+#endif //LASTFM_ALBUM_H

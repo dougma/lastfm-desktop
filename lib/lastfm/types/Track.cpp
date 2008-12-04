@@ -173,12 +173,12 @@ MutableTrack::unlove()
 }
 
 
-struct TrackWsRequestBuilder : WsRequestBuilder
+struct MbidFriendly_WsRequestBuilder : WsRequestBuilder
 {
-	TrackWsRequestBuilder( const char* p ) : WsRequestBuilder( p )
+	MbidFriendly_WsRequestBuilder( const char* p ) : WsRequestBuilder( p )
 	{}
 	
-	TrackWsRequestBuilder& add( Track const * const t )
+	MbidFriendly_WsRequestBuilder& add( Track const * const t )
 	{
 		if (t->mbid().isNull()) 
 		{
@@ -196,14 +196,14 @@ struct TrackWsRequestBuilder : WsRequestBuilder
 WsReply*
 Track::getTopTags() const
 {
-	return TrackWsRequestBuilder( "track.getTopTags" ).add( this ).get();
+	return MbidFriendly_WsRequestBuilder( "track.getTopTags" ).add( this ).get();
 }
 
 
 WsReply*
 Track::getTags() const
 {
-	return TrackWsRequestBuilder( "track.getTags" ).add( this ).get();
+	return MbidFriendly_WsRequestBuilder( "track.getTags" ).add( this ).get();
 }
 
 
@@ -217,6 +217,20 @@ Track::addTags( const QStringList& tags ) const
             .add( "artist", d->artist )
             .add( "track", d->title )
             .add( "tags", tags.join( QChar(',') ) )
+            .post();
+}
+
+
+WsReply*
+Track::removeTag( const QString& tag ) const
+{
+    if (tag.isEmpty())
+        return 0;
+    
+    return WsRequestBuilder( "track.removeTag" )
+            .add( "artist", d->artist )
+            .add( "track", d->title )
+            .add( "tags", tag )
             .post();
 }
 

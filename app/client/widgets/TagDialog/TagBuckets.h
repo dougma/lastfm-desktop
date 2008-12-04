@@ -33,7 +33,7 @@ class TagBuckets : public QWidget
     
 public:
     TagBuckets( const class Track& );
-
+    
     struct {
         TagBucket* track;
         TagBucket* artist;
@@ -59,7 +59,9 @@ class TagBucket : public QTextEdit
 public:
     TagBucket();
        
+    QStringList tags() const;
     QStringList newTags() const;
+    QStringList deletedTags() const;
     
 public slots:
     void onGotTags( class WsReply* );

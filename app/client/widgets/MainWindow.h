@@ -112,9 +112,9 @@ private:
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
     UNICORN_UNIQUE_DIALOG_DECL( LocalRqlDialog );
 
+    bool m_animating;
     bool m_animatingDashboard;
     bool m_animatingSources;
-    bool m_animating;
 
 private slots:    
     void onAnimateFrame( int );

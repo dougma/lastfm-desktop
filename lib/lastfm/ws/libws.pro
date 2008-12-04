@@ -1,6 +1,6 @@
 TARGET = ws
 TEMPLATE = lib
-QT = core network xml gui
+QT = core network xml
 CONFIG += core
 
 include( $$ROOT_DIR/common/qmake/include.pro )

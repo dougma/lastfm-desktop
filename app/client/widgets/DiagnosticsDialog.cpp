@@ -340,7 +340,7 @@ DiagnosticsDialog::onCopyToClipboard()
 
 
 void
-DiagnosticsDialog::onTrackFingerprintingStarted( const Track& track )
+DiagnosticsDialog::onTrackFingerprintingStarted( const Track& )
 {
 #if 0
     ui.fpCurrentTrackLabel->setText( track.toString() );
@@ -350,7 +350,7 @@ DiagnosticsDialog::onTrackFingerprintingStarted( const Track& track )
 
 
 void
-DiagnosticsDialog::onTrackFingerprinted( const Track& track  )
+DiagnosticsDialog::onTrackFingerprinted( const Track& )
 {
 #if 0
     ui.fpCurrentTrackLabel->setText( "" );

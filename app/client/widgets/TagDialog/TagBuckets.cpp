@@ -137,6 +137,14 @@ TagBuckets::onHeaderClicked()
 }
 
 
+
+
+TagBucket::TagBucket()
+{    
+    setAcceptDrops( true );
+}
+
+
 void
 TagBucket::onGotTags( WsReply* r )
 {
@@ -145,21 +153,32 @@ TagBucket::onGotTags( WsReply* r )
 
 
 QStringList
+TagBucket::tags() const
+{
+    //FIXME do properly! ie. get correct disallowed characters and apply the restrictions
+    return toPlainText().split( QRegExp( "[ \t]*(,|\n)[ \t]*" ) );
+}
+
+
+QStringList
 TagBucket::newTags() const 
 {
-    //FIXME do properly!
-    QStringList tags = toPlainText().split( QRegExp( "[ \t]*(,|\n)[ \t]*" ) );
-                                    
+    QStringList tags = this->tags();
     foreach (QString tag, m_existingTags)
         tags.removeAll( tag );
-    
     return tags;
 }
 
 
-TagBucket::TagBucket()
-{    
-    setAcceptDrops( true );
+QStringList
+TagBucket::deletedTags() const
+{
+    QStringList deleted_tags;
+    QStringList const tags = this->tags();
+    foreach (QString tag, m_existingTags)
+        if (!tags.contains( tag ))
+            deleted_tags += tag;
+    return deleted_tags;
 }
 
 

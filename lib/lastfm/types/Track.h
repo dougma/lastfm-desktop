@@ -151,9 +151,11 @@ public:
 	WsReply* getTopTags() const;
     
     /** you can only add 10 tags, we submit everything you give us, but the
-      * docs state 10 only */
+      * docs state 10 only. Will return 0 if the list is empty. */
     WsReply* addTags( const QStringList& ) const;
-
+    /** will return 0 if the string is "" */
+    WsReply* removeTag( const QString& ) const;
+    
 	/** the url for this track's page at last.fm */
 	QUrl www() const;
 	

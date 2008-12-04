@@ -27,7 +27,7 @@ class ScrobblePoint
 {
     uint i;
 
-public:   
+public:
     /** j is in seconds, and should be 50% the duration of a track */
     explicit ScrobblePoint( uint j )
     {

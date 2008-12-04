@@ -30,8 +30,7 @@
 LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
      : m_nam( new WsAccessManager( this ) ),
        m_retry_counter( 0 ),
-       m_station( station ),
-       m_minQueue( 0 )
+       m_station( station )
 {    
 #ifdef WIN32
     static const char *PLATFORM = "win32";
@@ -133,7 +132,7 @@ LegacyTuner::takeNextTrack()
     Track t;
     if (!m_queue.isEmpty()) {
         t = m_queue.takeFirst();
-        if (m_queue.size() == m_minQueue)
+        if (m_queue.isEmpty())
             fetchFiveMoreTracks();
     }
     return t;

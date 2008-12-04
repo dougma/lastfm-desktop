@@ -112,12 +112,12 @@ Resolver::stillResolving(const Track& t)
 
 ResolveRequest::ResolveRequest(const Track& t, unsigned refCount)
 : m_track(t)
-, m_ref(refCount)
 , m_artist(QString(t.artist()).toUtf8())
 , m_album(QString(t.album()).toUtf8())
 , m_title(t.title().toUtf8())
 , m_mbid(QString(t.mbid()).toUtf8())
 , m_fpid(QString(t.fingerprintId()).toUtf8())
+, m_ref(refCount)
 {
 }
 

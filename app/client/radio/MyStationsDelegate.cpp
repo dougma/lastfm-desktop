@@ -56,8 +56,7 @@ MyStationsDelegate::paint(QPainter* painter,
 }
 
 QSize
-MyStationsDelegate::sizeHint( const QStyleOptionViewItem& option, 
-							  const QModelIndex& index ) const
+MyStationsDelegate::sizeHint( const QStyleOptionViewItem&, const QModelIndex& index ) const
 {
 	QFontMetrics fm = qApp->fontMetrics();
 	QSize size = fm.size( Qt::TextSingleLine, index.data( Qt::DisplayRole ).toString() );

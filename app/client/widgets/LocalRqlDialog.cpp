@@ -44,6 +44,9 @@ LocalRqlDialog::onParseGood(unsigned trackCount)
 void 
 LocalRqlDialog::onParseBad(int errorLineNumber, QString errorLine, int errorOffset)
 {
+    Q_UNUSED( errorLineNumber );
+    Q_UNUSED( errorOffset );
+    
     QMessageBox::critical(this, "RQL parse error", errorLine, QMessageBox::Cancel, QMessageBox::Cancel);
 }
 

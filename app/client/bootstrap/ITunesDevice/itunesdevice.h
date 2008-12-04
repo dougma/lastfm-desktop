@@ -43,10 +43,10 @@ signals:
 private:
     QString m_iTunesLibraryPath;
     QString m_database;
-    int m_totalSize;
 
     class QFile* m_file;
     class ITunesParser* m_handler;
+    int m_totalSize;
     class QXmlSimpleReader* m_xmlReader;
     class QXmlInputSource* m_xmlInput;
 };

@@ -50,7 +50,6 @@ private:
 	uint m_retry_counter;
     RadioStation m_station;
     QByteArray m_session;
-    unsigned m_minQueue;
     QList<Track> m_queue;
 };
 

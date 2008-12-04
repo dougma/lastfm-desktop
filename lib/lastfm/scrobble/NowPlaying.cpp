@@ -32,7 +32,6 @@ NowPlaying::NowPlaying( const QByteArray& data )
     // we wait 5 seconds to prevent the server panicking when people skip a lot
     // tracks in succession
     m_timer = new QTimer( this );
-    m_timer->setInterval( 5000 );
     m_timer->setSingleShot( true );
     connect( m_timer, SIGNAL(timeout()), SLOT(request()) );
 }
@@ -48,7 +47,7 @@ NowPlaying::reset()
 
 void
 NowPlaying::submit( const Track& track )
-{
+{   
     if (track.isNull())
         return;
 
@@ -61,5 +60,16 @@ NowPlaying::submit( const Track& track )
              "&m=" + e(track.mbid());
     #undef e
 
-    m_timer->start();
+    // m_time is initialised to midnight, so a bug exists that if the app is 
+    // started after 00:00 and before 00:04 we trigger via the timer. But meh!
+    uint ms = m_delay.elapsed();
+    
+    if (ms < 10000) {
+        m_timer->setInterval( 10000 - ms );
+        m_timer->start();
+    }
+    else {
+        m_delay.restart();
+        request();
+    }
 }

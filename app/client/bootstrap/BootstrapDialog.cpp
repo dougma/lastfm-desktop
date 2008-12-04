@@ -28,7 +28,7 @@
 #endif
 
 
-BootstrapDialog::BootstrapDialog( PlayerListener* listener, QWidget* parent )
+BootstrapDialog::BootstrapDialog( PlayerListener*, QWidget* parent )
                : QProgressDialog( parent )
 {
 #ifdef WIN32

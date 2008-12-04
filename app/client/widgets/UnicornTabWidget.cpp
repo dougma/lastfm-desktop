@@ -24,9 +24,9 @@
 #include <QHBoxLayout>
 
 Unicorn::TabBar::TabBar()
-        :m_active( ":/DockWindow/tab/active.png" ),
-         m_spacing( 0 ),
-         m_leftMargin( 5 )
+        :m_spacing( 0 ),
+         m_leftMargin( 5 ),
+         m_active( ":/DockWindow/tab/active.png" )
 {
 #ifndef WIN32
     QFont f = font();
@@ -92,7 +92,7 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
 
 
 void 
-Unicorn::TabBar::mouseReleaseEvent( QMouseEvent* e )
+Unicorn::TabBar::mouseReleaseEvent( QMouseEvent* )
 {
     m_mouseDownPos = QPoint();
 }

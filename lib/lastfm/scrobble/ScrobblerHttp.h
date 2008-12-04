@@ -33,9 +33,7 @@ class ScrobblerHttp : public QHttp
 public:
     void retry();
     int requestId() const { return m_id; }
-    
     bool isActive() const { return m_id != -1; }
-
     QString host() const { return m_host; }
 
 protected:
@@ -45,8 +43,7 @@ protected:
 
 protected slots:
     virtual void request() = 0;
-    // Never use the QHttp::get method directly. Makes it possible to test without needing to mock QHttp.
-    int get( QString );
+
 signals:
     void done( const QByteArray& data );
 
@@ -90,12 +87,15 @@ public:
 
 inline QDebug operator<<( QDebug d, ScrobblerHttp* http )
 {
+#ifdef QT_TESTLIB_LIB
+    return d;
+#else
     d << "  Http response: " << http->lastResponse().statusCode() << "\n"
   	  << "  QHttp error code: " << http->error() << "\n"
 	  << "  QHttp error text: " << http->errorString() << "\n"
 	  << "  Request: " << http->host() + http->currentRequest().path() << "\n"
 	  << "  Bytes returned: " << http->bytesAvailable();
-	
+#endif
     return d;
 }
 

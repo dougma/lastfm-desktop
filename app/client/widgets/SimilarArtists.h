@@ -52,7 +52,7 @@ class SimilarArtistsModel : public QAbstractItemModel
 	virtual QModelIndex parent(const QModelIndex& ) const { return QModelIndex(); }
 	virtual int rowCount( const QModelIndex& ) const { return m_items.count(); }
 	virtual int columnCount( const QModelIndex& ) const { return 1; }
-	virtual Qt::ItemFlags flags( const QModelIndex& index ) const { return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable; }
+	virtual Qt::ItemFlags flags( const QModelIndex& ) const { return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemIsSelectable; }
 
 	QList<class SimilarArtistsItem *> m_items;
 	class WsAccessManager *m_wam;

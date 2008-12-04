@@ -46,43 +46,46 @@ void
 PlayableListItem::iconDataDownloaded()
 {
     QNetworkReply* reply = static_cast< QNetworkReply* >( sender());
-    
+
     QPixmap pixmap;
     pixmap.loadFromData( reply->readAll() );
-    
+
     if( pixmap.isNull() )
         return;
-    
+
     setPixmap( pixmap );
     const QRect textRect = listWidget()->fontMetrics().boundingRect( text() );
 }
 
 
-void 
+void
 PlayableListItem::fetchImage()
 {
-    switch( playableType())
+    switch( playableType() )
     {
         case Seed::ArtistType:
         {
             Artist a( text() );
             WsReply* reply = a.search( 5 );
-            
+
             connect( reply, SIGNAL(finished(WsReply*)), SLOT(onArtistSearchFinished(WsReply*)) );
-            return;
+            break;
         }
-            
+
         case Seed::UserType:
         {
             //TODO user.search method - waiting on webteam
-            return;
+            break;
         }
-        
+
         case Seed::TagType:
         {
             setIcon( QIcon( ":/buckets/tag_39.png" ) );
-            return;
+            break;
         }
+            
+        default:
+            break;
     }
 }
 
