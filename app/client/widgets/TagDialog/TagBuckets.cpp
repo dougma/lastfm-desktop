@@ -20,7 +20,7 @@
 #include "TagBuckets.h"
 #include "lib/lastfm/types/Tag.h"
 #include "PlayableMimeData.h"
-#include "SeedTypes.h"
+#include "radio/buckets/SeedTypes.h"
 #include <QtGui>
 
 static int gint = 0;

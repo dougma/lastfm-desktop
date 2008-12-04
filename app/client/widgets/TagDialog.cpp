@@ -18,12 +18,12 @@
  ***************************************************************************/
 
 #include "TagDialog.h"
-#include "widgets/TagListWidget.h"
-#include "widgets/UnicornTabWidget.h"
-#include "widgets/UnicornWidget.h"
-#include "widgets/TrackWidget.h"
+#include "TagListWidget.h"
+#include "UnicornTabWidget.h"
+#include "UnicornWidget.h"
+#include "TrackWidget.h"
+#include "TagDialog/TagBuckets.h"
 #include "radio/buckets/DelegateDragHint.h"
-#include "TagBuckets.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/lastfm/ws/WsReply.h"

@@ -26,8 +26,6 @@ debug:macx-xcode {
     }
 
     SOURCES += common/c++/Logger.cpp
-    SOURCES -= lib/lastfm/core/win/Utils.cpp
-	SOURCES -= lib/lastfm/ws/win/Pac.cpp lib/lastfm/ws/win/NdisEvents.cpp lib/lastfm/ws/win/WmiSink.cpp lib/lastfm/ws/win/WsAccessManagerInit.cpp
 
     INCLUDEPATH += app/client lib
     LIBS += -framework SystemConfiguration -framework CoreServices
@@ -47,12 +45,11 @@ else {
                app/twiddly \
                app/clientplugins/localresolver/libresolver.pro
 
-	# make the app client the default project in visual studio
-    
     win32 {
         RC_FILE = app/client/win/client.rc
     }
 
+	# make the app client the default project in visual studio
 	debug:win32 {
 		SUBDIRS -= app/client
 		SUBDIRS = app/client $$SUBDIRS
