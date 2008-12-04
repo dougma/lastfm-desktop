@@ -92,7 +92,6 @@ TrackDashboard::TrackDashboard()
     ui.cover = new PrettyCoverWidget;
     ui.cover->setParent( ui.papyrus );
     
-    ui.cover->setCursor( Qt::PointingHandCursor );
     connect( ui.cover, SIGNAL( clicked()), SLOT( onCoverClicked()));
     
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
@@ -113,7 +112,7 @@ TrackDashboard::TrackDashboard()
     ((ListView*)ui.similarArtists)->setSeedType( Seed::ArtistType );
     v->setMargin( 0 );
     v->setSpacing( 0 );
-    
+
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
@@ -122,16 +121,16 @@ TrackDashboard::TrackDashboard()
     ui.scrollbar = new FadingScrollBar( this );
     ui.scrollbar->setVisible( false );
     connect( ui.scrollbar, SIGNAL(valueChanged( int )), SLOT(setPapyrusPosition( int )) );
-        
+
 #ifndef Q_WS_MAC
     // mac has finer grained scrolling, and acceleration
     ui.scrollbar->setSingleStep( 9 );
 #endif
-    
+
     UnicornWidget::paintItBlack( this );
     UnicornWidget::paintItBlack( ui.bio );
     setAutoFillBackground( true );
-    
+
     QPalette p = palette();
     QColor c( 0x0e, 0x0e, 0x0e );
     p.setColor( QPalette::Window, c );
@@ -140,26 +139,19 @@ TrackDashboard::TrackDashboard()
     setPalette( p );
     p.setColor( QPalette::Text, QColor( 0xa3, 0xa5, 0xa8 ) );
     ui.bio->setPalette( p );
-    
-	QFile file( ":/black.css" );
-	file.open( QFile::ReadOnly );
-    QString css = file.readAll();
-
-    QFont font = this->font();
-    font.setPointSize( 11 );
 
 	ui.spinner = new SpinnerLabel( this );
     ui.spinner->move( 10, 10 );
-    
+
     clear();
-    
+
     setAttribute( Qt::WA_MacNoClickThrough );
 }
 
 
 void
 TrackDashboard::setTrack( const Track& t )
-{    
+{        
     if (m_track.artist() != t.artist())
     {
         ui.info->hide();
@@ -183,7 +175,7 @@ TrackDashboard::setTrack( const Track& t )
     if (m_track.album() != t.album())
     {
         ui.cover->clear();
-        
+
         qDeleteAll( findChildren<TrackImageFetcher*>() );
 
         TrackImageFetcher* fetch = new TrackImageFetcher( t, nam );
@@ -192,7 +184,10 @@ TrackDashboard::setTrack( const Track& t )
         connect( fetch, SIGNAL(finished( QImage )), fetch, SLOT(deleteLater()) );
         fetch->start();
     }
-
+    
+    ui.cover->setCursor( m_track.album().isNull() ? Qt::PointingHandCursor : Qt::ArrowCursor );
+    ui.cover->show();
+    
     m_track = t;
 }
 
@@ -208,6 +203,7 @@ TrackDashboard::tuningIn()
 void
 TrackDashboard::clear()
 {
+    ui.cover->hide();
     ui.cover->clear();
     ui.bio->setUrl( QUrl("about:blank") );
     ui.scrollbar->setRange( 0, 0 );
@@ -448,5 +444,7 @@ TrackDashboard::openExternally( const QUrl& url )
 void 
 TrackDashboard::onCoverClicked()
 {
-    QDesktopServices::openUrl( m_track.album().www() );
+    Album album = m_track.album();
+    if (!album.isNull())
+        QDesktopServices::openUrl( album.www() );
 }
