@@ -59,7 +59,6 @@ signals:
     void clicked();
     
 protected:
-    virtual void mousePressEvent( QMouseEvent* );
     virtual void mouseReleaseEvent( QMouseEvent* );
     
 private:
@@ -67,7 +66,6 @@ private:
 
     QImage m_cover;
     uint m_reflection_height;
-    bool m_mouseDown;
 };
 
 #endif //TRACK_INFO_WIDGET_H

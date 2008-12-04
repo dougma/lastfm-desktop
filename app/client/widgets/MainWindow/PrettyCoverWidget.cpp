@@ -24,13 +24,7 @@
 
 PrettyCoverWidget::PrettyCoverWidget()
                  : m_reflection_height( 30 )
-{
-    QFont font = this->font();
-    font.setBold( true );
-    setFont( font );
-
-    clear();
-}
+{}
 
 
 void
@@ -109,47 +103,12 @@ PrettyCoverWidget::paintEvent( QPaintEvent* )
     p.setRenderHint( QPainter::SmoothPixmapTransform );
     p.setTransform( transform );
     p.drawImage( point, composition );
-
-#if 0    
-    p.resetTransform();
-    p.setPen( Qt::white );
-    
-    if (p.fontMetrics().width( m_track.title() ) <= width())
-    {
-        QString text = m_track.title();
-        if (m_showArtist) text += "\n" + m_track.artist();
-        
-        QRect r = rect();
-        r.setTop( r.bottom() - m_reflection_height );
-        p.drawText( r, Qt::AlignCenter, text );
-    }
-#endif
 }
 
 
-void 
-PrettyCoverWidget::mousePressEvent( QMouseEvent* e )
-{
-    if( e->button() != Qt::LeftButton )
-        return;
-
-    m_mouseDown = true;
-}
-
-void 
+void
 PrettyCoverWidget::mouseReleaseEvent( QMouseEvent* e )
 {
-    if (e->button() != Qt::LeftButton)
-    {
-        e->ignore();
-        return;
-    }
-    
-    if( rect().contains( e->pos()) && m_mouseDown )
-    {
+    if (e->button() == Qt::LeftButton)
         emit clicked();
-    }
-    
-    m_mouseDown = false;
-    
 }
