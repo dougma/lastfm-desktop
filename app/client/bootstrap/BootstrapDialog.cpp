@@ -28,12 +28,14 @@
 #endif
 
 
-BootstrapDialog::BootstrapDialog( PlayerListener*, QWidget* parent )
+BootstrapDialog::BootstrapDialog( PlayerListener* listener, QWidget* parent )
                : QProgressDialog( parent )
 {
 #ifdef WIN32
     m_plugins = Plugin::installed();
     connect( listener, SIGNAL(bootstrapCompleted( QString )), SLOT(onBootstrapCompleted( QString )) );
+#else
+    Q_UNUSED( listener );
 #endif
 }
 
