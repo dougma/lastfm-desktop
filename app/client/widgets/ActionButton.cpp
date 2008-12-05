@@ -18,29 +18,30 @@
  ***************************************************************************/
 
 #include "ActionButton.h"
-#include <QPointer>
-#include "lib/lastfm/scrobble/Scrobble.h"
-class QMovie;
-class QTimeLine;
+#include <QAction>
 
 
-class ScrobbleButton : public ActionButton
+void
+ActionButton::setAction( QAction* action )
 {
-    Q_OBJECT
-
-    QMovie* m_movie;
-    QPointer<QObject> m_timer;
-    Scrobble m_track;
-
-public:
-    ScrobbleButton();
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
+    const bool b = action->isCheckable();
+    setCheckable( b );
     
-private slots:
-    void onTrackSpooled( const class Track&, class StopWatch* );
-    void onScrobbled();
-    void advanceFrame();
-    void updateToolTip( int );
-};
+    // only do one or the other or you trigger it all twice
+    if (b)
+        connect( this, SIGNAL(toggled( bool )), action, SLOT(setChecked( bool )) );
+    else
+        connect( this, SIGNAL(clicked()), action, SLOT(trigger()) );
+    
+    connect( action, SIGNAL(changed()), SLOT(onActionChanged()) );
+    onActionChanged( action );
+}
+
+
+void
+ActionButton::onActionChanged( QAction* action )
+{
+    if (!action) action = (QAction*) sender();
+    setEnabled( action->isEnabled());
+    setChecked( action->isChecked());
+}

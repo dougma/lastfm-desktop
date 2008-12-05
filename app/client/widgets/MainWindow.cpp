@@ -175,6 +175,7 @@ MainWindow::setupUi()
     ui.sources->connectToAmp( ui.amp );
     ui.dashboardHeader->ui.ban->setAction( ui.ban );
     ui.dashboardHeader->ui.love->setAction( ui.love );
+    ((ActionButton*)ui.dashboardHeader->ui.scrobbleButton)->setAction( ui.scrobble );
     
     ui.amp->ui.dashboardButton->setAction( ui.viewDashboard );
     ui.amp->ui.bucketsButton->setAction( ui.viewSources );
@@ -223,6 +224,8 @@ MainWindow::setupUi()
     
     ui.viewDashboard->setChecked( true );
     ui.viewSources->setChecked( true );
+    
+    ui.messagebar->raise();
 }
 
 

@@ -20,16 +20,13 @@
 #ifndef IMAGE_BUTTON_H
 #define IMAGE_BUTTON_H
 
-#include <QAbstractButton>
-#include <QAction>
+#include "ActionButton.h"
 #include <QIcon>
 #include <QMap>
 
 
-class ImageButton : public QAbstractButton
+class ImageButton : public ActionButton
 {
-	Q_OBJECT
-    
     void init( const QPixmap& );
 	
 public:
@@ -37,7 +34,6 @@ public:
     explicit ImageButton( const QPixmap& pixmap, QWidget* parent = 0 );
     explicit ImageButton( const QString& pixmap_path, QWidget* parent = 0 );
     
-	void setAction( class QAction* );
     void setPixmap( const QPixmap&, const QIcon::State = QIcon::Off, QIcon::Mode = QIcon::Normal );
 	void moveIcon( int x, int y, QIcon::Mode = QIcon::Normal );
     
@@ -49,9 +45,6 @@ protected:
 private:
     QSize m_sizeHint;
 	QMap< QIcon::Mode, QPoint > m_iconOffsets;
-    
-private slots:
-	void onActionChanged( QAction* = 0 );
 };
 
 #endif //IMAGE_BUTTON_H

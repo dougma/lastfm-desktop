@@ -105,11 +105,6 @@ App::App( int& argc, char** argv )
 #endif
 
     m_scrobbler = new Scrobbler( "ass" );
-    connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
-    connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
-    connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
-
-    connect( new WsConnectionMonitor( this ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
 
 #ifndef NDEBUG
     QString plugins_path = qApp->applicationDirPath();
@@ -172,6 +167,7 @@ App::setMainWindow( MainWindow* window )
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
     connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
 	connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
+    connect( window->ui.scrobble, SIGNAL(toggled( bool )), SLOT(setScrobblingEnabled( bool )) );
 
 	// for now not on mac, FIXME eventually, in tray as option, default off
 #ifndef Q_WS_MAC
@@ -188,6 +184,30 @@ App::setMainWindow( MainWindow* window )
              window, 
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 #endif
+
+    setScrobblingEnabled( true );
+}
+
+
+void
+App::setScrobblingEnabled( bool b )
+{
+    if (sender() != m_mainWindow->ui.scrobble)
+    {
+        m_mainWindow->ui.scrobble->setChecked( b ); //recursive
+    }
+    else if (b)
+    {
+        connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
+        connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
+        connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
+        
+        connect( new WsConnectionMonitor( m_scrobbler ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
+    }
+    else {
+        disconnect( m_playerMediator, 0, m_scrobbler, 0 );
+        delete m_scrobbler->findChild<WsConnectionMonitor*>();
+    }
 }
 
 

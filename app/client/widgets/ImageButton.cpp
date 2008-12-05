@@ -29,14 +29,14 @@
 
 
 ImageButton::ImageButton( const QPixmap& rest, QWidget* parent )
-           : QAbstractButton( parent )
+           : ActionButton( parent )
 {
     init( rest );
 }
 
 
 ImageButton::ImageButton( const QString& path, QWidget* parent )
-           : QAbstractButton( parent )
+           : ActionButton( parent )
 {
     init( QPixmap( path ) );
 }
@@ -47,23 +47,6 @@ ImageButton::init( const QPixmap& p )
 {
     setPixmap( p );
     m_sizeHint = p.size();
-}
-
-
-void
-ImageButton::setAction( QAction* action )
-{
-    const bool b = action->isCheckable();
-    setCheckable( b );
-    
-    // only do one or the other or you trigger it all twice
-    if (b)
-        connect( this, SIGNAL(toggled( bool )), action, SLOT(setChecked( bool )) );
-    else
-        connect( this, SIGNAL(clicked()), action, SLOT(trigger()) );
-
-    connect( action, SIGNAL(changed()), SLOT(onActionChanged()) );
-    onActionChanged( action );
 }
 
 
@@ -107,13 +90,4 @@ void
 ImageButton::moveIcon( int x, int y, QIcon::Mode m )
 {
     m_iconOffsets.insert( m, QPoint( x, y ) );
-}
-
-
-void
-ImageButton::onActionChanged( QAction* action )
-{
-    if (!action) action = (QAction*) sender();
-    setEnabled( action->isEnabled());
-    setChecked( action->isChecked());
 }

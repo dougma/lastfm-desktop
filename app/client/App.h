@@ -62,24 +62,24 @@ signals:
     void status( const QString& message, const QString& id );
     
 public slots:
-    /** all webservices connect to this and emit in the case of bad errors that
-      * need to be handled at a higher level */
-    void onWsError( Ws::Error );
-
-    void onRadioError( int, const class QVariant& );
-
     /** currently also quits, needs fixing! */
     void logout();
-
 	void love( bool loveOrUnlove );
 	void ban();
-
     void parseArguments( const QStringList& );
+    
+    void setScrobblingEnabled( bool );
     
 private slots:
 	void onScrobblerStatusChanged( int );
     void onTrackSpooled( const Track& t );
     void onUserGotInfo( WsReply* );
+    
+    /** all webservices connect to this and emit in the case of bad errors that
+     * need to be handled at a higher level */
+    void onWsError( Ws::Error );
+    
+    void onRadioError( int, const class QVariant& );
     
 private:
     class PlayerMediator* m_playerMediator;

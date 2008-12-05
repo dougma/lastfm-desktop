@@ -17,30 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ActionButton.h"
-#include <QPointer>
-#include "lib/lastfm/scrobble/Scrobble.h"
-class QMovie;
-class QTimeLine;
+#ifndef ACTION_BUTTON_H
+#define ACTION_BUTTON_H
 
 
-class ScrobbleButton : public ActionButton
+#include <QAbstractButton>
+
+
+class ActionButton : public QAbstractButton
 {
     Q_OBJECT
-
-    QMovie* m_movie;
-    QPointer<QObject> m_timer;
-    Scrobble m_track;
-
+    
 public:
-    ScrobbleButton();
-
-protected:
-    virtual void paintEvent( QPaintEvent* );
+    ActionButton( QWidget* parent = 0 ) : QAbstractButton( parent )
+    {}
+    
+    void setAction( class QAction* );
     
 private slots:
-    void onTrackSpooled( const class Track&, class StopWatch* );
-    void onScrobbled();
-    void advanceFrame();
-    void updateToolTip( int );
+    void onActionChanged( QAction* = 0 );
 };
+
+#endif
