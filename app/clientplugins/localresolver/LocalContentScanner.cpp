@@ -25,6 +25,8 @@
 #include "SearchLocation.h"
 #include "QueryError.h"
 #include <memory>
+#include <QDebug>
+
 
 // we make use of QThreadPool priorities to allow some tasks to queue jump
 #define PRIORITY_INIT 0
@@ -219,8 +221,7 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
 void 
 LocalContentScanner::exception(const QString& msg) const
 {
-    // todo: something useful
-    msg;
+    qCritical() << msg;
 }
 
 void
