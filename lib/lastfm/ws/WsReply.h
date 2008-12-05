@@ -56,7 +56,7 @@ class LASTFM_WS_DLLEXPORT WsReply : public QObject
 public:
     /** the <lfm> element from the XML response, see http://last.fm/api */
     CoreDomElement lfm() const { return CoreDomElement( m_lfm ); }
-    
+
     Ws::Error error() const { return m_error; }
     QNetworkReply::NetworkError networkError() const { return m_reply->error(); }
     static QString networkErrorString( QNetworkReply::NetworkError );
@@ -70,13 +70,13 @@ public:
     /* returns the value of the "Expires" response header, or an
      * invalid QDateTime for a missing or invalid Expires header */
     QDateTime expires() const;
-    
+
     /** use this metadata component to remind you what wsreply this is */
     void setAssociatedData( const QVariant& v ) { m_associatedData = v; }
     QVariant associatedData() const { return m_associatedData; }
 
     QByteArray data() const { return m_data; }
-	
+
 	bool failed() const { return m_error != Ws::NoError; }
 
     /* this is a useful function, why doesn't Qt expose it? */
@@ -101,17 +101,10 @@ inline QDebug operator<<( QDebug d, WsReply* r )
 }
 
 
-#include <QMetaEnum>
+#include <lastfm/q.h>
 inline QDebug operator<<( QDebug d, QNetworkReply::NetworkError e )
-{    
-    QMetaObject meta = QNetworkReply::staticMetaObject;
-    for (int i=0; i < meta.enumeratorCount(); ++i) {
-        QMetaEnum m = meta.enumerator(i);
-        if (m.name() == QLatin1String("NetworkError"))
-            return d << QLatin1String(m.valueToKey(e));
-    }
-    
-    return d << "Unknown error";
+{
+    return d << lastfm::qMetaEnumString<QNetworkReply>( e, "NetworkError" );
 }
 
 #endif

@@ -106,4 +106,17 @@ private:
     uint m_hard_failures;
 };
 
+
+#include <QDebug>
+#include <lastfm/q.h>
+static inline QDebug operator<<( QDebug d, Scrobbler::Status status )
+{
+    return d << lastfm::qMetaEnumString<Scrobbler>( status, "Status" );
+}
+static inline QDebug operator<<( QDebug d, Scrobbler::Error error )
+{
+    return d << lastfm::qMetaEnumString<Scrobbler>( error, "Status" );
+}
+
+
 #endif /* SCROBBLER_H */
