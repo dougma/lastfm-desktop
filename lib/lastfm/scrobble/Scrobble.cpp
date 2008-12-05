@@ -42,7 +42,6 @@ Scrobble::isValid( Invalidity* v ) const
     #define TEST( test, x ) \
         if (test) { \
             if (v) *v = x; \
-            qWarning() << #x << *this; \
             return false; \
         }
     

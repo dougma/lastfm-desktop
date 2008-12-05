@@ -87,8 +87,14 @@ ScrobbleCache::write()
 void
 ScrobbleCache::add( const Scrobble& track )
 {
-    if (track.isValid())
+    Scrobble::Invalidity invalidity;
+
+    if (track.isValid( &invalidity ))
+    {
         add( QList<Track>() << track );
+    }
+    else
+        qWarning() << invalidity;
 }
 
 
