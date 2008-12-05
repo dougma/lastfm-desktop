@@ -438,7 +438,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
         int artistId = 
         PREPARE(
             "INSERT INTO artists (lowercase_name) "
-            "VALUES (:lowercase_name, 0)" ).
+            "VALUES (:lowercase_name)" ).
         bindValue( ":lowercase_name", lowercase_name ).
         exec().
         lastInsertId().toInt();
