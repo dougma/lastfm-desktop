@@ -55,6 +55,14 @@
 #endif
 
 
+struct Settings
+{    
+    bool isScrobblingEnabled() const { return moose::UserSettings().value( "ScrobblingEnabled", true ).toBool(); }
+    bool setScrobblingEnabled( bool b ) { moose::UserSettings().setValue( "ScrobblingEnabled", b ); }
+    
+    uint volume() const { return QSettings().value( "Volume", 80 ).toUInt(); }
+    void setVolume( uint i ) { QSettings().value( "Volume", i ); }
+};
 
 
 App::App( int& argc, char** argv ) 
@@ -120,7 +128,7 @@ App::App( int& argc, char** argv )
     m_localRql = new LocalRql( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
 	m_radio = new Radio( new Phonon::AudioOutput );
-	m_radio->audioOutput()->setVolume( 0.8 ); //TODO rememeber
+	m_radio->audioOutput()->setVolume( Settings().volume() );
 
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
     connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
@@ -152,6 +160,8 @@ App::App( int& argc, char** argv )
 
 App::~App()
 {
+    Settings().setVolume( m_radio->audioOutput()->volume() );
+    
     delete m_scrobbler;
     delete m_radio;
     delete m_resolver;
@@ -162,6 +172,8 @@ void
 App::setMainWindow( MainWindow* window )
 {
     m_mainWindow = window;
+    
+    window->ui.scrobble->setChecked( false ); // if true we set it up the bomb later in this function
 
     connect( window->ui.love, SIGNAL(triggered( bool )), SLOT(love( bool )) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
@@ -185,7 +197,11 @@ App::setMainWindow( MainWindow* window )
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 #endif
 
-    setScrobblingEnabled( true );
+    if (Settings().isScrobblingEnabled())
+    {
+        // only do if true, otherwise the state machine will be fucked
+        setScrobblingEnabled( true );
+    }
 }
 
 
@@ -194,6 +210,7 @@ App::setScrobblingEnabled( bool b )
 {
     if (sender() != m_mainWindow->ui.scrobble)
     {
+        Q_ASSERT( m_mainWindow->ui.scrobble->isChecked() != b );
         m_mainWindow->ui.scrobble->setChecked( b ); //recursive
     }
     else if (b)
@@ -203,11 +220,17 @@ App::setScrobblingEnabled( bool b )
         connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
         
         connect( new WsConnectionMonitor( m_scrobbler ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
+        
+        Track t = m_playerMediator->track();
+        if (!t.isNull()) 
+            m_scrobbler->nowPlaying( t );
     }
     else {
         disconnect( m_playerMediator, 0, m_scrobbler, 0 );
         delete m_scrobbler->findChild<WsConnectionMonitor*>();
     }
+    
+    Settings().setScrobblingEnabled( b );
 }
 
 
