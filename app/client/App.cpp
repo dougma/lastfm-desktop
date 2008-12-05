@@ -222,7 +222,7 @@ App::setScrobblingEnabled( bool b )
         connect( new WsConnectionMonitor( m_scrobbler ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
         
         Track t = m_playerMediator->track();
-        if (!t.isNull()) 
+        if (!t.isNull())
             m_scrobbler->nowPlaying( t );
     }
     else {
