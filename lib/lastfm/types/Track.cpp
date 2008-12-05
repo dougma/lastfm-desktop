@@ -256,7 +256,7 @@ Track::isMp3() const
 Track
 Track::clone() const
 {
-    Track copy;
+    Track copy( *this );
     copy.d.detach();
     return copy;
 }
