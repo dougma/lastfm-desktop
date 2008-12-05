@@ -518,7 +518,8 @@ LocalCollection::removeFiles(QList<int> ids)
             }
             s.append( QString::number( i ) );
         }
-        QUERY( "DELETE FROM files where id IN (" + s + ")" );
+        QUERY( "DELETE FROM files WHERE id IN (" + s + ")" );
+        QUERY( "DELETE FROM tracktags WHERE file IN (" + s + ")" );
     }
 }
 
@@ -704,46 +705,36 @@ LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDat
     }
 }
 
-QSet<unsigned>
+QList<QPair<unsigned, float> >
 LocalCollection::filesWithTag(QString tag)
 {
-    QSet<unsigned> result;
+    QList<QPair<unsigned, float> > result;
 
     int tagId = getTagId( tag.simplified().toLower(), false );
     if ( tagId > 0 ) {
         QSqlQuery query = 
-            PREPARE( "SELECT file FROM tracktags WHERE tag == :tagId" ).
+            PREPARE( "SELECT file,weight FROM tracktags WHERE tag == :tagId" ).
             setForwardOnly( true ).
             bindValue( ":tagId", tagId ).
             exec();
         while ( query.next() ) {
             uint id = query.value( 0 ).toUInt();
-            result << id;
+            float weight = query.value( 1 ).toDouble();
+            result << qMakePair(id, weight);
         }
     }
 
     return result;
 }
 
-QSet<unsigned> 
+QList<unsigned> 
 LocalCollection::filesByArtist(QString artist)
 {
-    QSet<unsigned> result;
-
     int artistId = getArtistId( artist.simplified().toLower(), false );
     if ( artistId > 0 ) {
-        QSqlQuery query = 
-            PREPARE( "SELECT id FROM files WHERE artist == :artistId" ).
-            setForwardOnly( true ).
-            bindValue( ":artistId", artistId ).
-            exec();
-        while ( query.next() ) {
-            uint id = query.value( 0 ).toUInt();
-            result << id;
-        }
+        return filesByArtistId( artistId );
     }
-
-    return result;
+    return QList<unsigned>();
 }
 
 
@@ -795,7 +786,7 @@ LocalCollection::allTags()
 }
 
 bool 
-LocalCollection::getFileById(int fileId, LocalCollection::FileResult &out)
+LocalCollection::getFileById(uint fileId, LocalCollection::FileResult &out)
 {
     QSqlQuery query = PREPARE(
         "SELECT album, artists.lowercase_name, lowercase_title, "
@@ -820,15 +811,15 @@ LocalCollection::getFileById(int fileId, LocalCollection::FileResult &out)
     return false;
 }
 
-QSet<unsigned> 
-LocalCollection::allTracksByArtistId(int artistId)
+QList<unsigned> 
+LocalCollection::filesByArtistId(int artistId)
 {
     QSqlQuery query = PREPARE(
         "SELECT id FROM files WHERE artist == :artistId").
         setForwardOnly( true ).
         bindValue( ":artistId", artistId ).
         exec();
-    QSet<unsigned> results;
+    QList<unsigned> results;
     while (query.next()) {
         results << query.value( 0 ).toUInt();
     }

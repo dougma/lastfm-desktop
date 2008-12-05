@@ -39,6 +39,8 @@ class RqlOpProcessor
     ResultSet artist();
     ResultSet similarArtist();
 
+    void normalise(float weight, ResultSet& rs);
+
 public:
     static ResultSet process(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists);
 

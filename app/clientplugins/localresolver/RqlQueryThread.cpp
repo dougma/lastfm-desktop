@@ -169,6 +169,11 @@ RqlQueryThread::enqueueGetNextTrack(RqlQuery* src, ILocalRqlTrackCallback* cb)
     enqueue(new NextTrackRunnable(src, cb));
 }
 
+void
+RqlQueryThread::enqueueDelete(class RqlQuery* q)
+{
+    enqueue(new DeleteRunnable(q));
+}
 
 /////////////////////////////////////////////////////////////////////
 
@@ -211,5 +216,23 @@ RqlQueryThread::NextTrackRunnable::abort()
 {
 }
 
+//////////////
 
+
+RqlQueryThread::DeleteRunnable::DeleteRunnable(class RqlQuery* query)
+: m_query(query)
+{
+}
+
+void 
+RqlQueryThread::DeleteRunnable::doRequest(class RqlQueryThread*)
+{
+    delete m_query;
+}
+
+void 
+RqlQueryThread::DeleteRunnable::abort()
+{
+    delete m_query;
+}
 

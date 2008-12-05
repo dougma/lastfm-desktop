@@ -59,11 +59,20 @@ class RqlQueryThread :
         virtual void abort();
     };
 
+    class DeleteRunnable : public QueryRunnable
+    {
+        class RqlQuery *m_query;
+
+    public:
+        DeleteRunnable(class RqlQuery*);
+        virtual void doRequest(class RqlQueryThread*);
+        virtual void abort();
+    };
 
     class LocalCollection* m_pCollection;
     SimilarArtists m_sa;
 
-    void parse(QString, ILocalRqlParseCallback *);
+    void parse(QString, ILocalRqlParseCallback*);
     void nextTrack(class RqlQuery*, ILocalRqlTrackCallback*);
 
 protected:
@@ -71,8 +80,9 @@ protected:
     virtual void doRequest(QueryRunnable *);
 
 public:
-    void enqueueParse(const char* sRql, ILocalRqlParseCallback *);
+    void enqueueParse(const char* sRql, ILocalRqlParseCallback*);
     void enqueueGetNextTrack(class RqlQuery*, ILocalRqlTrackCallback*);
+    void enqueueDelete(class RqlQuery*);
 };
 
 

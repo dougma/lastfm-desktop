@@ -23,7 +23,22 @@
 
 #include <QSet>
 
-class ResultSet : public QSet<uint>
+struct TrackResult
+{
+    uint trackId;
+//    uint artistId;
+    float weight;
+
+    bool operator==(const TrackResult& that) const
+    {
+        return this->trackId == that.trackId;
+    }
+};
+
+extern uint qHash(const TrackResult& t);
+
+
+class ResultSet : public QSet<TrackResult>
 {
     // marks a special kind of result set which 
     // has come from an unsupported rql service name.
@@ -39,20 +54,32 @@ public:
     {
     }
 
-    ResultSet(const QSet<uint>& set)
-        :QSet<uint>(set)
-    {
-    }
-
+    // intersect the other ResultSet with this one. 
     ResultSet and(const ResultSet &other)
     {
         intersect(other);
         return *this;
     }
 
+    // 'unite' the other ResultSet with this one. 
+    // the weights are added when a TrackResult appears in both sets.
     ResultSet or(const ResultSet &other)
     {
-        unite(other);
+        ResultSet others;
+        foreach(const TrackResult& t, other)
+        {
+            ResultSet::iterator it = find(t);
+            if (it == end()) {
+                others.insert(t);
+            } else {
+                // operator* gives a const reference, but we're
+                // not modifiing the trackId (the source of the hash)
+                // so we're safe to cast it away
+                const_cast<TrackResult*>(&(*it))->weight += t.weight;
+            }
+        }
+
+        unite(others);
         return *this;
     }
 

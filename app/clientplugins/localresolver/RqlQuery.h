@@ -22,16 +22,16 @@
 
 #include "SimilarArtists.h"
 #include "../ILocalRql.h"
-#include <QSet>
+#include <QVector>
 
 
 class RqlQuery : public ILocalRqlTrackSource
 {
     class RqlQueryThread* m_queryThread;
-    QSet<uint> m_tracks;
+    ResultSet m_tracks;
 
 public:
-    RqlQuery(class RqlQueryThread* queryThread, QSet<uint> tracks);
+    RqlQuery(class RqlQueryThread* queryThread, ResultSet tracks);
 
     void getNextTrack(LocalCollection&, ILocalRqlTrackCallback*);
 

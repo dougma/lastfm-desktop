@@ -58,6 +58,8 @@ LocalRqlPlugin::finished()
     delete this;
 }
 
+
+// it leaks, and there's no feedback, it's just here for testing!
 void
 LocalRqlPlugin::testTag(const char *url)
 {
@@ -65,9 +67,6 @@ LocalRqlPlugin::testTag(const char *url)
         LocalCollection *pCollection = LocalCollection::create("TestTag");
         TagifierRequest *pTagifier = new TagifierRequest(*pCollection, QString::fromUtf8(url));
         bool requestedOk = pTagifier->makeRequest();
-        Q_ASSERT(requestedOk);
-        delete pTagifier;
-        delete pCollection;
     } catch (const QueryError& qe) {
         QString err = qe.text();
         int ii =0;

@@ -23,6 +23,7 @@
 #include "LocalCollection.h"
 #include "SimilarArtists.h"
 
+
 using namespace fm::last::query_parser;
 
 
@@ -101,25 +102,53 @@ RqlOpProcessor::unsupported()
 ResultSet 
 RqlOpProcessor::globalTag()
 {
-    return m_collection.filesWithTag(m_it->name.data());
+    typedef QPair<uint, float> TrackPair;
+
+    QList<TrackPair> tracks(m_collection.filesWithTag(m_it->name.data()));
+
+    ResultSet rs;
+    foreach(const TrackPair& tp, tracks) {
+        TrackResult tr;
+        tr.trackId = tp.first;
+        tr.weight = tp.second;
+        rs << tr;
+    }
+    normalise(m_it->weight, rs);
+    return rs;
 }
 
 ResultSet 
 RqlOpProcessor::userTag()
 {
-    return m_collection.filesWithTag(m_it->name.data());
+    // todo: we have no user tags yet
+    return globalTag();
 }
 
 ResultSet 
 RqlOpProcessor::artist()
 {
-    return m_collection.filesByArtist(m_it->name.data());
+    QList<uint> tracks(m_collection.filesByArtist(m_it->name.data()));
+    ResultSet rs;
+    int count = tracks.size();
+    if (count) {
+        float weight = m_it->weight / count;
+        foreach(uint id, tracks) {
+            TrackResult tr;
+            tr.trackId = id;
+            tr.weight = weight;
+            rs << tr;
+        }
+        normalise(m_it->weight, rs);
+    }
+    return rs;
 }
 
 ResultSet 
 RqlOpProcessor::similarArtist()
 {
-    return m_similarArtists.filesBySimilarArtist(m_collection, m_it->name.data());
+    ResultSet rs( m_similarArtists.filesBySimilarArtist(m_collection, m_it->name.data()) );
+    normalise(m_it->weight, rs);
+    return rs;
 }
 
 // static
@@ -127,4 +156,21 @@ ResultSet
 RqlOpProcessor::process(QList<RqlOp> &ops, LocalCollection& collection, SimilarArtists& similarArtists)
 {
     return RqlOpProcessor(ops, collection, similarArtists).process();
+}
+
+void
+RqlOpProcessor::normalise(float weight, ResultSet& rs)
+{
+    if (weight < 0.0001) return;
+
+    float sum = 0;
+    foreach(const TrackResult& tr, rs) {
+        sum += tr.weight;
+    }
+    sum /= weight;
+    if (sum < 0.0001) return;
+
+    for(ResultSet::iterator p = rs.begin(); p != rs.end(); p++) {
+        const_cast<TrackResult*>(&(*p))->weight /= sum;
+    }
 }

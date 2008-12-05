@@ -23,9 +23,10 @@
 #include <QUrl>
 
 extern QString remapVolumeName(const QString& volume);
+extern QVector<uint> sample(ResultSet rs, unsigned playlistSize);
 
 
-RqlQuery::RqlQuery(RqlQueryThread* queryThread, QSet<uint> tracks)
+RqlQuery::RqlQuery(RqlQueryThread* queryThread, ResultSet tracks)
 :m_queryThread(queryThread)
 ,m_tracks(tracks)
 {
@@ -50,9 +51,8 @@ RqlQuery::getNextTrack(ILocalRqlTrackCallback* cb)
 void
 RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
 {
-    while (m_tracks.size()) {
-        int fileId = *m_tracks.begin();
-        m_tracks.remove(fileId);
+    if (m_tracks.size()) {
+        uint fileId = sample(m_tracks, 1)[0];
 
         LocalCollection::FileResult result;
         if (collection.getFileById(fileId, result)) {
@@ -71,5 +71,5 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
 void
 RqlQuery::finished()
 {
-    delete this;
+    m_queryThread->enqueueDelete(this);
 }

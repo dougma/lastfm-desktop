@@ -77,20 +77,23 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 
     QList<SimilarArtists::Result> artistList = similarArtists(coll, artistId);
 
-    // todo: carry the weights through into ResultSet
-    // for now: just tracks from the top similar artists 
-    // (excluding the artist in question!)
     ResultSet result;
     qSort(artistList.begin(), artistList.end());
 
     QList<SimilarArtists::Result>::iterator pArtist = artistList.begin();
     int artistCount = 0;
     int trackCount = 0;
-    while ((trackCount < 100 || artistCount < 5) && pArtist != artistList.end())
+    while ((trackCount < 10000 || artistCount < 20) && pArtist != artistList.end())
     {
         if (pArtist->first != artistId) {
-            QSet<uint> tracks = coll.allTracksByArtistId(pArtist->first) ;
-            result.unite(tracks);
+            QList<uint> tracks = coll.filesByArtistId(pArtist->first);
+            foreach(uint trackId, tracks) {
+                TrackResult tr;
+                tr.trackId = trackId;
+//                tr.artistId =  pArtist->first;
+                tr.weight = pArtist->second;
+                result << tr;
+            }
             trackCount += tracks.size();
             artistCount++;
         }

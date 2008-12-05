@@ -203,11 +203,11 @@ public:
     QList<LocalCollection::ResolveResult> resolve(const QString artist, const QString album, const QString title);
 
     // rql support
-    QSet<unsigned> filesWithTag(QString tag);
-    QSet<unsigned> filesByArtist(QString artist);
     EntryList allTags();
-    bool getFileById(int fileId, LocalCollection::FileResult &out);
-    QSet<unsigned> allTracksByArtistId(int artistId);
+    QList< QPair<unsigned, float> > filesWithTag(QString tag);
+    QList<unsigned> filesByArtist(QString artist);
+    QList<unsigned> filesByArtistId(int artistId);
+    bool getFileById(uint fileId, LocalCollection::FileResult &out);
 
     // tag handling
     int getTagId(QString tag, bool bCreate);
