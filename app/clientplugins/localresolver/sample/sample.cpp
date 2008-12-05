@@ -60,40 +60,30 @@ bool orderByWeightDesc(const std::pair<uint, float>& a, const std::pair<uint, fl
     return a.second > b.second;
 }
 
-QVector<uint>
-sample(ResultSet rs, unsigned playlistSize)
+uint
+sample(ResultSet rs)
 {
     // convert the ResultSet to a vector for sorting
-    std::vector<std::pair<uint, float>> tracks;
+    std::vector<std::pair<uint, float> > tracks;
     float totalWeight = 0;
     foreach (const TrackResult& tr, rs) {
         tracks.push_back(std::make_pair(tr.trackId, tr.weight));
         totalWeight += tr.weight;
     }
 
-    if (tracks.size() < playlistSize)
-        playlistSize = tracks.size();
-
-    QVector<uint> result;
-    result.resize(playlistSize);
-    QVector<uint>::iterator pResult = result.begin();
-
-    /////
-
-    std::vector<std::pair<uint, float>>::iterator pBegin = tracks.begin();
-    std::vector<std::pair<uint, float>>::iterator pEnd = tracks.end();
+    std::vector<std::pair<uint, float> >::iterator pBegin = tracks.begin();
+    std::vector<std::pair<uint, float> >::iterator pEnd = tracks.end();
 
     std::sort(pBegin, pEnd, orderByWeightDesc);
 
     // normalise weights, sum to 1
-    std::vector<std::pair<uint, float>>::iterator pIt = tracks.begin();
+    std::vector<std::pair<uint, float> >::iterator pIt = tracks.begin();
     for (; pIt != pEnd; pIt++) {
         pIt->second /= totalWeight;
     }
 
+    // pull out a single sample
     ListBasedSampler<AccessPolicy, CopyPolicy> sampler;
-    sampler.multiSample(pBegin, pEnd, pResult, playlistSize, true);
-
-    return result;
+    return sampler.singleSample(pBegin, pEnd, true).first;
 }
 
