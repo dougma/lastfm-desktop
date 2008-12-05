@@ -33,6 +33,8 @@ void LocalRqlDialog::onPlay()
 void 
 LocalRqlDialog::onParseGood(unsigned trackCount)
 {
+    Q_UNUSED(trackCount);
+
     LocalRqlResult* rqlResult = dynamic_cast<LocalRqlResult*>(sender());
     if (rqlResult) {
         LocalRadioTrackSource* lrts = new LocalRadioTrackSource(rqlResult);

@@ -437,7 +437,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
     if ( bCreate ) {
         int artistId = 
         PREPARE(
-            "INSERT INTO artists (lowercase_name, updates_since_dl) "
+            "INSERT INTO artists (lowercase_name) "
             "VALUES (:lowercase_name, 0)" ).
         bindValue( ":lowercase_name", lowercase_name ).
         exec().
@@ -467,18 +467,6 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
     bindValue( ":album", info.m_album ).
     bindValue( ":kbps", info.m_kbps ).
     bindValue( ":duration", info.m_duration ).
-    exec();
-
-    updateArtist( artistId );
-}
-
-void
-LocalCollection::updateArtist(int artistId)
-{
-    PREPARE(
-        "UPDATE artists SET updates_since_dl = updates_since_dl + 1 "
-        "WHERE id = :artistId" ).
-    bindValue( ":artistId", artistId ).
     exec();
 }
 
@@ -551,59 +539,6 @@ LocalCollection::getTagId(QString tag, bool bCreate)
     return 0;
 }
 
-// returns up to 10 artists with expired tags
-// ordered by artists who've had the most updates since last download
-QStringList
-LocalCollection::artistsWithExpiredTags()
-{
-    uint now = QDateTime::currentDateTime().toUTC().toTime_t();
-
-    QSqlQuery query = PREPARE( 
-        "SELECT lowercase_name "
-        "FROM artists "
-        "WHERE ( next_dl_time IS NULL "
-        "OR next_dl_time < :now )"
-        "AND lowercase_name != '' "
-        "ORDER BY updates_since_dl DESC "
-        "LIMIT 10" ).
-    bindValue( ":now", now ).
-    exec();
-
-    QStringList result;
-    while ( query.next() ) {
-        result << query.value( 0 ).toString();
-    }
-    return result;
-}
-
-
-// returns up to 10 artists whose tags need updating (the last update 
-// has not necessarily expired)
-// ordered by artists who've had the most updates since last download
-QStringList
-LocalCollection::artistsNeedingTagUpdate()
-{
-    QSqlQuery q = QUERY( 
-        "SELECT lowercase_name "
-        "FROM artists WHERE "
-        "lowercase_name != '' "
-        "AND updates_since_dl > 0 "
-        "ORDER BY updates_since_dl DESC "
-        "LIMIT 10" );
-
-    QStringList result;
-    while ( q.next() ) {
-        result << q.value( 0 ).toString();
-    }
-    return result;
-}
-
-void
-LocalCollection::deleteUserTrackTagsForArtist(int artistId, unsigned userId)
-{
-    deleteTrackTagsForArtist( artistId, userId );
-}
-
 void
 LocalCollection::deleteGlobalTrackTagsForArtist(int artistId)
 {
@@ -638,19 +573,6 @@ LocalCollection::setGlobalTagsForArtist(QString artist, WeightedStringList globa
 }
 
 void
-LocalCollection::setUserTagsForArtist(QString artist, QStringList userTags, unsigned userId)
-{
-    int artistId = getArtistId( artist, true );
-    deleteUserTrackTagsForArtist( artistId, userId );
-    foreach(QString tag, userTags) {
-        insertUserArtistTag(
-            artistId,
-            getTagId( tag, true ),
-            userId );
-    }
-}
-
-void
 LocalCollection::insertUserArtistTag(int artistId, int tagId, unsigned userId)
 {
     insertTrackTag(artistId, tagId, userId, 100);
@@ -676,33 +598,6 @@ LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int we
     bindValue( ":weight", weight ).
     bindValue( ":userId", userId ).
     exec();
-}
-
-void 
-LocalCollection::updateArtistDownload(QString artist, QDateTime nextDlTime, QDateTime dlTime /* = QDateTime() */)
-{
-    Q_ASSERT(nextDlTime.isValid());
-
-    if (dlTime.isValid()) {
-        PREPARE(
-            "UPDATE artists SET "
-            "updates_since_dl = 0, "
-            "dl_time = :dl_time, "
-            "next_dl_time = :next_dl_time "
-            "WHERE lowercase_name == :artist" ).
-        bindValue( ":artist", artist ).
-        bindValue( ":dl_time", dlTime.toUTC().toTime_t() ).
-        bindValue( ":next_dl_time", nextDlTime.toUTC().toTime_t() ).
-        exec();
-    } else {
-        PREPARE(
-            "UPDATE artists SET "
-            "next_dl_time = :next_dl_time "
-            "WHERE lowercase_name == :artist" ).
-        bindValue( ":artist", artist ).
-        bindValue( ":next_dl_time", nextDlTime.toUTC().toTime_t() ).
-        exec();
-    }
 }
 
 QList<QPair<unsigned, float> >

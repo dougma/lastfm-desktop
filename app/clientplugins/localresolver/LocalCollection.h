@@ -188,7 +188,6 @@ public:
     bool getDirectoryId(int sourceId, QString path, int &result);
 
     int getArtistId(QString artistName, bool bCreate);
-    void updateArtist(int artistId);
 
     bool addDirectory(int sourceId, QString path, int &resultId);
     void removeDirectory(int directoryId);
@@ -211,12 +210,7 @@ public:
 
     // tag handling
     int getTagId(QString tag, bool bCreate);
-    QStringList artistsWithExpiredTags();
-    QStringList artistsNeedingTagUpdate();
-
     void setGlobalTagsForArtist(QString artist, WeightedStringList globalTags);
-    void setUserTagsForArtist(QString artist, QStringList userTags, unsigned userId);
-    void updateArtistDownload(QString artist, QDateTime nextDlTime, QDateTime dlTime = QDateTime());
 
     void deleteUserTrackTagsForArtist(int artistId, unsigned userId);
     void deleteGlobalTrackTagsForArtist(int artistId);

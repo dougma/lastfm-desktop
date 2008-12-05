@@ -79,11 +79,11 @@ TagUpdater::run()
 void
 TagUpdater::launchNextBatch()
 {
-    if (0 == startRequests(m_collection->artistsWithExpiredTags())) {
-        if (0 == startRequests(m_collection->artistsNeedingTagUpdate())) {
-            m_timer->start(TAGUPDATER_IDLE_WAIT_MS);
-        }
-    }
+    //if (0 == startRequests(m_collection->artistsWithExpiredTags())) {
+    //    if (0 == startRequests(m_collection->artistsNeedingTagUpdate())) {
+    //        m_timer->start(TAGUPDATER_IDLE_WAIT_MS);
+    //    }
+    //}
 }
 
 // returns the number of requests started
@@ -165,7 +165,7 @@ TagUpdater::onWsFinished(WsReply* r)
         }
         // 'now' may be invalid, which is fine: it 
         // means we didn't update the artist details
-        m_collection->updateArtistDownload(artist, next, now);
+//        m_collection->updateArtistDownload(artist, next, now);
 
         m_activeRequests -= r;
         if (0 == m_activeRequests.size()) {
