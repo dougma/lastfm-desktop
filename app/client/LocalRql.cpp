@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "LocalRql.h"
+#include "lib/lastfm/types/Track.h"
 
 
 LocalRqlResult::LocalRqlResult()
@@ -81,14 +82,14 @@ LocalRqlResult::trackFail()
 ////////////////////////////////////////////
 
 
-LocalRql::LocalRql(const QList<ILocalRqlPlugin*>& plugins)
+LocalRql::LocalRql(const QList<ILocalRqlPlugin*>& plugins) : m_plugin( 0 )
 {
-    if (plugins.size()) {
-        m_plugin = plugins[0];
-        m_plugin->init();
-    } else {
-        m_plugin = 0;
-    }
+    //TODO make the list make sense
+    
+    if (!plugins.size()) return;
+
+    m_plugin = plugins[0];
+    m_plugin->init();
 }
 
 LocalRql::~LocalRql()

@@ -21,8 +21,8 @@
 #define LOCAL_RQL_H
 
 #include <QObject>
-#include "lib/lastfm/types/Track.h"
 #include "app/clientplugins/ILocalRql.h"
+
 
 class LocalRqlResult 
     : public QObject
@@ -55,8 +55,8 @@ public:
 
 signals:
     void parseGood(unsigned);
-    void parseBad(int, QString, int);
-    void track(Track);
+    void parseBad(int, const QString&, int);
+    void track(const class Track& );
     void endOfTracks();
 };
 

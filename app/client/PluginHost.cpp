@@ -27,18 +27,19 @@
 PluginHost::PluginHost(const QString& pluginPath)
 {
     QDir pluginDir(pluginPath);
-    foreach(const QString& f, pluginDir.entryList(QDir::Files)) {
-        if (QLibrary::isLibrary(pluginDir.filePath(f))) {
-            // it looks like a shared library, so try loading it:
-            QLibrary lib(pluginDir.filePath(f));
-            P_getService get = (P_getService) lib.resolve(PLUGIN_ENTRYPOINT);
-            if (get) {
-                m_plugins << get;
-                // and the lib will remain loaded until app terminates. ok?
-            } else {
-                lib.unload();
-            }
-        }
+    foreach(const QString& f, pluginDir.entryList(QDir::Files)) 
+    {
+        if (!QLibrary::isLibrary(pluginDir.filePath( f ))) continue;
+
+        // it looks like a shared library, so try loading it:
+        QLibrary lib( pluginDir.filePath( f ) );
+        P_getService get = (P_getService) lib.resolve( PLUGIN_ENTRYPOINT );
+        
+        if (get) 
+            m_plugins << get;
+            // and the lib will remain loaded until app terminates. ok?
+        else
+            lib.unload();
     }
     
     qDebug() << "Found" << m_plugins.count() << "plugins";

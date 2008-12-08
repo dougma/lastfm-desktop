@@ -49,4 +49,4 @@ public:
 	}
 };
 
-#endif // MESSAGEBOX_H
+#endif // MESSAGE_BOX_BUILDER_H

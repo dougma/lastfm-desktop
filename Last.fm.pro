@@ -7,7 +7,7 @@ debug:macx-xcode {
 	VERSION	= 2.0.0
 	QMAKE_INFO_PLIST = app/client/mac/Info.plist
 
-    CONFIG += mad fftw3f samplerate
+    CONFIG += mad fftw3f samplerate taglib sqlite3
 
     include( $$ROOT_DIR/common/qmake/include.pro )
 
@@ -16,7 +16,8 @@ debug:macx-xcode {
 
     DIRS = app/client \
            lib/lastfm/core lib/lastfm/ws lib/lastfm/radio lib/lastfm/types lib/lastfm/scrobble lib/lastfm/fingerprint \
-           lib/unicorn
+           lib/unicorn \
+           app/clientplugins/localresolver
 
     for( dir, DIRS ) {
         SOURCES += $$findSources( cpp, $$dir )

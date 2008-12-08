@@ -50,8 +50,13 @@
 #ifdef WIN32
     #include "legacy/disableHelperApp.cpp"
 #endif
-#ifdef Q_WS_MAC
-    extern void qt_mac_set_menubar_icons( bool );
+#ifdef __APPLE__
+    extern void qt_mac_set_menubar_icons( bool );    
+#ifndef NDEBUG
+    #define NPLUGINS
+    #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
+    #include "app/clientplugins/localresolver/TrackResolver.h"
+#endif
 #endif
 
 
@@ -124,9 +129,15 @@ App::App( int& argc, char** argv )
 #endif
 #endif
 
+#ifdef NPLUGINS
+    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << new LocalRqlPlugin );
+    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << new TrackResolver );
+#else
     PluginHost pluginHost( plugins_path );    // todo: make this a member so we can reuse it?
     m_localRql = new LocalRql( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
+#endif
+
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( Settings().volume() );
 
@@ -534,11 +545,13 @@ App::submitTwiddleCache( const QString& path )
     //TODO message "Your iPod tracks will be submitted at the end of this track"
 }
 
+
 LocalRql*
 App::localRql()
 {
     return m_localRql;
 }
+
 
 #include "the/app.h"
 namespace The
