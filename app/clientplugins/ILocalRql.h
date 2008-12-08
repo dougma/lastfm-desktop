@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 
-#ifndef ILOCALRQL_H
-#define ILOCALRQL_H
+#ifndef I_LOCAL_RQL_H
+#define I_LOCAL_RQL_H
 
 #pragma GCC system_header
 

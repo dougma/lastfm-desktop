@@ -33,7 +33,7 @@ using namespace std;
 using namespace fm::last::query_parser;
 
 
-RqlOp root2op( const querynode_data& node )
+static RqlOp root2op( const querynode_data& node )
 {
    RqlOp op;
    op.isRoot = true;
@@ -45,7 +45,7 @@ RqlOp root2op( const querynode_data& node )
 }
 
 
-RqlOp leaf2op( const querynode_data& node )
+static RqlOp leaf2op( const querynode_data& node )
 {
    RqlOp op;
    op.isRoot = false;

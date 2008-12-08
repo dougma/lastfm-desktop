@@ -96,6 +96,8 @@ LocalContentScanner::startFullScan()
 void
 LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 {
+    qDebug() << path;
+    
     const int sourceId = sl.source().m_id;
 	const QString fullPath(sl.source().m_volume + path);
 
