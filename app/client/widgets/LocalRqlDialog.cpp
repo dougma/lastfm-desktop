@@ -19,7 +19,8 @@ LocalRqlDialog::LocalRqlDialog( QWidget *parent )
     }
 }
 
-void LocalRqlDialog::onPlay()
+void
+LocalRqlDialog::onPlay()
 {
     QString rql = ui.lineEditRql->text();
     LocalRqlResult* rqlResult = The::app().localRql()->startParse(rql);
