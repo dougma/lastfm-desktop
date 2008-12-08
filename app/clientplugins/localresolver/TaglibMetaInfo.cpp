@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include "TaglibMetaInfo.h"
-#include "tag.h"
+#include <taglib/tag.h>
 
 
 // a factory method (currently we're using taglib to get out metaInfo)

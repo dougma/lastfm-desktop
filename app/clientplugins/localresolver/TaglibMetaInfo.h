@@ -22,13 +22,13 @@
 
 #include "MediaMetaInfo.h"
 // taglib:
-#include "fileref.h"
-#include "mpegfile.h"
-#include "flacfile.h"
-#include "mpcfile.h"
-#include "oggfile.h"
-#include "trueaudiofile.h"
-#include "wavpackfile.h"
+#include <taglib/fileref.h>
+#include <taglib/mpegfile.h>
+#include <taglib/flacfile.h>
+#include <taglib/mpcfile.h>
+#include <taglib/oggfile.h>
+#include <taglib/trueaudiofile.h>
+#include <taglib/wavpackfile.h>
 
 
 // taglib specialisation of MediaMetaInfo
