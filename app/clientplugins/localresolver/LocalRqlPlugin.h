@@ -17,11 +17,12 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LOCAL_RQL_H
-#define LOCAL_RQL_H
+#ifndef LOCAL_RQL_PLUGIN_H
+#define LOCAL_RQL_PLUGIN_H
 
 #include "../ILocalRql.h"
 #include "SimilarArtists.h"
+
 
 
 class LocalRqlPlugin : public ILocalRqlPlugin
