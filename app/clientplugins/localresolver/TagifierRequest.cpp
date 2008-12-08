@@ -90,6 +90,8 @@ Batcher::doBatch()
 
 void Batcher::process(int fileId, QString tag, float weight)
 {
+    qDebug() << tag;
+    
     m_fileIds << fileId;
     m_tags << tag;
     m_weights << weight;
