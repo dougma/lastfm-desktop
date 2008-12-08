@@ -79,7 +79,7 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
     if ( fileSize > 500000 )
     {
         ifstream inFile( path );
-        inFile.seekg( static_cast<streamoff>( fileSize - 400000 ) );
+        inFile.seekg( -400000, std::ios_base::end );
         istreambuf_iterator<char> bufReader( inFile ), end;
         string sFile;
         sFile.reserve( 400005 );
