@@ -50,7 +50,11 @@ LocalRqlDialog::onParseBad(int errorLineNumber, QString errorLine, int errorOffs
     Q_UNUSED( errorLineNumber );
     Q_UNUSED( errorOffset );
     
-    QMessageBox::critical(this, "RQL parse error", errorLine, QMessageBox::Cancel, QMessageBox::Cancel);
+    MessageBoxBuilder( this )
+            .setTitle( "RQL parse error" )
+            .setText( errorLine )
+            .sheet()
+            .exec();
 }
 
 void
