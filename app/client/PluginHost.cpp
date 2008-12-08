@@ -21,6 +21,7 @@
 #include <QLibrary>
 #include <QDir>
 #include <QThread>
+#include <QDebug>
 
 
 PluginHost::PluginHost(const QString& pluginPath)
@@ -39,5 +40,8 @@ PluginHost::PluginHost(const QString& pluginPath)
             }
         }
     }
+    
+    qDebug() << "Found" << m_plugins.count() << "plugins";
 }
+
 
