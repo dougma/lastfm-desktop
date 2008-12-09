@@ -80,6 +80,9 @@ protected:
     virtual void doRequest(QueryRunnable *);
 
 public:
+    RqlQueryThread() : m_pCollection( 0 )
+    {}
+    
     void enqueueParse(const char* sRql, ILocalRqlParseCallback*);
     void enqueueGetNextTrack(class RqlQuery*, ILocalRqlTrackCallback*);
     void enqueueDelete(class RqlQuery*);
