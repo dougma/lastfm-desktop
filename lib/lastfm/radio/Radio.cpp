@@ -102,12 +102,6 @@ Radio::enqueue()
         Q_ASSERT( 0 );
         return;
     }
-    
-	//if (tracks.isEmpty()) {
-	//	qWarning() << "Received blank playlist, Last.fm is b0rked";
-	//	stop();
-	//	return;
-	//}
 	
     phononEnqueue();
 }
@@ -187,11 +181,7 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
         case Phonon::ErrorState:
 			if (m_mediaObject->errorType() == Phonon::FatalError)
             {
-                QString error = m_mediaObject->errorString();                
-            #ifdef WIN32
-                if (error == "Unknown error 0x800C0008") error = tr("There was an error communicating with Last.fm");
-            #endif
-				emit this->error( Ws::UnknownError, error );
+                qWarning() << "Phonon fatal error:" << m_mediaObject->errorString();
             }
             // seems we need to clear the error state before trying to play again.
             m_bErrorRecover = true;
