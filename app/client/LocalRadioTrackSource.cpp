@@ -42,12 +42,15 @@ LocalRadioTrackSource::~LocalRadioTrackSource()
 Track
 LocalRadioTrackSource::takeNextTrack()
 {
-    if (m_buffer.size()) {
-        return m_buffer.takeFirst();
-    }
-
+    // always have a track ready, this prevents "Tuning in" inbetween
+    // every track
     m_rqlResult->getNextTrack();
-    return Track();
+    
+    Track t;
+    if (m_buffer.size()) 
+        t = m_buffer.takeFirst();
+
+    return t;
 }
 
 void 

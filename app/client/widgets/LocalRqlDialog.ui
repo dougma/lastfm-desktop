@@ -12,81 +12,71 @@
   <property name="windowTitle" >
    <string>RQL testing</string>
   </property>
-  <widget class="QLineEdit" name="lineEditRql" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>541</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEditTagifierUrl" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>150</y>
-     <width>541</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>http://compute1:8080/trackresolve</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>46</width>
-     <height>14</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>RQL</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>130</y>
-     <width>71</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>tagifier url</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="playButton" >
-   <property name="geometry" >
-    <rect>
-     <x>470</x>
-     <y>60</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Play</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="tagButton" >
-   <property name="geometry" >
-    <rect>
-     <x>470</x>
-     <y>180</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Tag</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout" >
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>RQL</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEditRql" />
+   </item>
+   <item>
+    <widget class="QPushButton" name="playButton" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>Play</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Tagifier URL</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEditTagifierUrl" >
+     <property name="text" >
+      <string>http://musiclookup.last.fm/trackresolve</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="tagButton" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>Fetch Tags</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

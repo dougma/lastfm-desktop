@@ -348,13 +348,15 @@ App::onUserGotInfo( WsReply* reply )
     {
         qWarning() << e;
     }
-}
+} 
 
 
 void
 App::onTrackSpooled( const Track& t )
 {
     if (t.isNull()) return;
+    
+    qDebug() << t;
     
 #ifdef Q_OS_MAC
     if (t.source() == Track::Player && t.isMp3() && moose::Settings().fingerprintingEnabled())
@@ -410,11 +412,11 @@ App::open( const QUrl& url )
 void
 App::open( const RadioStation& station )
 {
-    m_radio->play( 
-        station, 
-        station.isLegacyPlaylist()
-                ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
-                : (AbstractTrackSource*) new Tuner( station ) );
+    AbstractTrackSource* source = station.isLegacyPlaylist()
+            ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
+            : (AbstractTrackSource*) new Tuner( station );
+
+    m_radio->play( station, source );
 }
 
 
@@ -427,6 +429,7 @@ App::openXspf( const QUrl& url )
         src );
     src->start();
 }
+
 
 // todo: change the param to be the rql string
 void
