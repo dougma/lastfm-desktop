@@ -59,7 +59,10 @@ LocalRadioTrackSource::start()
 void
 LocalRadioTrackSource::onTrack(Track t)
 {
-    m_buffer.push_back(t);
+    // decided by rgarrett 2008-12-09
+    MutableTrack( t ).setSource( Track::PersonalisedRecommendation );
+    
+    m_buffer += t;
     emit trackAvailable();
 }
 
@@ -68,4 +71,3 @@ LocalRadioTrackSource::onEndOfTracks()
 {
     emit error( Ws::NotEnoughContent );
 }
-
