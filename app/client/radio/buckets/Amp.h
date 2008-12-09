@@ -22,10 +22,8 @@
 
 #include <QWidget>
 #include "SeedTypes.h"
-#include "lib/lastfm/types/Track.h"
-#include "widgets/UnicornWidget.h"
 #include "State.h"
-#include <QMouseEvent>
+class Track;
 
 
 class Amp : public QWidget
@@ -55,11 +53,6 @@ signals:
 protected:
     virtual void paintEvent( QPaintEvent* );   
     virtual void resizeEvent( QResizeEvent* );
-    
-    enum AnimationPosition { Left = 0, Right };
-    
-    void showWidgetAnimated( QWidget* w, AnimationPosition );
-    void hideWidgetAnimated( QWidget* w, AnimationPosition );
 
 protected slots:
     void onPlayerBucketChanged();
@@ -68,11 +61,14 @@ protected slots:
     void onTrackSpooled( const Track&, class StopWatch* );
     void onStateChanged( State, const Track& );
 
-    
 private:
     void setupUi();
-    State m_playerState;
+    void setRadioControlsVisible( bool );
+    bool isRadioControlsVisible() const;
     
+    State m_playerState;
+
+    class QTimeLine* m_timeline;
 };
 
 #endif

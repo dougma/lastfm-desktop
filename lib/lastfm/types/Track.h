@@ -160,13 +160,10 @@ public:
 	QUrl www() const;
 	
 protected:
-    friend class MutableTrack;
-    // we couldn't just make this protected because c++ is stupid
-    // and you can't reference the d pointer from a copy of the baseclass
     QExplicitlySharedDataPointer<TrackData> d;
     
 private:
-    Track( TrackData* thatd ) : d( thatd )
+    Track( TrackData* that_d ) : d( that_d )
     {}
 };
 
@@ -231,7 +228,7 @@ TrackData::TrackData()
 #include <QDebug>
 inline QDebug operator<<( QDebug d, const Track& t )
 {
-    return d << t.toString( '-' ) << t.album();
+    return d << t.toString( '-' ) << t.url();
 }
 
 

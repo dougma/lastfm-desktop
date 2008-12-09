@@ -28,10 +28,10 @@
 #include "widgets/ImageButton.h"
 #include "PlayableListItem.h"
 #include "PlayerBucketList.h"
-
 #include <QPaintEvent>
 #include <QPainter>
 #include <QTimeLine>
+
 
 struct BorderedContainer : public QWidget
 {
@@ -74,6 +74,7 @@ struct BorderedContainer : public QWidget
     }
     
     void showText( bool b ){ m_showText = b; update();}
+    bool isTextShown() const { return m_showText; }
     
     void resizeEvent( QResizeEvent* e )
     {
@@ -99,12 +100,19 @@ private: QString m_text; bool m_showText;
 
 
 Amp::Amp()
-{
+{    
     setupUi();
     
-    connect( qApp, SIGNAL(trackSpooled( const Track&, StopWatch*)), SLOT( onTrackSpooled(const Track&, StopWatch*)) );
-    connect( qApp, SIGNAL(stateChanged( State, Track)), SLOT( onStateChanged(  State, Track)) );
-    connect( qApp, SIGNAL(playerChanged( QString )), SLOT( onPlayerChanged( QString )));
+    connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled(Track, StopWatch*)) );
+    connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onStateChanged( State, Track )) );
+    connect( qApp, SIGNAL(playerChanged( QString )), SLOT(onPlayerChanged( QString )));
+
+    m_timeline = new QTimeLine( 500, this );
+    m_timeline->setUpdateInterval( 10 );
+    connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(onWidgetAnimationFrameChanged( int )));
+    
+    // we take the common factor of the two widths
+    m_timeline->setFrameRange( 0, ui.controls->width() * ui.volume->width() );
     
     onPlayerBucketChanged();
 }
@@ -182,23 +190,44 @@ Amp::setupUi()
 void 
 Amp::onPlayerBucketChanged()
 {
-    if( ui.bucket->count() > 0 )
+    setRadioControlsVisible( ui.bucket->count() > 0 );
+}
+
+
+bool
+Amp::isRadioControlsVisible() const
+{
+    if (m_timeline->state() == QTimeLine::Running)
+        return m_timeline->direction() == QTimeLine::Backward;
+    
+    return ui.controls->x() == 0;
+}
+
+
+void
+Amp::setRadioControlsVisible( bool b )
+{
+    if (b == isRadioControlsVisible())
+        return;
+
+    if (b)
     {
-        showWidgetAnimated( ui.controls, Left );
-        showWidgetAnimated( ui.volume, Right );
+        m_timeline->setDirection( QTimeLine::Backward );
+        m_timeline->start();
         ui.borderWidget->showText( false );
     }
-    else
+    else 
     {
-        hideWidgetAnimated( ui.controls, Left );
-        hideWidgetAnimated( ui.volume, Right );
+        m_timeline->setDirection( QTimeLine::Forward );
+        m_timeline->start();
+
         if( m_playerState != Paused )
             ui.borderWidget->showText( true );
     }
 }
 
 
-void 
+void
 Amp::addAndLoadItem( const QString& itemText, const Seed::Type type )
 {
     PlayableListItem* item = new PlayableListItem;
@@ -226,7 +255,7 @@ Amp::resizeEvent( QResizeEvent* event )
     if( event->size().width() == event->oldSize().width() )
         return;
     
-    if( ui.bucket->count() == 0 )
+    if (!isRadioControlsVisible())
     {
         ui.controls->move( -ui.controls->rect().width(), 0);
         ui.volume->move( ui.volume->rect().width(), 0);
@@ -250,70 +279,16 @@ Amp::paintEvent( QPaintEvent* event )
 }
 
 
-
-
-void 
-Amp::showWidgetAnimated( QWidget* w, AnimationPosition p )
-{
-    if( w->pos().x() == 0 )
-        return;
-    
-    QTimeLine* tl = new QTimeLine( 500, w );
-    tl->setUpdateInterval( 10 );
-    switch( p )
-    {
-        case Left:       
-            tl->setFrameRange( -w->rect().width(), 0 );
-            break;
-        case Right:
-            tl->setFrameRange( w->rect().width(), 0 );
-            break;
-        default:
-            Q_ASSERT( !"Unknown animation position" );
-            break;
-    }
-    connect( tl, SIGNAL( frameChanged( int )), this, SLOT( onWidgetAnimationFrameChanged( int )));
-    connect( tl, SIGNAL( finished()), tl, SLOT( deleteLater()));
-    tl->start();
-}
-
-
-void 
-Amp::hideWidgetAnimated( QWidget* w, AnimationPosition p )
-{
-    if( w->pos().x() > 0 || w->pos().x() < 0 )
-        return;
-
-    QTimeLine* tl = new QTimeLine( 500, w );
-    tl->setUpdateInterval( 10 );
-    switch( p )
-    {
-        case Left:       
-            tl->setFrameRange( 0, -w->rect().width() );
-            break;
-        case Right:
-            tl->setFrameRange( 0, w->rect().width() );
-            break;
-        default:
-            Q_ASSERT( !"Unknown animation position" );
-            break;
-    }
-
-    connect( tl, SIGNAL( frameChanged( int )), this, SLOT( onWidgetAnimationFrameChanged( int )));
-    connect( tl, SIGNAL( finished()), tl, SLOT( deleteLater()));
-    tl->start();
-}
-
-
 void 
 Amp::onWidgetAnimationFrameChanged( int frame )
 {
-    QTimeLine* tl = qobject_cast<QTimeLine*>(sender());
-    QWidget* w = qobject_cast<QWidget*>(tl->parent());
-    if( !w )
-        return;
-    
-    w->move( frame, w->pos().y());
+    QWidget* left = ui.controls;
+    QWidget* right = ui.volume;
+    int const xleft = 0 - frame / right->width();
+    int const xright = (right->parentWidget()->width() - right->width()) + frame / left->width();
+
+    left->move( xleft, left->y() );
+    right->move( xright, right->y() );
 }
 
 
@@ -335,6 +310,17 @@ Amp::onTrackSpooled( const Track& t, StopWatch* )
 void 
 Amp::onStateChanged( State s, const Track& t )
 {
+    switch ((int)s)
+    {
+        case TuningIn:
+            setRadioControlsVisible( true );
+            break;
+        case Stopped:
+            setRadioControlsVisible( ui.bucket->count() > 0 );
+            break;
+    }
+    
+    // couldn't figure out what any of this meant exactly, Jono --mxcl
     m_playerState = s;
     if( t.source() != Track::LastFmRadio && s == Paused )
         ui.borderWidget->showText( false );
