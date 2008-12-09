@@ -49,8 +49,8 @@ LocalContentScanner::LocalContentScanner()
 
 LocalContentScanner::~LocalContentScanner()
 {
-    m_bStopping = true;     // cause runnables to exit
-    delete m_pool;          // waits for queued runnables to exit
+    m_bStopping = true;   // cause runnables to exit
+    delete m_pool;        // waits for queued runnables to exit
 }
 
 
@@ -96,8 +96,6 @@ LocalContentScanner::startFullScan()
 void
 LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 {
-    qDebug() << path;
-    
     const int sourceId = sl.source().m_id;
 	const QString fullPath(sl.source().m_volume + path);
 
