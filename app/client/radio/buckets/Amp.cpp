@@ -126,24 +126,6 @@ Amp::setupUi()
     layout()->setSpacing( 13 );
     layout()->setContentsMargins( 11, 9, 12, 11 );
     
-    {
-        QVBoxLayout* v = new QVBoxLayout;
-        v->addStretch();
-        v->addWidget( ui.dashboardButton = new ImageButton( QPixmap(":/Amp/button/dashboard/rest.png") ) );
-        v->addWidget( ui.bucketsButton = new ImageButton( QPixmap(":/Amp/button/buckets/rest.png") ) );
-        v->addStretch();
-        v->setMargin( 0 );
-        v->setSpacing( 0 );
-        ((QBoxLayout*)layout())->addLayout( v );
-        
-        QPixmap p1( ":/Amp/button/buckets/checked.png" );
-        QPixmap p2( ":/Amp/button/dashboard/checked.png" );
-//        ui.bucketsButton->setPixmap( p1, QIcon::On );
-//        ui.dashboardButton->setPixmap( p2, QIcon::On );
-        ui.bucketsButton->setPixmap( p1, QIcon::Off, QIcon::Active );
-        ui.dashboardButton->setPixmap( p2, QIcon::Off, QIcon::Active );
-    }
-    
     ui.borderWidget = new BorderedContainer( this );
     
     {

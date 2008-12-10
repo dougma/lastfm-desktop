@@ -76,9 +76,6 @@ public slots:
 	void showTagDialog();
     void showPlaylistDialog();
     void showLocalRqlDialog();
-    
-    // true = open it up
-    void animate( bool = true );
 
 signals:
 	void loved();
@@ -98,7 +95,6 @@ private:
 	
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
-    virtual void resizeEvent( QResizeEvent* );
     virtual QSize sizeHint() const;
     
     Track m_track;
@@ -112,13 +108,6 @@ private:
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
     UNICORN_UNIQUE_DIALOG_DECL( LocalRqlDialog );
 
-    bool m_animating;
-    bool m_animatingDashboard;
-    bool m_animatingSources;
-
-private slots:    
-    void onAnimateFrame( int );
-    void onAnimationFinished();
 };
 
 #endif //MAINWINDOW_H

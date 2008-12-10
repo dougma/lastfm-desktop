@@ -146,6 +146,8 @@ TrackDashboard::TrackDashboard()
     clear();
 
     setAttribute( Qt::WA_MacNoClickThrough );
+    
+    ui.sources = new QPushButton( AuthenticatedUser().name(), this );
 }
 
 

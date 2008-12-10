@@ -32,6 +32,7 @@
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "widgets/TrackDashboard.h"
+#include "layouts/SideBySideLayout.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
@@ -54,8 +55,7 @@
 #define SETTINGS_POSITION_KEY "MainWindowPosition"
 
 
-MainWindow::MainWindow() 
-          : m_animating( false ), m_animatingDashboard( false ), m_animatingSources( false )
+MainWindow::MainWindow()
 {
     setupUi();
 
@@ -72,9 +72,6 @@ MainWindow::MainWindow()
     connect( ui.playlist, SIGNAL(triggered()), SLOT(showPlaylistDialog()) );
     connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
 
-    connect( ui.viewDashboard, SIGNAL(toggled( bool )), SLOT(animate( bool )) );
-    connect( ui.viewSources, SIGNAL(toggled( bool )), SLOT(animate( bool )) );
-    
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
 
@@ -139,7 +136,10 @@ void
 MainWindow::onStateChanged( State s )
 {
 	if (s == TuningIn)
+    {
         ui.dashboard->tuningIn();
+        ui.viewDashboard->trigger();
+    }
 }
 
 
@@ -147,6 +147,12 @@ void
 MainWindow::setupUi()
 {
     ui.setupUi( this );
+    
+    {
+        QActionGroup* ag = new QActionGroup( this );
+        ag->addAction( ui.viewSources );
+        ag->addAction( ui.viewDashboard );
+    }
 
     AuthenticatedUser user;
     ui.account->setTitle( user );
@@ -154,11 +160,23 @@ MainWindow::setupUi()
 
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     setCentralWidget( new QWidget );
+    new QVBoxLayout( centralWidget() );
+    centralWidget()->layout()->setContentsMargins( 0, 0, 0, 0 );
+    centralWidget()->layout()->setSpacing( 0 );
+
     
-    #define T( x, y ) x = y; x->setParent( centralWidget() );
-    T( ui.sources, new Sources );
-    T( ui.dashboard, new TrackDashboard );
+    QWidget* sourceDashboard = new QWidget( centralWidget() );
+    SideBySideLayout* sourceDashboardLayout = new SideBySideLayout( sourceDashboard );
+
+    sourceDashboard->layout()->addWidget( ui.sources = new Sources );
+    sourceDashboard->layout()->addWidget( ui.dashboard = new TrackDashboard );
+
+    connect( ui.viewSources, SIGNAL( triggered()), sourceDashboardLayout, SLOT( moveBackward()));
+    connect( ui.viewDashboard, SIGNAL( triggered()), sourceDashboardLayout, SLOT( moveForward()));
+    centralWidget()->layout()->addWidget( sourceDashboard );
+    
     // these ones should be on top, so created last
+    #define T( x, y ) x = y; centralWidget()->layout()->addWidget( x );
     T( ui.dashboardHeader, new TrackDashboardHeader );
     T( ui.amp, new Amp );
     #undef T
@@ -177,8 +195,8 @@ MainWindow::setupUi()
     ui.dashboardHeader->ui.love->setAction( ui.love );
     ((ActionButton*)ui.dashboardHeader->ui.scrobbleButton)->setAction( ui.scrobble );
     
-    ui.amp->ui.dashboardButton->setAction( ui.viewDashboard );
-    ui.amp->ui.bucketsButton->setAction( ui.viewSources );
+    connect( ui.sources->ui.dashboard, SIGNAL( clicked()), ui.viewDashboard, SLOT( trigger()));
+    connect( ui.dashboard->ui.sources, SIGNAL( clicked()), ui.viewSources, SLOT( trigger()));
     
     ui.amp->show();
     ui.dashboardHeader->show();
@@ -193,36 +211,15 @@ MainWindow::setupUi()
 	delete ui.windowMenu;
 #endif
 
-    ui.sources->setMinimumHeight( 200 );
     ui.dashboard->setMinimumHeight( 100 );
     
-    ui.sources->adjustSize();
-    ui.dashboard->resize( ui.sources->width(), 250 );
 
     setMinimumWidth( 300 );
 
     ui.sources->show();
     ui.dashboard->show();
 
-	adjustSize(); // Qt Designer makes this essential
-    resize( width(), height() + ui.sources->height() + ui.dashboard->height() );
     
-    //duplicated because Qt is shit
-    QRect r1 = ui.dashboard->geometry();
-    QRect r2 = ui.sources->geometry();
-
-    
-    int h1 = ui.dashboardHeader->sizeHint().height();
-    int h2 = ui.sources->sizeHint().height();
-    int const w = width();
-    
-    ui.dashboardHeader->setGeometry( 0, 0, w, h1 );
-    ui.dashboard->move( 0, h1 + 1 );
-    ui.amp->setGeometry( 0, h1 + r1.height(), w, h2 );
-    int const y = ui.amp->geometry().bottom() + 1;
-    ui.sources->move( 0, y );
-    
-    ui.viewDashboard->setChecked( true );
     ui.viewSources->setChecked( true );
     
     ui.messagebar->raise();
@@ -483,161 +480,6 @@ MainWindow::onUserGetInfoReturn( WsReply* reply )
     }
 	catch (CoreDomElement::Exception&)
 	{}
-}
-
-
-void
-MainWindow::animate( bool b )
-{
-    static QTimeLine* m_timeline = 0;
-    
-    if (!m_timeline) {
-        m_timeline = new QTimeLine( 400 );
-        connect( m_timeline, SIGNAL(frameChanged( int )), SLOT(onAnimateFrame( int )) );
-        connect( m_timeline, SIGNAL(finished()), SLOT(onAnimationFinished()) );
-        m_timeline->setUpdateInterval( 10 );
-    }
-    
-    if (m_animating)
-        return;
-    if (m_timeline->state() == QTimeLine::Running) {
-        qWarning() << "Unexpected state";
-        return;
-    }
-    
-	ui.viewSources->setEnabled( false );
-	ui.viewDashboard->setEnabled( false );
-    m_animating = true;
-    
-    QWidget* w, *wother;
-    if (sender() == ui.viewSources) {
-        m_animatingSources = true;
-        w = ui.sources;
-        wother = ui.dashboard;
-    } else {
-        m_animatingDashboard = true;
-        w = ui.dashboard;
-        wother = ui.sources;
-    }
-    
-    // raise to avoid sliding above other widget
-    w->stackUnder( wother );
-
-    setFixedHeight( height() ); //this one to work around qt bug
-    setMaximumHeight( 20 * 1000 );
-    setMinimumHeight( 0 ); //this one too
-    // the bug is that setMinimumHeight doesn't work in onAnimateFinished() 
-    // unless we do those two things here first. WTF!? QtSucks
-    
-    int const operand = b ? w->height() : -(w->height());
- 
-    m_timeline->setFrameRange( height(), height() + operand );
-    m_timeline->start();
-
-    w->show();
-}
-
-
-void
-MainWindow::onAnimateFrame( int new_height )
-{
-    resize( width(), new_height );
-
-#ifndef Q_WS_MAC
-	new_height -= ui.menubar->height();
-#endif
-
-    if (m_animatingDashboard)
-    {
-        int y = new_height;
-
-        if (ui.sources->isVisible())
-        {
-            y -= ui.sources->geometry().height();
-            ui.sources->move( 0, y );
-        }
-
-        ui.amp->move( 0, y - ui.amp->height() );
-    }
-    else
-        ui.sources->move( 0, new_height - ui.sources->height() );
-}
-
-
-void
-MainWindow::onAnimationFinished()
-{
-	ui.viewSources->setEnabled( true );
-	ui.viewDashboard->setEnabled( true );
-
-    QTimeLine* timeline = (QTimeLine*)sender();
-    
-    if (timeline->startFrame() > timeline->endFrame())
-    {
-        (m_animatingDashboard ? (QWidget*)ui.dashboard : (QWidget*)ui.sources)->hide();
-    }
-    
-    m_animating = m_animatingDashboard = m_animatingSources = false;
-    
-    int h = sizeHint().height();
-    
-    if (ui.dashboard->isHidden() && ui.sources->isHidden())
-        setFixedHeight( h );
-    else {
-        foreach (QWidget* w, QList<QWidget*>() << ui.sources << ui.dashboard)
-            if (w->isVisible())
-                h += w->minimumHeight();
-        setMinimumHeight( h );
-    }
-}
-
-
-void
-MainWindow::resizeEvent( QResizeEvent* e )
-{
-    static bool b = true;
-    if (b) { b = false; return; }
-    
-    if (m_animating) return;
-        
-    int const w = width();
-    
-    if (e->oldSize().isValid())
-    {
-        int const new_height = height() - e->oldSize().height();
-        
-        int new_sources_height = ui.sources->height() + new_height;
-        
-        if (ui.sources->isVisible() && new_sources_height >= ui.sources->minimumHeight())
-        {
-            ui.dashboard->resize( w, ui.dashboard->height() );
-            ui.sources->resize( w, ui.sources->height() + new_height );
-        }
-        else if (ui.dashboard->isVisible())
-        {
-            ui.dashboard->resize( w, ui.dashboard->height() + new_height );
-            ui.sources->resize( w, ui.sources->height() );
-        }
-        else
-        {
-            ui.dashboard->resize( w, ui.dashboard->height() );
-            ui.sources->resize( w, ui.sources->height() );
-        }
-    }
-    
-    int const h1 = ui.dashboardHeader->sizeHint().height();
-    int const h2 = ui.amp->sizeHint().height();
-
-#define RECT( x ) x->isVisible() ? x->geometry() : QRect()
-    QRect r1 = RECT( ui.dashboard );
-    QRect r2 = RECT( ui.sources );
-#undef RECT
-    
-    ui.dashboardHeader->setGeometry( 0, 0, w, h1 );
-    ui.dashboard->move( 0, h1 + 1 );
-    ui.amp->setGeometry( 0, h1 + r1.height(), w, h2 );
-    int const y = ui.amp->geometry().bottom() + 1;
-    ui.sources->move( 0, y );
 }
 
 

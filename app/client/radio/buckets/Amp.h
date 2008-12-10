@@ -42,8 +42,6 @@ public:
         class PlayerBucketList* bucket;
         class RadioControls* controls;
         class UnicornVolumeSlider* volume;
-        class ImageButton* bucketsButton;
-        class ImageButton* dashboardButton;
         class BorderedContainer* borderWidget;
     } ui;
 

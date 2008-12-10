@@ -16,65 +16,55 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef SIDE_BY_SIDE_LAYOUT_H
+#define SIDE_BY_SIDE_LAYOUT_H
 
-#ifndef TRACK_DASHBOARD_H
-#define TRACK_DASHBOARD_H
+#include <QLayout>
 
-#include <QWidget>
-#include "lib/lastfm/types/Track.h"
+/** @brief: A layout that allows 2 or more widgets to be laid out side by side
+  *         and scroll forwards and backwards with nice animation.
+  */
 
+/** still to implement: scrollToWidget method
+  *                     handle wrapping around the last/first widgets more nicely 
+  *                     make sure it's robust 
+  */
 
-/** @author <max@last.fm> */
-
-class TrackDashboard : public QWidget
+class SideBySideLayout : public QLayout
 {
     Q_OBJECT
-
-    Track m_track;
-    class QNetworkAccessManager* nam;
-    
 public:
-    TrackDashboard();
-
-    void tuningIn();
-    void setTrack( const class Track& );
-    void clear();
-
-    Qt::Orientation orientation() const
-    {
-        return ui.info->geometry().y() == 0 ? Qt::Horizontal : Qt::Vertical;
-    }
-
-    virtual QSize sizeHint() const { return QSize( 100, 100 ); }
+    SideBySideLayout( class QWidget* parent = 0 );
+    ~SideBySideLayout();
     
-    struct //FIXME make not public
-    {
-        QWidget* actionbar;
-        QWidget* papyrus;
-        QWidget* info;
-        class PrettyCoverWidget* cover;
-        class QWebView* bio;
-        class FadingScrollBar* scrollbar;
-        class SpinnerLabel* spinner;
-        class QListWidget *tags;
-        class QListWidget *similarArtists;
-        class QPushButton *sources;
-    } ui;
+    void addItem(QLayoutItem *item);
+    Qt::Orientations expandingDirections() const;
+    bool hasHeightForWidth() const;
+    int count() const;
+    QLayoutItem *itemAt(int index) const;
+    QSize minimumSize() const;
+    void setGeometry(const QRect &rect);
+    QSize sizeHint() const;
+    QLayoutItem *takeAt(int index);
+    QWidget* currentWidget();
     
 public slots:
-    void setPapyrusPosition( int );
+    void moveForward();
+    void moveBackward();
     
 private slots:
-    void onArtistGotInfo( WsReply* );
-    void onArtistGotTopTags( WsReply* );
-    void openExternally( const QUrl& );
-    
-    void onCoverClicked();
-    
+    void onFrameChanged( int frame );
+
+
 private:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void resizeEvent( QResizeEvent* );
-    virtual bool event( QEvent* );
+    void doLayout( const QRect &rect, int hOffset = 0 );
+    QList<QLayoutItem *> m_itemList;
+    QLayoutItem* m_currentItem;
+    class QTimeLine* m_timeLine;
+    
+
+
 };
 
-#endif
+#endif //SIDE_BY_SIDE_LAYOUT_H

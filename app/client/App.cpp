@@ -53,7 +53,6 @@
 #ifdef __APPLE__
     extern void qt_mac_set_menubar_icons( bool );    
 #ifndef NDEBUG
-    #define NPLUGINS
     #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
     #include "app/clientplugins/localresolver/TrackResolver.h"
 #endif
@@ -129,7 +128,7 @@ App::App( int& argc, char** argv )
 #endif
 #endif
 
-#ifdef NPLUGINS
+#ifdef NPLUGINS 
     m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << new LocalRqlPlugin );
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << new TrackResolver );
 #else
@@ -137,7 +136,6 @@ App::App( int& argc, char** argv )
     m_localRql = new LocalRql( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
 #endif
-
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( Settings().volume() );
 

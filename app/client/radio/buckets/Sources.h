@@ -45,6 +45,7 @@ public:
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;
         class ImageButton* cog;
+        class QPushButton* dashboard;
         struct {
             class QAction* iconView;
             class QAction* listView;

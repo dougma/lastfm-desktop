@@ -24,6 +24,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include "widgets/ImageButton.h"
+#include <QPushButton>
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
@@ -105,6 +106,7 @@ Sources::setupUi()
     ui.tabWidget->bar()->setTearable( true );
 
     ui.tabWidget->bar()->addWidget( ui.cog = new ImageButton( ":/MainWindow/button/cog/up.png" ) );
+    ui.tabWidget->bar()->addWidget( ui.dashboard = new QPushButton( "Now Playing" ));
     connect( ui.cog, SIGNAL(pressed()), SLOT(onCogMenuClicked()) );
     m_cogMenu = new QMenu( this );
     

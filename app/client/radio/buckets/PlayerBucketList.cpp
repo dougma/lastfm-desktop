@@ -250,8 +250,12 @@ PlayerBucketList::dropEvent( QDropEvent* event)
 	if( !event->mimeData() )
 		return;
 	
+    clear();
 	if( addFromMimeData( event->mimeData()))
+    {
+        play();
 		event->acceptProposedAction();
+    }
 	else
 		event->ignore();
 }

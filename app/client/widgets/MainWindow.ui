@@ -13,7 +13,7 @@
    <string>Last.fm</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <layout class="QHBoxLayout" />
+   <layout class="QVBoxLayout" name="verticalLayout_2" />
   </widget>
   <widget class="QMenuBar" name="menubar" >
    <property name="geometry" >
