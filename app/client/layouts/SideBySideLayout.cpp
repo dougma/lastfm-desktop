@@ -25,13 +25,14 @@
 SideBySideLayout::SideBySideLayout( QWidget* parent )
            : QLayout( parent ), m_currentItem( 0 ), m_timeLine( new QTimeLine( 500, this ) )
 {
+    m_timeLine->setUpdateInterval( 25 );
     connect( m_timeLine, SIGNAL( frameChanged( int )), SLOT( onFrameChanged( int )));
 }
 
 
 SideBySideLayout::~SideBySideLayout()
 {
-    while( QLayoutItem* i = m_itemList.takeAt( 0 ) )
+    while( QLayoutItem* i = takeAt( 0 ) )
         delete i;
 }
 
@@ -69,7 +70,7 @@ SideBySideLayout::count() const
 QLayoutItem* 
 SideBySideLayout::itemAt( int index ) const
 {
-    if( index >= index || index < 0 )
+    if( index >= m_itemList.count() || index < 0 || m_itemList.isEmpty() )
         return 0;
     
     return m_itemList.at( index );
@@ -92,7 +93,7 @@ void
 SideBySideLayout::setGeometry(const QRect &rect)
 {
     QLayout::setGeometry( rect );
-    if( !m_currentItem )
+    if( !m_currentItem || m_timeLine->state() == QTimeLine::Running )
         return;
     
     doLayout( rect );
@@ -126,7 +127,7 @@ SideBySideLayout::sizeHint() const
 QLayoutItem* 
 SideBySideLayout::takeAt( int index )
 {
-    if( index >= index || index < 0 )
+    if( index >= m_itemList.count() || index < 0 || m_itemList.isEmpty() )
         return 0;
     
     return m_itemList.takeAt( index );
