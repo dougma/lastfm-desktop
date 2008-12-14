@@ -104,8 +104,8 @@ FirehoseModel::onData()
 #include <QtNetwork/QHttp>
 FirehoseItem::FirehoseItem( const CoreDomElement& e )
             : m_user( e["user"]["name"].text() )
-{    
-    m_track = e["track"]["artist"]["name"].text() + '-' + e["track"]["name"].text();
+{	
+    m_track = e["track"]["artist"]["name"].text() + " - " + e["track"]["name"].text();
 
 	QUrl url( e["user"]["image"].text() );
 

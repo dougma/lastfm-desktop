@@ -24,11 +24,12 @@
 FirehoseView::FirehoseView() : h( 0 ), offset( 0 )
 {            
     timer = new QTimeLine( 1200, this );
-	timer->setUpdateInterval( 25 );
+	timer->setUpdateInterval( 10 );
     connect( timer, SIGNAL(frameChanged( int )), SLOT(onFrameChange( int )) );
     
     setAttribute( Qt::WA_MacShowFocusRect, false );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     bar()->setRange( 0, 0 );
 }
 
