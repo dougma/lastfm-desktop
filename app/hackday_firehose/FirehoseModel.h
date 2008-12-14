@@ -25,7 +25,6 @@
 #include <QList>
 #include <QPixmap>
 #include <QVariant>
-#include "lib/lastfm/types/Track.h"
 
 
 class FirehoseModel : public QAbstractItemModel
@@ -41,7 +40,7 @@ class FirehoseModel : public QAbstractItemModel
     
     QList<QString> m_users;
     QList<QPixmap> m_avatars;
-    QList<Track> m_tracks;
+    QList<QString> m_tracks;
     QList<QDateTime> m_timestamps;
     
     class QTcpSocket* m_socket;
@@ -71,19 +70,20 @@ class FirehoseItem : public QObject
 {
     Q_OBJECT
     
-    Track m_track;
+    QString m_track;
     QString const m_user;
     QPixmap m_avatar;
-    
+	int m_id;
+
 public:
     FirehoseItem( const class CoreDomElement& );
     
-    Track track() const { return m_track; }
+    QString track() const { return m_track; }
     QString user() const { return m_user; }
     QPixmap avatar() const { return m_avatar; }
     
 private slots:
-    void onAvatarDownloaded();
+    void onAvatarDownloaded( int );
     
 signals:
     void finished( FirehoseItem* );

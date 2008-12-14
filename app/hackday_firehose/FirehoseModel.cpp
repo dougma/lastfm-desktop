@@ -20,8 +20,6 @@
 #include "FirehoseModel.h"
 #include "app/moose.h"
 #include "lib/lastfm/core/CoreDomElement.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/ws/WsConnectionMonitor.h"
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTcpSocket>
@@ -32,9 +30,7 @@
 FirehoseModel::FirehoseModel()
              : m_socket( 0 )
              , m_cumulative_count( 0 )
-{
-    connect( new WsConnectionMonitor( this ), SIGNAL(up()), SLOT(reconnect()) );
-}
+{}
 
 
 void
@@ -105,28 +101,27 @@ FirehoseModel::onData()
     }
 }
 
-
+#include <QtNetwork/QHttp>
 FirehoseItem::FirehoseItem( const CoreDomElement& e )
             : m_user( e["user"]["name"].text() )
-{
-    static WsAccessManager* nam = 0;
-    if (!nam) nam = new WsAccessManager;
+{    
+    m_track = e["track"]["artist"]["name"].text() + '-' + e["track"]["name"].text();
+
+	QUrl url( e["user"]["image"].text() );
+
+	QHttp* http = new QHttp( url.host(), 80, this );
+	m_id = http->get( url.path() );
     
-    MutableTrack t;
-    t.setArtist( e["track"]["artist"]["name"].text() );
-    t.setTitle( e["track"]["name"].text() );
-    m_track = t;
-    
-    QNetworkReply* r = nam->get( QNetworkRequest( e["user"]["image"].text() ) );
-    
-    connect( r, SIGNAL(finished()), SLOT(onAvatarDownloaded()) );
+    connect( http, SIGNAL(requestFinished( int, bool )), SLOT(onAvatarDownloaded( int )) );
 }
 
 
 void
-FirehoseItem::onAvatarDownloaded()
+FirehoseItem::onAvatarDownloaded( int id )
 {
-    QByteArray data = static_cast<QNetworkReply*>(sender())->readAll();
+	if (id != m_id) return;
+	
+    QByteArray data = static_cast<QHttp*>(sender())->readAll();
     
     m_avatar.loadFromData( data );
     if (m_avatar.isNull())
@@ -145,7 +140,7 @@ FirehoseModel::onItemReady( FirehoseItem* item )
     m_timestamps.prepend( QDateTime::currentDateTime() );
     m_cumulative_count++;
     endInsertRows();
-    delete item;
+    item->deleteLater();
 }
 
 
@@ -173,7 +168,7 @@ FirehoseModel::data(const QModelIndex &index, int role) const
         case moose::TimestampRole: return m_timestamps[row];
         case moose::CumulativeCountRole: return m_cumulative_count;
             
-        case moose::SecondaryDisplayRole: return m_tracks[row].toString();
+        case moose::SecondaryDisplayRole: return m_tracks[row];
         case moose::SmallDisplayRole:
         {
             QString format = CoreLocale::system().qlocale().timeFormat( QLocale::ShortFormat );
