@@ -53,6 +53,7 @@
 #ifdef __APPLE__
     extern void qt_mac_set_menubar_icons( bool );    
 #ifndef NDEBUG
+    #define NPLUGINS
     #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
     #include "app/clientplugins/localresolver/TrackResolver.h"
 #endif
@@ -413,6 +414,7 @@ App::open( const RadioStation& station )
     if (m_mainWindow->ui.localRadio->isChecked())
     {
         openLocalContent( station );
+        return;
     }    
     
     AbstractTrackSource* source = station.isLegacyPlaylist()
@@ -438,7 +440,7 @@ App::openLocalContent( const RadioStation& station )
 {
     //FIXME this synconicity is evil, but so is asyncronicity here
     
-    LocalRqlResult* result = localRql()->startParse( station.url() );
+    LocalRqlResult* result = localRql()->startParse( station.rql() );
     QEventLoop loop;
     connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
     connect( result, SIGNAL(parseBad( unsigned, QString, int )), &loop, SLOT(quit()) );
