@@ -42,10 +42,11 @@ public:
 
 	/** if it isn't a lastfm url, we'll try to start it anyway, but it won't
 	  * work, and the user will get an error message */
-    void open( const class QUrl& );
+    void open( const QUrl& );
     void open( const class RadioStation& );
-    void openXspf( const class QUrl& );
-    void openLocalContent( class AbstractTrackSource* trackSource );
+    void openXspf( const QUrl& );
+    void openLocalContent( const RadioStation& );
+    void open( class AbstractTrackSource* );
     class LocalRql* localRql();
     
 signals:

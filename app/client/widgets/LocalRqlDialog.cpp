@@ -21,7 +21,7 @@ LocalRqlDialog::LocalRqlDialog( QWidget *parent )
 
 void
 LocalRqlDialog::onPlay()
-{
+{    
     QString rql = ui.lineEditRql->text();
     LocalRqlResult* rqlResult = The::app().localRql()->startParse(rql);
     if (rqlResult) {
@@ -39,7 +39,7 @@ LocalRqlDialog::onParseGood(unsigned trackCount)
     LocalRqlResult* rqlResult = dynamic_cast<LocalRqlResult*>(sender());
     if (rqlResult) {
         LocalRadioTrackSource* lrts = new LocalRadioTrackSource(rqlResult);
-        The::app().openLocalContent(lrts);
+        The::app().open(lrts);
         lrts->start();
     }
 }

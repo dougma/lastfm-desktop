@@ -410,6 +410,11 @@ App::open( const QUrl& url )
 void
 App::open( const RadioStation& station )
 {
+    if (m_mainWindow->ui.localRadio->isChecked())
+    {
+        openLocalContent( station );
+    }    
+    
     AbstractTrackSource* source = station.isLegacyPlaylist()
             ? (AbstractTrackSource*) new LegacyTuner( station, CoreSettings().value( "Password" ).toString() )
             : (AbstractTrackSource*) new Tuner( station );
@@ -422,18 +427,33 @@ void
 App::openXspf( const QUrl& url )
 {
     XspfResolvingTrackSource* src = new XspfResolvingTrackSource( m_resolver, url );
-    m_radio->play( 
-        RadioStation( "XSPF" ), 
-        src );
+    m_radio->play( RadioStation( "XSPF" ), src );
     src->start();
 }
 
 
-// todo: change the param to be the rql string
+#include "LocalRadioTrackSource.h"
 void
-App::openLocalContent( class AbstractTrackSource* trackSource )
+App::openLocalContent( const RadioStation& station )
 {
-    m_radio->play( RadioStation( "Local Content" ), trackSource );
+    //FIXME this synconicity is evil, but so is asyncronicity here
+    
+    LocalRqlResult* result = localRql()->startParse( station.url() );
+    QEventLoop loop;
+    connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
+    connect( result, SIGNAL(parseBad( unsigned, QString, int )), &loop, SLOT(quit()) );
+    loop.exec();
+
+    LocalRadioTrackSource* source = new LocalRadioTrackSource( result );
+    m_radio->play( RadioStation( "Local Content" ), source  );
+    source->start();
+}
+
+
+void
+App::open( AbstractTrackSource* source )
+{
+    m_radio->play( RadioStation( "Local Content" ), source  );
 }
 
 

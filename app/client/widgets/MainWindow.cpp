@@ -238,6 +238,8 @@ MainWindow::setupUi()
     a1->setData( 'L' );
     a2->setData( 'S' );
     
+    a2->setChecked( true );
+    
     ui.localRadio = a1;
 }
 

@@ -44,7 +44,14 @@ public:
     static RadioStation lovedTracks( const User& user )     { return "lastfm://user/" + user + "/loved"; }
     static RadioStation globalTag( const Tag& tag )         { return "lastfm://globaltags/" + tag; }
     static RadioStation similar( const Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
-    static RadioStation rql( const QString& rql )           { return "lastfm://rql/" + QString( rql.toUtf8().toBase64()); }
+    
+    static RadioStation rql( const QString& rql )           
+    {
+        RadioStation station;
+        station.m_rql = rql;
+        station.m_url = "lastfm://rql/" + QString( rql.toUtf8().toBase64());
+        return station;
+    }
 
     /** eg. "mxcl's Loved Tracks"
  	  * It is worth noting that the Radio doesn't set the title of RadioStation 
@@ -54,6 +61,7 @@ public:
 	QString title() const { return m_title; }
 	/** the Last.fm url, eg. lastfm://user/mxcl/loved */
 	QString url() const { return m_url; }
+    QString rql() const { return m_rql; }
 
 	void setTitle( const QString& s ) { m_title = s; }
 
@@ -66,6 +74,7 @@ public:
     }
     
 private:
+    QString m_rql;
 	QString m_url;
 	QString m_title;
 };
