@@ -96,7 +96,8 @@ struct TagDataset
     double apply_post_process( const Entry& entryA, const Entry& entryB, 
                               const std::pair<double, int>& simVal) const
     {
-        entryA; entryB; // unused
+        Q_UNUSED( entryA );
+        Q_UNUSED( entryB );
         if ( simVal.second < 5 )
             return simVal.first * ( static_cast<double>(simVal.second) / 5 );
         else

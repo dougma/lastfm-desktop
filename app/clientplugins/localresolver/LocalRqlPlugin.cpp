@@ -69,6 +69,5 @@ LocalRqlPlugin::testTag(const char *url)
         bool requestedOk = pTagifier->makeRequest();
     } catch (const QueryError& qe) {
         QString err = qe.text();
-        int ii =0;
     }
 }
