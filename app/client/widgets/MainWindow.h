@@ -60,6 +60,8 @@ public:
         class TrackDashboardHeader* dashboardHeader;
         class TrackDashboard* dashboard;
         class MessageBar* messagebar;
+        
+        QAction* localRadio;
     } ui;
 
 protected:

@@ -223,6 +223,22 @@ MainWindow::setupUi()
     ui.viewSources->setChecked( true );
     
     ui.messagebar->raise();
+    
+    menu = ui.menubar->addMenu( "Radio Mode" );
+    QAction* a1 = menu->addAction( "Local" );
+    QAction* a2 = menu->addAction( "Streaming" );
+
+    QActionGroup* g = new QActionGroup( menu );
+    g->addAction( a1 );
+    g->addAction( a2 );
+    g->setExclusive( true );
+    
+    a1->setCheckable( true );
+    a2->setCheckable( true );
+    a1->setData( 'L' );
+    a2->setData( 'S' );
+    
+    ui.localRadio = a1;
 }
 
 
