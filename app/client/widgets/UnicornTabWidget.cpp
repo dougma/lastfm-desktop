@@ -83,8 +83,9 @@ Unicorn::TabBar::mousePressEvent( QMouseEvent* e )
     
     m_mouseDownPos = e->pos();
     
-    int w = minimumWidth() / count();
-    int index = ( (e->pos().x() - m_leftMargin) / (w + m_spacing ));
+    int w = (minimumWidth() - layout()->minimumSize().width() - m_leftMargin) / count();
+    
+    int index = ( (e->pos().x() - m_leftMargin ) / (w + m_spacing ));
 
     if( index < count() )
         setCurrentIndex( index );
@@ -147,7 +148,7 @@ Unicorn::TabBar::tabInserted( int )
     int w = 0;
     for (int i = 0; i < count(); ++i)
         w = qMax( fontMetrics().width( tabText( i ) ), w );
-    setMinimumWidth( ( w + 10 ) * count() + layout()->minimumSize().width());
+    setMinimumWidth( (m_leftMargin + (count() * ( w + 20 ))) + 10 + layout()->minimumSize().width());
 }
 
 
@@ -159,9 +160,13 @@ Unicorn::TabBar::tabRemoved( int i )
 
 
 void 
-Unicorn::TabBar::addWidget( QWidget* w )
+Unicorn::TabBar::addWidget( QWidget* wi )
 {
-    layout()->addWidget( w );   
+    layout()->addWidget( wi );
+    int w = 0;
+    for (int i = 0; i < count(); ++i)
+        w = qMax( fontMetrics().width( tabText( i ) ), w );
+    setMinimumWidth(  (m_leftMargin + (count() * ( w + 20 ))) + 10 + layout()->minimumSize().width());
 }
 
 
@@ -174,13 +179,13 @@ Unicorn::TabBar::paintEvent( QPaintEvent* e )
     if( count() <= 0 )
         return;
         
-    int w = minimumWidth() / count();
+    int w = (minimumWidth() - layout()->minimumSize().width() - m_leftMargin) / count();
     for (int i = 0; i < count(); ++i)
     {
         int const x = m_leftMargin + (i * ( w + m_spacing ));
         
         if (i == count() - 1)
-            w += minimumWidth() % w;
+            w += (minimumWidth() - layout()->minimumSize().width() - m_leftMargin + 10) % w;
         
         if (currentIndex() == i)
         {
@@ -246,6 +251,8 @@ Unicorn::TabWidget::TabWidget()
     QPalette p = palette();
     p.setBrush( QPalette::Window, QBrush( 0x0e0e0e ) );
     setPalette( p );
+    
+    setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
     
     connect( m_bar, SIGNAL(currentChanged( int )), m_stack, SLOT(setCurrentIndex( int )) );
     connect( m_bar, SIGNAL(currentChanged( int )), SIGNAL(currentChanged(int)));

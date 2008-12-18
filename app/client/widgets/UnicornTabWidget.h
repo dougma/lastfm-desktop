@@ -73,6 +73,7 @@ namespace Unicorn
         void addTab( const QString& title, QWidget* );
         void addTab( QWidget* );
         QWidget* currentWidget() const { return m_stack->currentWidget(); }
+        virtual QSize sizeHint() const { return QWidget::sizeHint().expandedTo( m_bar->sizeHint() ); }
         
         void setTabEnabled( int index, bool );
         void setTearable( bool t ){ bar()->setTearable( t ); }
