@@ -99,7 +99,7 @@ LocalCollection::initDatabase()
 
     if ( !m_db.tables().contains( "metadata" ) ) {
         QUERY( "CREATE TABLE files ("
-                    "id                INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id                INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "directory         INTEGER NOT NULL,"
                     "filename          TEXT NOT NULL,"
                     "modification_date INTEGER,"
@@ -116,7 +116,7 @@ LocalCollection::initDatabase()
         QUERY( "CREATE INDEX files_artist_idx ON files ( artist );" );
 
         QUERY( "CREATE TABLE artists ("
-                    "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "lowercase_name     TEXT NOT NULL UNIQUE );" );
         QUERY( "CREATE INDEX artists_name_idx ON artists ( lowercase_name );" );
 
@@ -128,7 +128,7 @@ LocalCollection::initDatabase()
         QUERY( "CREATE INDEX simartists_artist_a_idx ON simartists ( artist_a );" );
 
         QUERY( "CREATE TABLE tags ("
-                    "id                 INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id                 INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "name               TEXT UNIQUE NOT NULL );" );
         QUERY( "CREATE INDEX tags_name_idx ON tags ( name );" );
 
@@ -140,24 +140,24 @@ LocalCollection::initDatabase()
         QUERY( "CREATE INDEX tracktags_file_idx ON tracktags ( file ); ");
 
         QUERY( "CREATE TABLE directories ("
-                    "id          INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "source      INTEGER,"          // sources foreign key
                     "path        TEXT NON NULL );" );
 
         QUERY( "CREATE INDEX directories_path_idx ON directories ( path );" );
 
         QUERY( "CREATE TABLE sources ("
-                    "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "volume     TEXT UNIQUE NOT NULL,"  // on unix: "/", on windows: "\\?volume\..."
                     "available  INTEGER NOT NULL);" );
 
         QUERY( "CREATE TABLE startDirs ("
-                    "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "path       TEXT NON NULL,"
                     "source     INTEGER );" );      // sources foreign key
 
         QUERY( "CREATE TABLE exclusions ("
-                    "id         INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "path       TEXT NON NULL,"           
                     "startDir   INTEGER,"           // startDirs foreign key
                     "subDirs    INTEGER );" );     
