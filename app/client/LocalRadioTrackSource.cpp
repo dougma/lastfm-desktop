@@ -27,6 +27,7 @@
 
 LocalRadioTrackSource::LocalRadioTrackSource(LocalRqlResult* rqlResult)
 : m_rqlResult(rqlResult)
+, m_first(true)
 {
     Q_ASSERT(rqlResult);
     // QueuedConnections are important here, see LocalRql.h
@@ -63,14 +64,17 @@ void
 LocalRadioTrackSource::onTrack(Track t)
 {
     // decided by rgarrett 2008-12-09
-    MutableTrack( t ).setSource( Track::PersonalisedRecommendation );
+    MutableTrack(t).setSource(Track::PersonalisedRecommendation);
     
     m_buffer += t;
-    emit trackAvailable();
+    if (m_first) {
+        m_first = false;
+        emit trackAvailable();
+    }
 }
 
 void
 LocalRadioTrackSource::onEndOfTracks()
 {
-    emit error( Ws::NotEnoughContent );
+    emit error(Ws::NotEnoughContent);
 }
