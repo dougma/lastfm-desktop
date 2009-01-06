@@ -20,6 +20,7 @@
 #include "RqlQuery.h"
 #include "RqlQueryThread.h"
 #include "LocalCollection.h"
+#include "MediaMetaInfo.h"
 #include <QUrl>
 
 extern QString remapVolumeName(const QString& volume);
@@ -51,20 +52,30 @@ RqlQuery::getNextTrack(ILocalRqlTrackCallback* cb)
 void
 RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
 {
-    if (m_tracks.size()) {
+    // loop until we get a sample from the resultset for 
+    // which we can read id3 tags:
+
+    while (m_tracks.size()) {
         TrackResult tr(sample(m_tracks));
         bool removed = m_tracks.remove(tr);
         Q_ASSERT(removed);
 
         LocalCollection::FileResult result;
         if (collection.getFileById(tr.trackId, result)) {
-            cb->trackOk(
-                result.m_title.toUtf8(),
-                result.m_album.toUtf8(),
-                result.m_artist.toUtf8(),
-                QUrl::fromLocalFile( remapVolumeName(result.m_sourcename) + result.m_path + result.m_filename).toEncoded(),
-                result.m_duration);
-            return;
+            QString filename(remapVolumeName(result.m_sourcename) + result.m_path + result.m_filename);
+
+            // read id3 tags from the file
+            // todo: check that they kinda match what we have in our db?
+            MediaMetaInfo* mmi = MediaMetaInfo::create(filename);
+            if (mmi) {
+                cb->trackOk(
+                    mmi->title().toUtf8(), // result.m_title.toUtf8(),
+                    mmi->album().toUtf8(), // result.m_album.toUtf8(),
+                    mmi->artist().toUtf8(), // result.m_artist.toUtf8(),
+                    QUrl::fromLocalFile(filename).toEncoded(),
+                    mmi->duration());  //result.m_duration);
+                return;
+            }
         }
     }
     cb->trackFail();
