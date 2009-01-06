@@ -48,7 +48,6 @@ LocalRqlResult::parseFail(int errorLineNumber, const char *errorLine, int errorO
 void
 LocalRqlResult::getNextTrack()
 {
-    Q_ASSERT(m_trackSource);    // you want to wait for the parseGood signal
     if (m_trackSource) {
         m_trackSource->getNextTrack(this);
     }

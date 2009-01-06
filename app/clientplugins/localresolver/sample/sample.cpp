@@ -29,17 +29,17 @@ struct AccessPolicy
 {
   template <typename IT>
   float operator()(const IT& el) const
-  { return el->second; }
+  { return el->weight; }
 };
 
 
 struct CopyPolicy
 {
-   template <typename InIT, typename OutIT>
-   void operator() ( const InIT& from, OutIT& to ) const
-   {
-      *to = from->first;
-   }
+   //template <typename InIT, typename OutIT>
+   //void operator() ( const InIT& from, OutIT& to ) const
+   //{
+   //   *to = *from;
+   //}
 
    template <typename IT>
    typename std::iterator_traits<IT>::value_type operator() ( IT& it ) const
@@ -55,35 +55,35 @@ struct CopyPolicy
 };
 
 
-bool orderByWeightDesc(const std::pair<uint, float>& a, const std::pair<uint, float>& b)
+bool orderByWeightDesc(const TrackResult& a, const TrackResult& b)
 {
-    return a.second > b.second;
+    return a.weight > b.weight;
 }
 
-uint
+TrackResult
 sample(ResultSet rs)
 {
     // convert the ResultSet to a vector for sorting
-    std::vector<std::pair<uint, float> > tracks;
+    std::vector<TrackResult> tracks;
     float totalWeight = 0;
     foreach (const TrackResult& tr, rs) {
-        tracks.push_back(std::make_pair(tr.trackId, tr.weight));
+        tracks.push_back(tr);
         totalWeight += tr.weight;
     }
 
-    std::vector<std::pair<uint, float> >::iterator pBegin = tracks.begin();
-    std::vector<std::pair<uint, float> >::iterator pEnd = tracks.end();
+    std::vector<TrackResult>::iterator pBegin = tracks.begin();
+    std::vector<TrackResult>::iterator pEnd = tracks.end();
 
     std::sort(pBegin, pEnd, orderByWeightDesc);
 
     // normalise weights, sum to 1
-    std::vector<std::pair<uint, float> >::iterator pIt = tracks.begin();
+    std::vector<TrackResult>::iterator pIt = tracks.begin();
     for (; pIt != pEnd; pIt++) {
-        pIt->second /= totalWeight;
+        pIt->weight /= totalWeight;
     }
 
     // pull out a single sample
     ListBasedSampler<AccessPolicy, CopyPolicy> sampler;
-    return sampler.singleSample(pBegin, pEnd, true).first;
+    return sampler.singleSample(pBegin, pEnd, true);
 }
 
