@@ -73,7 +73,7 @@ bool operator<(const SimilarArtists::Result& a, const SimilarArtists::Result& b)
 ResultSet
 SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 {
-    int artistId = coll.getArtistId(QString(artist).simplified().toLower(), false);
+    int artistId = coll.getArtistId(QString(artist).simplified().toLower(), LocalCollection::NoCreate);
 
     QList<SimilarArtists::Result> artistList = similarArtists(coll, artistId);
 
@@ -86,7 +86,7 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
     while ((trackCount < 10000 || artistCount < 20) && pArtist != artistList.end())
     {
         if (pArtist->first != artistId) {
-            QList<uint> tracks = coll.filesByArtistId(pArtist->first);
+            QList<uint> tracks = coll.filesByArtistId(pArtist->first, LocalCollection::AvailableSources);
             foreach(uint trackId, tracks) {
                 TrackResult tr;
                 tr.trackId = trackId;

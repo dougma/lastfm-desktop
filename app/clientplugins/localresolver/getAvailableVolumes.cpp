@@ -175,11 +175,7 @@ remapVolumeName(const QString& volume)
 bool
 isVolumeImplicitlyAvailable(const QString& volume)
 {
-#ifdef _WIN32
-    // a very noddy test for a UNC path:
-    return volume.startsWith("\\\\") && volume[2] != '?';
-#else
+    // there are none!      
     return false;
-#endif
 }
 

@@ -104,7 +104,7 @@ RqlOpProcessor::globalTag()
 {
     typedef QPair<uint, float> TrackPair;
 
-    QList<TrackPair> tracks(m_collection.filesWithTag(m_it->name.data()));
+    QList<TrackPair> tracks(m_collection.filesWithTag(m_it->name.data(), LocalCollection::AvailableSources));
 
     ResultSet rs;
     foreach(const TrackPair& tp, tracks) {
@@ -127,7 +127,7 @@ RqlOpProcessor::userTag()
 ResultSet 
 RqlOpProcessor::artist()
 {
-    QList<uint> tracks(m_collection.filesByArtist(m_it->name.data()));
+    QList<uint> tracks(m_collection.filesByArtist(m_it->name.data(), LocalCollection::AvailableSources));
     ResultSet rs;
     int count = tracks.size();
     if (count) {

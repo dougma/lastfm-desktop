@@ -32,6 +32,8 @@ extern void addUserFuncs(QSqlDatabase db);
 
 #define LOCAL_COLLECTION_SCHEMA_VERSION_INT 3
 #define LOCAL_COLLECTION_SCHEMA_VERSION_STR "3"
+#define LEVENSHTEIN_ARTIST_THRESHOLD "0.7"
+#define LEVENSHTEIN_TITLE_THRESHOLD "0.7"
 
 // these macros add-in the function name for 
 // the call to the method of the same name
@@ -190,6 +192,7 @@ LocalCollection::version() const
 QString
 LocalCollection::getFingerprint( const QString& filePath )
 {
+    Q_UNUSED(filePath);
     Q_ASSERT(!"todo");
     return "";
 }
@@ -197,6 +200,8 @@ LocalCollection::getFingerprint( const QString& filePath )
 void
 LocalCollection::setFingerprint( const QString& filePath, QString fpId )
 {
+    Q_UNUSED(filePath);
+    Q_UNUSED(fpId);
     Q_ASSERT(!"todo");
 }
 
@@ -338,8 +343,8 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
         "INNER JOIN directories AS d ON f.directory = d.id "
         "INNER JOIN sources AS s ON d.source = s.id "
         "WHERE s.available = 1 "
-        "AND aq > 0.7 "
-        "AND tq > 0.7 " 
+        "AND aq > "LEVENSHTEIN_ARTIST_THRESHOLD" "
+        "AND tq > "LEVENSHTEIN_TITLE_THRESHOLD" " 
 
         // tried this to see if was faster, by it fails to prepare... :(
         //
@@ -410,7 +415,7 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
     bindValue( ":fileId", fileId ).
     bindValue( ":modification_date", lastModified ).
     bindValue( ":lowercase_title", info.m_title.simplified().toLower() ).
-    bindValue( ":artist", getArtistId( info.m_artist, true ) ).
+    bindValue( ":artist", getArtistId( info.m_artist, Create ) ).
     bindValue( ":album", info.m_album ).
     bindValue( ":kbps", info.m_kbps ).
     bindValue( ":duration", info.m_duration ).
@@ -419,7 +424,7 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
 
 // returns 0 if the artistName does not exist and bCreate is false
 int
-LocalCollection::getArtistId(QString artistName, bool bCreate)
+LocalCollection::getArtistId(QString artistName, Creation flag)
 {
     QString lowercase_name( artistName.simplified().toLower() );
 
@@ -434,7 +439,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
         }
     }
 
-    if ( bCreate ) {
+    if ( flag == Create ) {
         int artistId = 
         PREPARE(
             "INSERT INTO artists (lowercase_name) "
@@ -453,7 +458,7 @@ LocalCollection::getArtistId(QString artistName, bool bCreate)
 void
 LocalCollection::addFile(int directoryId, QString filename, unsigned lastModified, const FileMeta& info)
 {
-    int artistId = getArtistId( info.m_artist, true );
+    int artistId = getArtistId( info.m_artist, Create );
     Q_ASSERT( artistId > 0 );
 
     PREPARE(
@@ -512,7 +517,7 @@ LocalCollection::removeFiles(QList<int> ids)
 }
 
 int
-LocalCollection::getTagId(QString tag, bool bCreate)
+LocalCollection::getTagId(QString tag, Creation flag)
 {
     tag = tag.simplified().toLower();
 
@@ -527,7 +532,7 @@ LocalCollection::getTagId(QString tag, bool bCreate)
         }
     }
 
-    if ( bCreate ) {
+    if ( flag == Create ) {
         int id = PREPARE( "INSERT INTO tags (name) VALUES (:name)" ).
         bindValue( ":name", tag ).
         exec().
@@ -562,12 +567,12 @@ LocalCollection::deleteTrackTagsForArtist(int artistId, unsigned userId)
 void
 LocalCollection::setGlobalTagsForArtist(QString artist, WeightedStringList globalTags)
 {
-    int artistId = getArtistId( artist, true );
+    int artistId = getArtistId( artist, Create );
     deleteGlobalTrackTagsForArtist( artistId );
     foreach(const WeightedString& tag, globalTags) {
         insertGlobalArtistTag( 
             artistId, 
-            getTagId( tag, true ),
+            getTagId( tag, Create ),
             tag.weighting() );
     }
 }
@@ -601,14 +606,27 @@ LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int we
 }
 
 QList<QPair<unsigned, float> >
-LocalCollection::filesWithTag(QString tag)
+LocalCollection::filesWithTag(QString tag, Availablity flag)
 {
     QList<QPair<unsigned, float> > result;
 
-    int tagId = getTagId( tag.simplified().toLower(), false );
+    int tagId = getTagId( tag, NoCreate );
     if ( tagId > 0 ) {
+        QString queryString;
+
+        if (flag == AllSources) {
+            queryString = "SELECT file, weight FROM tracktags WHERE tag = :tagId";
+        } else {
+            Q_ASSERT( flag == AvailableSources );
+            queryString = 
+                "SELECT tracktags.file, tracktags.weight FROM tracktags "
+                "INNER JOIN files on tracktags.file = files.id "
+                "INNER JOIN directories on files.directory = directories.id "
+                "INNER JOIN sources on directories.source = sources.id "
+                "WHERE tag = :tagId AND sources.available = 1 ";
+        }
         QSqlQuery query = 
-            PREPARE( "SELECT file,weight FROM tracktags WHERE tag == :tagId" ).
+            PREPARE( queryString ).
             setForwardOnly( true ).
             bindValue( ":tagId", tagId ).
             exec();
@@ -622,16 +640,66 @@ LocalCollection::filesWithTag(QString tag)
     return result;
 }
 
+// get all the files by an artist, fuzzy match on the artist's name
 QList<unsigned> 
-LocalCollection::filesByArtist(QString artist)
+LocalCollection::filesByArtist(QString artist, Availablity flag)
 {
-    int artistId = getArtistId( artist.simplified().toLower(), false );
-    if ( artistId > 0 ) {
-        return filesByArtistId( artistId );
+    QString queryString;
+    if (flag == AllSources) {
+        queryString = 
+            "SELECT id FROM files WHERE artist IN "
+            "(SELECT id FROM artists "
+            " WHERE levenshtein(lowercase_name, :artist) > "LEVENSHTEIN_ARTIST_THRESHOLD")";
+    } else {
+        Q_ASSERT( flag == AvailableSources );
+        queryString = 
+            "SELECT files.id FROM files "
+            "INNER JOIN directories on files.directory = directories.id "
+            "INNER JOIN sources on directories.source = sources.id "
+            "WHERE files.artist IN "
+            "(SELECT id FROM artists "
+            " WHERE levenshtein(lowercase_name, :artist) > "LEVENSHTEIN_ARTIST_THRESHOLD") "
+            "AND sources.available = 1 ";
     }
-    return QList<unsigned>();
+
+    QSqlQuery query = PREPARE( queryString ).
+        setForwardOnly( true ).
+        bindValue( ":artist", artist.simplified().toLower() ).
+        exec();
+
+    QList<unsigned> results;
+    while (query.next()) {
+        results << query.value( 0 ).toUInt();
+    }
+    return results;
 }
 
+QList<unsigned> 
+LocalCollection::filesByArtistId(int artistId, Availablity flag)
+{
+    QString queryString;
+    if (flag == AllSources) {
+        queryString = "SELECT id FROM files WHERE artist = :artistId";
+    } else {
+        Q_ASSERT( flag == AvailableSources );
+        queryString = 
+            "SELECT files.id FROM files "
+            "INNER JOIN directories on files.directory = directories.id "
+            "INNER JOIN sources on directories.source = sources.id "
+            "WHERE files.artist = :artistId AND sources.available = 1 ";
+    }
+
+    QSqlQuery query = PREPARE( queryString ).
+        setForwardOnly( true ).
+        bindValue( ":artistId", artistId ).
+        exec();
+
+    QList<unsigned> results;
+    while (query.next()) {
+        results << query.value( 0 ).toUInt();
+    }
+    return results;
+}
 
 LocalCollection::EntryList
 LocalCollection::allTags()
@@ -704,21 +772,6 @@ LocalCollection::getFileById(uint fileId, LocalCollection::FileResult &out)
         return true;
     }
     return false;
-}
-
-QList<unsigned> 
-LocalCollection::filesByArtistId(int artistId)
-{
-    QSqlQuery query = PREPARE(
-        "SELECT id FROM files WHERE artist == :artistId").
-        setForwardOnly( true ).
-        bindValue( ":artistId", artistId ).
-        exec();
-    QList<unsigned> results;
-    while (query.next()) {
-        results << query.value( 0 ).toUInt();
-    }
-    return results;
 }
 
 QList<LocalCollection::FilesToTagResult> 
@@ -836,7 +889,7 @@ LocalCollection::resolveTags(QStringList tags, QMap<QString, int>& map)
         if (it != map.end()) {
             result << it.value();
         } else {
-            int id = getTagId(tag, true);
+            int id = getTagId(tag, Create);
             map.insert(tag, id);
             result << id;
         }

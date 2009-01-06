@@ -47,6 +47,16 @@ class LocalCollection : public QObject
     Q_OBJECT
 
 public:
+    enum Creation
+    {
+        Create, NoCreate
+    };
+
+    enum Availablity
+    {
+        AvailableSources, AllSources
+    };
+
     class File
     {
     public:
@@ -187,7 +197,7 @@ public:
 
     bool getDirectoryId(int sourceId, QString path, int &result);
 
-    int getArtistId(QString artistName, bool bCreate);
+    int getArtistId(QString artistName, Creation flag);
 
     bool addDirectory(int sourceId, QString path, int &resultId);
     void removeDirectory(int directoryId);
@@ -203,13 +213,13 @@ public:
 
     // rql support
     EntryList allTags();
-    QList< QPair<unsigned, float> > filesWithTag(QString tag);
-    QList<unsigned> filesByArtist(QString artist);
-    QList<unsigned> filesByArtistId(int artistId);
+    QList< QPair<unsigned, float> > filesWithTag(QString tag, Availablity flag);
+    QList<unsigned> filesByArtist(QString artist, Availablity flag);
+    QList<unsigned> filesByArtistId(int artistId, Availablity flag);
     bool getFileById(uint fileId, LocalCollection::FileResult &out);
 
     // tag handling
-    int getTagId(QString tag, bool bCreate);
+    int getTagId(QString tag, Creation flag);
     void setGlobalTagsForArtist(QString artist, WeightedStringList globalTags);
 
     void deleteUserTrackTagsForArtist(int artistId, unsigned userId);
