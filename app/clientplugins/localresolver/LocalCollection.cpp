@@ -334,21 +334,10 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
         return QList<LocalCollection::ResolveResult>();
 
     QSqlQuery query = PREPARE(
-        "SELECT a.lowercase_name, f.album, f.lowercase_title, "
-        "   levenshtein(a.lowercase_name, :artist) AS aq, "
-        "   levenshtein(f.lowercase_title, :title) AS tq, "
-        "   f.filename, f.kbps, f.duration, d.path, s.volume "
-        "FROM files AS f "
-        "INNER JOIN artists AS a on f.artist = a.id "
-        "INNER JOIN directories AS d ON f.directory = d.id "
-        "INNER JOIN sources AS s ON d.source = s.id "
-        "WHERE s.available = 1 "
-        "AND aq > "LEVENSHTEIN_ARTIST_THRESHOLD" "
-        "AND tq > "LEVENSHTEIN_TITLE_THRESHOLD" " 
+        // original, naive and slow:
 
-        // tried this to see if was faster, by it fails to prepare... :(
-        //
         //"SELECT a.lowercase_name, f.album, f.lowercase_title, "
+        //"   levenshtein(a.lowercase_name, :artist) AS aq, "
         //"   levenshtein(f.lowercase_title, :title) AS tq, "
         //"   f.filename, f.kbps, f.duration, d.path, s.volume "
         //"FROM files AS f "
@@ -356,24 +345,32 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
         //"INNER JOIN directories AS d ON f.directory = d.id "
         //"INNER JOIN sources AS s ON d.source = s.id "
         //"WHERE s.available = 1 "
-        //"AND a.id IN (SELECT id FROM artists where levenshtein(lowercase_name, :artist) > 0.7) "
-        //"AND aq > 0.7 "
-        //"AND tq > 0.7 " 
+        //"AND aq > "LEVENSHTEIN_ARTIST_THRESHOLD" "
+        //"AND tq > "LEVENSHTEIN_TITLE_THRESHOLD" " 
 
+        // subselect version faster, but can do better by caching
+        // artist match distance in temp table, something like:
+        // (TODO)
+        // temp table will allow us to preserve 'aq' too...
 
-        // tried this too...
-        //
-        //"SELECT a.lowercase_name, f.album, f.lowercase_title, "
-        //"   a.aq, "
-        //"   levenshtein(f.lowercase_title, :title) AS tq, "
-        //"   f.filename, f.kbps, f.duration, d.path, s.volume "
-        //"FROM files AS f "
-        //"INNER JOIN (SELECT id, lowercase_name, levenshtein(a.lowercase_name, :artist) AS aq FROM artists WHERE q > 0.7) AS a on f.artist = a.id "
-        //"INNER JOIN directories AS d ON f.directory = d.id "
-        //"INNER JOIN sources AS s ON d.source = s.id "
-        //"WHERE s.available = 1 "
-        //"AND tq > 0.7 " 
+        //"CREATE TEMP TABLE IF NOT EXISTS :tablename AS "
+        //"SELECT id, levenshtein(lowercase_name, :artist) AS aq "
+        //"FROM artists "
+        //"WHERE aq > "LEVENSHTEIN_ARTIST_THRESHOLD";"
 
+        "SELECT a.lowercase_name, f.album, f.lowercase_title, "
+        "   1.0 as aq, "
+        "   levenshtein(f.lowercase_title, :title) AS tq, "
+        "   f.filename, f.kbps, f.duration, d.path, s.volume "
+        "FROM files AS f "
+        "INNER JOIN artists AS a on f.artist = a.id "
+        "INNER JOIN directories AS d ON f.directory = d.id "
+        "INNER JOIN sources AS s ON d.source = s.id "
+        "WHERE s.available = 1 "
+        "AND a.id IN ("
+        " SELECT id FROM artists "
+        " WHERE levenshtein(lowercase_name, :artist) > "LEVENSHTEIN_ARTIST_THRESHOLD") "
+        "AND tq > "LEVENSHTEIN_TITLE_THRESHOLD 
     ).
     setForwardOnly( true ).
     bindValue( ":artist", artist.simplified().toLower() ).
