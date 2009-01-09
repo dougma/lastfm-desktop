@@ -79,7 +79,8 @@ StateMachine::setConnection( PlayerConnection* connection )
             
         case Paused:
             spoolTrack( connection->track(), connection->elapsed() );
-            pause();
+            if (m_watch->remaining() != 0)
+                pause();
             break;
     }
 }

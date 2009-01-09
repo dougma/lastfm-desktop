@@ -78,6 +78,10 @@ ScrobbleButton::onTrackSpooled( const Track& t, class StopWatch* watch )
         connect( watch, SIGNAL(timeout()), m_animation, SLOT(glow()) );
 
         setPixmap( m_animation->pixmap() );
+        
+        // this happens if we respool a track that we were observing already before
+        if (watch->remaining() == 0)
+            m_animation->glow( 0 );
     }
 }
 

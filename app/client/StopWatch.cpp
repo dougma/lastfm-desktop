@@ -25,7 +25,7 @@ StopWatch::StopWatch( ScrobblePoint timeout, uint elapsed ) : m_point( timeout )
 {    
     m_timer = new QTimer( this );
     m_timer->setSingleShot( true );
-    m_remaining = qMax( int(m_point*1000) - int(elapsed), 0 );
+    m_remaining = qMax( int(m_point)*1000 - int(elapsed), 0 );
 
     connect( m_timer, SIGNAL(timeout()), SLOT(finished()) );
 }

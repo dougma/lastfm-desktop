@@ -80,10 +80,10 @@ public:
             , next_interval( interval )
             , frame( 1 )
     {
-        if (from > to * 1000) { frame = STEPS; glow(); return; }
+        if (from >= to * 1000) 
+            frame = STEPS;
 
-        if (from > 0)
-        {
+        else if (from > 0) {
             frame = from / interval;
             start( interval - (from % interval) );
         }

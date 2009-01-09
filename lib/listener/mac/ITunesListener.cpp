@@ -55,8 +55,7 @@ ITunesListener::ITunesListener( QObject* parent )
 void
 ITunesListener::run()
 {
-    m_connection = new ITunesConnection;
-    emit newConnection( m_connection );
+    emit newConnection( m_connection = new ITunesConnection );
     
     setupCurrentTrack();
 
@@ -78,7 +77,7 @@ ITunesListener::run()
 void
 ITunesListener::callback( CFNotificationCenterRef, 
                         void* observer, 
-                        CFStringRef name, 
+                        CFStringRef, 
                         const void*, 
                         CFDictionaryRef info )
 {    

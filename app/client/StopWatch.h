@@ -58,7 +58,9 @@ class StopWatch : public QObject
     friend class StateMachine;
     
 public:
-    /** the StopWatch starts off paused, call resume() to start */
+    /** The StopWatch starts off paused, call resume() to start.
+      * The watch will not timeout() if elapsed is greater that the 
+      * scrobble point */
     StopWatch( ScrobblePoint timeout_in_seconds, uint elapsed_in_ms = 0 );
 
     bool isTimedOut() const { return m_remaining == 0 && !m_timer->isActive(); }
@@ -67,6 +69,7 @@ public:
     void resume();
     
     /** in milliseconds */
+    uint remaining() const { return m_remaining; }
     uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()); }
 
     ScrobblePoint scrobblePoint() const { return m_point; }
