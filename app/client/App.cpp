@@ -103,7 +103,9 @@ App::App( int& argc, char** argv )
     connect( m_stateMachine, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
     connect( m_stateMachine, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
     connect( m_stateMachine, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
+
     connect( m_stateMachine, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    connect( m_stateMachine, SIGNAL(trackUnspooled( Track )), SLOT(onTrackUnspooled( Track )) );
     
     PlayerMediator* mediator = new PlayerMediator( this );
     connect( mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), m_stateMachine, SLOT(setConnection( PlayerConnection* )) );
@@ -226,7 +228,6 @@ App::setScrobblingEnabled( bool b )
     else if (b)
     {
         connect( m_stateMachine, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
-        connect( m_stateMachine, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
         connect( m_stateMachine, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
         
         connect( new WsConnectionMonitor( m_scrobbler ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
@@ -375,12 +376,34 @@ App::onTrackSpooled( const Track& t )
 
 
 void
+App::onTrackUnspooled( const Track& t )
+{
+    Scrobble s( t );
+    bool const enabled = m_mainWindow->ui.scrobble->isChecked();
+    
+    // always submit loved tracks, scrobble point reached or not
+    // always submit banned tracks, scrobble point reached or not
+    // only submit skipped tracks, scrobble point reached or not, but only if scrobbling is on
+
+    if (s.isLoved() || s.isBanned() || s.isSkipped() && enabled)
+    {
+        m_scrobbler->cache( t );
+        m_scrobbler->submit();
+    }
+    else if (enabled)
+        m_scrobbler->submit();
+}
+
+
+void
 App::love( bool b )
 {
 	MutableTrack t = m_stateMachine->track();
 
-	if (b)
+	if (b) {
 		t.love();
+        m_scrobbler->cache( t );
+    }
 	else
 		t.unlove();
 }

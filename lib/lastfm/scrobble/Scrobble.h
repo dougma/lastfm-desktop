@@ -39,10 +39,16 @@ struct LASTFM_SCROBBLE_DLLEXPORT Scrobble : Track
         return d->extras["rating"].toAscii();
     }
     
+    bool isLoved() const { return ratingCharacter() == QChar('L'); }
+    bool isBanned() const { return ratingCharacter() == QChar('B'); }
+    bool isSkipped() const { return ratingCharacter() == QChar('S'); }
+    
+#if 0
     bool isNotLovedSkippedOrBanned() const
     {
         return ratingCharacter() == "";
     }
+#endif
 
     enum Invalidity
     {

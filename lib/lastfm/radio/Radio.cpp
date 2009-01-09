@@ -110,10 +110,14 @@ Radio::enqueue()
 void
 Radio::skip()
 {
+    if (m_track.extra( "rating" ).isEmpty())
+        MutableTrack( m_track ).setExtra( "rating", "S" );
+    
     // attempt to refill the phonon queue if it's empty
 	if (m_mediaObject->queue().isEmpty())
         phononEnqueue();
 
+    
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
     if (q.size())
 	{

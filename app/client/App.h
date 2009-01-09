@@ -73,7 +73,8 @@ public slots:
     
 private slots:
 	void onScrobblerStatusChanged( int );
-    void onTrackSpooled( const Track& t );
+    void onTrackSpooled( const Track& );
+    void onTrackUnspooled( const Track& );
     void onUserGotInfo( WsReply* );
     
     /** all webservices connect to this and emit in the case of bad errors that

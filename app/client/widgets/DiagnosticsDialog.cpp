@@ -283,10 +283,8 @@ DiagnosticsDialog::populateScrobbleCacheView()
     ScrobbleCache cache( Ws::Username );
 
     QList<QTreeWidgetItem *> items;
-    foreach (Scrobble t, cache.tracks())
-        if (t.isNotLovedSkippedOrBanned())
-            items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.title() << t.album() ) );
-
+    foreach (Track t, cache.tracks())
+        items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.title() << t.album() ) );
     ui.cachedTracksList->clear();
     ui.cachedTracksList->insertTopLevelItems( 0, items );
     ui.cachedTracksLabel->setText( cache.tracks().isEmpty()
