@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>504</width>
-    <height>500</height>
+    <width>498</width>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,7 +14,7 @@
   </property>
   <layout class="QVBoxLayout" >
    <item>
-    <widget class="QTabWidget" name="tabWidget" >
+    <widget class="QTabWidget" name="tabs" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -27,30 +27,36 @@
      <property name="currentIndex" >
       <number>0</number>
      </property>
-     <widget class="QWidget" name="scrobblingTab" >
+     <widget class="QWidget" name="subs_tab" >
       <attribute name="title" >
        <string>Scrobbling</string>
       </attribute>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout" name="verticalLayout" >
+       <property name="spacing" >
+        <number>5</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" >
          <property name="spacing" >
-          <number>0</number>
+          <number>-1</number>
          </property>
          <item>
-          <widget class="QLabel" name="label" >
-           <property name="text" >
-            <string>Status:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="StatusLight" native="1" name="subsLight" >
+          <widget class="StatusLight" native="1" name="subs_light" >
            <property name="sizePolicy" >
             <sizepolicy vsizetype="Maximum" hsizetype="Maximum" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="subs_status" >
+           <property name="toolTip" >
+            <string>This is an easter egg!</string>
+           </property>
+           <property name="text" >
+            <string/>
            </property>
           </widget>
          </item>
@@ -67,268 +73,57 @@
            </property>
           </spacer>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" >
          <item>
-          <widget class="QLabel" name="lastConnectionLabel" >
-           <property name="text" >
-            <string>Last successful connection:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lastConnectionStatusLabel" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QLabel" name="subs_cache_count" >
+           <property name="enabled" >
+            <bool>false</bool>
            </property>
            <property name="text" >
             <string/>
            </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" >
-         <property name="spacing" >
-          <number>2</number>
+        <widget class="QTreeWidget" name="cached" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="topMargin" >
-          <number>9</number>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
          </property>
-         <item>
-          <widget class="QTreeWidget" name="cachedTracksList" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="rootIsDecorated" >
-            <bool>false</bool>
-           </property>
-           <property name="uniformRowHeights" >
-            <bool>true</bool>
-           </property>
-           <property name="itemsExpandable" >
-            <bool>false</bool>
-           </property>
-           <property name="allColumnsShowFocus" >
-            <bool>true</bool>
-           </property>
-           <property name="columnCount" >
-            <number>3</number>
-           </property>
-           <column>
-            <property name="text" >
-             <string>Artist</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Track</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Album</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="cachedTracksLabel" >
-           <property name="enabled" >
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>Checking cache...</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="radioTab" >
-      <attribute name="title" >
-       <string>Radio</string>
-      </attribute>
-      <layout class="QVBoxLayout" >
-       <item>
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QLabel" name="radioServerLabel" >
-           <property name="text" >
-            <string>Radio server status:</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="radioServerStatusLabel" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>Checking...</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="wordWrap" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QGridLayout" >
-         <item row="2" column="2" >
-          <widget class="QLabel" name="outputBufferLabel" >
-           <property name="minimumSize" >
-            <size>
-             <width>35</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text" >
-            <string>0</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_10" >
-           <property name="text" >
-            <string>Output buffer:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2" >
-          <widget class="QLabel" name="httpBufferLabel" >
-           <property name="minimumSize" >
-            <size>
-             <width>35</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text" >
-            <string>0</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_8" >
-           <property name="text" >
-            <string>HTTP buffer:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" >
-          <widget class="QProgressBar" name="httpBufferProgress" >
-           <property name="value" >
-            <number>0</number>
-           </property>
-           <property name="textVisible" >
-            <bool>false</bool>
-           </property>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" >
-          <widget class="QProgressBar" name="decodedBufferProgress" >
-           <property name="value" >
-            <number>0</number>
-           </property>
-           <property name="textVisible" >
-            <bool>false</bool>
-           </property>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2" >
-          <widget class="QLabel" name="decodedBufferLabel" >
-           <property name="minimumSize" >
-            <size>
-             <width>35</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text" >
-            <string>0</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1" >
-          <widget class="QProgressBar" name="outputBufferProgress" >
-           <property name="value" >
-            <number>0</number>
-           </property>
-           <property name="textVisible" >
-            <bool>false</bool>
-           </property>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_9" >
-           <property name="text" >
-            <string>Decoded buffer:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
          </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="itemsExpandable" >
+          <bool>false</bool>
          </property>
-        </spacer>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <property name="columnCount" >
+          <number>3</number>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Artist</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Track</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Album</string>
+          </property>
+         </column>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -336,140 +131,59 @@
       <attribute name="title" >
        <string>Fingerprinting</string>
       </attribute>
-      <layout class="QVBoxLayout" >
-       <property name="spacing" >
-        <number>6</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2" >
        <item>
-        <layout class="QGridLayout" >
-         <property name="spacing" >
-          <number>6</number>
+        <widget class="QLabel" name="fingerprints_title" >
+         <property name="font" >
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
          </property>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="submissionServerLabel_2" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>Tracks in queue:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" >
-          <widget class="QLabel" name="fpQueueSizeLabel" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string/>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="submissionServerLabel_3" >
-           <property name="text" >
-            <string>Currently fingerprinting:</string>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="indent" >
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" >
-          <widget class="QLabel" name="fpCurrentTrackLabel" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string/>
-           </property>
-           <property name="alignment" >
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="wordWrap" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+         <property name="text" >
+          <string>Recently Fingerprinted Tracks</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" >
-         <property name="spacing" >
-          <number>2</number>
+        <widget class="QTreeWidget" name="fingerprints" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="topMargin" >
-          <number>9</number>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
          </property>
-         <item>
-          <widget class="QLabel" name="fingerprintedTracksTitle" >
-           <property name="font" >
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text" >
-            <string>Recently fingerprinted tracks</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTreeWidget" name="fingerprintedTracksList" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="rootIsDecorated" >
-            <bool>false</bool>
-           </property>
-           <property name="uniformRowHeights" >
-            <bool>true</bool>
-           </property>
-           <property name="itemsExpandable" >
-            <bool>false</bool>
-           </property>
-           <property name="allColumnsShowFocus" >
-            <bool>true</bool>
-           </property>
-           <property name="columnCount" >
-            <number>3</number>
-           </property>
-           <column>
-            <property name="text" >
-             <string>Artist</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Track</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Album</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-        </layout>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="itemsExpandable" >
+          <bool>false</bool>
+         </property>
+         <property name="allColumnsShowFocus" >
+          <bool>true</bool>
+         </property>
+         <property name="columnCount" >
+          <number>3</number>
+         </property>
+         <column>
+          <property name="text" >
+           <string>Artist</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Track</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Album</string>
+          </property>
+         </column>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -481,7 +195,7 @@
        <item>
         <layout class="QHBoxLayout" >
          <item>
-          <widget class="QComboBox" name="iPodScrobbleType" >
+          <widget class="QComboBox" name="ipod_type" >
            <property name="sizePolicy" >
             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
              <horstretch>0</horstretch>
@@ -501,7 +215,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="scrobbleIpodButton" >
+          <widget class="QPushButton" name="ipod_scrobble_button" >
            <property name="text" >
             <string>Scrobble iPod</string>
            </property>
@@ -513,7 +227,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QListWidget" name="ipodInfoList" />
+        <widget class="QListWidget" name="ipod_log" />
        </item>
       </layout>
      </widget>
@@ -522,12 +236,25 @@
    <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QPushButton" name="viewLogButton" >
+      <widget class="QPushButton" name="logs_button" >
        <property name="text" >
         <string>Logs</string>
        </property>
        <property name="autoDefault" >
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>&lt;a href='http://status.last.fm'>http://status.last.fm&lt;/a></string>
+       </property>
+       <property name="textFormat" >
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="openExternalLinks" >
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -548,7 +275,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="closeButton" >
+      <widget class="QPushButton" name="close_button" >
        <property name="text" >
         <string>&amp;Close</string>
        </property>
@@ -572,7 +299,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>closeButton</sender>
+   <sender>close_button</sender>
    <signal>clicked()</signal>
    <receiver>DiagnosticsDialog</receiver>
    <slot>accept()</slot>

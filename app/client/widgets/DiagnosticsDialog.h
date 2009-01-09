@@ -21,80 +21,81 @@
 #define DIAGNOSTICS_DIALOG_H
 
 #include "ui_DiagnosticsDialog.h"
-
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
-
-
-/** @author <max@last.fm>
-  * @brief Monitors the various parts of the application without requiring 
-  * us to keep an entire dialog instantiated */
-//TODO don't allocate whole object on global stack? lame for startup time
-class DrWatson : public QObject
-{
-    Q_OBJECT
-
-signals:
-    void scrobblerStatusChanged( int );
-
-private slots:
-    void onScrobblerStatusChanged( int );
-
-public:
-    DrWatson();
-
-    uint scrobbler_status;
-    QDateTime scrobbler_handshake_time;
-
-    void observe( class Scrobbler* o )
-    {
-        connect( (QObject*)o, SIGNAL(status( int, QVariant )), SLOT(onScrobblerStatusChanged( int )) );
-    }
-};
 
 
 class DiagnosticsDialog : public QDialog
 {
     Q_OBJECT
 
-    static DrWatson watson;
+    Ui::DiagnosticsDialog ui;
+    class DelayedLabelText* m_delay;
 
 public:
     DiagnosticsDialog( QWidget *parent = 0 );
     ~DiagnosticsDialog();
+    
+public slots:
+    void fingerprinted( const class Track& );
+    void scrobbleActivity( int );
 
-    static void observe( Scrobbler* p ) { watson.observe( p ); }
-
-    Ui::DiagnosticsDialog ui;
-
+private slots:
+    void onScrobblePointReached();
+    
 private:
-    void populateScrobbleCacheView();
-	void scrobbleIpod( bool isManual = false );
+	void scrobbleIPod( bool isManual = false );
 	QString diagnosticInformation();
 
     class QTimer* m_logTimer;
     std::ifstream m_logFile;
 
 private slots:
-    void onScrobblerStatusChanged( int );
-    void onScrobblePointReached();
-
-    void onHttpBufferSizeChanged( int bufferSize );
-    void onDecodedBufferSizeChanged( int bufferSize );
-    void onOutputBufferSizeChanged( int bufferSize );
-
-    void onCopyToClipboard();
-
-    void onTrackFingerprintingStarted( const class Track& );
-    void onTrackFingerprinted( const Track& );
-    void onCantFingerprintTrack( const Track&, QString reason );
-
-	void onScrobbleIpodClicked();
+	void onScrobbleIPodClicked();
 	void onLogPoll();
 	void onSendLogsClicked();
-
-    void onRefresh();
 };
 
-#endif //DIAGNOSTICSDIALOG_H
+
+#include <QTimer>
+class DelayedLabelText : public QObject
+{
+    Q_OBJECT
+    
+    QList<QString> texts;
+    QTimer m_timer;
+    
+public:
+    DelayedLabelText( QLabel* parent ) : QObject( parent )
+    {
+        m_timer.setInterval( 2000 );
+        connect( &m_timer, SIGNAL(timeout()), SLOT(timeout()) );
+    }
+    
+    void add( QString text )
+    {       
+        QLabel* label = static_cast<QLabel*>(parent());
+
+        if (m_timer.isActive()) {
+            if (texts.isEmpty() || texts.last() != text)
+                texts += text;
+            return;
+        }
+        
+        label->setText( text );
+        m_timer.start();
+    }
+    
+private slots:
+    void timeout()
+    {
+        if (texts.size())
+            static_cast<QLabel*>(parent())->setText( texts.takeFirst() );
+        if (texts.isEmpty())
+            m_timer.stop();
+    }
+};
+
+
+#endif //DIAGNOSTICS_DIALOG_H

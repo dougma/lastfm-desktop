@@ -62,6 +62,8 @@ public:
         class MessageBar* messagebar;
         
         QAction* localRadio;
+        
+        class DiagnosticsDialog* diagnostics;
     } ui;
 
 protected:
@@ -72,7 +74,6 @@ protected:
 
 public slots:
     void showSettingsDialog();
-    void showDiagnosticsDialog();
     void showAboutDialog();
     void showShareDialog();
 	void showTagDialog();
@@ -106,10 +107,8 @@ private:
 	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
 	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( DiagnosticsDialog );
     UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
     UNICORN_UNIQUE_DIALOG_DECL( LocalRqlDialog );
-
 };
 
 #endif //MAINWINDOW_H

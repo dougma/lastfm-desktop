@@ -27,52 +27,9 @@
 #include <QByteArray>
 #include <QClipboard>
 #include <QFile>
+#include <QHeaderView>
 #include <QTimer>
 #include <QProcess>
-
-DrWatson DiagnosticsDialog::watson;
-
-
-DrWatson::DrWatson()
-{
-    scrobbler_status = Scrobbler::Connecting;
-}
-
-
-void
-DrWatson::onScrobblerStatusChanged( int const new_status )
-{
-    int const old_status = scrobbler_status;
-
-    if (new_status == Scrobbler::Connecting)
-        switch (old_status)
-        {
-            case Scrobbler::ErrorBadSession:
-            case Scrobbler::ErrorBannedClientVersion:
-            case Scrobbler::ErrorInvalidSessionKey:
-            case Scrobbler::ErrorBadTime:
-            case Scrobbler::ErrorThreeHardFailures:
-                // the state that is already set better represents the actual
-                // state then "Connecting..." does
-                return;
-        }
-
-    switch (new_status)
-    {
-        case Scrobbler::TracksScrobbled:
-            scrobbler_status = Scrobbler::Handshaken;
-            break;
-
-        case Scrobbler::Handshaken:
-            scrobbler_handshake_time = QDateTime::currentDateTime();
-            // FALL THROUGH
-        default:
-            scrobbler_status = new_status;
-            break;
-    }
-
-    emit scrobblerStatusChanged( scrobbler_status ); 
-}
 
 
 DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
@@ -80,93 +37,39 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
 {
     ui.setupUi( this );
 
-#ifdef HIDE_RADIO
-    ui.tabWidget->removeTab( 1 );
-#endif
+    ui.cached->header()->setResizeMode( QHeaderView::Stretch );
+    ui.fingerprints->header()->setResizeMode( QHeaderView::Stretch );
+    
+    m_delay = new DelayedLabelText( ui.subs_status );
     
 #ifdef Q_WS_X11
-    ui.tabWidget->removeTab( 3 );
+    ui.tabs->removeTab( 3 );
 #endif
 
-
-    #ifdef Q_OS_MAC
-    ui.cachedTracksLabel->setAttribute( Qt::WA_MacSmallSize );
-    ui.fingerprintedTracksTitle->setAttribute( Qt::WA_MacSmallSize );
-    ui.cachedTracksList->setAttribute( Qt::WA_MacSmallSize );
-    ui.cachedTracksList->setAttribute( Qt::WA_MacShowFocusRect, false );
-    #endif
-
-    ui.httpBufferLabel->setMinimumWidth( ui.httpBufferProgress->fontMetrics().width( "100.0k" ) );
-
-    ui.httpBufferProgress->setMaximum( 500000 );
-    ui.decodedBufferProgress->setMaximum( 100000 );
-    ui.outputBufferProgress->setMaximum( 100000 );
-
-#if 0 
-    //TODO
-    connect( &The::scrobbler(), SIGNAL( status( int, QVariant ) ), SLOT( onScrobblerEvent() ) );
-    connect( ui.viewLogButton,  SIGNAL( clicked() ), &The::container(), SLOT( onAltShiftL() ) );
+#ifdef Q_OS_MAC
+    ui.subs_status->setAttribute( Qt::WA_MacSmallSize );
+    ui.subs_cache_count->setAttribute( Qt::WA_MacSmallSize );
+    ui.fingerprints_title->setAttribute( Qt::WA_MacSmallSize );
+    ui.cached->setAttribute( Qt::WA_MacSmallSize );
+    ui.cached->setAttribute( Qt::WA_MacShowFocusRect, false );
+    ui.fingerprints->setAttribute( Qt::WA_MacSmallSize );
+    ui.fingerprints->setAttribute( Qt::WA_MacShowFocusRect, false );
+#endif
     
-    // Fingerprint collector
-    ui.fpQueueSizeLabel->setText( "0" );
-    connect( The::app().m_fpCollector, SIGNAL( trackFingerprintingStarted( Track ) ),
-        this,                     SLOT( onTrackFingerprintingStarted( Track ) ),
-        Qt::QueuedConnection );
-    connect( The::app().m_fpCollector, SIGNAL( trackFingerprinted( Track ) ),
-        this,                     SLOT( onTrackFingerprinted( Track ) ),
-        Qt::QueuedConnection );
-    connect( The::app().m_fpCollector, SIGNAL( cantFingerprintTrack( Track, QString ) ),
-        this,                     SLOT( onCantFingerprintTrack( Track, QString ) ),
-        Qt::QueuedConnection );
-
-#endif
-    connect( qApp, SIGNAL(scrobblePointReached( ScrobblePoint )), SLOT(onScrobblePointReached()) );
-    connect( ui.scrobbleIpodButton, SIGNAL( clicked() ), SLOT( onScrobbleIpodClicked() ) );
+    connect( qApp, SIGNAL(scrobblePointReached( Track )), SLOT(onScrobblePointReached()), Qt::QueuedConnection ); // queued because otherwise cache isn't filled yet
+    connect( ui.ipod_scrobble_button, SIGNAL(clicked()), SLOT(onScrobbleIPodClicked()) );
 
     m_logTimer = new QTimer( this );
     connect( m_logTimer, SIGNAL(timeout()), SLOT(onLogPoll()) );
 
-    connect( &watson, SIGNAL(scrobblerStatusChanged( int )), SLOT(onScrobblerStatusChanged( int )) );
-
-    onScrobblerStatusChanged( watson.scrobbler_status );
+    onScrobblePointReached();
 }
-
-
-#if 0 
-//TODO
-void
-DiagnosticsDialog::show()
-{
-    //initialize the progress bars to 0
-    onDecodedBufferSizeChanged( 0 );
-    onHttpBufferSizeChanged( 0 );
-    onOutputBufferSizeChanged( 0 );
-
-    connect( &The::audioController().m_thread, SIGNAL( httpBufferSizeChanged( int ) ),
-        this,                              SLOT( onHttpBufferSizeChanged( int ) ),
-        Qt::QueuedConnection );
-
-    connect( &The::audioController().m_thread, SIGNAL( decodedBufferSizeChanged( int ) ),
-        this,                              SLOT( onDecodedBufferSizeChanged( int ) ),
-        Qt::QueuedConnection );
-
-    connect( &The::audioController().m_thread, SIGNAL( outputBufferSizeChanged( int ) ),
-        this,                              SLOT( onOutputBufferSizeChanged( int ) ),
-        Qt::QueuedConnection );
-
-    onRefresh();
-
-    QDialog::show();
-}
-#endif
 
 
 DiagnosticsDialog::~DiagnosticsDialog()
 {
-    if( m_logFile.is_open() )
-    {
+    if (m_logFile.is_open())
         m_logFile.close();
-    }
 }
 
 
@@ -181,12 +84,12 @@ static QString scrobblerStatusText( int const i )
         case Scrobbler::ErrorBadTime: return tr( "Your timezone or date are incorrect" );
         case Scrobbler::ErrorThreeHardFailures: return tr( "The submissions server is down" );
 
-        case Scrobbler::Connecting: return tr( "Connecting to Last.fm" );
-        case Scrobbler::Scrobbling: return tr( "Scrobbling" );
+        case Scrobbler::Connecting: return tr( "Connecting to Last.fm..." );
+        case Scrobbler::Scrobbling: return tr( "Scrobbling..." );
 
         case Scrobbler::TracksScrobbled:
         case Scrobbler::Handshaken:
-            return tr( "OK" );
+            return tr( "Ready" );
     }
     #undef tr
 
@@ -195,177 +98,59 @@ static QString scrobblerStatusText( int const i )
 
 
 void
-DiagnosticsDialog::onScrobblerStatusChanged( int v )
+DiagnosticsDialog::scrobbleActivity( int msg )
 {
-    QDateTime const &d = watson.scrobbler_handshake_time;
-    if (d.isValid())
-        ui.lastConnectionStatusLabel->setText( d.toString( "d/M/yyyy h:mm" ) );
+    m_delay->add( scrobblerStatusText( msg ) );
 
-    QString const s = scrobblerStatusText( v );
-    ui.subsLight->setToolTip( s );
+    if (msg == Scrobbler::TracksScrobbled)
+        QTimer::singleShot( 1000, this, SLOT(onScrobblePointReached()) );
 
-    populateScrobbleCacheView();
-
-    switch (v)
+    switch (msg)
     {
         case Scrobbler::ErrorBadSession:
             //TODO flashing
         case Scrobbler::Connecting:
             //NOTE we only get this on startup
-            ui.subsLight->setColor( Qt::yellow );
+            ui.subs_light->setColor( Qt::yellow );
             break;
         case Scrobbler::Handshaken:
         case Scrobbler::Scrobbling:
         case Scrobbler::TracksScrobbled:
-            ui.subsLight->setColor( Qt::green );
+            ui.subs_light->setColor( Qt::green );
             break;
         
         case Scrobbler::ErrorBannedClientVersion:
         case Scrobbler::ErrorInvalidSessionKey:
         case Scrobbler::ErrorBadTime:
         case Scrobbler::ErrorThreeHardFailures:
-            ui.subsLight->setColor( Qt::red );
+            ui.subs_light->setColor( Qt::red );
             break;
     }
 }
 
 
 void
-DiagnosticsDialog::onHttpBufferSizeChanged(int bufferSize)
-{
-    ui.httpBufferProgress->setValue( bufferSize );
-    ui.httpBufferLabel->setText( QString::number( bufferSize / 1000.0f, 'f', 1 ) + "k" );
-}
-
-
-void
-DiagnosticsDialog::onDecodedBufferSizeChanged(int bufferSize)
-{
-    ui.decodedBufferProgress->setValue( bufferSize );
-    ui.decodedBufferLabel->setText( QString::number( bufferSize / 1000.0f, 'f', 1 ) + "k" );
-}
-
-
-void
-DiagnosticsDialog::onOutputBufferSizeChanged(int bufferSize)
-{
-    ui.outputBufferProgress->setValue( bufferSize );
-    ui.outputBufferLabel->setText( QString::number( bufferSize / 1000.0f, 'f', 1 ) + "k" );
-}
-
-
-void
 DiagnosticsDialog::onScrobblePointReached()
-{
-    populateScrobbleCacheView();
-}
-
-
-#if 0
-void
-DiagnosticsDialog::radioHandshakeReturn( Request* req )
-{
-    Handshake* handshake = static_cast<Handshake*>( req );
-    if ( handshake->failed() )
-    {
-        ui.radioServerStatusLabel->setText( tr( "Error: " ) + handshake->errorMessage() );
-    } else
-    {
-        ui.radioServerStatusLabel->setText( tr( "OK" ) );
-    }
-}
-#endif
-
-
-void 
-DiagnosticsDialog::populateScrobbleCacheView()
-{
+{    
     ScrobbleCache cache( Ws::Username );
 
     QList<QTreeWidgetItem *> items;
     foreach (Track t, cache.tracks())
         items.append( new QTreeWidgetItem( QStringList() << t.artist() << t.title() << t.album() ) );
-    ui.cachedTracksList->clear();
-    ui.cachedTracksList->insertTopLevelItems( 0, items );
-    ui.cachedTracksLabel->setText( cache.tracks().isEmpty()
-            ? tr( "The cache is empty" )
-            : tr( "%n cached tracks", "", items.count() ) );
-}
+    ui.cached->clear();
+    ui.cached->insertTopLevelItems( 0, items );
 
-
-void 
-DiagnosticsDialog::onRefresh()
-{
-    populateScrobbleCacheView();
-}
-
-QString
-DiagnosticsDialog::diagnosticInformation()
-{
-    QString informationText;
-
-    //TODO should read "Last successful submission" - that's what it actually shows at least
-    informationText.append( tr( "Last successful connection: " ) + ui.lastConnectionStatusLabel->text() + "\n\n" );
-    informationText.append( tr( "Submission Server: " ) + ui.subsLight->toolTip() + "\n" );
-    informationText.append( ui.cachedTracksLabel->text() + ":\n\n" );
-
-    // Iterate through cached tracks list and add to clipboard contents
-    for(int row = 0; row < ui.cachedTracksList->topLevelItemCount(); row++)
-    {
-        QTreeWidgetItem *rowData = ui.cachedTracksList->topLevelItem( row );
-        for(int col = 0; col < rowData->columnCount(); col++)
-        {
-            informationText.append( rowData->data( col, Qt::DisplayRole ).toString() );
-            informationText.append( "\t:\t" );
-        }
-        //remove trailing seperators
-        informationText.chop(3);
-        informationText.append( "\n" );
-    }
-
-    #ifndef HIDE_RADIO
-    informationText.append( tr( "Radio Server: " ) + ui.radioServerStatusLabel->text() + "\n" );
-    #endif
-    
-    return informationText;
+    if (items.count())
+        ui.subs_cache_count->setText( tr("%1 locally cached tracks").arg( items.count() ) );
+    else
+        ui.subs_cache_count->clear();
 }
 
 void
-DiagnosticsDialog::onCopyToClipboard()
+DiagnosticsDialog::fingerprinted( const Track& t )
 {
-    QApplication::clipboard()->setText( diagnosticInformation() );
-}
-
-
-void
-DiagnosticsDialog::onTrackFingerprintingStarted( const Track& )
-{
-#if 0
-    ui.fpCurrentTrackLabel->setText( track.toString() );
-    ui.fpQueueSizeLabel->setText( QString::number( The::app().m_fpCollector->queueSize() ) );
-#endif
-}
-
-
-void
-DiagnosticsDialog::onTrackFingerprinted( const Track& )
-{
-#if 0
-    ui.fpCurrentTrackLabel->setText( "" );
-    ui.fpQueueSizeLabel->setText( QString::number( The::app().m_fpCollector->queueSize() ) );
-    
-    new QTreeWidgetItem( ui.fingerprintedTracksList, QStringList() << track.artist() << track.track() << track.album() );
-#endif
-}
-
-
-void
-DiagnosticsDialog::onCantFingerprintTrack( const Track& /* track */, QString /* reason */ )
-{
-#if 0
-    ui.fpCurrentTrackLabel->setText( "" );
-    ui.fpQueueSizeLabel->setText( QString::number( The::app().m_fpCollector->queueSize() ) );
-#endif
+    new QTreeWidgetItem( ui.fingerprints,
+                         QStringList() << t.artist() << t.title() << t.album() );
 }
 
 
@@ -399,8 +184,8 @@ DiagnosticsDialog::onLogPoll()
         if( data.isEmpty() )
             continue;
 
-        ui.ipodInfoList->addItem( data );
-        ui.ipodInfoList->scrollToBottom();
+        ui.ipod_log->addItem( data );
+        ui.ipod_log->scrollToBottom();
     }
     delete[] dataBuffer;
 }
@@ -410,7 +195,7 @@ DiagnosticsDialog::onLogPoll()
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/lastfm/core/UniqueApplication.h"
 void
-DiagnosticsDialog::onScrobbleIpodClicked()
+DiagnosticsDialog::onScrobbleIPodClicked()
 {
 #ifndef Q_WS_X11
     QStringList args = (QStringList() 
@@ -419,7 +204,7 @@ DiagnosticsDialog::onScrobbleIpodClicked()
                     << "--pid" << "0000" 
                     << "--serial" << "UNKNOWN");
 
-    bool const isManual = ( ui.iPodScrobbleType->currentIndex() == 1 );
+    bool const isManual = ( ui.ipod_type->currentIndex() == 1 );
     if (isManual)
         args += "--manual";
 

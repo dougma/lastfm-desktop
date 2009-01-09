@@ -25,6 +25,7 @@
 #include "lib/lastfm/types/Xspf.h"
 #include "lib/lastfm/radio/AbstractTrackSource.h"
 
+
 class XspfTrackSource : public AbstractTrackSource
 {
     Q_OBJECT

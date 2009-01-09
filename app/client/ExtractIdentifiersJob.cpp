@@ -31,6 +31,7 @@ ExtractIdentifiersJob::ExtractIdentifiersJob( const Track& t )
                m_track( t.clone() ), 
                m_path( t.url().path() )
 {   
+    setAutoDelete( true );
     connect( this, SIGNAL(mbid( QString )), SLOT(onMbid( QString )) );
 }
 
@@ -59,10 +60,18 @@ ExtractIdentifiersJob::run()
 
 
 FingerprintId
-ExtractIdentifiersJob::fpid() const
+ExtractIdentifiersJob::fpid()
 {
-    WsAccessManager wam;
+    #define WAIT_FOR_FINISHED( reply ) \
+        while (!reply->atEnd()) \
+            reply->waitForReadyRead( 10 * 1000 )
+    
     Fingerprint fp( m_track );
+    
+    if (!fp.id().isNull())
+        return fp.id();
+
+    WsAccessManager wam;    
     
     try
     {
@@ -70,7 +79,7 @@ ExtractIdentifiersJob::fpid() const
         fp.generate();
 
         QNetworkReply* reply = fp.submit( &wam );
-        waitForFinished( reply );
+        WAIT_FOR_FINISHED( reply );
         
         bool complete_fp_required = false;
         fp.decode( reply, &complete_fp_required );
@@ -81,7 +90,7 @@ ExtractIdentifiersJob::fpid() const
             CompleteFingerprint fp( m_track );
             fp.generate();
             fp.submit( &wam );
-            waitForFinished( reply );
+            WAIT_FOR_FINISHED( reply );
         }
 
     }
@@ -89,6 +98,8 @@ ExtractIdentifiersJob::fpid() const
     {
         qWarning() << e;
     }
+    
+    emit fingerprinted( m_track );
     
     return fp.id();
 }
@@ -98,13 +109,4 @@ void
 ExtractIdentifiersJob::onMbid( const QString& mbid )
 {
     MutableTrack( m_gui_track ).setMbid( Mbid(mbid) );
-}
-
-
-void
-ExtractIdentifiersJob::waitForFinished( QNetworkReply* reply )
-{
-    QEventLoop loop;
-    connect( reply, SIGNAL(finished()), &loop, SLOT(quit()) );
-    loop.exec();    
 }

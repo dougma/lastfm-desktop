@@ -34,8 +34,7 @@ class ExtractIdentifiersJob : public QObject, public QRunnable
     QString m_path;
 
     virtual void run();
-    FingerprintId fpid() const;
-    static void waitForFinished( class QNetworkReply* );
+    FingerprintId fpid();
     
 public:
     ExtractIdentifiersJob( const Track& );
@@ -43,6 +42,7 @@ public:
 
 signals:
     void mbid( const QString& );
+    void fingerprinted( const Track& );
     
 private slots:
     void onMbid( const QString& mbid );

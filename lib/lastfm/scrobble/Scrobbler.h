@@ -66,6 +66,7 @@ public:
         Handshaken,
         Scrobbling,
         TracksScrobbled,
+        
         StatusMax
     };
 
@@ -77,14 +78,12 @@ public:
         ErrorBannedClientVersion,
         ErrorInvalidSessionKey,
         ErrorBadTime,
-        ErrorThreeHardFailures,
-
-        NoError
+        ErrorThreeHardFailures
     };
 
 signals:
     /** the controller should show status in an appropriate manner */
-    void status( int code, QVariant data = QVariant() );
+    void status( int code );
 
 private slots:
     void onHandshakeReturn( const QByteArray& );

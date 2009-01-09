@@ -253,10 +253,12 @@ Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested 
     
     QString const response( reply->readAll() );
     QStringList const list = response.split( ' ' );
-    
-    if (list.isEmpty())
+       
+    if (response.isEmpty() || list.count() < 2) {
+        qWarning() << "Null response";
         return;
-    
+    }
+
     QString const fpid = list.value( 0 );
     QString const status = list.value( 1 );
     

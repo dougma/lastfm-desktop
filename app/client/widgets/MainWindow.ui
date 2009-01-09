@@ -39,7 +39,7 @@
     <property name="title" >
      <string>&amp;Help</string>
     </property>
-    <addaction name="diagnostics" />
+    <addaction name="diagnostics_action" />
     <addaction name="separator" />
     <addaction name="about" />
    </widget>
@@ -84,7 +84,7 @@
     <string>E&amp;xit</string>
    </property>
   </action>
-  <action name="diagnostics" >
+  <action name="diagnostics_action" >
    <property name="text" >
     <string>Diagnostics</string>
    </property>

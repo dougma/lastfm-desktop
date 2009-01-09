@@ -66,7 +66,7 @@ MainWindow::MainWindow()
     connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.viewLocalRql, SIGNAL(triggered()), SLOT(showLocalRqlDialog()) );
-    connect( ui.diagnostics, SIGNAL(triggered()), SLOT(showDiagnosticsDialog()) );
+    connect( ui.diagnostics_action, SIGNAL(triggered()), ui.diagnostics, SLOT(show()) );
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.playlist, SIGNAL(triggered()), SLOT(showPlaylistDialog()) );
@@ -241,6 +241,8 @@ MainWindow::setupUi()
     a2->setChecked( true );
     
     ui.localRadio = a1;
+    
+    ui.diagnostics = new DiagnosticsDialog( this );
 }
 
 
@@ -252,16 +254,11 @@ MainWindow::showSettingsDialog()
 
 
 void
-MainWindow::showDiagnosticsDialog()
-{
-    UNICORN_UNIQUE_DIALOG( DiagnosticsDialog )
-}
-
-void
 MainWindow::showLocalRqlDialog()
 {
     UNICORN_UNIQUE_DIALOG( LocalRqlDialog )
 }
+
 
 void
 MainWindow::showAboutDialog()

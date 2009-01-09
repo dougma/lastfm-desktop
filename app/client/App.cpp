@@ -168,8 +168,6 @@ App::App( int& argc, char** argv )
     pluginInstaller.install();
 #endif
 #endif
-    
-    DiagnosticsDialog::observe( m_scrobbler );
 
     setQuitOnLastWindowClosed( false );
 
@@ -228,6 +226,8 @@ App::setMainWindow( MainWindow* window )
         // only do if true, otherwise the state machine will be fucked
         setScrobblingEnabled( true );
     }
+
+    connect( m_scrobbler, SIGNAL(status( int )), window->ui.diagnostics, SLOT(scrobbleActivity( int )) );
 }
 
 
@@ -381,7 +381,10 @@ App::onTrackSpooled( const Track& t )
         
         if (t.mbid().isNull() || fpid.isNull())
         {
-            QThreadPool::globalInstance()->start( new ExtractIdentifiersJob( t ) );
+            ExtractIdentifiersJob* job = new ExtractIdentifiersJob( t );
+            QThreadPool::globalInstance()->start( job );
+            
+            connect( job, SIGNAL(fingerprinted( Track )), m_mainWindow->ui.diagnostics, SLOT(fingerprinted( Track )) );
         }
     }
 #endif
