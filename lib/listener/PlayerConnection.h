@@ -81,10 +81,6 @@ signals:
     void resumed();
     void stopped();
 
-    // used by the RadioPlayerConnection
-    void tuningIn( const class RadioStation& );
-    void trackSpooled( const Track& );
-    void trackStarted();
 };
 
 #endif
