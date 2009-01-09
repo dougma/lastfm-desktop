@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\libs&quot;;..\ScrobSub;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;;../../"
+				AdditionalIncludeDirectories="..\ScrobSub;../../;&quot;$(ProjectDir)\libs&quot;"
 				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;_DEBUG;_WINDOWS;_USRDLL;ITUNES_SCROBBLER_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/VERBOSE:LIB"
-				AdditionalDependencies="ws2_32.lib comsuppwd.lib wbemuuid.lib Setupapi.lib libs/sqlited.lib"
+				AdditionalDependencies="comsuppwd.lib wbemuuid.lib Setupapi.lib libs/sqlited.lib"
 				OutputFile="c:\program files\iTunes\Plug-Ins\itw_scrobbler.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\libs&quot;"
@@ -129,7 +129,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\ScrobSub;&quot;$(ProjectDir)\libs&quot;;&quot;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\WTL75\include&quot;"
+				AdditionalIncludeDirectories="..\ScrobSub;../../;&quot;$(ProjectDir)\libs&quot;"
 				PreprocessorDefinitions="ID3LIB_LINKOPTION=1;WIN32;NDEBUG;_WINDOWS;_USRDLL;ITUNES_SCROBBLER_EXPORTS;TARGET_OS_WIN32;_WIN32_DCOM;_ATL_APARTMENT_THREADED;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib sqlite.lib comsuppw.lib wbemuuid.lib Setupapi.lib libs/sqlite.lib"
+				AdditionalDependencies="sqlite.lib comsuppw.lib wbemuuid.lib Setupapi.lib libs/sqlite.lib"
 				OutputFile="Release\itw_scrobbler.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(ProjectDir)\libs"
@@ -385,16 +385,16 @@
 			Name="ScrobSub"
 			>
 			<File
-				RelativePath="..\scrobsub\BlockingClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\scrobsub\BlockingClient.h"
-				>
-			</File>
-			<File
 				RelativePath="..\scrobsub\EncodingUtils.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\scrobsub\EncodingUtils.h"
@@ -403,6 +403,14 @@
 			<File
 				RelativePath="..\scrobsub\RegistryUtils.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\scrobsub\RegistryUtils.h"
@@ -411,10 +419,30 @@
 			<File
 				RelativePath="..\scrobsub\ScrobSubmitter.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\scrobsub\ScrobSubmitter.h"
 				>
+			</File>
+			<File
+				RelativePath="..\..\common\c++\win\scrobSubPipeName.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

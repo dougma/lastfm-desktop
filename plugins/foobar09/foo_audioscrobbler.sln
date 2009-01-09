@@ -2,9 +2,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "foo_audioscrobbler", "foo_audioscrobbler.vcproj", "{7F80BCEE-72AB-4256-9D3A-3A03E15D2A1B}"
 	ProjectSection(ProjectDependencies) = postProject
+		{6530D504-E2F9-4073-9E42-3138A6085BFA} = {6530D504-E2F9-4073-9E42-3138A6085BFA}
 		{E8091321-D79D-4575-86EF-064EA1A4A20D} = {E8091321-D79D-4575-86EF-064EA1A4A20D}
-		{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C} = {EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}
 		{71AD2674-065B-48F5-B8B0-E1F9D3892081} = {71AD2674-065B-48F5-B8B0-E1F9D3892081}
+		{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C} = {EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "foobar2000_component_client", "foobar_sdk\foobar2000\foobar2000_component_client\foobar2000_component_client.vcproj", "{71AD2674-065B-48F5-B8B0-E1F9D3892081}"
@@ -12,6 +13,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "foobar2000_SDK", "foobar_sdk\foobar2000\SDK\foobar2000_SDK.vcproj", "{E8091321-D79D-4575-86EF-064EA1A4A20D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pfc", "foobar_sdk\pfc\pfc.vcproj", "{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScrobSub", "..\scrobsub\ScrobSub.vcproj", "{6530D504-E2F9-4073-9E42-3138A6085BFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +68,15 @@ Global
 		{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}.Release|Win32.Build.0 = Release|Win32
 		{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}.Release|x64.ActiveCfg = Release|x64
 		{EBFFFB4E-261D-44D3-B89C-957B31A0BF9C}.Release|x64.Build.0 = Release|x64
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Debug|Win32.Build.0 = Debug|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Debug|x64.ActiveCfg = Debug|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release ANSI|Win32.ActiveCfg = Release|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release ANSI|Win32.Build.0 = Release|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release ANSI|x64.ActiveCfg = Release|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release|Win32.ActiveCfg = Release|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release|Win32.Build.0 = Release|Win32
+		{6530D504-E2F9-4073-9E42-3138A6085BFA}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

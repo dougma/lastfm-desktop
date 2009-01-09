@@ -34,7 +34,7 @@
      
     \section install_sec Installation
     
-    The library consists of only three source files, so the easiest way of
+    The library consists of seven source files, so the easiest way of
     using them would be to simply include them in your project and compile
     them alongside your other code. The only class with a public interface
     is the ScrobSubmitter.
@@ -42,29 +42,26 @@
     Files needed:
     \li ScrobSubmitter.h
     \li ScrobSubmitter.cpp
-    \li BlockingClient.h
-    \li BlockingClient.cpp
     \li EncodingUtils.h
     \li EncodingUtils.cpp
-     
+    \li RegistryUtils.h
+    \li RegistryUtils.cpp
+    \li scrobSubPipeName.cpp
+
     \section dep_sec Dependencies
-    
-    Win32 and Winsock2. Add ws2_32.lib to you list of additional linker
-    dependencies.
 
 ******************************************************************************/
 
 #ifndef SCROBSUBMITTER_H
 #define SCROBSUBMITTER_H
 
-#include "BlockingClient.h"
-
 #include <string>
 #include <deque>
+#include <windows.h>
 
 /*************************************************************************/ /**
     Class for submitting tracks to the Last.fm client. It communicates with
-    the client via a local socket.
+    the client via a named pipe.
     
     To use it, call Init on player startup passing the required parameters.
     This will launch the Last.fm client if it isn't already runnning and
@@ -73,13 +70,11 @@
     Then simply call functions Start, Stop, Pause and Resume in response to
     player events to communicate these events to the Last.fm client. They all
     operate asynchronously, i.e. they will return straight away so as to
-    prevent hanging the calling thread if an operation takes some time. This
-    shouldn't normally be the case but if the client is not running, it might
-    take some time to discover that the socket is not open. The functions will
-    return a request ID uniquely identifying the command just sent. When the
-    request is finished, the status callback will be called with the ID as a
-    parameter and a message of either "OK" or a description of the error if
-    one occurred.
+    prevent hanging the calling thread if an operation takes some time. The 
+    functions will return a request ID uniquely identifying the command just 
+    sent. When the request is finished, the status callback will be called 
+    with the ID as a parameter and a message of either "OK" or a description 
+    of the error if one occurred.
     
     It's important to call Term at shutdown to clean up all resources properly.
         
@@ -142,8 +137,8 @@ public:
         void* userData);
 
     /*********************************************************************/ /**
-        Call this to terminate. Must be called in order for the socket thread
-        to be shut down properly.
+        Call this to terminate. Must be called in order for the  thread to be
+        shut down properly.
     **************************************************************************/
     void
     Term();
@@ -245,14 +240,14 @@ private:
 	LaunchClient();
 
     /**************************************************************************
-        Sends the command cmd down the socket.
+        Sends the command cmd.
     **************************************************************************/
     int
 	SendToAS(
 	    const std::string& cmd);
 
     /**************************************************************************
-        Socket thread starter.
+        Thread starter.
     **************************************************************************/
     static unsigned __stdcall
     SendToASThreadMain(
@@ -260,7 +255,7 @@ private:
 	{ reinterpret_cast<ScrobSubmitter*>(p)->SendToASThread(); return 0; }
 	 
     /**************************************************************************
-        Socket worker thread function.
+        Worker thread function.
     **************************************************************************/
     void
 	SendToASThread();
@@ -301,10 +296,6 @@ private:
 
     std::string      mPluginId;
     
-    int              mActualPort;
-    bool             mDoPortstepping;
-    BlockingClient   mSocket;
-    
     int              mNextId;
     std::deque<std::pair<int, std::string> > mRequestQueue;
 
@@ -313,7 +304,7 @@ private:
     HANDLE           mExit;
     CRITICAL_SECTION mMutex;
     bool             mStopThread;
-    
+    std::string      mPipeName;
 
     StatusCallback   mpReportStatus;
     void*            mpUserData;

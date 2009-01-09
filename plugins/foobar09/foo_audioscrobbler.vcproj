@@ -62,8 +62,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
-				AdditionalDependencies="Ws2_32.lib foobar_sdk/foobar2000/shared/shared.lib foobar_sdk/foobar2000/foobar2000_component_client/Debug/foobar2000_component_client.lib foobar_sdk/foobar2000/SDK/Debug/foobar2000_SDK.lib $(OutDir)/pfc.lib"
+				LinkLibraryDependencies="true"
+				AdditionalDependencies="foobar_sdk/foobar2000/shared/shared.lib foobar_sdk/foobar2000/foobar2000_component_client/Debug/foobar2000_component_client.lib foobar_sdk/foobar2000/SDK/Debug/foobar2000_SDK.lib $(OutDir)/pfc.lib"
 				OutputFile="C:\Program Files\foobar2000\components\$(InputName).dll"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames=""
@@ -125,7 +125,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="foobar_sdk/foobar2000;../../ScrobSub"
+				AdditionalIncludeDirectories="foobar_sdk/foobar2000;../ScrobSub"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FOO_AUDIOSCROBBLER_EXPORTS;UNICODE;_UNICODE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -146,7 +146,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkLibraryDependencies="false"
+				LinkLibraryDependencies="true"
 				AdditionalDependencies="Ws2_32.lib foobar_sdk/foobar2000/shared/shared.lib foobar_sdk/foobar2000/foobar2000_component_client/Release/foobar2000_component_client.lib foobar_sdk/foobar2000/SDK/Release/foobar2000_SDK.lib $(OutDir)/pfc.lib"
 				OutputFile="release/foo_audioscrobbler.dll"
 				LinkIncremental="1"
@@ -198,34 +198,6 @@
 				RelativePath=".\audioscrobbler.cpp"
 				>
 			</File>
-			<Filter
-				Name="ScrobSub"
-				>
-				<File
-					RelativePath="..\scrobsub\BlockingClient.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\scrobsub\BlockingClient.h"
-					>
-				</File>
-				<File
-					RelativePath="..\scrobsub\EncodingUtils.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\scrobsub\EncodingUtils.h"
-					>
-				</File>
-				<File
-					RelativePath="..\scrobsub\ScrobSubmitter.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\scrobsub\ScrobSubmitter.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"

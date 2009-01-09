@@ -46,21 +46,19 @@
 
 using namespace std;
 
+extern DWORD scrobSubPipeName(string* pipeName);
+extern string formatWin32Error(DWORD error);
+
 /******************************************************************************
     Constants
 ******************************************************************************/
 static const char* kVersion = "1.1.1";
-static const char* kHost = "localhost";
-static const int   kDefaultPort = 33367;
-static const int   kPortsToStep = 5;
 static const int   kLaunchWait = 60000; // in ms
 
 /******************************************************************************
     ScrobSubmitter
 ******************************************************************************/
 ScrobSubmitter::ScrobSubmitter() :
-    mActualPort(kDefaultPort),
-    mDoPortstepping(true),
     mNextId(0),
     mStopThread(false),
     mLaunchTime(0)
@@ -166,6 +164,12 @@ ScrobSubmitter::Init(
     if ( isAutoLaunchEnabled )
     {
         LaunchClient();
+    }
+
+    DWORD err = scrobSubPipeName(&mPipeName);
+    if (err)
+    {
+        ReportStatus(-1, true, formatWin32Error(err));
     }
 
     // Start socket thread
@@ -513,37 +517,37 @@ ScrobSubmitter::SendToASThread()
         LeaveCriticalSection(&mMutex);
         
         int nId = reqPair.first;
-        string sCmd = reqPair.second;
-        
-        if( !mSocket.isConnected() )
-        {
-            bool connected = ConnectToAS(nId);
-            if (!connected) { continue; }
-        }
-        
-        string sResponse;
-        try
-        {
-            mSocket.Send(sCmd);
-            mSocket.Receive(sResponse);
+        string& sCmd = reqPair.second;
 
-            // Can't throw
-            // mSocket.ShutDown();
+        #define RESPONSE_BUFFER_SIZE 1024
+        #define PIPE_TIMEOUT 3000   // ms
 
-            if (sResponse.substr(0, 2) != "OK")
-            {
-                ReportStatus(nId, true, sResponse);
-            }
-            else
-            {
-                ReportStatus(nId, false, sResponse);
-            }
-        }
-        catch (BlockingClient::NetworkException& e)
+        char responseBuffer[RESPONSE_BUFFER_SIZE];
+        DWORD bytesRead;
+
+        BOOL success = CallNamedPipeA(
+            mPipeName.data(), 
+            (LPVOID) sCmd.data(), (DWORD) sCmd.size(),
+            responseBuffer, RESPONSE_BUFFER_SIZE, 
+            &bytesRead,
+            PIPE_TIMEOUT);
+
+        if (success)
         {
-            // Shut socket down and report error
-            mSocket.ShutDown();
-            ReportStatus(nId, true, e.what());
+            std::string sResponse(responseBuffer, bytesRead);
+            bool error = sResponse.substr(0, 2) != "OK";
+            ReportStatus(nId, error, sResponse);
+        }
+        else
+        {
+            // the only acceptable error is file not found 
+            // (probably meaning the client is not running)
+            DWORD err = GetLastError();
+            if (err != ERROR_FILE_NOT_FOUND) 
+            {
+                ReportStatus(nId, true, formatWin32Error(err));
+                break;
+            }
         }
 
     } // end while
@@ -558,69 +562,7 @@ bool
 ScrobSubmitter::ConnectToAS(
     int reqId)
 {
-    try
-    {
-        mSocket.Connect(kHost, mActualPort);
-    }
-    catch (BlockingClient::NetworkException& e)
-    {
-        // Abort if thread has been told to stop
-        if (mStopThread) return false;
-
-        // It might be the case that the app simply hasn't had time to
-        // open its socket yet. If so, let's sleep for a bit and retry.
-
-        // GetTickCount wraps once every 49.7 days. But due to the nature of unsigned arithmetic,
-        // this code works correctly if the return value wraps one time, i.e. we're fine as long
-        // as the time between launch and the launchWait is less than 49.7 days.
-        DWORD nowTime = GetTickCount();
-        DWORD timeSinceLaunch = nowTime - mLaunchTime;
-
-        if (timeSinceLaunch < kLaunchWait)
-        {
-            ostringstream os;
-            os << "Connect failed, sent command too early after startup. "
-                "Time since launch: " << timeSinceLaunch << ". Retrying...";
-            ReportStatus(reqId, false, os.str().c_str());
-
-            Sleep(1000);
-            return ConnectToAS(reqId);
-        }
-        else if (mDoPortstepping)
-        {
-            // If after the waiting period we're still failing it might be because
-            // the original port was busy. The client might have port-stepped. Let's
-            // try and find its true port.
-            if (mActualPort <= (kDefaultPort + kPortsToStep))
-            {
-                mActualPort++;
-
-                ostringstream os;
-                os << "Port stepping to port " << mActualPort;
-                ReportStatus(reqId, false, os.str().c_str());
-
-                return ConnectToAS(reqId);
-            }
-            else
-            {
-                // If the port stepping didn't solve the problem, we don't want to
-                // try it again on each new connection attempt as it hogs the socket
-                // thread.
-                mActualPort = kDefaultPort;
-                mDoPortstepping = false;
-            }
-        }
-        
-        ReportStatus(reqId, true, e.what());
-        return false;
-    }
-
-    #ifdef WIN32
-        LPSTR cmdLine = GetCommandLineA();
-    #else
-        //TODO: implement this for posix systems
-        char* cmdLine = "";
-    #endif
+    LPSTR cmdLine = GetCommandLineA();
 
     ostringstream init;
     init << "INIT c="
@@ -690,3 +632,4 @@ ScrobSubmitter::Escape(
 
     return text;
 }    
+
