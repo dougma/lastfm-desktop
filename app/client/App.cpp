@@ -115,8 +115,22 @@ App::App( int& argc, char** argv )
     connect( itunes_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
     itunes_listener->start();
 #else
-    m_listener = new PlayerListener( this );
-    connect( m_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
+    try
+    {
+        m_listener = new PlayerListener( this );
+        connect( m_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
+    }
+    catch (PlayerListener::SocketFailure& e)
+    {
+        m_listener = 0;
+
+        qWarning() << e;
+        MessageBoxBuilder( 0 )
+                .setIcon( QMessageBox::Error )
+                .setTitle( tr("Scrobbling will not work") )
+                .setText( tr("Could not instantiate scrobbling socket") )
+                .exec()
+    }
 #endif
 
     m_scrobbler = new Scrobbler( "ass" ); //connections happen later
