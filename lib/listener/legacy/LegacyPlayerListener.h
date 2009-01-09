@@ -21,7 +21,7 @@
 #define LEGACY_PLAYER_LISTENER_H
 
 #include "lib/DllExportMacro.h"
-#include "PlayerConnection.h"
+#include "../PlayerConnection.h"
 #include <QTcpServer>
 #include <QMap>
 class PlayerConnection;

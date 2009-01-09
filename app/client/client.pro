@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = Last.fm
-CONFIG += unicorn radio core ws types scrobble
+CONFIG += unicorn radio core ws types scrobble listener
 QT = core gui xml network phonon webkit svg
 # Qt is broken and phonon requires openGL! I emailed them for fix0rs
 QT += opengl

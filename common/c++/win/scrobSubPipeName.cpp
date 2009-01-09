@@ -63,7 +63,7 @@ formatWin32Error(DWORD error)
 
 
 DWORD
-scrobSubPipeName(string& pipeName)
+scrobSubPipeName(string* pipeName)
 {
     #define PIPE_PREFIX "\\\\.\\pipe\\lastfm_scrobsub_"
 
@@ -83,7 +83,7 @@ scrobSubPipeName(string& pipeName)
             {
                 ostringstream os;
                 os << PIPE_PREFIX << sidstring;
-                pipeName = os.str();
+                *pipeName = os.str();
                 LocalFree(sidstring);
                 ok = true;
             }

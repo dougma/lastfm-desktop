@@ -1,6 +1,6 @@
 TARGET = listener
 TEMPLATE = lib
-QT = core
+QT = core xml network
 CONFIG += types scrobble
 
 include( $$ROOT_DIR/common/qmake/include.pro )

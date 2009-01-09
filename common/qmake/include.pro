@@ -25,6 +25,7 @@ CONFIG( ws ) {
 }
 CONFIG( types ):LIBS += -ltypes
 CONFIG( unicorn ):LIBS += -lunicorn
+CONFIG( listener ):LIBS += -llistener
 CONFIG( moose ):LIBS += -lmoose
 CONFIG( radio ):LIBS += -lradio
 CONFIG( scrobble ):LIBS += -lscrobble

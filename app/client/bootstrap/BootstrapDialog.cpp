@@ -23,7 +23,7 @@
 
 #ifdef WIN32
 #include "PluginBootstrapper.h"
-#include "player/PlayerListener.h"
+#include "lib/listener/PlayerListener.h"
 #include "win/CKillProcessHelper.h"
 #endif
 

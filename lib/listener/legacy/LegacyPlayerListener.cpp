@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "LegacyPlayerListener.h"
-#include "PlayerCommandParser.h"
-#include "PlayerConnection.h"
+#include "../PlayerCommandParser.h"
+#include "../PlayerConnection.h"
 #include <QTcpSocket>
 
 

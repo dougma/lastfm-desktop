@@ -456,7 +456,7 @@ App::openLocalContent( const RadioStation& station )
     
     QEventLoop loop;
     connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
-    connect( result, SIGNAL(parseBad( unsigned, QString, int )), &loop, SLOT(quit()) );
+    connect( result, SIGNAL(parseBad( int, QString, int )), &loop, SLOT(quit()) );
     loop.exec();
 
     LocalRadioTrackSource* source = new LocalRadioTrackSource( result );

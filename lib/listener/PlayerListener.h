@@ -24,12 +24,14 @@
 #include "PlayerConnection.h"
 #include <QLocalServer>
 #include <QMap>
+#include "lib/DllExportMacro.h"
+
 class PlayerConnection;
 
 
 /** listens to external clients via a TcpSocket and notifies a receiver to their
   * commands */
-class PlayerListener : public QLocalServer
+class LISTENER_DLLEXPORT PlayerListener : public QLocalServer
 {
     Q_OBJECT
 
