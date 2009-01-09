@@ -74,8 +74,10 @@ PlayerListener::onDataReady()
             QString const id = parser.playerId();
             PlayerConnection* connection = 0;
             
-            if (!m_connections.contains( id )) 
+            if (!m_connections.contains( id )) {
                 connection = m_connections[id] = new PlayerConnection( parser.playerId(), parser.playerName() );
+                emit newConnection( connection );
+            }
             else
                 connection = m_connections[id];
             

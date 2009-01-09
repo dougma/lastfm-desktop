@@ -385,7 +385,7 @@ App::onTrackUnspooled( const Track& t )
     // always submit banned tracks, scrobble point reached or not
     // only submit skipped tracks, scrobble point reached or not, but only if scrobbling is on
 
-    if (s.isLoved() || s.isBanned() || s.isSkipped() && enabled)
+    if (s.isLoved() || s.isBanned() || s.isSkipped() && enabled && s.source() == Track::LastFmRadio)
     {
         m_scrobbler->cache( t );
         m_scrobbler->submit();

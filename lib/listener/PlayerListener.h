@@ -49,7 +49,7 @@ public:
     uint port() const { return 33367; }
     
 signals:
-    void playerCommand( const PlayerConnection& );
+    void newConnection( class PlayerConnection* );
     void bootstrapCompleted( const QString& playerId );
 
 private slots:
