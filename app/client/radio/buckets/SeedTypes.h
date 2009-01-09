@@ -22,6 +22,7 @@
 
 #include <QMetaType>
 
+
 namespace Seed
 {
     enum Type { 
@@ -33,6 +34,7 @@ namespace Seed
         CustomType
     };
 }
+
 
 Q_DECLARE_METATYPE( Seed::Type )
 

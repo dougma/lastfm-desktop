@@ -17,50 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_LISTENER_H
-#define PLAYER_LISTENER_H
+#ifndef PLAYER_COMMAND_H
+#define PLAYER_COMMAND_H
 
-#include "common/HideStupidWarnings.h"
-#include "PlayerConnection.h"
-#include <QTcpServer>
-#include <QMap>
-class PlayerConnection;
-
-
-/** listens to external clients via a TcpSocket and notifies a receiver to their
-  * commands */
-class PlayerListener : public QTcpServer
+enum PlayerCommand
 {
-    Q_OBJECT
-
-public:
-    struct SocketFailure : private QString
-    {
-        SocketFailure( const QString& what ) : QString( what )
-        {}
-        
-        QString what() const { return *this; }
-    };
+    CommandInit,
+    CommandStart,
+    CommandPause,
+    CommandResume,
+    CommandStop,
+    CommandTerm,
     
-    PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
-    
-    uint port() const { return 33367; }
-    
-signals:
-    void playerCommand( const PlayerConnection& );
-    void bootstrapCompleted( const QString& playerId );
-
-private slots:
-    void onNewConnection();
-    void onDisconnection();
-    void onDataReady();
-
-private:
-    /** handles the TERM command as conecerning this class */
-    void term( QTcpSocket* );
-    
-    QMap<QTcpSocket*, PlayerConnection> m_connections;
+    CommandBootstrap
 };
-
 
 #endif

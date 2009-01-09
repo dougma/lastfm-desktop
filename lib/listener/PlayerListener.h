@@ -17,58 +17,46 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QtGlobal> //Q_WS_MAC
-#ifndef Q_WS_MAC
-#define ITUNES_SCRIPT_H
-#endif
+#ifndef PLAYER_LISTENER_H
+#define PLAYER_LISTENER_H
 
-#ifndef ITUNES_SCRIPT_H
-#define ITUNES_SCRIPT_H
+#include "common/HideStupidWarnings.h"
+#include "PlayerConnection.h"
+#include <QLocalServer>
+#include <QMap>
+class PlayerConnection;
 
-#include <QThread>
-#include <CoreFoundation/CoreFoundation.h>
 
-/** @author Christian Muehlhaeuser <chris@last.fm>
-  * @contributor Erik Jaelevik <erik@last.fm>
-  * @rewrite Max Howell <max@last.fm>
-  */
-class ITunesListener : public QThread
+/** listens to external clients via a TcpSocket and notifies a receiver to their
+  * commands */
+class PlayerListener : public QLocalServer
 {
     Q_OBJECT
 
 public:
-    ITunesListener( uint port, QObject* parent );
-
-    enum State { Unknown = -1, Playing, Paused, Stopped };
-
-    virtual void run();
+    struct SocketFailure : private QString
+    {
+        SocketFailure( const QString& what ) : QString( what )
+        {}
+        
+        QString what() const { return *this; }
+    };
     
-private:
-    /** to communicate with the player listener */
-    uint const m_port;
+    PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
+    
+    uint port() const { return 33367; }
+    
+signals:
+    void playerCommand( const PlayerConnection& );
+    void bootstrapCompleted( const QString& playerId );
 
-    static bool iTunesIsPlaying();
-    /** @returns true if the currently playing track is music, ie. not a podcast */
-    static bool isMusic();
-    /** iTunes notification center callback */
-    static void callback( CFNotificationCenterRef, 
-                          void*, 
-                          CFStringRef, 
-                          const void*, 
-                          CFDictionaryRef );
-    static void callback2( CFNotificationCenterRef, 
-						 void*, 
-						 CFStringRef, 
-						 const void*, 
-						 CFDictionaryRef );
+private slots:
+    void onNewConnection();
+    void onDataReady();
 
-    void callback( CFDictionaryRef );
-    void transmit( const QString& data );
-    void setupCurrentTrack();
-
-    State m_state;
-    QString m_previousPid;
-	class QTcpSocket* m_socket;
+private:    
+    QMap<QString, PlayerConnection*> m_connections;
 };
+
 
 #endif

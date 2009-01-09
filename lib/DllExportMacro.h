@@ -28,8 +28,14 @@
 	#else
 	    #define UNICORN_DLLEXPORT __declspec(dllimport)
 	#endif
+	#ifdef _LISTENER_DLLEXPORT
+	    #define LISTENER_DLLEXPORT __declspec(dllexport)
+	#else
+	    #define LISTENER_DLLEXPORT __declspec(dllimport)
+	#endif
 #else
     #define UNICORN_DLLEXPORT
+    #define LISTENER_DLLEXPORT
 #endif
 
 #endif

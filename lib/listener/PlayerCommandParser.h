@@ -23,6 +23,7 @@
 #include "common/HideStupidWarnings.h"
 #include "lib/lastfm/core/CoreException.h"
 #include "lib/lastfm/types/Track.h"
+#include "PlayerCommand.h"
 
 
 class PlayerCommandParser
@@ -36,19 +37,7 @@ public:
 
     PlayerCommandParser( QString line ) throw( Exception );
 
-    enum Command
-    {
-        Init,
-        Start,
-        Stop,
-        Pause,
-        Resume,
-        Term,
-        
-        Bootstrap
-    };
-
-    Command command() const { return m_command; }
+    PlayerCommand command() const { return m_command; }
     QString playerId() const { return m_playerId; }
     Track track() const { return m_track; }
     QString username() const { return m_username; }
@@ -57,17 +46,30 @@ public:
 	  * directory on Mac OS X */
     QString applicationPath() const { return m_applicationPath; }
 
+    QString playerName()
+    {
+        QString& id = m_playerId;
+        
+        if (id == "osx") return "iTunes";
+        if (id == "itw") return "iTunes";
+        if (id == "foo") return "foobar2000";
+        if (id == "wa2") return "Winamp";
+        if (id == "wmp") return "Windows Media Player";
+        if (id == "ass") return "Last.fm";
+        return QObject::tr( "Unknown media player" );
+    }    
+    
 private:
-    Command extractCommand( QString& line );
+    PlayerCommand extractCommand( QString& line );
     QMap<QChar, QString> extractArgs( const QString& line );
-    QString requiredArgs( Command );
+    QString requiredArgs( PlayerCommand );
     Track extractTrack( const QMap<QChar, QString>& args );
 
-    Command m_command;
+    PlayerCommand m_command;
     QString m_playerId;
     Track m_track;
     QString m_username;
     QString m_applicationPath;
 };
 
-#endif // PLAYERCOMMANDPARSER_H
+#endif // PLAYER_COMMAND_PARSER_H

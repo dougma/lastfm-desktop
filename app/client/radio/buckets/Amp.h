@@ -56,17 +56,15 @@ protected slots:
     void onPlayerBucketChanged();
     void onWidgetAnimationFrameChanged( int );
     void onPlayerChanged( const QString& );
-    void onTrackSpooled( const Track&, class StopWatch* );
-    void onStateChanged( State, const Track& );
+    void onStateChanged( State );
 
 private:
     void setupUi();
     void setRadioControlsVisible( bool );
     bool isRadioControlsVisible() const;
-    
-    State m_playerState;
 
     class QTimeLine* m_timeline;
+    QString m_playerName;
 };
 
 #endif

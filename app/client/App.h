@@ -83,14 +83,16 @@ private slots:
     void onRadioError( int, const class QVariant& );
     
 private:
-    class PlayerMediator* m_playerMediator;
     class Scrobbler* m_scrobbler;
     class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
     class Resolver *m_resolver;
     class LocalRql *m_localRql;
+    class StateMachine* m_stateMachine;
+#ifndef __APPLE__
     class PlayerListener* m_listener;
+#endif
 
     class QSystemTrayIcon* m_trayIcon;
     

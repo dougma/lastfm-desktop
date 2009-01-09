@@ -391,7 +391,6 @@ PlayerBucketList::visualRect ( const QModelIndex & index ) const
 void
 PlayerBucketList::play()
 {
-    
     RadioStation station = RadioStation::rql( queryString() );
     
     station.setTitle( "" );

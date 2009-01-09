@@ -27,13 +27,14 @@
 #include "ExtractIdentifiersJob.h"
 #include "ipod/BatchScrobbleDialog.h"
 #include "ipod/IPodScrobbleCache.h"
-#include "mac/ITunesListener.h"
 #include "mac/ITunesPluginInstaller.h"
-#include "player/PlayerListener.h"
-#include "player/PlayerMediator.h"
+#include "StateMachine.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/MainWindow.h"
 #include "app/twiddly/IPodScrobble.h"
+#include "lib/listener/PlayerMediator.h"
+#include "lib/listener/PlayerListener.h"
+#include "lib/listener/legacy/LegacyPlayerListener.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/fingerprint/Fingerprint.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
@@ -52,6 +53,7 @@
 #endif
 #ifdef __APPLE__
     extern void qt_mac_set_menubar_icons( bool );    
+    #include "lib/listener/mac/ITunesListener.h"
 #ifndef NDEBUG
     #define NPLUGINS
     #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
@@ -63,7 +65,7 @@
 struct Settings
 {    
     bool isScrobblingEnabled() const { return moose::UserSettings().value( "ScrobblingEnabled", true ).toBool(); }
-    bool setScrobblingEnabled( bool b ) { moose::UserSettings().setValue( "ScrobblingEnabled", b ); }
+    void setScrobblingEnabled( bool b ) { moose::UserSettings().setValue( "ScrobblingEnabled", b ); }
     
     uint volume() const { return QSettings().value( "Volume", 80 ).toUInt(); }
     void setVolume( uint i ) { QSettings().value( "Volume", i ); }
@@ -71,7 +73,7 @@ struct Settings
 
 
 App::App( int& argc, char** argv ) 
-   : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_listener( 0 )
+   : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_stateMachine( 0 )
 {
 #ifdef Q_WS_MAC
     qt_mac_set_menubar_icons( false );
@@ -87,37 +89,35 @@ App::App( int& argc, char** argv )
 #endif
    
 	QSettings s;
-    bool upgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
+    bool const upgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
 	s.setValue( "Version", applicationVersion() );
 #ifdef NDEBUG
     s.setValue( "Path", applicationFilePath() );
 #endif
-    
-    try { m_listener = new PlayerListener( this ); }
-    catch (PlayerListener::SocketFailure& e)
-    {
-        //FIXME
-        MessageBoxBuilder( 0 )
-                .setTitle( "Sorry" )
-                .setText( "You can't run the old client and the new client at once yet! We'll stay open, but scrobbling won't work." )
-                .exec();
-    }
-    
-    m_playerMediator = new PlayerMediator( m_listener );
-    connect( m_playerMediator, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
-    connect( m_playerMediator, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
-    connect( m_playerMediator, SIGNAL(stopped()), SIGNAL(stopped()) );
-    connect( m_playerMediator, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
-    connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
-    connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
 
-    connect( m_playerMediator, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
+    m_stateMachine = new StateMachine( this );
+    m_stateMachine->setScrobbleFraction( qreal(moose::Settings().scrobblePoint()) / 100 );    
+    connect( m_stateMachine, SIGNAL(playerChanged( QString )), SIGNAL(playerChanged( QString )) );
+    connect( m_stateMachine, SIGNAL(stateChanged( State, Track )), SIGNAL(stateChanged( State, Track )) );
+    connect( m_stateMachine, SIGNAL(stopped()), SIGNAL(stopped()) );
+    connect( m_stateMachine, SIGNAL(trackSpooled( Track, StopWatch* )), SIGNAL(trackSpooled( Track, StopWatch* )) );
+    connect( m_stateMachine, SIGNAL(trackUnspooled( Track )), SIGNAL(trackUnspooled( Track )) );
+    connect( m_stateMachine, SIGNAL(scrobblePointReached( Track )), SIGNAL(scrobblePointReached( Track )) ); 
+    connect( m_stateMachine, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
     
-#ifdef Q_WS_MAC
-    if (m_listener) new ITunesListener( m_listener->port(), this );
+    PlayerMediator* mediator = new PlayerMediator( this );
+    connect( mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), m_stateMachine, SLOT(setConnection( PlayerConnection* )) );
+    connect( new LegacyPlayerListener( this ), SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
+#ifdef __APPLE__
+    ITunesListener* itunes_listener = new ITunesListener( this );
+    connect( itunes_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
+    itunes_listener->start();
+#else
+    m_listener = new PlayerListener( this );
+    connect( m_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
 #endif
 
-    m_scrobbler = new Scrobbler( "ass" );
+    m_scrobbler = new Scrobbler( "ass" ); //connections happen later
 
 #ifndef NDEBUG
     QString plugins_path = qApp->applicationDirPath();
@@ -137,13 +137,13 @@ App::App( int& argc, char** argv )
     m_localRql = new LocalRql( pluginHost.getPlugins<ILocalRqlPlugin>("LocalRql") );
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
 #endif
+
 	m_radio = new Radio( new Phonon::AudioOutput );
 	m_radio->audioOutput()->setVolume( Settings().volume() );
-
-	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_playerMediator, SLOT(onRadioTuningIn( RadioStation )) );
-    connect( m_radio, SIGNAL(trackSpooled( Track )), m_playerMediator, SLOT(onRadioTrackSpooled( Track )) );
-    connect( m_radio, SIGNAL(trackStarted( Track )), m_playerMediator, SLOT(onRadioTrackStarted( Track )) );
-    connect( m_radio, SIGNAL(stopped()), m_playerMediator, SLOT(onRadioStopped()) );
+	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_stateMachine, SLOT(onRadioTuningIn( RadioStation )) );
+    connect( m_radio, SIGNAL(trackSpooled( Track )), m_stateMachine, SLOT(onRadioTrackSpooled( Track )) );
+    connect( m_radio, SIGNAL(trackStarted( Track )), m_stateMachine, SLOT(onRadioTrackStarted( Track )) );
+    connect( m_radio, SIGNAL(stopped()), m_stateMachine, SLOT(onRadioStopped()) );
     connect( m_radio, SIGNAL(error( int, QVariant )), SLOT(onRadioError( int, QVariant )) );
     
 #ifdef __APPLE__
@@ -225,18 +225,18 @@ App::setScrobblingEnabled( bool b )
     }
     else if (b)
     {
-        connect( m_playerMediator, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
-        connect( m_playerMediator, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
-        connect( m_playerMediator, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
+        connect( m_stateMachine, SIGNAL(trackSpooled( Track )), m_scrobbler, SLOT(nowPlaying( Track )) );
+        connect( m_stateMachine, SIGNAL(trackUnspooled( Track )), m_scrobbler, SLOT(submit()) );
+        connect( m_stateMachine, SIGNAL(scrobblePointReached( Track )), m_scrobbler, SLOT(cache( Track )) );
         
         connect( new WsConnectionMonitor( m_scrobbler ), SIGNAL(up()), m_scrobbler, SLOT(rehandshake()) );
         
-        Track t = m_playerMediator->track();
+        Track t = m_stateMachine->track();
         if (!t.isNull())
             m_scrobbler->nowPlaying( t );
     }
     else {
-        disconnect( m_playerMediator, 0, m_scrobbler, 0 );
+        disconnect( m_stateMachine, 0, m_scrobbler, 0 );
         delete m_scrobbler->findChild<WsConnectionMonitor*>();
     }
     
@@ -338,10 +338,12 @@ App::onUserGotInfo( WsReply* reply )
 {
     try
     {
+    #ifdef WIN32
         if (reply->lfm()["user"]["bootstrap"].text() != "0")
         {
             BootstrapDialog( m_listener, m_mainWindow ).exec();
         }
+    #endif
     }
     catch (CoreDomElement::Exception& e)
     {
@@ -375,7 +377,7 @@ App::onTrackSpooled( const Track& t )
 void
 App::love( bool b )
 {
-	MutableTrack t = m_playerMediator->track();
+	MutableTrack t = m_stateMachine->track();
 
 	if (b)
 		t.love();
@@ -387,7 +389,7 @@ App::love( bool b )
 void
 App::ban()
 {
-	MutableTrack t = m_playerMediator->track();
+	MutableTrack t = m_stateMachine->track();
 	t.ban();
 	m_radio->skip();
 }
@@ -441,6 +443,17 @@ App::openLocalContent( const RadioStation& station )
     //FIXME this synconicity is evil, but so is asyncronicity here
     
     LocalRqlResult* result = localRql()->startParse( station.rql() );
+    
+    if (!result)
+    {
+        MessageBoxBuilder( m_mainWindow )
+                .setTitle( tr("Local Radio Error") )
+                .setText( tr("Could not load plugin") )
+                .sheet()
+                .exec();
+        return;
+    }
+    
     QEventLoop loop;
     connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
     connect( result, SIGNAL(parseBad( unsigned, QString, int )), &loop, SLOT(quit()) );

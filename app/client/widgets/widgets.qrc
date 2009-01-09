@@ -26,12 +26,6 @@
       <file>SettingsDialog/ipod.png</file>
   </qresource>
   <qresource>
-      <file>ScrobbleButton.mng</file>
-      <file>ScrobbleButton/on.png</file>
-      <file>ScrobbleButton/off.png</file>
-      <file>ScrobbleButton/SADFACE.png</file>
-  </qresource>
-  <qresource>
       <file>RadioControls/volume/icon.png</file>
       <file>RadioControls/volume/rail.png</file>
       <file>RadioControls/volume/handle.png</file>
@@ -41,5 +35,47 @@
       <file>RadioControls/stop/onpress.png</file>
       <file>RadioControls/play/onpress.png</file>
       <file>RadioControls/skip/onpress.png</file>
+  </qresource>
+  <qresource>
+      <file>ScrobbleButton/on.png</file>
+      <file>ScrobbleButton/off.png</file>
+      <file>ScrobbleButton/SADFACE.png</file>
+
+      <file>ScrobbleButton/01.png</file>
+      <file>ScrobbleButton/02.png</file>
+      <file>ScrobbleButton/03.png</file>
+      <file>ScrobbleButton/04.png</file>
+      <file>ScrobbleButton/05.png</file>
+      <file>ScrobbleButton/06.png</file>
+      <file>ScrobbleButton/07.png</file>
+      <file>ScrobbleButton/08.png</file>
+      <file>ScrobbleButton/09.png</file>
+      <file>ScrobbleButton/10.png</file>
+      <file>ScrobbleButton/11.png</file>
+      <file>ScrobbleButton/12.png</file>
+      <file>ScrobbleButton/13.png</file>
+      <file>ScrobbleButton/14.png</file>
+      <file>ScrobbleButton/15.png</file>
+      <file>ScrobbleButton/16.png</file>
+      <file>ScrobbleButton/17.png</file>
+      <file>ScrobbleButton/18.png</file>
+      <file>ScrobbleButton/19.png</file>
+      <file>ScrobbleButton/20.png</file>
+      <file>ScrobbleButton/21.png</file>
+      <file>ScrobbleButton/22.png</file>
+      <file>ScrobbleButton/23.png</file>
+      <file>ScrobbleButton/24.png</file>
+      <file>ScrobbleButton/25.png</file>
+      <file>ScrobbleButton/26.png</file>
+      <file>ScrobbleButton/27.png</file>
+      <file>ScrobbleButton/28.png</file>
+      <file>ScrobbleButton/29.png</file>
+      <file>ScrobbleButton/30.png</file>
+      <file>ScrobbleButton/31.png</file>
+      <file>ScrobbleButton/32.png</file>
+      <file>ScrobbleButton/33.png</file>
+      <file>ScrobbleButton/34.png</file>
+      <file>ScrobbleButton/35.png</file>
+      <file>ScrobbleButton/36.png</file>
   </qresource>
 </RCC>

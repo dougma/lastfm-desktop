@@ -18,54 +18,70 @@
  ***************************************************************************/
 
 #include "ITunesListener.h"
+#include "../PlayerConnection.h"
 #include "lib/lastfm/core/CoreProcess.h"
 #include "lib/lastfm/core/mac/AppleScript.h"
 #include "lib/lastfm/core/mac/CFStringToQString.h"
-#include <QTcpSocket>
 #include <QThread>
-#include <QHostAddress>
-#include <QUrl>
-#include <QTextStream>
 
 
-ITunesListener::ITunesListener( uint const port, QObject* parent )
-              : m_port( port ), m_socket( 0 )
+struct ITunesConnection : PlayerConnection
 {
-    // you can't child QThreads to other threads, so do this instead
-    connect( parent, SIGNAL(destroyed()), SLOT(deleteLater()) );
-    start();
+    ITunesConnection() : PlayerConnection( "osx", "iTunes" )
+    {}
+    
+    void start( const Track& t )
+    {
+        MutableTrack mt( t );
+        mt.setSource( Track::Player );
+        mt.setExtra( "playerId", id() );
+        mt.stamp();
+        handleCommand( CommandStart, t ); 
+    }
+
+    void pause() { handleCommand( CommandPause ); }
+    void resume() { handleCommand( CommandResume ); }
+    void stop() { handleCommand( CommandStop ); }
+};
+
+
+ITunesListener::ITunesListener( QObject* parent )
+              : m_connection( 0 )
+{
+    connect( parent, SIGNAL(destroyed()), SLOT(deleteLater()) ); //FIXME safe?
 }
 
 
 void
 ITunesListener::run()
 {
-	m_socket = new QTcpSocket;
-    m_socket->connectToHost( QHostAddress::LocalHost, m_port );	
-	m_socket->waitForConnected( 1000 );
-	transmit( "INIT c=osx&f=/Applications/iTunes.app\n" ); //FIXME path of iTunes.app
-
+    m_connection = new ITunesConnection;
+    emit newConnection( m_connection );
+    
     setupCurrentTrack();
 
     CFNotificationCenterAddObserver( CFNotificationCenterGetDistributedCenter(), 
-                                     this,
-                                     callback, 
-                                     CFSTR( "com.apple.iTunes.playerInfo" ), 
-                                     NULL, 
-                                     CFNotificationSuspensionBehaviorDeliverImmediately );
+                                    this,
+                                    callback, 
+                                    CFSTR( "com.apple.iTunes.playerInfo" ), 
+                                    NULL, 
+                                    CFNotificationSuspensionBehaviorDeliverImmediately );
+
+    
+
     exec();
 
-	delete m_socket;
+	delete m_connection;
 }
 
     
 void
 ITunesListener::callback( CFNotificationCenterRef, 
                         void* observer, 
-                        CFStringRef, 
+                        CFStringRef name, 
                         const void*, 
                         CFDictionaryRef info )
-{
+{    
     static_cast<ITunesListener*>(observer)->callback( info );
 }
 
@@ -167,11 +183,11 @@ ITunesListener::callback( CFDictionaryRef info )
     switch (m_state)
     {
         case Paused:
-            transmit( "PAUSE c=osx\n" );
+            m_connection->pause();
             break;
 
         case Stopped:
-            transmit( "STOP c=osx\n" );
+            m_connection->stop();
             break;
             
         case Playing:
@@ -187,18 +203,19 @@ ITunesListener::callback( CFDictionaryRef info )
             if (m_previousPid == dict.pid && dict.position != 0)
             {
                 if (previousState == Paused)
-                    transmit( "RESUME c=osx\n" );
+                    m_connection->resume();
                 //else the user changed some metadata or the track's rating etc.
             }
             else
             {
-                transmit( "START c=osx"
-                               "&a=" + encodeAmp( dict.artist ) +
-                               "&t=" + encodeAmp( dict.name ) +
-                               "&b=" + encodeAmp( dict.album ) +
-                               "&l=" + QString::number( dict.duration ) +
-                               "&p=" + encodeAmp( dict.path ) + '\n' );
-
+                MutableTrack t;
+                t.setArtist( dict.artist );
+                t.setTitle( dict.name );
+                t.setAlbum( dict.album );
+                t.setDuration( dict.duration );
+                t.setUrl( QUrl::fromLocalFile( dict.path ) );
+                m_connection->start( t );
+                
                 m_previousPid = dict.pid;
             }
             break;
@@ -207,17 +224,6 @@ ITunesListener::callback( CFDictionaryRef info )
           qWarning() << "Unknown state.";
           break;
     }
-}
-
-
-void
-ITunesListener::transmit( const QString& data )
-{
-	int const n = m_socket->write( data.toUtf8() );
-	m_socket->flush();
-
-	if (n == -1)
-		qCritical() << "Sending submission through socket failed.";
 }
 
 
@@ -280,13 +286,12 @@ ITunesListener::setupCurrentTrack()
         
     if (!path.isEmpty())
     {
-        QString data = "START c=osx"
-                            "&a=" + encodeAmp( artist ) +
-                            "&t=" + encodeAmp( track ) +
-                            "&b=" + encodeAmp( album ) +
-                            "&l=" + duration +
-                            "&p=" + encodeAmp( path ) + '\n';
-
-        transmit( data );
+        MutableTrack t;
+        t.setArtist( artist );
+        t.setTitle( track );
+        t.setAlbum( album );
+        t.setDuration( duration.toInt() );
+        t.setUrl( QUrl::fromLocalFile( path ) );
+        m_connection->start( t );
     }
 }

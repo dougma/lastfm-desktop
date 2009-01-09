@@ -20,17 +20,16 @@
 #include "ActionButton.h"
 #include <QPointer>
 #include "lib/lastfm/scrobble/Scrobble.h"
-class QMovie;
-class QTimeLine;
+class ScrobbleButtonAnimation;
 
 
 class ScrobbleButton : public ActionButton
 {
     Q_OBJECT
 
-    QMovie* m_movie;
-    QPointer<QObject> m_timer;
+    QPointer<ScrobbleButtonAnimation> m_animation;
     Scrobble m_track;
+    QPixmap m_pixmap;
 
 public:
     ScrobbleButton();
@@ -40,7 +39,7 @@ protected:
     
 private slots:
     void onTrackSpooled( const class Track&, class StopWatch* );
-    void onScrobbled();
-    void advanceFrame();
+    void setPixmap( const QPixmap& );
     void updateToolTip( int );
+    void onChecked( bool );
 };

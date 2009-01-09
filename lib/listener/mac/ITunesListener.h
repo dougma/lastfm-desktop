@@ -17,45 +17,45 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef PLAYER_CONNECTION_H
-#define PLAYER_CONNECTION_H
+#ifndef ITUNES_SCRIPT_H
+#define ITUNES_SCRIPT_H
 
-#include "State.h"
-#include "PlayerCommandParser.h"
-#include "lib/lastfm/types/Track.h"
+#include <QThread>
+#include <CoreFoundation/CoreFoundation.h>
 
 
-class PlayerConnection
+/** @author Max Howell <max@last.fm> */
+class ITunesListener : public QThread
 {
-    friend class PlayerListener;
+    Q_OBJECT
 
-    void clear()
-    {
-        track = Track();
-        state = Stopped;
-    }    
+    virtual void run();    
     
-    QString determineName();
-
 public:
-    PlayerConnection() : state( Stopped ), command( PlayerCommandParser::Init )
-    {}
+    ITunesListener( QObject* parent );
+
+    enum State { Unknown = -1, Playing, Paused, Stopped };
+
+signals:
+    void newConnection( class PlayerConnection* );
     
-    bool isValid() const
-    {
-        return !id.isEmpty();
-    }
-    
-    bool operator==( const PlayerConnection& that ) const
-    {
-        return that.id == this->id;
-    }
-    
-    State state;
-    Track track;
-    QString id;
-    QString name;
-    PlayerCommandParser::Command command;
+private:
+    static bool iTunesIsPlaying();
+    /** @returns true if the currently playing track is music, ie. not a podcast */
+    static bool isMusic();
+    /** iTunes notification center callback */
+    static void callback( CFNotificationCenterRef, 
+                          void*, 
+                          CFStringRef, 
+                          const void*, 
+                          CFDictionaryRef );
+
+    void callback( CFDictionaryRef );
+    void setupCurrentTrack();
+
+    State m_state;
+    QString m_previousPid;
+    class ITunesConnection* m_connection;
 };
 
 #endif

@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,18 +17,37 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/DllExportMacro.h"
 #include "PlayerConnection.h"
-#include <QObject>
+#include <QList>
+class PlayerConnection;
 
 
-QString
-PlayerConnection::determineName()
+/** Usage, add PlayerConnections, seek() for the active one, when active 
+  * connection is available the newActiveConnection() signal will be emitted
+  * the ActionConnection will then stop seeking until you next call seek() */
+class LISTENER_DLLEXPORT PlayerMediator : public QObject
 {
-    if (id == "osx") return "iTunes";
-    if (id == "itw") return "iTunes";
-    if (id == "foo") return "FooBar";
-    if (id == "wa2") return "Winamp";
-    if (id == "wmp") return "Windows Media Player";
-    if (id == "ass") return "Last.fm";
-    return QObject::tr( "your media player" );
-}
+    Q_OBJECT
+
+    QList<PlayerConnection*> m_connections;
+
+protected:
+    PlayerConnection* m_active;
+    virtual bool assess( PlayerConnection* );
+
+public:
+    PlayerMediator( QObject* parent );
+        
+    PlayerConnection* activeConnection() const { return m_active; }
+
+public slots:
+    void follow( PlayerConnection* );
+    
+signals:
+    void activeConnectionChanged( PlayerConnection* );
+
+private slots:
+    void onActivity();
+    void onDestroyed();
+};

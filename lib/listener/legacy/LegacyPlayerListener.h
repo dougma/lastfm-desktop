@@ -14,44 +14,42 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PluginHost.h"
-#include <QLibrary>
-#include <QDir>
-#include <QThread>
-#include <QDebug>
+#ifndef LEGACY_PLAYER_LISTENER_H
+#define LEGACY_PLAYER_LISTENER_H
+
+#include "lib/DllExportMacro.h"
+#include "PlayerConnection.h"
+#include <QTcpServer>
+#include <QMap>
+class PlayerConnection;
 
 
-PluginHost::PluginHost(const QString& path)
+/** listens to external clients via a TcpSocket and notifies a receiver to their
+  * commands */
+class LISTENER_DLLEXPORT LegacyPlayerListener : public QTcpServer
 {
-    QDir d( path );
-    foreach(QString plugin, d.entryList(QDir::Files)) 
-    {
-        qDebug() << plugin;
-        
-        plugin = d.filePath( plugin );
-        
-        if (!QLibrary::isLibrary( plugin )) continue;
+    Q_OBJECT
 
-        qDebug() << plugin;        
-        
-        // it looks like a shared library, so try loading it:
-        QLibrary lib( plugin );
-        P_getService get = (P_getService) lib.resolve( PLUGIN_ENTRYPOINT );
-        
-        if (get)
-            m_plugins << get;
-            // and the lib will remain loaded until app terminates. ok?
-        else
-        {
-            qWarning() << lib.errorString();
-            lib.unload();
-        }
-    }
+public:
+    LegacyPlayerListener( QObject* parent );
     
-    qDebug() << "Found" << m_plugins.count() << "plugins in:" << path;
-}
+    static uint port() { return 33367; }
+    
+signals:
+    void newConnection( class PlayerConnection* );
+    
+private slots:
+    void onNewConnection();
+    void onDataReady();
 
+private:
+    /** handles the TERM command as conecerning this class */
+    void term( QTcpSocket* );
 
+    QMap<QString, PlayerConnection*> m_connections;
+};
+
+#endif

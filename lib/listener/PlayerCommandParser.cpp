@@ -50,13 +50,13 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
 
     switch (m_command)
     {
-        case Start:
+        case CommandStart:
             m_track = extractTrack( args );
             break;
-        case Bootstrap:
+        case CommandBootstrap:
             m_username = args['u'];
             break;
-        case Init:
+        case CommandInit:
             m_applicationPath = args['f'];
         default:
             break;
@@ -64,7 +64,7 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
 }
 
 
-PlayerCommandParser::Command
+PlayerCommand
 PlayerCommandParser::extractCommand( QString& line )
 {
     int const n = line.indexOf( ' ' );
@@ -75,13 +75,13 @@ PlayerCommandParser::extractCommand( QString& line )
     // Trim off command from passed in string
     line = line.mid( n + 1 );
 
-    if (command == "START") return Start;
-    if (command == "STOP") return Stop;
-    if (command == "PAUSE") return Pause;
-    if (command == "RESUME") return Resume;
-    if (command == "BOOTSTRAP") return Bootstrap;
-    if (command == "INIT") return Init;
-    if (command == "TERM") return Term;
+    if (command == "START") return CommandStart;
+    if (command == "STOP") return CommandStop;
+    if (command == "PAUSE") return CommandPause;
+    if (command == "RESUME") return CommandResume;
+    if (command == "BOOTSTRAP") return CommandBootstrap;
+    if (command == "INIT") return CommandInit;
+    if (command == "TERM") return CommandTerm;
 
     throw Exception( "Invalid command" );
 }
@@ -148,21 +148,21 @@ PlayerCommandParser::extractArgs( const QString& line )
 
 
 QString
-PlayerCommandParser::requiredArgs( PlayerCommandParser::Command c )
+PlayerCommandParser::requiredArgs( PlayerCommand c )
 {
     switch (c)
     {   
-        case Start: 
+        case CommandStart: 
             return "catblp";
-        case Bootstrap:
+        case CommandBootstrap:
             return "cu";
-        case Init:
+        case CommandInit:
             return "cf";
-        default:
-        case Stop:
-        case Pause:
-        case Resume:
-        case Term:
+        case CommandStop:
+        case CommandPause:
+        case CommandResume:
+        case CommandTerm:
+        default: // gcc 4.2 is stupid
             return "c";
     }
 }

@@ -16,7 +16,7 @@ debug:macx-xcode {
 
     DIRS = app/client \
            lib/lastfm/core lib/lastfm/ws lib/lastfm/radio lib/lastfm/types lib/lastfm/scrobble lib/lastfm/fingerprint \
-           lib/unicorn \
+           lib/unicorn lib/listener \
            app/clientplugins/localresolver
 
     for( dir, DIRS ) {
@@ -42,6 +42,7 @@ else {
                lib/lastfm/fingerprint/libfingerprint.pro \
                lib/lastfm/scrobble/libscrobble.pro \
                lib/unicorn/libunicorn.pro \
+               lib/listener/liblistener.pro \
 	           app/client \
                app/twiddly \
                app/clientplugins/localresolver/libresolver.pro

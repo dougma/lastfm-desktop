@@ -30,11 +30,18 @@ namespace mxcl
 {
     struct Time : private QTime
     {
-        using QTime::start;
-        using QTime::restart;
+        Time() : started( false ) 
+        {}
+        
+        bool started;
+        
+        void restart() { started = true; QTime::restart(); }
 
-        /** A stupid decision by Trolltech. Disallow negative time */
-        uint elapsed() const { return qMax( 0, QTime::elapsed() ); }
+        /** Disallow negative time, Trolltech suck? */
+        uint elapsed() const 
+        { 
+            return started ? qMax( 0, QTime::elapsed() ) : 0;
+        }
     };
 }
 
@@ -48,18 +55,19 @@ class StopWatch : public QObject
     Q_DISABLE_COPY( StopWatch )
 
     /** for access to timeout() signal */
-    friend class PlayerMediator;
+    friend class StateMachine;
     
 public:
     /** the StopWatch starts off paused, call resume() to start */
-    StopWatch( const ScrobblePoint& timeout_in_seconds );
+    StopWatch( ScrobblePoint timeout_in_seconds, uint elapsed_in_ms = 0 );
 
     bool isTimedOut() const { return m_remaining == 0 && !m_timer->isActive(); }
 
     void pause();
     void resume();
     
-    uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()) / 1000; }
+    /** in milliseconds */
+    uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()); }
 
     ScrobblePoint scrobblePoint() const { return m_point; }
     

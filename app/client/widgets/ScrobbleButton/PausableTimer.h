@@ -21,9 +21,46 @@
 #include <QBasicTimer>
 #include <QObject>
 #include <QTime>
+#include <QPixmap>
+#include <QPointer>
 
 
-class PausableTimer : public QObject
+static inline QPixmap scrobbleButtonPixmap( uint const i )
+{
+    Q_ASSERT( i > 0 );
+    Q_ASSERT( i < 37 );
+    QString const path = QString(":/ScrobbleButton/%1.png").arg( i, 2, 10, QChar('0') );
+    return QPixmap( path );
+}
+
+
+class Glow : public QObject, QBasicTimer
+{
+    Q_OBJECT
+    int value;
+    int const maxvalue;
+    
+    virtual void timerEvent( QTimerEvent* )
+    {
+        emit pixmap( scrobbleButtonPixmap( 25 + (value % 12) ) );
+        
+        if (value++ == maxvalue)
+            stop(),
+            deleteLater();
+    }
+    
+public:
+    Glow( uint iterations ) : value( 0 ), maxvalue( iterations * 12 + 5 )
+    {
+        start( 37, this );
+    }
+    
+signals:
+    void pixmap( const QPixmap& );
+};
+
+
+class ScrobbleButtonAnimation : public QObject
 {
     Q_OBJECT
     
@@ -31,23 +68,38 @@ class PausableTimer : public QObject
     QTime elapsed;
     uint const interval;
     uint next_interval;
-    uint iterations;
+    uint frame;
+    QPixmap m_pixmap;
+    QPointer<Glow> m_glow;
     
-    static const uint STEPS = 23;
+    static const uint STEPS = 24;
     
 public:
-    PausableTimer( const ScrobblePoint& p ) 
-            : interval( (p*1000) / STEPS ),
-              next_interval( interval ),
-              iterations( 0 )
+    ScrobbleButtonAnimation( uint from /* in milliseconds */, ScrobblePoint to ) 
+            : interval( (to*1000) / STEPS )
+            , next_interval( interval )
+            , frame( 1 )
     {
-        start( interval );
+        if (from > to * 1000) { frame = STEPS; glow(); return; }
+
+        if (from > 0)
+        {
+            frame = from / interval;
+            start( interval - (from % interval) );
+        }
+        else
+            start( interval );
+
+        m_pixmap = scrobbleButtonPixmap( frame );
     }
+
+    QPixmap pixmap() const { return m_pixmap; }
+    bool done() const { return frame >= STEPS; }
     
 public slots:
     void setPaused( bool b )
     {
-        Q_ASSERT( iterations < STEPS );
+        if (done()) return;
         if (b != timer.isActive()) return;
         
         if (b) {
@@ -58,8 +110,17 @@ public slots:
             start( next_interval );
     }
     
+    void glow( uint iterations = 3 )
+    {
+        if (!m_glow)
+        {
+            m_glow = new Glow( iterations ); // glow deletes self, leave it thus or you'll get animation b0rkage
+            connect( m_glow, SIGNAL(pixmap( QPixmap )), SIGNAL(pixmap( QPixmap )) );
+        }
+    }
+    
 signals:
-    void timeout();
+    void pixmap( const QPixmap& );
 
 private:
     void start(uint const time)
@@ -70,9 +131,10 @@ private:
     
     virtual void timerEvent(QTimerEvent*)
     {
-        emit timeout();
+        m_pixmap = scrobbleButtonPixmap( frame++ );
+        emit pixmap( m_pixmap );
         
-        if (++iterations >= STEPS)
+        if (done())
             timer.stop();
         else if (next_interval != interval)
             // we don't just start() every interval, as this introduces creep

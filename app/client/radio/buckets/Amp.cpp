@@ -103,8 +103,7 @@ Amp::Amp()
 {    
     setupUi();
     
-    connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled(Track, StopWatch*)) );
-    connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onStateChanged( State, Track )) );
+    connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
     connect( qApp, SIGNAL(playerChanged( QString )), SLOT(onPlayerChanged( QString )));
 
     m_timeline = new QTimeLine( 500, this );
@@ -202,9 +201,6 @@ Amp::setRadioControlsVisible( bool b )
     {
         m_timeline->setDirection( QTimeLine::Forward );
         m_timeline->start();
-
-        if( m_playerState != Paused )
-            ui.borderWidget->showText( true );
     }
 }
 
@@ -275,46 +271,40 @@ Amp::onWidgetAnimationFrameChanged( int frame )
 
 
 void 
-Amp::onTrackSpooled( const Track& t, StopWatch* )
-{
-    if( t.source() != Track::LastFmRadio )
-    {
-        if( t.isNull() )
-            ui.borderWidget->showText( false );
-        else if( ui.bucket->count() == 0 )
-        {
-            ui.borderWidget->showText( true );
-        }
-    }
-}
-
-
-void 
-Amp::onStateChanged( State s, const Track& t )
-{
+Amp::onStateChanged( State s )
+{   
     switch ((int)s)
     {
         case TuningIn:
+            m_playerName.clear();
+            ui.borderWidget->showText( false );
             setRadioControlsVisible( true );
             break;
+
+        case Paused:
+            if (m_playerName.size())
+                ui.borderWidget->setText( tr( "%1 is paused" ).arg( m_playerName ) );
+            break;
+            
+        case Playing:
+            if (m_playerName.size())
+                ui.borderWidget->setText( tr("Scrobbling from %1").arg( m_playerName ) );
+            break;
+            
         case Stopped:
             setRadioControlsVisible( ui.bucket->count() > 0 );
-            break;
+            if (m_playerName.size())
+                ui.borderWidget->setText( tr( "Connected to %1" ).arg( m_playerName ) );
+            else
+                ui.borderWidget->setText( "" );
     }
-    
-    // couldn't figure out what any of this meant exactly, Jono --mxcl
-    m_playerState = s;
-    if( t.source() != Track::LastFmRadio && s == Paused )
-        ui.borderWidget->showText( false );
-    else if( s == Playing && ui.bucket->count() == 0 )
-        ui.borderWidget->showText( true );
 }
 
 
 void 
 Amp::onPlayerChanged( const QString& name )
 {
-    ui.borderWidget->setText( tr( "%1 is now playing." ).arg( name ) );
-    ui.borderWidget->showText( false );
-    m_playerState = Paused;
+    m_playerName = name;
+    onStateChanged( Stopped );
+    ui.borderWidget->showText( m_playerName.size() );
 }
