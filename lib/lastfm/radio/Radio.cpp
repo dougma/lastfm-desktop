@@ -116,7 +116,6 @@ Radio::skip()
     // attempt to refill the phonon queue if it's empty
 	if (m_mediaObject->queue().isEmpty())
         phononEnqueue();
-
     
 	QList<Phonon::MediaSource> q = m_mediaObject->queue();
     if (q.size())
@@ -230,8 +229,11 @@ Radio::phononEnqueue()
     // Loop until we get a null url or a valid url.
     for (;;)
     {
+        // consume next track from the track source. a null track 
+        // response means wait until the trackAvailable signal
         Track t = m_trackSource->takeNextTrack();
         if (t.isNull()) break;
+
         // Invalid urls won't trigger the correct phonon
         // state changes, so we must filter them.
         if (!t.url().isValid()) continue;
@@ -239,8 +241,8 @@ Radio::phononEnqueue()
         m_track = t;
         Phonon::MediaSource ms( t.url() );
 
-        // it seems important to make this distinction:
-        if (m_mediaObject->state() == Phonon::PlayingState) {
+        // it is important to make this distinction:
+        if (m_mediaObject->currentSource().url().isValid()) {
             m_mediaObject->enqueue( ms );
         } else {
             m_mediaObject->setCurrentSource( ms );
