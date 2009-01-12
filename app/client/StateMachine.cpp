@@ -313,7 +313,9 @@ StateMachine::onRadioStopped()
     //HACK begins, replays previous connection, if any
     PlayerConnection* connection = m_connection;
     m_connection = 0;
-    setConnection( connection );
+    if (connection) {
+        setConnection( connection );
+    }
     //HACK ends
     
     if (m_connection == 0) 
