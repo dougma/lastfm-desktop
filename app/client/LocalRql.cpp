@@ -49,17 +49,22 @@ void
 LocalRqlResult::getNextTrack()
 {
     if (m_trackSource) {
-        m_trackSource->getNextTrack(this);
+        // the callbacks occur on random (plugin) threads, and therefore 
+        // produce signals on random threads, so they are wired up here 
+        // as queued connections.
+
+        LocalRqlTrackCallback *cb = new LocalRqlTrackCallback();
+        connect(cb, SIGNAL(track( Track )), SIGNAL(track( Track )), Qt::QueuedConnection );
+        connect(cb, SIGNAL(endOfTracks()), SIGNAL(endOfTracks()), Qt::QueuedConnection );
+        m_trackSource->getNextTrack(cb);
     }
 }
 
+
+////////////////////////////////////////////
+
 void
-LocalRqlResult::trackOk(
-        const char* title,
-        const char* album,
-        const char* artist,
-        const char* url,
-        unsigned duration)
+LocalRqlTrackCallback::trackOk(const char* title, const char* album, const char* artist, const char* url, unsigned duration)
 {
     MutableTrack mt;
     mt.setTitle( QString::fromUtf8( title ) );
@@ -68,14 +73,16 @@ LocalRqlResult::trackOk(
     mt.setUrl( QString::fromUtf8( url ) );
     mt.setDuration( duration );
     emit track( mt );
+    delete this;
 }
 
-void
-LocalRqlResult::trackFail()
+void 
+LocalRqlTrackCallback::trackFail()
 {
-    m_trackSource = 0;      // thanks, we're done.
     emit endOfTracks();
+    delete this;
 }
+
 
 
 ////////////////////////////////////////////
@@ -83,7 +90,7 @@ LocalRqlResult::trackFail()
 
 LocalRql::LocalRql(const QList<ILocalRqlPlugin*>& plugins) : m_plugin( 0 )
 {
-    //TODO make the list make sense
+    //TODO: make a list of plugins make sense
     
     if (!plugins.size()) return;
 

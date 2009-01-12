@@ -30,10 +30,9 @@ LocalRadioTrackSource::LocalRadioTrackSource(LocalRqlResult* rqlResult)
 , m_waiting(false)
 , m_endReached(false)
 {
-    Q_ASSERT(rqlResult);
-    // QueuedConnections are important here, see LocalRql.h
-    connect(rqlResult, SIGNAL(track(Track)), SLOT(onTrack(Track)), Qt::QueuedConnection);
-    connect(rqlResult, SIGNAL(endOfTracks()), SLOT(onEndOfTracks()), Qt::QueuedConnection);
+    Q_ASSERT( rqlResult );
+    connect( rqlResult, SIGNAL(track(Track)), SLOT(onTrack(Track)) );
+    connect( rqlResult, SIGNAL(endOfTracks()), SLOT(onEndOfTracks()) );
 }
 
 LocalRadioTrackSource::~LocalRadioTrackSource()

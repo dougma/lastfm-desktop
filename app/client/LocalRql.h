@@ -24,30 +24,42 @@
 #include "app/clientplugins/ILocalRql.h"
 
 
+// This is the client's interface to the LocalRql plugin(s)
+//
+class LocalRql
+{
+    class ILocalRqlPlugin* m_plugin;
+
+public:
+    LocalRql(const QList<ILocalRqlPlugin*>& plugins);
+    ~LocalRql();
+
+    bool isAvailable();
+    class LocalRqlResult* startParse(QString rql);
+    void testTag(QString url);
+};
+
+
+// RQL parsing results and track notifications are signalled via 
+// this class as created by LocalRql::startParse
+//
 class LocalRqlResult 
     : public QObject
     , public ILocalRqlParseCallback
-    , public ILocalRqlTrackCallback
 {
     Q_OBJECT
 
     class ILocalRqlTrackSource* m_trackSource;
-
-    // these callbacks can occur on random (plugin) threads, 
-    // so all they do is emit the signals below.
-    // consequently these signals need to be wired up as queued
-    // connections.  how to enforce this?
+    class LocalRqlNextTrack* m_nextTrack;
 
     // ILocalRqlParseCallback:
     void parseOk(class ILocalRqlTrackSource*, unsigned trackCount);
     void parseFail(int errorLineNumber, const char *errorLine, int errorOffset);
 
-    // ILocalRqlTrackCallback:
-    void trackOk(const char* title, const char* album, const char* artist, const char* url, unsigned duration);
-    void trackFail();
+    LocalRqlResult();
+    friend class LocalRql;          // LocalRql creates these objects
 
 public:
-    LocalRqlResult();
     ~LocalRqlResult();
 
     class LocalRadioTrackSource* createLocalRadioTrackSource();
@@ -61,18 +73,25 @@ signals:
 };
 
 
-
-class LocalRql
+// This class implements ILocalRqlTrackCallback
+// An object per callback allows us to properly manage its lifetime.
+// This class should be internal to LocalRqlResult, but Qt's moc can't do that.
+//
+class LocalRqlTrackCallback
+    : public QObject
+    , public ILocalRqlTrackCallback
 {
-    class ILocalRqlPlugin* m_plugin;
+    Q_OBJECT
 
-public:
-    LocalRql(const QList<ILocalRqlPlugin*>& plugins);
-    ~LocalRql();
+    // ILocalRqlTrackCallback:
+    void trackOk(const char* title, const char* album, const char* artist, const char* url, unsigned duration);
+    void trackFail();
 
-    bool isAvailable();
-    LocalRqlResult* startParse(QString rql);
-    void testTag(QString url);
+signals:
+    void track(const class Track& );
+    void endOfTracks();
 };
+
+
 
 #endif

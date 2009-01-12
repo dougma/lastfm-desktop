@@ -34,9 +34,9 @@ public:
     RqlQuery(class RqlQueryThread* queryThread, ResultSet tracks);
 
     void getNextTrack(LocalCollection&, ILocalRqlTrackCallback*);
+    unsigned tracksLeft();
 
     // ILocalRqlTrackSource
-    virtual unsigned tracksLeft();
     virtual void getNextTrack(ILocalRqlTrackCallback*);
     virtual void finished();
 };
