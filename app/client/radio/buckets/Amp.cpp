@@ -26,7 +26,7 @@
 #include "widgets/UnicornVolumeSlider.h"
 #include "the/radio.h"
 #include "widgets/ImageButton.h"
-#include "PlayableListItem.h"
+#include "Seed.h"
 #include "PlayerBucketList.h"
 #include <QPaintEvent>
 #include <QPainter>
@@ -171,7 +171,7 @@ Amp::setupUi()
 void 
 Amp::onPlayerBucketChanged()
 {
-    setRadioControlsVisible( ui.bucket->count() > 0 );
+    setRadioControlsVisible( ui.bucket->model()->rowCount() > 0 );
 }
 
 
@@ -208,15 +208,11 @@ Amp::setRadioControlsVisible( bool b )
 void
 Amp::addAndLoadItem( const QString& itemText, const Seed::Type type )
 {
-    PlayableListItem* item = new PlayableListItem;
-    item->setText( itemText );
+    Seed* item = new Seed;
+    item->setName( itemText );
     item->setPlayableType( type );
-	item->setForeground( Qt::white );
-	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
-	item->setFlags( item->flags() | Qt::ItemIsDragEnabled );
     item->fetchImage();
     ui.bucket->addItem( item );
-    
 }
 
 
@@ -270,9 +266,9 @@ Amp::onWidgetAnimationFrameChanged( int frame )
 }
 
 
-void 
+void
 Amp::onStateChanged( State s )
-{   
+{
     switch ((int)s)
     {
         case TuningIn:
@@ -292,12 +288,14 @@ Amp::onStateChanged( State s )
             break;
             
         case Stopped:
-            setRadioControlsVisible( ui.bucket->count() > 0 );
+            setRadioControlsVisible( ui.bucket->model()->rowCount() > 0 );
             if (m_playerName.size())
                 ui.borderWidget->setText( tr( "Connected to %1" ).arg( m_playerName ) );
             else
                 ui.borderWidget->setText( "" );
     }
+    
+
 }
 
 

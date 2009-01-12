@@ -17,21 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "PlayableListItem.h"
+#include "Seed.h"
+#include "SeedListModel.h"
+#include "SeedListView.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include <QTimeLine>
 #include <QPainter>
 #include "app/moose.h"
+#include "PlayableMimeData.h"
 
 
-PlayableListItem* /* static */
-PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget* parent )
+Seed::Seed( SeedListView* parent ) 
+     :QObject( parent )
 {
-    PlayableListItem* item = new PlayableListItem( parent );
+    setupItem();
+    m_networkManager = new WsAccessManager( this );
+}
+
+
+Seed::Seed( const QString& name, SeedListView* parent )
+     :QObject( parent ), m_name( name )
+{
+    setupItem();
+    m_networkManager = new WsAccessManager( this );
+    parent->seedModel()->addItem( this ); 
+}
+
+
+Seed* /* static */
+Seed::createFromMimeData( const PlayableMimeData* data, SeedListView* parent )
+{
+    Seed* item = new Seed( parent );
     
-    item->setText( data->text() );
+    item->setName( data->text() );
     
-    item->setData( moose::TypeRole, data->type() );
+    item->setPlayableType( data->type() );
     
     if( data->hasImage() )
         item->setIcon( QIcon( QPixmap::fromImage( data->imageData().value<QImage>())) );
@@ -43,7 +63,7 @@ PlayableListItem::createFromMimeData( const PlayableMimeData* data, QListWidget*
 
 
 void 
-PlayableListItem::iconDataDownloaded()
+Seed::iconDataDownloaded()
 {
     QNetworkReply* reply = static_cast< QNetworkReply* >( sender());
 
@@ -54,18 +74,17 @@ PlayableListItem::iconDataDownloaded()
         return;
 
     setPixmap( pixmap );
-    const QRect textRect = listWidget()->fontMetrics().boundingRect( text() );
 }
 
 
 void
-PlayableListItem::fetchImage()
+Seed::fetchImage()
 {
     switch( playableType() )
     {
         case Seed::ArtistType:
         {
-            Artist a( text() );
+            Artist a( name() );
             WsReply* reply = a.search( 5 );
 
             connect( reply, SIGNAL(finished(WsReply*)), SLOT(onArtistSearchFinished(WsReply*)) );
@@ -91,7 +110,7 @@ PlayableListItem::fetchImage()
 
 
 void 
-PlayableListItem::onArtistSearchFinished( WsReply* r )
+Seed::onArtistSearchFinished( WsReply* r )
 {
     try
     {
@@ -102,7 +121,7 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
         
         Artist a = results.first();
         
-        if(((QString)a).toLower() != text().toLower())
+        if(((QString)a).toLower() != name().toLower())
         {
             //TODO: handle exact artist not found case
             //      I'm going to work on the updated player bucket 
@@ -124,18 +143,18 @@ PlayableListItem::onArtistSearchFinished( WsReply* r )
 
 
 void 
-PlayableListItem::setPixmap( const QPixmap pm )
+Seed::setPixmap( const QPixmap pm )
 {
-    const QPixmap pm34 = cropToSize( pm, QSize( 34, 34 ));
+    const QPixmap pm126 = cropToSize( pm, QSize( 126, 100 ));
     const QPixmap pm17 = cropToSize( pm, QSize( 17, 17 ));
     
-    const QPixmap overlayedIcon34 = overlayPixmap( pm34, QPixmap( ":buckets/avatar_overlay_34.png" ), QPoint( 1, 1 ));
+    const QPixmap overlayedIcon126 = overlayPixmap( pm126, QPixmap( ":buckets/avatar_overlay_34.png" ), QPoint( 1, 1 ));
     const QPixmap overlayedIcon17 = overlayPixmap( pm17, QPixmap( ":buckets/avatar_overlay_17.png" ), QPoint( 1, 1 ));
     
-    QPixmap selectedIcon34 = overlayedIcon34;
+    QPixmap selectedIcon126 = overlayedIcon126;
     {
-        QRect selectRect = overlayedIcon34.rect().adjusted( 1, 1, -1, -3 );
-        QPainter p( &selectedIcon34 );
+        QRect selectRect = overlayedIcon126.rect().adjusted( 1, 1, -1, -3 );
+        QPainter p( &selectedIcon126 );
         p.drawPixmap( selectRect, QPixmap( ":buckets/avatar_overlay_selected.png" ) );
     }
 
@@ -147,8 +166,8 @@ PlayableListItem::setPixmap( const QPixmap pm )
     }
     
     QIcon icon;
-    icon.addPixmap( overlayedIcon34 );
-    icon.addPixmap( selectedIcon34, QIcon::Selected );
+    icon.addPixmap( overlayedIcon126 );
+    icon.addPixmap( selectedIcon126, QIcon::Selected );
     icon.addPixmap( overlayedIcon17 );
     icon.addPixmap( selectedIcon17, QIcon::Selected );
     setIcon( icon );
@@ -156,7 +175,7 @@ PlayableListItem::setPixmap( const QPixmap pm )
 
 
 QPixmap 
-PlayableListItem::overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset ) const
+Seed::overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset ) const
 {
     QPixmap output( source.size().expandedTo( overlay.size()));
 
@@ -172,7 +191,7 @@ PlayableListItem::overlayPixmap( const QPixmap source, const QPixmap overlay, co
 
 
 QPixmap 
-PlayableListItem::cropToSize( const QPixmap input, const QSize& size ) const
+Seed::cropToSize( const QPixmap input, const QSize& size ) const
 {
     QPixmap output = input;
     QSize diff = input.size() - size;
@@ -180,48 +199,8 @@ PlayableListItem::cropToSize( const QPixmap input, const QSize& size ) const
     if( abs(diff.height()) > 0 || abs(diff.width()) > 0 )
     {
         const QPixmap scaled = input.scaled( size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
-        const QPixmap cropped = scaled.copy( ((scaled.width() - size.width()) / 2), ((scaled.height() - size.height()) / 2), size.width(), size.height());
+        const QPixmap cropped = scaled.copy( ((scaled.width() - size.width()) / 2), 0, size.width(), size.height());
         output = cropped;
     }
     return output;
-}
-
-
-void 
-PlayableListItem::flash()
-{
-    QTimeLine* flashTimeLine = new QTimeLine( 150, this );
-    flashTimeLine->setFrameRange( 0, 100 );
-    flashTimeLine->setCurveShape( QTimeLine::EaseOutCurve );
-    connect( flashTimeLine, SIGNAL( frameChanged( int )), SLOT( onFlashFrameChanged( int )));
-    connect( flashTimeLine, SIGNAL( finished()), SLOT( onFlashFinished()));
-    flashTimeLine->start();
-}
-
-
-void 
-PlayableListItem::onFlashFrameChanged( int frame )
-{
-    setData( moose::HighlightRole, QVariant::fromValue<int>( frame ) );
-    if( listWidget() )
-        listWidget()->viewport()->update();
-    
-}
-
-
-void 
-PlayableListItem::onFlashFinished()
-{
-    QTimeLine* tl = static_cast<QTimeLine*>(sender());
-    
-    if( tl->direction() == QTimeLine::Forward )
-    {
-        tl->setCurveShape( QTimeLine::EaseInCurve );
-        tl->setDuration( 300 );
-        tl->setDirection( QTimeLine::Backward );
-        tl->start();
-    }
-    else
-        tl->deleteLater();
-    
 }

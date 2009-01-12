@@ -112,8 +112,9 @@ Artist::list( WsReply* r )
 		foreach( CoreDomElement e, r->lfm().children( "artist" ))
 		{
             Artist a( e["name"].text());
-            a.m_smallImage = e.optional( "image_small" ).text();
-            a.m_image = e.optional( "image" ).text();
+            a.m_smallImage = e.optional( "image size=small" ).text();
+            a.m_image = e.optional( "image size=medium" ).text();
+            a.m_largeImage = e.optional( "image size=large" ).text();
 			results += a;
 		}
 	}

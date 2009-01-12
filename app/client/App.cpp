@@ -62,6 +62,9 @@
 #endif
 
 
+#include "RqlStationTemplate.h"
+
+
 struct Settings
 {    
     bool isScrobblingEnabled() const { return moose::UserSettings().value( "ScrobblingEnabled", true ).toBool(); }
@@ -87,7 +90,8 @@ App::App( int& argc, char** argv )
 #elif defined (Q_WS_X11)
     Ws::UserAgent = "Last.fm Client (X11)";
 #endif
-   
+
+    
 	QSettings s;
     bool const upgradeJustOccurred = applicationVersion() != s.value( "Version", "An Impossible Version String" );
 	s.setValue( "Version", applicationVersion() );

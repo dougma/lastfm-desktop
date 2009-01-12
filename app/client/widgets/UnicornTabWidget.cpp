@@ -23,6 +23,8 @@
 #include <QTabBar>
 #include <QHBoxLayout>
 
+const uint Unicorn::TabBar::k_startTearDistance = 30;
+
 Unicorn::TabBar::TabBar()
         :m_spacing( 0 ),
          m_leftMargin( 5 ),
@@ -110,7 +112,7 @@ Unicorn::TabBar::mouseMoveEvent( QMouseEvent* e )
         return;
         
     if( (e->pos() - m_mouseDownPos ).manhattanLength() < 
-        QApplication::startDragDistance())
+        k_startTearDistance)
         return;
         
     TabWidget* tabWidget = qobject_cast<TabWidget*>( parentWidget() );
@@ -263,6 +265,7 @@ void
 Unicorn::TabWidget::addTab( const QString& title, QWidget* w )
 {
     m_bar->addTab( title );
+    setMinimumWidth( m_bar->minimumWidth());
     m_stack->addWidget( w );
     w->setAttribute( Qt::WA_MacShowFocusRect, false );
 }

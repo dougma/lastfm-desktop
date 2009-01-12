@@ -28,12 +28,13 @@
 #include "widgets/UnicornTabWidget.h"
 #include "widgets/UnicornWidget.h"
 #include <QStringListModel>
-#include "Sources.h"
-#include "SourcesList.h"
+#include "SeedsWidget.h"
+#include "SeedListView.h"
 #include "Amp.h"
 #include "the/mainWindow.h"
 #include "lib/lastfm/radio/RadioStation.h"
-#include "PlayableListItem.h"
+#include "Seed.h"
+#include "SeedListModel.h"
 #include "DelegateDragHint.h"
 #include "widgets/RadioControls.h"
 #include "lib/lastfm/types/User.h"
@@ -41,6 +42,7 @@
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "widgets/Firehose.h"
 #include "radio/buckets/PlayerBucketList.h"
+#include "radio/buckets/CombosWidget.h"
 #include <phonon/volumeslider.h>
 
 struct SpecialWidget : QWidget
@@ -57,7 +59,7 @@ struct SpecialWidget : QWidget
 };
 
 
-Sources::Sources()
+SeedsWidget::SeedsWidget()
         :m_connectedAmp( 0 )
 {
     m_accessManager = new WsAccessManager( this );
@@ -78,10 +80,9 @@ Sources::Sources()
                                //  << StringPair( tr("My Neighbours"), QString( "neighbours:%1" ).arg(name)))
 
     {
-        PlayableListItem* n = new PlayableListItem( station.first, ui.stationsBucket );
+        Seed* n = new Seed( station.first, ui.stationsBucket );
         n->setRQL( station.second );
         n->setPlayableType( Seed::PreDefinedType );
-        n->setSizeHint( QSize( 90, n->sizeHint().height()+20));
         connect( authUser.getInfo(), SIGNAL( finished( WsReply*)), SLOT( onAuthUserInfoReturn( WsReply* )) );
     }
     
@@ -96,7 +97,7 @@ Sources::Sources()
 
 
 void 
-Sources::setupUi()
+SeedsWidget::setupUi()
 {
     new QVBoxLayout( this );
     layout()->setMargin( 0 );
@@ -115,35 +116,40 @@ Sources::setupUi()
     
     layout()->addWidget( ui.tabWidget );
     
-    ui.stationsBucket = new SourcesList( this );
+    ui.stationsBucket = new SeedListView( this );
     ui.stationsBucket->setWindowTitle( tr( "Stations" ) );
     connect( ui.stationsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.stationsBucket );    //on mac, qt 4.4.1 child widgets aren't inheritting palletes properly
     ui.tabWidget->addTab( ui.stationsBucket );
     
-    ui.friendsBucket = new SourcesList( this );
+    ui.friendsBucket = new SeedListView( this );
     ui.friendsBucket->setWindowTitle( tr( "Friends" ));
     
     Firehose* hose;
     ui.friendsBucket->addCustomWidget( hose = new Firehose, tr( "Firehose View" ) );
-    ui.friendsBucket->setSourcesViewMode( SourcesList::CustomMode );
+    ui.friendsBucket->setSourcesViewMode( SeedListView::CustomMode );
 
     connect( ui.friendsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.friendsBucket );    //as above
     ui.tabWidget->addTab( ui.friendsBucket );
     
-	ui.tagsBucket = new SourcesList( this );
+	ui.tagsBucket = new SeedListView( this );
     ui.tagsBucket->setWindowTitle( tr( "Tags" ));
     
     connect( ui.tagsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.tagsBucket );    //as above
     ui.tabWidget->addTab( ui.tagsBucket );
 
-	ui.artistsBucket = new SourcesList( this );
+	ui.artistsBucket = new SeedListView( this );
     ui.artistsBucket->setWindowTitle( tr( "Artists" ));
     connect( ui.artistsBucket, SIGNAL( doubleClicked(const QModelIndex&)), SLOT( onItemDoubleClicked( const QModelIndex&)));
     UnicornWidget::paintItBlack( ui.artistsBucket );    //as above
     ui.tabWidget->addTab( ui.artistsBucket );
+    
+    ui.combosWidget = new CombosWidget( this );
+    ui.combosWidget->setWindowTitle( tr( "Combos" ));
+    UnicornWidget::paintItBlack( ui.combosWidget );
+    ui.tabWidget->addTab( ui.combosWidget );
     
 #if 0
     //
@@ -195,7 +201,7 @@ Sources::setupUi()
 
 
 void
-Sources::onFreeInputReturn()
+SeedsWidget::onFreeInputReturn()
 {
     if( ui.freeInput->text().trimmed().startsWith( "lastfm://" ))
     {
@@ -218,15 +224,15 @@ Sources::onFreeInputReturn()
 
 
 void 
-Sources::onUserGetFriendsReturn( WsReply* r )
+SeedsWidget::onUserGetFriendsReturn( WsReply* r )
 {
     QList< User > users = User::list( r );
     
     foreach( User user, users )
     {
-        PlayableListItem* n = new PlayableListItem( user, ui.friendsBucket );
+        Seed* n = new Seed( user, ui.friendsBucket );
         
-        QNetworkReply* r = m_accessManager->get( QNetworkRequest( user.mediumImageUrl()));
+        QNetworkReply* r = m_accessManager->get( QNetworkRequest( user.largeImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
         
         n->setPlayableType( Seed::UserType );	
@@ -236,7 +242,7 @@ Sources::onUserGetFriendsReturn( WsReply* r )
 
 
 void 
-Sources::onUserGetTopTagsReturn( WsReply* r )
+SeedsWidget::onUserGetTopTagsReturn( WsReply* r )
 {
     WeightedStringList tags = Tag::list( r );
     if( tags.count() < 1 )
@@ -249,7 +255,7 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
     tagIcon.addPixmap( QPixmap( ":/buckets/tag_21.png" ), QIcon::Selected );
     foreach( WeightedString tag, tags )
     {
-        PlayableListItem* n = new PlayableListItem( tag, ui.tagsBucket );
+        Seed* n = new Seed( tag, ui.tagsBucket );
         n->setIcon( tagIcon );
         n->setPlayableType( Seed::TagType );
     }
@@ -257,20 +263,22 @@ Sources::onUserGetTopTagsReturn( WsReply* r )
 
 
 void 
-Sources::onUserGetArtistsReturn( WsReply* r )
+SeedsWidget::onUserGetArtistsReturn( WsReply* r )
 {
     QList<Artist> artists = Artist::list( r );
     foreach( Artist a, artists )
     {
-        PlayableListItem* n = new PlayableListItem( a, ui.artistsBucket );
-        QNetworkReply* r = m_accessManager->get( QNetworkRequest( a.imageUrl()));
+        Seed* n = new Seed( a, ui.artistsBucket );
+        n->setPlayableType( Seed::ArtistType );
+
+        QNetworkReply* r = m_accessManager->get( QNetworkRequest( a.largeImageUrl()));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
     }
 }
 
 
 void
-Sources::onAuthUserInfoReturn( WsReply* r )
+SeedsWidget::onAuthUserInfoReturn( WsReply* r )
 {
     QList<CoreDomElement> images = r->lfm().children( "image" );
     if( images.isEmpty() )
@@ -283,14 +291,30 @@ Sources::onAuthUserInfoReturn( WsReply* r )
 
 
 void 
-Sources::onUserGetPlaylistsReturn( WsReply* r )
+SeedsWidget::authUserIconDataDownloaded()
+{
+    QNetworkReply* reply = static_cast< QNetworkReply* >( sender() );
+    
+    QPixmap pm;
+    if ( pm.loadFromData( reply->readAll()) ) 
+    {
+        for( int i = 0; i < ui.stationsBucket->seedModel()->rowCount(); i++ )
+        {
+            ui.stationsBucket->seedModel()->setData( ui.stationsBucket->seedModel()->index( i ), QVariant::fromValue<QIcon>( QIcon( pm )), Qt::DecorationRole);
+        }
+    }
+}
+
+
+void 
+SeedsWidget::onUserGetPlaylistsReturn( WsReply* r )
 {
 Q_UNUSED( r )
 #if 0 //FIXME: No RQL for playlists yet!
     QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
     foreach( CoreDomElement playlist, playlists )
     {
-        PlayableListItem* n = new PlayableListItem( playlist[ "title" ].text(), ui.stationsBucket );
+        Seed* n = new Seed( playlist[ "title" ].text(), ui.stationsBucket );
 
         QString smallImageUrl = playlist.optional( "image size=small").text();
         if( !smallImageUrl.isEmpty() )
@@ -309,15 +333,15 @@ Q_UNUSED( r )
 
 
 void 
-Sources::onItemDoubleClicked( const QModelIndex& index )
+SeedsWidget::onItemDoubleClicked( const QModelIndex& index )
 {
     if( !m_connectedAmp )
         return;
     
-    SourcesList* itemView = dynamic_cast< SourcesList*>( sender() );
+    SeedListView* itemView = dynamic_cast< SeedListView*>( sender() );
     Q_ASSERT( itemView );
 
-    if( !(itemView->itemFromIndex( index )->flags() & Qt::ItemIsEnabled) )
+    if( !(itemView->seedModel()->itemFromIndex( index )->flags() & Qt::ItemIsEnabled) )
         return;
     
     QStyleOptionViewItem options;
@@ -327,45 +351,36 @@ Sources::onItemDoubleClicked( const QModelIndex& index )
     options.decorationAlignment = Qt::AlignVCenter | Qt::AlignCenter;
     options.rect = itemView->visualRect( index );
     
-    itemView->itemFromIndex( index )->setFlags( Qt::NoItemFlags );
     
     DelegateDragHint* w = new DelegateDragHint( itemView->itemDelegate( index ), index, options, itemView );
-    w->setMimeData( itemView->mimeData( QList<QListWidgetItem*>()<< itemView->itemFromIndex(index) ) );
+    w->setMimeData( itemView->seedModel()->mimeData( QModelIndexList() << index ) );
     w->dragToChild<QAbstractItemView*>( m_connectedAmp );
     connect( w, SIGNAL( finishedAnimation()), SLOT( onDnDAnimationFinished()));
 }
 
 
 void 
-Sources::onDnDAnimationFinished()
-{
-    DelegateDragHint* delegateWidget = static_cast<DelegateDragHint*>(sender());
-    QModelIndex index = delegateWidget->index();
-}
-
-
-void 
-Sources::onAmpSeedRemoved( QString text, Seed::Type type )
+SeedsWidget::onAmpSeedRemoved( QString text, Seed::Type type )
 {
     switch ( type ) {
         case Seed::UserType :
-            foreach( QListWidgetItem* item, ui.friendsBucket->findItems( text, Qt::MatchFixedString ))
+            foreach( Seed* item, ui.friendsBucket->seedModel()->findSeeds( text ))
             {
-                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+//TODO:                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
             }
             break;
             
         case Seed::TagType:
-            foreach( QListWidgetItem* item, ui.tagsBucket->findItems( text, Qt::MatchFixedString ))
+            foreach( Seed* item, ui.tagsBucket->seedModel()->findSeeds( text ))
             {
-                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+//TODO:                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
             }
             break;
             
         case Seed::PreDefinedType:
-            foreach( QListWidgetItem* item, ui.stationsBucket->findItems( text, Qt::MatchFixedString ))
+            foreach( Seed* item, ui.stationsBucket->seedModel()->findSeeds( text ))
             {
-                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
+//TODO:                item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled );
             }
             break;            
         default:
@@ -375,7 +390,7 @@ Sources::onAmpSeedRemoved( QString text, Seed::Type type )
 
 
 void 
-Sources::connectToAmp( Amp* amp )
+SeedsWidget::connectToAmp( Amp* amp )
 {
     if( m_connectedAmp )
         m_connectedAmp->disconnect( this );
@@ -387,28 +402,7 @@ Sources::connectToAmp( Amp* amp )
 
 
 void 
-Sources::authUserIconDataDownloaded()
-{
-    QNetworkReply* reply = static_cast< QNetworkReply* >( sender() );
-
-    QPixmap pm;
-    if ( pm.loadFromData( reply->readAll()) ) 
-    {
-        QListWidgetItem* item;
-        for( int i = 0; (item = ui.stationsBucket->item( i )); i++ )
-        {
-            PlayableListItem* pitem;
-            if( !(pitem = dynamic_cast< PlayableListItem*>( item )))
-                continue;
-            
-            pitem->setPixmap( pm );
-        }
-    }
-}
-
-
-void 
-Sources::onContextMenuRequested( const QPoint& pos )
+SeedsWidget::onContextMenuRequested( const QPoint& pos )
 {
     m_cogMenu->move( pos );
     m_cogMenu->show();
@@ -416,16 +410,16 @@ Sources::onContextMenuRequested( const QPoint& pos )
 
 
 void 
-Sources::onCogMenuClicked()
+SeedsWidget::onCogMenuClicked()
 {
     emit customContextMenuRequested( ui.cog->mapToGlobal( QPoint( ui.cog->geometry().width() - m_cogMenu->sizeHint().width(), ui.cog->height()) ) );
 }
 
 
 void 
-Sources::onTabChanged()
+SeedsWidget::onTabChanged()
 {
-    SourcesList* listView = qobject_cast< SourcesList* >( ui.tabWidget->currentWidget() );
+    SeedListView* listView = qobject_cast< SeedListView* >( ui.tabWidget->currentWidget() );
     if( !listView )
         return;
     
@@ -440,25 +434,25 @@ Sources::onTabChanged()
 
 
 void 
-Sources::onTopArtistsToggled( bool b )
+SeedsWidget::onTopArtistsToggled( bool b )
 {
     if( !b )
         return;
     
     AuthenticatedUser authUser;
-    ui.artistsBucket->clear();
+    ui.artistsBucket->seedModel()->clear();
     connect( authUser.getTopArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetArtistsReturn( WsReply* )) );
     
 }
 
 
 void 
-Sources::onRecentArtistsToggled( bool b )
+SeedsWidget::onRecentArtistsToggled( bool b )
 {
     if( !b )
         return;
     
     AuthenticatedUser authUser;
-    ui.artistsBucket->clear();
+    ui.artistsBucket->seedModel()->clear();
     connect( authUser.getRecentArtists(), SIGNAL(finished( WsReply* )), SLOT(onUserGetArtistsReturn( WsReply* )) );
 }

@@ -17,68 +17,70 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TRACK_DASHBOARD_H
-#define TRACK_DASHBOARD_H
-
-#include <QWidget>
-#include "lib/lastfm/types/Track.h"
+#include "RqlStationTemplate.h"
 
 
-/** @author <max@last.fm> */
-
-class TrackDashboard : public QWidget
+RqlStationTemplate::RqlStationTemplate( FieldNode* f )
+                   :m_rootNode( f )
 {
-    Q_OBJECT
+}
 
-    Track m_track;
-    class QNetworkAccessManager* nam;
-    
-public:
-    TrackDashboard();
 
-    void tuningIn();
-    void setTrack( const class Track& );
-    void clear();
+RqlStationTemplate::Iterator::Iterator( QueryNode* t )
+{
+    m_rootNode = t;
+    reset();
+}
 
-    Qt::Orientation orientation() const
+
+void 
+RqlStationTemplate::Iterator::reset()
+{
+    m_traversalStack.clear();
+    m_firstTime = true;
+    m_curNode = m_rootNode;
+}
+
+
+QueryNode*
+RqlStationTemplate::Iterator::next()
+{
+    QueryNode *n;
+    if( m_firstTime )
     {
-        return ui.info->geometry().y() == 0 ? Qt::Horizontal : Qt::Vertical;
+        n = m_rootNode;
+        m_firstTime = false;
     }
-
-    virtual QSize sizeHint() const { return QSize( 100, 100 ); }
-    
-    struct //FIXME make not public
+    else
     {
-        QWidget* actionbar;
-        QWidget* papyrus;
-        QWidget* info;
-        class PrettyCoverWidget* cover;
-        class QWebView* bio;
-        class FadingScrollBar* scrollbar;
-        class SpinnerLabel* spinner;
-        class QListWidget *tags;
-        class QListWidget *similarArtists;
-        class QPushButton *sources;
-        class QPushButton *moreBio;
-    } ui;
+        n=m_curNode;
+        n=n->rp;
+    }
     
-public slots:
-    void setPapyrusPosition( int );
-    void doLayout();
-    
-private slots:
-    void onArtistGotInfo( WsReply* );
-    void onArtistGotTopTags( WsReply* );
-    void openExternally( const QUrl& );
-    
-    void onCoverClicked();
-    
-private:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void resizeEvent( QResizeEvent* );
-    virtual bool event( QEvent* );
-    
-    QStringList formatBio( const QString& s );
-};
+    do
+    {
+        while( n != NULL )
+        { //push all left children on the stack
+            m_traversalStack.push(n);
+            n=n->lp;
+        }
+        if( !m_traversalStack.isEmpty() )
+        { //if the traversal stack is not empty, visit the top item
+            n=m_traversalStack.pop();
+            m_curNode=n;
+            return m_curNode;
+        }
+    }
+    while( !m_traversalStack.isEmpty());
+    m_curNode=NULL; //the traversal is done
+    return m_curNode;
+}
 
-#endif
+
+FieldNode* 
+RqlStationTemplate::Iterator::nextField()
+{
+    QueryNode* n;
+    for( n = next(); n && ( n->lp || n->rp ) ; n = next() );
+    return (FieldNode*)n;
+}

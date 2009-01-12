@@ -17,34 +17,39 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "SourcesList.h"
-#include "PlayableListItem.h"
+#include "SeedListView.h"
+#include "Seed.h"
+#include "SeedListModel.h"
 #include <QStackedLayout>
 #include <QStyledItemDelegate>
 #include <QAction>
 #include <QActionGroup>
 
-SourcesList::SourcesList( QWidget* parent )
-            : QListWidget( parent ),
+SeedListView::SeedListView( QWidget* parent )
+            : QListView( parent ),
               m_customWidget( 0 ),
               m_customModeEnabled( false )
 {
-    QStackedLayout* l = new QStackedLayout( this );
+    setModel( m_model = new SeedListModel( this ) );
+    setDragEnabled( true );
     
-    setItemDelegate( new SourcesListDelegate( this ) );
+    QStackedLayout* l = new QStackedLayout( this );
+
+    SourcesListDelegate* delegate;
+    setItemDelegate( delegate = new SourcesListDelegate( this ) );
+    
+    delegate->setIconSize( QListView::IconMode, QSize( 126, 100 ));
+    delegate->setIconSize( QListView::ListMode, QSize( 36, 38 ));
+    setSpacing( 10 );
+
     setSourcesViewMode( IconMode );
     setFlow( QListView::LeftToRight );
     setResizeMode( QListView::Adjust );
-    setIconSize( QSize( 36, 38 ) );
-    setLayoutMode( QListView::SinglePass );
-    setDragEnabled( true );
     setAlternatingRowColors( true );
     setWordWrap( true );
     setAttribute( Qt::WA_MacShowFocusRect, false );
     setDragDropMode( QAbstractItemView::DragOnly );
     setAutoScroll( false );
-    setUniformItemSizes( false );
-    model()->setSupportedDragActions( Qt::CopyAction );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     
     
@@ -55,6 +60,7 @@ SourcesList::SourcesList( QWidget* parent )
     ui.actions.listView->setCheckable( true );
     ui.actions.iconView = new QAction( tr( "Icon View" ), this );
     ui.actions.iconView->setCheckable( true );
+    
     connect( ui.actions.listView, SIGNAL(toggled( bool )), SLOT( onViewModeAction( bool ))); 
     connect( ui.actions.iconView, SIGNAL(toggled( bool )), SLOT( onViewModeAction( bool )));
     
@@ -67,47 +73,23 @@ SourcesList::SourcesList( QWidget* parent )
 }
 
 
-QMimeData* 
-SourcesList::mimeData( const QList<QListWidgetItem *> items ) const
-{
-    if( items.isEmpty() )
-        return 0;
-    
-    PlayableListItem* item = dynamic_cast<PlayableListItem*>( items.first() );
-    
-    PlayableMimeData* data = new PlayableMimeData;
-    data->setType( item->playableType() );
-    data->setText( item->text() );
-    data->setImageData( item->icon().pixmap( QSize( 36, 38 )).toImage() );
-    
-    if( item->playableType() == Seed::PreDefinedType )
-        data->setRQL( item->rql() );
-    return data;
-}
-
-
 void 
-SourcesList::setSourcesViewMode( ViewMode m )
+SeedListView::setSourcesViewMode( ViewMode m )
 {
     if( m < CustomMode )
     {
         m_customModeEnabled = false;
         if( m == IconMode )
         {
-            setSpacing( 0 );
             setFlow( QListView::LeftToRight );
-            setUniformItemSizes( true );
             setAlternatingRowColors( false );
-            setIconSize( QSize( 36, 38 ) );
+            setMovement( QListView::Snap );
         }
         else
         {
-            setSpacing( 5 );
-            setMovement( QListView::Free );
             setFlow( QListView::TopToBottom );
-            setUniformItemSizes( false );
             setAlternatingRowColors( true );
-            setIconSize( QSize( 19, 30 ) );
+            setMovement( QListView::Snap );
         }
         
         QListView::setViewMode( (QListView::ViewMode)m );
@@ -130,7 +112,7 @@ SourcesList::setSourcesViewMode( ViewMode m )
 
 
 void 
-SourcesList::addCustomWidget( QWidget* w, QString title )
+SeedListView::addCustomWidget( QWidget* w, QString title )
 {
     m_customWidget = w;
     ((QStackedLayout*)layout())->addWidget( m_customWidget );
@@ -147,7 +129,7 @@ SourcesList::addCustomWidget( QWidget* w, QString title )
 
 
 void 
-SourcesList::showCustomWidget( bool show )
+SeedListView::showCustomWidget( bool show )
 {
     if( show )
         setSourcesViewMode( CustomMode );
@@ -155,7 +137,7 @@ SourcesList::showCustomWidget( bool show )
 
 
 void 
-SourcesList::onViewModeAction( bool b )
+SeedListView::onViewModeAction( bool b )
 {
     if( !b )
         return;
@@ -170,7 +152,7 @@ SourcesList::onViewModeAction( bool b )
 
 
 void 
-SourcesList::showEvent( QShowEvent* )
+SeedListView::showEvent( QShowEvent* )
 {
     switch( sourcesViewMode() )
     {

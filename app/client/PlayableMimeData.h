@@ -25,7 +25,7 @@
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/types/User.h"
 
-#include "radio/buckets/SeedTypes.h"
+#include "radio/buckets/Seed.h"
 
 
 class PlayableMimeData : public QMimeData

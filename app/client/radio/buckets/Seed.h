@@ -17,40 +17,41 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef PLAYABLE_LIST_ITEM
-#define PLAYABLE_LIST_ITEM
+#ifndef SEED_H
+#define SEED_H
 
 #include <QListWidgetItem>
-#include "PlayableMimeData.h"
 #include <QNetworkReply>
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "app/moose.h"
 
-class PlayableListItem : public QObject, public QListWidgetItem
+class Seed : public QObject
 {
     Q_OBJECT
     
 public:
-	PlayableListItem( QListWidget* parent = 0 ) : QObject( parent ), QListWidgetItem( parent, QListWidgetItem::UserType ){ setupItem(); m_networkManager = new WsAccessManager( this ); }
-	PlayableListItem( const QString & text, QListWidget * parent = 0 )
-    :QObject( parent ), QListWidgetItem( text, parent, QListWidgetItem::UserType ){ setupItem(); m_networkManager = new WsAccessManager( this ); } ;
-	
+	Seed( class SeedListView* parent = 0 );
+	Seed( const QString& name, SeedListView* parent = 0 );
+
+    enum Type { 
+        Undefined = -1,
+        ArtistType = 0, 
+        TagType, 
+        UserType, 
+        PreDefinedType, 
+        CustomType
+    };
+    
     void setupItem()
-    {
-        QFont f = font();
-        f.setPointSize( 10 );
-        setFont( f );
-        setPixmap( QPixmap( ":/lastfm/no/user.png" ) );
-        setSizeHint( QSize( 60, 60) );
-    }
+    {}
     
-	static PlayableListItem* createFromMimeData( const PlayableMimeData* data, QListWidget* parent = 0 );
+	static Seed* createFromMimeData( const class PlayableMimeData* data, SeedListView* parent = 0 );
 	
-	void setPlayableType( const Seed::Type t ){ setData( moose::TypeRole, t ); }
+	void setPlayableType( const Seed::Type t ){ m_type = t; }
+    Seed::Type playableType() const{ return m_type; }
     
-    Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled; }
-	
-    Seed::Type playableType() const{ return (Seed::Type)data( moose::TypeRole ).toInt(); }
+    Qt::ItemFlags flags() const{ return Qt::ItemIsDragEnabled | Qt::ItemIsEnabled; }
+
     QString rql() const{ return m_rql; }
     
     void fetchImage();
@@ -59,22 +60,32 @@ public:
     
     void setRQL( const QString& rql ){ m_rql = rql; }
     
-    void flash();
+    void setIcon( const QIcon& i ){ m_icon = i; emit updated(); }
+    const QIcon& icon() const{ return m_icon; }
+    
+    void setName( const QString& name ){ m_name = name; emit updated(); }
+    const QString& name() const{ return m_name; }
+    
+signals:
+    void updated();
     
 public slots:
     void iconDataDownloaded();
     
 private slots:
-    void onArtistSearchFinished( WsReply* r );
-    void onFlashFrameChanged( int );
-    void onFlashFinished();
+    void onArtistSearchFinished( class WsReply* r );
     
 private:
     QPixmap cropToSize( const QPixmap, const QSize& ) const;
     QPixmap overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset = QPoint( 0, 0)) const;
     class WsAccessManager* m_networkManager;
     QString m_rql;
+    Type m_type;
+    QString m_name;
+    QIcon m_icon;
     
 };
 
-#endif //PLAYABLE_LIST_ITEM
+Q_DECLARE_METATYPE( Seed::Type )
+
+#endif //SEED_H

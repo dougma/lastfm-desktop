@@ -100,6 +100,7 @@ TrackDashboard::TrackDashboard()
     QVBoxLayout* v = new QVBoxLayout( ui.info );
     
     v->addWidget( ui.bio = new BioWebView );
+
     v->addSpacing( 10 );
     v->addWidget( new QLabel( tr( HEADING "Tags") ) );
     v->addSpacing( 3 );
@@ -116,6 +117,7 @@ TrackDashboard::TrackDashboard()
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
     ui.bio->page()->setLinkDelegationPolicy( QWebPage::DelegateExternalLinks );
+    ui.bio->setAutoFillBackground( true );
     connect( ui.bio, SIGNAL(linkClicked( const QUrl& )), SLOT(openExternally( const QUrl& )) );
 
     ui.scrollbar = new FadingScrollBar( this );
@@ -230,8 +232,9 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
     
     QString css =
         "<style>"
-            "body{padding:0;margin:0;color:#bbb}"
+            "body{padding:0;margin:0;color:#bbb;}"
             "#stats{color:#444444;margin:0;line-height:1.3;font-weight:bold}"
+            "#extended{display:none;}"
             "p{line-height:1.6em}"
             "h1 a{color:#fff;margin:0 0 2px 0}"
             "h1 a:hover{text-decoration:underline}"
@@ -239,7 +242,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
             "a:hover{text-decoration:underline}"
             "body{font-size:11px}"
             "h1{font-size:18px}"
-    #ifdef Q_WS_MAC
+    #ifdef Q_WS_MAC 
             "body{font-family:Lucida Grande}"
     #endif
         "</style>";
@@ -268,9 +271,13 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
                  << tr("Why not write one?") << "</a>";
         }
         else
-            html << "<p id=content>" << content.replace(QRegExp("\r+"), "<p>")
+        {
+            QStringList bio = formatBio( content );
+            html << "<span id=content>" << bio.at( 0 ) << "</span>"
                  << "<p id=editme style='margin-top:0'>" << tr("This information was created by users like you! ")
-                 << "<a href=\"" << url << "/+wiki/edit" << "\">" << editmessage << "</a>";
+                 << "<a href=\"" << url << "/wiki/edit" << "\">" << editmessage << "</a>"
+                 << "<button onclick=\"toggleMoreInfo();\">More..</button>";
+        }
 
         foreach (CoreDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
@@ -280,13 +287,39 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 		qWarning() << e;
 
         html << "<h1>" << m_track.artist() << "</h1>"
-             << "<p>" << tr("Unable to contact Last.fm.<br>Your scrobbles are being cached.");
+             << "<p>" << tr( "Unable to contact Last.fm.<br>Your scrobbles are being cached." );
 	}
-
     ui.bio->setHtml( *html.string()  );
+    
     resizeEvent( 0 );
     
     ui.info->show();
+}
+
+
+QStringList 
+TrackDashboard::formatBio( const QString& s )
+{
+    QStringList paras = s.split( QRegExp( "\\r+" ));
+
+    if( paras.empty() )
+        return QStringList();
+    
+    paras.replaceInStrings( QRegExp( "^(.*)$" ), "<p>\\1</p>" );
+    
+    QString first = paras.takeFirst();
+    
+    while( !paras.isEmpty() && QString(first).replace( QRegExp( "</?[^>]*>"), "" ).length() < 300 )
+    {
+        first += paras.takeFirst();
+    }
+    
+    QString more = paras.join("");
+    
+    QStringList out;
+    out << first << more;
+    
+    return out;
 }
 
 
@@ -303,11 +336,17 @@ TrackDashboard::onArtistGotTopTags( WsReply* reply )
 void
 TrackDashboard::resizeEvent( QResizeEvent* )
 {    
+    doLayout();
+}
+            
+void 
+TrackDashboard::doLayout()
+{
     if (m_track.isNull())
-        return;
+    return;
     
     ui.papyrus->setFixedWidth( width() );    
-
+    
     int w = 0;
     
     if (width() > ui.cover->widthForHeight( height() ) * 2)
@@ -318,7 +357,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->setParent( this );
         ui.cover->show();
         ui.cover->move( 15, 12 );
-
+        
         int h = height() - 12;
         ui.cover->resize( ui.cover->widthForHeight( h ), h );
         
@@ -337,28 +376,28 @@ TrackDashboard::resizeEvent( QResizeEvent* )
         ui.cover->move(((ui.papyrus->width() - coverWidth) / 2), 0 );
         ui.cover->show();
         
-
+        
         w = qMax( coverWidth, 180 );
-
+        
         int const x = (width() - w) / 2;
-
+        
         ui.cover->resize( coverWidth, height() - 12 );
         ui.info->move( x, ui.cover->height() + 12 );
     }
-
+    
     ui.info->setFixedWidth( w );
     ui.bio->page()->setViewportSize( QSize(w, height()) );
     const int h = ui.bio->page()->mainFrame()->contentsSize().height();
     ui.bio->setFixedSize( w, h );
     ui.info->adjustSize();
-
+    
     ui.papyrus->resize( 0xff, ui.info->height() + ui.info->geometry().y() );
-
+    
     {
         const int w = ui.scrollbar->sizeHint().width();
         ui.scrollbar->setGeometry( width() - w, 0, w, height() );
     }
- 
+    
     if (!m_track.isNull())
     {
         ui.scrollbar->setRange( 0, ui.papyrus->height() - height() );
@@ -369,7 +408,7 @@ TrackDashboard::resizeEvent( QResizeEvent* )
     ui.scrollbar->raise();
     
     if (m_track.isNull())
-        ui.scrollbar->hide();
+    ui.scrollbar->hide();
 }
 
 

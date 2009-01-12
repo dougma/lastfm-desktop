@@ -20,7 +20,8 @@
 #include "PlayerBucketList.h"
 #include "Sources.h"
 #include "SeedDelegate.h"
-#include "PlayableListItem.h"
+#include "SeedListModel.h"
+#include "Seed.h"
 #include "PlayableMimeData.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include <QVBoxLayout>
@@ -32,7 +33,8 @@
 #include "lib/lastfm/radio/RadioStation.h"
 #include "app/moose.h"
 
-Q_DECLARE_METATYPE( PlayableListItem* )
+
+Q_DECLARE_METATYPE( Seed* )
 
 const int PlayerBucketList::k_itemMargin = 4;
 
@@ -44,9 +46,10 @@ const int PlayerBucketList::k_itemSizeY = 50;
 
 
 PlayerBucketList::PlayerBucketList( QWidget* w )
-			: QListWidget( w ),
-			  m_showDropText( true)
+                 : QListView( w ),
+                  m_showDropText( true)
 {
+    setModel( m_model = new SeedListModel( this ));
     connect( this, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
                    SLOT( onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*)));
     setIconSize( QSize( 33, 38 ));
@@ -190,7 +193,10 @@ PlayerBucketList::calculateLayout()
     calculateToolIconsLayout();
     
     //update the query inputbox
-    ui.queryEdit->setText( queryString());
+    if( model()->rowCount() > 0 )
+        ui.queryEdit->setText( queryString());
+    else 
+        ui.queryEdit->setText( "" );
 }
 
 
@@ -250,7 +256,7 @@ PlayerBucketList::dropEvent( QDropEvent* event)
 	if( !event->mimeData() )
 		return;
 	
-    clear();
+    model()->removeRows( 0, model()->rowCount());
 	if( addFromMimeData( event->mimeData()))
     {
         play();
@@ -268,11 +274,8 @@ PlayerBucketList::addFromMimeData( const QMimeData* d )
 	if( !data )
 		return false;
 	
-	PlayableListItem* item = PlayableListItem::createFromMimeData( data );
-	item->setForeground( Qt::white );
-	item->setBackground( QColor( 0x2e, 0x2e, 0x2e));
-	item->setFlags( item->flags() ^ Qt::ItemIsDragEnabled );
-    
+	Seed* item = Seed::createFromMimeData( data );
+   
     if( item->playableType() == Seed::PreDefinedType )
         item->setRQL( data->rql());
     
@@ -313,9 +316,9 @@ PlayerBucketList::queryString() const
    convert this to QGraphicsItems first though! - jono */
 QString 
 PlayerBucketList::queryString( const QModelIndex i, bool joined ) const 
-{  
+{
 	QString qs;
-	
+	int type = i.data( moose::TypeRole ).toInt();
 	switch ( i.data( moose::TypeRole ).toInt() ) {
 		case Seed::UserType:
             if( joined )
@@ -338,7 +341,7 @@ PlayerBucketList::queryString( const QModelIndex i, bool joined ) const
         case Seed::PreDefinedType:
             if( joined )
                 qs = " and ";
-            qs += ((PlayableListItem*)itemFromIndex( i ))->rql();
+            qs += (m_model->itemFromIndex( i ))->rql();
             return qs;
 	}
 	qs += "\"" + i.data( Qt::DisplayRole ).toString() + "\"";
@@ -399,57 +402,43 @@ PlayerBucketList::play()
 
 
 bool 
-PlayerBucketList::addItem( PlayableListItem* item )
+PlayerBucketList::addItem( Seed* item )
 {
-    PlayableListItem* foundItem = 0;
-    foreach( QListWidgetItem* anItem, findItems( item->text(), Qt::MatchFixedString ))
+    Seed* foundItem = 0;
+    foreach( Seed* seed, m_model->findSeeds( item->name() ))
     {
-        PlayableListItem* pItem;
-        if( !( pItem= dynamic_cast<PlayableListItem*>( anItem )))
-            continue;
-        
-        if( pItem->playableType() == item->playableType() )
+        if( seed->playableType() == seed->playableType() )
         {
-            foundItem = pItem;
+            foundItem = seed;
             break;
         }
     }
     
     if( foundItem )
     {
-        foundItem->flash();
+        //TODO: multiple item indicator? (flash the existing item or something)
         return false;
     }
     
-    addItem( (QListWidgetItem*)item );
-    emit itemAdded( item->text(), item->playableType());
+    m_model->addItem( item );
+    emit itemAdded( item->name(), item->playableType());
     return true;
-}
-
-
-void
-PlayerBucketList::addItem( QListWidgetItem* item )
-{
-    QListWidget::addItem( item );
-    calculateLayout();
-
 }
 
 
 void 
 PlayerBucketList::removeIndex( const QModelIndex& index )
 {
-    PlayableListItem* item = static_cast<PlayableListItem*>( itemFromIndex( index ));
+    Seed* item = m_model->itemFromIndex( index );
     if( item )
         removeItem( item );
 }
 
 
 void 
-PlayerBucketList::removeItem( PlayableListItem* item )
+PlayerBucketList::removeItem( Seed* item )
 {
-    setCurrentItem( NULL );
-    const QString text = item->text();
+    const QString text = item->name();
     const Seed::Type
     type = item->playableType();
     delete item;
@@ -510,22 +499,6 @@ PlayerBucketList::onCurrentItemChanged( QListWidgetItem* current, QListWidgetIte
     {
         ui.removeButton->hide();
     }
-}
-
-
-void 
-PlayerBucketList::mousePressEvent( QMouseEvent* event )
-{
-    if( event->button() == Qt::LeftButton &&
-        !indexAt( event->pos()).isValid())
-    {
-        //clear selection when mouse is clicked outside
-        //of any seed items
-        setCurrentItem( NULL );
-        viewport()->update();
-    }
-    
-    QListWidget::mousePressEvent( event );
 }
 
 

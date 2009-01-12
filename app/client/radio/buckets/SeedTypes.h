@@ -22,20 +22,4 @@
 
 #include <QMetaType>
 
-
-namespace Seed
-{
-    enum Type { 
-        Undefined = -1,
-        ArtistType = 0, 
-        TagType, 
-        UserType, 
-        PreDefinedType, 
-        CustomType
-    };
-}
-
-
-Q_DECLARE_METATYPE( Seed::Type )
-
 #endif //SEED_TYPES_H

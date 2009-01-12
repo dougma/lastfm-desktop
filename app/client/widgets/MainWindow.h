@@ -56,7 +56,7 @@ public:
 	struct Ui : ::Ui::MainWindow
 	{
 		class Amp* amp;
-        class Sources* sources;
+        class SeedsWidget* seeds;
         class TrackDashboardHeader* dashboardHeader;
         class TrackDashboard* dashboard;
         class MessageBar* messagebar;

@@ -17,22 +17,22 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef SOURCES_LIST_H
-#define SOURCES_LIST_H
+#ifndef SEED_LIST_VIEW_H
+#define SEED_LIST_VIEW_H
 
 #include <QListWidget>
 #include <QStyledItemDelegate>
 #include <QResizeEvent>
 #include <QAction>
-
-class SourcesList : public QListWidget
+#include <QDebug>
+class SeedListView : public QListView
 {
     Q_OBJECT
     
     friend class Sources;
     
 public:
-    SourcesList( QWidget* parent );
+    SeedListView( QWidget* parent );
 
     enum ViewMode {
         ListMode = QListView::ListMode,
@@ -43,7 +43,7 @@ public:
     ViewMode sourcesViewMode()
     {
         if( !m_customModeEnabled )
-            return (ViewMode)QListWidget::viewMode();
+            return (ViewMode)QListView::viewMode();
         else
             return CustomMode;
     }
@@ -51,13 +51,12 @@ public:
     void addCustomWidget( QWidget* w, QString title = "" );
     
     void setSourcesViewMode( ViewMode m );
+    class SeedListModel* seedModel(){ return m_model; }
     
 public slots:
     void showCustomWidget( bool );
     
 protected:
-    QMimeData* mimeData( const QList<QListWidgetItem *> items ) const;
-    
     void focusOutEvent( QFocusEvent* )
     {
         clearSelection();
@@ -65,6 +64,15 @@ protected:
     }
     
     virtual void showEvent( QShowEvent* );
+    virtual void dragMoveEvent( QDragMoveEvent* e )
+    {
+        e->ignore();
+    }
+    
+    virtual void dropEvent( QDropEvent* e )
+    {
+        e->ignore();
+    }
     
 private slots:
     void onDataChanged( const QModelIndex&, const QModelIndex& )
@@ -79,6 +87,7 @@ private:
     QSize m_itemSizeHint;
     QWidget* m_customWidget;
     bool m_customModeEnabled;
+    class SeedListModel* m_model;
     
     struct {
         struct {
@@ -92,22 +101,35 @@ private:
     {
     public:
         SourcesListDelegate( QObject* parent = 0 ): QStyledItemDelegate( parent ){}
-        virtual QSize sizeHint ( const QStyleOptionViewItem& option, const QModelIndex& index ) const
+        
+        virtual void paint( QPainter* p, const QStyleOptionViewItem& option, const QModelIndex& i ) const
         {
-            QStyleOptionViewItemV4 opt = option;
-            initStyleOption( &opt, index );
-            if( opt.decorationPosition == QStyleOptionViewItem::Left )
+            QStyleOptionViewItem o = option;
+            o.decorationSize = ( o.decorationPosition == QStyleOptionViewItem::Top ) ? m_iconModeSize : m_listModeSize;
+            return QStyledItemDelegate::paint( p, o, i );
+        }
+        
+        virtual QSize sizeHint( const QStyleOptionViewItem& option, const QModelIndex& i ) const
+        {
+            QStyleOptionViewItem o = option;
+            o.decorationSize = ( o.decorationPosition == QStyleOptionViewItem::Top ) ? m_iconModeSize : m_listModeSize;
+            return QStyledItemDelegate::sizeHint( o, i );
+        }
+
+        void setIconSize( const QListView::ViewMode m, QSize s )
+        {
+            switch( m )
             {
-                //Add 10px padding when in ListView mode
-                return QStyledItemDelegate::sizeHint( option, index ) + QSize( 0, -10 );
-            }
-            else 
-            {
-                return QStyledItemDelegate::sizeHint( option, index ) + QSize( 20, 0 );
+                case QListView::IconMode: m_iconModeSize = s; break;
+                case QListView::ListMode: m_listModeSize = s; break;
             }
         }
+        
+    private:
+        QSize m_iconModeSize;
+        QSize m_listModeSize;
     };
     
 };
 
-#endif //SOURCES_LIST_H
+#endif //SEED_LIST_VIEW_H

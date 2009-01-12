@@ -19,7 +19,7 @@
 
 #include "MainWindow.h"
 #include "radio/buckets/Amp.h"
-#include "radio/buckets/Sources.h"
+#include "radio/buckets/SeedsWidget.h"
 #include "Settings.h"
 #include "the/app.h" 
 #include "widgets/DiagnosticsDialog.h"
@@ -168,7 +168,7 @@ MainWindow::setupUi()
     QWidget* sourceDashboard = new QWidget( centralWidget() );
     SideBySideLayout* sourceDashboardLayout = new SideBySideLayout( sourceDashboard );
 
-    sourceDashboard->layout()->addWidget( ui.sources = new Sources );
+    sourceDashboard->layout()->addWidget( ui.seeds = new SeedsWidget );
     sourceDashboard->layout()->addWidget( ui.dashboard = new TrackDashboard );
 
     connect( ui.viewSources, SIGNAL( triggered()), sourceDashboardLayout, SLOT( moveBackward()));
@@ -190,12 +190,12 @@ MainWindow::setupUi()
     addDragHandleWidget( ui.dashboardHeader );
     addDragHandleWidget( ui.amp );
     
-    ui.sources->connectToAmp( ui.amp );
+    ui.seeds->connectToAmp( ui.amp );
     ui.dashboardHeader->ui.ban->setAction( ui.ban );
     ui.dashboardHeader->ui.love->setAction( ui.love );
     ((ActionButton*)ui.dashboardHeader->ui.scrobbleButton)->setAction( ui.scrobble );
     
-    connect( ui.sources->ui.dashboard, SIGNAL( clicked()), ui.viewDashboard, SLOT( trigger()));
+    connect( ui.seeds->ui.dashboard, SIGNAL( clicked()), ui.viewDashboard, SLOT( trigger()));
     connect( ui.dashboard->ui.sources, SIGNAL( clicked()), ui.viewSources, SLOT( trigger()));
     
     ui.amp->show();
@@ -216,7 +216,7 @@ MainWindow::setupUi()
 
     setMinimumWidth( 300 );
 
-    ui.sources->show();
+    ui.seeds->show();
     ui.dashboard->show();
 
     

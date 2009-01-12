@@ -45,7 +45,8 @@ public:
     
     QUrl smallImageUrl(){ return m_smallImage; }
     QUrl imageUrl(){ return m_image; }
-	
+	QUrl largeImageUrl(){ return m_largeImage; }
+    
 	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
 	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
 	
@@ -75,6 +76,7 @@ public:
 private:
 	QUrl m_smallImage;
 	QUrl m_image;
+    QUrl m_largeImage;
 };
 
 #endif

@@ -34,7 +34,8 @@
 #include "app/moose.h"
 
 
-class PlayerBucketList : public QListWidget
+
+class PlayerBucketList : public QListView
 {
 	Q_OBJECT
 public:
@@ -43,7 +44,7 @@ public:
 	QRect visualRect ( const QModelIndex & index ) const;
 	QModelIndex indexAt( const QPoint& point ) const;
     
-    bool addItem( class PlayableListItem* item );
+    bool addItem( class Seed* item );
     
 signals:
     void itemRemoved( QString, Seed::Type );
@@ -57,7 +58,6 @@ protected:
 	void resizeEvent ( QResizeEvent* event );	
 	void dropEvent( QDropEvent* event);	
 	void dragEnterEvent ( QDragEnterEvent * event );
-    void mousePressEvent( QMouseEvent* event );
 
     void dragMoveEvent( QDragMoveEvent* event ){ event->acceptProposedAction(); }
 	
@@ -75,8 +75,7 @@ protected:
     void addItem( QListWidgetItem* item );
     
     void removeIndex( const QModelIndex& i );
-    void removeItem( PlayableListItem* item );
-    
+    void removeItem( Seed* item );
     
 private slots:
     void onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*);
@@ -101,13 +100,14 @@ private:
     QString queryString() const;
 	QString queryString( const QModelIndex i, bool joined = true ) const;
     
+    class SeedListModel* m_model;
     
     struct {
         class ImageButton* clearButton;
         class ImageButton* removeButton;
         class ImageButton* queryEditButton;
         class QLineEdit* queryEdit;
-        } ui;
+    } ui;
 
 };
 

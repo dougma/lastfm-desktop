@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SeedDelegate.h"
-#include "SeedTypes.h"
+#include "Seed.h"
 
 SeedDelegate::SeedDelegate( QObject* parent )
              :QAbstractItemDelegate( parent )

@@ -25,7 +25,7 @@
 #include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/Amp.h"
-#include "radio/buckets/Sources.h"
+#include "radio/buckets/SeedsWidget.h"
 #include "PlayableMimeData.h"
 #include <QDesktopServices>
 #include <QHeaderView>

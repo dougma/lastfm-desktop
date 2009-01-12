@@ -17,30 +17,31 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef SOURCES_H
-#define SOURCES_H
+#ifndef SEEDS_WIDGET_H
+#define SEEDS_WIDGET_H
 
 #include <QMainWindow>
 #include <QActionGroup>
-#include "SeedTypes.h"
+#include "Seed.h"
 namespace Unicorn{ class TabWidget; }
 
 
-class Sources : public QWidget
+class SeedsWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	Sources();
+	SeedsWidget();
     
     void setupUi();
 
 	struct {
 		class Unicorn::TabWidget* tabWidget;
-        class SourcesList* stationsBucket;
-		class SourcesList* friendsBucket;
-		class SourcesList* tagsBucket;
-        class SourcesList* artistsBucket;
+        class SeedListView* stationsBucket;
+		class SeedListView* friendsBucket;
+		class SeedListView* tagsBucket;
+        class SeedListView* artistsBucket;
+        class CombosWidget* combosWidget;
         class RadioControls* controls;
         class QLineEdit* freeInput;
         class QComboBox* inputSelector;
@@ -80,7 +81,6 @@ protected slots:
     void authUserIconDataDownloaded();
     
     void onItemDoubleClicked( const class QModelIndex& index );
-    void onDnDAnimationFinished();
     void onFreeInputReturn();
     
     void onAmpDestroyed(){ m_connectedAmp = 0; }
@@ -94,4 +94,4 @@ protected slots:
 
 };
 
-#endif //SOURCES_H
+#endif //SEEDS_WIDGET_H

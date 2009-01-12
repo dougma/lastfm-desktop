@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,54 +17,42 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef AMP_H
-#define AMP_H
+#ifndef SEED_LIST_MODEL_H
+#define SEED_LIST_MODEL_H
 
-#include <QWidget>
-#include "Seed.h"
-#include "State.h"
-class Track;
+#include <QAbstractListModel>
 
+class Seed;
 
-class Amp : public QWidget
+class SeedListModel : public QAbstractListModel
 {
-    Q_OBJECT
-
+Q_OBJECT
 public:
-    Amp();
+    SeedListModel( QObject* parent = 0 ):QAbstractListModel( parent ){}
     
-    /** add the item to the bucket and load any associated data (ie image) */
-    void addAndLoadItem( const QString& item, const Seed::Type );
+    void addItem( Seed* );
+    void clear();
     
-    QSize sizeHint() const { return QSize( 366, 86 ); }
-
-    struct {
-        class PlayerBucketList* bucket;
-        class RadioControls* controls;
-        class UnicornVolumeSlider* volume;
-        class BorderedContainer* borderWidget;
-    } ui;
-
-signals:
-    void itemRemoved( QString, Seed::Type );
-
-protected:
-    virtual void paintEvent( QPaintEvent* );   
-    virtual void resizeEvent( QResizeEvent* );
-
-protected slots:
-    void onPlayerBucketChanged();
-    void onWidgetAnimationFrameChanged( int );
-    void onPlayerChanged( const QString& );
-    void onStateChanged( State );
-
+    
+    virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;
+    virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
+    virtual bool setData( const QModelIndex&, const QVariant&, int role = Qt::EditRole );
+    virtual Qt::ItemFlags flags( const QModelIndex& index ) const;
+    virtual QMimeData* mimeData( const QModelIndexList& indexes ) const;
+    
+    Seed* itemFromIndex( const QModelIndex& i ) const
+    {
+        return m_items[ i.row() ];
+    }
+    
+    QList< Seed* > findSeeds( const QString& string ) const;
+    
 private:
-    void setupUi();
-    void setRadioControlsVisible( bool );
-    bool isRadioControlsVisible() const;
-
-    class QTimeLine* m_timeline;
-    QString m_playerName;
+    QList< Seed* > m_items;
+    
+private slots:
+    void onSeedDestroyed();
+    void onSeedUpdated();
 };
 
-#endif
+#endif //SEED_LIST_MODEL_H
