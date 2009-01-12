@@ -27,7 +27,7 @@
 
 LocalRadioTrackSource::LocalRadioTrackSource(LocalRqlResult* rqlResult)
 : m_rqlResult(rqlResult)
-, m_first(true)
+, m_waiting(false)
 {
     Q_ASSERT(rqlResult);
     // QueuedConnections are important here, see LocalRql.h
@@ -43,14 +43,16 @@ LocalRadioTrackSource::~LocalRadioTrackSource()
 Track
 LocalRadioTrackSource::takeNextTrack()
 {
-    // always have a track ready, this prevents "Tuning in" inbetween
-    // every track
+    // always try to have a track ready to
+    // prevent "Tuning in" between tracks
     m_rqlResult->getNextTrack();
     
     Track t;
-    if (m_buffer.size()) 
+    if (m_buffer.size()) {
         t = m_buffer.takeFirst();
-
+    } else {
+        m_waiting = true;
+    }
     return t;
 }
 
@@ -63,12 +65,12 @@ LocalRadioTrackSource::start()
 void
 LocalRadioTrackSource::onTrack(Track t)
 {
-    // decided by rgarrett 2008-12-09
+    // source decided by rgarrett 2008-12-09:
     MutableTrack(t).setSource(Track::PersonalisedRecommendation);
     
     m_buffer += t;
-    if (m_first) {
-        m_first = false;
+    if (m_waiting) {
+        m_waiting = false;
         emit trackAvailable();
     }
 }

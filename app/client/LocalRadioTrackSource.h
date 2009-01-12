@@ -29,7 +29,7 @@ class LocalRadioTrackSource : public AbstractTrackSource
 
     class LocalRqlResult* m_rqlResult;
     QList<Track> m_buffer;
-    bool m_first;
+    bool m_waiting;
 
 private slots:
     void onTrack(Track);
