@@ -87,7 +87,7 @@ FirehoseModel::onData()
     QByteArray data = r->readAll();
     QDomDocument xml;
     if (!xml.setContent( data )) {
-        qWarning() << "Couldn't parse" << data;
+        qWarning() << "Couldn't parse:" << data;
         return;
     }
     

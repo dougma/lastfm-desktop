@@ -30,22 +30,6 @@
 
 Logger* Logger::instance = 0;
 
-#define LOBSTER \
-"                         ,.---." << std::endl << \
-"               ,,,,     /    _ `." << std::endl << \
-"                \\\\\\\\   /      \\  )" << std::endl << \
-"                 |||| /\\/``-.__\\/" << std::endl << \
-"                 ::::/\\/_" << std::endl << \
-" {{`-.__.-'(`(^^(^^^(^ 9 `.========='" << std::endl << \
-"{{{{{{ { ( ( (  (   (-----:=" << std::endl << \
-" {{.-'~~'-.(,(,,(,,,(__6_.'=========." << std::endl << \
-"                 ::::\\/\\ " << std::endl << \
-"                 |||| \\/\\  ,-'/\\" << std::endl << \
-"                ////   \\ `` _/  )" << std::endl << \
-"               ''''     \\  `   /" << std::endl << \
-"                         `---''" << std::endl
-
-
 Logger::Logger( const COMMON_CHAR* path, Severity severity ) 
       : mLevel( severity )
 {
@@ -77,18 +61,7 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
 #endif
 
     if ( fileSize > 500000 )
-    {
-        ifstream inFile( path );
-        inFile.seekg( -400000, std::ios_base::end );
-        istreambuf_iterator<char> bufReader( inFile ), end;
-        string sFile;
-        sFile.reserve( 400005 );
-        sFile.assign( bufReader, end );
-        inFile.close();
-        ofstream outFile( path );
-        outFile << sFile << flush;
-        outFile.close();
-    }
+        truncate( path );
 
     ios::openmode flags = ios::out | ios::app;
     mFileOut.open( path, flags );
@@ -104,9 +77,8 @@ Logger::Logger( const COMMON_CHAR* path, Severity severity )
         return;
     }
     
-    mFileOut << "________________________________________________________________________________" << endl;
-    mFileOut << endl << endl << LOBSTER;
-    mFileOut << "\"Your argument is invalid because I own a giant lobster\"" << endl << endl;
+    mFileOut << endl << endl;
+    mFileOut << "==========================================================================lastfm" << endl;
 }
 
 
@@ -187,3 +159,21 @@ Logger::log( Severity level, const std::wstring& in, const char* function, int l
     log( level, message, function, line );
 }
 #endif
+
+
+void
+Logger::truncate( const COMMON_CHAR* path ) //static
+{
+    using namespace std;
+    
+    ifstream inFile( path );
+    inFile.seekg( -400000, std::ios_base::end );
+    istreambuf_iterator<char> bufReader( inFile ), end;
+    string sFile;
+    sFile.reserve( 400005 );
+    sFile.assign( bufReader, end );
+    inFile.close();
+    ofstream outFile( path );
+    outFile << sFile << flush;
+    outFile.close();
+}

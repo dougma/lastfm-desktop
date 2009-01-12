@@ -36,10 +36,10 @@ namespace twiddly
     static inline QString path()
     {
     #ifdef __APPLE__
-        return QFileInfo( moose::path() + "../Resources/twiddly" ).absoluteFilePath();
+        return QFileInfo( moose::dir().filePath( "../Resources/twiddly" ) ).absoluteFilePath();
     #endif
     #ifdef WIN32
-        return moose::path() + "twiddly.exe";
+        return moose::dir().filePath( "twiddly.exe" );
     #endif
     }
 }

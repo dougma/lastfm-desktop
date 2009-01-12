@@ -36,7 +36,8 @@ public:
     Ui::SendLogsDialog ui;
 
 private slots:
-    void onSendClicked();
+    void send();
+    void view();
     void onSuccess();
     void onError();
 };

@@ -54,6 +54,8 @@ public:
     /** plain write + flush, we suggest utf8 */
     void log( const char* message );
 
+    static void truncate( const COMMON_CHAR* path );
+    
 private:
     const Severity mLevel;
 #ifdef WIN32

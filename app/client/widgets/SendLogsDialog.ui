@@ -5,16 +5,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>287</height>
+    <width>339</width>
+    <height>306</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Send Logs</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
+   <property name="spacing" >
+    <number>-1</number>
+   </property>
    <item>
     <widget class="QLabel" name="infoHeader" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text" >
       <string>You can use this tool to send the Last.fm development team your logs. The transmission will contain:&lt;ul>&lt;li>Log files this software generated&lt;li>Some information about your computer&lt;/ul>&lt;p>Please describe the problem below:</string>
      </property>
@@ -49,11 +58,22 @@
     <widget class="QTextEdit" name="moreInfoTextEdit" />
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
+     <item>
+      <widget class="QPushButton" name="view" >
+       <property name="text" >
+        <string>View Logs</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox" >
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::Cancel</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

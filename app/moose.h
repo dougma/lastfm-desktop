@@ -46,7 +46,11 @@ namespace moose
             return CoreDir::programFiles().filePath( "Last.fm/Last.fm.exe" );
         #endif
     }
-
+    
+    static inline QDir dir()
+    {
+        return QFileInfo( path() ).absoluteDir();
+    }
 
     enum ItemDataRole
     {

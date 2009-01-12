@@ -22,8 +22,9 @@
 
 #include "ui_DiagnosticsDialog.h"
 #include <QDateTime>
-#include <iostream>
-#include <fstream>
+#include <QPointer>
+#include <QProcess> //Qt enums
+#include <QFile>
 
 
 class DiagnosticsDialog : public QDialog
@@ -35,7 +36,6 @@ class DiagnosticsDialog : public QDialog
 
 public:
     DiagnosticsDialog( QWidget *parent = 0 );
-    ~DiagnosticsDialog();
     
 public slots:
     void fingerprinted( const class Track& );
@@ -48,13 +48,15 @@ private:
 	void scrobbleIPod( bool isManual = false );
 	QString diagnosticInformation();
 
-    class QTimer* m_logTimer;
-    std::ifstream m_logFile;
+    QPointer<QProcess> m_twiddly;
+    QFile* m_ipod_log;
 
 private slots:
 	void onScrobbleIPodClicked();
-	void onLogPoll();
 	void onSendLogsClicked();
+	void poll();
+    void onTwiddlyFinished( int, QProcess::ExitStatus );
+    void onTwiddlyError( QProcess::ProcessError );
 };
 
 

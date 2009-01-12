@@ -29,7 +29,7 @@ namespace lastfm
     /** http://labs.trolltech.com/blogs/2008/10/09/coding-tip-pretty-printing-enum-values
       * Tips for making this take a single parameter welcome! :)
       */
-    template <typename T> static inline QLatin1String qMetaEnumString( int enum_value, const char* enum_name )
+    template <typename T> static inline QString qMetaEnumString( int enum_value, const char* enum_name )
     {
         QMetaObject meta = T::staticMetaObject;
         for (int i=0; i < meta.enumeratorCount(); ++i)
@@ -38,7 +38,7 @@ namespace lastfm
             if (m.name() == QLatin1String(enum_name))
                 return QLatin1String(m.valueToKey(enum_value));
         }
-        return QLatin1String("Unknown enum value");
+        return "Unknown enum value: " + QString::number( enum_value );
     }
 }
 

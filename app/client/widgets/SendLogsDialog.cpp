@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SendLogsDialog.h"
-#include "SendLogsRequest.h"
+#include "DiagnosticsDialog/SendLogsRequest.h"
 #include "Settings.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/CoreDir.h"
@@ -29,6 +29,7 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QMovie>
+#include <QProcess>
 
 #ifdef WIN32
 #include <windows.h>
@@ -43,7 +44,8 @@ SendLogsDialog::SendLogsDialog( QWidget *parent )
     ui.spinner->hide();
     ui.buttonBox->addButton( "Send", QDialogButtonBox::AcceptRole );
 
-    connect( ui.buttonBox, SIGNAL( accepted() ), SLOT( onSendClicked() ) );
+    connect( ui.buttonBox, SIGNAL(accepted()), SLOT(send()) );
+    connect( ui.view, SIGNAL(clicked()), SLOT(view()) );
 }
 
 
@@ -135,7 +137,7 @@ static QString systemInformationString()
 
 
 void
-SendLogsDialog::onSendClicked()
+SendLogsDialog::send()
 {
     SendLogsRequest* request = new SendLogsRequest( ui.moreInfoTextEdit->toPlainText() );
 
@@ -162,6 +164,18 @@ SendLogsDialog::onSendClicked()
     ui.moreInfoTextEdit->setEnabled( false );
     ui.spinner->show();
     ui.spinner->movie()->start();
+}
+
+
+void
+SendLogsDialog::view()
+{
+#ifdef __APPLE__
+    QProcess::startDetached( "open", QStringList() << CoreDir::logs().absolutePath() 
+                                                   << "-a" << "Console" );
+#else
+    QProcess::startDetached( "explorer.exe", QStringList() << CoreDir::logs().absoluteFilePath() );
+#endif
 }
 
 

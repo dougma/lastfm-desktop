@@ -209,20 +209,18 @@ StateMachine::unspoolTrack()
     //FIXME ideally we'd only do this if the track changes naturally
     // but scrobsub has no facility to notify us of that.
     
-    if (m_watch && !m_watch->isTimedOut())
+    if (m_connection && m_watch && !m_watch->isTimedOut())
     {
         QDebug d = qDebug() << "Watch didn't timeout, checking if we should scrobble anyway..";
         
         uint const elapsed = m_watch->elapsed() / 1000;
 
         // cater to iTunes crossfade
-        if (m_connection) {
-            QString const id = m_connection->id();
-            if (elapsed >= m_track.duration() - 12 
-                && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
-                && (id == "osx" || id == "itw"))
-                emit m_watch->timeout();
-        }
+        QString const id = m_connection->id();
+        if (elapsed >= m_track.duration() - 12 
+            && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
+            && (id == "osx" || id == "itw"))
+            emit m_watch->timeout();
         
         // allow 4 seconds of leeway, to allow for various inaccuracies
         else if (elapsed + 4 > m_watch->scrobblePoint())

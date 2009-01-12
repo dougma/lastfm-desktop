@@ -25,7 +25,7 @@
       <bool>false</bool>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="subs_tab" >
       <attribute name="title" >
@@ -227,7 +227,19 @@
         </layout>
        </item>
        <item>
-        <widget class="QListWidget" name="ipod_log" />
+        <widget class="QPlainTextEdit" name="ipod_log" >
+         <property name="font" >
+          <font>
+           <family>Courier New</family>
+          </font>
+         </property>
+         <property name="readOnly" >
+          <bool>true</bool>
+         </property>
+         <property name="maximumBlockCount" >
+          <number>0</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

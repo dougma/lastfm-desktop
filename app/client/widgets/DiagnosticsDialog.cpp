@@ -19,22 +19,21 @@
 
 #include "DiagnosticsDialog.h"
 #include "widgets/SendLogsDialog.h"
+#include "app/twiddly.h"
+#include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/scrobble/Scrobbler.h"
 #include "lib/lastfm/scrobble/ScrobbleCache.h"
 #include "lib/lastfm/scrobble/Scrobble.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QByteArray>
-#include <QClipboard>
-#include <QFile>
 #include <QHeaderView>
-#include <QTimer>
 #include <QProcess>
 
 
 DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
-        : QDialog( parent )
-{
+        : QDialog( parent ), m_ipod_log( 0 )
+{    
     ui.setupUi( this );
 
     ui.cached->header()->setResizeMode( QHeaderView::Stretch );
@@ -54,22 +53,17 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
     ui.cached->setAttribute( Qt::WA_MacShowFocusRect, false );
     ui.fingerprints->setAttribute( Qt::WA_MacSmallSize );
     ui.fingerprints->setAttribute( Qt::WA_MacShowFocusRect, false );
+    
+    QFont f = ui.ipod_log->font();
+    f.setPointSize( 10 );
+    ui.ipod_log->setFont( f );
 #endif
     
     connect( qApp, SIGNAL(scrobblePointReached( Track )), SLOT(onScrobblePointReached()), Qt::QueuedConnection ); // queued because otherwise cache isn't filled yet
     connect( ui.ipod_scrobble_button, SIGNAL(clicked()), SLOT(onScrobbleIPodClicked()) );
-
-    m_logTimer = new QTimer( this );
-    connect( m_logTimer, SIGNAL(timeout()), SLOT(onLogPoll()) );
+    connect( ui.logs_button, SIGNAL(clicked()), SLOT(onSendLogsClicked()) );
 
     onScrobblePointReached();
-}
-
-
-DiagnosticsDialog::~DiagnosticsDialog()
-{
-    if (m_logFile.is_open())
-        m_logFile.close();
 }
 
 
@@ -155,49 +149,21 @@ DiagnosticsDialog::fingerprinted( const Track& t )
 
 
 void 
-DiagnosticsDialog::onLogPoll()
-{
-    //Clear all state flags on the file stream
-    //this avoids stale state information
-    m_logFile.clear();
-
-    //This will reset the state information to !good
-    //if at end of file.
-    m_logFile.peek();
-
-    //early out if at EOF or other error
-    if( !m_logFile.good() )
-        return;
-    
-    char* dataBuffer = new char[1000];
-
-    //Read the log file in batches of 10 lines
-    //(this is not ideal but avoids hanging the ui thread too much)
-    for( int i = 0; i < 10 && m_logFile.good(); ++i )
-    {
-        QString data;
-        m_logFile.getline( dataBuffer, 1000 );
-        data = dataBuffer;
-        data = data.trimmed();
-
-        //ignore empty lines 
-        if( data.isEmpty() )
-            continue;
-
-        ui.ipod_log->addItem( data );
-        ui.ipod_log->scrollToBottom();
-    }
-    delete[] dataBuffer;
+DiagnosticsDialog::poll()
+{    
+    QTextStream s( m_ipod_log );
+    while (!s.atEnd())
+        ui.ipod_log->appendPlainText( s.readLine() );
 }
 
 
-#include "app/twiddly.h"
-#include "lib/unicorn/UnicornCoreApplication.h"
-#include "lib/lastfm/core/UniqueApplication.h"
+#include "common/c++/Logger.h"
 void
 DiagnosticsDialog::onScrobbleIPodClicked()
 {
-#ifndef Q_WS_X11
+#ifndef Q_WS_X11    
+    if (m_twiddly) { qWarning() << "m_twiddly already running. Early out."; return; }
+    
     QStringList args = (QStringList() 
                     << "--device" << "diagnostic" 
                     << "--vid" << "0000" 
@@ -208,16 +174,52 @@ DiagnosticsDialog::onScrobbleIPodClicked()
     if (isManual)
         args += "--manual";
 
-    if (!m_logFile.is_open())
-    {
-        QString const path = UnicornCoreApplication::log( twiddly::applicationName() ).absoluteFilePath();
-        m_logFile.open( path.toStdString().c_str() );
-        m_logFile.seekg( 0, std::ios_base::end );
-        m_logTimer->start( 10 );
-    }
+    QString path = UnicornCoreApplication::log( twiddly::applicationName() ).absoluteFilePath();
+#ifndef NDEBUG
+    path = path.remove( ".debug" ); //because we run the release twiddly always
+#endif    
 
-    QProcess::startDetached( twiddly::path(), args );
+    // we seek to the end below, but then twiddly's logger pretruncates the file
+    // which then means our seeked position is beyond the file's end, and we
+    // thus don't show any log output
+    QByteArray const cpath = QFile::encodeName( path );
+    Logger::truncate( cpath.data() );
+
+    m_ipod_log = new QFile( path );
+    m_ipod_log->open( QIODevice::ReadOnly );
+    m_ipod_log->seek( m_ipod_log->size() );
+    ui.ipod_log->clear();    
+    
+    m_twiddly = new QProcess( this );
+    connect( m_twiddly, SIGNAL(finished( int, QProcess::ExitStatus )), SLOT(onTwiddlyFinished( int, QProcess::ExitStatus )) );
+    connect( m_twiddly, SIGNAL(error( QProcess::ProcessError )), SLOT(onTwiddlyError( QProcess::ProcessError )) );
+    m_twiddly->start( twiddly::path(), args );
+    
+    m_ipod_log->setParent( m_twiddly );    
+    
+    QTimer* timer = new QTimer( m_twiddly );
+    timer->setInterval( 10 );
+    connect( timer, SIGNAL(timeout()), SLOT(poll()) );
+    timer->start();
 #endif
+}
+
+
+#include "lib/lastfm/q.h"
+void
+DiagnosticsDialog::onTwiddlyFinished( int code, QProcess::ExitStatus status )
+{    
+    qDebug() << "Exit code:" << code << lastfm::qMetaEnumString<QProcess>( status, "ExitStatus" );
+    poll(); //get last bit
+    m_twiddly->deleteLater();
+}
+
+
+void
+DiagnosticsDialog::onTwiddlyError( QProcess::ProcessError e )
+{
+    qDebug() << "Twiddly error:" << lastfm::qMetaEnumString<QProcess>( e, "ProcessError" );
+    m_twiddly->deleteLater();
 }
 
 
