@@ -25,6 +25,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTcpSocket>
+#include <QTimer>
 
 
 FirehoseModel::FirehoseModel()
@@ -57,8 +58,10 @@ FirehoseModel::reconnect()
     // using WsAccessManager stopped after the HEADERS were returned
     // for some reason. We block signals to prevent recursively calling this 
     // function
-    if (m_socket) m_socket->blockSignals( true );
-    delete m_socket;
+    if (m_socket) { 
+        disconnect( m_socket, 0, this, 0 ); // don't call onFinished()
+        m_socket->deleteLater(); //safer, we had a crash
+    }
     m_socket = new QTcpSocket( this );
     connect( m_socket, SIGNAL(connected()), SLOT(onConnect()) );
     connect( m_socket, SIGNAL(readyRead()), SLOT(onData()) );
@@ -79,11 +82,14 @@ FirehoseModel::onConnect()
 
 void
 FirehoseModel::onData()
-{    
+{
     QTcpSocket* r = (QTcpSocket*)sender();
     QByteArray data = r->readAll();
     QDomDocument xml;
-    xml.setContent( data );
+    if (!xml.setContent( data )) {
+        qWarning() << "Couldn't parse" << data;
+        return;
+    }
     
     // I'm mainly lazy because Track.operator== won't work here */
     static QByteArray mxcl_is_lazy; 
@@ -150,8 +156,8 @@ FirehoseModel::onItemReady( FirehoseItem* item )
 void
 FirehoseModel::onFinished()
 {
-    qDebug() << "Firehose disconnected. Reconnecting.";
-    reconnect();
+    qDebug() << "Firehose disconnected by server. Reconnecting in 30 seconds...";
+    QTimer::singleShot( 30*1000, this, SLOT(reconnect()) );
 }
 
 
