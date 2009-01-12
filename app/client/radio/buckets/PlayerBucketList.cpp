@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerBucketList.h"
-#include "Sources.h"
+#include "SeedsWidget.h"
 #include "SeedDelegate.h"
 #include "SeedListModel.h"
 #include "Seed.h"
@@ -318,7 +318,7 @@ QString
 PlayerBucketList::queryString( const QModelIndex i, bool joined ) const 
 {
 	QString qs;
-	int type = i.data( moose::TypeRole ).toInt();
+
 	switch ( i.data( moose::TypeRole ).toInt() ) {
 		case Seed::UserType:
             if( joined )
