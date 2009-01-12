@@ -20,7 +20,7 @@
 #ifndef LASTFM_FINGERPRINT_ID_H
 #define LASTFM_FINGERPRINT_ID_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QDebug>
 #include <QString>
 

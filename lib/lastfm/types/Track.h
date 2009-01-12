@@ -20,7 +20,7 @@
 #ifndef LASTFM_TRACK_H
 #define LASTFM_TRACK_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/types/Album.h>
 #include <lastfm/types/Artist.h>
 #include <lastfm/types/FingerprintId.h>

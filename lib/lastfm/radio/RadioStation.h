@@ -20,7 +20,7 @@
 #ifndef LASTFM_RADIO_STATION_H
 #define LASTFM_RADIO_STATION_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/types/User.h>
 #include <lastfm/types/Tag.h>
 #include <lastfm/types/Artist.h>

@@ -20,7 +20,7 @@
 #ifndef LASTFM_CORE_LOCALE_H
 #define LASTFM_CORE_LOCALE_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QLocale>
 
 

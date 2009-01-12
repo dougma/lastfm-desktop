@@ -20,7 +20,7 @@
 #ifndef LASTFM_USER_H
 #define LASTFM_USER_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/core/WeightedStringList.h>
 #include <QString>
 #include <QUrl>

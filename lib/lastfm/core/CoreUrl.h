@@ -20,7 +20,7 @@
 #ifndef LASTFM_CORE_URL_H
 #define LASTFM_CORE_URL_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QString>
 #include <QUrl>
 

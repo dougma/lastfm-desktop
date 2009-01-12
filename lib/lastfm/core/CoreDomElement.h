@@ -20,7 +20,7 @@
 #ifndef CORE_DOM_ELEMENT_H
 #define CORE_DOM_ELEMENT_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/core/CoreException.h>
 #include <QDebug>
 #include <QDomElement>

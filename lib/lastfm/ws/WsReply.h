@@ -20,7 +20,7 @@
 #ifndef LASTFM_WS_REPLY_H
 #define LASTFM_WS_REPLY_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/core/CoreDomElement.h>
 #include <lastfm/ws/WsError.h>
 #include <QNetworkReply>
@@ -101,7 +101,6 @@ inline QDebug operator<<( QDebug d, WsReply* r )
 }
 
 
-#include <lastfm/q.h>
 inline QDebug operator<<( QDebug d, QNetworkReply::NetworkError e )
 {
     return d << lastfm::qMetaEnumString<QNetworkReply>( e, "NetworkError" );

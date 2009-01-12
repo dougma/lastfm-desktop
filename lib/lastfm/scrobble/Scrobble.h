@@ -20,7 +20,7 @@
 #ifndef LASTFM_SCROBBLE_H
 #define LASTFM_SCROBBLE_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/types/Track.h>
 
 
@@ -50,12 +50,19 @@ struct LASTFM_SCROBBLE_DLLEXPORT Scrobble : Track
     }
 #endif
 
+    /** if isValid() returns false, Scrobbler will not scrobble the track */
     enum Invalidity
     {
         TooShort,
         ArtistNameMissing,
         TrackNameMissing,
         ArtistInvalid,
+        
+        // the user can setup rules that describe music that should never be
+        // scrobbled. We obey these rules even in your implementation :P
+        // it is also possible we may decide some paths are not sensible in the
+        // future and add them as well
+        ForbiddenPath,
 
         NoTimestamp,
         FromTheFuture,

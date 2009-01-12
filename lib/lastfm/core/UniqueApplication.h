@@ -20,7 +20,7 @@
 #ifndef LASTFM_UNIQUE_APPLICATION_H
 #define LASTFM_UNIQUE_APPLICATION_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QObject>
 #include <QStringList>
 #ifdef Q_WS_MAC

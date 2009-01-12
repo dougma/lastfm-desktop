@@ -20,7 +20,7 @@
 #ifndef LASTFM_ALBUM_H
 #define LASTFM_ALBUM_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/types/Artist.h>
 #include <lastfm/types/Mbid.h>
 #include <QString>

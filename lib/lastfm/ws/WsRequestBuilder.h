@@ -20,7 +20,7 @@
 #ifndef LASTFM_WS_REQUEST_MANAGER_H
 #define LASTFM_WS_REQUEST_MANAGER_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/ws/WsReply.h> //for your convenience
 #include <lastfm/ws/WsRequestParameters.h>
 #include <QThreadStorage>

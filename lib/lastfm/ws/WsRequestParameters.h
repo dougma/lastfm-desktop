@@ -20,7 +20,7 @@
 #ifndef LASTFM_WS_REQUEST_PARAMETERS_H
 #define LASTFM_WS_REQUEST_PARAMETERS_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QString>
 #include <QList>
 #include <QPair>

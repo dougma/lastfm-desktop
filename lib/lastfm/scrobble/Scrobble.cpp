@@ -19,6 +19,17 @@
 
 #include "Scrobble.h"
 #include "ScrobblePoint.h"
+#include <QFSFileEngine>
+#include "lib/lastfm/core/CoreSettings.h"
+#include "lib/lastfm/private.h"
+
+
+static inline QString dirToString( const QDir& d )
+{
+    QString s = d.absolutePath();
+    if (QFSFileEngine().caseSensitive()) s = s.toLower();
+    return s;
+}
 
 
 QByteArray
@@ -69,6 +80,22 @@ Scrobble::isValid( Invalidity* v ) const
                          << "[unknown]"
                          << "[unknown artist]").contains( d->artist.toLower() ), 
            ArtistInvalid );
+    
+    if (url().scheme() == "file")
+    {       
+        QString const path = dirToString( QFileInfo(url().path()).dir() );
+
+        foreach (QString const forbidden_path, CoreSettings().value( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS ).toStringList())
+        {
+            QDir d( forbidden_path );
+            if (!d.exists()) continue;
+            if (path.startsWith( dirToString( d ) )) {
+                *v = ForbiddenPath;
+                return false;
+            }
+            
+        }
+    }
     
     return true;
 }

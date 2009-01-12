@@ -16,30 +16,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
-
-#ifndef LASTFM_Q_H
-#define LASTFM_Q_H
-
-#include <QMetaEnum>
-#include <QLatin1String>
-
-
-namespace lastfm
-{
-    /** http://labs.trolltech.com/blogs/2008/10/09/coding-tip-pretty-printing-enum-values
-      * Tips for making this take a single parameter welcome! :)
-      */
-    template <typename T> static inline QString qMetaEnumString( int enum_value, const char* enum_name )
-    {
-        QMetaObject meta = T::staticMetaObject;
-        for (int i=0; i < meta.enumeratorCount(); ++i)
-        {
-            QMetaEnum m = meta.enumerator(i);
-            if (m.name() == QLatin1String(enum_name))
-                return QLatin1String(m.valueToKey(enum_value));
-        }
-        return "Unknown enum value: " + QString::number( enum_value );
-    }
-}
-
-#endif
+ 
+ #ifndef LASTFM_PRIVATE_H
+ #define LASTFM_PRIVATE_H
+ 
+ #define LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS "ExclusionDirs"
+ 
+ #endif
+ 

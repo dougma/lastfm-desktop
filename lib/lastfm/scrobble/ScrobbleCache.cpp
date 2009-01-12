@@ -65,7 +65,7 @@ ScrobbleCache::write()
     else {
         QDomDocument xml;
         QDomElement e = xml.createElement( "submissions" );
-        e.setAttribute( "product", "Last.fm Audioscrobbler" );
+        e.setAttribute( "product", QCoreApplication::applicationName() );
         e.setAttribute( "version", "2" );
 
         foreach (Track i, m_tracks)
@@ -87,14 +87,7 @@ ScrobbleCache::write()
 void
 ScrobbleCache::add( const Scrobble& track )
 {
-    Scrobble::Invalidity invalidity;
-
-    if (track.isValid( &invalidity ))
-    {
-        add( QList<Track>() << track );
-    }
-    else
-        qWarning() << invalidity;
+    add( QList<Track>() << track );
 }
 
 
@@ -103,7 +96,13 @@ ScrobbleCache::add( const QList<Track>& tracks )
 {
     foreach (const Track& track, tracks)
     {
-        if (track.isNull()) 
+        Scrobble::Invalidity invalidity;
+        
+        if (!Scrobble(track).isValid( &invalidity ))
+        {
+            qWarning() << invalidity;
+        }
+        else if (track.isNull()) 
             qDebug() << "Will not cache an empty track";
         else
             m_tracks += track;

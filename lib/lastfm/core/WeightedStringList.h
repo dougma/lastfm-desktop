@@ -20,7 +20,7 @@
 #ifndef LASTFM_WEIGHTED_STRING_LIST_H
 #define LASTFM_WEIGHTED_STRING_LIST_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/core/WeightedString.h>
 #include <QtAlgorithms>
 #include <QStringList>

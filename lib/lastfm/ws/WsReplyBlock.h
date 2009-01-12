@@ -20,7 +20,7 @@
 #ifndef WS_REPLY_BLOCK_H
 #define WS_REPLY_BLOCK_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QObject>
 class QEventLoop;
 class WsReply;

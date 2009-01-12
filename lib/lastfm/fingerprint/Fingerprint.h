@@ -20,7 +20,7 @@
 #ifndef LASTFM_FINGERPRINT_H
 #define LASTFM_FINGERPRINT_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/fingerprint/FpError.h>
 #include <lastfm/types/FingerprintId.h>
 #include <lastfm/types/Track.h>

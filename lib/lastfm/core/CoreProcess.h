@@ -20,7 +20,7 @@
 #ifndef LASTFM_CORE_PROCESS_H
 #define LASTFM_CORE_PROCESS_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QString>
 
 

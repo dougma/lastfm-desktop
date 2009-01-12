@@ -20,7 +20,7 @@
 #ifndef LASTFM_SCROBBLER_H
 #define LASTFM_SCROBBLER_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QByteArray>
 #include <QList>
 #include <QString>
@@ -107,7 +107,6 @@ private:
 
 
 #include <QDebug>
-#include <lastfm/q.h>
 static inline QDebug operator<<( QDebug d, Scrobbler::Status status )
 {
     return d << lastfm::qMetaEnumString<Scrobbler>( status, "Status" );

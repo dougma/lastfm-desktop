@@ -21,7 +21,7 @@
 #define LASTFM_TUNER_H
 
 #include "AbstractTrackSource.h"
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <lastfm/radio/RadioStation.h>
 #include <lastfm/types/Track.h>
 #include <lastfm/ws/WsError.h>

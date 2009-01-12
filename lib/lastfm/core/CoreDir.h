@@ -20,7 +20,7 @@
 #ifndef LASTFM_CORE_DIR_H
 #define LASTFM_CORE_DIR_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QCoreApplication>
 #include <QDir>
 

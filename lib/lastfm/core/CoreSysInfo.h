@@ -20,7 +20,7 @@
 #ifndef CORE_SYSINFO_H
 #define CORE_SYSINFO_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QString>
 
 

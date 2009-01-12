@@ -20,7 +20,7 @@
 #ifndef LASTFM_WS_KEYS_H
 #define LASTFM_WS_KEYS_H
 
-#include <lastfm/DllExportMacro.h>
+#include <lastfm/public.h>
 #include <QString>
 
 
