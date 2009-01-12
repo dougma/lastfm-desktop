@@ -182,8 +182,12 @@ DiagnosticsDialog::onScrobbleIPodClicked()
     // we seek to the end below, but then twiddly's logger pretruncates the file
     // which then means our seeked position is beyond the file's end, and we
     // thus don't show any log output
+#ifdef WIN32
+    Logger::truncate( (wchar_t*) path.utf16() );
+#else
     QByteArray const cpath = QFile::encodeName( path );
     Logger::truncate( cpath.data() );
+#endif
 
     m_ipod_log = new QFile( path );
     m_ipod_log->open( QIODevice::ReadOnly );

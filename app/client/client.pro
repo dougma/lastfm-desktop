@@ -23,6 +23,9 @@ RESOURCES += $$findSources( qrc )
 # included directly into App.cpp, so avoid link error
 SOURCES -= legacy/disableHelperApp.cpp
 
+SOURCES += ../../common/c++/Logger.cpp
+HEADERS += ../../common/c++/Logger.h
+
 macx* {
 	QMAKE_INFO_PLIST = mac/Info.plist
 	ICON = mac/client.icns

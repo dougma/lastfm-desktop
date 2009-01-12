@@ -174,7 +174,7 @@ SendLogsDialog::view()
     QProcess::startDetached( "open", QStringList() << CoreDir::logs().absolutePath() 
                                                    << "-a" << "Console" );
 #else
-    QProcess::startDetached( "explorer.exe", QStringList() << CoreDir::logs().absoluteFilePath() );
+    QProcess::startDetached( "explorer.exe", QStringList() << CoreDir::logs().absolutePath() );
 #endif
 }
 
