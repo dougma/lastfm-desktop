@@ -39,22 +39,28 @@ struct TagDataset
 
     EntryList m_allArtists;
 
+    static float calcNormal(const TagVec& vec)
+    {
+        typedef QPair< TagId, TagWeight > Tag;
+        float sum = 0;
+        foreach(const Tag& tag, vec) {
+            sum += (tag.second * tag.second);
+        }
+        return sqrt(sum); 
+    }
+
     bool load(LocalCollection& collection)
     {
+        // if data hasn't been loaded yet: load and
+        // precalculate the normals for each artist
+
         if (0 == m_allArtists.size()) {
             m_allArtists = collection.allTags();
 
-            // precalculate the normals for each artist
             for(EntryList::iterator pIt = m_allArtists.begin(); pIt != m_allArtists.end(); pIt++) {
-                float sum = 0;
-                typedef QPair< TagId, TagWeight > Tag;
-                foreach(const Tag& tag, pIt->tagVec) {
-                    sum += (tag.second * tag.second);
-                }
-                pIt->norm = sqrt(sum); 
+                pIt->norm = calcNormal(pIt->tagVec);
             }
         }
-
         return true;
     }
 
@@ -121,7 +127,7 @@ public:
     ResultSet filesBySimilarArtist(LocalCollection& coll, const char *artist);
 
 private:
-    QList<Result> similarArtists(LocalCollection& coll, int artistId);
+    QList<Result> getSimilarArtists(LocalCollection& coll, const char *artist, int artistId);
 };
 
 

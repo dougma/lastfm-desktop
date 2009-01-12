@@ -18,20 +18,67 @@
  ***************************************************************************/
 
 #include "SimilarArtists.h"
+#include "lib/lastfm/types/Tag.h"
+#include "lib/lastfm/types/Artist.h"
+#include "lib/lastfm/ws/WsReplyBlock.h"
 #include "similarity/CosSimilarity.h"
 #include <boost/bind.hpp>
+#include <QtAlgorithms>
 
 
+// these two operators are for qBinaryFind in TagDataset::findArtist
 
-bool operator<(TagDataset::ArtistId i, const TagDataset::Entry& e)
+bool 
+operator<(TagDataset::ArtistId i, const TagDataset::Entry& e)
 {
     return i < e.artistId;
 }
 
-bool operator<(const TagDataset::Entry& e, TagDataset::ArtistId i)
+bool 
+operator<(const TagDataset::Entry& e, TagDataset::ArtistId i)
 {
     return e.artistId < i;
 }
+
+
+//
+
+
+bool
+orderByWeightDesc(const WeightedString& a, const WeightedString& b)
+{
+    return a.weighting() > b.weighting();
+}
+
+
+void
+dlArtistTags(LocalCollection& coll, const QString& artist, TagDataset::Entry& outTags)
+{
+    WsReply* reply = WsReplyBlock::wait(
+        Artist(artist).getTopTags(),
+        10 * 1000);
+
+    if (reply) {
+        WeightedStringList wsl = Tag::list(reply);
+        qSort(wsl.begin(), wsl.end(), orderByWeightDesc);
+
+        // take the top ten tags having non-zero weight
+        int count = 0;
+        WeightedStringList::iterator p = wsl.begin();
+        while (p != wsl.end() && p->weighting() > 0  && count < 10) {
+            TagDataset::TagId tagId = coll.getTagId(*p, LocalCollection::Create);
+            // webservice gives weight 0..100; we want it 0..1
+            TagDataset::TagWeight tagWeight = p->weighting() / 100.0;     
+            outTags.tagVec.push_back( qMakePair(tagId, tagWeight) );
+            p++;
+            count++;
+        }
+        outTags.norm = TagDataset::calcNormal(outTags.tagVec);
+    }
+}
+
+
+//////////////////////////////////////
 
 
 void
@@ -43,12 +90,25 @@ resultCb(QList<SimilarArtists::Result>& results, const TagDataset::Entry& entry,
 }
 
 QList<SimilarArtists::Result>
-SimilarArtists::similarArtists(LocalCollection& coll, int artistId)
+SimilarArtists::getSimilarArtists(LocalCollection& coll, const char* artist, int artistId)
 {
     QList<Result> results;
 
-    m_dataset.load(coll);
-    TagDataset::Entry *pArtist = m_dataset.findArtist(artistId);
+    TagDataset::Entry otherArtistTags;
+    TagDataset::Entry *pArtist = 0;
+
+    {
+        m_dataset.load(coll);
+        pArtist = m_dataset.findArtist(artistId);
+
+        if (pArtist == 0) {
+            otherArtistTags.artistId = artistId;
+            dlArtistTags(coll, QString(artist), otherArtistTags);
+            if (otherArtistTags.tagVec.size()) {
+                pArtist = &otherArtistTags;
+            }
+        }
+    }
 
     if (pArtist && m_dataset.m_allArtists.size()) {
         if (m_dataset.m_allArtists.size()) {
@@ -63,22 +123,24 @@ SimilarArtists::similarArtists(LocalCollection& coll, int artistId)
     return results;
 }
 
-bool operator<(const SimilarArtists::Result& a, const SimilarArtists::Result& b)
+
+bool 
+artistList_orderByWeightDesc(const SimilarArtists::Result& a, const SimilarArtists::Result& b)
 {
-    // yes, we want it in "reverse" order, ie: bigger things at the top.
     return a.second > b.second;
 }
-
 
 ResultSet
 SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 {
-    int artistId = coll.getArtistId(QString(artist).simplified().toLower(), LocalCollection::NoCreate);
-
-    QList<SimilarArtists::Result> artistList = similarArtists(coll, artistId);
-
     ResultSet result;
-    qSort(artistList.begin(), artistList.end());
+
+    int artistId = coll.getArtistId(
+        QString(artist).simplified().toLower(), 
+        LocalCollection::Create);
+
+    QList<SimilarArtists::Result> artistList = getSimilarArtists(coll, artist, artistId);
+    qSort(artistList.begin(), artistList.end(), artistList_orderByWeightDesc);
 
     QList<SimilarArtists::Result>::iterator pArtist = artistList.begin();
     int artistCount = 0;
