@@ -47,6 +47,7 @@
 #include <QSystemTrayIcon>
 #include <QThreadPool>
 #include <phonon/audiooutput.h>
+#include <phonon/backendcapabilities.h>
 
 #ifdef WIN32
     #include "legacy/disableHelperApp.cpp"
@@ -158,8 +159,21 @@ App::App( int& argc, char** argv )
     m_resolver = new Resolver( pluginHost.getPlugins<ITrackResolverPlugin>("TrackResolver") );
 #endif
 
-	m_radio = new Radio( new Phonon::AudioOutput );
-	m_radio->audioOutput()->setVolume( Settings().volume() );
+////// radio
+    Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+	audioOutput->setVolume( Settings().volume() );
+
+    QString audioOutputDeviceName = moose::Settings().audioOutputDeviceName();
+    if (audioOutputDeviceName.size())
+    {
+        foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
+            if (d.name() == audioOutputDeviceName) {
+                audioOutput->setOutputDevice( d );
+                break;
+            }
+    }
+
+	m_radio = new Radio( audioOutput );
 	connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_stateMachine, SLOT(onRadioTuningIn( RadioStation )) );
     connect( m_radio, SIGNAL(trackSpooled( Track )), m_stateMachine, SLOT(onRadioTrackSpooled( Track )) );
     connect( m_radio, SIGNAL(trackStarted( Track )), m_stateMachine, SLOT(onRadioTrackStarted( Track )) );

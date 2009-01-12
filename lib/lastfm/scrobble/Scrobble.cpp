@@ -93,7 +93,6 @@ Scrobble::isValid( Invalidity* v ) const
                 *v = ForbiddenPath;
                 return false;
             }
-            
         }
     }
     

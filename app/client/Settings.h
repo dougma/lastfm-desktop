@@ -54,15 +54,17 @@ namespace moose
         bool alwaysConfirmIPodScrobbles() const { return UserSettings().value( "AlwaysConfirmIPodScrobbles", true ).toBool(); }
         bool fingerprintingEnabled() const { return UserSettings().value( "FingerprintingEnabled", true ).toBool(); }
         bool iPodScrobblingEnabled() const { return UserSettings().value( "iPodScrobblingEnabled", true ).toBool(); }
+        QString audioOutputDeviceName() const { return QSettings().value( "OutputDevice" ).toString(); }
     };
 
-    struct MutableSettings
+    struct MutableSettings : Settings
     {
         void setLogOutOnExit( bool b ) { Unicorn::UserSettings().setValue( "LogOutOnExit", b ); }
-        void setScrobblePoint( int scrobblePoint ) { UserSettings().setValue( "ScrobblePoint", scrobblePoint ); }
+        void setScrobblePoint( int i ) { UserSettings().setValue( "ScrobblePoint", i ); }
         void setIPodScrobblingEnabled( bool b ) { UserSettings().setValue( "iPodScrobblingEnabled", b ); }
         void setAlwaysConfirmIPodScrobbles( bool b ) { UserSettings().setValue( "AlwaysConfirmIPodScrobbles", b ); }
         void setFingerprintingEnabled( bool b ) { UserSettings().setValue( "FingerprintingEnabled", b ); }
+        void setAudioOutputDeviceName( QString s ) { QSettings().setValue( "OutputDevice", s ); }
     };
 
 #ifdef WIN32

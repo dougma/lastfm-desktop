@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-#include "widgets/SendLogsDialog.h"
+#include "DiagnosticsDialog/SendLogsDialog.h"
 #include "app/twiddly.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
@@ -209,7 +209,6 @@ DiagnosticsDialog::onScrobbleIPodClicked()
 }
 
 
-#include "lib/lastfm/q.h"
 void
 DiagnosticsDialog::onTwiddlyFinished( int code, QProcess::ExitStatus status )
 {    

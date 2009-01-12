@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SendLogsDialog.h"
-#include "DiagnosticsDialog/SendLogsRequest.h"
+#include "SendLogsRequest.h"
 #include "Settings.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/CoreDir.h"
@@ -174,7 +174,7 @@ SendLogsDialog::view()
     QProcess::startDetached( "open", QStringList() << CoreDir::logs().absolutePath() 
                                                    << "-a" << "Console" );
 #else
-    QProcess::startDetached( "explorer.exe", QStringList() << CoreDir::logs().absolutePath() );
+    QProcess::startDetached( "explorer.exe", QStringList() << CoreDir::logs().absoluteFilePath() );
 #endif
 }
 

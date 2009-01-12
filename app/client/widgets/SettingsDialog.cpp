@@ -19,9 +19,14 @@
 
 #include "SettingsDialog.h"
 #include "Settings.h"
+#include "the/radio.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreLocale.h"
+#include "lib/lastfm/private.h"
 #include <QtGui>
+#include <phonon>
+
+Q_DECLARE_METATYPE( Phonon::AudioOutputDevice );
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
@@ -73,6 +78,15 @@ SettingsDialog::SettingsDialog( QWidget* parent )
         connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
     foreach (QRadioButton* o, ui.pageStack->findChildren<QRadioButton*>())
         connect( o, SIGNAL(toggled( bool )), SLOT(enableOk()) );
+    
+    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
+    {
+        ui.outputDevice->addItem( d.name(), QVariant::fromValue( d ) );
+        if (d.name() == The::radio().audioOutput()->outputDevice().name())
+            ui.outputDevice->setCurrentIndex( ui.outputDevice->count() - 1 );
+    }
+    
+    ui.forbiddenPaths->setPlainText( CoreSettings().value( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS ).toStringList().join( "\n" ) );
 }
 
 
@@ -80,6 +94,7 @@ void //virtual
 SettingsDialog::accept()
 {
     moose::MutableSettings s;
+    CoreSettings cs;
 
     // note, don't delete the username/password from the settings yet, do that
     // at exit, in case the user changes his/her mind
@@ -89,7 +104,16 @@ SettingsDialog::accept()
 
     int const i = ui.languages->currentIndex();
     if (i != -1)
-        CoreSettings().setValue( "Locale", ui.languages->itemData( i ).toInt() );
+        cs.setValue( "Locale", ui.languages->itemData( i ).toInt() );
 
+    Phonon::AudioOutputDevice d = ui.outputDevice->itemData( ui.outputDevice->currentIndex() ).value<Phonon::AudioOutputDevice>();    
+    if (s.audioOutputDeviceName() != d.name())
+    {
+        s.setAudioOutputDeviceName( d.name() );
+        The::radio().audioOutput()->setOutputDevice( d );
+    }
+    
+    cs.setValue( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS, ui.forbiddenPaths->toPlainText().split( '\n' ) );
+    
     QDialog::accept();
 }
