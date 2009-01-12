@@ -214,13 +214,15 @@ StateMachine::unspoolTrack()
         QDebug d = qDebug() << "Watch didn't timeout, checking if we should scrobble anyway..";
         
         uint const elapsed = m_watch->elapsed() / 1000;
-        QString const id = m_connection->id(); //FIXME radio :(
-        
+
         // cater to iTunes crossfade
-        if (elapsed >= m_track.duration() - 12 
-            && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
-            && (id == "osx" || id == "itw"))
-            emit m_watch->timeout();
+        if (m_connection) {
+            QString const id = m_connection->id();
+            if (elapsed >= m_track.duration() - 12 
+                && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
+                && (id == "osx" || id == "itw"))
+                emit m_watch->timeout();
+        }
         
         // allow 4 seconds of leeway, to allow for various inaccuracies
         else if (elapsed + 4 > m_watch->scrobblePoint())
