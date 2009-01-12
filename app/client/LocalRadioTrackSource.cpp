@@ -28,6 +28,7 @@
 LocalRadioTrackSource::LocalRadioTrackSource(LocalRqlResult* rqlResult)
 : m_rqlResult(rqlResult)
 , m_waiting(false)
+, m_endReached(false)
 {
     Q_ASSERT(rqlResult);
     // QueuedConnections are important here, see LocalRql.h
@@ -45,12 +46,17 @@ LocalRadioTrackSource::takeNextTrack()
 {
     // always try to have a track ready to
     // prevent "Tuning in" between tracks
-    m_rqlResult->getNextTrack();
+    if (!m_endReached) {
+        m_rqlResult->getNextTrack();
+    }
     
     Track t;
     if (m_buffer.size()) {
         t = m_buffer.takeFirst();
-    } else {
+    } else if (!m_waiting) {
+        if (m_endReached) {
+            emit error(Ws::NotEnoughContent);
+        }             
         m_waiting = true;
     }
     return t;
@@ -78,5 +84,8 @@ LocalRadioTrackSource::onTrack(Track t)
 void
 LocalRadioTrackSource::onEndOfTracks()
 {
-    emit error(Ws::NotEnoughContent);
+    m_endReached = true;
+    if (m_waiting) {
+        emit error(Ws::NotEnoughContent);
+    } 
 }

@@ -29,7 +29,8 @@ class LocalRadioTrackSource : public AbstractTrackSource
 
     class LocalRqlResult* m_rqlResult;
     QList<Track> m_buffer;
-    bool m_waiting;
+    bool m_waiting;         // we are waiting for a callback from m_rqlResult
+    bool m_endReached;      // m_rqlResult has signalled endOfTracks
 
 private slots:
     void onTrack(Track);
