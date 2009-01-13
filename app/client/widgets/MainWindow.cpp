@@ -85,6 +85,11 @@ MainWindow::MainWindow()
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
 
 	setAcceptDrops( true );
+	
+#ifdef SUPER_MEGA_DEBUG
+	// causes all events from the whole application to get logged
+	qApp->installEventFilter( this );
+#endif	
 }
 
 
@@ -514,6 +519,10 @@ MainWindow::sizeHint() const
 bool 
 MainWindow::eventFilter( QObject* o, QEvent* event )
 {
+#ifdef SUPER_MEGA_DEBUG
+	qDebug() << o << event;
+#endif
+	
     QWidget* obj = qobject_cast<QWidget*>( o );
     if (!obj)
         return false;

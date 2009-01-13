@@ -20,6 +20,7 @@
 #include "ActionButton.h"
 #include <QPointer>
 #include "lib/lastfm/scrobble/Scrobble.h"
+#include "lib/lastfm/scrobble/ScrobblePoint.h"
 class ScrobbleButtonAnimation;
 
 
@@ -28,7 +29,10 @@ class ScrobbleButton : public ActionButton
     Q_OBJECT
 
     QPointer<ScrobbleButtonAnimation> m_animation;
-    Scrobble m_track;
+    class Scrobble m_scrobble;
+	class WsConnectionMonitor* m_connectionMonitor;
+	class QLabel* m_tip;
+	ScrobblePoint m_scrobblePoint;
     QPixmap m_pixmap;
 
 public:
@@ -36,10 +40,11 @@ public:
 
 protected:
     virtual void paintEvent( QPaintEvent* );
+	virtual bool event( QEvent* );
     
 private slots:
     void onTrackSpooled( const class Track&, class StopWatch* );
     void setPixmap( const QPixmap& );
-    void updateToolTip( int );
+	void update();
     void onChecked( bool );
 };
