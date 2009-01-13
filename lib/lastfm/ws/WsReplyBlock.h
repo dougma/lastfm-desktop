@@ -43,7 +43,7 @@ public:
     static WsReply* wait(WsReply*, int timeout);
 
 private slots:
-    void onFinished( WsReply * );
+    void onFinished( WsReply* reply = 0 );
 };
 
 #endif

@@ -44,7 +44,7 @@ WsReplyBlock::waitForFinished( int timeoutMs )
 {
     if (m_reply) {
         QTimer::singleShot( timeoutMs, this, SLOT(onFinished()) );
-        m_eventloop = new QEventLoop();
+        m_eventloop = new QEventLoop( this );
         m_eventloop->exec();
     }
     return m_reply;
