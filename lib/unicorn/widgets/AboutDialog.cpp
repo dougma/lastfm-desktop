@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -45,7 +45,7 @@ AboutDialog::AboutDialog( QWidget* parent )
     v->addWidget( label( "<a href='http://www.last.fm'>www.last.fm</a>" ) );
     v->addWidget( label( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a>" ) );
     v->addSpacing( 10 );
-    v->addWidget( label( QString::fromUtf8("Copyright © 2005-2008 Last.fm Ltd.") ) );
+    v->addWidget( label( QString::fromUtf8("Copyright © 2005-2009 Last.fm Ltd.") ) );
     v->setSizeConstraint( QLayout::SetFixedSize );
     v->setSpacing( 2 );
 

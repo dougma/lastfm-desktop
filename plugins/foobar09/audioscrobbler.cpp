@@ -15,7 +15,7 @@
     along with this source; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-    Copyright © 2007 Last.fm Ltd.
+    Copyright 2007-2009 Last.fm Ltd.
 */
 #include <ScrobSubmitter.h>
 

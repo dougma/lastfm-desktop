@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2008 Last.fm Ltd.                                      *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -89,10 +89,7 @@ Scrobble::isValid( Invalidity* v ) const
         {
             QDir d( forbidden_path );
             if (!d.exists()) continue;
-            if (path.startsWith( dirToString( d ) )) {
-                *v = ForbiddenPath;
-                return false;
-            }
+            TEST( path.startsWith( dirToString( d ) ), ForbiddenPath );
         }
     }
     

@@ -1,7 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2004 - 2008 by                                          *
+ *   Copyright 2004-2009 by                                                *
  *      Gareth Simpson <iscrobbler@xurble.org>                             *
- *      Last.fm Ltd. <client@last.fm>                                      *
+ *      Last.fm Ltd.                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *

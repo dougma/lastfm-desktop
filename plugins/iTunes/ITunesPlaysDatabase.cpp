@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2008 Last.fm Ltd.                                           *
+ *   Copyright 2008-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -16,7 +16,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
+
 #include "ITunesPlaysDatabase.h"
 
 #include "Moose.h"

@@ -1,7 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
