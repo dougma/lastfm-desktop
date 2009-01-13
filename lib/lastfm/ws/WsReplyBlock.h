@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2009 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,18 +17,18 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef WS_REPLY_BLOCK_H
-#define WS_REPLY_BLOCK_H
+#ifndef LASTFM_WS_REPLY_BLOCK_H
+#define LASTFM_WS_REPLY_BLOCK_H
 
 #include <lastfm/public.h>
 #include <QObject>
 class QEventLoop;
 class WsReply;
 
-/** @brief Makes it easy to block on a WsReply
-  *
-  */
 
+/** @brief Makes it easy to block on a WsReply
+  * NOTE we're not sure if it is safe to do this in the GUI thread
+  */
 class LASTFM_WS_DLLEXPORT WsReplyBlock : public QObject
 {
     Q_OBJECT

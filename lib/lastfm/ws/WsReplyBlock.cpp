@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2009 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,8 +23,7 @@
 #include <QTimer>
 
 
-//static 
-WsReply* 
+WsReply* //static
 WsReplyBlock::wait(WsReply* reply, int timeout)
 {
     return WsReplyBlock(reply).waitForFinished(timeout);
@@ -39,6 +38,7 @@ WsReplyBlock::WsReplyBlock( WsReply* reply )
     } 
 }
 
+
 WsReply*
 WsReplyBlock::waitForFinished( int timeoutMs )
 {
@@ -50,11 +50,10 @@ WsReplyBlock::waitForFinished( int timeoutMs )
     return m_reply;
 }
 
+
 void
 WsReplyBlock::onFinished( WsReply* reply )
 {
     m_reply = reply;
     m_eventloop->exit();
 }
-
-
