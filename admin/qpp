@@ -1,4 +1,8 @@
 #!/usr/bin/ruby
+# Usage examples:
+#   qpp foo.pro         => ./_file.qmake
+#   qpp foo/bar/        => ./_file.qmake
+#
 cwd = File.dirname( __FILE__ )
 require 'find'
 require 'ftools'

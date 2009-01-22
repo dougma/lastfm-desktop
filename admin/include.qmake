@@ -5,9 +5,8 @@ include( qmake/3rdparty.pro.inc )
 include( qmake/1stparty.pro.inc )
 
 
-# TODO ./configure && make tests && tests/go
-## a tests SUBDIR .pro may be best
-## make tests needs to build everything else first and then build the tests
+# TODO ./configure --tests && make && _bin/tests
+# TODO move useful stuff in tests/ to admin?
 
 # TODO remove dependency on Ruby
 # make qmake files .in files and push sources into their truncated .in versions?

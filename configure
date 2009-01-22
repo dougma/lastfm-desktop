@@ -73,6 +73,7 @@ do
 			exit;;
 		--tests)
 		    echo 'Will build tests'
+		    TESTS=1
 		    EXTRA_QMAKE_FLAGS='CONFIG += tests';;
 		--xcode)
 		    echo "Will generate Xcode project"
@@ -175,6 +176,13 @@ else
             BUILD_CMD='devenv /useenv Last.sln';;
     esac
 fi
+
+
+if [ $TESTS ]
+then
+    cp admin/tests/run_tests.sh _bin/tests
+fi
+
 
 echo
 echo 'Good, your configure is finished!'
