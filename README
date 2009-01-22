@@ -2,27 +2,50 @@ Build Instructions
 ==================
 ./configure && make
 
+If that didn't work it's because:-
+
+
 Build Dependencies
 ==================
-Windows
--------
-cygwin -- tar, perl, ssh, svn, gzip, etc.
-The latest Windows SDK.
-Qt 4.4 (built with Phonon support if you want sound :P)
+* Qt >= 4.4 (built with Phonon if you want sound :P)
+* Ruby
+* Perl
 
-Mac OS X
---------
-Install Qt-4.4.
-Install MacPorts
-$ sudo port install taglib libsamplerate fftw-3 libmad
+Qt is readily available as a simple binary installer on all platforms.
 
+You will also need depending on your chosen platform:-
 
 Linux
 -----
-pkg-config, taglib, libsamplerate, fftw3, libmad, Qt4.4
+* pkg-config
+* taglib
+* libsamplerate
+* fftw3
+* libmad
 
 Possibly you'll have to play around to get a phonon that works with KDE4 and 
-Qt. I can't help you there I'm afraid.
+Qt. I can't help you there I'm afraid. An example Ubuntu installation would 
+probably go:
+
+	sudo apt-get install qt4-dev pkg-config libtag libsamplerate libfftw3 libmad
+	./configure && make -j2 && make install
+
+I wrote that from memory as I'm working on a Mac today. If it's wrong please
+write and correct me. KTHXBAI.
+
+Mac OS X
+--------
+We suggest you grab the Qt 4.4 dmg installer from the Qt website. Then, the
+easiest way to install the additional dependencies is with MacPorts:-
+
+	sudo port install taglib libsamplerate fftw-3 libmad
+
+Windows
+-------
+We only build via cygwin. You will also need the latest Windows SDK. We tend
+to build using Visual Studio. But in theory MinGW and its alternatives should
+work fine. Good luck with building on Windows. It's hard!
+
 
 Build Support
 =============
@@ -35,9 +58,10 @@ from people standing at bus-stops.
 
 Maybe check the official forum: http://www.last.fm/forum/34905
 
+
 Bugs
 ====
 If you find a bug in the software, please let us know about it.
 
-Max Howell, Clientside Lead Developer
-<max@last.fm>
+Max Howell <max@last.fm>
+Clientside Lead Developer, Last.fm
