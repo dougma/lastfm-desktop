@@ -2,7 +2,7 @@ TEMPLATE = app
 QT = core gui network xml
 TARGET = CrashReporter
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/admin/include.qmake )
 
 win32:LIBS += -luser32
 

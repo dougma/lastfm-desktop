@@ -23,8 +23,10 @@
 #include <lastfm/public.h>
 #include <lastfm/core/CoreDomElement.h>
 #include <lastfm/ws/WsError.h>
-#include <QNetworkReply>
+#include <QDateTime>
 #include <QDomDocument>
+#include <QNetworkReply>
+
 
 
 /** @brief A Last.fm wrapper around a QNetworkReply

@@ -1,0 +1,36 @@
+include( qmake/breakpad.pro.inc )
+include( qmake/debug.pro.inc )
+include( qmake/QtOverride.pro.inc )
+include( qmake/3rdparty.pro.inc )
+include( qmake/1stparty.pro.inc )
+
+
+# TODO ./configure && make tests && tests/go
+## a tests SUBDIR .pro may be best
+## make tests needs to build everything else first and then build the tests
+
+# TODO remove dependency on Ruby
+# make qmake files .in files and push sources into their truncated .in versions?
+## this would be somewhat a pita, but only is needed for qpp needing ones anyway..
+
+
+linux*{
+	CONFIG += link_pkgconfig
+	# use KDE phonon if installed in preference
+	contains( QT, phonon ):LIBS += -L$$system( kde4-config --prefix )/lib
+}
+
+
+#default install target
+target.path = $$INSTALL_DIR/lib
+
+
+defineTest( generateBuildParameters ) {
+	system( echo \'$DESTDIR = \"$$DESTDIR\";\' > _build_parameters.pl.h )
+	system( echo \'$VERSION = \"$$VERSION\";\' >> _build_parameters.pl.h )
+	system( echo \'$QT_FRAMEWORKS_DIR = \"$$QMAKE_LIBDIR_QT\";\' >> _build_parameters.pl.h )
+	system( echo \'$QMAKE_LIBDIR_QT = \"$$QMAKE_LIBDIR_QT\";\' >> _build_parameters.pl.h )
+	system( echo \'$ROOT_DIR = \"$$ROOT_DIR\";\' >> _build_parameters.pl.h )
+	system( echo \'$QT = \"$$QT\";\' >> _build_parameters.pl.h )
+	system( echo \'$REVISION = \"\'`svn info | grep \"Last Changed Rev\" | cut -d\' \' -f4`\'\";\' >> _build_parameters.pl.h )
+}

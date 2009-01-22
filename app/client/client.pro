@@ -1,59 +1,61 @@
 TEMPLATE = app
 TARGET = Last.fm
-CONFIG += unicorn radio core ws types scrobble listener
-QT = core gui xml network phonon webkit svg
-# Qt is broken and phonon requires openGL! I emailed them for fix0rs
-QT += opengl
-# Required because Twiddly requires it
-QT += sql
+CONFIG += unicorn radio scrobble listener fingerprint
 VERSION = 2.0.0
 
-CONFIG += fingerprint
+QT = gui \
+	 webkit svg \ #review at release
+     opengl \ #phonon requires this bizarrely
+     sql #doug's headers have an incredible vast dependency chain :P
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+macx-xcode:debug {
+	#fucked up stuff to make a semi-useful xcodeproj
+	#statically linking, essentially; it's a headache
+	CONFIG += mad fftw3f samplerate taglib sqlite3
+	CONFIG -= unicorn radio scrobble listener fingerprint
+}
 
-generateVersionHeader()
-QMAKE_EXTRA_INCLUDES += $$generateInstallerMakefile()
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
+!macx-xcode:generateBuildParameters()
 
-SOURCES   += $$findSources( cpp )
-HEADERS   += $$findSources( h )
-FORMS     += $$findSources( ui )
-RESOURCES += $$findSources( qrc )
-
-# included directly into App.cpp, so avoid link error
-SOURCES -= legacy/disableHelperApp.cpp
-
-SOURCES += ../../common/c++/Logger.cpp
-HEADERS += ../../common/c++/Logger.h
+INCLUDEPATH += .
 
 macx* {
 	QMAKE_INFO_PLIST = mac/Info.plist
-	ICON = mac/client.icns
+	debug:ICON = mac/client.icns
+	release:ICON = mac/client_debug.icns
 }
-else {
-	INCLUDEPATH += .
-    win32:LIBS += -lshell32 -luser32
+macx-xcode:debug {
+    # must be copied to $$ROOT_DIR before processing because qmake is broken
+    # and the xcode generator is poor so we have elaborate workarounds
+	system( admin/qpp lib )
+	include( _files.qmake )
+	system( admin/qpp app/clientplugins )
+	include( _files.qmake )
+
+	LIBS += -framework SystemConfiguration -framework CoreServices
+	SOURCES += common/c++/Logger.cpp
+    ICON = app/client/$$ICON
+    QMAKE_INFO_PLIST = app/client/$$QMAKE_INFO_PLIST
+	QT += sql
+	INCLUDEPATH += app/client
+	DEFINES += NPLUGINS
+}
+macx-g++:release {
+    QT += sql # to make Makefile.dmg copy the QtSql framework into the bundle
+	system( $$ROOT_DIR/admin/dist/mac/Makefile.dmg.pl $$LIBS > Makefile.dmg )
+	QMAKE_EXTRA_INCLUDES += Makefile.dmg
 }
 
 win32 {
-	RC_FILE = win/client.rc
-}
-
-release:win32 {
-	root = $$system( cygpath -m '$$ROOT_DIR' )
-	qt = $$system( cygpath -m '$$QMAKE_LIBDIR_QT\\..' )
-
-	LONG_VERSION = $$VERSION-$$system( sh $$ROOT_DIR/common/bash/svn_revision.sh )
-	
-	system( cp win/client.iss.in client.iss )
-	system( perl -pi -e       's!\@VERSION\@!$$LONG_VERSION!g' client.iss )
-	system( perl -pi -e 's!\@SHORT_VERSION\@!$$VERSION!g' client.iss )
-	system( perl -pi -e      's!\@ROOT_DIR\@!$$root!g' client.iss )
-	system( perl -pi -e        's!\@QT_DIR\@!$$qt!g' client.iss )
-	system( perl -pi -e       's!\@BIN_DIR\@!$$root/_bin!g' client.iss )
+    RC_FILE = win/client.rc
+    LIBS += -lshell32 -luser32
+    PRECOMPILED_HEADER = $$ROOT_DIR/common/precompiled.h
+    release:system( $$ROOT_DIR/admin/dist/win/isspp win/client.iss.in $$ROOT_DIR/Last.fm.iss )
 }
 
 linux* {
-    SOURCES -= $$findSources( cpp, bootstrap )
-    HEADERS -= $$findSources( h, bootstrap )
+    SOURCES -= $$system( ls bootstrap/*.cpp )
+    HEADERS -= $$system( ls bootstrap/*.h )
 }

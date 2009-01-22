@@ -17,30 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <QtTest/QtTest>
-
+#include <QtTest>
 #include "PlayerCommandParser.h"
+
 
 class TestPlayerCommandParser : public QObject
 {
     Q_OBJECT
 
-    private slots:
-        void initTestCase()
-        {
-            
-        }
-        
-        void testStart();
-        void testStop();
-        void testResume();
-        void testPause();
-        void testBootstrap();
-        void testEmptyLine();
-        void testMissingArgument();
-        void testInvalidCommand();
-        void testDuplicatedArgument();
-        void testUnicode();
+private slots:
+    void testStart();
+    void testStop();
+    void testResume();
+    void testPause();
+    void testBootstrap();
+    void testEmptyLine();
+    void testMissingArgument();
+    void testInvalidCommand();
+    void testDuplicatedArgument();
+    void testUnicode();
 };
 
 
@@ -54,13 +49,13 @@ TestPlayerCommandParser::testStart()
                                    "&l=100"
                                    "&p=/home/tester/test.mp3" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Start );
+    QCOMPARE( pcp.command(), CommandStart );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
-    QCOMPARE( pcp.track().artist(), QString( "Test Artist" ) );
-    QCOMPARE( pcp.track().track(), QString( "Test Title" ) );
-    QCOMPARE( pcp.track().album(), QString( "Test Album" ) );
-    QCOMPARE( pcp.track().duration(), 100 );
-    QCOMPARE( pcp.track().path(), QString( "/home/tester/test.mp3" ) );
+    QCOMPARE( pcp.track().artist(), Artist( "Test Artist" ) );
+    QCOMPARE( pcp.track().title(), QString( "Test Title" ) );
+    QCOMPARE( pcp.track().album().title(), QString( "Test Album" ) );
+    QCOMPARE( pcp.track().duration(), 100u );
+    QCOMPARE( pcp.track().url().path(), QString( "/home/tester/test.mp3" ) );
 }
 
 void
@@ -68,7 +63,7 @@ TestPlayerCommandParser::testStop()
 {
     PlayerCommandParser pcp ( "STOP c=testapp" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Stop );
+    QCOMPARE( pcp.command(), CommandStop );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
 }
 
@@ -77,7 +72,7 @@ TestPlayerCommandParser::testResume()
 {
     PlayerCommandParser pcp ( "RESUME c=testapp" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Resume );
+    QCOMPARE( pcp.command(), CommandResume );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
 }
 
@@ -86,7 +81,7 @@ TestPlayerCommandParser::testPause()
 {
     PlayerCommandParser pcp ( "PAUSE c=testapp" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Pause );
+    QCOMPARE( pcp.command(), CommandPause );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
 }
 
@@ -95,7 +90,7 @@ TestPlayerCommandParser::testBootstrap()
 {
     PlayerCommandParser pcp ( "BOOTSTRAP c=testapp&u=TestUser" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Bootstrap );
+    QCOMPARE( pcp.command(), CommandBootstrap );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
     QCOMPARE( pcp.username(), QString( "TestUser" ) );
 }
@@ -112,7 +107,7 @@ TestPlayerCommandParser::testEmptyLine()
     }
     catch ( PlayerCommandParser::Exception e )
     {
-        QCOMPARE( 1, 1 ); // Success
+        // Success
     }
 }
 
@@ -128,7 +123,7 @@ TestPlayerCommandParser::testMissingArgument()
     }
     catch ( PlayerCommandParser::Exception e )
     {
-        QCOMPARE( 1, 1 ); // Success
+        // Success
     }
 }
 
@@ -144,7 +139,7 @@ TestPlayerCommandParser::testInvalidCommand()
     }
     catch ( PlayerCommandParser::Exception e )
     {
-        QCOMPARE( 1, 1 ); // Success
+        // Success
     }
 }
 
@@ -160,7 +155,7 @@ TestPlayerCommandParser::testDuplicatedArgument()
     }
     catch ( PlayerCommandParser::Exception e )
     {
-        QCOMPARE( 1, 1 ); // Success
+        // Success
     }
 }
 
@@ -174,13 +169,13 @@ TestPlayerCommandParser::testUnicode()
                                    "&l=123"
                                    "&p=/home/tester/15 対峙.mp3" );
 
-    QCOMPARE( pcp.command(), PlayerCommandParser::Start );
+    QCOMPARE( pcp.command(), CommandStart );
     QCOMPARE( pcp.playerId(), QString( "testapp" ) );
-    QCOMPARE( pcp.track().artist(), QString( "佐橋俊彦" ) );
-    QCOMPARE( pcp.track().track(), QString( "対峙" ) );
-    QCOMPARE( pcp.track().album(), QString( "TV Animation ジパング original Soundtrack" ) );
-    QCOMPARE( pcp.track().duration(), 123 );
-    QCOMPARE( pcp.track().path(), QString( "/home/tester/15 対峙.mp3" ) );
+    QCOMPARE( pcp.track().artist(), Artist( "佐橋俊彦" ) );
+    QCOMPARE( pcp.track().title(), QString( "対峙" ) );
+    QCOMPARE( pcp.track().album().title(), QString( "TV Animation ジパング original Soundtrack" ) );
+    QCOMPARE( pcp.track().duration(), 123u );
+    QCOMPARE( pcp.track().url().path(), QString( "/home/tester/15 対峙.mp3" ) );
 }
 
 QTEST_APPLESS_MAIN(TestPlayerCommandParser)

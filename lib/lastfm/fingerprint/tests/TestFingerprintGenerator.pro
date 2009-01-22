@@ -5,7 +5,7 @@
 QT += testlib xml network sql
 CONFIG += core types fingerprint
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/admin/include.qmake )
 
 TEMPLATE = app
 TARGET = 
@@ -13,4 +13,4 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-SOURCES += TestFingerprintGenerator.cpp
+#SOURCES += TestFingerprintGenerator.cpp

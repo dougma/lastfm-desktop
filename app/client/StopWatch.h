@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -54,8 +54,8 @@ class StopWatch : public QObject
     Q_OBJECT
     Q_DISABLE_COPY( StopWatch )
 
-    /** for access to timeout() signal */
-    friend class StateMachine;
+    friend class StateMachine; //for access to timeout() signal 
+    friend class TestStopWatch; //for testing, duh!
     
 public:
     /** The StopWatch starts off paused, call resume() to start.

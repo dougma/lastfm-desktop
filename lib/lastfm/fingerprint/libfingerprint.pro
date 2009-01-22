@@ -3,14 +3,10 @@ TEMPLATE = lib
 QT += xml network sql
 CONFIG += dll types core ws
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 INCLUDEPATH += fplib/include
-
-SOURCES   = $$findSources( cpp )
-HEADERS   = $$findSources( h )
-FORMS     = $$findSources( ui )
-RESOURCES = $$findSources( qrc )
 
 mac*:release {
     LIBS += /opt/local/lib/libfftw3f.a

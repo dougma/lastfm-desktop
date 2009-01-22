@@ -1,21 +1,16 @@
 TARGET = core
 TEMPLATE = lib
-QT = core xml
+DEFINES += _CORE_DLLEXPORT
 
+QT = core xml
 # UniqueApplication on Windows needs QWidget sadly
 win32: QT += gui
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
-SOURCES = $$findSources( cpp )
-HEADERS = $$findSources( h )
-
-DEFINES += _CORE_DLLEXPORT
-
-macx {
-	# AppleScript stuff
-	LIBS += -framework Carbon
-}
+# AppleScript stuff
+macx:LIBS += -framework Carbon
 
 win32:LIBS += user32.lib shell32.lib
 

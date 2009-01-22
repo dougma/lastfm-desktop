@@ -211,23 +211,19 @@ StateMachine::unspoolTrack()
     
     if (m_connection && m_watch && !m_watch->isTimedOut())
     {
-        QDebug d = qDebug() << "Watch didn't timeout, checking if we should scrobble anyway..";
-        
         uint const elapsed = m_watch->elapsed() / 1000;
-
-        // cater to iTunes crossfade
         QString const id = m_connection->id();
-        if (elapsed >= m_track.duration() - 12 
+        bool b = elapsed >= m_track.duration() - 12 
             && m_track.duration() >= ScrobblePoint::kScrobbleMinLength
-            && (id == "osx" || id == "itw"))
-            emit m_watch->timeout();
-        
+            && (id == "osx" || id == "itw");
         // allow 4 seconds of leeway, to allow for various inaccuracies
-        else if (elapsed + 4 > m_watch->scrobblePoint())
+        b |= elapsed + 4 > m_watch->scrobblePoint();
+
+        if (b)
+        {
+            qDebug() << "Watch didn't time out, but we think it should have.";
             emit m_watch->timeout();
-        
-        else
-            d << "no";
+        }
     }
     
     delete m_watch; //do always just in case, QPointer will set to 0 for us

@@ -2,25 +2,14 @@ Build Instructions
 ==================
 ./configure && make
 
-But if you want to hack on Last.fm, use ./configure --ide to get a nice project
-file. Except on Linux, where you get Makefiles as usual. But everything good can
-import those.
-
-Build Requirements
+Build Dependencies
 ==================
 Windows
 -------
 cygwin -- tar, perl, ssh, svn, gzip, etc.
 The latest Windows SDK
-Qt 4.4 (built with Phonon support if you want sound)
+Qt 4.4 (built with Phonon support if you want sound :P)
 
-Mac
----
-Install macports, then install libmad, taglig, libsamplerate, libfftw3
-
-./configure --release && make dmg
-
-Folder Structure
-================
-dist/
-  - tools for building distributible packages
+Mac OS X
+--------
+Install macports, then install libmad, taglib, libsamplerate, libfftw3

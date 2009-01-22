@@ -7,7 +7,6 @@ CONFIG( debug, debug|release ) {
         !macx-xcode:CONFIG -= app_bundle
 	}
 
-
     linux* {
         QMAKE_CXXFLAGS_DEBUG = -ggdb
     }

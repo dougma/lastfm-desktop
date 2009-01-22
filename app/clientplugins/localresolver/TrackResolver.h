@@ -21,7 +21,7 @@
 #define TRACK_RESOLVER_H
 
 #include "../ITrackResolver.h"
-#include "LocalCollection.h"
+#include "LocalCollection.h" 
 
 
 class TrackResolver : public QObject, public ITrackResolverPlugin

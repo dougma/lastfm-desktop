@@ -28,6 +28,9 @@ class ScrobblePoint
     uint i;
 
 public:
+    ScrobblePoint() : i( kScrobbleTimeMax )
+    {}
+    
     /** j is in seconds, and should be 50% the duration of a track */
     explicit ScrobblePoint( uint j )
     {

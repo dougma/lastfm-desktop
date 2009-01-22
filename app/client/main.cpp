@@ -27,7 +27,7 @@
 #include "App.h"
 #include "Settings.h"
 #include "widgets/MainWindow.h"
-#include "version.h"
+#include "_version.h"
 #include "app/moose.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "lib/lastfm/core/UniqueApplication.h"

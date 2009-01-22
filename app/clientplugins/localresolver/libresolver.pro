@@ -6,10 +6,8 @@ CONFIG += taglib ws types sqlite3 boost
 
 #TODO rename localresolver.pro
 
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES  = $$findSources( cpp )
-HEADERS  = $$findSources( h )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 SOURCES -= test.cpp
 

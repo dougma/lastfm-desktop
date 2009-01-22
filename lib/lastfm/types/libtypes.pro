@@ -3,11 +3,8 @@ TEMPLATE = lib
 QT = core
 CONFIG += core ws
 
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES = $$findSources( cpp )
-HEADERS = $$findSources( h )
-RESOURCES = qrc/types.qrc
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 DEFINES += _TYPES_DLLEXPORT
 

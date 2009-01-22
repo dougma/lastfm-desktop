@@ -1,0 +1,21 @@
+# this kinda sucks, but there isn't really any other way to finish off the dmg 
+# build with the right bits going in the right places and that
+
+QT_LIB_DIR = $(QMAKE)/../../lib
+
+moose_extra: $(BUNDLE_RESOURCES)/AudioScrobbler.bundle $(BUNDLE_RESOURCES)/twiddly $(BUNDLE_PLUGINS)/libresolver.1.dylib
+$(BUNDLE_RESOURCES):
+	mkdir $@
+$(BUNDLE_RESOURCES)/AudioScrobbler.bundle: |$(BUNDLE_RESOURCES)
+	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
+	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle $@
+$(CONTENTS_DIR)/MacOS/twiddly: _bin/twiddly
+	admin/dist/mac/deposx.sh _bin/twiddly $(QT_LIB_DIR)
+	cp _bin/twiddly $@
+$(BUNDLE_RESOURCES)/twiddly: $(CONTENTS_DIR)/MacOS/twiddly
+	cd $(BUNDLE_RESOURCES) && ln -s ../MacOS/twiddly
+$(BUNDLE_PLUGINS):
+	mkdir $@
+$(BUNDLE_PLUGINS)/libresolver.1.dylib: _bin/libresolver.1.dylib |$(BUNDLE_PLUGINS)
+	admin/dist/mac/deposx.sh _bin/libresolver.1.dylib $(QT_LIB_DIR)
+	cp _bin/libresolver.1.dylib $@

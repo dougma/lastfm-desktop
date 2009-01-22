@@ -1,0 +1,24 @@
+use File::Copy;
+
+open FILE, '_build/build_parameters.pl.h' or die $!;
+while ($line = <FILE>) {
+    $str .= $line;
+}
+eval $str;
+close FILE
+
+
+$root_dir = `cygpath -m '$ROOT_DIR'`
+$qt_dir   = `cygpath -m '$QMAKE_LIBDIR_QT\\..'`
+
+
+copy( $ARGV[0], $ARGV[1] ) or die $!;
+open FILE, $ARGV[1] or die $!;
+while (<>)
+    s/@VERSION@/$VERSION-$REVISION/g;
+    s/@SHORT_VERSION@/$VERSION/g;
+    s/@ROOT_DIR@/$ROOT_DIR/g;
+    s/@QT_DIR@/$qt_dir/g;
+    s/@BIN_DIR@/$root_dir\\_bin/g;
+}
+close FILE;

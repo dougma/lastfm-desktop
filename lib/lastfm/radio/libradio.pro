@@ -1,13 +1,11 @@
 TEMPLATE = lib
 TARGET = radio
-CONFIG += ws types core
 QT = core phonon
-
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES += $$findSources( cpp )
-HEADERS += $$findSources( h )
+CONFIG += ws types core
 DEFINES += _RADIO_DLLEXPORT
+
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 headers.files = Radio.h RadioStation.h Tuner.h
 headers.path = $$INSTALL_DIR/include/lastfm/radio

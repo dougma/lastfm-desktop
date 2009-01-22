@@ -1,9 +1,7 @@
-QT = core testlib xml network
+QT = gui testlib
 TEMPLATE = app
 INCLUDEPATH += ..
-CONFIG += ws core types
+CONFIG += types
 
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES += $$findSources( cpp )
-HEADERS += $$findSources( h )
+include( $$ROOT_DIR/admin/include.qmake )
+SOURCES = TestTrack.cpp

@@ -50,16 +50,15 @@
 #include <phonon/backendcapabilities.h>
 
 #ifdef WIN32
-    #include "legacy/disableHelperApp.cpp"
+    #include "win/disableLegacyHelperApp.h"
 #endif
 #ifdef __APPLE__
     extern void qt_mac_set_menubar_icons( bool );    
     #include "lib/listener/mac/ITunesListener.h"
-#ifndef NDEBUG
-    #define NPLUGINS
+#endif
+#ifdef NPLUGINS
     #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
     #include "app/clientplugins/localresolver/TrackResolver.h"
-#endif
 #endif
 
 

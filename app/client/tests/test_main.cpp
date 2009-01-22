@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2008-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,9 +17,19 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef _H
-#define _H
+#include "TestSettings.h"
+#include "TestStopWatch.h"
 
 
+int main( int argc, char** argv)
+{
+    QApplication app( argc, argv );
+    
+    #define TEST( Type ) { \
+        Type o; \
+        if (int r = QTest::qExec( &o, argc, argv ) != 0) return r; }
 
-#endif
+    TEST( TestSettings );
+    TEST( TestStopWatch );
+    return 0;
+}

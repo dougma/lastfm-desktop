@@ -2,11 +2,11 @@ CONFIG -= app_bundle
 CONFIG += core types unicorn
 QT = core xml sql
 
-include( $$ROOT_DIR/common/qmake/include.pro )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 LIBS += -L$$DESTDIR
-SOURCES += main.cpp PlayCountsDatabase.cpp IPod.cpp $$ROOT_DIR/common/c++/Logger.cpp
-HEADERS += $$findSources( h )
+SOURCES = main.cpp PlayCountsDatabase.cpp IPod.cpp $$ROOT_DIR/common/c++/Logger.cpp
 
 macx*:SOURCES += ITunesLibrary_mac.cpp
 

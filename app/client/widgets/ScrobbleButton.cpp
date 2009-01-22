@@ -164,6 +164,7 @@ ScrobbleButton::update()
 	if (m_scrobble.isNull())
 	{ 
 		m_tip->clear();
+		QAbstractButton::update();
 		return; 
 	}
 	

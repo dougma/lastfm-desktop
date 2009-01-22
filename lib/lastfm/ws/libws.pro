@@ -3,10 +3,8 @@ TEMPLATE = lib
 QT = core network xml
 CONFIG += core
 
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES = $$findSources( cpp )
-HEADERS = $$findSources( h )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 DEFINES += _WS_DLLEXPORT
 

@@ -1,34 +1,32 @@
 #!/bin/bash
 
-source common/bash/utils.sh.inc
-source common/bash/generate_ide_projects.sh.inc
+source admin/utils.bash
 
-while [ $# -gt 0 ]
-do
-    case "$1" in
-        --debug)
-            echo "The default is --debug, but let's pretend you made a difference anyway.";;
-        --release)
-            echo 'Will optimise and strip binaries.'
-            RELEASE=1;;
-		--3rdparty)
-		    svn co svn+ssh://gimli.last.fm/svn/libs/cpp lib/3rdparty
-			exit;;
-        --help | -h | --usage)
-            echo "There is one option, it is: --release"
-            exit;;
-        --dev-clean)
-            mv Last.fm.xcodeproj /tmp
-			svn-clean
-			mv /tmp/Last.fm.xcodeproj .
-            exit;;
-    esac
+#################################################################### functions
+fix_sln()
+{
+    FIRST_BIT='
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "qmake", "qmake", "{780C13D3-8172-4EE0-8FD5-26ED6489851C}"
+	ProjectSection(SolutionItems) = preProject'
     
-    shift
-done
+    for x in `admin/findmoose pro` .qmake.cache
+    do
+        FIRST_BIT="$FIRST_BIT
+		$x=$x"
+    done
 
+    LAST_BIT='
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{3FDD67B7-DF67-4F22-8545-755D722794BC}"
+	ProjectSection(SolutionItems) = preProject
+		common\qrc\common.qrc = common\qrc\common.qrc
+		lib\DllExportMacro.h = lib\DllExportMacro.h
+	EndProjectSection
+EndProject'
 
-header "Configuring Last.fm"
+    echo "$FIRST_BIT$LAST_BIT" >> Last.sln
+}
 
 qCheck()
 {
@@ -41,7 +39,7 @@ qCheck()
             # QMake version 2.01a
             # Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
 
-            middle "Checking if $1 is the right version..."
+            middle "Checking if $1 is a valid version..."
 
             min=4
             $1 -v 2> /dev/null | grep -q "^Using Qt version 4.[$min-9]"
@@ -59,8 +57,38 @@ qCheck()
 }
 
 
-qCheck qmake qmake-qt4
+######################################################################## usage
+header "Configuring Last.fm"
 
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        --debug)
+            echo "The default is --debug, but let's pretend you made a difference anyway.";;
+        --release)
+            echo 'Will optimise and strip binaries.'
+            RELEASE=1;;
+		--3rdparty)
+		    svn co svn+ssh://gimli.last.fm/svn/libs/cpp lib/3rdparty
+			exit;;
+		--tests)
+		    echo 'Will build tests'
+		    EXTRA_QMAKE_FLAGS='CONFIG += tests';;
+		--xcode)
+		    echo "Will generate Xcode project"
+		    XCODE=1;;
+        --help | -h | --usage)
+            echo "There is one option, it is: --release"
+            exit;;
+    esac
+    
+    shift
+done
+
+[ $XCODE ] && [ $RELEASE ] && die 'Incompatible arguments'
+
+
+qCheck qmake qmake-qt4
 
 if [[ $QMAKE == 'toolow' ]]
 then
@@ -85,58 +113,65 @@ fi
 
 
 header 'Generating Build System'
+middle "Running qpp..."
 
+for x in `admin/findsrc pro lib` `admin/findsrc pro app`
+do
+    cwd=`pwd`
+    pushd `dirname $x` &> /dev/null
+    $cwd/admin/qpp `basename $x` || die "Ruby not installed?"
+    popd &> /dev/null
+done
+
+
+middle "Running qmake..."
 if [ $RELEASE ]
 then
     qmake -config release -recursive "CONFIG -= debug debug_and_release" Last.fm.pro
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
 
-    case `uname` in
-        Darwin)
-		cat <<HEREDOC>>Makefile
-
-CONTENTS_DIR=_bin/Last.fm.app/Contents
-RESOURCES_DIR=\$(CONTENTS_DIR)/Resources
-PLUGINS_DIR=\$(CONTENTS_DIR)/MacOS/plugins
-QT_LIB_DIR=/opt/qt/4.4.3-release/lib
+    if [[ `uname` == 'Darwin' ]]
+    then
+        cat <<END>>Makefile
 
 dmg: all misc
 	cd app/client && make -f Makefile dmg
 bundle: all misc
 	cd app/client && make -f Makefile bundle
 install: all misc
-	cd app/client && make -f Makefile bundle-install
-misc: \$(RESOURCES_DIR)/AudioScrobbler.bundle \$(RESOURCES_DIR)/twiddly \$(PLUGINS_DIR)/libresolver.1.dylib
-\$(RESOURCES_DIR):
-	mkdir \$@
-\$(RESOURCES_DIR)/AudioScrobbler.bundle: |\$(RESOURCES_DIR)
-	xcodebuild -configuration Deployment -project plugins/iTunes/_iTunes.xcodeproj
-	cp -R plugins/iTunes/build/Deployment/AudioScrobbler.bundle \$@
-\$(CONTENTS_DIR)/MacOS/twiddly: _bin/twiddly
-	common/dist/mac/deposx.sh _bin/twiddly \$(QT_LIB_DIR)
-	cp _bin/twiddly \$@
-\$(RESOURCES_DIR)/twiddly: \$(CONTENTS_DIR)/MacOS/twiddly
-	cd \$(RESOURCES_DIR) && ln -s ../MacOS/twiddly
-\$(PLUGINS_DIR):
-	mkdir \$@
-\$(PLUGINS_DIR)/libresolver.1.dylib: _bin/libresolver.1.dylib |\$(PLUGINS_DIR)
-	common/dist/mac/deposx.sh _bin/libresolver.1.dylib \$(QT_LIB_DIR)
-	cp _bin/libresolver.1.dylib \$@
-HEREDOC
-
-	esac
+	cd app/client && make -f Makefile bundle-install    
+END
+    fi
 else
     case `uname` in
         Darwin)
-            gen_xcodeproj || die "Configure failed."
-            BUILD_CMD='open Last.fm.xcodeproj';;
+        if [ $XCODE ]
+        then
+            admin/qpp app/client/client.pro
+            cp app/client/client.pro client.pro.cp
+            qmake -config debug -spec macx-xcode client.pro.cp || exit $?
+            # the only way to add the QtOverride stuff to xcodeproj bundles, 
+            # which suggests we should lose it
+            XCODEPROJ='Last.fm.xcodeproj/project.pbxproj'
+            perl -pi -e 's|HEADER_SEARCH_PATHS = \(|HEADER_SEARCH_PATHS = \( common/qt/override,|g' $XCODEPROJ
+        	# disable stupid recursive includes
+        	perl -pi -e 's|buildSettings = {|buildSettings = {\n\t\tALWAYS_SEARCH_USER_PATHS = NO;|g' $XCODEPROJ
+            BUILD_CMD='open Last.fm.xcodeproj'
+            rm _files.qmake client.pro.cp _version.h
+        else
+            qmake -config debug -recursive Last.fm.pro "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
+            BUILD_CMD='make'        
+        fi;;
+            
         Linux)
-            qmake -config debug -recursive Last.fm.pro "CONFIG += warn_off" || die "Configure failed."
+            qmake -config debug -recursive Last.fm.pro "CONFIG += warn_off" "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
             BUILD_CMD='make'
-            middle "Configured to produce a debug build.";;
-        *)      
+            middle "Configured to produce a _debug_ build.";;
+
+        *)
             svn co svn+ssh://gimli.last.fm/svn/clientside/bin/win _bin
-            gen_vs_sln || die "Configure failed."
+            qmake -recursive -tp vc Last.fm.pro "CONFIG -= flat" "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
+            fix_sln
             BUILD_CMD='devenv /useenv Last.sln';;
     esac
 fi
@@ -146,3 +181,5 @@ echo 'Good, your configure is finished!'
 echo "Now type '$BUILD_CMD' to complete the awesome cycle."
 
 rmdir _build build &> /dev/null
+
+exit 0

@@ -45,6 +45,8 @@ struct WsAccessManagerInit
     #ifdef WIN32
         IeSettings s;
         // if it's autodetect, we determine the proxy everytime in proxy()
+        // we don't really want to do a PAC lookup here, as it times out
+        // at two seconds, so that hangs startup
         if (!s.fAutoDetect && s.lpszProxy)
         {
             QUrl url( QString::fromUtf16(s.lpszProxy) );

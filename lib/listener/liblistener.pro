@@ -3,9 +3,7 @@ TEMPLATE = lib
 QT = core xml network
 CONFIG += core types scrobble
 
-include( $$ROOT_DIR/common/qmake/include.pro )
-
-SOURCES   = $$findSources( cpp )
-HEADERS   = $$findSources( h )
+include( $$ROOT_DIR/admin/include.qmake )
+include( _files.qmake )
 
 DEFINES += _LISTENER_DLLEXPORT

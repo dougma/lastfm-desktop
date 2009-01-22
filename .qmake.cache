@@ -26,6 +26,4 @@ macx* {
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
 }
 
-COMMON_LIBS_DIR = /svn/libs/cpp
-
 INSTALL_DIR = /usr/local

@@ -21,7 +21,6 @@
 #define LOCAL_RQL_PLUGIN_H
 
 #include "../ILocalRql.h"
-#include "SimilarArtists.h"
 
 
 

@@ -9,10 +9,15 @@
 use Cwd 'abs_path';
 use File::Basename;
 
-$DESTDIR = shift;
-$VERSION = shift;
-$QT_FRAMEWORKS_DIR = $ENV{'QMAKE_LIBDIR_QT'};
-$REVISION = `svn info | grep "Last Changed Rev" | cut -d' ' -f4`;
+##############################################################################
+open FILE, '_build_parameters.pl.h' or die $!;
+while ($line = <FILE>) {
+    $str .= $line;
+}
+eval $str;
+close FILE;
+##############################################################################
+
 
 while( my $v = shift )
 {
@@ -29,7 +34,7 @@ sub getQtModules()
 {
 	# these 4 lines de-dupe $QT
 	my %saw;
-	my @in = split( ' ', $ENV{'QT'} );
+	my @in = split( ' ', $QT );
 	@saw{@in} = ();
 	my @out = keys %saw;
 
@@ -52,18 +57,21 @@ $DEPOSX = "\$(DIST_TOOLS_DIR)/deposx.sh";
 $dmg = "\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION)-\$(REVISION).dmg";
 
 print <<END;
-DIST_TOOLS_DIR = $root/common/dist/mac
+DIST_TOOLS_DIR = $root/admin/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
 CONTENTS = \$(BUNDLE)/Contents
 VERSION = $VERSION
 REVISION = $REVISION
 BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
+BUNDLE_RESOURCES = \$(CONTENTS)/Resources
+BUNDLE_PLUGINS = \$(CONTENTS)/MacOS/plugins
+
 INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
 
 .PHONY = bundle bundle-clean bundle-install dmg dmg-clean everything
 
-YOUR_MUM: all
+MOOSE: all moose_extra
 
 \$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist

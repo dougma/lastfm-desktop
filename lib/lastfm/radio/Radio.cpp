@@ -34,7 +34,7 @@ Radio::Radio( Phonon::AudioOutput* output )
        m_bErrorRecover( false )
 {
     m_mediaObject = new Phonon::MediaObject;
-    m_mediaObject->setTickInterval( 100 );
+    m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
 	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
@@ -42,7 +42,7 @@ Radio::Radio( Phonon::AudioOutput* output )
     Phonon::createPath( m_mediaObject, m_audioOutput );    
 }
 
-    
+
 Radio::~Radio()
 {    
     // I'm not confident about the sleep code on Windows --mxcl

@@ -26,8 +26,8 @@ class TestCoreUrl : public QObject
     Q_OBJECT
 
 private slots:
-    void encode();
-    void encode_data();
+    void encode();      /** @author <jono@last.fm> */
+    void encode_data(); /** @^^ */
 };
 
 void TestCoreUrl::encode_data()
