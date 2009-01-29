@@ -27,7 +27,7 @@ class UNICORN_DLLEXPORT LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    LoginDialog();
+    LoginDialog( const QString& username = "" );
 
     QString passwordHash() const { return m_password; }
     QString username() const { return m_username; }

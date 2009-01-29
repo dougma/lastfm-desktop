@@ -28,10 +28,16 @@
 #endif
 
 
-LoginDialog::LoginDialog()
-           : m_subscriber( true )
+LoginDialog::LoginDialog( const QString& username )
+           : m_username( username )
+           , m_subscriber( true )
 {
     ui.setupUi( this );
+    if (username.size())
+    {
+        ui.username->setText( username );
+        ui.password->setFocus();
+    }
 	
 #ifdef Q_WS_MAC
 	ui.spacerItem->changeSize( 0, 0 );
@@ -48,7 +54,8 @@ LoginDialog::LoginDialog()
 	ui.transient->setModal( true );
 	ui.progress->setRange( 0, 0 );
 	ui.text->setFixedWidth( ui.text->sizeHint().width() * 2.5 );
-
+    ui.urls->setAttribute( Qt::WA_MacSmallSize );
+    
 	connect( ui.cancel, SIGNAL(clicked()), ui.transient, SLOT(reject()) );
 	connect( ui.transient, SIGNAL(rejected()), SLOT(cancel()) );
 
@@ -63,8 +70,6 @@ LoginDialog::LoginDialog()
 #else
     ui.spinner->hide();
 #endif
-    
-    ui.urls->setAttribute( Qt::WA_MacSmallSize );
 
 	ok()->setText( tr("Log In") );
     ok()->setDisabled( true );

@@ -51,7 +51,7 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
     CoreSettings s;
     if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Unicorn::Settings().logOutOnExit())
     {
-        LoginDialog d;
+        LoginDialog d( s.value( "Username" ).toString() );
         if (d.exec() == QDialog::Accepted)
         {
             // if LogOutOnExit is enabled, really, we shouldn't store these,
@@ -107,7 +107,6 @@ Unicorn::Application::~Application()
     {
         CoreSettings s;
         s.remove( "SessionKey" );
-        s.remove( "Username" );
         s.remove( "Password" );
     }
 }
