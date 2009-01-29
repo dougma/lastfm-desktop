@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "App.h"
+#include "_version.h"
 #include "Settings.h"
 #include "Resolver.h"
 #include "LocalRql.h"
@@ -84,11 +85,11 @@ App::App( int& argc, char** argv )
     
     // ATTENTION! Under no circumstance change these strings! --mxcl
 #ifdef WIN32
-    Ws::UserAgent = "Last.fm Client (Windows)";
+    Ws::UserAgent = "Last.fm Client " VERSION " (Windows)";
 #elif defined (Q_WS_MAC)
-    Ws::UserAgent = "Last.fm Client (OS X)";
+    Ws::UserAgent = "Last.fm Client " VERSION " (OS X)";
 #elif defined (Q_WS_X11)
-    Ws::UserAgent = "Last.fm Client (X11)";
+    Ws::UserAgent = "Last.fm Client " VERSION " (X11)";
 #endif
 
     
