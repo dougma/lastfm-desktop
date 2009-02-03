@@ -45,7 +45,7 @@ MooseConfig::defaultPath()
         }
         catch ( const RegistryUtils::CRegistryException& )
         {
-            LOGL( 2, "Client path not found in HKCU" );
+            qWarning() << "Client path not found in HKCU";
         }
         
         RegCloseKey( h );
@@ -69,7 +69,7 @@ MooseConfig::defaultPath()
             }
             catch ( const RegistryUtils::CRegistryException& )
             {
-                LOGL( 2, "Client path not found in HKLM" );
+                qWarning() << "Client path not found in HKLM";
             }
             
             RegCloseKey( h );
@@ -78,7 +78,7 @@ MooseConfig::defaultPath()
 
     if ( buffer[0] == L'\0' )
     {
-        LOGL( 1, "Couldn't read the client path from the registry.");
+        qCritical() << "Couldn't read the client path from the registry.";
         return std::wstring();
     }    
 
