@@ -24,6 +24,7 @@
 #include "similarity/CosSimilarity.h"
 #include <boost/bind.hpp>
 #include <QtAlgorithms>
+#include <QSet>
 
 
 // these two operators are for qBinaryFind in TagDataset::findArtist
@@ -148,6 +149,32 @@ artistList_orderByWeightDesc(const SimilarArtists::Result& a, const SimilarArtis
     return a.second > b.second;
 }
 
+// static
+QSet<int>
+SimilarArtists::buildArtistFilter(LocalCollection& coll, int artistId)
+{
+    QSet<int> result;
+
+    // These artists are too random, so we exclude them from sim-art.
+    // Maybe when track tags are actually track tags (and not artist 
+    // tags) we won't need to do this.  Maybe?
+    const char* duds[] = { "various artists", "various", "soundtrack", "[unknown]", NULL };
+    for (const char** artist = &duds[0]; *artist; artist++) {
+        int id = coll.getArtistId(*artist, LocalCollection::NoCreate);
+        if (id > 0) result.insert(id);
+    }
+
+    if (result.contains(artistId)) {
+        // unless we're looking for the similar artists of 
+        // "various" etc, then the above are good candidates!
+        result.clear();
+    }
+
+    // the artist of "similar artist" is always excluded:
+    result += artistId;
+    return result;
+}
+
 ResultSet
 SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 {
@@ -155,6 +182,8 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 
     QString qsArtist = QString(artist).simplified().toLower();
     int artistId = coll.getArtistId(qsArtist, LocalCollection::NoCreate);
+
+    QSet<int> artistFilter = buildArtistFilter(coll, artistId);
 
     QList<SimilarArtists::Result> artistList = getSimilarArtists(coll, qsArtist, artistId);
     qSort(artistList.begin(), artistList.end(), artistList_orderByWeightDesc);
@@ -164,7 +193,7 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
     int trackCount = 0;
     while ((trackCount < 10000 || artistCount < 20) && pArtist != artistList.end())
     {
-        if (pArtist->first != artistId) {
+        if (!artistFilter.contains(pArtist->first)) {
             QList<uint> tracks = coll.filesByArtistId(pArtist->first, LocalCollection::AvailableSources);
             foreach(uint trackId, tracks) {
                 TrackResult tr;

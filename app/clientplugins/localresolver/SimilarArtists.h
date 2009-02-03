@@ -128,6 +128,7 @@ public:
 
 private:
     QList<Result> getSimilarArtists(LocalCollection& coll, const QString& artist, int artistId);
+    static QSet<int> buildArtistFilter(LocalCollection& coll, int artistId);
 };
 
 
