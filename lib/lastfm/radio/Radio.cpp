@@ -127,6 +127,7 @@ Radio::skip()
 	}
     else if (m_state != Stopped)
     {
+        qDebug() << "queue empty";
 	    // we are still waiting for a playlist to come back from the tuner
 	    m_mediaObject->blockSignals( true );    //don't tell outside world that we stopped
 	    m_mediaObject->stop();
@@ -177,8 +178,9 @@ Radio::clear()
 
 
 void
-Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ )
+Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
+    qDebug() << "new:" << newstate << " old:" << oldstate;
     switch (newstate)
     {
         case Phonon::ErrorState:
@@ -195,8 +197,10 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State /*oldstate*/ 
 			// if the play queue runs out we get this for some reason
 			// this means we are fetching new tracks still, we should show a 
 			// tuning in state;
-			if (m_mediaObject->queue().size() == 0)
+            if (m_mediaObject->queue().size() == 0) {
+                qDebug() << "queue empty, going to TuningIn";
                 changeState( TuningIn );
+            }
 			break;
 			
         case Phonon::StoppedState:

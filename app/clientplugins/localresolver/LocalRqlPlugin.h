@@ -37,8 +37,6 @@ public:
     void init();
 	void parse(const char *rql, ILocalRqlParseCallback *);
     void finished();
-
-    void testTag(const char *url);
 };
 
 

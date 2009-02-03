@@ -20,6 +20,7 @@
 #include <string.h>
 #include "TrackResolver.h"
 #include "LocalRqlPlugin.h"
+#include "TrackTagUpdater.h"
 
 
 /** always exporting, never importing  **/
@@ -29,6 +30,9 @@
     #define RESOLVER_DLLEXPORT
 #endif
 
+TrackTagUpdater *gTrackTagUpdater = 0;
+
+
 
 extern "C" {
 
@@ -36,6 +40,13 @@ RESOLVER_DLLEXPORT
 void *
 lastfm_getService(const char *service)
 {
+    if (0 == gTrackTagUpdater) {
+        gTrackTagUpdater = TrackTagUpdater::create(
+            "http://musiclookup.last.fm/trackresolve",
+            100,        // number of days track tags are good 
+            5);         // 5 minute delay between web requests
+    }
+
     if (0 == strcmp("TrackResolver", service)) {
         return static_cast<ITrackResolverPlugin*>(new TrackResolver());
     }

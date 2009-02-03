@@ -23,6 +23,10 @@
 #include "lib/lastfm/radio/AbstractTrackSource.h"
 #include <QList>
 
+
+// Provides 'track resolving' functionality by
+// wrapping up another track source.
+// 
 class ResolvingTrackSource : public AbstractTrackSource
 {
     Q_OBJECT

@@ -771,13 +771,19 @@ LocalCollection::getFileById(uint fileId, LocalCollection::FileResult &out)
 }
 
 QList<LocalCollection::FilesToTagResult> 
-LocalCollection::getFilesToTag()
+LocalCollection::getFilesToTag(int maxTagAgeDays)
 {
+    time_t oldTagAge = 
+        QDateTime::currentDateTime().toUTC().toTime_t() 
+        - maxTagAgeDays * 24* 60* 60;
+
     QSqlQuery query = PREPARE(
         "SELECT files.id, artists.lowercase_name, files.album, files.lowercase_title "
         "FROM files "
         "INNER JOIN artists ON artists.id = files.artist "
-        "WHERE tag_time IS NULL" ).
+        "WHERE tag_time IS NULL " 
+        "OR tag_time < :oldTagAge").
+        bindValue(":oldTagAge", oldTagAge).
         setForwardOnly( true ).
         exec();
     QList<FilesToTagResult> results;

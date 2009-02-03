@@ -25,7 +25,8 @@
 #include <QObject>
 #include <QList>
 
-
+// Radio class plays tracks from an AbstractTrackSource
+//
 class LASTFM_RADIO_DLLEXPORT AbstractTrackSource : public QObject
 {
     Q_OBJECT

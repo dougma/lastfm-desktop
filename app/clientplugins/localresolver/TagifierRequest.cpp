@@ -27,7 +27,7 @@
 class Batcher
 {
     // these are from TagifierRequest:
-    LocalCollection& m_collection;
+    LocalCollection* m_collection;
     QVariantList& m_requestedFileIds;
 
     // build up three parallel arrays to feed into updateTrackTags in batches 
@@ -46,13 +46,13 @@ class Batcher
     void doBatch();
 
 public:
-    Batcher(LocalCollection& collection, QVariantList& requestedFileIds);
+    Batcher(LocalCollection* collection, QVariantList& requestedFileIds);
     ~Batcher();
     void process(int fileId, QString tag, float weight);
 };
 
 
-Batcher::Batcher(LocalCollection& collection, QVariantList& requestedFileIds)
+Batcher::Batcher(LocalCollection* collection, QVariantList& requestedFileIds)
 :m_collection(collection)
 ,m_requestedFileIds(requestedFileIds)
 ,m_firstBatch(true)
@@ -62,8 +62,9 @@ Batcher::Batcher(LocalCollection& collection, QVariantList& requestedFileIds)
 Batcher::~Batcher()
 {
     if (m_tags.size())
-        doBatch();
-    m_collection.setFileTagTime(m_requestedFileIds);
+        doBatch();        // submit partial remaining batch
+
+    m_collection->setFileTagTime(m_requestedFileIds);
 }
 
 void 
@@ -71,14 +72,14 @@ Batcher::doBatch()
 {
     if (m_firstBatch) {
         // things seem to be going well enough to delete track tags
-        m_collection.deleteTrackTags(m_requestedFileIds);
+        m_collection->deleteTrackTags(m_requestedFileIds);
         m_firstBatch = false;
     }
     {
-        AutoTransaction<LocalCollection> trans(m_collection);
-        m_collection.updateTrackTags(
+        AutoTransaction<LocalCollection> trans(*m_collection);
+        m_collection->updateTrackTags(
             m_fileIds, 
-            m_collection.resolveTags(m_tags, m_tagmap), 
+            m_collection->resolveTags(m_tags, m_tagmap), 
             m_weights);
         trans.commit();
     }
@@ -104,22 +105,24 @@ void Batcher::process(int fileId, QString tag, float weight)
 ///////////////////////
 
 
-TagifierRequest::TagifierRequest(LocalCollection& collection, QString url)
+TagifierRequest::TagifierRequest(LocalCollection* collection, QString url)
     :m_reply(0)
     ,m_url(url)
     ,m_collection(collection)
 {
+    Q_ASSERT(collection);
 }
 
 // a false return means there will be no 
+// callback because there is no work to do!
 bool
-TagifierRequest::makeRequest()
+TagifierRequest::makeRequest(int maxTagAgeDays)
 {
     Q_ASSERT(0 == m_reply);
     if (m_reply) return false;
 
     {
-        QList<LocalCollection::FilesToTagResult> files = m_collection.getFilesToTag();
+        QList<LocalCollection::FilesToTagResult> files = m_collection->getFilesToTag(maxTagAgeDays);
         foreach(const LocalCollection::FilesToTagResult& f, files) {
             QString line;
             line += QString::number(f.fileId);

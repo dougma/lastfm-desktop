@@ -36,7 +36,6 @@ public:
 
     bool isAvailable();
     class LocalRqlResult* startParse(QString rql);
-    void testTag(QString url);
 };
 
 

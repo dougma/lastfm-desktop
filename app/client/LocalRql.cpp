@@ -120,11 +120,3 @@ LocalRql::startParse(QString rql)
     }
     return result;
 }
-
-void 
-LocalRql::testTag(QString url)
-{
-    if (m_plugin) {
-        m_plugin->testTag(url.toUtf8());
-    }
-}

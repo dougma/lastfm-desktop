@@ -23,6 +23,8 @@
 #include "ResolvingTrackSource.h"
 #include <QUrl>
 
+// Represents a xspf url as a ResolvingTrackSource
+//
 class XspfResolvingTrackSource : public ResolvingTrackSource
 {
 public:

@@ -95,6 +95,7 @@ LocalContentScanner::startFullScan()
 void
 LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 {
+    bool changes = false;
     const int sourceId = sl.source().m_id;
 	const QString fullPath(sl.source().m_volume + path);
 
@@ -131,6 +132,7 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 						fullPath + file.name(),
 						file.id(),
 						it.value());
+                    changes = true;
 				}
 				map.erase(it);       // done
 			}
@@ -149,8 +151,12 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 				it.key(),       // filename
 				directoryId,
 				it.value());    // last modified time
+            changes = true;
 		}
     }
+
+    if (changes)
+        emit tracksChanged();
 }
 
 void 

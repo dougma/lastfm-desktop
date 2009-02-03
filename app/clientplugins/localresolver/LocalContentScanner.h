@@ -80,6 +80,7 @@ public:
     ~LocalContentScanner();
 
 signals:
+    void tracksChanged();
     void fullScanStart(const SearchLocation&);
     void fullScanFinished(const SearchLocation&, bool);
     void dirScanStart(const SearchLocation&, const QString&);

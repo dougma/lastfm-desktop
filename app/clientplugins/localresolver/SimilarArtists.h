@@ -127,7 +127,7 @@ public:
     ResultSet filesBySimilarArtist(LocalCollection& coll, const char *artist);
 
 private:
-    QList<Result> getSimilarArtists(LocalCollection& coll, const char *artist, int artistId);
+    QList<Result> getSimilarArtists(LocalCollection& coll, const QString& artist, int artistId);
 };
 
 

@@ -21,12 +21,6 @@
 #include "LocalRqlPlugin.h"
 #include "RqlQueryThread.h"
 
-//#include "TagUpdater.h"
-
-#include "TagifierRequest.h"
-#include "QueryError.h"
-
-
 
 
 LocalRqlPlugin::LocalRqlPlugin()
@@ -58,16 +52,3 @@ LocalRqlPlugin::finished()
     delete this;
 }
 
-
-// it leaks, and there's no feedback, it's just here for testing!
-void
-LocalRqlPlugin::testTag(const char *url)
-{
-    try {
-        LocalCollection *pCollection = LocalCollection::create("TestTag");
-        TagifierRequest *pTagifier = new TagifierRequest(*pCollection, QString::fromUtf8(url));
-        bool requestedOk = pTagifier->makeRequest();
-    } catch (const QueryError& qe) {
-        QString err = qe.text();
-    }
-}

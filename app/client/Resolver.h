@@ -42,6 +42,7 @@ public:
 
 
 // Resolver class is used for starting the track resolution requests
+//
 class Resolver : public QObject
 {
     Q_OBJECT;
@@ -73,6 +74,7 @@ private slots:
 
 // This is the request object sent to the plugins
 // Its lifetime is managed by the plugins (calling finished())
+
 class ResolveRequest : public QObject, public ITrackResolveRequest
 {
     Q_OBJECT;

@@ -12,11 +12,10 @@ LocalRqlDialog::LocalRqlDialog( QWidget *parent )
     
     if (The::app().localRql()->isAvailable()) {
         connect(ui.playButton, SIGNAL(clicked()), this, SLOT(onPlay()));
-        connect(ui.tagButton, SIGNAL(clicked()), this, SLOT(onTag()));
     } else {
         ui.playButton->setDisabled(true);
-        ui.tagButton->setDisabled(true);
     }
+    ui.tagButton->setDisabled(true);
 }
 
 void
@@ -60,6 +59,4 @@ LocalRqlDialog::onParseBad(int errorLineNumber, QString errorLine, int errorOffs
 void
 LocalRqlDialog::onTag()
 {
-    QString url = ui.lineEditTagifierUrl->text();
-    The::app().localRql()->testTag(url);
 }

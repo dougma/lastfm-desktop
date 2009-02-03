@@ -51,14 +51,28 @@ orderByWeightDesc(const WeightedString& a, const WeightedString& b)
 }
 
 
-void
-dlArtistTags(LocalCollection& coll, const QString& artist, TagDataset::Entry& outTags)
+// Returns a TagDataset::Entry containing tags for the artist.
+// Calls the last.fm webservice to get the tags and blocks
+// for up to 10 seconds while waiting for the response.
+// 
+// coll is used to look-up/create tag ids from tag names
+// artistId is used to initialise the artistId member of the result
+// artist is the name sent to the last.fm web service
+//
+// a return containing an empty tagVec could be considered failure
+//
+TagDataset::Entry
+dlArtistTags(LocalCollection& coll, const QString& artist, int artistId)
 {
+    TagDataset::Entry result;
+    result.artistId = artistId;
+
     WsReply* reply = WsReplyBlock::wait(
         Artist(artist).getTopTags(),
-        10 * 1000);
+        10 * 1000);     // 10 seconds
 
     if (reply) {
+        // parse result and sort higher weights to top
         WeightedStringList wsl = Tag::list(reply);
         qSort(wsl.begin(), wsl.end(), orderByWeightDesc);
 
@@ -69,12 +83,14 @@ dlArtistTags(LocalCollection& coll, const QString& artist, TagDataset::Entry& ou
             TagDataset::TagId tagId = coll.getTagId(*p, LocalCollection::Create);
             // webservice gives weight 0..100; we want it 0..1
             TagDataset::TagWeight tagWeight = p->weighting() / 100.0;     
-            outTags.tagVec.push_back( qMakePair(tagId, tagWeight) );
+            result.tagVec.push_back( qMakePair(tagId, tagWeight) );
             p++;
             count++;
         }
-        outTags.norm = TagDataset::calcNormal(outTags.tagVec);
+        result.norm = TagDataset::calcNormal(result.tagVec);
     }
+
+    return result;
 }
 
 
@@ -90,22 +106,24 @@ resultCb(QList<SimilarArtists::Result>& results, const TagDataset::Entry& entry,
 }
 
 QList<SimilarArtists::Result>
-SimilarArtists::getSimilarArtists(LocalCollection& coll, const char* artist, int artistId)
+SimilarArtists::getSimilarArtists(LocalCollection& coll, const QString& artist, int artistId)
 {
     QList<Result> results;
 
-    TagDataset::Entry otherArtistTags;
-    TagDataset::Entry *pArtist = 0;
+    m_dataset.load(coll);
 
-    {
-        m_dataset.load(coll);
-        pArtist = m_dataset.findArtist(artistId);
+    TagDataset::Entry otherArtist;
+    TagDataset::Entry *pArtist = artistId > 0 ? m_dataset.findArtist(artistId) : 0;
 
-        if (pArtist == 0) {
-            otherArtistTags.artistId = artistId;
-            dlArtistTags(coll, QString(artist), otherArtistTags);
-            if (otherArtistTags.tagVec.size()) {
-                pArtist = &otherArtistTags;
+    if (pArtist == 0) {
+        otherArtist = dlArtistTags(coll, artist, artistId);
+        if (otherArtist.tagVec.size()) {
+            // result looks good
+            pArtist = &otherArtist;
+            if (artistId < 1) {
+                // this previously-unknown-to-us artist has some tags 
+                // at Last.fm, so why not add their name to our db:
+                otherArtist.artistId = coll.getArtistId(artist, LocalCollection::Create);
             }
         }
     }
@@ -135,11 +153,10 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
 {
     ResultSet result;
 
-    int artistId = coll.getArtistId(
-        QString(artist).simplified().toLower(), 
-        LocalCollection::Create);
+    QString qsArtist = QString(artist).simplified().toLower();
+    int artistId = coll.getArtistId(qsArtist, LocalCollection::NoCreate);
 
-    QList<SimilarArtists::Result> artistList = getSimilarArtists(coll, artist, artistId);
+    QList<SimilarArtists::Result> artistList = getSimilarArtists(coll, qsArtist, artistId);
     qSort(artistList.begin(), artistList.end(), artistList_orderByWeightDesc);
 
     QList<SimilarArtists::Result>::iterator pArtist = artistList.begin();

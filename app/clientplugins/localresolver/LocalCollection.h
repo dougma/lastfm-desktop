@@ -229,7 +229,7 @@ public:
     void insertGlobalArtistTag(int artistId, int tagId, int weight);
     void insertTrackTag(int artistId, int tagId, unsigned userId, int weight);
 
-    QList<FilesToTagResult> getFilesToTag();
+    QList<FilesToTagResult> getFilesToTag(int maxTagAgeDays);
     void deleteTrackTags(QVariantList fileIds);
     void updateTrackTags(QVariantList fileIds, QVariantList tagIds, QVariantList weights);
     void setFileTagTime(QVariantList fileIds);

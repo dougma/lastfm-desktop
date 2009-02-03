@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2005-2008 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,43 +17,60 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef TAGIFIER_REQUEST_H
-#define TAGIFIER_REQUEST_H
+#ifndef TRACK_TAG_UPDATER_H
+#define TRACK_TAG_UPDATER_H
 
-#include <QUrl>
-#include <QByteArray>
-#include <QVariantList>
-#include "lib/lastfm/ws/WsAccessManager.h"
+/** @brief Manages track tag requesting: signal needsUpdate as tracks are 
+  * added and this class will ensure that requests happen at a controlled
+  * rate.  createUpdater creates a thread for the new TrackTagUpdater to 
+  * run on.
+  *
+  */
 
-/* @brief Queries the LocalCollection db for all tracks needing tags, 
- * then makes the web service request and handles the response.
- * Blocks for lengthy periods, especially when handling large numbers
- * of tracks; advise that you run it in its own thread.
-*/
+#include <QObject>
+#include <QString>
+#include <QDateTime>
 
-class TagifierRequest : public QObject
+class TrackTagUpdater : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
-    QUrl m_url;
-    QByteArray m_body;
-    WsAccessManager m_wam;
-    class QNetworkReply* m_reply;
+    const QString m_webServiceUrl;
+    const unsigned m_tagValidityDays;
+    const unsigned m_interRequestDelayMins;
+
+    class QTimer* m_timer;
     class LocalCollection* m_collection;
-    int m_requestIdCount, m_responseIdCount, m_responseTagCount;
-    QVariantList m_requestedFileIds;
+    bool m_needsUpdate;
+    QDateTime m_lastRequestTimeUtc;
 
-    void handleResponse();
+    ///
+
+    TrackTagUpdater(const QString& webServiceUrl, unsigned tagValidityDays, unsigned interRequestDelayMins);
+    ~TrackTagUpdater()
+    {
+        // FIXME.  testing only
+        int ii = 0;
+    }
+
+    void startTimer(int seconds);
+    unsigned secondsToNextUpdate();
+    int secondsSinceLastRequest();
 
 private slots:
-    void onFinished();
+    void doUpdateTags();
+    void onFinished(int requestIdCount, int responseIdCount, int responseTagCount);
 
 public:
-    TagifierRequest(LocalCollection* collection, QString url);
-    bool makeRequest(int maxTagAgeDays);
+    static TrackTagUpdater* 
+    create(const QString& webServiceUrl, unsigned tagValidityDays, unsigned interRequestDelayMins);
+
+public slots:
+    void needsUpdate();
 
 signals:
-    void finished(int requestIdCount, int responseIdCount, int responseTagCount);
+    void tagsUpdated(int requestIdCount, int responseIdCount, int responseTagCount, int secondsTaken);
 };
+
 
 #endif
