@@ -50,9 +50,10 @@ macx-g++:release {
 
 win32 {
     RC_FILE = win/client.rc
+	SOURCES += ../../common/c++/Logger.cpp
     LIBS += -lshell32 -luser32
     PRECOMPILED_HEADER = $$ROOT_DIR/common/precompiled.h
-    release:system( $$ROOT_DIR/admin/dist/win/isspp win/client.iss.in $$ROOT_DIR/Last.fm.iss )
+    release:system( perl $$ROOT_DIR/admin/dist/win/isspp win/client.iss.in $$ROOT_DIR/Last.fm.iss )
 }
 
 linux* {
