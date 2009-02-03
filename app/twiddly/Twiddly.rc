@@ -1,4 +1,4 @@
-IDI_ICON1 ICON DISCARDABLE "..\\..\\common\\dist\\win\\installer.ico"
+IDI_ICON1 ICON DISCARDABLE "..\\..\\admin\\dist\\win\\installer.ico"
 
 // The first entry ('1') on the below line is normally written as the define
 // VS_VERSION_INFO, but we can't always be sure that value has been included
