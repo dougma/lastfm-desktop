@@ -46,12 +46,14 @@ def find_sources( dir )
       case Platform::IMPL
         when :macosx then excludes << 'win'
         when :mswin  then excludes << 'mac'
+		when :cygwin then excludes << 'mac'
       end
       Find.prune if excludes.include?( File.basename( path ) )
     elsif File.file?( path )
       case Platform::IMPL
         when :macosx then next if /_mac\.cpp$/.match( path )
         when :mswin  then next if /_win\.cpp$/.match( path )
+        when :cygwin then next if /_win\.cpp$/.match( path )
       end      
       yield( path, File.extname( path ) )
     end
