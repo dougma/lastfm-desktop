@@ -157,7 +157,9 @@ DiagnosticsDialog::poll()
 }
 
 
-#include "common/c++/Logger.h"
+#ifndef Q_WS_X11
+#include "common/c++/Logger.cpp"
+#endif
 void
 DiagnosticsDialog::onScrobbleIPodClicked()
 {
