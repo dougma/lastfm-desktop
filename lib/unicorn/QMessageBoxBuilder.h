@@ -37,6 +37,8 @@ public:
     MessageBoxBuilder& setText( const QString& x );
     /** the default is Information */
     MessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
+    /** the default is a single OK button */
+    MessageBoxBuilder& setButtons( QMessageBox::StandardButtons buttons ) { box.setStandardButtons( buttons ); return *this; }
 
     int exec();
 	

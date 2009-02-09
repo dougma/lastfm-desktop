@@ -44,8 +44,8 @@ public:
     static RadioStation lovedTracks( const User& user )     { return "lastfm://user/" + user + "/loved"; }
     static RadioStation globalTag( const Tag& tag )         { return "lastfm://globaltags/" + tag; }
     static RadioStation similar( const Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
-    
-    static RadioStation rql( const QString& rql )           
+
+    static RadioStation rql( const QString& rql )
     {
         RadioStation station;
         station.m_rql = rql;

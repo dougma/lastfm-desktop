@@ -39,7 +39,7 @@ public:
     {}
 
     bool isNull() const { return m_name.isEmpty(); }
-    
+        
 	/** the url for this artist's page at www.last.fm */
 	QUrl www() const;
     
@@ -57,7 +57,8 @@ public:
           * returns false still. So you should have queried this! */
         return m_name.isEmpty() ? "[unknown]" : m_name; 
     }
-
+    QString name() const { return QString(*this); }	
+    
     WsReply* share( const class User& recipient, const QString& message = "" );
 	WsReply* getInfo() const;	
 	WsReply* getSimilar() const;

@@ -141,6 +141,8 @@ public:
     
     bool isMp3() const;
     
+    operator QVariant() const { return QVariant::fromValue( *this ); }
+    
 //////////// lastfm::Ws
     
 	/** See last.fm/api Track section */
