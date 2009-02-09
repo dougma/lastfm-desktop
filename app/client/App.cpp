@@ -76,7 +76,7 @@ struct Settings
 };
 
 
-App::App( int& argc, char** argv ) 
+App::App( int& argc, char** argv ) throw( StubbornUserException )
    : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_stateMachine( 0 )
 {
 #ifdef Q_WS_MAC
@@ -387,8 +387,7 @@ App::onTrackSpooled( const Track& t )
     if (t.isNull()) return;
     
     qDebug() << t;
-    
-#ifdef Q_OS_MAC
+
     if (t.source() == Track::Player && t.isMp3() && moose::Settings().fingerprintingEnabled())
     {
         FingerprintId fpid = Fingerprint( t ).id();
@@ -401,8 +400,6 @@ App::onTrackSpooled( const Track& t )
             connect( job, SIGNAL(fingerprinted( Track )), m_mainWindow->ui.diagnostics, SLOT(fingerprinted( Track )) );
         }
     }
-#endif
-    
 }
 
 

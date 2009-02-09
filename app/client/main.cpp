@@ -95,10 +95,10 @@ int main( int argc, char** argv )
 
         return app.exec();
     }
-    catch (Unicorn::Application::UnsupportedPlatformException&)
+    catch (App::UnsupportedPlatformException&)
     {
         // a message box was displayed to the user by Unicorn::Application
-        qCritical() << "Unsupported platform"; 
+        qCritical() << "Unsupported platform";
         return 2;
     }
     catch (Unicorn::Application::StubbornUserException&)

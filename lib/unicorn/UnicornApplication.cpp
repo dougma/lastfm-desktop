@@ -28,25 +28,13 @@
 #include <QTranslator>
 
 
-Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException, UnsupportedPlatformException )
+Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException )
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
     UnicornCoreApplication::init();
     
     translate();
-
-#ifdef Q_WS_MAC
-    if (QSysInfo::MacintoshVersion < QSysInfo::MV_10_4)
-    {
-        MessageBoxBuilder( 0 )
-            .setIcon( QMessageBox::Critical )
-            .setTitle( tr("Unsupported OS X Version") )
-            .setText( tr( "We are sorry, but Last.fm requires OS X Tiger or above.") )
-            .exec();
-        throw UnsupportedPlatformException();
-    }
-#endif
 
     CoreSettings s;
     if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Unicorn::Settings().logOutOnExit())

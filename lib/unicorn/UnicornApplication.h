@@ -34,16 +34,12 @@ namespace Unicorn
         bool m_logoutAtQuit;
 
     public:
-        // shows a message box advising user of error before throwing
-        class UnsupportedPlatformException
-        {};
-
         class StubbornUserException
         {};
         
         /** will put up the log in dialog if necessary, throwing if the user
           * cancels, ie. they refuse to log in */
-        Application( int&, char** ) throw( StubbornUserException, UnsupportedPlatformException );
+        Application( int&, char** ) throw( StubbornUserException );
         ~Application();
 
         /** when the application exits, the user will be logged out 

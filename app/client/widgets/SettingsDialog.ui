@@ -109,7 +109,7 @@
       <bool>true</bool>
      </property>
      <property name="resizeMode" >
-      <enum>QListView::Fixed</enum>
+      <enum>QListView::Adjust</enum>
      </property>
      <property name="layoutMode" >
       <enum>QListView::SinglePass</enum>
@@ -120,8 +120,11 @@
      <property name="viewMode" >
       <enum>QListView::IconMode</enum>
      </property>
-     <property name="selectionRectVisible" >
+     <property name="uniformItemSizes" >
       <bool>false</bool>
+     </property>
+     <property name="selectionRectVisible" >
+      <bool>true</bool>
      </property>
      <property name="currentRow" >
       <number>-1</number>

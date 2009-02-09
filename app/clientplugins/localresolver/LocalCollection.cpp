@@ -783,7 +783,7 @@ LocalCollection::getFilesToTag(int maxTagAgeDays)
         "INNER JOIN artists ON artists.id = files.artist "
         "WHERE tag_time IS NULL " 
         "OR tag_time < :oldTagAge").
-        bindValue(":oldTagAge", oldTagAge).
+        bindValue(":oldTagAge", (uint)oldTagAge).
         setForwardOnly( true ).
         exec();
     QList<FilesToTagResult> results;

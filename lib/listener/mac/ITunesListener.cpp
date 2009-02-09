@@ -48,6 +48,7 @@ struct ITunesConnection : PlayerConnection
 ITunesListener::ITunesListener( QObject* parent )
               : m_connection( 0 )
 {
+    qRegisterMetaType<Track>("Track");
     connect( parent, SIGNAL(destroyed()), SLOT(deleteLater()) ); //FIXME safe?
 }
 

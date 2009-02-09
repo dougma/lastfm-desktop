@@ -35,7 +35,10 @@ class App : public Unicorn::Application
     friend MainWindow& The::mainWindow();
     
 public:
-    App( int&, char** );
+    class UnsupportedPlatformException
+    {};
+
+    App( int&, char** ) throw( StubbornUserException );
     ~App();
 
     void setMainWindow( class MainWindow* ); //access via The::mainWindow()
