@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "DiagnosticsDialog.h"
-#include "DiagnosticsDialog/SendLogsDialog.h"
+//TODO #include "DiagnosticsDialog/SendLogsDialog.h"
 #include "app/twiddly.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
@@ -231,5 +231,5 @@ DiagnosticsDialog::onTwiddlyError( QProcess::ProcessError e )
 void 
 DiagnosticsDialog::onSendLogsClicked()
 {
-    SendLogsDialog( this ).exec();
+//TODO    SendLogsDialog( this ).exec();
 }
