@@ -1,0 +1,646 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>603</width>
+    <height>596</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>551</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="contextMenuPolicy" >
+   <enum>Qt::PreventContextMenu</enum>
+  </property>
+  <property name="acceptDrops" >
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle" >
+   <string>Last.fm</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <property name="autoFillBackground" >
+    <bool>true</bool>
+   </property>
+   <layout class="QVBoxLayout" >
+    <property name="spacing" >
+     <number>0</number>
+    </property>
+    <property name="leftMargin" >
+     <number>0</number>
+    </property>
+    <property name="topMargin" >
+     <number>0</number>
+    </property>
+    <property name="rightMargin" >
+     <number>0</number>
+    </property>
+    <property name="bottomMargin" >
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter" >
+      <property name="autoFillBackground" >
+       <bool>true</bool>
+      </property>
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QFrame" name="sidebarFrame" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize" >
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="widget" >
+       <layout class="QVBoxLayout" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>8</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" >
+          <property name="spacing" >
+           <number>5</number>
+          </property>
+          <item>
+           <widget class="TrackProgressFrame" name="songTimeBar" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>0</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="frameShape" >
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="ProgressFrame" name="stationTimeBar" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>0</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="maximumSize" >
+             <size>
+              <width>16777215</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="frameShape" >
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType" >
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>20</width>
+            <height>7</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="stack" >
+          <property name="autoFillBackground" >
+           <bool>true</bool>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="currentIndex" >
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>603</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionSendToTray" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionMyProfile" />
+    <addaction name="separator" />
+    <addaction name="actionDashboard" />
+   </widget>
+   <widget class="QMenu" name="menuControls" >
+    <property name="title" >
+     <string>&amp;Controls</string>
+    </property>
+    <addaction name="actionPlay" />
+    <addaction name="actionStop" />
+    <addaction name="actionSkip" />
+    <addaction name="separator" />
+    <addaction name="actionVolumeUp" />
+    <addaction name="actionVolumeDown" />
+    <addaction name="actionMute" />
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <property name="separatorsCollapsible" >
+     <bool>true</bool>
+    </property>
+    <addaction name="actionFAQ" />
+    <addaction name="actionForums" />
+    <addaction name="separator" />
+    <addaction name="actionCheckForUpdates" />
+    <addaction name="separator" />
+    <addaction name="actionDiagnostics" />
+    <addaction name="separator" />
+    <addaction name="actionAboutLastfm" />
+   </widget>
+   <widget class="QMenu" name="menuUser" >
+    <property name="title" >
+     <string>&amp;Account</string>
+    </property>
+    <property name="separatorsCollapsible" >
+     <bool>true</bool>
+    </property>
+    <addaction name="actionAddUser" />
+    <addaction name="actionDeleteUser" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <property name="separatorsCollapsible" >
+     <bool>true</bool>
+    </property>
+    <addaction name="actionGetPlugin" />
+    <addaction name="actionPlaylist" />
+    <addaction name="actionTag" />
+    <addaction name="actionShare" />
+    <addaction name="separator" />
+    <addaction name="actionLove" />
+    <addaction name="actionBan" />
+    <addaction name="separator" />
+    <addaction name="actionToggleScrobbling" />
+    <addaction name="actionToggleDiscoveryMode" />
+    <addaction name="separator" />
+    <addaction name="actionScrobbleManualIPod" />
+    <addaction name="separator" />
+    <addaction name="actionInviteAFriend" />
+    <addaction name="separator" />
+    <addaction name="actionSettings" />
+   </widget>
+   <addaction name="menuFile" />
+   <addaction name="menuView" />
+   <addaction name="menuTools" />
+   <addaction name="menuControls" />
+   <addaction name="menuUser" />
+   <addaction name="menuHelp" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="autoFillBackground" >
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolbar" >
+   <property name="movable" >
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle" >
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionMyProfile" />
+   <addaction name="separator" />
+   <addaction name="actionShare" />
+   <addaction name="actionTag" />
+   <addaction name="actionPlaylist" />
+   <addaction name="separator" />
+   <addaction name="actionLove" />
+   <addaction name="actionBan" />
+   <addaction name="separator" />
+   <addaction name="actionPlay" />
+   <addaction name="actionStop" />
+   <addaction name="actionSkip" />
+  </widget>
+  <action name="actionSettings" >
+   <property name="text" >
+    <string>&amp;Options...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionGetPlugin" >
+   <property name="text" >
+    <string>&amp;Get Plugin...</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates" >
+   <property name="text" >
+    <string>Check for &amp;Updates...</string>
+   </property>
+   <property name="menuRole" >
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionAboutLastfm" >
+   <property name="text" >
+    <string>&amp;About Last.fm...</string>
+   </property>
+  </action>
+  <action name="actionAddUser" >
+   <property name="text" >
+    <string>&amp;Add User...</string>
+   </property>
+  </action>
+  <action name="actionDeleteUser" >
+   <property name="text" >
+    <string>Delete User...</string>
+   </property>
+  </action>
+  <action name="actionToggleScrobbling" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Enable S&amp;crobbling</string>
+   </property>
+  </action>
+  <action name="actionTag" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/tag.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Tag...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Tag what's currently playing</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionShare" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/Share.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Share...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Share what's currently playing with someone</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionLove" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/love.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Love</string>
+   </property>
+   <property name="toolTip" >
+    <string>Express your love for the track that's playing</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionBan" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/ban.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Ban</string>
+   </property>
+   <property name="toolTip" >
+    <string>Don't ever play me this again</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionMyProfile" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>&amp;My Profile</string>
+   </property>
+   <property name="toolTip" >
+    <string>Show/Hide My Profile</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionToggleDiscoveryMode" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Enable &amp;Discovery Mode</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionDashboard" >
+   <property name="text" >
+    <string>My Last.fm Page</string>
+   </property>
+  </action>
+  <action name="actionVolumeDown" >
+   <property name="text" >
+    <string>Volume &amp;Down</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Down</string>
+   </property>
+  </action>
+  <action name="actionMute" >
+   <property name="text" >
+    <string>&amp;Mute</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionVolumeUp" >
+   <property name="text" >
+    <string>Volume &amp;Up</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Up</string>
+   </property>
+  </action>
+  <action name="actionFAQ" >
+   <property name="text" >
+    <string>FA&amp;Q</string>
+   </property>
+   <property name="shortcut" >
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionStop" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/stop.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Stop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Stop radio</string>
+   </property>
+  </action>
+  <action name="actionForums" >
+   <property name="text" >
+    <string>&amp;Forums</string>
+   </property>
+  </action>
+  <action name="actionInviteAFriend" >
+   <property name="text" >
+    <string>Invite a &amp;Friend...</string>
+   </property>
+  </action>
+  <action name="actionPlay" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/play.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Play</string>
+   </property>
+   <property name="toolTip" >
+    <string>Resume last radio station</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Space</string>
+   </property>
+  </action>
+  <action name="actionSkip" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/skip.png</iconset>
+   </property>
+   <property name="text" >
+    <string>S&amp;kip</string>
+   </property>
+   <property name="toolTip" >
+    <string>Skip this track</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Right</string>
+   </property>
+  </action>
+  <action name="actionDiagnostics" >
+   <property name="text" >
+    <string>&amp;Diagnostics</string>
+   </property>
+  </action>
+  <action name="actionPlaylist" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../res/qrc/last.fm.qrc" >:/action/Playlist.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Add To My &amp;Playlist</string>
+   </property>
+   <property name="iconText" >
+    <string>Playlist</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add what's currently playing to your Last.fm Playlist</string>
+   </property>
+   <property name="statusTip" >
+    <string>Add what's currently playing to your Last.fm Playlist</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionSendToTray" >
+   <property name="text" >
+    <string>&amp;Send to Tray</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+   <property name="toolTip" >
+    <string>Send application to the notification area</string>
+   </property>
+  </action>
+  <action name="actionScrobbleManualIPod" >
+   <property name="text" >
+    <string>Scrobble iPod...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TrackProgressFrame</class>
+   <extends>QFrame</extends>
+   <header>TrackProgressFrame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProgressFrame</class>
+   <extends>QFrame</extends>
+   <header>progressframe.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../res/qrc/last.fm.qrc" />
+ </resources>
+ <connections/>
+</ui>

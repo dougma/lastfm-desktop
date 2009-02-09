@@ -1,0 +1,20 @@
+<RCC>
+    <qresource>
+        <file>SideBarNowPlaying.png</file>
+        <file>action/Playlist.png</file>
+        <file>action/ban.png</file>
+        <file>action/love.png</file>
+        <file>action/play.png</file>
+        <file>action/Share.png</file>
+        <file>action/skip.png</file>
+        <file>action/stop.png</file>
+        <file>action/tag.png</file>
+        <file>button/Close.png</file>
+        <file>button/CloseActive.png</file>
+        <file>button/MoreHelp.png</file>
+        <file>button/MoreHelpActive.png</file>
+        <file>button/MoreHelpHover.png</file>
+        <file>mac/RestStateWidgetCombo.png</file>
+        <file>mac/RestStateWidgetComboActive.png</file>
+    </qresource>
+</RCC>
