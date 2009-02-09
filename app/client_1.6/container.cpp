@@ -1264,7 +1264,7 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
 
     if (t.isNull())
     {
-        // done in above state handler
+        ui.actionSkip->setEnabled( false );
     }
     else if (t.source() == Track::LastFmRadio)
     {
