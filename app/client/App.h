@@ -50,7 +50,7 @@ public:
     class LocalRql* localRql();
     
 signals:
-    /** documented in PlayerManager */
+    /** documented in StateMachine */
     void playerChanged( const QString& name );
     void trackSpooled( const Track&, class StopWatch* = 0 );
     void trackUnspooled( const Track& );
@@ -85,7 +85,6 @@ private slots:
     
 private:
     class Scrobbler* m_scrobbler;
-    class DrWatson* m_watson;
     class MainWindow* m_mainWindow;
     class Radio* m_radio;
     class Resolver *m_resolver;

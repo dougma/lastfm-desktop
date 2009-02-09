@@ -130,11 +130,7 @@ App::App( int& argc, char** argv )
         m_listener = 0;
 
         qWarning() << e.what();
-        MessageBoxBuilder( 0 )
-                .setIcon( QMessageBox::Warning )
-                .setTitle( tr("Scrobbling will not work") )
-                .setText( tr("Could not instantiate scrobbling pipe") )
-                .exec();
+        //TODO diagnostics dialog warning
     }
 #endif
 

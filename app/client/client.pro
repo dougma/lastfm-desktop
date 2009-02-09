@@ -3,8 +3,9 @@ TARGET = Last.fm
 CONFIG += unicorn radio scrobble listener fingerprint
 VERSION = 2.0.0
 
-QT = gui \
-	 webkit svg \ #review at release
+# we don't add the basics as it tests that our build system will do that for the 
+# CONFIG line above
+QT = webkit svg \ #review at release
      opengl \ #phonon requires this bizarrely
      sql #doug's headers have an incredible vast dependency chain :P
 
@@ -13,6 +14,7 @@ macx-xcode:debug {
 	#statically linking, essentially; it's a headache
 	CONFIG += mad fftw3f samplerate taglib sqlite3
 	CONFIG -= unicorn radio scrobble listener fingerprint
+	QT += core gui network xml phonon
 }
 
 include( $$ROOT_DIR/admin/include.qmake )
@@ -38,7 +40,6 @@ macx-xcode:debug {
 	SOURCES += common/c++/Logger.cpp
     ICON = app/client/$$ICON
     QMAKE_INFO_PLIST = app/client/$$QMAKE_INFO_PLIST
-	QT += sql
 	INCLUDEPATH += app/client
 	DEFINES += NPLUGINS
 }
