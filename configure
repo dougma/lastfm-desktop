@@ -149,8 +149,8 @@ else
         if [ $XCODE ]
         then
             admin/qpp app/client/client.pro
-            cp app/client/client.pro client.pro.cp
-            qmake -config debug -spec macx-xcode client.pro.cp || exit $?
+            cp app/client/client.pro _client.pro
+            qmake -config debug -spec macx-xcode _client.pro || exit $?
             # the only way to add the QtOverride stuff to xcodeproj bundles, 
             # which suggests we should lose it
             XCODEPROJ='Last.fm.xcodeproj/project.pbxproj'
@@ -158,8 +158,12 @@ else
         	# disable stupid recursive includes
         	perl -pi -e 's|buildSettings = {|buildSettings = {\n\t\tALWAYS_SEARCH_USER_PATHS = NO;|g' $XCODEPROJ
             BUILD_CMD='open Last.fm.xcodeproj'
-            rm _files.qmake client.pro.cp _version.h
+            rm _files.qmake _version.h
         else
+            if [[ $EXTRA_QMAKE_FLAGS == '' ]]; then
+                EXTRA_QMAKE_FLAGS='NOTHING=""'
+            fi
+        
             qmake -config debug -recursive Last.fm.pro "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
             BUILD_CMD='make'        
         fi;;
