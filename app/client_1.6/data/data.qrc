@@ -46,11 +46,11 @@
 <file>icons/my_neighbours.png</file>
 <file>icons/my_tags.png</file>
 <file>icons/neighbour_radio.png</file>
-<file>icons/options_account.png</file>
+<file alias="SettingsDialog/account.png">icons/options_account.png</file>
 <file>icons/options_connection.png</file>
-<file>icons/options_mediadevices.png</file>
-<file>icons/options_radio.png</file>
-<file>icons/options_scrobbling.png</file>
+<file alias="SettingsDialog/ipod.png">icons/options_mediadevices.png</file>
+<file alias="SettingsDialog/radio.png">icons/options_radio.png</file>
+<file alias="SettingsDialog/scrobbling.png">icons/options_scrobbling.png</file>
 <file>icons/orangeprofile24.png</file>
 <file>icons/personal_radio.png</file>
 <file>icons/qt_cross.png</file>

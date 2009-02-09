@@ -8,7 +8,6 @@ class App : public Unicorn::Application
     Q_OBJECT
     
     class StateMachine* machine;
-    class Radio* radio;
     class Scrobbler* scrobbler;
     class Container* container;
     class QSystemTrayIcon* trayicon;
@@ -16,6 +15,8 @@ class App : public Unicorn::Application
 public:
     App( int&, char** );
     ~App();
+
+    class Radio* radio;
 
     void setContainer( class Container* );
     

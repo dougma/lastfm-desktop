@@ -40,6 +40,7 @@ class Container : public QMainWindow
         uint stackIndex() const { return ui.stack->currentIndex(); }
         
         class DiagnosticsDialog* diagnostics;
+        class SettingsDialog* settings;
 
     public slots:
         void onTuningIn( const RadioStation& );
@@ -55,10 +56,12 @@ class Container : public QMainWindow
             Ui::PlayControls playcontrols;
 
         } ui;
+        
+        void setStopVisible( bool );
 
     public slots:
 //TODO        void checkForUpdates( bool invokedByUser = true );
-//TODO        void showSettingsDialog( int startPage = 0 );
+        void showSettingsDialog();
         void showDiagnosticsDialog();
 //TODO        void showShareDialog();
 //TODO        void showTagDialog( int defaultTagType = -1 );

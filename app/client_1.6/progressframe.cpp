@@ -74,7 +74,11 @@ ProgressFrame::setStopWatch( StopWatch* watch )
     m_seconds_timer->setParent( watch );
     m_seconds_timer->start();
 
-    setValue( m_watch ? m_watch->elapsed() : 0 );
+    if (m_watch)
+    {
+        setValue( m_watch ? m_watch->elapsed() / 1000 : 0 );
+        m_seconds_timer->setOffset( value() );
+    }
 
     //m_progressEnabled = true;
     //m_clockEnabled = true;
@@ -88,6 +92,7 @@ ProgressFrame::prepareNewEndlessTimer()
     delete m_seconds_timer;
     m_seconds_timer = new SecondsTimer;
     connect( m_seconds_timer, SIGNAL(valueChanged( int )), SLOT(setValue( int )) );
+    update();
 }
 
 
@@ -249,6 +254,8 @@ ProgressFrame::paintIcon( QPainter* painter, QRect rect, const QPixmap& icon )
 QRect
 ProgressFrame::paintClock( QPainter* painter, QRect rect )
 {
+    if (!m_watch) return QRect();
+    
     // texts on top
     painter->setPen( Qt::black );
     painter->setBrush( Qt::black );

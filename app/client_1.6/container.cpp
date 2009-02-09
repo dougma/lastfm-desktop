@@ -71,6 +71,7 @@
 
 //client 2
 #include "app/client/widgets/DiagnosticsDialog.h"
+#include "app/client/widgets/SettingsDialog.h"
 
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
@@ -124,7 +125,10 @@ Container::Container()
     setupConnections();
     restoreState();
 
+    connect( qApp, SIGNAL(playerChanged( QString )), ui.stationTimeBar, SLOT(hide()) );
+
     diagnostics = new DiagnosticsDialog( this );
+    settings = new SettingsDialog( this );
         
     // we must restore state here as we save it in toggleSidebar in order to get
     // round the bug in Qt where saveState for the splitter is lost for hidden widgets
@@ -410,15 +414,10 @@ Container::setupConnections()
 {
     connect( ui.actionDashboard, SIGNAL( triggered() ), SLOT( gotoProfile() ) );
     connect( ui.actionSettings, SIGNAL( triggered() ), SLOT( showSettingsDialog() ) );
-    connect( ui.actionGetPlugin, SIGNAL( triggered() ), SLOT( getPlugin() ) );
     connect( ui.actionCheckForUpdates, SIGNAL( triggered() ), SLOT( checkForUpdates() ) );
-    connect( ui.actionAddUser, SIGNAL( triggered() ), SLOT( addUser() ) );
-    connect( ui.actionDeleteUser, SIGNAL( triggered() ), SLOT( deleteUser() ) );
     connect( ui.actionToggleScrobbling, SIGNAL( triggered() ), SLOT( toggleScrobbling() ) );
     connect( ui.actionToggleDiscoveryMode, SIGNAL( triggered() ), SLOT( toggleDiscoveryMode() ) );
     connect( ui.actionAboutLastfm, SIGNAL( triggered() ), SLOT( about() ) );
-    connect( ui.menuUser, SIGNAL( aboutToShow() ), SLOT( onAboutToShowUserMenu() ) );
-    connect( ui.menuUser, SIGNAL( triggered( QAction* ) ), SLOT( onUserSelected( QAction* ) ) );
     connect( ui.actionSkip, SIGNAL( triggered() ), SIGNAL(skip() ) );
     connect( ui.actionStop, SIGNAL( triggered() ), SIGNAL(stop() ) );
     connect( ui.actionPlay, SIGNAL( triggered() ), SLOT(onPlayClicked()) );
@@ -1000,16 +999,17 @@ Container::showShareDialog()
     m_shareDialog->setSong( m_track );
     m_shareDialog->exec();
 }
+#endif
 
 
 void
-Container::showSettingsDialog( int startPage )
+Container::showSettingsDialog()
 {
-    SettingsDialog settingsDialog( this );
-    settingsDialog.exec( startPage );
+    settings->raise();
+    settings->show();
 }
 
-#endif
+
 void
 Container::showDiagnosticsDialog()
 {
@@ -1193,11 +1193,9 @@ Container::onAppStateChanged( State state, const Track& track )
     switch (state)
     {
         case TuningIn:
+            setStopVisible( true );
             ui.stack->setCurrentIndex( 1 );
-            ui.meta->setTuningIn();
-            ui.actionPlay->setVisible( false );
-            ui.actionStop->setVisible( true );
-        
+            ui.meta->setTuningIn();    
             ui.songTimeBar->clear();
             ui.stationTimeBar->setClockText( "" );
             ui.stationTimeBar->setEnabled( true );
@@ -1212,11 +1210,13 @@ Container::onAppStateChanged( State state, const Track& track )
                 // gap between tuning in and starting playback so the user may have
                 // already switched back to the change station tab
                 showMetaDataWidget();
-                ui.actionPlay->setVisible( false );
-                ui.actionStop->setVisible( false );                
+                setStopVisible( false );
+                ui.actionPlay->setEnabled( false );
             }
-            else
+            else {
+                ui.actionSkip->setEnabled( true );
                 ui.stationTimeBar->setText( tr( "Station: %1" ).arg( m_station.title() ) );
+            }
             break;
             
         case Stopped:
@@ -1237,8 +1237,7 @@ Container::onAppStateChanged( State state, const Track& track )
             ui.stationTimeBar->setEnabled( false );
             ui.stationTimeBar->hide();
             
-            ui.actionPlay->setVisible( true );
-            ui.actionStop->setVisible( false );
+            setStopVisible( false );
 
             showRestState();
             break;
@@ -1247,11 +1246,27 @@ Container::onAppStateChanged( State state, const Track& track )
         case Paused:
             break;
     }
-    
-    ui.actionPlay->setEnabled( ui.actionPlay->isVisible() && !The::currentUser().resumeStation().isEmpty() );
-    ui.actionStop->setEnabled( ui.actionStop->isVisible() );
-    ui.actionPlay->setShortcut( ui.actionPlay->isEnabled() ? Qt::Key_Space : QKeySequence() );
-    ui.actionStop->setShortcut( ui.actionStop->isEnabled() ? Qt::Key_Space : QKeySequence() );
+}
+
+
+void
+Container::setStopVisible( bool b )
+{
+    if (b) {
+        ui.actionPlay->setVisible( false );
+        ui.actionPlay->setEnabled( false );
+        ui.actionStop->setVisible( true );
+        ui.actionStop->setEnabled( true );
+        ui.actionPlay->setShortcut( QKeySequence() );
+        ui.actionStop->setShortcut( Qt::Key_Space );
+    } else {
+        ui.actionPlay->setVisible( true );
+        ui.actionPlay->setEnabled( The::currentUser().resumeStation().size() );
+        ui.actionStop->setVisible( false );
+        ui.actionStop->setEnabled( false );
+        ui.actionPlay->setShortcut( Qt::Key_Space );
+        ui.actionStop->setShortcut( QKeySequence() );
+    }
 }
 
 
@@ -1268,17 +1283,8 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
     }
     else if (t.source() == Track::LastFmRadio)
     {
-        ui.actionPlay->setEnabled( false );
-        ui.actionStop->setEnabled( true );
-        
         ui.stationTimeBar->startEndlessTimerIfNotAlreadyStarted();
     }
-    else //track from media player, we have no control
-    {        
-        ui.actionPlay->setEnabled( false );
-        ui.actionStop->setEnabled( false );        
-    }
-    
 
     if (t.isNull()) return;
     
@@ -1287,10 +1293,7 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
     qDebug() << track;
     
     ui.songTimeBar->setTrack( track );
-    m_trayIcon->setTrack( track );
-    // clear loading messages and that FIXME this sucks
-    statusBar()->clearMessage();
-
+        
     if (!Scrobble(track).isValid() && track.source() != Track::LastFmRadio)
     {
         ui.actionTag->setEnabled( false );
@@ -1325,6 +1328,11 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
         }
     }
 
+    m_trayIcon->setTrack( track );
+    // clear loading messages and that FIXME this sucks
+    statusBar()->clearMessage();
+
+
     ui.stack->setCurrentIndex( 1 );
 }
 
@@ -1332,6 +1340,8 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
 void
 Container::onScrobblePointReached( const Track& t )
 {
+    qDebug() << t;
+    
     ui.songTimeBar->pushClockText( tr( "scrobbled" ), 5 );
     ui.sidebar->addRecentlyPlayedTrack( t );
 }

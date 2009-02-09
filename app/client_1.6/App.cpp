@@ -486,3 +486,9 @@ App::parseArguments( const QStringList& args )
                 break;
         }
 }
+
+
+namespace The
+{
+    Radio& radio() { return *((App*)qApp)->radio; }
+}

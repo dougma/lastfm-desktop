@@ -19,9 +19,12 @@ INCLUDEPATH += ../client
 HEADERS += ../client/ExtractIdentifiersJob.h \
            ../client/StateMachine.h \
            ../client/StopWatch.h \
-           ../client/widgets/DiagnosticsDialog.h
+           ../client/widgets/DiagnosticsDialog.h \
+           ../client/widgets/SettingsDialog.h
 SOURCES += ../client/ExtractIdentifiersJob.cpp \
            ../client/StateMachine.cpp \
            ../client/StopWatch.cpp \
-           ../client/widgets/DiagnosticsDialog.cpp
-FORMS   += ../client/widgets/DiagnosticsDialog.ui
+           ../client/widgets/DiagnosticsDialog.cpp \
+           ../client/widgets/SettingsDialog.cpp
+FORMS   += ../client/widgets/DiagnosticsDialog.ui \
+           ../client/widgets/SettingsDialog.ui

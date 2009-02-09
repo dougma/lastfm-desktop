@@ -87,8 +87,10 @@ RestStateWidget::RestStateWidget( QWidget* parent )
     connect( ui.edit, SIGNAL( textChanged( QString ) ), SLOT( onEditTextChanged( QString ) ) );
     connect( ui.play, SIGNAL( clicked() ), SLOT( onPlayClicked() ) );
 
+    ui.hello->setText( tr("Hello %1,").arg( The::currentUser().username() ) );
+    ui.combo->setCurrentIndex( CurrentUserSettings().value( "RestStateWidgetComboIndex", 0 ).toInt() );
+
     setFocusProxy( ui.edit );
-    onUserChanged( The::currentUser() );
 
     ui.edit->installEventFilter( this );
 }
@@ -128,20 +130,9 @@ RestStateWidget::updatePlayerNames()
 
 
 void
-RestStateWidget::onUserChanged( LastFmUserSettings& user )
-{
-    ui.hello->setText( tr("Hello %1,").arg( user.username() ) );
-    ui.combo->setCurrentIndex( CurrentUserSettings().value( "RestStateWidgetComboIndex", 0 ).toInt() );
-
-    qDeleteAll( findChildren<RestStateMessage*>() );
-
-    QString const username = user.username().toLower();
-}
-
-
-void
 RestStateWidget::onHandshaken( Handshake* handshake )
 {
+    Q_UNUSED( handshake )
 #if 0 //TODO
     #ifndef Q_WS_MAC
         const bool noPluginsInstalled = The::settings().allPlugins().empty();

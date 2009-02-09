@@ -49,7 +49,6 @@ signals:
     void play( const QUrl& );
 
 private slots:
-    void onUserChanged( class LastFmUserSettings& );
     void onPlayClicked();
     void onEditTextChanged( const QString& );
     void showBootstrapWizard();

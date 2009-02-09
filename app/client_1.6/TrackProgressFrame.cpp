@@ -186,7 +186,7 @@ TrackProgressFrame::paintClock( QPainter* painter, QRect rect )
             }
             else
             {
-                bool scrobbled = ( watchTimeOut() - value() ) < 1;
+                bool scrobbled = m_watch->isTimedOut();
                 if ( scrobbled )
                 {
                     timeString = tr( "scrobbled", "Needs to be very short, displayed in track progress bar" );

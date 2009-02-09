@@ -152,6 +152,7 @@ class ProgressFrame : public QFrame
         QTimer m_textPushTimer;
         QTimer m_clockPushTimer;
 
+protected:
         StopWatch* m_watch;
         QPointer<SecondsTimer> m_seconds_timer;
         int m_value;
@@ -176,9 +177,10 @@ class SecondsTimer : public QObject
     static QTimer* s_timer;
     QTime elapsed;
     bool m_active;
+    int m_offset;
 
 public:
-    SecondsTimer() : m_active( false )
+    SecondsTimer() : m_active( false ), m_offset( 0 )
     {
         if (!s_timer)
         {
@@ -186,6 +188,8 @@ public:
             s_timer->setInterval( 1000 );
         }
     }
+    
+    void setOffset( int i ) { m_offset = i; }
     
     void start()
     {
@@ -203,7 +207,7 @@ public:
 private slots:
     void onTimeout()
     {
-        emit valueChanged( (int) floor( elapsed.elapsed() / 1000.0 ) );
+        emit valueChanged( (int) floor( elapsed.elapsed() / 1000.0 ) + m_offset );
     }
     
 signals:
