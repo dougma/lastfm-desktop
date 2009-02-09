@@ -1183,9 +1183,10 @@ void
 Container::onTuningIn( const RadioStation& station )
 {
     m_station = station;
-    ui.stationTimeBar->setText( tr( "Tuning in..." ) );
+    ui.stationTimeBar->setText( station.title().size() ? tr("Fetching playlist...") : tr( "Starting station..." ) );
     statusBar()->showMessage( tr( "Starting station %1..." ).arg( station.title() ) );
 }
+
 
 void
 Container::onAppStateChanged( State state, const Track& track )
