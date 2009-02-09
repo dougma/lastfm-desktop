@@ -1152,6 +1152,7 @@ Container::onAltShiftL()
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
         ShellExecuteW( 0, 0, (TCHAR*)UnicornCoreApplication::log().filePath().utf16(), 0, 0, SW_SHOWNORMAL );
+    #else
         QDesktopServices::openUrl( QUrl::fromLocalFile( UnicornCoreApplication::log().filePath() ) );
     #endif
 }
@@ -1163,6 +1164,7 @@ Container::onAltShiftF()
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
         ShellExecuteW( 0, 0, (TCHAR*)UnicornCoreApplication::log().path().utf16(), 0, 0, SW_SHOWNORMAL );
+    #else
         QDesktopServices::openUrl( QUrl::fromLocalFile( CoreDir::logs().path() ) );
     #endif
 }
