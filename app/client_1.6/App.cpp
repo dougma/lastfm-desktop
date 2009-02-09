@@ -196,7 +196,7 @@ App::setContainer( Container* window )
         setScrobblingEnabled( true );
     }
 
-//TODO    connect( scrobbler, SIGNAL(status( int )), window->ui.diagnostics, SLOT(scrobbleActivity( int )) );
+    connect( scrobbler, SIGNAL(status( int )), (QObject*)container->diagnostics, SLOT(scrobbleActivity( int )) );
 
     connect( container, SIGNAL(play( QUrl )), SLOT(open( QUrl )) );
     connect( container, SIGNAL(skip()), radio, SLOT(skip()) );
@@ -352,7 +352,6 @@ App::onTrackSpooled( const Track& t )
     
     qDebug() << t;
     
-#ifdef Q_OS_MAC
     if (t.source() == Track::Player && t.isMp3() && The::currentUser().fingerprintingEnabled())
     {
         FingerprintId fpid = Fingerprint( t ).id();
@@ -362,11 +361,9 @@ App::onTrackSpooled( const Track& t )
             ExtractIdentifiersJob* job = new ExtractIdentifiersJob( t );
             QThreadPool::globalInstance()->start( job );
             
-//TODO            connect( job, SIGNAL(fingerprinted( Track )), container->ui.diagnostics, SLOT(fingerprinted( Track )) );
+            connect( job, SIGNAL(fingerprinted( Track )), (QObject*)container->diagnostics, SLOT(fingerprinted( Track )) );
         }
-    }
-#endif
-    
+    }    
 }
 
 

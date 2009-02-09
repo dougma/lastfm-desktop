@@ -38,6 +38,8 @@ class Container : public QMainWindow
         ~Container();
         
         uint stackIndex() const { return ui.stack->currentIndex(); }
+        
+        class DiagnosticsDialog* diagnostics;
 
     private:
         struct : Ui::MainWindow
@@ -54,7 +56,7 @@ class Container : public QMainWindow
     public slots:
 //TODO        void checkForUpdates( bool invokedByUser = true );
 //TODO        void showSettingsDialog( int startPage = 0 );
-//TODO        void showDiagnosticsDialog();
+        void showDiagnosticsDialog();
 //TODO        void showShareDialog();
 //TODO        void showTagDialog( int defaultTagType = -1 );
 //TODO        void showTagDialogMD(); //medical doctor??

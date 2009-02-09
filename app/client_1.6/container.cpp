@@ -69,6 +69,9 @@
 
 #include "UglySettings.h"
 
+//client 2
+#include "app/client/widgets/DiagnosticsDialog.h"
+
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
@@ -99,8 +102,8 @@ Container::Container()
         , m_styleOverrides( 0 )
 #endif
 {    
+
 //TODO    m_shareDialog = new ShareDialog( this );
-//TODO    m_diagnosticsDialog = new DiagnosticsDialog( this );
 //TODO    m_updater = new CAutoUpdater( this );
 
     setupUi();
@@ -111,6 +114,8 @@ Container::Container()
     applyMenuTweaks();
     setupConnections();
     restoreState();
+
+    diagnostics = new DiagnosticsDialog( this );
         
     // we must restore state here as we save it in toggleSidebar in order to get
     // round the bug in Qt where saveState for the splitter is lost for hidden widgets
@@ -995,13 +1000,14 @@ Container::showSettingsDialog( int startPage )
     settingsDialog.exec( startPage );
 }
 
-
+#endif
 void
 Container::showDiagnosticsDialog()
 {
-    m_diagnosticsDialog->show();
+    diagnostics->raise();
+    diagnostics->show();
 }
-#endif
+
 
 void 
 Container::showNotification( const QString& title, const QString& message )
