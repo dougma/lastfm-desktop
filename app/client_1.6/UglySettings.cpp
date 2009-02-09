@@ -109,7 +109,7 @@ LastFmUserSettings::setResumePlayback( bool enabled )
 
 
 void
-LastFmUserSettings::setResumeStation( QUrl station )
+LastFmUserSettings::setResumeStation( QString station )
 {
     MyQSettings( this ).setValue( "resumestation", station );
     emit userChanged( username() );

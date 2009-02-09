@@ -48,6 +48,10 @@ class ProgressFrame : public QFrame
         // timeout for reverse display to work.
         void setStopWatch( StopWatch* watch );
 
+        /** hack for client 1.6 to show radio session timer */
+        void prepareNewEndlessTimer();
+        void startEndlessTimerIfNotAlreadyStarted();
+
         bool reverse() { return m_reverse; }
         void setReverse( bool reverse ) { m_reverse = reverse; }
 
@@ -163,18 +167,35 @@ class ProgressFrame : public QFrame
 
 
 #include <cmath>
-class SecondsTimer : public QTimer
+#include <QCoreApplication>
+class SecondsTimer : public QObject
 {
     Q_OBJECT
+    static QTimer* s_timer;
     QTime elapsed;
-    
+    bool m_active;
+
 public:
-    SecondsTimer()
+    SecondsTimer() : m_active( false )
     {
+        if (!s_timer)
+        {
+            s_timer = new QTimer( qApp );
+            s_timer->setInterval( 1000 );
+        }
+    }
+    
+    void start()
+    {
+        s_timer->start();
         elapsed.start();
-        setInterval( 1000 );
-        connect( this, SIGNAL(timeout()), SLOT(onTimeout()) );
-        start();
+        m_active = true;
+        connect( s_timer, SIGNAL(timeout()), SLOT(onTimeout()) );
+    }
+    
+    bool isActive() const
+    {
+        return m_active;
     }
     
 private slots:

@@ -201,6 +201,8 @@ App::setContainer( Container* window )
     connect( container, SIGNAL(play( QUrl )), SLOT(open( QUrl )) );
     connect( container, SIGNAL(skip()), radio, SLOT(skip()) );
     connect( container, SIGNAL(stop()), radio, SLOT(stop()) );
+    
+    connect( radio, SIGNAL(tuningIn( RadioStation )), container, SLOT(onTuningIn( RadioStation )) );
 }
 
 
@@ -401,7 +403,7 @@ App::logout()
 void
 App::open( const QUrl& url )
 {
-    qDebug() << url;
+    The::currentUser().setResumeStation( url.toString() );
     
     RadioStation station( url.toString() );
 

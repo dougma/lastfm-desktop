@@ -126,12 +126,12 @@ public:
     bool resumePlayback() const { return MyQSettings( this ).value( "resumeplayback", 0 ).toInt() == 1; }
     void setResumePlayback( bool enabled );
 
-    QUrl resumeStation() const
+    QString resumeStation() const
     {
-        return QUrl( MyQSettings( this ).value( "resumestation" ).toString() );
+        return MyQSettings( this ).value( "resumestation" ).toString();
     }
     
-    void setResumeStation( QUrl station );
+    void setResumeStation( QString station );
     
     void addRecentStation( const class Station& );
     void removeRecentStation( int list_index );

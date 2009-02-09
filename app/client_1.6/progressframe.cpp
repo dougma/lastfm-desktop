@@ -23,7 +23,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-
+QTimer* SecondsTimer::s_timer = 0;
 
 
 ProgressFrame::ProgressFrame( QWidget *parent ) :
@@ -45,14 +45,6 @@ ProgressFrame::ProgressFrame( QWidget *parent ) :
     setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
     setLineWidth( 1 );
 }
-
-void
-ProgressFreamstart( uint end_time_in_seconds = -1 );
-/** stops timing, and shows this text */
-void stop( const QString& text = "" );
-void setEndTime( uint seconds );
-void showTemporaryMessage( const QString& );
-
 
 
 void
@@ -78,15 +70,32 @@ void
 ProgressFrame::setStopWatch( StopWatch* watch )
 {
     m_watch = watch;
-    m_seconds_timer = new SecondsTimer;
-    connect( m_seconds_timer, SIGNAL(valueChanged( int )), SLOT(setValue( int )) );
+    prepareNewEndlessTimer();
     m_seconds_timer->setParent( watch );
+    m_seconds_timer->start();
 
-    setValue( m_watch->elapsed() );
+    setValue( m_watch ? m_watch->elapsed() : 0 );
 
     //m_progressEnabled = true;
     //m_clockEnabled = true;
     m_clockText = "";
+}
+
+
+void
+ProgressFrame::prepareNewEndlessTimer()
+{
+    delete m_seconds_timer;
+    m_seconds_timer = new SecondsTimer;
+    connect( m_seconds_timer, SIGNAL(valueChanged( int )), SLOT(setValue( int )) );
+}
+
+
+void
+ProgressFrame::startEndlessTimerIfNotAlreadyStarted()
+{
+    if (m_seconds_timer && !m_seconds_timer->isActive())
+        m_seconds_timer->start();
 }
 
 

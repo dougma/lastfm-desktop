@@ -41,6 +41,9 @@ class Container : public QMainWindow
         
         class DiagnosticsDialog* diagnostics;
 
+    public slots:
+        void onTuningIn( const RadioStation& );
+
     private:
         struct : Ui::MainWindow
         {
@@ -153,6 +156,7 @@ class Container : public QMainWindow
 
 private:
     Track m_track;
+    RadioStation m_station;
 };
 
 

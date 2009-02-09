@@ -111,6 +111,10 @@ Container::Container()
 //TODO    m_shareDialog = new ShareDialog( this );
 //TODO    m_updater = new CAutoUpdater( this );
 
+    connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onAppStateChanged( State, Track )) );
+    connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled( Track, StopWatch* )) );
+    connect( qApp, SIGNAL(scrobblePointReached( Track )), SLOT(onScrobblePointReached( Track )) );
+
     setupUi();
     setupTimeBar();
     setupTrayIcon();
@@ -138,12 +142,11 @@ Container::Container()
     ui.actionToggleDiscoveryMode->setChecked( The::currentUser().isDiscovery() );
     ui.scrobbleLabel->setEnabled( enabled );    
 
+    ui.actionPlay->setEnabled( The::currentUser().resumeStation().isEmpty() );
+
 //TODO    ui.actionToggleDiscoveryMode->setEnabled( The::user().isSubscriber() );
     
-    connect( qApp, SIGNAL(stateChanged( State, Track )), SLOT(onAppStateChanged( State, Track )) );
-    connect( qApp, SIGNAL(trackSpooled( Track, StopWatch* )), SLOT(onTrackSpooled( Track, StopWatch* )) );
-    connect( qApp, SIGNAL(scrobblePointReached( Track )), SLOT(onScrobblePointReached( Track )) );
-    
+
     ui.stack->setBackgroundRole( QPalette::Base );
 }
 
@@ -252,7 +255,6 @@ Container::setupTimeBar()
     stationBarGradient.setColorAt( 1, k_stationBarGreyBottom );
 
     ui.stationTimeBar->setBackgroundGradient( stationBarGradient );
-//TODO    ui.stationTimeBar->setStopWatch( &The::radio().stationStopWatch() );
 
     if ( qApp->arguments().contains( "--sanity" ) )
         stationBarGradient = trackBarBkgrGradient;
@@ -978,7 +980,9 @@ Container::onBanClicked()
 
 void
 Container::onPlayClicked()
-{}
+{
+    emit play( The::currentUser().resumeStation() );
+}
 
 
 void
@@ -1174,6 +1178,14 @@ Container::onAltShiftP()
 
 
 void
+Container::onTuningIn( const RadioStation& station )
+{
+    m_station = station;
+    ui.stationTimeBar->setText( tr( "Tuning in..." ) );
+    statusBar()->showMessage( tr( "Starting station %1..." ).arg( station.title() ) );
+}
+
+void
 Container::onAppStateChanged( State state, const Track& track )
 {
     switch (state)
@@ -1196,6 +1208,7 @@ Container::onAppStateChanged( State state, const Track& track )
             ui.stationTimeBar->setClockText( "" );
             ui.stationTimeBar->setEnabled( true );
             ui.stationTimeBar->setVisible( true );
+            ui.stationTimeBar->prepareNewEndlessTimer();
             break;
             
         case Playing:
@@ -1208,6 +1221,8 @@ Container::onAppStateChanged( State state, const Track& track )
                 ui.actionPlay->setVisible( false );
                 ui.actionStop->setVisible( false );                
             }
+            else
+                ui.stationTimeBar->setText( tr( "Station: %1" ).arg( m_station.title() ) );
             break;
             
         case Stopped:
@@ -1238,7 +1253,7 @@ Container::onAppStateChanged( State state, const Track& track )
             break;
     }
     
-    ui.actionPlay->setEnabled( ui.actionPlay->isVisible() );
+    ui.actionPlay->setEnabled( ui.actionPlay->isVisible() && !The::currentUser().resumeStation().isEmpty() );
     ui.actionStop->setEnabled( ui.actionStop->isVisible() );
     ui.actionPlay->setShortcut( ui.actionPlay->isEnabled() ? Qt::Key_Space : QKeySequence() );
     ui.actionStop->setShortcut( ui.actionStop->isEnabled() ? Qt::Key_Space : QKeySequence() );
@@ -1254,13 +1269,14 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
 
     if (t.isNull())
     {
-        ui.actionPlay->setEnabled( true );
-        ui.actionStop->setEnabled( false );
+        // done in above state handler
     }
     else if (t.source() == Track::LastFmRadio)
     {
         ui.actionPlay->setEnabled( false );
         ui.actionStop->setEnabled( true );
+        
+        ui.stationTimeBar->startEndlessTimerIfNotAlreadyStarted();
     }
     else //track from media player, we have no control
     {        
@@ -1277,6 +1293,8 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
     
     ui.songTimeBar->setTrack( track );
     m_trayIcon->setTrack( track );
+    // clear loading messages and that FIXME this sucks
+    statusBar()->clearMessage();
 
     if (!Scrobble(track).isValid() && track.source() != Track::LastFmRadio)
     {
@@ -1305,7 +1323,6 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
         {
             ui.actionSkip->setEnabled( false );
             ui.actionBan->setEnabled( false );            
-            statusBar()->clearMessage();
         }
         else {
             ui.actionSkip->setEnabled( true );
