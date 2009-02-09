@@ -1174,7 +1174,7 @@ Container::onAltShiftF()
 void
 Container::onAltShiftP()
 {
-//TODO    ShellExecuteW( 0, 0, (TCHAR*)UnicornUtils::globalAppDataPath().utf16(), 0, 0, SW_SHOWNORMAL );
+    ShellExecuteW( 0, 0, (TCHAR*)UnicornUtils::globalAppDataPath().utf16(), 0, 0, SW_SHOWNORMAL );
 }
 #endif
 
@@ -1332,7 +1332,6 @@ Container::onTrackSpooled( const Track& t, StopWatch* watch )
     m_trayIcon->setTrack( track );
     // clear loading messages and that FIXME this sucks
     statusBar()->clearMessage();
-
 
     ui.stack->setCurrentIndex( 1 );
 }

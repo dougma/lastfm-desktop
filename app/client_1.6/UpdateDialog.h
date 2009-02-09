@@ -34,11 +34,11 @@ class UpdateDialog : public QProgressDialog
     QNetworkReply* checking;
     QByteArray md5;
     QUrl url;
-    
     QTemporaryFile tmp;
 
 public:
-    /** auto deletes if the check comes back false */
+    /** auto deletes if the check comes back false
+      * call show() if you want the whole process to be visible */
     UpdateDialog( QWidget* parent ) : QProgressDialog( parent ), checking( 0 )
     {
         setRange( 0, 0 ); //indeterminate
@@ -109,10 +109,10 @@ private slots:
 
         tmp.setAutoRemove( false );
         
-        connect( this, SIGNAL(canceled()), SLOT(onCanceled()) );
+        connect( this, SIGNAL(canceled()), SLOT(install()) );
     }
 
-    void onCanceled()
+    void install()
     {
     #ifdef __APPLE__
         QDesktopServices::openUrl( QUrl::fromLocalFile( tmp.fileName() ) );
