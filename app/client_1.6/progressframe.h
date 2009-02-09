@@ -27,6 +27,8 @@
 #include <QFrame>
 #include <QPointer>
 #include <QTimer>
+#include <math.h>
+
 class QPainter;
 class SecondsTimer;
 
@@ -178,7 +180,7 @@ public:
 private slots:
     void onTimeout()
     {
-        emit valueChanged( (int) ::round( float(elapsed.elapsed()) / 1000.0f ) );
+        emit valueChanged( (int) floor( elapsed.elapsed() / 1000.0 ) );
     }
     
 signals:

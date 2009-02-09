@@ -92,6 +92,11 @@
 #endif
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#include <shellapi.h>
+#endif
+
 
 Container::Container()
         : QMainWindow(),
@@ -1143,7 +1148,6 @@ Container::onAltShiftL()
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
         ShellExecuteW( 0, 0, (TCHAR*)UnicornCoreApplication::log().filePath().utf16(), 0, 0, SW_SHOWNORMAL );
-    #else
         QDesktopServices::openUrl( QUrl::fromLocalFile( UnicornCoreApplication::log().filePath() ) );
     #endif
 }
@@ -1154,8 +1158,7 @@ Container::onAltShiftF()
 {
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
-        ShellExecuteW( 0, 0, (TCHAR*)CoreDir::log().path().utf16(), 0, 0, SW_SHOWNORMAL );
-    #else
+        ShellExecuteW( 0, 0, (TCHAR*)UnicornCoreApplication::log().path().utf16(), 0, 0, SW_SHOWNORMAL );
         QDesktopServices::openUrl( QUrl::fromLocalFile( CoreDir::logs().path() ) );
     #endif
 }
@@ -1165,7 +1168,7 @@ Container::onAltShiftF()
 void
 Container::onAltShiftP()
 {
-    ShellExecuteW( 0, 0, (TCHAR*)UnicornUtils::globalAppDataPath().utf16(), 0, 0, SW_SHOWNORMAL );
+//TODO    ShellExecuteW( 0, 0, (TCHAR*)UnicornUtils::globalAppDataPath().utf16(), 0, 0, SW_SHOWNORMAL );
 }
 #endif
 

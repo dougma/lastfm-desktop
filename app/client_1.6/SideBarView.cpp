@@ -96,16 +96,16 @@ SideBarTree::SideBarTree( QWidget* parent ) :
 #elif defined WIN32
     if ( style()->objectName() == "windowsvista" )
     {
-        setStyle( new TreeStyle<QWindowsVistaStyle> );
+//TODO        setStyle( new TreeStyle<QWindowsVistaStyle> );
         setStyleSheet( "QTreeView { border: 1px solid palette(dark); border-left: 0; border-top: 0 }" );
     }
     else if ( style()->objectName() == "windowsxp" )
     {
-        setStyle( new TreeStyle<QWindowsXPStyle> );
+//TODO        setStyle( new TreeStyle<QWindowsXPStyle> );
     }
     else
     {
-        setStyle( new TreeStyle<QWindowsStyle> );
+//TODO        setStyle( new TreeStyle<QWindowsStyle> );
     }
     style()->setParent( this );
 

@@ -87,12 +87,6 @@ TrayIcon::refreshToolTip()
     if ( m_artist != "" && m_track != "" )
     {
         tip = m_artist + " " + QChar(8211) /*en dash*/ + " " + m_track;
-
-        if ( The::settings().allUsers().count() > 1 )
-        {
-            tip += " | " + m_user;
-        }
-
     }
     else
     {

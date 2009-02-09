@@ -65,7 +65,7 @@ static const int kDefaultControlPort = 32213;
     
     // set QSettings to HkcuSettings
     // FIXME this causes unexpected bugs, but what's the work around?
-    #define QSettings HkcuSettings
+//    #define QSettings HkcuSettings
 #else
     // set HklmSettings to QSettings
     typedef QSettings HklmSettings;

@@ -39,7 +39,7 @@ class UNICORN_DLLEXPORT UnicornCoreApplication : public QCoreApplication
 public:
 	UnicornCoreApplication( int& argc, char** argv );
 	
-	QFileInfo log() const
+	static QFileInfo log()
 	{
 		Q_ASSERT( applicationName().size() );
 		return log( applicationName() );

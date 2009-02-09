@@ -100,7 +100,7 @@ App::App( int& argc, char** argv )
     try
     {
         listener = new PlayerListener( this );
-        connect( m_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
+        connect( listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
     }
     catch (PlayerListener::SocketFailure& e)
     {
@@ -142,7 +142,7 @@ App::App( int& argc, char** argv )
 
 #ifdef WIN32
     //TODO do only once?
-    Legacy::disableHelperApp();
+//TODO    Legacy::disableHelperApp();
 #endif
     
     connect(AuthenticatedUser().getInfo(),
@@ -182,7 +182,7 @@ App::setContainer( Container* window )
 
     QMenu* menu = new QMenu;
 	menu->addAction( tr( "Open" ), window, SLOT(show()) );
-    menu->addAction( window->ui.quit );
+//TODO    menu->addAction( window->ui.quit );
     trayicon->setContextMenu( menu );
     connect( trayicon, 
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
