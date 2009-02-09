@@ -20,9 +20,10 @@
  ***************************************************************************/
 
 #include "progressframe.h"
-
 #include <QPainter>
 #include <QPaintEvent>
+
+
 
 
 ProgressFrame::ProgressFrame( QWidget *parent ) :
@@ -45,6 +46,14 @@ ProgressFrame::ProgressFrame( QWidget *parent ) :
     setLineWidth( 1 );
 }
 
+void
+ProgressFreamstart( uint end_time_in_seconds = -1 );
+/** stops timing, and shows this text */
+void stop( const QString& text = "" );
+void setEndTime( uint seconds );
+void showTemporaryMessage( const QString& );
+
+
 
 void
 ProgressFrame::clear()
@@ -53,6 +62,8 @@ ProgressFrame::clear()
     setClockText( "" );
     setEnabled( false );
     setValue( 0 );
+    
+    delete m_seconds_timer;
 }
 
 
@@ -66,31 +77,16 @@ ProgressFrame::isActive()
 void
 ProgressFrame::setStopWatch( StopWatch* watch )
 {
-    disconnectWatch();
-
     m_watch = watch;
-    connect( m_watch, SIGNAL( valueChanged( int ) ),
-             this,    SLOT( setValue( int ) ) );
+    m_seconds_timer = new SecondsTimer;
+    connect( m_seconds_timer, SIGNAL(valueChanged( int )), SLOT(setValue( int )) );
+    m_seconds_timer->setParent( watch );
 
     setValue( m_watch->elapsed() );
 
     //m_progressEnabled = true;
     //m_clockEnabled = true;
     m_clockText = "";
-}
-
-
-void
-ProgressFrame::disconnectWatch()
-{
-    if ( m_watch != NULL )
-    {
-        disconnect( m_watch, SIGNAL( valueChanged( int ) ),
-                    this,    SLOT( setValue( int ) ) );
-
-//         delete m_watch;
-        m_watch = NULL;
-    }
 }
 
 

@@ -25,8 +25,10 @@
 #include "StopWatch.h"
 #include "lib/lastfm/types/Track.h"
 #include <QFrame>
+#include <QPointer>
 #include <QTimer>
 class QPainter;
+class SecondsTimer;
 
 
 class ProgressFrame : public QFrame
@@ -122,7 +124,6 @@ class ProgressFrame : public QFrame
     private:
 
         void paintEvent( QPaintEvent* event );
-        void disconnectWatch();
 
         QPixmap m_pixmap;
 
@@ -146,6 +147,7 @@ class ProgressFrame : public QFrame
         QTimer m_clockPushTimer;
 
         StopWatch* m_watch;
+        QPointer<SecondsTimer> m_seconds_timer;
         int m_value;
 
     private slots:
@@ -155,6 +157,32 @@ class ProgressFrame : public QFrame
         void popText();
         void popClockText();
 
+};
+
+
+#include <cmath>
+class SecondsTimer : public QTimer
+{
+    Q_OBJECT
+    QTime elapsed;
+    
+public:
+    SecondsTimer()
+    {
+        elapsed.start();
+        setInterval( 1000 );
+        connect( this, SIGNAL(timeout()), SLOT(onTimeout()) );
+        start();
+    }
+    
+private slots:
+    void onTimeout()
+    {
+        emit valueChanged( (int) ::round( float(elapsed.elapsed()) / 1000.0f ) );
+    }
+    
+signals:
+    void valueChanged( int );
 };
 
 #endif
