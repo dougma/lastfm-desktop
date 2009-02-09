@@ -69,6 +69,8 @@
 
 #include "UglySettings.h"
 
+#include "lib/lastfm/core/CoreDir.h"
+#include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/lastfm/scrobble/Scrobble.h"
 
@@ -1134,10 +1136,9 @@ Container::onAltShiftL()
 {
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
-//TODO        QString file = QString::fromStdWString( Logger::GetLogger().GetFilePath() );
-        ShellExecuteW( 0, 0, (TCHAR*)file.utf16(), 0, 0, SW_SHOWNORMAL );
+        ShellExecuteW( 0, 0, (TCHAR*)UnicornCoreApplication::log().filePath().utf16(), 0, 0, SW_SHOWNORMAL );
     #else
-//TODO        QDesktopServices::openUrl( QUrl::fromLocalFile( QString::fromStdString( Logger::GetLogger().GetFilePath() ) ) );
+        QDesktopServices::openUrl( QUrl::fromLocalFile( UnicornCoreApplication::log().filePath() ) );
     #endif
 }
 
@@ -1147,10 +1148,9 @@ Container::onAltShiftF()
 {
     #ifdef WIN32
         // The QDesktopServices call doesn't work on Windows
-//TODO        QString file = MooseUtils::logPath( "" );
-        ShellExecuteW( 0, 0, (TCHAR*)file.utf16(), 0, 0, SW_SHOWNORMAL );
+        ShellExecuteW( 0, 0, (TCHAR*)CoreDir::log().path().utf16(), 0, 0, SW_SHOWNORMAL );
     #else
-//TODO        QDesktopServices::openUrl( QUrl::fromLocalFile( MooseUtils::logPath( "" ) ) );
+        QDesktopServices::openUrl( QUrl::fromLocalFile( CoreDir::logs().path() ) );
     #endif
 }
 
