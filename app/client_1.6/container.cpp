@@ -1193,16 +1193,8 @@ Container::onAppStateChanged( State state, const Track& track )
     switch (state)
     {
         case TuningIn:
-//TODO            statusBar()->showMessage( tr( "Starting station %1..." ).arg( The::radio().stationUrl() ) );
-
             ui.stack->setCurrentIndex( 1 );
             ui.meta->setTuningIn();
-
-//TODO            if ( The::radio().stationUrl().isPlaylist() )
-//TODO                ui.stationTimeBar->setText( tr( "Connecting to playlist..." ) );
-//TODO            else
-//TODO                ui.stationTimeBar->setText( tr( "Starting station..." ) );
-
             ui.actionPlay->setVisible( false );
             ui.actionStop->setVisible( true );
         
@@ -1230,7 +1222,6 @@ Container::onAppStateChanged( State state, const Track& track )
         case Stopped:
 //TODO            ui.actionToggleDiscoveryMode->setEnabled( The::user().isSubscriber() );
             statusBar()->clearMessage();
-            showRestState();
 
             ui.actionShare->setEnabled( false );
             ui.actionTag->setEnabled( false  );
@@ -1248,6 +1239,8 @@ Container::onAppStateChanged( State state, const Track& track )
             
             ui.actionPlay->setVisible( true );
             ui.actionStop->setVisible( false );
+
+            showRestState();
             break;
             
         case Buffering:

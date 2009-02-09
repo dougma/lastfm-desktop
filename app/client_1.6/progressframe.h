@@ -168,6 +168,8 @@ class ProgressFrame : public QFrame
 
 #include <cmath>
 #include <QCoreApplication>
+/** uses one timer to keep updates in sync visually, even though this may make 
+  * the timer up to one second out of sync */
 class SecondsTimer : public QObject
 {
     Q_OBJECT
