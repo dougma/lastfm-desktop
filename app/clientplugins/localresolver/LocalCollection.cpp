@@ -133,7 +133,7 @@ LocalCollection::initDatabase()
                     "name               TEXT UNIQUE NOT NULL );" );
         QUERY( "CREATE INDEX tags_name_idx ON tags ( name );" );
 
-        // file has tag with weight, and source indicates user tag or dl'd tag
+        // file has tag with weight
         QUERY( "CREATE TABLE tracktags ("
                     "file               INTEGER NOT NULL,"      // files foreign key
                     "tag                INTEGER NOT NULL,"      // tags foreign key

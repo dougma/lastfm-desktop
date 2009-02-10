@@ -45,6 +45,8 @@ lastfm_getService(const char *service)
             "http://musiclookup.last.fm/trackresolve",
             100,        // number of days track tags are good 
             5);         // 5 minute delay between web requests
+
+        // todo: connect(m_scanner, SIGNAL(tracksChanged()), gTrackTagUpdater, SLOT(needsUpdate()));
     }
 
     if (0 == strcmp("TrackResolver", service)) {

@@ -24,7 +24,6 @@
 #include "QueryError.h"
 #include "TrackTagUpdater.h"
 
-extern TrackTagUpdater *gTrackTagUpdater;
 extern QString remapVolumeName(const QString& volume);
 
 
@@ -42,9 +41,10 @@ TrackResolver::~TrackResolver()
 void
 TrackResolver::init()
 {
+    Q_ASSERT(m_query == 0 && m_scanner == 0);     // only init once, innit.
+
     m_query = TrackResolverThread::create();
     m_scanner = new LocalContentScanner;
-    connect(m_scanner, SIGNAL(tracksChanged()), gTrackTagUpdater, SLOT(needsUpdate()));
 }
 
 void 
