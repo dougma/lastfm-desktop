@@ -27,6 +27,16 @@ class App : public Unicorn::Application
 {
 public:
     App( int& argc, char* argv[] );
+
+    void openXspf( QString filename );
+
+private:
+    class TrackTagUpdater* m_trackTagUpdater;
+    class ILocalRqlPlugin* m_localRql;
+    class ITrackResolverPlugin* m_trackResolver;
+
+    class Radio* m_radio;
+    class Resolver* m_resolver;
 };
 
 #endif //APP_H

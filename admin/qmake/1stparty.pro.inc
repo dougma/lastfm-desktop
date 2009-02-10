@@ -22,6 +22,9 @@ CONFIG( fingerprint ) {
 }
 CONFIG( resolver ) {
 	LIBS += -lresolver
+	win32:LIBS += -lmpr
+	INCLUDEPATH += $$ROOT_DIR/app/clientplugins/localresolver
+	CONFIG += taglib sqlite3
 }
 CONFIG( types ) {
 	LIBS += -ltypes

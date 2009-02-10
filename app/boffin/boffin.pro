@@ -1,4 +1,4 @@
-CONFIG += core types unicorn
+CONFIG += core types unicorn resolver radio sqlite3 taglib
 QT = gui xml sql
 VERSION = 0.0.1
 
