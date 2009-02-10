@@ -23,7 +23,9 @@
 #include "widgets/LoginDialog.h"
 #include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/core/CoreDir.h"
+#include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsKeys.h"
+#include "lib/lastfm/ws/WsReply.h"
 #include <QDebug>
 #include <QTranslator>
 
@@ -59,6 +61,8 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
 
     Ws::Username = s.value( "Username" ).toString();
     Ws::SessionKey = s.value( "SessionKey" ).toString();
+    
+    connect( AuthenticatedUser().getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 }
 
 
@@ -97,4 +101,22 @@ Unicorn::Application::~Application()
         s.remove( "SessionKey" );
         s.remove( "Password" );
     }
+}
+
+
+void
+Unicorn::Application::onUserGotInfo( WsReply* r )
+{
+    try
+    {
+        const char* key = Unicorn::UserSettings::subscriptionKey();
+        bool const value = r->lfm()["user"]["subscriber"].text().toInt() == 1;
+        Unicorn::UserSettings().setValue( key, value );
+    }
+    catch (CoreDomElement& e)
+    {
+        qWarning() << e;
+    }
+    
+    emit userGotInfo( r );
 }

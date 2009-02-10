@@ -76,7 +76,7 @@
   </action>
   <action name="logout" >
    <property name="text" >
-    <string>Log &amp;Out</string>
+    <string>Log &amp;Out &amp;&amp; Quit</string>
    </property>
   </action>
   <action name="quit" >

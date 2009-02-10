@@ -18,9 +18,18 @@
  ***************************************************************************/
  
 #include "App.h"
-
+#include "MainWindow.h"
+#include "_version.h"
 
 int main( int argc, char* argv[] )
 {
-    return App( argc, argv ).exec();
+    QCoreApplication::setApplicationName( "Boffin" );
+    QCoreApplication::setApplicationVersion( VERSION );
+
+    App app( argc, argv );
+
+    MainWindow window;
+    window.show();
+    
+    return app.exec();
 }

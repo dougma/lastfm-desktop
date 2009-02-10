@@ -105,5 +105,67 @@ AuthenticatedUser::getInfo()
 QUrl
 User::www() const
 { 
-	return "http://www.last.fm/user/" + CoreUrl::encode( m_name ); 
+	return CoreUrl( "http://www.last.fm/user/" + CoreUrl::encode( m_name ) ).localised(); 
+}
+
+
+QString //static
+AuthenticatedUser::getInfoString( WsReply* reply )
+{
+    #define tr QObject::tr
+    
+    class Gender
+    {
+        QString s;
+
+    public:
+        Gender( const QString& ss ) :s( ss.toLower() )
+        {}
+ 
+        bool known() const { return male() || female(); }
+        bool male() const { return s == "m"; }
+        bool female() const { return s == "f"; }
+ 
+        QString toString()
+        {
+            QStringList list;
+            if (male())
+                list << tr("boy") << tr("lad") << tr("chap") << tr("guy");
+            else if (female())
+                // I'm not sexist, it's just I'm gutless and couldn't think
+                // of any other non offensive terms for women!
+                list << tr("girl") << tr("lady") << tr("lass");
+            else 
+                return tr("person");
+            
+            return list.value( QDateTime::currentDateTime().toTime_t() % list.count() );
+        }
+    };
+
+    QString text;
+	try
+	{
+    	CoreDomElement e = reply->lfm()["user"];
+    	Gender gender = e["gender"].text();
+    	QString age = e["age"].text();
+    	uint const scrobbles = e["playcount"].text().toUInt();
+    	if (gender.known() && age.size() && scrobbles > 0)
+    	{
+    		text = tr("A %1, %2 years of age with %L3 scrobbles")
+    				.arg( gender.toString() )
+    				.arg( age )
+    				.arg( scrobbles );
+    	}
+    	else if (scrobbles > 0)
+    	{
+            text = tr("%L1 scrobbles").arg( scrobbles );
+    	}    
+    }
+	catch (CoreDomElement::Exception& e)
+	{
+        qWarning() << e;
+	}
+    return text;
+    
+    #undef tr
 }

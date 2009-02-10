@@ -90,7 +90,10 @@ public:
     {}
 
 	/** you can only get information about the autheticated user */
-	static WsReply* getInfo();       
+	static WsReply* getInfo();
+	
+	/** a verbose string, eg. "A man with 36,153 scrobbles" */
+    static QString getInfoString( WsReply* );
 };
 
 #endif

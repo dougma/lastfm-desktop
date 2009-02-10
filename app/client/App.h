@@ -66,8 +66,6 @@ signals:
     void status( const QString& message, const QString& id );
     
 public slots:
-    /** currently also quits, needs fixing! */
-    void logout();
 	void love( bool loveOrUnlove );
 	void ban();
     void parseArguments( const QStringList& );

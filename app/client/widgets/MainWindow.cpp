@@ -159,9 +159,8 @@ MainWindow::setupUi()
         ag->addAction( ui.viewDashboard );
     }
 
-    AuthenticatedUser user;
-    ui.account->setTitle( user );
-   	connect( user.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGetInfoReturn( WsReply* )) );
+    ui.account->setTitle( Ws::Username );
+   	connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     setCentralWidget( new QWidget );
@@ -439,67 +438,16 @@ MainWindow::dropEvent( QDropEvent* e )
 
 
 void
-MainWindow::onUserGetInfoReturn( WsReply* reply )
+MainWindow::onUserGotInfo( WsReply* reply )
 {
-	try
-	{
-        class Gender
-        {
-            QString s;
-            
-        public:
-            Gender( const QString& ss ) :s( ss.toLower() )
-            {}
-            
-            bool known() const { return male() || female(); }
-            bool male() const { return s == "m"; }
-            bool female() const { return s == "f"; }
-            
-            QString toString()
-            {
-                QStringList list;
-                if (male())
-                {
-                    list << tr("boy") << tr("lad") << tr("chap") << tr("guy");
-                }
-                else if (female())
-                    // I'm not sexist, it's just I'm gutless and couldn't think
-                    // of any other non offensive terms for women!
-                    list << tr("girl") << tr("lady") << tr("lass");
-                else 
-                    return tr("person");
-                    
-                return list.value( QDateTime::currentDateTime().toTime_t() % list.count() );
-            }
-        };
-        
-        QString action_text;
+    QString const text = AuthenticatedUser::getInfoString( reply );
 
-		CoreDomElement e = reply->lfm()["user"];
-		Gender gender = e["gender"].text();
-		QString age = e["age"].text();
-		uint const scrobbles = e["playcount"].text().toUInt();
-		if (gender.known() && age.size() && scrobbles > 0)
-		{
-			action_text = tr("A %1, %2 years of age with %L3 scrobbles")
-					.arg( gender.toString() )
-					.arg( age )
-					.arg( scrobbles );
-		}
-		else if (scrobbles > 0)
-		{
-            action_text = tr("%L1 scrobbles").arg( scrobbles );
-		}
-
-        if (action_text.size())
-        {
-            QAction* act = ui.account->addAction( action_text );
-            act->setEnabled( false );
-            ui.account->insertAction( ui.profile, act );
-        }
+    if (text.size())
+    {
+        QAction* act = ui.account->addAction( text );
+        act->setEnabled( false );
+        ui.account->insertAction( ui.profile, act );
     }
-	catch (CoreDomElement::Exception&)
-	{}
 }
 
 

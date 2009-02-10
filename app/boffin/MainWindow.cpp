@@ -17,53 +17,47 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_APPLICATION_H
-#define UNICORN_APPLICATION_H
+#include "MainWindow.h"
+#include "lib/lastfm/core/CoreUrl.h"
+#include "lib/lastfm/types/User.h"
+#include "lib/lastfm/ws/WsKeys.h"
+#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QMenuBar>
 
-#include "lib/DllExportMacro.h"
-#include "common/HideStupidWarnings.h"
-#include <QApplication>
-class WsReply;
 
-
-namespace Unicorn
+MainWindow::MainWindow()
 {
-    class UNICORN_DLLEXPORT Application : public QApplication
-    {
-        Q_OBJECT
-
-        bool m_logoutAtQuit;
-
-    public:
-        class StubbornUserException
-        {};
-
-        /** will put up the log in dialog if necessary, throwing if the user
-          * cancels, ie. they refuse to log in */
-        Application( int&, char** ) throw( StubbornUserException );
-        ~Application();
-
-        /** when the application exits, the user will be logged out
-          * the verb is "to log out", not "to logout". Demonstrated by, eg. "He
-          * logged out", or, "she logs out" */
-        void logoutAtQuit() { m_logoutAtQuit = true; }
-
-    public slots:
-        void logout()
-        {
-            logoutAtQuit();
-            quit();
-        }
-
-    private:
-        void translate();
-
-    private slots:
-        void onUserGotInfo( WsReply* );
-
-    signals:
-        void userGotInfo( WsReply* );
-    };
+    setWindowTitle( tr("Last.fm Boffin") );
+    
+    ui.account = menuBar()->addMenu( Ws::Username );
+    ui.profile = ui.account->addAction( tr("Visit Profile"), this, SLOT(openProfileUrl()) );
+    ui.account->addSeparator();
+    ui.account->addAction( tr("Log Out && Quit"), qApp, SLOT(logout()) );
+#ifndef Q_OS_MAC
+    ui.account->addAction( tr("Quit"), qApp, SLOT(quit()) );
+#endif
+    
+    connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 }
 
-#endif
+
+void
+MainWindow::onUserGotInfo( WsReply* reply )
+{
+    QString const text = AuthenticatedUser::getInfoString( reply );
+
+    if (text.size())
+    {
+        QAction* act = ui.account->addAction( text );
+        act->setEnabled( false );
+        ui.account->insertAction( ui.profile, act );
+    }
+}
+
+
+void
+MainWindow::openProfileUrl()
+{
+    QDesktopServices::openUrl( AuthenticatedUser().www() );
+}

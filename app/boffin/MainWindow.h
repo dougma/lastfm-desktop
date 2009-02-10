@@ -17,53 +17,25 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_APPLICATION_H
-#define UNICORN_APPLICATION_H
-
-#include "lib/DllExportMacro.h"
-#include "common/HideStupidWarnings.h"
-#include <QApplication>
-class WsReply;
+#include <QMainWindow>
 
 
-namespace Unicorn
+class MainWindow : public QMainWindow
 {
-    class UNICORN_DLLEXPORT Application : public QApplication
+    Q_OBJECT
+
+    struct Ui
     {
-        Q_OBJECT
+        QMenu* account;
+        QAction* profile;
+    } ui;
 
-        bool m_logoutAtQuit;
-
-    public:
-        class StubbornUserException
-        {};
-
-        /** will put up the log in dialog if necessary, throwing if the user
-          * cancels, ie. they refuse to log in */
-        Application( int&, char** ) throw( StubbornUserException );
-        ~Application();
-
-        /** when the application exits, the user will be logged out
-          * the verb is "to log out", not "to logout". Demonstrated by, eg. "He
-          * logged out", or, "she logs out" */
-        void logoutAtQuit() { m_logoutAtQuit = true; }
-
-    public slots:
-        void logout()
-        {
-            logoutAtQuit();
-            quit();
-        }
-
-    private:
-        void translate();
-
-    private slots:
-        void onUserGotInfo( WsReply* );
-
-    signals:
-        void userGotInfo( WsReply* );
-    };
-}
-
-#endif
+public:
+    MainWindow();
+    
+public slots:
+    void openProfileUrl();
+    
+private slots:
+    void onUserGotInfo( class WsReply* );
+};

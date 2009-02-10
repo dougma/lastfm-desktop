@@ -190,9 +190,7 @@ App::App( int& argc, char** argv ) throw( StubbornUserException )
     Legacy::disableHelperApp();
 #endif
     
-    connect(AuthenticatedUser().getInfo(),
-            SIGNAL(finished( WsReply* )),
-            SLOT(onUserGotInfo( WsReply* )));
+    connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 }
 
 
@@ -443,14 +441,6 @@ App::ban()
 	MutableTrack t = m_stateMachine->track();
 	t.ban();
 	m_radio->skip();
-}
-
-
-void
-App::logout()
-{
-    logoutAtQuit();
-    quit(); //TODO warn the user at least first! and restart as well
 }
 
 

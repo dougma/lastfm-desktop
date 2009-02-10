@@ -145,9 +145,7 @@ App::App( int& argc, char** argv )
 //TODO    Legacy::disableHelperApp();
 #endif
     
-    connect(AuthenticatedUser().getInfo(),
-            SIGNAL(finished( WsReply* )),
-            SLOT(onUserGotInfo( WsReply* )));
+    connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
 }
 
 
