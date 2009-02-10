@@ -26,6 +26,7 @@
 #include "SideBarModel.h" //FIXME just for enums
 #include "SideBarRevealPopup.h"
 #include "SideBarToolTipLabel.h"
+#include "SideBarTreeStyle.h"
 #include "SideBarView.h"
 #include "UglySettings.h"
 #include "DragMimeData.h"
@@ -96,16 +97,16 @@ SideBarTree::SideBarTree( QWidget* parent ) :
 #elif defined WIN32
     if ( style()->objectName() == "windowsvista" )
     {
-//TODO        setStyle( new TreeStyle<QWindowsVistaStyle> );
+        setStyle( new TreeStyle<QWindowsVistaStyle> );
         setStyleSheet( "QTreeView { border: 1px solid palette(dark); border-left: 0; border-top: 0 }" );
     }
     else if ( style()->objectName() == "windowsxp" )
     {
-//TODO        setStyle( new TreeStyle<QWindowsXPStyle> );
+        setStyle( new TreeStyle<QWindowsXPStyle> );
     }
     else
     {
-//TODO        setStyle( new TreeStyle<QWindowsStyle> );
+        setStyle( new TreeStyle<QWindowsStyle> );
     }
     style()->setParent( this );
 
