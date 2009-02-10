@@ -39,7 +39,6 @@ class TrackTagUpdater : public QObject
     const unsigned m_tagValidityDays;
     const unsigned m_interRequestDelayMins;
 
-    class QTimer* m_timer;
     class LocalCollection* m_collection;
     bool m_needsUpdate;
     QDateTime m_lastRequestTimeUtc;

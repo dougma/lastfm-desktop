@@ -31,10 +31,13 @@ TrackTagUpdater*
 TrackTagUpdater::create(const QString& webServiceUrl, unsigned tagValidityDays, unsigned interRequestDelayMins)
 {
     QThread* thread = new QThread();
+
     TrackTagUpdater* updater = new TrackTagUpdater(webServiceUrl, tagValidityDays, interRequestDelayMins);
     updater->moveToThread(thread);
-    updater->setParent(thread);
+
+    connect(thread, SIGNAL(started()), updater, SLOT(needsUpdate()));
     thread->start();
+
     return updater;
 }
 
@@ -43,7 +46,6 @@ TrackTagUpdater::TrackTagUpdater(const QString& webServiceUrl, unsigned tagValid
 : m_webServiceUrl(webServiceUrl)
 , m_tagValidityDays(tagValidityDays)
 , m_interRequestDelayMins(interRequestDelayMins)
-, m_timer(0)
 , m_collection(0)
 , m_needsUpdate(false)
 {
@@ -55,18 +57,13 @@ TrackTagUpdater::needsUpdate()
     Q_ASSERT(sender());     // must invoke via signal/slot connection for thread safety.
 
     m_needsUpdate = true;
-    if (!m_timer) {
-        m_timer = new QTimer();
-        connect(m_timer, SIGNAL(timeout()), SLOT(doUpdateTags()));
-        startTimer(1);
-    }
+    startTimer(1);
 }
 
 void
 TrackTagUpdater::startTimer(int seconds)
 {
-    m_timer->setSingleShot(true);
-    m_timer->setInterval(seconds * 1000);
+    QTimer::singleShot(seconds * 1000, this, SLOT(doUpdateTags()));
 }
 
 unsigned
