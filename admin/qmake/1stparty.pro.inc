@@ -20,6 +20,9 @@ CONFIG( fingerprint ) {
 	LIBS += -lfingerprint
 	CONFIG += types
 }
+CONFIG( resolver ) {
+	LIBS += -lresolver
+}
 CONFIG( types ) {
 	LIBS += -ltypes
 	CONFIG += ws

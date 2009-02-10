@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include <string.h>
-#include "TrackResolver.h"
-#include "LocalRqlPlugin.h"
-#include "TrackTagUpdater.h"
+#include "../localresolver/TrackResolver.h"
+#include "../localresolver/LocalRqlPlugin.h"
+#include "../localresolver/TrackTagUpdater.h"
 
 
 /** always exporting, never importing  **/
