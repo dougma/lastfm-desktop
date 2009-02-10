@@ -19,6 +19,7 @@
  
 #include "App.h"
 
+#include "LocalContentScanner.h"
 #include "TrackTagUpdater.h"
 #include "LocalRqlPlugin.h"
 #include "TrackResolver.h"
@@ -34,11 +35,12 @@
 App::App( int& argc, char* argv[] )
     :Unicorn::Application( argc, argv )
 {
+    m_contentScanner = new LocalContentScanner();
     m_trackTagUpdater = TrackTagUpdater::create(
         "http://musiclookup.last.fm/trackresolve",
         100,        // number of days track tags are good 
         5);         // 5 minute delay between web requests
-
+    connect(m_contentScanner, SIGNAL(tracksChanged()), m_trackTagUpdater, SLOT(needsUpdate()));
 
     m_localRql = new LocalRqlPlugin();
     m_localRql->init();

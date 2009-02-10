@@ -30,7 +30,6 @@ class TrackResolver : public QObject, public ITrackResolverPlugin
 
     QString m_dbPath;
 	class TrackResolverThread* m_query;
-	class LocalContentScanner* m_scanner;
 
 public:
     TrackResolver();

@@ -29,22 +29,18 @@ extern QString remapVolumeName(const QString& volume);
 
 TrackResolver::TrackResolver()
 : m_query(0)
-, m_scanner(0)
 {}
 
 TrackResolver::~TrackResolver()
 {
-    delete m_scanner;
     delete m_query;
 }
 
 void
 TrackResolver::init()
 {
-    Q_ASSERT(m_query == 0 && m_scanner == 0);     // only init once, innit.
-
+    Q_ASSERT(m_query == 0);     // only init once, innit.
     m_query = TrackResolverThread::create();
-    m_scanner = new LocalContentScanner;
 }
 
 void 

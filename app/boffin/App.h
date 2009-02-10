@@ -31,6 +31,7 @@ public:
     void openXspf( QString filename );
 
 private:
+    class LocalContentScanner* m_contentScanner;
     class TrackTagUpdater* m_trackTagUpdater;
     class ILocalRqlPlugin* m_localRql;
     class ITrackResolverPlugin* m_trackResolver;
