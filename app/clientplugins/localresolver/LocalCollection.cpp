@@ -137,7 +137,7 @@ LocalCollection::initDatabase()
         QUERY( "CREATE TABLE tracktags ("
                     "file               INTEGER NOT NULL,"      // files foreign key
                     "tag                INTEGER NOT NULL,"      // tags foreign key
-                    "weight             INTEGER NOT NULL);" );  // 0-100
+                    "weight             FLOAT NOT NULL);" );    // 0-1
         QUERY( "CREATE INDEX tracktags_file_idx ON tracktags ( file ); ");
 
         QUERY( "CREATE TABLE directories ("
@@ -417,6 +417,19 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
     bindValue( ":duration", info.m_duration ).
     exec();
 }
+
+bool 
+LocalCollection::getCounts(int& outArtists, int& outFiles)
+{
+    QSqlQuery q = QUERY( "SELECT COUNT(DISTINCT artist), COUNT(id) FROM files" );
+    bool ok1 = false, ok2 = false;
+    if (q.next()) {
+        outArtists = q.value( 0 ).toInt( &ok1 );
+        outFiles = q.value( 1 ).toInt( &ok2 );
+    }
+    return (ok1 && ok2);
+}
+
 
 // returns 0 if the artistName does not exist and bCreate is false
 int
@@ -717,7 +730,7 @@ LocalCollection::allTags()
         while ( query.next() ) {
             int artistId = query.value(0).toInt();
             int tag = query.value(1).toInt();
-            float weight = query.value(2).toDouble() / 100;
+            float weight = query.value(2).toDouble();
 
             if (prevArtistId == 0) // first run through the loop
                 prevArtistId = artistId;
@@ -873,6 +886,7 @@ LocalCollection::updateTrackTags(QVariantList fileIds, QVariantList tagIds, QVar
         execBatch();
 }
 
+// returns a VariantList of (integer) tag IDs givem a list of tag names
 QVariantList
 LocalCollection::resolveTags(QStringList tags)
 {

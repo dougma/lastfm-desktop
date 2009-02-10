@@ -164,6 +164,8 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
 {
     try {
         bool good = false;
+        int artistCount = -1, fileCount = -1;
+
         QString pathname(fullpath + filename);
         emit fileScanStart(pathname);
         try {
@@ -177,6 +179,7 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
                 good = true;
+                m_pCol->getCounts(artistCount, fileCount);
             }
         }
         catch (QueryError &e) {
@@ -185,7 +188,7 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
         catch (...) {
             exception("NewFileScan::run scanning file");
         }
-        emit fileScanFinished(pathname, good);
+        emit fileScanFinished(pathname, good, artistCount, fileCount);
     } 
     catch (...) {
         exception("NewFileScan::run signalling");
@@ -197,6 +200,8 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
 {
     try {
         bool good = false;
+        int artistCount = -1, fileCount = -1;
+
         emit fileScanStart(pathname);
         try {
             std::auto_ptr<MediaMetaInfo> p(MediaMetaInfo::create(pathname));
@@ -208,6 +213,7 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
                 good = true;
+                m_pCol->getCounts(artistCount, fileCount);
             }
         }
         catch (QueryError& e) {
@@ -216,7 +222,7 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
         catch (...) {
             exception("OldFileRescan::run scanning file");
         }
-        emit fileScanFinished(pathname, good);
+        emit fileScanFinished(pathname, good, artistCount, fileCount);
     } 
     catch (...) {
         exception("OldFileRescan::run signalling");

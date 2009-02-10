@@ -82,10 +82,10 @@ public:
 signals:
     void tracksChanged();
     void fullScanStart(const SearchLocation&);
-    void fullScanFinished(const SearchLocation&, bool);
+    void fullScanFinished(const SearchLocation&, bool completed);
     void dirScanStart(const SearchLocation&, const QString&);
     void fileScanStart(const QString&);
-    void fileScanFinished(const QString&, bool);
+    void fileScanFinished(const QString&, bool bScanGood, int artistCount, int fileCount);
 };
 
 #endif

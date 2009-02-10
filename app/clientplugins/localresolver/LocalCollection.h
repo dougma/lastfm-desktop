@@ -207,6 +207,7 @@ public:
     void updateFile(int fileId, unsigned lastModified, const FileMeta& info);
     void addFile(int directoryId, QString name, unsigned lastModified, const FileMeta& info);
     void removeFiles(QList<int> ids);
+    bool getCounts(int& outArtists, int& outFiles);
 
     QList<LocalCollection::ResolveResult> resolve(const QString artist, const QString album, const QString title);
 
