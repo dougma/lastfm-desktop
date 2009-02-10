@@ -48,6 +48,7 @@ TrackTagUpdater::TrackTagUpdater(const QString& webServiceUrl, unsigned tagValid
 , m_interRequestDelayMins(interRequestDelayMins)
 , m_collection(0)
 , m_needsUpdate(false)
+, m_outstandingRequest(false)
 {
 }
 
@@ -87,6 +88,9 @@ TrackTagUpdater::secondsSinceLastRequest()
 void
 TrackTagUpdater::doUpdateTags()
 {
+    if (m_outstandingRequest)
+        return;
+
     if (m_needsUpdate) {
         try {
             m_needsUpdate = false;
@@ -97,8 +101,10 @@ TrackTagUpdater::doUpdateTags()
 
             TagifierRequest* req = new TagifierRequest(m_collection, m_webServiceUrl);
             connect(req, SIGNAL(finished( int, int, int )), SLOT(onFinished( int, int, int )));
-            if (req->makeRequest(m_tagValidityDays))
+            if (req->makeRequest(m_tagValidityDays)) {
+                m_outstandingRequest = true;
                 return;     // onFinished will be signalled. bail now.
+            }
 
             delete req;
         } 
@@ -116,8 +122,9 @@ TrackTagUpdater::doUpdateTags()
 void 
 TrackTagUpdater::onFinished(int requestIdCount, int responseIdCount, int responseTagCount)
 {
+    m_outstandingRequest = false;
     delete sender();
     int timeTaken = secondsSinceLastRequest();
     emit tagsUpdated(requestIdCount, responseIdCount, responseTagCount, timeTaken);
-    startTimer(secondsToNextUpdate());
+    doUpdateTags();
 }

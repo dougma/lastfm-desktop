@@ -41,6 +41,7 @@ class TrackTagUpdater : public QObject
 
     class LocalCollection* m_collection;
     bool m_needsUpdate;
+    bool m_outstandingRequest;
     QDateTime m_lastRequestTimeUtc;
 
     ///
