@@ -34,10 +34,15 @@
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
+extern "C" {
+extern int sqlite3_threadsafe();
+}
 
 App::App( int& argc, char** argv )
     :Unicorn::Application( argc, argv ), m_radio( 0 )
 {
+    int i = sqlite3_threadsafe();
+
 /// content resolver
     m_contentScanner = new LocalContentScanner;
     m_trackTagUpdater = TrackTagUpdater::create(
@@ -54,6 +59,8 @@ App::App( int& argc, char** argv )
 
     m_trackResolver = new TrackResolver();
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
+
+
 
 /// blah
     //if (argc > 1) {
