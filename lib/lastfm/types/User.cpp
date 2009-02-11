@@ -105,7 +105,7 @@ AuthenticatedUser::getInfo()
 QUrl
 User::www() const
 { 
-	return CoreUrl( "http://www.last.fm/user/" + CoreUrl::encode( m_name ) ).localised(); 
+    return lastfm::UrlBuilder( "user" ).slash( m_name ).url();
 }
 
 

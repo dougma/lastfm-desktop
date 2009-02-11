@@ -62,9 +62,7 @@ Album::share( const User& recipient, const QString& message )
 QUrl
 Album::www() const
 {
-	QString const artist = CoreUrl::encode( m_artist );
-	QString const album = CoreUrl::encode( m_title );
-	return CoreUrl( "http://www.last.fm/music/" + artist + "/" + album ).localised();	
+    return lastfm::UrlBuilder( "music" ).slash( m_artist ).slash( m_title ).url();
 }
 
 
@@ -80,5 +78,3 @@ Album::addTags( const QStringList& tags ) const
             .add( "tags", tags.join( QChar(',') ) )
             .post();
 }
-
-

@@ -23,32 +23,46 @@
 #include <lastfm/public.h>
 #include <QString>
 #include <QUrl>
+class CoreLocale;
+  
 
-
-struct LASTFM_CORE_DLLEXPORT CoreUrl : public QUrl
+namespace lastfm
 {
-	CoreUrl( const QUrl& url ) : QUrl( url )
-	{}
-	
-	/** www.last.fm becomes the local version, eg www.lastfm.de */
-	CoreUrl localised() const;
-	/** www.last.fm becomes m.last.fm, localisation is preserved */
-	CoreUrl mobilised() const;
+    class LASTFM_CORE_DLLEXPORT UrlBuilder
+    {
+        QByteArray path;
 
-	/** Use this to URL encode any database item (artist, track, album). It
-	 * internally calls UrlEncodeSpecialChars to double encode some special
-	 * symbols according to the same pattern as that used on the website.
-	 *
-	 * &, /, ;, +, #
-	 *
-	 * Use for any urls that go to www.last.fm
-	 * Do not use for ws.audioscrobbler.com
-	 */
-	static QString encode( QString );
-	static QString decode( QString );
+    public:
+        /** Careful, the base is not encoded at all, we assume it is ASCII!
+          * If you need it encoded at all you must use the slash function.
+          * eg. UrlBuilder( "user" ).slash( "mxcl" ) ==> http://last.fm/user/mxcl
+          */
+        UrlBuilder( const QString& base ) : path( '/' + base.toAscii() )
+        {}
+        
+        UrlBuilder& slash( const QString& path ) { this->path += '/' + encode( path ); return *this; }
+
+        QUrl url() const;
 	
-	/** returns eg. www.lastfm.de */
-	static QString localisedHostName( const class CoreLocale& );
-};
+    	/** www.last.fm becomes the local version, eg www.lastfm.de */
+    	static QUrl localize( QUrl );
+    	/** www.last.fm becomes m.last.fm, localisation is preserved */
+    	static QUrl mobilize( QUrl );
+
+    	/** Use this to URL encode any database item (artist, track, album). It
+    	 * internally calls UrlEncodeSpecialChars to double encode some special
+    	 * symbols according to the same pattern as that used on the website.
+    	 *
+    	 * &, /, ;, +, #
+    	 *
+    	 * Use for any urls that go to www.last.fm
+    	 * Do not use for ws.audioscrobbler.com
+    	 */
+    	static QByteArray encode( QString );
+
+    	/** returns eg. www.lastfm.de */
+    	static QString localizedHostName( const CoreLocale& );
+    };
+}
 
 #endif

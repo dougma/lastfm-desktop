@@ -24,34 +24,32 @@
 #include <QStringList>
 
 
-QString //static
-CoreUrl::encode( QString s )
+QUrl
+lastfm::UrlBuilder::url() const
 {
-    if( s.contains( QRegExp( "& | \\/ | ; | + | #" )))
-        s = QUrl::toPercentEncoding( s );
+    QUrl url;
+    url.setScheme( "http" );
+    url.setHost( localizedHostName( CoreSettings().locale() ) );
+    url.setEncodedPath( path );
+    return url;
+}
 
-    s = QString::fromAscii( QUrl::toPercentEncoding( s ));
 
-    return s;
+QByteArray //static
+lastfm::UrlBuilder::encode( QString s )
+{
+    foreach (QChar c, QList<QChar>() << '&' << '/' << ';' << '+' << '#' << '%')
+        if (s.contains( c ))
+            // the middle step may seem odd but this is what the site does
+            // eg. search for the exact string "Radiohead 2 + 2 = 5"
+            return QUrl::toPercentEncoding( s ).replace( "%20", "+" ).toPercentEncoding( "", "+" );;
+
+    return QUrl::toPercentEncoding( s.replace( ' ', '+' ), "+" );
 }
 
 
 QString //static
-CoreUrl::decode( QString s )
-{
-    s = QUrl::fromPercentEncoding( s.toAscii() );
-    s.replace( "%26", "&" );
-    s.replace( "%2F", "/" );
-    s.replace( "%3B", ";" );
-    s.replace( "%2B", "+" );
-    s.replace( "%23", "#" );
-    s.replace( '+', ' ' );
-    return s;
-}
-
-
-QString //static
-CoreUrl::localisedHostName( const CoreLocale& locale )
+lastfm::UrlBuilder::localizedHostName( const CoreLocale& locale )
 {
 	QString const code = locale.code();
 	
@@ -73,19 +71,17 @@ CoreUrl::localisedHostName( const CoreLocale& locale )
 }
 
 
-CoreUrl
-CoreUrl::localised() const
+QUrl //static
+lastfm::UrlBuilder::localize( QUrl url)
 {
-	CoreUrl url = *this;
-	url.setHost( host().replace( QRegExp("^(www.)?last.fm"), localisedHostName( CoreSettings().locale() ) ) );
+	url.setHost( url.host().replace( QRegExp("^(www.)?last.fm"), localizedHostName( CoreSettings().locale() ) ) );
 	return url;
 }
 
 
-CoreUrl
-CoreUrl::mobilised() const
+QUrl //static
+lastfm::UrlBuilder::mobilize( QUrl url )
 {
-	CoreUrl url = *this;
-	url.setHost( host().replace( QRegExp("^(www.)?last"), "m.last" ) );
+	url.setHost( url.host().replace( QRegExp("^(www.)?last"), "m.last" ) );
 	return url;
 }

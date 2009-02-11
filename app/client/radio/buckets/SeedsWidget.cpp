@@ -271,7 +271,7 @@ SeedsWidget::onUserGetArtistsReturn( WsReply* r )
         Seed* n = new Seed( a, ui.artistsBucket );
         n->setPlayableType( Seed::ArtistType );
 
-        QNetworkReply* r = m_accessManager->get( QNetworkRequest( a.largeImageUrl()));
+        QNetworkReply* r = m_accessManager->get( QNetworkRequest( a.imageUrl() ));
         connect( r, SIGNAL( finished()), n, SLOT( iconDataDownloaded()));
     }
 }

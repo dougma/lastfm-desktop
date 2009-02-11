@@ -65,14 +65,6 @@ public:
     
     /** the Last.fm website url for this album */
 	QUrl www() const;
-	
-	enum ImageSize
-	{
-		Small = 0,
-		Medium = 1,
-		Large = 2, /** seemingly 174x174 */
-        ExtraLarge = 3
-	};
 };
 
 #endif //LASTFM_ALBUM_H

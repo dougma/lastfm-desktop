@@ -76,20 +76,30 @@
 
 namespace lastfm
 {
-  /** http://labs.trolltech.com/blogs/2008/10/09/coding-tip-pretty-printing-enum-values
-    * Tips for making this take a single parameter welcome! :)
-    */
-  template <typename T> static inline QString qMetaEnumString( int enum_value, const char* enum_name )
-  {
-      QMetaObject meta = T::staticMetaObject;
-      for (int i=0; i < meta.enumeratorCount(); ++i)
-      {
-          QMetaEnum m = meta.enumerator(i);
-          if (m.name() == QLatin1String(enum_name))
-              return QLatin1String(m.valueToKey(enum_value));
-      }
-      return "Unknown enum value: " + QString::number( enum_value );
-  }
+    /** http://labs.trolltech.com/blogs/2008/10/09/coding-tip-pretty-printing-enum-values
+     * Tips for making this take a single parameter welcome! :)
+     * 
+     * eg. lastfm::qMetaEnumString<QNetworkReply>( error, "NetworkError" );
+     */
+    template <typename T> static inline QString qMetaEnumString( int enum_value, const char* enum_name )
+    {
+        QMetaObject meta = T::staticMetaObject;
+        for (int i=0; i < meta.enumeratorCount(); ++i)
+        {
+            QMetaEnum m = meta.enumerator(i);
+            if (m.name() == QLatin1String(enum_name))
+                return QLatin1String(m.valueToKey(enum_value));
+        }
+        return "Unknown enum value: " + QString::number( enum_value );
+    }
+
+	enum ImageSize
+	{
+		Small = 0,
+		Medium = 1,
+		Large = 2, /** seemingly 174x174 */
+        ExtraLarge = 3
+	};
 }
 
 #endif //LASTFM_PUBLIC_H

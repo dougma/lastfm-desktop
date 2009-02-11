@@ -238,9 +238,7 @@ Track::removeTag( const QString& tag ) const
 QUrl
 Track::www() const
 {
-	QString const artist = CoreUrl::encode( d->artist );
-	QString const track = CoreUrl::encode( d->title );
-	return CoreUrl( "http://www.last.fm/music/" + artist + "/_/" + track ).localised();
+	return lastfm::UrlBuilder( "music" ).slash( d->artist ).slash( "_" ).slash( d->title ).url();
 }
 
 

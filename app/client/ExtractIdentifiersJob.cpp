@@ -63,9 +63,10 @@ FingerprintId
 ExtractIdentifiersJob::fpid()
 {
     #define WAIT_FOR_FINISHED( reply ) \
-        while (!reply->atEnd()) \
-            reply->waitForReadyRead( 10 * 1000 )
-    
+        QEventLoop loop; \
+        loop.connect( reply, SIGNAL(finished()), SLOT(quit()) ); \
+        loop.exec();
+
     Fingerprint fp( m_track );
     
     if (!fp.id().isNull())

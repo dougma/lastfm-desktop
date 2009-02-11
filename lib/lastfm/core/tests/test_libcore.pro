@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += testlib
+QT += testlib network
 CONFIG += core
 include( $$ROOT_DIR/admin/include.qmake )
 SOURCES += TestCoreUrl.cpp

@@ -121,7 +121,7 @@ Seed::onArtistSearchFinished( WsReply* r )
         
         Artist a = results.first();
         
-        if(((QString)a).toLower() != name().toLower())
+        if (a.name().toLower() != name().toLower())
         {
             //TODO: handle exact artist not found case
             //      I'm going to work on the updated player bucket 
@@ -131,7 +131,7 @@ Seed::onArtistSearchFinished( WsReply* r )
         
         if( a.imageUrl().isValid() )
         {
-            QNetworkReply* get = m_networkManager->get( QNetworkRequest( a.smallImageUrl() ));
+            QNetworkReply* get = m_networkManager->get( QNetworkRequest( a.imageUrl( lastfm::Small ) ));
             connect( get, SIGNAL( finished()), SLOT( iconDataDownloaded()));
         }
     }

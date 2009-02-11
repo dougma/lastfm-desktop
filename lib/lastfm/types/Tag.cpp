@@ -26,14 +26,14 @@
 QUrl
 Tag::www() const
 {
-	return CoreUrl( "http://www.last.fm/tag/" + CoreUrl::encode( m_name ) ).localised();
+	return lastfm::UrlBuilder( "tag" ).slash( m_name ).url();
 }
 
 
 QUrl
 Tag::www( const User& user ) const
 {
-	return CoreUrl( "http://www.last.fm/" + CoreUrl::encode( user ) + "/tags/" + CoreUrl::encode( m_name ) ).localised();
+	return lastfm::UrlBuilder( "user" ).slash( user.name() ).slash( "tags" ).slash( Tag::name() ).url();
 }
 
 

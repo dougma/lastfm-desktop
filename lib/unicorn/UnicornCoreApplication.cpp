@@ -63,7 +63,7 @@ UnicornCoreApplication::init()
     new Logger( path );
 
     qInstallMsgHandler( qMsgHandler );
-    qDebug() << "Introducing" << applicationName()+'-'+applicationVersion();
+    qDebug() << "Introducing" << applicationName()+' '+applicationVersion();
     qDebug() << "Directed by" << CoreSysInfo::platform();
 }
 

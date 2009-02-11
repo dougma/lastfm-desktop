@@ -35,6 +35,7 @@ public:
 	{}
 	
 	operator QString() const { return m_name; }
+    QString name() const { return m_name; }
 	
 	/** the global tag page at www.last.fm */
 	QUrl www() const;

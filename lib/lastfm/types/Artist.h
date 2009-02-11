@@ -30,6 +30,7 @@ class WsReply;
 class LASTFM_TYPES_DLLEXPORT Artist
 {
     QString m_name;
+    QList<QUrl> m_images;
 
 public:
     Artist()
@@ -38,14 +39,13 @@ public:
     Artist( const QString& name ) : m_name( name )
     {}
 
+    /** will be QUrl() unless you got this back from a getInfo or something call */
+    QUrl imageUrl( lastfm::ImageSize size = lastfm::Large ) const { return m_images.value( size ); }
+
     bool isNull() const { return m_name.isEmpty(); }
         
 	/** the url for this artist's page at www.last.fm */
 	QUrl www() const;
-    
-    QUrl smallImageUrl(){ return m_smallImage; }
-    QUrl imageUrl(){ return m_image; }
-	QUrl largeImageUrl(){ return m_largeImage; }
     
 	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
 	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
@@ -55,12 +55,15 @@ public:
         /** if no artist name is set, return the musicbrainz unknown identifier
           * in case some part of the GUI tries to display it anyway. Note isNull
           * returns false still. So you should have queried this! */
-        return m_name.isEmpty() ? "[unknown]" : m_name; 
+        return m_name.isEmpty() ? "[unknown]" : m_name;
     }
     QString name() const { return QString(*this); }	
     
     WsReply* share( const class User& recipient, const QString& message = "" );
-	WsReply* getInfo() const;	
+
+	WsReply* getInfo() const;
+    static Artist getInfo( WsReply* );
+	
 	WsReply* getSimilar() const;
 	static WeightedStringList getSimilar( WsReply* );
     
@@ -73,11 +76,6 @@ public:
 	
 	WsReply* search( int limit = -1 ) const;
 	static QList<Artist> list( WsReply* );
-    
-private:
-	QUrl m_smallImage;
-	QUrl m_image;
-    QUrl m_largeImage;
 };
 
 #endif

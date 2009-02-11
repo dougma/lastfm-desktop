@@ -231,7 +231,7 @@ TrackDashboardHeader::onCurseClientTeam()
 
 
 void 
-TrackDashboardHeader::onTrackLinkActivated( QString link )
+TrackDashboardHeader::onTrackLinkActivated( const QString& link )
 {
     QDesktopServices::openUrl( link );
 }

@@ -38,7 +38,7 @@ Artist::share( const User& user, const QString& message )
 QUrl 
 Artist::www() const
 {
-	return "http://www.last.fm/music/" + CoreUrl::encode( m_name );
+    return lastfm::UrlBuilder( "music" ).slash( Artist::name() ).url();
 }
 
 
@@ -103,26 +103,42 @@ Artist::getSimilar( WsReply* r )
 }
 
 
+static inline void images( QList<QUrl>& images, const CoreDomElement& e )
+{
+    images.clear();
+    images += e.optional( "image size=small" ).text();
+    images += e.optional( "image size=medium" ).text();
+    images += e.optional( "image size=large" ).text();
+}
+
+
 QList<Artist> /* static */
 Artist::list( WsReply* r )
 {
-	QList<Artist> results;
-	try
+	QList<Artist> artists;
+	foreach (CoreDomElement e, r->lfm().children( "artist" ))
 	{
-		foreach( CoreDomElement e, r->lfm().children( "artist" ))
-		{
-            Artist a( e["name"].text());
-            a.m_smallImage = e.optional( "image size=small" ).text();
-            a.m_image = e.optional( "image size=medium" ).text();
-            a.m_largeImage = e.optional( "image size=large" ).text();
-			results += a;
-		}
+    	try
+    	{    
+            Artist artist( e["name"].text());
+            images( artist.m_images, e );
+    		artists += artist;
+	    }
+    	catch (CoreDomElement::Exception& e)
+    	{
+    		qWarning() << e;
+    	}
 	}
-	catch( CoreDomElement::Exception& e)
-	{
-		qWarning() << e;
-	}
-	return results;
+	return artists;
+}
+
+
+Artist
+Artist::getInfo( WsReply* r )
+{
+    Artist artist( r->lfm()["artist"]["name"].text() );
+    images( artist.m_images, r->lfm()["artist"] );
+    return artist;
 }
 
 
