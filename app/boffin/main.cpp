@@ -30,6 +30,8 @@ int main( int argc, char* argv[] )
 
     MainWindow window;
     window.show();
+
+    app.setupMainWindow( &window );
     
     return app.exec();
 }

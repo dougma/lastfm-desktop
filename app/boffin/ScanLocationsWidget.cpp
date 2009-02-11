@@ -16,36 +16,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef APP_H
-#define APP_H
 
-#include "lib/unicorn/UnicornApplication.h"
+#include "ScanLocationsWidget.h"
+#include <QtGui>
+
+//bold scanning now:
+// line
+//bold queued:
+// line
+// line
 
 
-class App : public Unicorn::Application
+ScanLocationsWidget::ScanLocationsWidget()
 {
-    Q_OBJECT
+    QHBoxLayout* h = new QHBoxLayout( this );
+    h->addLayout( layout = new QGridLayout( this ) );
+    h->addStretch();
+}
+
+
+void
+ScanLocationsWidget::setLocations( const QStringList& paths )
+{
+    this->paths = paths;
     
-public:
-    App( int& argc, char* argv[] );
-    ~App();
+    QList<QLabel*> labels;
+    
+    uint row = 0;
+    foreach (QString path, paths)
+    {
+        QLabel* label;
+        QPushButton* button;
+        layout->addWidget( label = new QLabel(path), row, 0 );
+        layout->addWidget( button = new QPushButton(tr("Abort")), row, 1 );
+        row++;
+        
+        labels += label;
+    }
+    
+    QLabel* l = labels.first();
+    l->setText( "Scanning: " + l->text() );
+}
 
-    void openXspf( QString filename );
-    void setupMainWindow( class MainWindow* );
 
-private slots:
-    void onOutputDeviceActionTriggered( QAction* );
-
-private:
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
-    class ILocalRqlPlugin* m_localRql;
-    class ITrackResolverPlugin* m_trackResolver;
-
-    class Radio* m_radio;
-    class Resolver* m_resolver;
-};
-
-#endif //APP_H
+void
+ScanLocationsWidget::setCurrentlyScanning( const QString& path )
+{}

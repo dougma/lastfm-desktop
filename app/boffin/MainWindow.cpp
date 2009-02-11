@@ -18,27 +18,41 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
+#include "ScanProgressWidget.h"
+#include "ScanLocationsWidget.h"
 #include "lib/lastfm/core/CoreUrl.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QMenuBar>
+#include <QVBoxLayout>
 
 
 MainWindow::MainWindow()
-{
-    setWindowTitle( tr("Last.fm Boffin") );
-    
+{    
     ui.account = menuBar()->addMenu( Ws::Username );
-    ui.profile = ui.account->addAction( tr("Visit Profile"), this, SLOT(openProfileUrl()) );
+    ui.profile = ui.account->addAction( tr("Visit &Profile"), this, SLOT(openProfileUrl()) );
     ui.account->addSeparator();
-    ui.account->addAction( tr("Log Out && Quit"), qApp, SLOT(logout()) );
+    ui.account->addAction( tr("Log &Out && Quit"), qApp, SLOT(logout()) );
 #ifndef Q_OS_MAC
-    ui.account->addAction( tr("Quit"), qApp, SLOT(quit()) );
+    ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
 #endif
+    ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
+
+    ui.progress = new ScanProgressWidget;
     
+    QVBoxLayout* v = new QVBoxLayout( ui.progress );
+    v->addStretch();
+    v->addWidget( ui.locations = new ScanLocationsWidget );
+    ui.locations->setLocations( QStringList() << "/arse/Tunes" << "/bum/Music" );
+
+    setCentralWidget( ui.progress );
+    setWindowTitle( tr("Last.fm Boffin") );
+
     connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
+    
+    resize( 750, 550 );
 }
 
 

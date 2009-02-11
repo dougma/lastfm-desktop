@@ -18,7 +18,7 @@
  ***************************************************************************/
  
 #include "App.h"
-
+#include "MainWindow.h"
 #include "LocalContentScannerThread.h"
 #include "LocalContentScanner.h"
 #include "TrackTagUpdater.h"
@@ -26,21 +26,23 @@
 #include "TrackResolver.h"
 #include "Resolver.h"
 #include "lib/lastfm/radio/Radio.h"
-
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
-
 #include "XspfResolvingTrackSource.h"
+#include <QMenu>
+
+#define OUTPUT_DEVICE_KEY "OutputDevice"
 
 
-App::App( int& argc, char* argv[] )
-    :Unicorn::Application( argc, argv )
+App::App( int& argc, char** argv )
+    :Unicorn::Application( argc, argv ), m_radio( 0 )
 {
-    m_contentScanner = new LocalContentScanner();
+/// content resolver
+    m_contentScanner = new LocalContentScanner;
     m_trackTagUpdater = TrackTagUpdater::create(
-        "http://musiclookup.last.fm/trackresolve",
-        100,        // number of days track tags are good 
-        5);         // 5 minute delay between web requests
+            "http://musiclookup.last.fm/trackresolve",
+            100,        // number of days track tags are good 
+            5);         // 5 minute delay between web requests
     connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
 
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
@@ -52,40 +54,58 @@ App::App( int& argc, char* argv[] )
     m_trackResolver = new TrackResolver();
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 
-    //////////////////////////////////////
-
-    Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
-	audioOutput->setVolume( 1.0 /* Settings().volume() */ );
-
-    QString audioOutputDeviceName; /* = moose::Settings().audioOutputDeviceName(); */
-    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices()) {
-        audioOutput->setOutputDevice( d );
-        break;
-    }
-
-	m_radio = new Radio( audioOutput );
-//  connect( m_radio, SIGNAL(tuningIn( RadioStation )), m_stateMachine, SLOT(onRadioTuningIn( RadioStation )) );
-//  connect( m_radio, SIGNAL(trackSpooled( Track )), m_stateMachine, SLOT(onRadioTrackSpooled( Track )) );
-//  connect( m_radio, SIGNAL(trackStarted( Track )), m_stateMachine, SLOT(onRadioTrackStarted( Track )) );
-//  connect( m_radio, SIGNAL(stopped()), m_stateMachine, SLOT(onRadioStopped()) );
-//  connect( m_radio, SIGNAL(error( int, QVariant )), SLOT(onRadioError( int, QVariant )) );
-
-    ////
-
+/// blah
     if (argc > 1) {
         openXspf( argv[1] );
     }
-
-    
 }
+
 
 App::~App()
 {
     m_contentScanner->stop();
     m_contentScannerThread->wait();
     delete m_contentScanner;
-    delete m_contentScannerThread;
+    delete m_contentScannerThread;    
+    
+    QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
 }
+
+
+void
+App::setupMainWindow( MainWindow* window )
+{
+    QObject* o = (QObject*)window->ui.progress;
+    connect( m_contentScanner, SIGNAL(trackScanned( Track )), o, SLOT(newTrack( Track )) );
+    connect( m_contentScanner, SIGNAL(finished()), o, SLOT(onFinished()) );
+
+////// audio output device
+    QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
+    Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+	audioOutput->setVolume( 1.0 /* Settings().volume() */ );
+
+    QActionGroup* actiongroup = new QActionGroup( window->ui.outputdevice );
+
+    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices()) 
+    {
+        QAction* a = window->ui.outputdevice->addAction( d.name() );
+        a->setCheckable( true );
+        if (name == d.name())
+            audioOutput->setOutputDevice( d );
+        if (audioOutput->outputDevice().name() == d.name())
+            a->setChecked( true );
+            
+        actiongroup->addAction( a );
+    }
+    
+    connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
+    
+	m_radio = new Radio( audioOutput );
+
+////// content scanning
+    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), (QObject*)window->ui.progress, SLOT(onNewTrack( Track )) );
+}
+
 
 void
 App::openXspf( QString filename )
@@ -93,4 +113,20 @@ App::openXspf( QString filename )
     XspfResolvingTrackSource* src = new XspfResolvingTrackSource( m_resolver, filename );
     m_radio->play( RadioStation( "XSPF" ), src );
     src->start();
+}
+
+
+void
+App::onOutputDeviceActionTriggered( QAction* a )
+{
+    //FIXME for some reason setOutputDevice just returns false! :(
+    
+    QString const name = a->text();
+    
+    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
+        if (d.name() == name) {
+            qDebug() << m_radio->audioOutput()->setOutputDevice( d );
+            qDebug() << m_radio->audioOutput()->outputDevice().name();
+            return;
+        }
 }

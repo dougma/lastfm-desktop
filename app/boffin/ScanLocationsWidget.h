@@ -16,36 +16,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef APP_H
-#define APP_H
 
-#include "lib/unicorn/UnicornApplication.h"
+#include <QWidget>
+#include <QStringList>
 
 
-class App : public Unicorn::Application
+class ScanLocationsWidget : public QWidget
 {
     Q_OBJECT
     
+    class QGridLayout* layout;
+    QStringList paths;
+
 public:
-    App( int& argc, char* argv[] );
-    ~App();
+    ScanLocationsWidget();
 
-    void openXspf( QString filename );
-    void setupMainWindow( class MainWindow* );
+    void setLocations( const QStringList& );
 
-private slots:
-    void onOutputDeviceActionTriggered( QAction* );
+public slots:
+    void setCurrentlyScanning( const QString& path );
 
-private:
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
-    class ILocalRqlPlugin* m_localRql;
-    class ITrackResolverPlugin* m_trackResolver;
-
-    class Radio* m_radio;
-    class Resolver* m_resolver;
+signals:
+    void abort( const QString& path );
+    void queue( const QString& path );
 };
-
-#endif //APP_H

@@ -24,10 +24,15 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    friend class App;
+
     struct Ui
     {
-        QMenu* account;
-        QAction* profile;
+        class QMenu* account;
+        class QMenu* outputdevice;
+        class QAction* profile;
+        class ScanProgressWidget* progress;
+        class ScanLocationsWidget* locations;
     } ui;
 
 public:
