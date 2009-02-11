@@ -54,7 +54,6 @@ class TrackTagUpdater : public QObject
     }
 
     void startTimer(int seconds);
-    unsigned secondsToNextUpdate();
     int secondsSinceLastRequest();
 
 private slots:

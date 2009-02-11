@@ -67,16 +67,6 @@ TrackTagUpdater::startTimer(int seconds)
     QTimer::singleShot(seconds * 1000, this, SLOT(doUpdateTags()));
 }
 
-unsigned
-TrackTagUpdater::secondsToNextUpdate()
-{
-    if (!m_lastRequestTimeUtc.isValid())
-        return 0;
-
-    int result = m_interRequestDelayMins * 60 - secondsSinceLastRequest();
-    return result < 0 ? 0 : result;
-}
-
 int
 TrackTagUpdater::secondsSinceLastRequest()
 {
@@ -98,7 +88,6 @@ TrackTagUpdater::doUpdateTags()
                 m_collection = LocalCollection::create("TrackTagUpdater");
 
             m_lastRequestTimeUtc = QDateTime::currentDateTime().toUTC();
-
             TagifierRequest* req = new TagifierRequest(m_collection, m_webServiceUrl);
             connect(req, SIGNAL(finished( int, int, int )), SLOT(onFinished( int, int, int )));
             if (req->makeRequest(m_tagValidityDays)) {
@@ -114,9 +103,10 @@ TrackTagUpdater::doUpdateTags()
         catch(...) {
             qWarning() << "TrackTagUpdater::doUpdateTags: unhandled exception";
         }
-    }
+    } 
 
-    startTimer(secondsToNextUpdate());
+    // come back later
+    startTimer(m_interRequestDelayMins * 60);
 }
 
 void 
