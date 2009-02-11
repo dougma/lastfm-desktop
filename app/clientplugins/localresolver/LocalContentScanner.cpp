@@ -25,6 +25,7 @@
 #include "QueryError.h"
 #include <memory>
 #include <QDebug>
+#include "boost/bind.hpp"
 
 
 // we make use of QThreadPool priorities to allow some tasks to queue jump
@@ -35,21 +36,66 @@
 QStringList getAvailableVolumes();
 bool isVolumeImplicitlyAvailable(const QString& volume);
 
-LocalContentScanner::LocalContentScanner()
+LocalContentScanner::LocalContentScanner(bool addNewVolumesAutomatically /* = true */)
     : m_pCol( 0 )
     , m_bStopping( false )
+    , m_addNewVolumesAutomatically( addNewVolumesAutomatically )
 {
-    m_pool = new QThreadPool();
-    // just 1 thread in the pool because the db connection 
-    // shouldn't be shared between threads
-    m_pool->setMaxThreadCount(1);       
-    m_pool->start(new Init(this), PRIORITY_INIT);
 }
 
 LocalContentScanner::~LocalContentScanner()
 {
-    m_bStopping = true;   // cause runnables to exit
-    delete m_pool;        // waits for queued runnables to exit
+    Q_ASSERT(m_bStopping);      // probably you want to stop it first
+}
+
+void
+LocalContentScanner::stop()
+{
+    m_bStopping = true;
+}
+
+void
+LocalContentScanner::run()
+{
+    m_pCol = LocalCollection::create("LocalContentScanner");
+    announceStarted();
+    startFullScan();
+    m_bStopping = true;
+    emit finished();
+}
+
+void 
+LocalContentScanner::announceStarted()
+{
+    QStringList scanLocations;
+    QStringList volumes = getAvailableVolumes();
+
+    foreach(const LocalCollection::Source &src, m_pCol->getAllSources()) {
+        bool available = volumes.contains(src.m_volume) || isVolumeImplicitlyAvailable(src.m_volume);
+        if (available != src.m_available) {
+            m_pCol->setSourceAvailability(src.m_id, available);
+        }
+        if (available) {
+            Exclusions exclusions(m_pCol->getExcludedDirectories(src.m_id));
+            QStringList startdirs(m_pCol->getStartDirectories(src.m_id));
+            if (startdirs.isEmpty()) {
+                startdirs << "";    // scan from the root
+            }
+            foreach (const QString &dir, startdirs) {
+                scanLocations << src.m_volume + dir;
+            }
+            volumes.removeAll(src.m_volume);
+        }
+    }
+
+    // remaining entries in 'volumes' are new
+    if (m_addNewVolumesAutomatically) {
+        foreach(const QString v, volumes) {
+            scanLocations << v;
+        }
+    }
+
+    emit started( scanLocations );
 }
 
 
@@ -70,32 +116,41 @@ LocalContentScanner::startFullScan()
                 startdirs << "";    // scan from the root
             }
             foreach (const QString &dir, startdirs) {
-                m_pool->start(
-                    new FullScan(SearchLocation(src, dir, exclusions), this),
-                    PRIORITY_FULLSCAN );
+                if (stopping()) return;
+                scan(SearchLocation(src, dir, exclusions));
             }
             volumes.removeAll(src.m_volume);
         }
     }
 
     // remaining entries in 'volumes' are new
-    bool bAddNewVolumesAutomatically = true;    // todo... optional?
-    if (bAddNewVolumesAutomatically) {
+    if (m_addNewVolumesAutomatically) {
         foreach(const QString v, volumes) {
+            if (stopping()) return;
             LocalCollection::Source src(m_pCol->addSource(v));
-            m_pool->start(
-                new FullScan(SearchLocation(src, "", Exclusions()), this),
-                PRIORITY_FULLSCAN );
+            scan(SearchLocation(src, "", Exclusions()));
         }
     }
 }
 
+void
+LocalContentScanner::scan(const SearchLocation& sl)
+{
+    sl.recurseDirs(boost::bind(
+        &LocalContentScanner::dirScan,
+        this,
+        sl,
+        _1) );
+}
+
+
 // reconcile the files on disk (at path, under SearchLocation sl) with the files in the db
 //
-void
+// returns true to indicate stopping
+//
+bool
 LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 {
-    bool changes = false;
     const int sourceId = sl.source().m_id;
 	const QString fullPath(sl.source().m_volume + path);
 
@@ -108,7 +163,7 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
     if (map.isEmpty()) {
         if (dirInDb)
             m_pCol->removeDirectory(directoryId);
-        return;
+        return true;
     }
 
     if (dirInDb || m_pCol->addDirectory(sourceId, path, directoryId)) {
@@ -128,11 +183,7 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
 
 				if (file.lastModified() < it.value()) {
 					// file on disk is newer than our db entry
-					oldFileRescan(
-						fullPath + file.name(),
-						file.id(),
-						it.value());
-                    changes = true;
+                    oldFileRescan( fullPath + file.name(), file.id(), it.value() );
 				}
 				map.erase(it);       // done
 			}
@@ -146,17 +197,10 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
             it != map.constEnd() && !stopping(); 
             it++) 
         {
-			newFileScan(
-				fullPath,
-				it.key(),       // filename
-				directoryId,
-				it.value());    // last modified time
-            changes = true;
+            newFileScan( fullPath, it.key() /* filename */, directoryId, it.value() /* last modified time */ );
 		}
     }
-
-    if (changes)
-        emit tracksChanged();
+    return !stopping();
 }
 
 void 
@@ -164,6 +208,7 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
 {
     try {
         bool good = false;
+        Track track;
         int artistCount = -1, fileCount = -1;
 
         QString pathname(fullpath + filename);
@@ -178,8 +223,9 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
 					lastModified, 
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
+                track = mediaMetaToTrack( info, pathname );
+                m_pCol->getCounts( artistCount, fileCount );
                 good = true;
-                m_pCol->getCounts(artistCount, fileCount);
             }
         }
         catch (QueryError &e) {
@@ -188,7 +234,10 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
         catch (...) {
             exception("NewFileScan::run scanning file");
         }
-        emit fileScanFinished(pathname, good, artistCount, fileCount);
+
+        if (good) {
+            emit trackScanned( track, artistCount, fileCount );
+        }
     } 
     catch (...) {
         exception("NewFileScan::run signalling");
@@ -200,11 +249,12 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
 {
     try {
         bool good = false;
+        Track track;
         int artistCount = -1, fileCount = -1;
 
         emit fileScanStart(pathname);
         try {
-            std::auto_ptr<MediaMetaInfo> p(MediaMetaInfo::create(pathname));
+            std::auto_ptr<MediaMetaInfo> p( MediaMetaInfo::create(pathname) );
             MediaMetaInfo *info = p.get();
             if (info) {
                 m_pCol->updateFile(
@@ -212,8 +262,9 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
 					lastModified, 
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
+                track = mediaMetaToTrack( info, pathname );
+                m_pCol->getCounts( artistCount, fileCount );
                 good = true;
-                m_pCol->getCounts(artistCount, fileCount);
             }
         }
         catch (QueryError& e) {
@@ -222,73 +273,31 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
         catch (...) {
             exception("OldFileRescan::run scanning file");
         }
-        emit fileScanFinished(pathname, good, artistCount, fileCount);
+
+        if (good) {
+            emit trackScanned( track, artistCount, fileCount );
+        }
     } 
     catch (...) {
         exception("OldFileRescan::run signalling");
     }
 }
 
+Track
+LocalContentScanner::mediaMetaToTrack(MediaMetaInfo *i, QString file)
+{
+    MutableTrack t;
+    t.setArtist( i->artist() );
+    t.setAlbum( i->album() );
+    t.setTitle( i->title() );
+    t.setDuration( i->duration() );
+    t.setUrl( QUrl::fromLocalFile( file ) );
+    return t;
+}
+
+
 void 
 LocalContentScanner::exception(const QString& msg) const
 {
     qCritical() << msg;
-}
-
-void
-LocalContentScanner::init()
-{
-    m_pCol = LocalCollection::create("LocalContentScanner");
-    startFullScan();
-}
-
-////////////////////////////////////////////////////////////////////
-
-LocalContentScanner::Init::Init(LocalContentScanner* lcs)
-:m_lcs(lcs)
-{}
-
-void 
-LocalContentScanner::Init::run()
-{
-	try {
-        m_lcs->init();
-    } catch (QueryError& e) {
-        m_lcs->exception("QueryError: " + e.text());
-	} catch (...) {
-		m_lcs->exception("unknown exception in ThreadInit::run");
-	}
-}
-
-////////////////////////////////////////////////////////////////////
-
-LocalContentScanner::FullScan::FullScan(const SearchLocation& sl, LocalContentScanner* lcs)
-:m_sl(sl)
-,m_lcs(lcs)
-{}
-
-void 
-LocalContentScanner::FullScan::run()
-{
-    bool completed;
-	try {
-        QThread::currentThread()->setPriority(QThread::LowPriority);
-        completed = m_sl.recurseDirs(*this);
-    } catch (QueryError& e) {
-        m_lcs->exception(" " + e.text());
-	} catch (...) {
-		m_lcs->exception("unknown exception in Fullscan::run");
-	}
-    emit m_lcs->fullScanFinished(m_sl, completed);
-}
-
-// this is the callback for the recurseDirs call in FullScan::run
-// bridging the SearchLocation object back to the LocalContentScanner
-bool
-LocalContentScanner::FullScan::operator()(const QString &path)
-{
-    if (m_lcs->stopping())
-        return false;
-    m_lcs->dirScan(m_sl, path);
-    return true;
 }

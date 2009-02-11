@@ -19,6 +19,7 @@
  
 #include "App.h"
 
+#include "LocalContentScannerThread.h"
 #include "LocalContentScanner.h"
 #include "TrackTagUpdater.h"
 #include "LocalRqlPlugin.h"
@@ -40,7 +41,10 @@ App::App( int& argc, char* argv[] )
         "http://musiclookup.last.fm/trackresolve",
         100,        // number of days track tags are good 
         5);         // 5 minute delay between web requests
-    connect(m_contentScanner, SIGNAL(tracksChanged()), m_trackTagUpdater, SLOT(needsUpdate()));
+    connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
+
+    m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
+    m_contentScannerThread->start();
 
     m_localRql = new LocalRqlPlugin();
     m_localRql->init();
@@ -73,6 +77,14 @@ App::App( int& argc, char* argv[] )
     }
 
     
+}
+
+App::~App()
+{
+    m_contentScanner->stop();
+    m_contentScannerThread->wait();
+    delete m_contentScanner;
+    delete m_contentScannerThread;
 }
 
 void

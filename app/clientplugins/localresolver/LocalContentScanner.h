@@ -22,7 +22,7 @@
 
 #include <QRunnable>
 #include "SearchLocation.h"
-//#include "MediaMetaInfo.h"
+#include "lib/lastfm/types/Track.h"
 
 
 class LocalContentScanner : public QObject
@@ -31,61 +31,35 @@ class LocalContentScanner : public QObject
     Q_DISABLE_COPY(LocalContentScanner)
 
     volatile bool m_bStopping;
-    class QThreadPool* m_pool;
     class LocalCollection* m_pCol;
+    bool m_addNewVolumesAutomatically;
 
-
-    class Init : public QRunnable
-    {
-    public:
-        Init(LocalContentScanner* lcs);
-        void run();
-
-    private:
-        LocalContentScanner *m_lcs;
-    };
-
-    class ChangeNotification : public QRunnable
-    {
-    public:
-        ChangeNotification();
-        void run();
-
-    private:
-        SearchLocation m_sl;
-    };
-
-    class FullScan : public QRunnable
-    {
-    public:
-        FullScan(const SearchLocation&, LocalContentScanner *);
-        void run();
-        bool operator()(const QString& path);
-
-    private:
-        SearchLocation m_sl;
-        LocalContentScanner *m_lcs;
-    };
-
-    void init();
+    void announceStarted();
     void startFullScan();
-    void dirScan(const SearchLocation& sl, const QString& path);
+    void scan(const SearchLocation& sl);
+    bool dirScan(const SearchLocation& sl, const QString& path);
     void newFileScan(const QString& fullpath, const QString& filename, int directoryId, unsigned lastModified);
     void oldFileRescan(const QString& pathname, int fileId, unsigned lastModified);
     void exception(const QString&) const;
     bool stopping() { return m_bStopping; }
 
+    static Track mediaMetaToTrack(class MediaMetaInfo *m, QString file);
+
 public:
-    LocalContentScanner();
+    LocalContentScanner(bool addNewVolumesAutomatically = true);
     ~LocalContentScanner();
+    void run();
+    void stop();
 
 signals:
-    void tracksChanged();
     void fullScanStart(const SearchLocation&);
     void fullScanFinished(const SearchLocation&, bool completed);
     void dirScanStart(const SearchLocation&, const QString&);
     void fileScanStart(const QString&);
-    void fileScanFinished(const QString&, bool bScanGood, int artistCount, int fileCount);
+
+    void started(QStringList scanLocations);
+    void trackScanned(Track, int totalArtistCount, int totalFileCount);
+    void finished();
 };
 
 #endif

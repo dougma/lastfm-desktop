@@ -14,32 +14,21 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
- 
-#ifndef APP_H
-#define APP_H
 
-#include "lib/unicorn/UnicornApplication.h"
+#include "LocalContentScannerThread.h"
+#include "LocalContentScanner.h"
 
 
-class App : public Unicorn::Application
+LocalContentScannerThread::LocalContentScannerThread(class LocalContentScanner *lcs)
+: m_lcs(lcs)
 {
-public:
-    App( int& argc, char* argv[] );
-    ~App();
+    m_lcs->moveToThread(this);
+}
 
-    void openXspf( QString filename );
-
-private:
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
-    class ILocalRqlPlugin* m_localRql;
-    class ITrackResolverPlugin* m_trackResolver;
-
-    class Radio* m_radio;
-    class Resolver* m_resolver;
-};
-
-#endif //APP_H
+void 
+LocalContentScannerThread::run()
+{
+    m_lcs->run();
+}
