@@ -28,6 +28,7 @@ TagCloudModel::TagCloudModel( QObject* parent )
     m_db = QSqlDatabase::addDatabase( "QSQLITE", "TagCloud");
     m_db.setDatabaseName( CoreDir::data().path() + "/LocalCollection.db" );
     m_db.open();
+    fetchTags();
 }
 
 
