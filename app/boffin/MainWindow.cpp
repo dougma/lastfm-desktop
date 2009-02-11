@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "ScanProgressWidget.h"
-#include "ScanLocationsWidget.h"
 #include "lib/lastfm/core/CoreUrl.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsKeys.h"
@@ -39,15 +37,7 @@ MainWindow::MainWindow()
     ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
 #endif
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
-
-    ui.progress = new ScanProgressWidget;
     
-    QVBoxLayout* v = new QVBoxLayout( ui.progress );
-    v->addStretch();
-    v->addWidget( ui.locations = new ScanLocationsWidget );
-    ui.locations->setLocations( QStringList() << "/arse/Tunes" << "/bum/Music" );
-
-    setCentralWidget( ui.progress );
     setWindowTitle( tr("Last.fm Boffin") );
 
     connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );

@@ -30,6 +30,7 @@
 #include <phonon/backendcapabilities.h>
 #include "XspfResolvingTrackSource.h"
 #include <QMenu>
+#include <QVBoxLayout>
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
@@ -72,13 +73,13 @@ App::~App()
 }
 
 
+#include "ScanProgressWidget.h"
+#include "ScanLocationsWidget.h"
 void
-App::setupMainWindow( MainWindow* window )
+App::setMainWindow( MainWindow* window )
 {
-    QObject* o = (QObject*)window->ui.progress;
-    connect( m_contentScanner, SIGNAL(trackScanned( Track )), o, SLOT(newTrack( Track )) );
-    connect( m_contentScanner, SIGNAL(finished()), o, SLOT(onFinished()) );
-
+    m_mainwindow = window;
+    
 ////// audio output device
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
     Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
@@ -97,13 +98,23 @@ App::setupMainWindow( MainWindow* window )
             
         actiongroup->addAction( a );
     }
-    
+
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     
 	m_radio = new Radio( audioOutput );
 
-////// content scanning
-    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), (QObject*)window->ui.progress, SLOT(onNewTrack( Track )) );
+////// scanning widget
+    ScanProgressWidget* progress = new ScanProgressWidget;
+    window->setCentralWidget( progress );
+    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track )) );
+    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()) );
+
+    ScanLocationsWidget* locations = new ScanLocationsWidget;
+    locations->setLocations( QStringList() << "/jono/s/bad/boy/Tunes" << "/doug/s/super/Music" );
+    
+    QVBoxLayout* v = new QVBoxLayout( progress );
+    v->addStretch();
+    v->addWidget( locations );
 }
 
 
@@ -129,4 +140,19 @@ App::onOutputDeviceActionTriggered( QAction* a )
             qDebug() << m_radio->audioOutput()->outputDevice().name();
             return;
         }
+}
+
+
+#include "TagCloudView.h"
+#include "TagDelegate.h"
+#include "TagCloudModel.h"
+void
+App::onScanningFinished()
+{
+    disconnect( sender(), 0, this, 0 ); //only once pls
+    
+    TagCloudView* view = new TagCloudView;
+    view->setModel( new TagCloudModel );
+    view->setItemDelegate( new TagDelegate );
+    m_mainwindow->setCentralWidget( view );
 }

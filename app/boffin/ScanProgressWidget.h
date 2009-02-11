@@ -28,8 +28,6 @@ class ImageFucker : public QObject
 {
     Q_OBJECT
 
-    WsAccessManager nam;
-
 public:
     ImageFucker( const Artist& artist )
     {
@@ -59,6 +57,8 @@ private slots:
 class ScanProgressWidget : public QWidget
 {
     Q_OBJECT
+
+    WsAccessManager nam;
 
     QList<ImageFucker*> images;
     QList<Track> tracks;

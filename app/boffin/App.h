@@ -32,10 +32,11 @@ public:
     ~App();
 
     void openXspf( QString filename );
-    void setupMainWindow( class MainWindow* );
+    void setMainWindow( class MainWindow* );
 
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
+    void onScanningFinished();
 
 private:
     class LocalContentScannerThread* m_contentScannerThread;
@@ -46,6 +47,8 @@ private:
 
     class Radio* m_radio;
     class Resolver* m_resolver;
+    
+    class MainWindow* m_mainwindow;
 };
 
 #endif //APP_H

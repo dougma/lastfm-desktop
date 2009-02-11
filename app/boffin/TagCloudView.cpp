@@ -44,7 +44,7 @@ TagCloudView::~TagCloudView()
 
 void 
 TagCloudView::paintEvent( QPaintEvent* event )
-{
+{    
     QPainter p( viewport() );
     QStyleOptionViewItem opt;
     opt.initFrom( this );

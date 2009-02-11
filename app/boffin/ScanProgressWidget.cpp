@@ -117,9 +117,18 @@ ScanProgressWidget::onImageFucked()
 void
 ImageFucker::onArtistGotInfo( WsReply* wsreply )
 {
-    QUrl url = Artist::getInfo( wsreply ).imageUrl();
-    QNetworkReply* reply = nam.get( QNetworkRequest(url) );
-    connect( reply, SIGNAL(finished()), SLOT(onImageDownloaded()) );
+    try 
+    {
+        static WsAccessManager nam;
+        
+        QUrl url = Artist::getInfo( wsreply ).imageUrl();
+        QNetworkReply* reply = nam.get( QNetworkRequest(url) );
+        connect( reply, SIGNAL(finished()), SLOT(onImageDownloaded()) );
+    }
+    catch (CoreDomElement::Exception& e)
+    {
+        qWarning() << e;
+    }
 }
 
 
@@ -158,14 +167,14 @@ ImageFucker::onImageDownloaded()
 {
     QNetworkReply* reply = static_cast<QNetworkReply*>(sender());
     QByteArray const data = reply->readAll();
-    
+
     QImage in;
     in.loadFromData( data );
-    
+
     height = in.height();
     pixmap = reflect0rize( in );
-    
+
     y = rand() % 1000;
-    
+
     emit fucked();
 }

@@ -31,8 +31,6 @@ class MainWindow : public QMainWindow
         class QMenu* account;
         class QMenu* outputdevice;
         class QAction* profile;
-        class ScanProgressWidget* progress;
-        class ScanLocationsWidget* locations;
     } ui;
 
 public:
