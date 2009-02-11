@@ -24,11 +24,11 @@
 #include "TrackTagUpdater.h"
 #include "LocalRqlPlugin.h"
 #include "TrackResolver.h"
-#include "Resolver.h"
 #include "lib/lastfm/radio/Radio.h"
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
-#include "XspfResolvingTrackSource.h"
+#include "../client/Resolver.h"
+#include "../client/XspfResolvingTrackSource.h"
 #include <QMenu>
 #include <QVBoxLayout>
 
@@ -56,9 +56,9 @@ App::App( int& argc, char** argv )
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 
 /// blah
-    if (argc > 1) {
-        openXspf( argv[1] );
-    }
+    //if (argc > 1) {
+    //    openXspf( argv[1] );
+    //}
 }
 
 
