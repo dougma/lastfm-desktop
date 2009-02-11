@@ -24,58 +24,60 @@
 #include <lastfm/core/WeightedStringList.h>
 #include <QString>
 #include <QUrl>
-class WsReply;
 
 
-class LASTFM_TYPES_DLLEXPORT Artist
+namespace lastfm
 {
-    QString m_name;
-    QList<QUrl> m_images;
-
-public:
-    Artist()
-    {}
-
-    Artist( const QString& name ) : m_name( name )
-    {}
-
-    /** will be QUrl() unless you got this back from a getInfo or something call */
-    QUrl imageUrl( lastfm::ImageSize size = lastfm::Large ) const { return m_images.value( size ); }
-
-    bool isNull() const { return m_name.isEmpty(); }
-        
-	/** the url for this artist's page at www.last.fm */
-	QUrl www() const;
-    
-	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
-	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
-	
-    operator QString() const 
+    class LASTFM_TYPES_DLLEXPORT Artist
     {
-        /** if no artist name is set, return the musicbrainz unknown identifier
-          * in case some part of the GUI tries to display it anyway. Note isNull
-          * returns false still. So you should have queried this! */
-        return m_name.isEmpty() ? "[unknown]" : m_name;
-    }
-    QString name() const { return QString(*this); }	
-    
-    WsReply* share( const class User& recipient, const QString& message = "" );
+        QString m_name;
+        QList<QUrl> m_images;
 
-	WsReply* getInfo() const;
-    static Artist getInfo( WsReply* );
-	
-	WsReply* getSimilar() const;
-	static WeightedStringList getSimilar( WsReply* );
+    public:
+        Artist()
+        {}
+
+        Artist( const QString& name ) : m_name( name )
+        {}
+
+        /** will be QUrl() unless you got this back from a getInfo or something call */
+        QUrl imageUrl( lastfm::ImageSize size = lastfm::Large ) const { return m_images.value( size ); }
+
+        bool isNull() const { return m_name.isEmpty(); }
+        
+    	/** the url for this artist's page at www.last.fm */
+    	QUrl www() const;
     
-    /** use Tag::list to get the tag list out of the finished reply */
-    WsReply* getTags() const;
-    WsReply* getTopTags() const;
-    
-    /** Last.fm dictates that you may submit at most 10 of these */
-    WsReply* addTags( const QStringList& ) const;
+    	bool operator==( const Artist& that ) const { return m_name == that.m_name; }
+    	bool operator!=( const Artist& that ) const { return m_name != that.m_name; }
 	
-	WsReply* search( int limit = -1 ) const;
-	static QList<Artist> list( WsReply* );
-};
+        operator QString() const 
+        {
+            /** if no artist name is set, return the musicbrainz unknown identifier
+              * in case some part of the GUI tries to display it anyway. Note isNull
+              * returns false still. So you should have queried this! */
+            return m_name.isEmpty() ? "[unknown]" : m_name;
+        }
+        QString name() const { return QString(*this); }	
+    
+        WsReply* share( const class User& recipient, const QString& message = "" );
+
+    	WsReply* getInfo() const;
+        static Artist getInfo( WsReply* );
+	
+    	WsReply* getSimilar() const;
+    	static WeightedStringList getSimilar( WsReply* );
+    
+        /** use Tag::list to get the tag list out of the finished reply */
+        WsReply* getTags() const;
+        WsReply* getTopTags() const;
+    
+        /** Last.fm dictates that you may submit at most 10 of these */
+        WsReply* addTags( const QStringList& ) const;
+	
+    	WsReply* search( int limit = -1 ) const;
+    	static QList<Artist> list( WsReply* );
+    };
+}
 
 #endif

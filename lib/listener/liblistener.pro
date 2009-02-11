@@ -6,4 +6,4 @@ CONFIG += core types scrobble
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
 
-DEFINES += _LISTENER_DLLEXPORT
+DEFINES += _LISTENER_DLLEXPORT LASTFM_COLLAPSE_NAMESPACE

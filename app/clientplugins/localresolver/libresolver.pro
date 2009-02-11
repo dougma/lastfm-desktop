@@ -8,6 +8,7 @@ CONFIG += taglib ws types sqlite3 boost
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 SOURCES -= test.cpp
 

@@ -25,46 +25,48 @@
 #include <lastfm/types/Mbid.h>
 #include <QString>
 #include <QUrl>
-class WsReply;
 
 
-class LASTFM_TYPES_DLLEXPORT Album
+namespace lastfm
 {
-    Mbid m_mbid;
-    Artist m_artist;
-    QString m_title;
+    class LASTFM_TYPES_DLLEXPORT Album
+    {
+        Mbid m_mbid;
+        Artist m_artist;
+        QString m_title;
 
-public:
-	Album()
-	{}
+    public:
+    	Album()
+    	{}
 
-    explicit Album( Mbid mbid ) : m_mbid( mbid )
-    {}
+        explicit Album( Mbid mbid ) : m_mbid( mbid )
+        {}
 
-    Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
-    {}
+        Album( Artist artist, QString title ) : m_artist( artist ), m_title( title )
+        {}
 
-	bool operator==( const Album& that ) const { return m_title == that.m_title && m_artist == that.m_artist; }
-	bool operator!=( const Album& that ) const { return m_title != that.m_title || m_artist != that.m_artist; }
+    	bool operator==( const Album& that ) const { return m_title == that.m_title && m_artist == that.m_artist; }
+    	bool operator!=( const Album& that ) const { return m_title != that.m_title || m_artist != that.m_artist; }
 	
-    operator QString() const { return m_title; }
-    QString title() const { return m_title; }
-    Artist artist() const { return m_artist; }
-    Mbid mbid() const { return m_mbid; }
+        operator QString() const { return m_title; }
+        QString title() const { return m_title; }
+        Artist artist() const { return m_artist; }
+        Mbid mbid() const { return m_mbid; }
 
-	/** artist may have been set, since we allow that in the ctor, but should we handle untitled albums? */
-	bool isNull() const { return m_title.isEmpty() && m_mbid.isNull(); }
+    	/** artist may have been set, since we allow that in the ctor, but should we handle untitled albums? */
+    	bool isNull() const { return m_title.isEmpty() && m_mbid.isNull(); }
 	
-    /** Album.getInfo WebService */
-    WsReply* getInfo() const;
-    WsReply* share( const class User& recipient, const QString& message = "" );
+        /** Album.getInfo WebService */
+        WsReply* getInfo() const;
+        WsReply* share( const class User& recipient, const QString& message = "" );
 
-    /** use Tag::list to get the tag list out of the finished reply */
-    WsReply* getTags() const;
-    WsReply* addTags( const QStringList& ) const;
+        /** use Tag::list to get the tag list out of the finished reply */
+        WsReply* getTags() const;
+        WsReply* addTags( const QStringList& ) const;
     
-    /** the Last.fm website url for this album */
-	QUrl www() const;
-};
+        /** the Last.fm website url for this album */
+    	QUrl www() const;
+    };
+}
 
 #endif //LASTFM_ALBUM_H

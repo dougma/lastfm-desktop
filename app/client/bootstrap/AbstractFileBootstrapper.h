@@ -20,6 +20,7 @@
 #ifndef ABSTRACT_FILE_BOOTSTRAPPER_H
 #define ABSTRACT_FILE_BOOTSTRAPPER_H
 
+#include "lib/lastfm/public.h"
 #include "AbstractBootstrapper.h"
 #include <QDomDocument>
 #include <QDomElement>
@@ -34,7 +35,7 @@ class AbstractFileBootstrapper : public AbstractBootstrapper
     AbstractFileBootstrapper( QString product, QObject* parent = NULL );
 
 protected:
-    bool appendTrack( const class Track& );
+    bool appendTrack( const Track& );
     void zipAndSend();
 
 signals:

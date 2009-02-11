@@ -19,7 +19,10 @@
 
 #include "User.h"
 #include "lib/lastfm/ws/WsRequestBuilder.h"
-#include "lib/lastfm/core/CoreUrl.h"
+#include "lib/lastfm/core/UrlBuilder.h"
+
+
+namespace lastfm {
 
 
 WsReply*
@@ -169,3 +172,6 @@ AuthenticatedUser::getInfoString( WsReply* reply )
     
     #undef tr
 }
+
+
+} //namespace lastfm

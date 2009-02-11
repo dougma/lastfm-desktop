@@ -34,6 +34,9 @@
 #include <QUrl>
 
 
+namespace lastfm {
+
+
 struct TrackData : QSharedData
 {
     TrackData();
@@ -227,14 +230,22 @@ TrackData::TrackData()
 {}
 
 
+} //namespace lastfm
+
+
 #include <QDebug>
-inline QDebug operator<<( QDebug d, const Track& t )
+inline QDebug operator<<( QDebug d, const lastfm::Track& t )
 {
     return d << t.toString( '-' ) << t.url();
 }
 
 
 #include <QMetaType>
-Q_DECLARE_METATYPE( Track );
+Q_DECLARE_METATYPE( lastfm::Track );
 
+
+#ifdef LASTFM_COLLAPSE_NAMESPACE
+using lastfm::MutableTrack;
 #endif
+
+#endif //LASTFM_TRACK_H

@@ -27,6 +27,8 @@
 #include <QNetworkReply>
 #include <fstream>
 
+using lastfm::Track;
+
 static const uint k_bufferSize = 1024 * 8;
 static const int k_minTrackDuration = 30;
 

@@ -20,6 +20,7 @@
 #ifndef LASTFM_NOW_PLAYING_H
 #define LASTFM_NOW_PLAYING_H
 
+#include "lib/lastfm/public.h"
 #include "ScrobblerHttp.h"
 #include <QTime>
 
@@ -31,7 +32,7 @@ class NowPlaying : public ScrobblerPostHttp
 
 public:
     NowPlaying( const QByteArray& );
-    void submit( const class Track& );
+    void submit( const lastfm::Track& );
     void reset();
 
     using ScrobblerPostHttp::request;

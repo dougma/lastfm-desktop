@@ -20,32 +20,35 @@
 #ifndef LASTFM_PLAYLIST_H
 #define LASTFM_PLAYLIST_H
 
+#include <lastfm/public.h>
+#include <lastfm/types/Xspf.h>
 #include <QString>
 #include <QUrl>
-#include <lastfm/types/Xspf.h>
-class WsReply;
 
 
-class LASTFM_TYPES_DLLEXPORT Playlist
+namespace lastfm
 {
-	int m_id;
+    class LASTFM_TYPES_DLLEXPORT Playlist
+    {
+    	int m_id;
 	
-	Playlist() : m_id( -1 )
-	{}
+    	Playlist() : m_id( -1 )
+    	{}
 
-public:
-	Playlist( int id ) : m_id( id )
-	{}
+    public:
+    	Playlist( int id ) : m_id( id )
+    	{}
 	
-	int id() const { return m_id; }
+    	int id() const { return m_id; }
 
-	WsReply* addTrack( const class Track& ) const;
-	WsReply* fetch() const;
+    	WsReply* addTrack( const Track& ) const;
+    	WsReply* fetch() const;
 
-	static WsReply* create( const QString& title, const QString& description = "" );
-	static WsReply* fetch( const QUrl& url );
+    	static WsReply* create( const QString& title, const QString& description = "" );
+    	static WsReply* fetch( const QUrl& url );
 	
-	static Xspf fetch( WsReply* );
-};
+    	static Xspf fetch( WsReply* );
+    };
+}
 
 #endif

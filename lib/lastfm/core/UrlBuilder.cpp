@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "CoreUrl.h"
+#include "UrlBuilder.h"
 #include "CoreLocale.h"
 #include "CoreSettings.h"
 #include <QRegExp>
@@ -29,7 +29,7 @@ lastfm::UrlBuilder::url() const
 {
     QUrl url;
     url.setScheme( "http" );
-    url.setHost( localizedHostName( CoreSettings().locale() ) );
+    url.setHost( hostForLocale( CoreSettings().locale() ) );
     url.setEncodedPath( path );
     return url;
 }
@@ -49,7 +49,7 @@ lastfm::UrlBuilder::encode( QString s )
 
 
 QString //static
-lastfm::UrlBuilder::localizedHostName( const CoreLocale& locale )
+lastfm::UrlBuilder::hostForLocale( const CoreLocale& locale )
 {
 	QString const code = locale.code();
 	
@@ -74,7 +74,7 @@ lastfm::UrlBuilder::localizedHostName( const CoreLocale& locale )
 QUrl //static
 lastfm::UrlBuilder::localize( QUrl url)
 {
-	url.setHost( url.host().replace( QRegExp("^(www.)?last.fm"), localizedHostName( CoreSettings().locale() ) ) );
+	url.setHost( url.host().replace( QRegExp("^(www.)?last.fm"), hostForLocale( CoreSettings().locale() ) ) );
 	return url;
 }
 

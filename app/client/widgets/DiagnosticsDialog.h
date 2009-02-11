@@ -20,6 +20,7 @@
 #ifndef DIAGNOSTICS_DIALOG_H
 #define DIAGNOSTICS_DIALOG_H
 
+#include "lib/lastfm/public.h"
 #include "ui_DiagnosticsDialog.h"
 #include <QDateTime>
 #include <QPointer>
@@ -38,7 +39,7 @@ public:
     DiagnosticsDialog( QWidget *parent = 0 );
     
 public slots:
-    void fingerprinted( const class Track& );
+    void fingerprinted( const Track& );
     void scrobbleActivity( int );
 
 private slots:

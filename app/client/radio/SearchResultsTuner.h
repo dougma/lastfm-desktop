@@ -20,14 +20,17 @@
 #ifndef SEARCH_RESULTS_TUNER_H
 #define SEARCH_RESULTS_TUNER_H
 
+#include "lib/lastfm/public.h"
 #include <QTabWidget>
+
+
 class SearchResultsTuner : public QTabWidget
 {
 	Q_OBJECT
 
 public:
 	SearchResultsTuner();
-	void addArtists( QList<class Artist> );
+	void addArtists( QList<Artist> );
 	void addTags( QStringList );
 
 private slots:

@@ -32,7 +32,7 @@ class TagBuckets : public QWidget
     int m_current_index;
     
 public:
-    TagBuckets( const class Track& );
+    TagBuckets( const Track& );
     
     struct {
         TagBucket* track;

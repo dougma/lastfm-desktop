@@ -46,10 +46,10 @@ public:
 public slots:
     /** will ask Last.fm to update the now playing information for the 
       * authenticated user */
-    void nowPlaying( const class Track& );
+    void nowPlaying( const lastfm::Track& );
     /** will cache the track, but we won't submit it until you call submit() */
-    void cache( const Track& );
-    void cache( const QList<Track>& );
+    void cache( const lastfm::Track& );
+    void cache( const QList<lastfm::Track>& );
     /** will submit the submission cache for this user */
     void submit();
 

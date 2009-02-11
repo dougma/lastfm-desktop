@@ -23,7 +23,7 @@
 
 
 WsReply*
-Playlist::addTrack( const Track& t ) const
+lastfm::Playlist::addTrack( const Track& t ) const
 {
 	return WsRequestBuilder( "playlist.addTrack" )
 			.add( "playlistID", m_id )
@@ -34,14 +34,14 @@ Playlist::addTrack( const Track& t ) const
 
 
 WsReply*
-Playlist::fetch() const
+lastfm::Playlist::fetch() const
 {
 	return fetch( QUrl("lastfm://playlist/" + QString::number( m_id )) );
 }
 
 
 WsReply* //static
-Playlist::fetch( const QUrl& url )
+lastfm::Playlist::fetch( const QUrl& url )
 {
 	return WsRequestBuilder( "playlist.fetch" )
 			.add( "playlistURL", url.toString() )
@@ -50,7 +50,7 @@ Playlist::fetch( const QUrl& url )
 
 
 WsReply* //static
-Playlist::create( const QString& title, const QString& description /*=""*/ )
+lastfm::Playlist::create( const QString& title, const QString& description /*=""*/ )
 {
 	return WsRequestBuilder( "playlist.create" )
 			.add( "title", title )

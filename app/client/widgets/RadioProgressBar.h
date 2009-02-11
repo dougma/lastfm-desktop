@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/lastfm/public.h"
 #include <QWidget>
 
 
@@ -31,8 +32,8 @@ public:
     virtual QSize sizeHint() const;
     
 private slots:
-    void onRadioTick(qint64 tick );
-    void onTrackSpooled( const class Track& track, class StopWatch* );
+    void onRadioTick( qint64 tick );
+    void onTrackSpooled( const Track& track, class StopWatch* );
 
 private:
     int m_scrobbleProgressTick;

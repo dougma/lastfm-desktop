@@ -17,14 +17,15 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_SCROBBLE_CACHE_H
-#define LASTFM_SCROBBLE_CACHE_H
+#ifndef SCROBBLE_CACHE_H
+#define SCROBBLE_CACHE_H
 
-#include <DllExportMacro.h>
 #include "Scrobble.h"
 #include <QList>
 #include <QString>
 
+using lastfm::Track;
+ 
 
 /** absolutely not thread-safe */
 class LASTFM_SCROBBLE_DLLEXPORT ScrobbleCache

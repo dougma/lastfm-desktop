@@ -20,14 +20,14 @@
 #include "Album.h"
 #include "Artist.h"
 #include "User.h"
-#include "../core/CoreUrl.h"
+#include "../core/UrlBuilder.h"
 #include "../ws/WsRequestBuilder.h"
 #include <QFile>
 #include <QTimer>
 
 
 WsReply*
-Album::getInfo() const
+lastfm::Album::getInfo() const
 {
     return WsRequestBuilder( "album.getInfo" )
             .add( "artist", m_artist )
@@ -38,7 +38,7 @@ Album::getInfo() const
 
 
 WsReply*
-Album::getTags() const
+lastfm::Album::getTags() const
 {
 	return WsRequestBuilder( "album.getTags" )
             .add( "artist", m_artist )
@@ -48,7 +48,7 @@ Album::getTags() const
 
 
 WsReply*
-Album::share( const User& recipient, const QString& message )
+lastfm::Album::share( const User& recipient, const QString& message )
 {
     return WsRequestBuilder( "album.share" )
 		.add( "recipient", recipient )
@@ -60,14 +60,14 @@ Album::share( const User& recipient, const QString& message )
 
 
 QUrl
-Album::www() const
+lastfm::Album::www() const
 {
     return lastfm::UrlBuilder( "music" ).slash( m_artist ).slash( m_title ).url();
 }
 
 
 WsReply*
-Album::addTags( const QStringList& tags ) const
+lastfm::Album::addTags( const QStringList& tags ) const
 {
     if (tags.isEmpty())
         return 0;

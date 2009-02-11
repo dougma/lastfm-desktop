@@ -25,6 +25,9 @@
 #include <QTimer>
 #include <cmath>
 
+using lastfm::Track;
+using lastfm::MutableTrack;
+
 
 Radio::Radio( Phonon::AudioOutput* output )
      : m_trackSource( 0 ),

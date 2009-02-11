@@ -43,7 +43,7 @@ protected:
 	virtual bool event( QEvent* );
     
 private slots:
-    void onTrackSpooled( const class Track&, class StopWatch* );
+    void onTrackSpooled( const Track&, class StopWatch* );
     void setPixmap( const QPixmap& );
 	void update();
     void onChecked( bool );

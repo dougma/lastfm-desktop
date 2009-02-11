@@ -22,6 +22,7 @@ include( _files.qmake )
 !macx-xcode:generateBuildParameters()
 
 INCLUDEPATH += .
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 macx* {
 	QMAKE_INFO_PLIST = mac/Info.plist

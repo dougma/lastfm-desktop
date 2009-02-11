@@ -25,6 +25,8 @@
 #include <QDebug>
 #include <QtXml>
 
+using lastfm::Track;
+using lastfm::Xspf;
 
 //TODO discovery mode
 //TODO skips left

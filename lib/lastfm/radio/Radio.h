@@ -69,8 +69,8 @@ signals:
     /** emitted up to twice, as first time may not have a title for the station
       * but the second time will */
     void tuningIn( const RadioStation& );
-    void trackSpooled( const Track& ); /** and we're now prebuffering */
-    void trackStarted( const Track& );
+    void trackSpooled( const lastfm::Track& ); /** and we're now prebuffering */
+    void trackStarted( const lastfm::Track& );
     void buffering( int );
     void stopped();
 	
@@ -101,40 +101,32 @@ private:
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
 	Radio::State m_state;
-	Track m_track;
+	lastfm::Track m_track;
 	RadioStation m_station;
     bool m_bErrorRecover;
 };
 
 
-#define CASE(x) case x: return d << #x
 #include <QDebug>
 inline QDebug operator<<( QDebug d, Radio::State s )
 {
-	switch (s)
-	{
-		CASE(Radio::TuningIn);
-        CASE(Radio::Buffering);
-		CASE(Radio::Playing);
-		CASE(Radio::Stopped);
-	}
-    return d;
+    return d << lastfm::qMetaEnumString<Radio>( s, "State" );
 }
-
 inline QDebug operator<<( QDebug d, Phonon::State s )
 {
 	switch (s)
 	{
+	    #define CASE(x) case x: return d << #x
 		CASE(Phonon::LoadingState);
 		CASE(Phonon::StoppedState);
 		CASE(Phonon::PlayingState);
 		CASE(Phonon::BufferingState);
 		CASE(Phonon::PausedState);
 		CASE(Phonon::ErrorState);
+        #undef CASE
 	}
     return d;
 }
-#undef CASE
 
 
 Q_DECLARE_METATYPE( Radio::State );

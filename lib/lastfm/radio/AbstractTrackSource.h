@@ -34,7 +34,7 @@ class LASTFM_RADIO_DLLEXPORT AbstractTrackSource : public QObject
 public:
     // returns a null track if there's nothing available; in 
     // which case trackAvailable() will be signalled, later.
-    virtual Track takeNextTrack() { return Track(); };
+    virtual lastfm::Track takeNextTrack() { return lastfm::Track(); };
     
 signals:
 	void title( const QString& );

@@ -20,6 +20,7 @@
 #ifndef TRACK_DASHBOARD_HEADER_H
 #define TRACK_DASHBOARD_HEADER_H
 
+#include "lib/lastfm/public.h"
 #include <QWidget>
 #include <QMouseEvent>
 
@@ -47,7 +48,7 @@ protected:
     void resizeEvent( QResizeEvent* e );
     
 private slots:
-    void onTrackSpooled( const class Track&, class StopWatch* );
+    void onTrackSpooled( const Track&, class StopWatch* );
     void onContextMenuRequested( const QPoint& pos );
     
     void onPraiseClientTeam();

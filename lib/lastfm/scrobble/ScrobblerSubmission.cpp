@@ -22,6 +22,8 @@
 #include "Scrobbler.h"
 #include "Scrobble.h"
 
+using lastfm::Track;
+
 
 void
 ScrobblerSubmission::setTracks( const QList<Track>& tracks )

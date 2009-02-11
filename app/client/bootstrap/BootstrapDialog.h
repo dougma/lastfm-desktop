@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "lib/lastfm/public.h"
 #include <QProgressDialog>
 #include <QList>
 #ifdef WIN32
@@ -38,7 +39,7 @@ public:
     void exec();
     
 private slots:
-    void onITunesTrackProcessed( int, const class Track& );
+    void onITunesTrackProcessed( int, const Track& );
     // private and passed to ctor because without it, the class would completely
     // fail to work
     void onBootstrapCompleted( const QString& plugin_id );

@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include "lib/lastfm/ws/WsAccessManager.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/types/Track.h"
 #include <QHash>
 /** @author Max Howell <max@last.fm> */
+
 
 class ImageFucker : public QObject
 {
@@ -58,8 +58,6 @@ class ScanProgressWidget : public QWidget
 {
     Q_OBJECT
 
-    WsAccessManager nam;
-
     QList<ImageFucker*> images;
     QList<Track> tracks;
     QHash<QString, int> track_counts;
@@ -73,7 +71,7 @@ public:
     virtual void timerEvent( QTimerEvent* );
 
 public slots:
-    void onNewTrack( const class Track& );
+    void onNewTrack( const Track& );
 
 private slots:
     void onImageFucked();

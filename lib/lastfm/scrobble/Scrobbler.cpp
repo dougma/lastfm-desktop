@@ -24,6 +24,8 @@
 #include "ScrobblerSubmission.h"
 #include "lib/lastfm/ws/WsKeys.h"
 
+using lastfm::Track;
+
 
 Scrobbler::Scrobbler( const QString& clientId )
         : m_clientId( clientId ),

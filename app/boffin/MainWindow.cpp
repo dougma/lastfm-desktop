@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "lib/lastfm/core/CoreUrl.h"
+#include "lib/lastfm/core/UrlBuilder.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QCoreApplication>

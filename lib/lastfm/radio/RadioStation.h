@@ -38,12 +38,12 @@ public:
     explicit RadioStation( const QUrl& u ) : m_url( u.toString() )
     {}
 	
-    static RadioStation library( const User& user )         { return "lastfm://user/" + QString(user) + "/personal"; }
-    static RadioStation recommendations( const User& user ) { return "lastfm://user/" + user + "/recommended"; }
-    static RadioStation neighbourhood( const User& user )   { return "lastfm://user/" + user + "/neighbours"; }
-    static RadioStation lovedTracks( const User& user )     { return "lastfm://user/" + user + "/loved"; }
-    static RadioStation globalTag( const Tag& tag )         { return "lastfm://globaltags/" + tag; }
-    static RadioStation similar( const Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
+    static RadioStation library( const lastfm::User& user )         { return "lastfm://user/" + QString(user) + "/personal"; }
+    static RadioStation recommendations( const lastfm::User& user ) { return "lastfm://user/" + user + "/recommended"; }
+    static RadioStation neighbourhood( const lastfm::User& user )   { return "lastfm://user/" + user + "/neighbours"; }
+    static RadioStation lovedTracks( const lastfm::User& user )     { return "lastfm://user/" + user + "/loved"; }
+    static RadioStation globalTag( const lastfm::Tag& tag )         { return "lastfm://globaltags/" + tag; }
+    static RadioStation similar( const lastfm::Artist& artist )     { return "lastfm://artist/" + artist + "/similarartists"; }
 
     static RadioStation rql( const QString& rql )
     {

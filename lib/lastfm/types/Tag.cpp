@@ -19,8 +19,11 @@
 
 #include "Tag.h"
 #include "User.h"
-#include "../core/CoreUrl.h"
+#include "../core/UrlBuilder.h"
 #include "../ws/WsRequestBuilder.h"
+
+
+namespace lastfm {
 
 
 QUrl
@@ -82,3 +85,6 @@ Tag::list( WsReply* r )
     }
     return tags;
 }
+
+
+} //namespace lastfm

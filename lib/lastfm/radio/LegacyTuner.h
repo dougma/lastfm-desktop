@@ -20,8 +20,9 @@
 #ifndef LEGACY_TUNER_H
 #define LEGACY_TUNER_H
 
+#include "lib/lastfm/public.h"
 #include "AbstractTrackSource.h"
-#include <lastfm/radio/RadioStation.h>
+#include "RadioStation.h"
 
 
 class LASTFM_RADIO_DLLEXPORT LegacyTuner : public AbstractTrackSource
@@ -33,7 +34,7 @@ public:
 	  * automatically fetches the first 5 tracks for the station */
     LegacyTuner( const RadioStation&, const QString& password_md5 );
 
-    virtual Track takeNextTrack();
+    virtual lastfm::Track takeNextTrack();
 
 private slots:
 	void onHandshakeReturn();
@@ -50,7 +51,7 @@ private:
 	uint m_retry_counter;
     RadioStation m_station;
     QByteArray m_session;
-    QList<Track> m_queue;
+    QList<lastfm::Track> m_queue;
 };
 
 #endif

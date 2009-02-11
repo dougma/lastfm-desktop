@@ -42,7 +42,7 @@ public:
 	/** You need to have assigned Ws::* for this to work, creating the tuner
 	  * automatically fetches the first 5 tracks for the station */
     explicit Tuner( const RadioStation& );
-    virtual Track takeNextTrack();
+    virtual lastfm::Track takeNextTrack();
 
 private slots:
 	void onTuneReturn( WsReply* );
@@ -63,7 +63,7 @@ private:
       */
     bool fetchFiveMoreTracks();
 
-    QList<Track> m_queue;
+    QList<lastfm::Track> m_queue;
 	uint m_retry_counter;
 };
 

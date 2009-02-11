@@ -14,6 +14,7 @@ QT = gui \
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
 
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
 INCLUDEPATH += ../client
 
 HEADERS += ../client/ExtractIdentifiersJob.h \

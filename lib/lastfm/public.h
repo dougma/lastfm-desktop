@@ -72,15 +72,15 @@
 
 
 #include <QMetaEnum>
-#include <QLatin1String>
+#include <QString>
 
 namespace lastfm
 {
     /** http://labs.trolltech.com/blogs/2008/10/09/coding-tip-pretty-printing-enum-values
-     * Tips for making this take a single parameter welcome! :)
-     * 
-     * eg. lastfm::qMetaEnumString<QNetworkReply>( error, "NetworkError" );
-     */
+      * Tips for making this take a single parameter welcome! :)
+      * 
+      * eg. lastfm::qMetaEnumString<QNetworkReply>( error, "NetworkError" );
+      */
     template <typename T> static inline QString qMetaEnumString( int enum_value, const char* enum_name )
     {
         QMetaObject meta = T::staticMetaObject;
@@ -93,6 +93,7 @@ namespace lastfm
         return "Unknown enum value: " + QString::number( enum_value );
     }
 
+
 	enum ImageSize
 	{
 		Small = 0,
@@ -100,6 +101,33 @@ namespace lastfm
 		Large = 2, /** seemingly 174x174 */
         ExtraLarge = 3
 	};
+	
+	
+	//convenience
+    class Track;
+    class Album;
+    class Artist;
+    class User;
+    class Tag;
+    class AuthenticatedUser;
+    class Xspf;
+    class Playlist;
 }
+
+
+#ifdef LASTFM_COLLAPSE_NAMESPACE
+using lastfm::Track;
+using lastfm::Album;
+using lastfm::Artist;
+using lastfm::User;
+using lastfm::AuthenticatedUser;
+using lastfm::Tag;
+using lastfm::Xspf;
+using lastfm::Playlist;
+#endif
+
+
+//convenience
+class WsReply;
 
 #endif //LASTFM_PUBLIC_H

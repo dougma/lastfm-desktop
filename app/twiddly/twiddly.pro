@@ -5,6 +5,7 @@ QT = core xml sql
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
 
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
 LIBS += -L$$DESTDIR
 SOURCES = main.cpp PlayCountsDatabase.cpp IPod.cpp $$ROOT_DIR/common/c++/Logger.cpp
 

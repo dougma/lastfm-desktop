@@ -34,15 +34,10 @@
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
-extern "C" {
-extern int sqlite3_threadsafe();
-}
 
 App::App( int& argc, char** argv )
     :Unicorn::Application( argc, argv ), m_radio( 0 )
 {
-    int i = sqlite3_threadsafe();
-
 /// content resolver
     m_contentScanner = new LocalContentScanner;
     m_trackTagUpdater = TrackTagUpdater::create(
@@ -156,10 +151,19 @@ App::onOutputDeviceActionTriggered( QAction* a )
 void
 App::onScanningFinished()
 {
+    QTime time;
+    time.start();
+    
+    qDebug() << "Hi!";
+    
     disconnect( sender(), 0, this, 0 ); //only once pls
     
     TagCloudView* view = new TagCloudView;
     view->setModel( new TagCloudModel );
     view->setItemDelegate( new TagDelegate );
     m_mainwindow->setCentralWidget( view );
+    
+    view->setFrameStyle( QFrame::NoFrame );
+
+    qDebug() << "Bye!" << time.elapsed() << "ms";
 }

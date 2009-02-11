@@ -23,7 +23,7 @@
 #include <QUrl>
 
 
-Xspf::Xspf( const QDomElement& playlist_node, Track::Source src /* = Track::LastFmRadio */ )
+lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
 {
     try
     {

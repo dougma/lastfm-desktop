@@ -10,7 +10,7 @@ public:
     MetaDataWidget( QWidget* parent = 0 );
     
     void setTuningIn();
-    void setTrack( const class Track& );
+    void setTrack( const Track& );
 
 protected slots:
     void onInfoFetched( WsReply* );

@@ -25,18 +25,21 @@
 #include <QList>
 
 
-class LASTFM_TYPES_DLLEXPORT Xspf
+namespace lastfm
 {
-public:
-    /** pass in the playlist node! */
-	Xspf( const class QDomElement& playlist_node, Track::Source src = Track::LastFmRadio );
+    class LASTFM_TYPES_DLLEXPORT Xspf
+    {
+    public:
+        /** pass in the playlist node! */
+    	Xspf( const class QDomElement& playlist_node, Track::Source src = Track::LastFmRadio );
 
-	QList<Track> tracks() const { return m_tracks; }
-	QString title() const{ return m_title; }
+    	QList<Track> tracks() const { return m_tracks; }
+    	QString title() const{ return m_title; }
 
-private:
-	QList<Track> m_tracks;
-	QString m_title;
-};
+    private:
+    	QList<Track> m_tracks;
+    	QString m_title;
+    };
+}
 
 #endif

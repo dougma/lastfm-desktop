@@ -46,7 +46,7 @@ NowPlaying::reset()
 
 
 void
-NowPlaying::submit( const Track& track )
+NowPlaying::submit( const lastfm::Track& track )
 {   
     if (track.isNull())
         return;

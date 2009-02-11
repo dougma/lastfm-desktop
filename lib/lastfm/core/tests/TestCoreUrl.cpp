@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <QtTest/QtTest>
-#include "lib/lastfm/core/CoreUrl.h"
+#include "lib/lastfm/core/UrlBuilder.h"
 
 
 class TestCoreUrl : public QObject

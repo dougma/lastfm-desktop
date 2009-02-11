@@ -37,7 +37,7 @@ public:
     TrackDashboard();
 
     void tuningIn();
-    void setTrack( const class Track& );
+    void setTrack( const Track& );
     void clear();
 
     Qt::Orientation orientation() const

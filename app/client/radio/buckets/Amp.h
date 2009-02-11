@@ -23,7 +23,6 @@
 #include <QWidget>
 #include "Seed.h"
 #include "State.h"
-class Track;
 
 
 class Amp : public QWidget

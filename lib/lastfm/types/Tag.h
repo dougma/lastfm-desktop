@@ -26,28 +26,31 @@
 #include <QUrl>
 
 
-class LASTFM_TYPES_DLLEXPORT Tag
+namespace lastfm
 {
-	QString m_name;
+    class LASTFM_TYPES_DLLEXPORT Tag
+    {
+    	QString m_name;
 	
-public:
-	Tag( const QString& name ) : m_name( name )
-	{}
+    public:
+    	Tag( const QString& name ) : m_name( name )
+    	{}
 	
-	operator QString() const { return m_name; }
-    QString name() const { return m_name; }
+    	operator QString() const { return m_name; }
+        QString name() const { return m_name; }
 	
-	/** the global tag page at www.last.fm */
-	QUrl www() const;
-	/** the tag page for user @p user at www.last.fm */
-	QUrl www( const class User& user ) const;
+    	/** the global tag page at www.last.fm */
+    	QUrl www() const;
+    	/** the tag page for user @p user at www.last.fm */
+    	QUrl www( const class User& user ) const;
 	
-	class WsReply* search() const;
-	static QStringList search( WsReply* );
+    	class WsReply* search() const;
+    	static QStringList search( WsReply* );
     
-    /** you can in fact pass any *.get*Tags result to this
-      * though you must be aware, the weighting may be empty */
-    static WeightedStringList list( WsReply* );
-};
+        /** you can in fact pass any *.get*Tags result to this
+          * though you must be aware, the weighting may be empty */
+        static WeightedStringList list( WsReply* );
+    };
+}
 
 #endif

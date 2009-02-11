@@ -19,8 +19,11 @@
 
 #include "Artist.h"
 #include "User.h"
-#include "../core/CoreUrl.h"
+#include "../core/UrlBuilder.h"
 #include "../ws/WsRequestBuilder.h"
+
+
+namespace lastfm {
 
 
 WsReply* 
@@ -153,3 +156,6 @@ Artist::addTags( const QStringList& tags ) const
             .add( "tags", tags.join( QChar(',') ) )
             .post();
 }
+
+
+} //namespace lastfm

@@ -22,78 +22,79 @@
 
 #include <lastfm/public.h>
 #include <lastfm/core/WeightedStringList.h>
+#include <lastfm/ws/WsKeys.h>
 #include <QString>
 #include <QUrl>
-class WsReply;
 
 
-class LASTFM_TYPES_DLLEXPORT User
+namespace lastfm
 {
-    QString m_name;
+    class LASTFM_TYPES_DLLEXPORT User
+    {
+        QString m_name;
 	
-public:    
-    User( const QString& name ) : m_name( name ), m_match( -1.0f )
-    {}
+    public:    
+        User( const QString& name ) : m_name( name ), m_match( -1.0f )
+        {}
 
-    operator QString() const { return m_name; }
-    QString name() const { return m_name; }
+        operator QString() const { return m_name; }
+        QString name() const { return m_name; }
 	
-    /** You can get a WeightedStringList using Tag::getTopTags() */
-	WsReply* getTopTags() const;
+        /** You can get a WeightedStringList using Tag::getTopTags() */
+    	WsReply* getTopTags() const;
 
-    /** get a QList<User> from User::list() */
-    WsReply* getFriends() const;
-	WsReply* getNeighbours() const;
+        /** get a QList<User> from User::list() */
+        WsReply* getFriends() const;
+    	WsReply* getNeighbours() const;
     
-    WsReply* getPlaylists() const;
-    WsReply* getTopArtists() const;
-    WsReply* getRecentArtists() const;
-    WsReply* getRecentTracks() const;
+        WsReply* getPlaylists() const;
+        WsReply* getTopArtists() const;
+        WsReply* getRecentArtists() const;
+        WsReply* getRecentTracks() const;
     
-    static QList<User> list( WsReply* );
+        static QList<User> list( WsReply* );
     
-//////
-	QUrl smallImageUrl() const { return m_smallImage; }
-	QUrl mediumImageUrl() const { return m_mediumImage; }
-	QUrl largeImageUrl() const { return m_largeImage; }
+    //////
+    	QUrl smallImageUrl() const { return m_smallImage; }
+    	QUrl mediumImageUrl() const { return m_mediumImage; }
+    	QUrl largeImageUrl() const { return m_largeImage; }
 	
-    QString realName() const { return m_realName; }
+        QString realName() const { return m_realName; }
     
-    /** the user's profile page at www.last.fm */
-    QUrl www() const;
+        /** the user's profile page at www.last.fm */
+        QUrl www() const;
     
-	/** Returns the match between the logged in user and the user which this
-	  *	object represents (if < 0.0f then not set) */
-	float match() const { return m_match; }
+    	/** Returns the match between the logged in user and the user which this
+    	  *	object represents (if < 0.0f then not set) */
+    	float match() const { return m_match; }
 	
-private:
-	QUrl m_smallImage;
-	QUrl m_mediumImage;
-	QUrl m_largeImage;
+    private:
+    	QUrl m_smallImage;
+    	QUrl m_mediumImage;
+    	QUrl m_largeImage;
 	
-	float m_match;
+    	float m_match;
     
-    QString m_realName;
-};
+        QString m_realName;
+    };
 
 
-
-#include <lastfm/ws/WsKeys.h>
-/** The authenticated user is special, as some webservices only work for him */
-class LASTFM_TYPES_DLLEXPORT AuthenticatedUser : public User
-{
-    using User::match;
+    /** The authenticated user is special, as some webservices only work for him */
+    class LASTFM_TYPES_DLLEXPORT AuthenticatedUser : public User
+    {
+        using User::match; //hide as not useful
     
-public:
-    /** the authenticated User */
-    AuthenticatedUser() : User( Ws::Username )
-    {}
+    public:
+        /** the authenticated User */
+        AuthenticatedUser() : User( Ws::Username )
+        {}
 
-	/** you can only get information about the autheticated user */
-	static WsReply* getInfo();
+    	/** you can only get information about the autheticated user */
+    	static WsReply* getInfo();
 	
-	/** a verbose string, eg. "A man with 36,153 scrobbles" */
-    static QString getInfoString( WsReply* );
-};
+    	/** a verbose string, eg. "A man with 36,153 scrobbles" */
+        static QString getInfoString( WsReply* );
+    };
+}
 
 #endif

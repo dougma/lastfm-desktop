@@ -31,7 +31,7 @@ class QNetworkAccessManager;
 
 class LASTFM_FINGERPRINT_DLLEXPORT Fingerprint
 {
-    Track m_track;
+    lastfm::Track m_track;
     QByteArray m_data;
     fingerprint::FingerprintExtractor* m_extractor;
     int m_id;
@@ -44,7 +44,7 @@ public:
       * considered 99.9999...9999% unique and so we use it for most stuff as 
       * it is much quicker than a complete fingerprint, still though, you
       * should do the generate step in a thread. */
-    Fingerprint( const Track& );
+    Fingerprint( const lastfm::Track& );
     ~Fingerprint();
     
     /** if the id isNull(), then you'll need to do generate, submit and decode */
@@ -77,7 +77,7 @@ public:
 class LASTFM_FINGERPRINT_DLLEXPORT CompleteFingerprint : public Fingerprint
 {
 public:
-    CompleteFingerprint( const Track& t ) : Fingerprint( t )
+    CompleteFingerprint( const lastfm::Track& t ) : Fingerprint( t )
     {
         m_complete = true;
     }

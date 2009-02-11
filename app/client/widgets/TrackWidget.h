@@ -20,6 +20,7 @@
 #ifndef TRACK_WIDGET_H
 #define TRACK_WIDGET_H
 
+#include "lib/lastfm/public.h"
 #include <QWidget>
 
 
@@ -35,7 +36,7 @@ class TrackWidget : public QWidget
 public:
     TrackWidget();
 
-    void setTrack( const class Track& );
+    void setTrack( const Track& );
     
 private slots:
     void onCoverDownloaded( const class QImage& );

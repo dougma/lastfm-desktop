@@ -27,18 +27,18 @@
 
 class ScrobblerSubmission : public ScrobblerPostHttp
 {
-    QList<Track> m_tracks;
-    QList<Track> m_batch;
+    QList<lastfm::Track> m_tracks;
+    QList<lastfm::Track> m_batch;
 
 public:
 	/** tracks will be submitted in batches of 50 */
-    void setTracks( const QList<Track>& );
+    void setTracks( const QList<lastfm::Track>& );
     /** submits a batch, if we are already submitting, does nothing */
     void submitNextBatch();
     /** the batch that is being submitted currently */
-    QList<Track> batch() const { return m_batch; }
+    QList<lastfm::Track> batch() const { return m_batch; }
     /** tracks that have not yet been removed due to an OK from Last.fm */
-    QList<Track> unsubmittedTracks() const { return m_tracks; }
+    QList<lastfm::Track> unsubmittedTracks() const { return m_tracks; }
 
     virtual void request()
     {

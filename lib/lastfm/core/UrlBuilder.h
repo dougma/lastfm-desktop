@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_CORE_URL_H
-#define LASTFM_CORE_URL_H
+#ifndef LASTFM_URL_BUILDER_H
+#define LASTFM_URL_BUILDER_H
 
 #include <lastfm/public.h>
 #include <QString>
@@ -28,6 +28,7 @@ class CoreLocale;
 
 namespace lastfm
 {
+    /** For building www.last.fm urls. We have special rules for encoding and that */
     class LASTFM_CORE_DLLEXPORT UrlBuilder
     {
         QByteArray path;
@@ -39,29 +40,29 @@ namespace lastfm
           */
         UrlBuilder( const QString& base ) : path( '/' + base.toAscii() )
         {}
-        
+
         UrlBuilder& slash( const QString& path ) { this->path += '/' + encode( path ); return *this; }
 
         QUrl url() const;
-	
+
     	/** www.last.fm becomes the local version, eg www.lastfm.de */
     	static QUrl localize( QUrl );
     	/** www.last.fm becomes m.last.fm, localisation is preserved */
     	static QUrl mobilize( QUrl );
 
     	/** Use this to URL encode any database item (artist, track, album). It
-    	 * internally calls UrlEncodeSpecialChars to double encode some special
-    	 * symbols according to the same pattern as that used on the website.
-    	 *
-    	 * &, /, ;, +, #
-    	 *
-    	 * Use for any urls that go to www.last.fm
-    	 * Do not use for ws.audioscrobbler.com
-    	 */
+    	  * internally calls UrlEncodeSpecialChars to double encode some special
+    	  * symbols according to the same pattern as that used on the website.
+    	  *
+    	  * &, /, ;, +, #
+    	  *
+    	  * Use for any urls that go to www.last.fm
+    	  * Do not use for ws.audioscrobbler.com
+    	  */
     	static QByteArray encode( QString );
 
     	/** returns eg. www.lastfm.de */
-    	static QString localizedHostName( const CoreLocale& );
+    	static QString hostForLocale( const CoreLocale& );
     };
 }
 

@@ -26,6 +26,9 @@
 #include <QCoreApplication>
 #include <QtNetwork>
 
+using lastfm::Track;
+using lastfm::Xspf;
+
 
 LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
      : m_nam( new WsAccessManager( this ) ),

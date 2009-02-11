@@ -19,20 +19,20 @@
 
 #include "Track.h"
 #include "User.h"
-#include "../core/CoreUrl.h"
+#include "../core/UrlBuilder.h"
 #include "../ws/WsRequestBuilder.h"
 #include "../ws/WsReply.h"
 #include <QFileInfo>
 
 
-Track::Track()
+lastfm::Track::Track()
 {
     d = new TrackData;
     d->null = true;
 }
 
 
-Track::Track( const QDomElement& e )
+lastfm::Track::Track( const QDomElement& e )
 {
     d = new TrackData;
 
@@ -45,7 +45,7 @@ Track::Track( const QDomElement& e )
     d->duration = e.namedItem( "duration" ).toElement().text().toInt();
     d->url = e.namedItem( "url" ).toElement().text();
     d->rating = e.namedItem( "rating" ).toElement().text().toUInt();
-    d->source = e.namedItem( "source" ).toElement().text().toInt(); //defaults to 0, or Track::Unknown
+    d->source = e.namedItem( "source" ).toElement().text().toInt(); //defaults to 0, or lastfm::Track::Unknown
     d->time = QDateTime::fromTime_t( e.namedItem( "timestamp" ).toElement().text().toUInt() );
     
     QDomNodeList nodes = e.namedItem( "extras" ).childNodes();
@@ -59,7 +59,7 @@ Track::Track( const QDomElement& e )
 
 
 QDomElement
-Track::toDomElement( QDomDocument& xml ) const
+lastfm::Track::toDomElement( QDomDocument& xml ) const
 {
     QDomElement item = xml.createElement( "track" );
     
@@ -98,7 +98,7 @@ Track::toDomElement( QDomDocument& xml ) const
 
 
 QString
-Track::toString( const QChar& separator ) const
+lastfm::Track::toString( const QChar& separator ) const
 {
     if ( d->artist.isEmpty() )
     {
@@ -116,7 +116,7 @@ Track::toString( const QChar& separator ) const
 
 
 QString //static
-Track::durationString( int const duration )
+lastfm::Track::durationString( int const duration )
 {
     QTime t = QTime().addSecs( duration );
     if (duration < 60*60)
@@ -127,7 +127,7 @@ Track::durationString( int const duration )
 
 
 WsReply*
-Track::share( const User& recipient, const QString& message )
+lastfm::Track::share( const User& recipient, const QString& message )
 {
     return WsRequestBuilder( "track.share" )
         .add( "recipient", recipient )
@@ -139,7 +139,7 @@ Track::share( const User& recipient, const QString& message )
 
 
 WsReply*
-MutableTrack::love()
+lastfm::MutableTrack::love()
 {
     if (d->extras.value("rating").size())
         return 0;
@@ -154,7 +154,7 @@ MutableTrack::love()
 
 
 WsReply*
-MutableTrack::ban()
+lastfm::MutableTrack::ban()
 {
     d->extras["rating"] = "B";
     
@@ -166,7 +166,7 @@ MutableTrack::ban()
 
 
 void
-MutableTrack::unlove()
+lastfm::MutableTrack::unlove()
 {
     QString& r = d->extras["rating"];
     if (r == "L") r = "";
@@ -178,7 +178,7 @@ struct MbidFriendly_WsRequestBuilder : WsRequestBuilder
 	MbidFriendly_WsRequestBuilder( const char* p ) : WsRequestBuilder( p )
 	{}
 	
-	MbidFriendly_WsRequestBuilder& add( Track const * const t )
+	MbidFriendly_WsRequestBuilder& add( lastfm::Track const * const t )
 	{
 		if (t->mbid().isNull()) 
 		{
@@ -194,21 +194,21 @@ struct MbidFriendly_WsRequestBuilder : WsRequestBuilder
 
 
 WsReply*
-Track::getTopTags() const
+lastfm::Track::getTopTags() const
 {
 	return MbidFriendly_WsRequestBuilder( "track.getTopTags" ).add( this ).get();
 }
 
 
 WsReply*
-Track::getTags() const
+lastfm::Track::getTags() const
 {
 	return MbidFriendly_WsRequestBuilder( "track.getTags" ).add( this ).get();
 }
 
 
 WsReply*
-Track::addTags( const QStringList& tags ) const
+lastfm::Track::addTags( const QStringList& tags ) const
 {
     if (tags.isEmpty())
         return 0;
@@ -222,7 +222,7 @@ Track::addTags( const QStringList& tags ) const
 
 
 WsReply*
-Track::removeTag( const QString& tag ) const
+lastfm::Track::removeTag( const QString& tag ) const
 {
     if (tag.isEmpty())
         return 0;
@@ -236,14 +236,14 @@ Track::removeTag( const QString& tag ) const
 
 
 QUrl
-Track::www() const
+lastfm::Track::www() const
 {
 	return lastfm::UrlBuilder( "music" ).slash( d->artist ).slash( "_" ).slash( d->title ).url();
 }
 
 
 bool
-Track::isMp3() const
+lastfm::Track::isMp3() const
 {
     //FIXME really we should check the file header?
     return d->url.scheme() == "file" &&
@@ -251,8 +251,8 @@ Track::isMp3() const
 }
 
 
-Track
-Track::clone() const
+lastfm::Track
+lastfm::Track::clone() const
 {
     Track copy( *this );
     copy.d.detach();

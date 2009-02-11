@@ -24,12 +24,12 @@
 #include <lastfm/types/Track.h>
 
 
-struct LASTFM_SCROBBLE_DLLEXPORT Scrobble : Track
+struct LASTFM_SCROBBLE_DLLEXPORT Scrobble : lastfm::Track
 {
     Scrobble()
     {}
     
-    Scrobble( const Track& that ) : Track( that )
+    Scrobble( const lastfm::Track& that ) : Track( that )
     {}
     
     QByteArray sourceString() const;
