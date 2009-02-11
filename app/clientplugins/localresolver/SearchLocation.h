@@ -54,15 +54,15 @@ public:
     // Directories in the exclusion list (and optionally, 
     // their subdirectories) are skipped.
     // recurseDirs returns false if it was aborted by the callback.
-    template<class T>
-    bool recurseDirs(T& callback) const
+    template<typename T>
+    bool recurseDirs(T callback) const
     {
         return _recurseDirs(m_startPath, callback);
     }
 
 private:
-    template<class T>
-    bool _recurseDirs(const QString& path, T& callback) const
+    template<typename T>
+    bool _recurseDirs(const QString& path, T callback) const
     {
         int idx = m_exclusions.indexOf(LocalCollection::Exclusion(path));
         bool excluded = idx != -1;
