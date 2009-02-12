@@ -18,69 +18,55 @@
  ***************************************************************************/
  
 #include "App.h"
-#include "PickDirsDialog.h"
 #include "MainWindow.h"
-#include "LocalContentScannerThread.h"
-#include "LocalContentScanner.h"
-#include "TrackTagUpdater.h"
-#include "LocalRqlPlugin.h"
-#include "TrackResolver.h"
+#include "PickDirsDialog.h"
+#include "ScanProgressWidget.h"
+#include "app/clientplugins/localresolver/LocalContentScannerThread.h"
+#include "app/clientplugins/localresolver/LocalContentScanner.h"
+#include "app/clientplugins/localresolver/LocalRqlPlugin.h"
+#include "app/clientplugins/localresolver/TrackResolver.h"
+#include "app/clientplugins/localresolver/TrackTagUpdater.h"
+#include "app/client/Resolver.h"
+#include "app/client/XspfResolvingTrackSource.h"
 #include "lib/lastfm/radio/Radio.h"
-#include <phonon/audiooutput.h>
-#include <phonon/backendcapabilities.h>
-#include "../client/Resolver.h"
-#include "../client/XspfResolvingTrackSource.h"
 #include <QMenu>
 #include <QVBoxLayout>
+#include <phonon/audiooutput.h>
+#include <phonon/backendcapabilities.h>
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
 
 App::App( int& argc, char** argv )
-    :Unicorn::Application( argc, argv ), m_radio( 0 )
-{
-/// content resolver
-    m_contentScanner = new LocalContentScanner;
-    m_trackTagUpdater = TrackTagUpdater::create(
-            "http://musiclookup.last.fm/trackresolve",
-            100,        // number of days track tags are good 
-            5);         // 5 minute delay between web requests
-    connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
-
-    m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
-    m_contentScannerThread->start();
-
-    m_localRql = new LocalRqlPlugin();
-    m_localRql->init();
-
-    m_trackResolver = new TrackResolver();
-    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
-
-/// blah
-    //if (argc > 1) {
-    //    openXspf( argv[1] );
-    //}
-}
+   : Unicorn::Application( argc, argv )
+   , m_contentScannerThread( 0 )
+   , m_contentScanner( 0 )
+   , m_trackTagUpdater( 0 )
+   , m_localRql( 0 )
+   , m_trackResolver( 0 )
+   , m_radio( 0 )
+   , m_resolver( 0 )
+   , m_mainwindow( 0 )
+{}
 
 
 App::~App()
 {
-    m_contentScanner->stop();
-    m_contentScannerThread->wait();
+    if (m_contentScanner) m_contentScanner->stop();
+    if (m_contentScannerThread) m_contentScannerThread->wait();
     delete m_contentScanner;
     delete m_contentScannerThread;    
     
-    QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
+    if (m_radio) QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
 }
 
 
-#include "ScanProgressWidget.h"
 void
-App::setMainWindow( MainWindow* window ) throw( int /*exitcode*/ )
+App::init( MainWindow* window ) throw( int /*exitcode*/ )
 {
     m_mainwindow = window;
     
-////// audio output device
+////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
     Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
 	audioOutput->setVolume( 1.0 /* Settings().volume() */ );
@@ -103,9 +89,30 @@ App::setMainWindow( MainWindow* window ) throw( int /*exitcode*/ )
     
 	m_radio = new Radio( audioOutput );
 
-//////
-    if (PickDirsDialog( window ).exec() == QDialog::Rejected) 
+////// 
+    PickDirsDialog picker( window );
+    if (picker.exec() == QDialog::Rejected)
         throw 1;
+
+    //TODO use these!
+    (void) picker.dirs();
+
+/// content resolver
+    m_contentScanner = new LocalContentScanner;
+    m_trackTagUpdater = TrackTagUpdater::create(
+            "http://musiclookup.last.fm/trackresolve",
+            100,        // number of days track tags are good 
+            5);         // 5 minute delay between web requests
+    connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
+
+    m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
+    m_contentScannerThread->start();
+
+    m_localRql = new LocalRqlPlugin();
+    m_localRql->init();
+
+    m_trackResolver = new TrackResolver();
+    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;

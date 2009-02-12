@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "_version.h"
 
+
 int main( int argc, char* argv[] )
 {
     QCoreApplication::setApplicationName( "Boffin" );
@@ -32,8 +33,8 @@ int main( int argc, char* argv[] )
 
         MainWindow window;
         window.show();
-        
-        app.setMainWindow( &window );
+        app.init( &window );
+
         return app.exec();
     }
     catch (int i)

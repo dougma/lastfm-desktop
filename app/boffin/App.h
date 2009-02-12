@@ -31,8 +31,9 @@ public:
     App( int& argc, char* argv[] );
     ~App();
 
+    void init( class MainWindow* ) throw( int /*exitcode*/ );
+
     void openXspf( QString filename );
-    void setMainWindow( class MainWindow* ) throw( int /*exitcode*/ );
 
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
