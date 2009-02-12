@@ -31,8 +31,9 @@ class ImageFucker : public QObject
 public:
     ImageFucker( const Artist& artist )
     {
+        this->steps = 0;
         this->height = 0;
-        this->opacity = x = 0;
+        this->x = this->opacity = 0;
         this->artist = artist;
         
         connect( artist.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
@@ -44,6 +45,7 @@ public:
     qreal opacity;
     uint height;
     int y;
+    int steps;
 
 signals:
     void fucked();
@@ -58,6 +60,10 @@ class ScanProgressWidget : public QWidget
 {
     Q_OBJECT
 
+    bool m_done;
+    uint m_artist_count;
+    uint m_track_count;
+
     QList<ImageFucker*> images;
     QList<Track> tracks;
     QHash<QString, int> track_counts;
@@ -71,43 +77,9 @@ public:
     virtual void timerEvent( QTimerEvent* );
 
 public slots:
-    void onNewTrack( const Track& );
+    void onNewTrack( const Track&, int, int );
+    void onFinished();
 
 private slots:
     void onImageFucked();
-};
-
-
-#include <QList>
-#include <QTimer>
-class ScanProgressMock : public QTimer
-{
-    Q_OBJECT
-    
-    QList<Artist> artists;
-    
-public:
-    ScanProgressMock()
-    {
-        artists << Artist("Nirvana") << Artist("Blur") << Artist("Foo Fighters") << Artist(QString::fromUtf8("安室奈美恵")) << Artist("The Cinematic Orchestra");
-        
-        connect( this, SIGNAL(timeout()), SLOT(onTimeout()) );
-        setInterval( 5000 );
-        start();
-    }
-    
-private slots:
-    void onTimeout()
-    {
-        if (artists.size())
-        {
-            MutableTrack t;
-            t.setArtist( artists.takeFirst() );
-            t.setUrl( QUrl("file://arse/arse") );
-            emit track( t );
-        }
-    }
-    
-signals:
-    void track( const Track& );
 };

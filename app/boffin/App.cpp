@@ -117,7 +117,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
     window->setCentralWidget( progress );
-    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track )) );
+    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track, int, int )) );
     connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()) );
 }
 
@@ -153,6 +153,8 @@ App::onOutputDeviceActionTriggered( QAction* a )
 void
 App::onScanningFinished()
 {
+    static_cast<ScanProgressWidget*>(m_mainwindow->centralWidget())->onFinished();
+    
     QTime time;
     time.start();
     

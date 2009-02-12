@@ -26,9 +26,10 @@
 
 ScanProgressWidget::ScanProgressWidget()
 {
-//    QObject* o = new ScanProgressMock;
-//    connect( o, SIGNAL(track( Track )), SLOT(onNewTrack( Track )) );
-    
+    m_done = false;
+    m_artist_count = 0;
+    m_track_count = 0;
+
     (new QBasicTimer)->start( 20, this );
     
     setBackgroundRole( QPalette::Base );
@@ -39,16 +40,19 @@ ScanProgressWidget::ScanProgressWidget()
 
 
 void
-ScanProgressWidget::onNewTrack( const Track& t )
+ScanProgressWidget::onNewTrack( const Track& t, int nartists, int ntracks )
 {
+    m_artist_count = nartists;
+    m_track_count = ntracks;
+    
     int& i = count( t.artist() );
     i++;
-    tracks.prepend( t );
+    tracks += t;
     
     // so this is a time saving way to keep the list the size of the screen
     // it goes over a bit almost certainly, but it's ok
     if (tracks.size() > 60)
-        tracks.pop_back();
+        tracks.pop_front();
     
     if (i == 1)
     {
@@ -60,16 +64,33 @@ ScanProgressWidget::onNewTrack( const Track& t )
 
 
 void
+ScanProgressWidget::onFinished()
+{
+    m_done = true;
+    repaint();
+}
+
+
+void
 ScanProgressWidget::paintEvent( QPaintEvent* e )
 {
     {
         QPainter p( this );
+        int y = height() - 6;
+        QString text;
+        
+        if (m_artist_count != 0 && m_track_count != 0)
+            text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
+        else
+            text = tr("Starting up...");
+
+        if (m_done) text.prepend( tr("Preparation complete. ") );
+        p.drawText( 6, height() - 6, text );    
         p.setPen( Qt::lightGray );
-        int i = 15;
         foreach (Track track, tracks)
         {
-            p.drawText( 6, i, track.url().path() );
-            i += 18;
+            y -= 18;
+            p.drawText( 6, y, track.url().path() );
         }
     }
     
@@ -88,7 +109,7 @@ ScanProgressWidget::paintEvent( QPaintEvent* e )
 
         QString text = images[i]->artist + "\n" + QString( "%L1 tracks" ).arg( count( images[i]->artist ) );
 
-        QRectF rect( pt.x(), y + (images[i]->pixmap.height() * 0.75), images[i]->pixmap.width(), height() );
+        QRectF rect( pt.x(), y + (images[i]->pixmap.height() * 0.75) + 4, images[i]->pixmap.width(), height() );
 
         p.setPen( Qt::black );
         p.drawText( rect, Qt::AlignTop | Qt::AlignHCenter, text );
@@ -99,11 +120,22 @@ ScanProgressWidget::paintEvent( QPaintEvent* e )
 void
 ScanProgressWidget::timerEvent( QTimerEvent* )
 {
+    QList<int> remove;
+    
     for (int i = 0; i < images.count(); ++i)
-    {
-        images[i]->opacity += 0.5f / images[i]->pixmap.width();
+    {   
+        int steps = images[i]->steps;
+        
+        images[i]->opacity = float(steps > 100 ? 200 - steps : steps) / 100.0f;        
         images[i]->x += 0.5;
+        images[i]->steps++;
+        
+        if (steps == 200) remove.prepend( i );
     }
+    
+    foreach (int i, remove)
+        images.takeAt( i )->deleteLater();
+
     update();
 }
 
@@ -111,7 +143,9 @@ ScanProgressWidget::timerEvent( QTimerEvent* )
 void
 ScanProgressWidget::onImageFucked()
 {
-    images += (ImageFucker*)sender();
+    ImageFucker* fucker = (ImageFucker*)sender();
+    fucker->x = rand() % width();
+    images += fucker;
 }
 
 
