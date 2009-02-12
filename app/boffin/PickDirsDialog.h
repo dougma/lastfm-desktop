@@ -17,48 +17,29 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "ScanLocationsWidget.h"
-#include <QtGui>
+#include <QDialog>
 
-//bold scanning now:
-// line
-//bold queued:
-// line
-// line
-
-
-ScanLocationsWidget::ScanLocationsWidget()
+ 
+class PickDirsDialog : public QDialog
 {
-    QHBoxLayout* h = new QHBoxLayout( this );
-    h->addLayout( layout = new QGridLayout( this ) );
-    h->addStretch();
-}
+    Q_OBJECT
 
-
-void
-ScanLocationsWidget::setLocations( const QStringList& paths )
-{
-    this->paths = paths;
-    
-    QList<QLabel*> labels;
-    
-    uint row = 0;
-    foreach (QString path, paths)
+    struct Ui
     {
-        QLabel* label;
-        QPushButton* button;
-        layout->addWidget( label = new QLabel(path), row, 0 );
-        layout->addWidget( button = new QPushButton(tr("Abort")), row, 1 );
-        row++;
+        class QDialogButtonBox* buttons;
+        class QGroupBox* group;
+        class QPushButton* add;
         
-        labels += label;
-    }
+    } ui;
     
-    QLabel* l = labels.first();
-    l->setText( "Scanning: " + l->text() );
-}
+    void add( const QString& path );
 
+private slots:
+    void prompt();
+    void enableDisableOk();
 
-void
-ScanLocationsWidget::setCurrentlyScanning( const QString& path )
-{}
+public:
+    PickDirsDialog( QWidget* parent );
+    
+    QStringList dirs() const;
+};

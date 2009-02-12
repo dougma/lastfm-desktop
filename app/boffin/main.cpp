@@ -26,12 +26,18 @@ int main( int argc, char* argv[] )
     QCoreApplication::setApplicationName( "Boffin" );
     QCoreApplication::setApplicationVersion( VERSION );
 
-    App app( argc, argv );
+    try
+    {
+        App app( argc, argv );
 
-    MainWindow window;
-    window.show();
-
-    app.setMainWindow( &window );
-    
-    return app.exec();
+        MainWindow window;
+        window.show();
+        
+        app.setMainWindow( &window );
+        return app.exec();
+    }
+    catch (int i)
+    {
+        return i;
+    }
 }

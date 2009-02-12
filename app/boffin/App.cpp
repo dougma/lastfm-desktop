@@ -18,6 +18,7 @@
  ***************************************************************************/
  
 #include "App.h"
+#include "PickDirsDialog.h"
 #include "MainWindow.h"
 #include "LocalContentScannerThread.h"
 #include "LocalContentScanner.h"
@@ -55,8 +56,6 @@ App::App( int& argc, char** argv )
     m_trackResolver = new TrackResolver();
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 
-
-
 /// blah
     //if (argc > 1) {
     //    openXspf( argv[1] );
@@ -76,9 +75,8 @@ App::~App()
 
 
 #include "ScanProgressWidget.h"
-#include "ScanLocationsWidget.h"
 void
-App::setMainWindow( MainWindow* window )
+App::setMainWindow( MainWindow* window ) throw( int /*exitcode*/ )
 {
     m_mainwindow = window;
     
@@ -105,18 +103,15 @@ App::setMainWindow( MainWindow* window )
     
 	m_radio = new Radio( audioOutput );
 
+//////
+    if (PickDirsDialog( window ).exec() == QDialog::Rejected) 
+        throw 1;
+
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
     window->setCentralWidget( progress );
     connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track )) );
     connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()) );
-
-    ScanLocationsWidget* locations = new ScanLocationsWidget;
-    locations->setLocations( QStringList() << "/jono/s/bad/boy/Tunes" << "/doug/s/super/Music" );
-    
-    QVBoxLayout* v = new QVBoxLayout( progress );
-    v->addStretch();
-    v->addWidget( locations );
 }
 
 

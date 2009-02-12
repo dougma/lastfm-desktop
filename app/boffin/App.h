@@ -32,7 +32,7 @@ public:
     ~App();
 
     void openXspf( QString filename );
-    void setMainWindow( class MainWindow* );
+    void setMainWindow( class MainWindow* ) throw( int /*exitcode*/ );
 
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
