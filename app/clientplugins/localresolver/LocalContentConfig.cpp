@@ -92,9 +92,11 @@ splitPath(const QString& p)
 //
 static
 QPair<QString, QString> 
-splitPath(QString path)
+splitPath(const QString& path)
 {
-    return QPair<QString, QString>( QString("/"), removeLeadingSlash(path) );
+    // need a trailing slash on the path component
+    QString p = path.endsWidth("/") ? path : ( path + "/" );
+    return QPair<QString, QString>( QString("/"), removeLeadingSlash( p ) );
 }
 
 #endif
