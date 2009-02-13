@@ -45,6 +45,8 @@ private slots:
     void onScanningFinished();
     void onTrackSpooled( const lastfm::Track& );
     void onPlayActionToggled( bool );
+    void onRadioStopped();
+    
 private:
     class LocalContentScannerThread* m_contentScannerThread;
     class LocalContentScanner* m_contentScanner;

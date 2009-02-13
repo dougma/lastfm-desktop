@@ -39,6 +39,8 @@ MainWindow::MainWindow()
     ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
 #endif
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
+
+    ui.rescan = menuBar()->addMenu( tr("Tools") )->addAction( tr("&Scan Music Again") );
  
     setUnifiedTitleAndToolBarOnMac( true );
     QToolBar* toolbar;
@@ -48,10 +50,17 @@ MainWindow::MainWindow()
     ui.skip = toolbar->addAction( tr("Skip") );
     ui.play->setCheckable( true );
 
-    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+    toolbar->setIconSize( QSize( 49, 49 ) );
 
-    ui.play->setIcon( QPixmap(":/lastfm/no/cover.png") );
-    
+//    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+
+    QIcon playicon( QPixmap(":/play.png") );
+    playicon.addPixmap( QPixmap(":/stop.png"), QIcon::Normal, QIcon::On );
+
+    ui.play->setIcon( playicon );
+    ui.pause->setIcon( QPixmap(":/pause.png") );
+    ui.skip->setIcon( QPixmap(":/skip.png") );
+            
     setWindowTitle( Track() );
 
     connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );

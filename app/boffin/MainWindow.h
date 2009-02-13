@@ -36,6 +36,8 @@ class MainWindow : public QMainWindow
         QAction* play;
         QAction* pause;
         QAction* skip;
+        
+        QAction* rescan;
     } ui;
 
 public:

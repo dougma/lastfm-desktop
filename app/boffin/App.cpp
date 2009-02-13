@@ -103,6 +103,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 	
 	
     connect( m_radio, SIGNAL(trackSpooled( lastfm::Track )), SLOT(onTrackSpooled( lastfm::Track )) );
+    connect( m_radio, SIGNAL(stopped()), SLOT(onRadioStopped()) );
 
 /// content scanner
     try
@@ -254,6 +255,13 @@ App::onTrackSpooled( const Track& t )
     m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( !t.isNull() );
     m_mainwindow->ui.play->blockSignals( false );
+}
+
+
+void
+App::onRadioStopped()
+{
+    m_mainwindow->setWindowTitle( Track() );
 }
 
 
