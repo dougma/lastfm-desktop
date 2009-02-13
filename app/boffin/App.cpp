@@ -137,8 +137,9 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     m_contentScannerThread->start();
 
 /// local rql
-    m_localRql = new LocalRqlPlugin;
-    m_localRql->init();
+    m_localRqlPlugin = new LocalRqlPlugin;
+    m_localRqlPlugin->init();
+    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
 
 /// content resolver
     m_trackResolver = new TrackResolver;
@@ -221,8 +222,7 @@ App::play( QStringList tags )
     for (int i = 0; i < tags.count(); ++i)
         tags[i] = "tag:\"" + tags[i] + '"';
     QString const rql = tags.join( " or " );
-    LocalRql localrql( QList<ILocalRqlPlugin*>() << m_localRql );
-    LocalRqlResult* result = localrql.startParse( rql );
+    LocalRqlResult* result = m_localRql->startParse( rql );
     
     if (!result)
     {

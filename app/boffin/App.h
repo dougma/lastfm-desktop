@@ -49,7 +49,8 @@ private:
     class LocalContentScannerThread* m_contentScannerThread;
     class LocalContentScanner* m_contentScanner;
     class TrackTagUpdater* m_trackTagUpdater;
-    class ILocalRqlPlugin* m_localRql;
+    class ILocalRqlPlugin* m_localRqlPlugin;
+    class LocalRql* m_localRql;
     class ITrackResolverPlugin* m_trackResolver;
 
     class Radio* m_radio;
