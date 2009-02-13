@@ -58,8 +58,12 @@ LocalCollection::LocalCollection(QString connectionName)
 LocalCollection::~LocalCollection()
 {
     m_db.close();
-    m_db = QSqlDatabase(); // to make the db "not in use" (removes a qt warning)
-    QSqlDatabase::removeDatabase( m_connectionName );
+
+// removeDatabase seems to cause other instances of LocalCollection to die :(
+// maybe i don't understand removeDatabase.  todo.
+
+//    m_db = QSqlDatabase(); // to make the db "not in use" (removes a qt warning)
+//    QSqlDatabase::removeDatabase( m_connectionName );
 }
 
 QSqlQuery
