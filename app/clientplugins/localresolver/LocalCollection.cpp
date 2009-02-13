@@ -149,18 +149,14 @@ LocalCollection::initDatabase()
 
         QUERY( "CREATE TABLE sources ("
                     "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                    "volume     TEXT UNIQUE NOT NULL,"  // on unix: "/", on windows: "\\?volume\..."
+                    "volume     TEXT NOT NULL,"  // on unix: "/", on windows: "\\?volume\..."
+                    "path       TEXT,"           // appended to the volume (empty string is null in sqlite)
                     "available  INTEGER NOT NULL);" );
-
-        QUERY( "CREATE TABLE startDirs ("
-                    "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                    "path       TEXT NON NULL,"
-                    "source     INTEGER );" );      // sources foreign key
 
         QUERY( "CREATE TABLE exclusions ("
                     "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "path       TEXT NON NULL,"           
-                    "startDir   INTEGER,"           // startDirs foreign key
+                    "source     INTEGER,"           // sources foreign key
                     "subDirs    INTEGER );" );     
 
         QUERY( "CREATE TABLE metadata ("
@@ -207,7 +203,7 @@ LocalCollection::setFingerprint( const QString& filePath, QString fpId )
 QList<LocalCollection::Source>
 LocalCollection::getAllSources()
 {
-    QSqlQuery q = QUERY( "SELECT id, volume, available FROM sources" );
+    QSqlQuery q = QUERY( "SELECT id, volume, path, available FROM sources" );
 
     QList<LocalCollection::Source> result;
     while ( q.next() ) {
@@ -215,10 +211,11 @@ LocalCollection::getAllSources()
 
         int id = q.value( 0 ).toInt( &ok1 );
         QString volume( q.value( 1 ).toString() );
-        int available = q.value( 2 ).toInt( &ok2 );
+        QString path( q.value( 2 ).toString() );
+        int available = q.value( 3 ).toInt( &ok2 );
 
         if ( ok1 && ok2 ) {
-            result << LocalCollection::Source(id, volume, available != 0);
+            result << LocalCollection::Source(id, volume, path, available != 0);
         }
     }
     return result;
@@ -237,10 +234,8 @@ QList<LocalCollection::Exclusion>
 LocalCollection::getExcludedDirectories(int sourceId)
 {
     QSqlQuery query = PREPARE(
-        "SELECT exclusions.path, exclusions.subDirs "
-        "FROM exclusions "
-        "INNER JOIN startDirs ON exclusions.startDir = startDirs.id "
-        "WHERE startDirs.source = :sourceId" ).
+        "SELECT path, subDirs FROM exclusions "
+        "WHERE exclusions.source = :sourceId" ).
     bindValue( ":sourceId", sourceId ).
     exec();
 
@@ -251,22 +246,6 @@ LocalCollection::getExcludedDirectories(int sourceId)
         if ( ok ) {
             result << Exclusion(query.value( 0 ).toString(), subdirsExcluded != 0);
         }
-    }
-    return result;
-}
-
-QList<QString>
-LocalCollection::getStartDirectories(int sourceId)
-{
-    QSqlQuery query = PREPARE( 
-        "SELECT path FROM startDirs "
-        "WHERE source = :sourceId" ).
-    bindValue( ":sourceId", sourceId ).
-    exec();
-
-    QList<QString> result;
-    while (query.next()) {
-        result << query.value( 0 ).toString();
     }
     return result;
 }
@@ -484,18 +463,58 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
     exec();
 }
 
-LocalCollection::Source
-LocalCollection::addSource(const QString& volume)
+int
+LocalCollection::getSourceId(const QString& volume, const QString& path, Creation flag)
 {
-    int id = PREPARE(
-        "INSERT INTO sources (id, volume, available) "
-        "VALUES (NULL, :volume, 1)" ).
-    bindValue( ":volume", volume ).
-    exec().
-    lastInsertId().toInt();
+    {
+        QSqlQuery q =
+            PREPARE("SELECT id FROM sources WHERE volume = :volume AND path = :path").
+            bindValue( ":volume", volume ).
+            bindValue( ":path", path ).
+            exec();
+        if (q.next()) {
+            int id = q.value( 0 ).toInt();
+            Q_ASSERT( id );
+            return id;
+        }
+    }
 
-    Q_ASSERT(id > 0);
-    return Source(id, volume, true);
+    if ( flag == Create ) {
+        int id = PREPARE(
+            "INSERT INTO sources (id, volume, path, available) "
+            "VALUES (NULL, :volume, :path, 1)" ).
+        bindValue( ":volume", volume ).
+        bindValue( ":path", path ).
+        exec().
+        lastInsertId().toInt();
+        Q_ASSERT(id > 0);
+        return id;
+    }
+    return 0;
+}
+
+void 
+LocalCollection::deleteSource( const QString& volume, const QString &path )
+{
+    int id = getSourceId( volume, path, LocalCollection::NoCreate );
+    if (id) {
+        // todo: can we have cascading deletes?
+        AutoTransaction<LocalCollection> trans(*this);
+        PREPARE( "DELETE FROM tracktags WHERE file IN ("
+            "SELECT files.id FROM files "
+            "INNER JOIN directories ON directories.id = files.directory "
+            "WHERE directories.source = :id )").
+            bindValue( ":id", id).exec();
+        PREPARE( "DELETE FROM files WHERE directory IN ("
+            "SELECT directories.id FROM directories "
+            "WHERE directories.source = :id )" ).
+            bindValue( ":id", id ).exec();
+        PREPARE( "DELETE FROM directories WHERE source = :id ").
+            bindValue( ":id", id ).exec();
+        PREPARE( "DELETE FROM sources WHERE id = :id " ).
+            bindValue( ":id", id ).exec();
+        trans.commit();
+    }
 }
 
 void

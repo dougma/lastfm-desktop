@@ -17,17 +17,18 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifdef WIN32
-    // pull in GetVolumeNameForVolumeMountPoint:
-    #define _WIN32_WINNT 0x0500
-    #include <windows.h>
-#endif
-
 #include <QDir>
 #include <QString>
 #include <QStringList>
 
+
 #ifdef WIN32
+
+// pull in GetVolumeNameForVolumeMountPoint:
+#define _WIN32_WINNT 0x0500
+#include <windows.h>
+
+extern QString getVolumeName(WCHAR* drive);
 
 class FailCriticalErrors
 {
@@ -59,44 +60,20 @@ QStringList getAvailableVolumes()
     // volume name if we can (likely for local storage)
     // otherwise a unc is good (for mapped network drives)
 
-    DWORD drives = GetLogicalDrives();
+    DWORD drives = GetLogicalDrives();      // GetLogicalDrives returns a bitmask of available drive letters
     DWORD mask = 1;
     WCHAR drive[4];
     FailCriticalErrors errMode;   // stop error popup for missing cd-roms, floppies, etc
-    for (wcscpy(drive, L"A:\\"); drive[0] <= 'Z'; mask <<= 1, drive[0]++) 
-    {
-        if (drives & mask) 
-        {
-            UINT driveType = GetDriveTypeW(drive);
-            if (driveType == DRIVE_REMOVABLE || driveType == DRIVE_FIXED)
-            {
-                WCHAR volumeName[256];
-                if (GetVolumeNameForVolumeMountPointW(&drive[0], &volumeName[0], 255)) 
-                    result << QString::fromUtf16(volumeName);
-            }
-            else if (driveType == DRIVE_REMOTE)
-            {
-                // WNetGetUniversalName is one ugly call
-                #define BUFFERSIZE 512
-                char buffer[BUFFERSIZE];
-                DWORD bytes = BUFFERSIZE;
-                if (NO_ERROR == WNetGetUniversalName(drive, UNIVERSAL_NAME_INFO_LEVEL, buffer, &bytes))
-                {
-                    UNIVERSAL_NAME_INFO *punc = (UNIVERSAL_NAME_INFO *) &buffer;
-                    QString unc = QString::fromUtf16(punc->lpUniversalName);
-                    result << (unc.endsWith("\\") ? unc : unc + "\\");
-                } 
-            }
-            else
-            {
-                // ignore driveType == DRIVE_CDROM (also applies to Dvd-drives)
-                int ii = 0;  // todo... check to see where usb memory keys and usb hard-drives turn up
+    for (wcscpy(drive, L"A:\\"); drive[0] <= 'Z'; mask <<= 1, drive[0]++) {
+        if (drives & mask) {
+            QString volumeName = getVolumeName( drive );
+            if (volumeName.length()) {
+                result << volumeName;
             }
         }
     }
-#elif defined(Q_WS_MAC)
-    //TODO HACK FIXME!
-    result += QDir::home().filePath( "Music" ) + "/";
+#else
+    result << "/";
 #endif
 
     return result;
@@ -173,7 +150,7 @@ remapVolumeName(const QString& volume)
 // recognise the sources which don't appear in
 // getAvailableVolumes(), but are available
 bool
-isVolumeImplicitlyAvailable(const QString& volume)
+isVolumeImplicitlyAvailable(const QString& )
 {
     // there are none!      
     return false;

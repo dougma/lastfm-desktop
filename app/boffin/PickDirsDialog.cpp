@@ -80,9 +80,9 @@ void
 PickDirsDialog::add( const QString& path )
 {
     if (path.isEmpty()) return;
-    
+
     QToolButton* remove;
-    QWidget* row = new QLabel( path );
+    QWidget* row = new QLabel( QDir::toNativeSeparators( path ) );
     QHBoxLayout* h = new QHBoxLayout( row );
     h->setMargin( 0 );
     h->addStretch();
@@ -110,7 +110,7 @@ PickDirsDialog::prompt()
 
 
 QStringList
-PickDirsDialog::dirs() const
+PickDirsDialog::getDirs() const
 {
     QStringList dirs;
     foreach (QLabel* l, ui.group->findChildren<QLabel*>())
@@ -121,9 +121,17 @@ PickDirsDialog::dirs() const
 
 
 void
+PickDirsDialog::setDirs(QStringList dirs)
+{
+    foreach (QString dir, dirs)
+        add( dir );
+}
+
+
+void
 PickDirsDialog::enableDisableOk()
 {
-    qDebug() << dirs();
+    qDebug() << getDirs();
     
-    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( dirs().count() );
+    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( getDirs().count() );
 }

@@ -32,7 +32,6 @@ class LocalContentScanner : public QObject
 
     volatile bool m_bStopping;
     class LocalCollection* m_pCol;
-    bool m_addNewVolumesAutomatically;
 
     void announceStarted();
     void startFullScan();
@@ -46,7 +45,7 @@ class LocalContentScanner : public QObject
     static Track mediaMetaToTrack(class MediaMetaInfo *m, QString file);
 
 public:
-    LocalContentScanner(bool addNewVolumesAutomatically = true);
+    LocalContentScanner();
     ~LocalContentScanner();
     void run();
     void stop();

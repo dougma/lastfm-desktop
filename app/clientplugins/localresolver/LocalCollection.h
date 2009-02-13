@@ -78,14 +78,16 @@ public:
     class Source
     {
     public:
-        Source(int id, const QString& volume, bool available)
+        Source(int id, const QString& volume, const QString& path, bool available)
             :m_id(id)
             ,m_volume(volume)
+            ,m_path(path)
             ,m_available(available)
         {}
 
         int m_id;
         QString m_volume;
+        QString m_path;
         bool m_available;
     };
 
@@ -188,20 +190,17 @@ public:
     /** \brief Temp method: Sets a fingerprint id. */
     void setFingerprint( const QString& filePath, QString fpId );
 
-    LocalCollection::Source addSource(const QString& volume);
     QList<Source> getAllSources();
-    void setSourceAvailability(int sourceId, bool bAvailable);
-    bool removeSource();
-    bool getSourceId(QString name, int &result);
-
-    bool getDirectoryId(int sourceId, QString path, int &result);
+    int getSourceId( const QString& volume, const QString& path, Creation flag );
+    void deleteSource( const QString& volume, const QString &path );
+    void setSourceAvailability( int sourceId, bool bAvailable );
 
     int getArtistId(QString artistName, Creation flag);
 
+    bool getDirectoryId(int sourceId, QString path, int &result);
     bool addDirectory(int sourceId, QString path, int &resultId);
     void removeDirectory(int directoryId);
     QList<Exclusion> getExcludedDirectories(int sourceId);
-    QList<QString> getStartDirectories(int sourceId);
 
     QList<File> getFiles(int directoryId);
     void updateFile(int fileId, unsigned lastModified, const FileMeta& info);

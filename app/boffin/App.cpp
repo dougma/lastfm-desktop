@@ -23,9 +23,11 @@
 #include "ScanProgressWidget.h"
 #include "app/clientplugins/localresolver/LocalContentScannerThread.h"
 #include "app/clientplugins/localresolver/LocalContentScanner.h"
+#include "app/clientplugins/localresolver/LocalContentConfig.h"
 #include "app/clientplugins/localresolver/LocalRqlPlugin.h"
 #include "app/clientplugins/localresolver/TrackResolver.h"
 #include "app/clientplugins/localresolver/TrackTagUpdater.h"
+#include "app/clientplugins/localresolver/QueryError.h"
 #include "app/client/Resolver.h"
 #include "app/client/XspfResolvingTrackSource.h"
 #include "lib/lastfm/radio/Radio.h"
@@ -89,15 +91,22 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     
 	m_radio = new Radio( audioOutput );
 
-////// 
-    PickDirsDialog picker( window );
-    if (picker.exec() == QDialog::Rejected)
-        throw 1;
+/// content scanner
+    try
+    {
+        LocalContentConfig cfg;
+        PickDirsDialog picker( window );
+        picker.setDirs( cfg.getScanDirs() );
+        if (picker.exec() == QDialog::Rejected)
+            throw 1;
+        cfg.setScanDirs( picker.getDirs() );
+        cfg.updateVolumeAvailability();
+    } 
+    catch (QueryError e)
+    {
+        int ii = 0;
+    }
 
-    //TODO use these!
-    (void) picker.dirs();
-
-/// content resolver
     m_contentScanner = new LocalContentScanner;
     m_trackTagUpdater = TrackTagUpdater::create(
             "http://musiclookup.last.fm/trackresolve",
@@ -108,9 +117,11 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
     m_contentScannerThread->start();
 
+/// local rql
     m_localRql = new LocalRqlPlugin();
     m_localRql->init();
 
+/// content resolver
     m_trackResolver = new TrackResolver();
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 

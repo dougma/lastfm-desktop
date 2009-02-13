@@ -28,18 +28,9 @@
 #include "boost/bind.hpp"
 
 
-// we make use of QThreadPool priorities to allow some tasks to queue jump
-#define PRIORITY_INIT 0
-#define PRIORITY_VOLUMEAVAILABLE 1
-#define PRIORITY_FULLSCAN 2
-
-QStringList getAvailableVolumes();
-bool isVolumeImplicitlyAvailable(const QString& volume);
-
-LocalContentScanner::LocalContentScanner(bool addNewVolumesAutomatically /* = true */)
+LocalContentScanner::LocalContentScanner()
     : m_pCol( 0 )
     , m_bStopping( false )
-    , m_addNewVolumesAutomatically( addNewVolumesAutomatically )
 {
 }
 
@@ -68,30 +59,10 @@ void
 LocalContentScanner::announceStarted()
 {
     QStringList scanLocations;
-    QStringList volumes = getAvailableVolumes();
 
     foreach(const LocalCollection::Source &src, m_pCol->getAllSources()) {
-        bool available = volumes.contains(src.m_volume) || isVolumeImplicitlyAvailable(src.m_volume);
-        if (available != src.m_available) {
-            m_pCol->setSourceAvailability(src.m_id, available);
-        }
-        if (available) {
-            Exclusions exclusions(m_pCol->getExcludedDirectories(src.m_id));
-            QStringList startdirs(m_pCol->getStartDirectories(src.m_id));
-            if (startdirs.isEmpty()) {
-                startdirs << "";    // scan from the root
-            }
-            foreach (const QString &dir, startdirs) {
-                scanLocations << src.m_volume + dir;
-            }
-            volumes.removeAll(src.m_volume);
-        }
-    }
-
-    // remaining entries in 'volumes' are new
-    if (m_addNewVolumesAutomatically) {
-        foreach(const QString v, volumes) {
-            scanLocations << v;
+        if (src.m_available) {
+            scanLocations << (src.m_volume + src.m_path);
         }
     }
 
@@ -102,33 +73,11 @@ LocalContentScanner::announceStarted()
 void 
 LocalContentScanner::startFullScan()
 {
-    QStringList volumes = getAvailableVolumes();
-
     foreach(const LocalCollection::Source &src, m_pCol->getAllSources()) {
-        bool available = volumes.contains(src.m_volume) || isVolumeImplicitlyAvailable(src.m_volume);
-        if (available != src.m_available) {
-            m_pCol->setSourceAvailability(src.m_id, available);
-        }
-        if (available) {
-            Exclusions exclusions(m_pCol->getExcludedDirectories(src.m_id));
-            QStringList startdirs(m_pCol->getStartDirectories(src.m_id));
-            if (startdirs.isEmpty()) {
-                startdirs << "";    // scan from the root
-            }
-            foreach (const QString &dir, startdirs) {
-                if (stopping()) return;
-                scan(SearchLocation(src, dir, exclusions));
-            }
-            volumes.removeAll(src.m_volume);
-        }
-    }
-
-    // remaining entries in 'volumes' are new
-    if (m_addNewVolumesAutomatically) {
-        foreach(const QString v, volumes) {
+        if (src.m_available) {
+            Exclusions exclusions( m_pCol->getExcludedDirectories( src.m_id ) );
             if (stopping()) return;
-            LocalCollection::Source src(m_pCol->addSource(v));
-            scan(SearchLocation(src, "", Exclusions()));
+            scan( SearchLocation( src, src.m_path, exclusions ) );      // todo: fix SeachLocation constructor
         }
     }
 }
@@ -301,3 +250,4 @@ LocalContentScanner::exception(const QString& msg) const
 {
     qCritical() << msg;
 }
+
