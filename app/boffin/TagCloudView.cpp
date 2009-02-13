@@ -43,7 +43,7 @@ TagCloudView::~TagCloudView()
 
 
 void 
-TagCloudView::paintEvent( QPaintEvent* event )
+TagCloudView::paintEvent( QPaintEvent* )
 {    
     QPainter p( viewport() );
     QStyleOptionViewItem opt;
@@ -105,3 +105,9 @@ TagCloudView::viewportEvent( QEvent* event )
     return QAbstractItemView::viewportEvent( event );
 }
 
+
+QString
+TagCloudView::currentTag() const
+{
+    return "rock";
+}

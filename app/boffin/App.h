@@ -20,6 +20,7 @@
 #ifndef APP_H
 #define APP_H
 
+#include <lastfm/public.h>
 #include "lib/unicorn/UnicornApplication.h"
 
 
@@ -34,11 +35,16 @@ public:
     void init( class MainWindow* ) throw( int /*exitcode*/ );
 
     void openXspf( QString filename );
-
+    void play( QStringList tags );
+    
+public slots:
+    void play();
+    
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
     void onScanningFinished();
-
+    void onTrackSpooled( const lastfm::Track& );
+    void onPlayActionToggled( bool );
 private:
     class LocalContentScannerThread* m_contentScannerThread;
     class LocalContentScanner* m_contentScanner;
@@ -50,6 +56,8 @@ private:
     class Resolver* m_resolver;
     
     class MainWindow* m_mainwindow;
+    
+    class TagCloudView* m_cloud;
 };
 
 #endif //APP_H

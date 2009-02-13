@@ -23,6 +23,8 @@
 #include <QtGui>
 #include <QtNetwork>
 
+/** all quite messy, apologies --mxcl */
+
 
 ScanProgressWidget::ScanProgressWidget()
 {
@@ -80,11 +82,13 @@ ScanProgressWidget::paintEvent( QPaintEvent* e )
         QString text;
         
         if (m_artist_count != 0 && m_track_count != 0)
+        {
             text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
+            if (m_done) text.prepend( tr("Preparation complete. ") );
+        }
         else
             text = tr("Starting up...");
 
-        if (m_done) text.prepend( tr("Preparation complete. ") );
         p.drawText( 6, height() - 6, text );    
         p.setPen( Qt::lightGray );
         foreach (Track track, tracks)

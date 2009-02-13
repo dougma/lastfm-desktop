@@ -30,7 +30,10 @@
 #include "app/clientplugins/localresolver/QueryError.h"
 #include "app/client/Resolver.h"
 #include "app/client/XspfResolvingTrackSource.h"
+#include "app/client/LocalRql.h"
+#include "app/client/LocalRadioTrackSource.h"
 #include "lib/lastfm/radio/Radio.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QMenu>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
@@ -49,6 +52,7 @@ App::App( int& argc, char** argv )
    , m_radio( 0 )
    , m_resolver( 0 )
    , m_mainwindow( 0 )
+   , m_cloud( 0 )
 {}
 
 
@@ -67,6 +71,12 @@ void
 App::init( MainWindow* window ) throw( int /*exitcode*/ )
 {
     m_mainwindow = window;
+    
+    window->ui.play->setEnabled( false );
+    window->ui.pause->setEnabled( false );
+    window->ui.skip->setEnabled( false );
+    
+    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
     
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
@@ -90,21 +100,30 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     
 	m_radio = new Radio( audioOutput );
+	
+	
+    connect( m_radio, SIGNAL(trackSpooled( lastfm::Track )), SLOT(onTrackSpooled( lastfm::Track )) );
 
 /// content scanner
     try
     {
         LocalContentConfig cfg;
-        PickDirsDialog picker( window );
-        picker.setDirs( cfg.getScanDirs() );
-        if (picker.exec() == QDialog::Rejected)
-            throw 1;
-        cfg.setScanDirs( picker.getDirs() );
-        cfg.updateVolumeAvailability();
+        QStringList const dirs = cfg.getScanDirs();
+        
+        if (dirs.isEmpty()) 
+        {
+            PickDirsDialog picker( window );
+            picker.setDirs( cfg.getScanDirs() );
+            if (picker.exec() == QDialog::Rejected)
+                throw 1;
+            cfg.setScanDirs( picker.getDirs() );
+            cfg.updateVolumeAvailability();
+        }
     } 
     catch (QueryError e)
     {
-        int ii = 0;
+        //TODO this is unacceptable error handling
+        // just let the rest of the app continue regardless? FIXME soon!
     }
 
     m_contentScanner = new LocalContentScanner;
@@ -118,18 +137,18 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     m_contentScannerThread->start();
 
 /// local rql
-    m_localRql = new LocalRqlPlugin();
+    m_localRql = new LocalRqlPlugin;
     m_localRql->init();
 
 /// content resolver
-    m_trackResolver = new TrackResolver();
+    m_trackResolver = new TrackResolver;
     m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
     window->setCentralWidget( progress );
     connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track, int, int )) );
-    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()) );
+    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection );
 }
 
 
@@ -173,12 +192,76 @@ App::onScanningFinished()
     
     disconnect( sender(), 0, this, 0 ); //only once pls
     
-    TagCloudView* view = new TagCloudView;
-    view->setModel( new TagCloudModel );
-    view->setItemDelegate( new TagDelegate );
-    m_mainwindow->setCentralWidget( view );
+    m_cloud = new TagCloudView;
+    m_cloud->setModel( new TagCloudModel );
+    m_cloud->setItemDelegate( new TagDelegate );
+    m_mainwindow->setCentralWidget( m_cloud );
     
-    view->setFrameStyle( QFrame::NoFrame );
+    m_cloud->setFrameStyle( QFrame::NoFrame );
 
     qDebug() << "Bye!" << time.elapsed() << "ms";
+    
+    m_mainwindow->ui.play->setEnabled( true );
+    m_mainwindow->ui.pause->setEnabled( true );
+    m_mainwindow->ui.skip->setEnabled( true );
+}
+
+
+void
+App::play()
+{
+    qDebug() << "HI";
+    if (m_cloud) play( QStringList() << m_cloud->currentTag() );
+}
+
+
+void
+App::play( QStringList tags )
+{
+    for (int i = 0; i < tags.count(); ++i)
+        tags[i] = "tag:\"" + tags[i] + '"';
+    QString const rql = tags.join( " or " );
+    LocalRql localrql( QList<ILocalRqlPlugin*>() << m_localRql );
+    LocalRqlResult* result = localrql.startParse( rql );
+    
+    if (!result)
+    {
+        MessageBoxBuilder( m_mainwindow )
+                .setTitle( tr("Local Radio Error") )
+                .setText( tr("Could not load plugin") )
+                .sheet()
+                .exec();
+        return;
+    }
+
+    //FIXME this synconicity is evil, but so is asyncronicity here
+    QEventLoop loop;
+    connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
+    connect( result, SIGNAL(parseBad( int, QString, int )), &loop, SLOT(quit()) );
+    loop.exec();
+
+    LocalRadioTrackSource* source = new LocalRadioTrackSource( result );
+    m_radio->play( RadioStation( tags.join( ", " ) ), source  );
+    source->start();
+}
+
+
+void
+App::onTrackSpooled( const Track& t )
+{    
+    m_mainwindow->setWindowTitle( t );
+    
+    m_mainwindow->ui.play->blockSignals( true );
+    m_mainwindow->ui.play->setChecked( !t.isNull() );
+    m_mainwindow->ui.play->blockSignals( false );
+}
+
+
+void
+App::onPlayActionToggled( bool b )
+{
+    if (b)
+        play();
+    else
+        m_radio->stop();
 }

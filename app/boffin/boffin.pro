@@ -8,8 +8,17 @@ DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 macx*:QMAKE_INFO_PLIST = mac/Info.plist
 
-SOURCES += ../client/Resolver.cpp ../client/XspfTrackSource.cpp \
-	../client/ResolvingTrackSource.cpp ../client/XspfResolvingTrackSource.cpp 
+SOURCES += ../client/Resolver.cpp \
+           ../client/XspfTrackSource.cpp \
+	       ../client/ResolvingTrackSource.cpp \
+	       ../client/XspfResolvingTrackSource.cpp  \
+	       ../client/LocalRql.cpp \
+	       ../client/LocalRadioTrackSource.cpp
 
-HEADERS += ../client/Resolver.h ../client/XspfTrackSource.h \
-	../client/ResolvingTrackSource.h ../client/XspfResolvingTrackSource.h  
+HEADERS += ../client/Resolver.h \
+           ../client/XspfTrackSource.h \
+	       ../client/ResolvingTrackSource.h \
+	       ../client/XspfResolvingTrackSource.h \
+	       ../client/LocalRql.h \
+	       ../client/LocalRadioTrackSource.h
+	       

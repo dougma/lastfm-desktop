@@ -64,14 +64,6 @@ PickDirsDialog::PickDirsDialog( QWidget* parent )
     QLabel* label;
     v->insertWidget( 2, label = new QLabel( "<b>Folders Containing Music") );
     label->setAttribute( Qt::WA_MacSmallSize );
-
-    add( QDir::home().filePath( "Music" ) );
-#endif
-#ifdef Q_OS_WIN
-    //TODO
-#endif
-#ifdef Q_WS_X11
-    add( QDir::homePath() );
 #endif
 }
 
@@ -123,6 +115,15 @@ PickDirsDialog::getDirs() const
 void
 PickDirsDialog::setDirs(QStringList dirs)
 {
+    qDebug() << dirs;
+    
+    if (dirs.isEmpty())
+#ifdef __APPLE__
+        dirs << QDir::home().filePath( "Music" );
+#else
+        dirs << QDir::homePath();
+#endif
+    
     foreach (QString dir, dirs)
         add( dir );
 }
@@ -131,7 +132,5 @@ PickDirsDialog::setDirs(QStringList dirs)
 void
 PickDirsDialog::enableDisableOk()
 {
-    qDebug() << getDirs();
-    
     ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( getDirs().count() );
 }

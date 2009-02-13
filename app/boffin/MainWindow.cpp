@@ -19,11 +19,13 @@
 
 #include "MainWindow.h"
 #include "lib/lastfm/core/UrlBuilder.h"
+#include "lib/lastfm/types/Track.h"
 #include "lib/lastfm/types/User.h"
 #include "lib/lastfm/ws/WsKeys.h"
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QMenuBar>
+#include <QToolBar>
 #include <QVBoxLayout>
 
 
@@ -37,8 +39,20 @@ MainWindow::MainWindow()
     ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
 #endif
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
+ 
+    setUnifiedTitleAndToolBarOnMac( true );
+    QToolBar* toolbar;
+    addToolBar( toolbar = new QToolBar );
+    ui.play = toolbar->addAction( tr("Play") );
+    ui.pause = toolbar->addAction( tr("Pause") );
+    ui.skip = toolbar->addAction( tr("Skip") );
+    ui.play->setCheckable( true );
+
+    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+
+    ui.play->setIcon( QPixmap(":/lastfm/no/cover.png") );
     
-    setWindowTitle( tr("Last.fm Boffin") );
+    setWindowTitle( Track() );
 
     connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
     
@@ -64,4 +78,14 @@ void
 MainWindow::openProfileUrl()
 {
     QDesktopServices::openUrl( AuthenticatedUser().www() );
+}
+
+
+void
+MainWindow::setWindowTitle( const Track& t )
+{
+    if (t.isNull())
+        QMainWindow::setWindowTitle( tr("Last.fm Boffin") );
+    else
+        QMainWindow::setWindowTitle( t.toString() );
 }

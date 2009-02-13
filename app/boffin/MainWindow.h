@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include <lastfm/types/Track.h>
 #include <QMainWindow>
 
 
@@ -31,10 +32,16 @@ class MainWindow : public QMainWindow
         class QMenu* account;
         class QMenu* outputdevice;
         class QAction* profile;
+        
+        QAction* play;
+        QAction* pause;
+        QAction* skip;
     } ui;
 
 public:
     MainWindow();
+
+    void setWindowTitle( const Track& );
     
 public slots:
     void openProfileUrl();

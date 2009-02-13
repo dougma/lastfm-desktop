@@ -27,14 +27,16 @@ class TagCloudView : public QAbstractItemView
 public:
     TagCloudView( QWidget* parent = 0 );
     ~TagCloudView();
-    virtual void paintEvent( QPaintEvent* );
-
+    
 //QAbstractItemView pure virtual functions:
     virtual QModelIndex indexAt( const QPoint& ) const;
     virtual void scrollTo( const QModelIndex&, ScrollHint ){};
     virtual QRect visualRect( const QModelIndex& ) const;
 
+    QString currentTag() const;
+
 protected:
+    virtual void paintEvent( QPaintEvent* );
     virtual bool isIndexHidden( const QModelIndex& ) const{ return false; }
     virtual void setSelection( const QRect&, QItemSelectionModel ){};
     virtual QRegion visualRegionForSelection( const QItemSelection& ) const{ return QRegion(); }
