@@ -57,7 +57,8 @@ LocalCollection::LocalCollection(QString connectionName)
 
 LocalCollection::~LocalCollection()
 {
-    m_db.close();
+//  don't close... more testing.
+//    m_db.close();
 
 // removeDatabase seems to cause other instances of LocalCollection to die :(
 // maybe i don't understand removeDatabase.  todo.
