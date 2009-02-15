@@ -21,7 +21,7 @@
 #include "lib/lastfm/core/UrlBuilder.h"
 
 
-class TestCoreUrl : public QObject
+class TestUrlBuilder : public QObject
 {
     Q_OBJECT
 
@@ -37,7 +37,7 @@ private slots:
 
 
 void
-TestCoreUrl::encode_data()
+TestUrlBuilder::encode_data()
 {
     QTest::addColumn<QString>("input");
     QTest::addColumn<QString>("output");
@@ -50,7 +50,7 @@ TestCoreUrl::encode_data()
 
 
 void
-TestCoreUrl::encode()
+TestUrlBuilder::encode()
 {
     QFETCH( QString, input );
     QFETCH( QString, output );    
@@ -80,7 +80,7 @@ static inline int getResponseCode( const QUrl& url )
 
 
 void
-TestCoreUrl::no404_data()
+TestUrlBuilder::no404_data()
 {
     QTest::addColumn<QString>("artist");
     QTest::addColumn<QString>("track");
@@ -94,7 +94,7 @@ TestCoreUrl::no404_data()
 }
 
 void
-TestCoreUrl::no404()
+TestUrlBuilder::no404()
 {
     QFETCH( QString, artist );
     QFETCH( QString, track );
@@ -106,11 +106,11 @@ TestCoreUrl::no404()
 
 
 void
-TestCoreUrl::test404()
+TestUrlBuilder::test404()
 {
     QCOMPARE( getResponseCode( QUrl("http://www.last.fm/404") ), 404 );
 }
 
 
-QTEST_MAIN( TestCoreUrl )
-#include "TestCoreUrl.moc"
+QTEST_MAIN( TestUrlBuilder )
+#include "TestUrlBuilder.moc"
