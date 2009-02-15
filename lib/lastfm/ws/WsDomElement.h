@@ -17,11 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef CORE_DOM_ELEMENT_H
-#define CORE_DOM_ELEMENT_H
+#ifndef LASTFM_WS_DOM_ELEMENT_H
+#define LASTFM_WS_DOM_ELEMENT_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/CoreException.h>
+#include <lastfm/global.h>
+#include <lastfm/CoreException>
 #include <QDebug>
 #include <QDomElement>
 #include <QList>
@@ -32,24 +32,22 @@
   * @brief facade pattern for QDomElement, throwing exceptions in situations that we must handle
   *
   * QDomElement dome;
-  * CoreDomElement( dome )["album"]["image size=small"].text();
-  * foreach (CoreDomElement e, CoreDomElement( dome )["album"].children( "image" ))
+  * WsDomElement( dome )["album"]["image size=small"].text();
+  * foreach (WsDomElement e, WsDomElement( dome )["album"].children( "image" ))
   *     qDebug() << e.text();
   */
-class LASTFM_CORE_DLLEXPORT CoreDomElement
+class LASTFM_WS_DLLEXPORT WsDomElement
 {
     QDomElement e;
 
-	friend QDebug operator<<( QDebug, const CoreDomElement& );
+	friend QDebug operator<<( QDebug, const WsDomElement& );
     
-    CoreDomElement()
+    WsDomElement()
     {}
     
 public:
     class Exception : public CoreException
     {
-        friend class CoreDomElement;
-
         Exception( QString s ) : CoreException( s )
         {}
 
@@ -59,13 +57,13 @@ public:
     };
 
 
-    CoreDomElement( const QDomElement& x ) : e( x )
+    WsDomElement( const QDomElement& x ) : e( x )
     {
         if (e.isNull()) throw Exception::nullNode();
     }
 
     /** returns a null element unless the node @p name exists */
-    CoreDomElement optional( const QString& name ) const
+    WsDomElement optional( const QString& name ) const
     {
         try
         {
@@ -73,7 +71,7 @@ public:
         }
         catch (Exception&)
         {
-            return CoreDomElement();
+            return WsDomElement();
         }
     }
     
@@ -81,20 +79,20 @@ public:
       *
       * e["element"]["element attribute=value"].text();
       */
-    CoreDomElement operator[]( const QString& name ) const;
+    WsDomElement operator[]( const QString& name ) const;
     
     /** use in all cases where empty would be an error, it throws if empty,
       * ignores optional() since you are explicitly asking for a throw! */
     QString nonEmptyText() const;
 
     QString text() const { return e.text(); }
-    QList<CoreDomElement> children( const QString& named ) const;
+    QList<WsDomElement> children( const QString& named ) const;
     
     operator QDomElement() const { return e; }
 };
 
 
-inline QDebug operator<<( QDebug debug, const CoreDomElement& e )
+inline QDebug operator<<( QDebug debug, const WsDomElement& e )
 {
 	QString s;
 	QTextStream t( &s, QIODevice::WriteOnly );

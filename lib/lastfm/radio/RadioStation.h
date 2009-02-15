@@ -20,10 +20,9 @@
 #ifndef LASTFM_RADIO_STATION_H
 #define LASTFM_RADIO_STATION_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/User.h>
-#include <lastfm/types/Tag.h>
-#include <lastfm/types/Artist.h>
+#include <lastfm/User>
+#include <lastfm/Tag>
+#include <lastfm/Artist>
 
 
 /** @author <jono@last.fm> 

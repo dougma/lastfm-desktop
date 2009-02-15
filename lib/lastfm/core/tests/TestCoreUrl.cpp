@@ -58,7 +58,7 @@ TestCoreUrl::encode()
 }
 
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QtNetwork>
 #include <QEventLoop>
 static inline int getResponseCode( const QUrl& url )

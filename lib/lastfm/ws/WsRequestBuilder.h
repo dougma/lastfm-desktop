@@ -20,47 +20,34 @@
 #ifndef LASTFM_WS_REQUEST_MANAGER_H
 #define LASTFM_WS_REQUEST_MANAGER_H
 
-#include <lastfm/public.h>
-#include <lastfm/ws/WsReply.h> //for your convenience
-#include <lastfm/ws/WsRequestParameters.h>
+#include <lastfm/WsReply> //for your convenience <3 x
+#include <QMap>
 #include <QThreadStorage>
 
-   
 
 /** A convenience class to create a WsReply for Last.fm webservices.
   * We add the session key, api signature and session key to every request */
 class LASTFM_WS_DLLEXPORT WsRequestBuilder
 {
-    enum RequestMethod
-    {
-        GET,
-        POST
-    };
+    static QThreadStorage<class WsAccessManager*> nam; // one per thread
+    QMap<QString, QString> params;
 
-    /** DO NOT MAKE THIS ACCESSIBLE TO OTHER PARTS OF THE APPLICATION 
-      * Talk to max if you wanted to */
-    static QThreadStorage<class WsAccessManager*> nam;  // one per thread
-
-    RequestMethod request_method;
-    WsRequestParameters params;
-
+    enum RequestMethod { Get, Post };
     /** starts the request, connect to finished() to get the results */
-    WsReply* start();
+    WsReply* start( RequestMethod );
 
 public:
     WsRequestBuilder( const QString& methodName );
-    
-    WsReply* get() { request_method = GET; return start(); }
-    WsReply* post() { request_method = POST; return start(); }
 
-    /** add a parameter to the request */
-    WsRequestBuilder& add( const QString& key, const QString& value ) { params.add( key, value ); return *this; }
+    WsReply* get() { return start( Get ); }
+    WsReply* post() { return start( Post ); }
+
+    /** add a parameter to the request, if @p key isEmpty() we silently ignore it */
+    WsRequestBuilder& add( const QString& key, const QString& value );
+    /** for convenience */
     WsRequestBuilder& add( const QString& key, int const value ) { return add( key, QString::number( value ) ); }
-    /** adds the parameter if @p value is not empty */
-    WsRequestBuilder& addIfNotEmpty( const QString& key, const QString& v ) { if (v.size()) params.add( key, v ); return *this; }
-  
-    /** connects the receiver and slot to the reply's done() signal */
-    WsRequestBuilder& connect( QObject* receiver, const char* slot );
+    /** for convenience */
+    WsRequestBuilder& addIfNotEmpty( const QString& key, const QString& s ) { if (s.size()) add( key, s ); return *this; }
 };
 
 #endif

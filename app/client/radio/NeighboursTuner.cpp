@@ -50,7 +50,7 @@ NeighboursTuner::onFetchedNeighbours( WsReply* r )
 	foreach( const User& user, neighbours )
 	{
 		QListWidgetItem* i = new QListWidgetItem( user, this );
-		i->setData( Qt::DecorationRole, QImage( ":/lastfm/no/user.png" ));
+		i->setData( Qt::DecorationRole, QImage( ":/lastfm/no/avatar.png" ));
 		i->setData( StationDelegate::CountRole, user.match() );
 		addItem( i );
 		

@@ -43,7 +43,7 @@
 
 
 App::App( int& argc, char** argv )
-   : Unicorn::Application( argc, argv )
+   : unicorn::Application( argc, argv )
    , m_contentScannerThread( 0 )
    , m_contentScanner( 0 )
    , m_trackTagUpdater( 0 )

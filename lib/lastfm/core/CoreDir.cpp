@@ -48,8 +48,7 @@ CoreDir::bundle()
 #endif
 
 
-QDir
-CoreDir::dataDotDot()
+static QDir dataDotDot()
 {
 #ifdef WIN32
     if ((QSysInfo::WindowsVersion & QSysInfo::WV_DOS_based) == 0)
@@ -105,6 +104,13 @@ CoreDir::dataDotDot()
 #else
     return QDir::home();
 #endif
+}
+
+
+QDir
+CoreDir::data()
+{
+    return dataDotDot().filePath( "Last.fm" );
 }
 
 

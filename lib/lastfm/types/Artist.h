@@ -20,8 +20,7 @@
 #ifndef LASTFM_ARTIST_H
 #define LASTFM_ARTIST_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/WeightedStringList.h>
+#include <lastfm/WeightedStringList>
 #include <QString>
 #include <QUrl>
 

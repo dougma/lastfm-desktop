@@ -30,7 +30,7 @@
 #include "_version.h"
 #include "app/moose.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
-#include "lib/lastfm/core/UniqueApplication.h"
+#include "lib/unicorn/UniqueApplication.h"
 #include <QDir>
 #include <QTimer>
 
@@ -101,7 +101,7 @@ int main( int argc, char** argv )
         qCritical() << "Unsupported platform";
         return 2;
     }
-    catch (Unicorn::Application::StubbornUserException&)
+    catch (unicorn::Application::StubbornUserException&)
     {
         // user wouldn't log in
         return 0;

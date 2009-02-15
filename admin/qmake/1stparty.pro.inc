@@ -40,5 +40,5 @@ CONFIG( core ) {
 	QT += core xml
 }
 
-# so #include <lastfm/*.h> works
-INCLUDEPATH += $$ROOT_DIR/lib
+# make work: #include <lastfm/*>
+INCLUDEPATH += $$ROOT_DIR/_include

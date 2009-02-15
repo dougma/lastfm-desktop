@@ -20,10 +20,9 @@
 #ifndef LASTFM_RADIO_H
 #define LASTFM_RADIO_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Track.h>
-#include <lastfm/radio/RadioStation.h>
-#include <lastfm/ws/WsError.h>
+#include <lastfm/Track>
+#include <lastfm/RadioStation>
+#include <lastfm/WsError>
 #include <phonon/phononnamespace.h>
 #include <QList>
 #include <QThread>

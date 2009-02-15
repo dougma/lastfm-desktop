@@ -20,10 +20,11 @@
 #ifndef LASTFM_SCROBBLE_POINT_H
 #define LASTFM_SCROBBLE_POINT_H
 
+#include <lastfm/global.h>
 #include <QtAlgorithms>
 
 
-class ScrobblePoint
+class LASTFM_SCROBBLE_DLLEXPORT ScrobblePoint
 {
     uint i;
 

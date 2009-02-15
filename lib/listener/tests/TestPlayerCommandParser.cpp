@@ -162,7 +162,7 @@ TestPlayerCommandParser::testDuplicatedArgument()
 void
 TestPlayerCommandParser::testUnicode()
 {
-    PlayerCommandParser pcp ( "START c=testapp"
+    PlayerCommandParser pcp( "START c=testapp"
                                    "&a=佐橋俊彦"
                                    "&t=対峙"
                                    "&b=TV Animation ジパング original Soundtrack"

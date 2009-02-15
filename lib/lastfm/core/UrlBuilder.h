@@ -20,10 +20,10 @@
 #ifndef LASTFM_URL_BUILDER_H
 #define LASTFM_URL_BUILDER_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
+#include <QLocale>
 #include <QString>
 #include <QUrl>
-class CoreLocale;
   
 
 namespace lastfm
@@ -62,7 +62,7 @@ namespace lastfm
     	static QByteArray encode( QString );
 
     	/** returns eg. www.lastfm.de */
-    	static QString hostForLocale( const CoreLocale& );
+    	static QString host( const QLocale& = QLocale() );
     };
 }
 

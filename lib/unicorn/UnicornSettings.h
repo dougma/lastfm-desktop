@@ -25,10 +25,10 @@
 #include <QString>
 
 
-namespace Unicorn
+namespace unicorn
 {   
     /** Clearly no use until a username() has been assigned. But this is 
-      * automatic if you use Unicorn::Application anyway. */
+      * automatic if you use unicorn::Application anyway. */
     class UserSettings : public CoreSettings
     {
     public:

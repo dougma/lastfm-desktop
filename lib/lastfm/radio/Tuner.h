@@ -20,11 +20,10 @@
 #ifndef LASTFM_TUNER_H
 #define LASTFM_TUNER_H
 
-#include "AbstractTrackSource.h"
-#include <lastfm/public.h>
-#include <lastfm/radio/RadioStation.h>
-#include <lastfm/types/Track.h>
-#include <lastfm/ws/WsError.h>
+#include "lib/lastfm/radio/AbstractTrackSource.h"
+#include <lastfm/RadioStation>
+#include <lastfm/Track>
+#include <lastfm/WsError>
 #include <QList>
 
 

@@ -20,7 +20,7 @@
 #ifndef LASTFM_NOW_PLAYING_H
 #define LASTFM_NOW_PLAYING_H
 
-#include "lib/lastfm/public.h"
+#include "lib/lastfm/global.h"
 #include "ScrobblerHttp.h"
 #include <QTime>
 

@@ -20,6 +20,8 @@
 #include <QtTest>
 #include "Track.h"
 
+using lastfm::Track;
+
 
 class TestTrack : public QObject
 {
@@ -27,7 +29,7 @@ class TestTrack : public QObject
     
     Track example()
     {
-        MutableTrack t;
+        lastfm::MutableTrack t;
         t.setTitle( "Test Title" );
         t.setArtist( "Test Artist" );
         t.setAlbum( "Test Album" );

@@ -176,7 +176,7 @@ DiagnosticsDialog::onScrobbleIPodClicked()
     if (isManual)
         args += "--manual";
 
-    QString path = UnicornCoreApplication::log( twiddly::applicationName() ).absoluteFilePath();
+    QString path = unicorn::CoreApplication::log( twiddly::applicationName() ).absoluteFilePath();
 #ifndef NDEBUG
     path = path.remove( ".debug" ); //because we run the release twiddly always
 #endif    

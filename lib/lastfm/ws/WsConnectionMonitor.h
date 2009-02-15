@@ -20,7 +20,7 @@
 #ifndef WS_CONNECTION_MONITOR_H
 #define WS_CONNECTION_MONITOR_H
 
-#include "lib/lastfm/public.h"
+#include "../global.h"
 #include <QObject>
 #ifdef WIN32
 #include "win/NdisEvents.h"

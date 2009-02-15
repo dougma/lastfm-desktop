@@ -17,11 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "CoreDomElement.h"
+#include "WsDomElement.h"
 
 
-CoreDomElement
-CoreDomElement::operator[]( const QString& name ) const
+WsDomElement
+WsDomElement::operator[]( const QString& name ) const
 {
     QStringList parts = name.split( ' ' );
     if (parts.size() >= 2)
@@ -31,16 +31,16 @@ CoreDomElement::operator[]( const QString& name ) const
         QString attributeName = parts.value( 0 );
         QString attributeValue = parts.value( 1 );
 
-        foreach (CoreDomElement e, children( tagName ))
+        foreach (WsDomElement e, children( tagName ))
             if (e.e.attribute( attributeName ) == attributeValue)
                 return e;
     }
-    return CoreDomElement( e.firstChildElement( name ) );
+    return WsDomElement( e.firstChildElement( name ) );
 }
 
 
 QString
-CoreDomElement::nonEmptyText() const 
+WsDomElement::nonEmptyText() const 
 {
     QString const s = e.text();
     if (s.isEmpty())
@@ -49,12 +49,12 @@ CoreDomElement::nonEmptyText() const
 }
 
 
-QList<CoreDomElement>
-CoreDomElement::children( const QString& named ) const
+QList<WsDomElement>
+WsDomElement::children( const QString& named ) const
 {
-    QList<CoreDomElement> elements;
+    QList<WsDomElement> elements;
     QDomNodeList nodes = e.elementsByTagName( named );
     for (int x = 0; x < nodes.count(); ++x)
-        elements += CoreDomElement( nodes.at( x ).toElement() );
+        elements += WsDomElement( nodes.at( x ).toElement() );
     return elements;
 }

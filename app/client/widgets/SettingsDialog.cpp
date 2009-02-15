@@ -21,8 +21,7 @@
 #include "Settings.h"
 #include "the/radio.h"
 #include "lib/unicorn/UnicornSettings.h"
-#include "lib/lastfm/core/CoreLocale.h"
-#include "lib/lastfm/private.h"
+#include "lib/lastfm/scrobble/private.h"
 #include <QtGui>
 #include <phonon>
 
@@ -47,19 +46,19 @@ SettingsDialog::SettingsDialog( QWidget* parent )
 
     // Add languages to language drop-down
     ui.languages->addItem( tr( "System Language" ), "" );
-    ui.languages->addItem( "English", CoreLocale( QLocale::English ).code() );
-    ui.languages->addItem( QString( "Fran" ) + QChar( 0xe7 ) + QString( "ais" ), CoreLocale( QLocale::French ).code() );
-    ui.languages->addItem( "Italiano", CoreLocale( QLocale::Italian ).code() );
-    ui.languages->addItem( "Deutsch", CoreLocale( QLocale::German ).code() );
-    ui.languages->addItem( QString( "Espa" ) + QChar( 0xf1 ) + QString( "ol" ), CoreLocale( QLocale::Spanish ).code() );
-    ui.languages->addItem( QString( "Portugu" ) + QChar( 0xea ) + QString( "s" ), CoreLocale( QLocale::Portuguese ).code() );
-    ui.languages->addItem( "Polski", CoreLocale( QLocale::Polish ).code() );
-    ui.languages->addItem( "Svenska", CoreLocale( QLocale::Swedish ).code() );
-    ui.languages->addItem( QString::fromUtf8( "Türkçe" ), CoreLocale( QLocale::Turkish ).code() );
-    ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), CoreLocale( QLocale::Russian ).code() );
-    ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), CoreLocale( QLocale::Chinese ).code() );
+    ui.languages->addItem( "English", QLocale::English );
+    ui.languages->addItem( QString( "Fran" ) + QChar( 0xe7 ) + QString( "ais" ), QLocale::French );
+    ui.languages->addItem( "Italiano", QLocale::Italian );
+    ui.languages->addItem( "Deutsch", QLocale::German );
+    ui.languages->addItem( QString( "Espa" ) + QChar( 0xf1 ) + QString( "ol" ), QLocale::Spanish );
+    ui.languages->addItem( QString( "Portugu" ) + QChar( 0xea ) + QString( "s" ), QLocale::Portuguese );
+    ui.languages->addItem( "Polski", QLocale::Polish );
+    ui.languages->addItem( "Svenska", QLocale::Swedish );
+    ui.languages->addItem( QString::fromUtf8( "Türkçe" ), QLocale::Turkish );
+    ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), QLocale::Russian );
+    ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), QLocale::Chinese );
 
-    ui.logOutOnExit->setChecked( Unicorn::Settings().logOutOnExit() );
+    ui.logOutOnExit->setChecked( unicorn::Settings().logOutOnExit() );
 
     moose::Settings s;
     ui.fingerprintingEnabled->setChecked( s.fingerprintingEnabled() );
@@ -86,7 +85,7 @@ SettingsDialog::SettingsDialog( QWidget* parent )
             ui.outputDevice->setCurrentIndex( ui.outputDevice->count() - 1 );
     }
     
-    ui.forbiddenPaths->setPlainText( CoreSettings().value( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS ).toStringList().join( "\n" ) );
+    ui.forbiddenPaths->setPlainText( CoreSettings().value( SCROBBLE_EXCLUSION_DIRS ).toStringList().join( "\n" ) );
 }
 
 
@@ -113,7 +112,7 @@ SettingsDialog::accept()
         The::radio().audioOutput()->setOutputDevice( d );
     }
     
-    cs.setValue( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS, ui.forbiddenPaths->toPlainText().split( '\n' ) );
+    cs.setValue( SCROBBLE_EXCLUSION_DIRS, ui.forbiddenPaths->toPlainText().split( '\n' ) );
     
     QDialog::accept();
 }

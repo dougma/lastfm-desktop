@@ -26,7 +26,7 @@
 /** @author <petgru@last.fm> 
   * @author <adam@last.fm>
   */
-class Settings : public Unicorn::Settings
+class Settings : public unicorn::Settings
 {
     void setValue( QString key, QVariant v )
     {
@@ -40,25 +40,12 @@ class Settings : public Unicorn::Settings
         return s.value( key, default_value );
     }
     
-
     template <class T> T value( QString key, QVariant default_value = QVariant() ) const
     {
         return value( key, default_value ).value<T>();
     }
     
 public:
-    static Settings& instance()
-    {
-        static Settings* settings = 0;
-        
-        if (!settings)
-        {
-            settings = new Settings( qApp );
-            settings->setObjectName( "Settings-Instance" );
-        }
-        return *settings;
-    }
-
     // WINDOW STUFF
     void setSize( QSize size ) { setValue ( "window/size", size ); }
     void setPosition( QPoint pos ) { setValue ( "window/position", pos ); }

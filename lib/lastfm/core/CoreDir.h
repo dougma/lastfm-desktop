@@ -20,35 +20,24 @@
 #ifndef LASTFM_CORE_DIR_H
 #define LASTFM_CORE_DIR_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QCoreApplication>
 #include <QDir>
 
 
+// some of these are only useful to unicorn
+// but data dir is used by ie. libfingerprint
+
+
 namespace CoreDir
 {
-    /** @returns the path to the top-level Application Data folder
-      * XP:    C:\Documents and Settings\user\Local Settings\Application Data.
-      * Vista: C:\Users\user\AppData\Local
-      * OSX:   ~/Library/Application Support
-      * Unix:  ~/.local/share
-      *
-      * May return an empty string on Windows if the system call to get the
-      * path fails.
-      */
-    LASTFM_CORE_DLLEXPORT QDir dataDotDot();
-
-
     /** @returns directory where application data can be stored
       * XP:    C:\Documents and Settings\user\Local Settings\Application Data\Last.fm
       * Vista: C:\Users\user\AppData\Local\Last.fm
       * OSX:   ~/Library/Application Support/Last.fm/
       * Unix:  ~/.local/share/Last.fm/
       */
-    inline QDir data()
-    {
-        return dataDotDot().filePath( "Last.fm" );
-    }
+    LASTFM_CORE_DLLEXPORT QDir data();
     
 
     /** @returns directory where logs can be stored
@@ -93,7 +82,7 @@ namespace CoreDir
     
 #ifdef Q_WS_MAC
     /** eg. /Applications/Last.fm.app/ */
-    QDir bundle();
+    LASTFM_CORE_DLLEXPORT QDir bundle();
 #endif
 }
 

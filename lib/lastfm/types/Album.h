@@ -20,9 +20,8 @@
 #ifndef LASTFM_ALBUM_H
 #define LASTFM_ALBUM_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Artist.h>
-#include <lastfm/types/Mbid.h>
+#include <lastfm/Artist>
+#include <lastfm/Mbid>
 #include <QString>
 #include <QUrl>
 
@@ -62,6 +61,9 @@ namespace lastfm
 
         /** use Tag::list to get the tag list out of the finished reply */
         WsReply* getTags() const;
+        WsReply* getTopTags() const;
+        
+        /** Last.fm dictates that you may submit at most 10 of these */
         WsReply* addTags( const QStringList& ) const;
     
         /** the Last.fm website url for this album */

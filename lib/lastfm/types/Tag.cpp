@@ -52,10 +52,10 @@ Tag::search( WsReply* r )
 {
 	QStringList tags;
     try {
-        foreach( CoreDomElement e, r->lfm().children( "tag" ))
+        foreach (WsDomElement e, r->lfm().children( "tag" ))
             tags += e["name"].text();
     }
-    catch( CoreDomElement::Exception& e )
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
     }    
@@ -69,7 +69,7 @@ Tag::list( WsReply* r )
 	WeightedStringList tags;
     try
     {
-        foreach (CoreDomElement e, r->lfm().children( "tag" ))
+        foreach (WsDomElement e, r->lfm().children( "tag" ))
         {
             int const weight = e.optional("count").text().toInt();
             
@@ -79,7 +79,7 @@ Tag::list( WsReply* r )
             tags += WeightedString( e["name"].text().toLower(), weight );
         }
     }
-    catch( CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
     }

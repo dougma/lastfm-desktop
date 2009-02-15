@@ -80,7 +80,7 @@ Firehose::onUserGotInfo( WsReply* reply )
         uint const id = reply->lfm()["user"]["id"].text().toInt();
         setUserId( id );
     }
-    catch (CoreDomElement::Exception&)
+    catch (WsDomElement::Exception&)
     {
         setStaff();
     }

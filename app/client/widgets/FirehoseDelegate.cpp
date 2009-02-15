@@ -19,7 +19,6 @@
 
 #include "FirehoseDelegate.h"
 #include "app/moose.h"
-#include "lib/lastfm/core/CoreLocale.h"
 #include "lib/lastfm/types/Track.h"
 #include <QPainter>
 

@@ -20,8 +20,7 @@
 #ifndef LASTFM_WEIGHTED_STRING_LIST_H
 #define LASTFM_WEIGHTED_STRING_LIST_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/WeightedString.h>
+#include <lastfm/WeightedString>
 #include <QtAlgorithms>
 #include <QStringList>
 
@@ -52,7 +51,7 @@ public:
         return strings;
     }
 
-    void weightedSort( Qt::SortOrder order = Qt::AscendingOrder ) 
+    void sortByWeight( Qt::SortOrder order = Qt::AscendingOrder ) 
     {
         qSort( begin(), end() );
 		if (order == Qt::DescendingOrder)

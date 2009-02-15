@@ -21,7 +21,7 @@
 #define FINGERPRINTERPROGRESSBAR_H
 
 #include <QDialog>
-#include "libLastFmTools/LastMessageBox.h"
+#include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QTimer>
 #include <QPushButton>
 #include <QtCore>

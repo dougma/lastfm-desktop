@@ -90,7 +90,7 @@ Artist::getSimilar( WsReply* r )
 	WeightedStringList artists;
 	try
 	{
-		foreach (CoreDomElement e, r->lfm().children( "artist" ))
+		foreach (WsDomElement e, r->lfm().children( "artist" ))
 		{
 			QString artistName = e["name"].text();
 			float match = e["match"].text().toFloat();
@@ -98,7 +98,7 @@ Artist::getSimilar( WsReply* r )
 		}
 		
 	}
-	catch( CoreDomElement::Exception& e)
+	catch( WsDomElement::Exception& e)
 	{
 		qWarning() << e;
 	}
@@ -106,7 +106,7 @@ Artist::getSimilar( WsReply* r )
 }
 
 
-static inline void images( QList<QUrl>& images, const CoreDomElement& e )
+static inline void images( QList<QUrl>& images, const WsDomElement& e )
 {
     images.clear();
     images += e.optional( "image size=small" ).text();
@@ -119,7 +119,7 @@ QList<Artist> /* static */
 Artist::list( WsReply* r )
 {
 	QList<Artist> artists;
-	foreach (CoreDomElement e, r->lfm().children( "artist" ))
+	foreach (WsDomElement e, r->lfm().children( "artist" ))
 	{
     	try
     	{    
@@ -127,7 +127,7 @@ Artist::list( WsReply* r )
             images( artist.m_images, e );
     		artists += artist;
 	    }
-    	catch (CoreDomElement::Exception& e)
+    	catch (WsDomElement::Exception& e)
     	{
     		qWarning() << e;
     	}

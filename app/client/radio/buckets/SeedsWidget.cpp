@@ -280,7 +280,7 @@ SeedsWidget::onUserGetArtistsReturn( WsReply* r )
 void
 SeedsWidget::onAuthUserInfoReturn( WsReply* r )
 {
-    QList<CoreDomElement> images = r->lfm().children( "image" );
+    QList<WsDomElement> images = r->lfm().children( "image" );
     if( images.isEmpty() )
         return;
     
@@ -311,8 +311,8 @@ SeedsWidget::onUserGetPlaylistsReturn( WsReply* r )
 {
 Q_UNUSED( r )
 #if 0 //FIXME: No RQL for playlists yet!
-    QList<CoreDomElement> playlists = r->lfm().children( "playlist" );
-    foreach( CoreDomElement playlist, playlists )
+    QList<WsDomElement> playlists = r->lfm().children( "playlist" );
+    foreach( WsDomElement playlist, playlists )
     {
         Seed* n = new Seed( playlist[ "title" ].text(), ui.stationsBucket );
 

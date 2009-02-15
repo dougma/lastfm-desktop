@@ -20,8 +20,8 @@
 #ifndef LASTFM_PLAYLIST_H
 #define LASTFM_PLAYLIST_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Xspf.h>
+#include <lastfm/global.h>
+#include <lastfm/Xspf>
 #include <QString>
 #include <QUrl>
 

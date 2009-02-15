@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <lastfm/types/Track.h>
+#include <lastfm/Track>
 #include <QMainWindow>
 
 

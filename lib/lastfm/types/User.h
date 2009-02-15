@@ -20,9 +20,8 @@
 #ifndef LASTFM_USER_H
 #define LASTFM_USER_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/WeightedStringList.h>
-#include <lastfm/ws/WsKeys.h>
+#include <lastfm/WeightedStringList>
+#include <lastfm/WsKeys>
 #include <QString>
 #include <QUrl>
 
@@ -40,10 +39,10 @@ namespace lastfm
         operator QString() const { return m_name; }
         QString name() const { return m_name; }
 	
-        /** You can get a WeightedStringList using Tag::getTopTags() */
+        /** use Tag::list() on the response to get a WeightedStringList */
     	WsReply* getTopTags() const;
 
-        /** get a QList<User> from User::list() */
+        /** use User::list() on the response to get a QList<User> */
         WsReply* getFriends() const;
     	WsReply* getNeighbours() const;
     

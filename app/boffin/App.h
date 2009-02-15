@@ -20,11 +20,11 @@
 #ifndef APP_H
 #define APP_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include "lib/unicorn/UnicornApplication.h"
 
 
-class App : public Unicorn::Application
+class App : public unicorn::Application
 {
     Q_OBJECT
     

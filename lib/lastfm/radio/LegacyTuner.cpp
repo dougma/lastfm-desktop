@@ -18,8 +18,7 @@
  ***************************************************************************/
 
 #include "LegacyTuner.h"
-#include "lib/lastfm/core/CoreDomElement.h"
-#include "lib/lastfm/core/CoreLocale.h"
+#include "lib/lastfm/ws/WsDomElement.h"
 #include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 #include "lib/lastfm/types/Xspf.h"
@@ -28,6 +27,9 @@
 
 using lastfm::Track;
 using lastfm::Xspf;
+
+
+static inline QByteArray iso3166() { return QLocale().name().right( 2 ).toAscii().toLower(); }
 
 
 LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
@@ -53,7 +55,7 @@ LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_m
     url.addEncodedQueryItem( "platform", PLATFORM );
     url.addEncodedQueryItem( "username", QUrl::toPercentEncoding(Ws::Username) );
     url.addEncodedQueryItem( "passwordmd5", password_md5.toAscii() );
-    url.addEncodedQueryItem( "language", CoreSettings().locale().code().toAscii() );
+    url.addEncodedQueryItem( "language", iso3166() );
 
     QNetworkRequest request( url );
     QNetworkReply* reply = m_nam->get( request );
@@ -104,9 +106,7 @@ LegacyTuner::onHandshakeReturn()
     else
     {
         url.setPath( "/radio/adjust.php" );
-        
-
-        url.addQueryItem( "lang", CoreSettings().locale().code() );
+        url.addEncodedQueryItem( "lang", iso3166() );
 
         QNetworkRequest request( url );
         reply = m_nam->get( request );

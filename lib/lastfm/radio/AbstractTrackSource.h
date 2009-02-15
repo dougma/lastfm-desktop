@@ -20,8 +20,8 @@
 #ifndef TRACK_SOURCE_H
 #define TRACK_SOURCE_H
 
-#include <lastfm/types/Track.h>
-#include <lastfm/ws/WsError.h>
+#include <lastfm/Track>
+#include <lastfm/WsError>
 #include <QObject>
 #include <QList>
 

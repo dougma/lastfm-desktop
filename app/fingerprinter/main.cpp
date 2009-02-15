@@ -18,17 +18,10 @@
  ***************************************************************************/
 
 #include "App.h"
-#include "lib/unicorn/Logger.h"
-#include "lib/unicorn/UnicornDir.h"
 
 
-int main( int argc, char *argv[] )
+int main( int argc, char** argv )
 {
-    QCoreApplication::setApplicationName( "Fingerprinter" );
-    QCoreApplication::setOrganizationName( "Last.fm" );
-    QCoreApplication::setOrganizationDomain( "last.fm" );
-    
-    App app( argc, argv );
-    Logger::GetLogger().Init( UnicornDir::logs( "Fingerprinter.log" ) );
-    return app.exec();
+    QCoreApplication::setApplicationName( "Batch Fingerprinter" );
+    return App( argc, argv ).exec();
 }

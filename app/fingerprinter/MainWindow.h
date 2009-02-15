@@ -17,53 +17,47 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02111-1307, USA.          *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include "CheckDirTree.h"
 #include "ui_mainwindow.h"
-
 #include <QMainWindow>
 #include <QDragEnterEvent>
 
 
-/**
-    @author <petgru@last.fm> 
-    @author <adam@last.fm>
-*/
+/** @author <petgru@last.fm> 
+  * @author <adam@last.fm>
+  * @motherfuckingrewrite <max@last.fm>
+  */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
     
-    signals:
-        void startFingerprinting( QStringList dirs );
-        void wantsToClose( QCloseEvent* event );
-        void logout();
-        
-    public:
-        MainWindow();
-        ~MainWindow();
-        
-        void dragEnterEvent( QDragEnterEvent* );
-        void dropEvent( QDropEvent* );
-        
-    public slots:
-        void start();
-        
-        void showFAQ();
-        void aboutDialog();
-        
-    protected:
-        void closeEvent(QCloseEvent *event);
+signals:
+    void startFingerprinting( QStringList dirs );
+    void wantsToClose( QCloseEvent* event );
+    void logout();
+    
+public:
+    MainWindow();
+    
+    void dragEnterEvent( QDragEnterEvent* );
+    void dropEvent( QDropEvent* );
+    
+public slots:
+    void start();
+    
+    void showFAQ();
+    void aboutDialog();
+    
+protected:
+    void closeEvent( QCloseEvent* );
 
-    	Ui::MainWindow ui;
-    
-    protected slots:
-        
-    private:
-    
-    private slots:
-        void fingerprintButtonClicked();
+	Ui::MainWindow ui;
+
+private slots:
+    void fingerprintButtonClicked();
 };
 
 #endif

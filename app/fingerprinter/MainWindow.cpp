@@ -19,14 +19,14 @@
 
 #include "MainWindow.h"
 #include "Settings.h"
-#include "version.h"
-#include "lib/unicorn/AboutDialog.h"
+#include "lib/unicorn/widgets/AboutDialog.h"
 #include <QUrl>
 #include <QDebug>
+#include <QDesktopServices>
+#include "_version.h"
 
 
 MainWindow::MainWindow()
-          : QMainWindow()
 {
     ui.setupUi( this );
 
@@ -34,8 +34,8 @@ MainWindow::MainWindow()
     setStatusBar( 0 );
     setAcceptDrops(true);
     
-    resize( FingerprinterSettings::instance().size() );
-    move( FingerprinterSettings::instance().position() );
+    resize( Settings().size() );
+    move( Settings().position() );
     
     #ifndef Q_WS_MAC
         QMenu* fileMenu = new QMenu( tr( "&File" ), this );
@@ -138,12 +138,12 @@ MainWindow::dropEvent (QDropEvent* event)
 void
 MainWindow::showFAQ()
 {
-    new BrowserThread( "http://www.last.fm/help/faq/?category=Fingerprinting" );
+    QDesktopServices::openUrl( QUrl("http://www.last.fm/help/faq/?category=Fingerprinting") );
 }
 
 
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog( VERSION, this ).exec();
+    AboutDialog( this ).exec();
 }

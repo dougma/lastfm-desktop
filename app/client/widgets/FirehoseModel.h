@@ -76,7 +76,7 @@ class FirehoseItem : public QObject
     QPixmap m_avatar;
     
 public:
-    FirehoseItem( const class CoreDomElement& );
+    FirehoseItem( const class WsDomElement& );
     
     Track track() const { return m_track; }
     QString user() const { return m_user; }

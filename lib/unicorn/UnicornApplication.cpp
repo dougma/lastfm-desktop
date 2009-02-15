@@ -30,16 +30,16 @@
 #include <QTranslator>
 
 
-Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException )
+unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException )
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
-    UnicornCoreApplication::init();
+    CoreApplication::init();
     
     translate();
 
     CoreSettings s;
-    if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Unicorn::Settings().logOutOnExit())
+    if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Settings().logOutOnExit())
     {
         LoginDialog d( s.value( "Username" ).toString() );
         if (d.exec() == QDialog::Accepted)
@@ -51,7 +51,7 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
             s.setValue( "SessionKey", d.sessionKey() );
             s.setValue( "Password", d.passwordHash() );
             
-            Unicorn::UserSettings().setValue( Unicorn::UserSettings::subscriptionKey(), d.isSubscriber() );
+            UserSettings().setValue( UserSettings::subscriptionKey(), d.isSubscriber() );
         }
         else
         {
@@ -67,23 +67,23 @@ Unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
 
 
 void
-Unicorn::Application::translate()
+unicorn::Application::translate()
 {
 #ifdef NDEBUG
-    QString const lang_code = CoreSettings().locale().code();
+    QString const iso3166 = QLocale().name().right( 2 ).toLower();
 
 #ifdef Q_WS_MAC
-    QDir d = CoreDir::bundle().filePath( "Contents/Resources/qm" );
+    QDir const d = CoreDir::bundle().filePath( "Contents/Resources/qm" );
 #else
-    QDir d = qApp->applicationDirPath() + "/i18n";
+    QDir const d = qApp->applicationDirPath() + "/i18n";
 #endif
 
     //TODO need a unicorn/core/etc. translation, plus policy of no translations elsewhere or something!
     QTranslator* t1 = new QTranslator;
-    t1->load( d.filePath( "lastfm_" + lang_code ) );
+    t1->load( d.filePath( "lastfm_" + iso3166 ) );
 
     QTranslator* t2 = new QTranslator;
-    t2->load( d.filePath( "qt_" + lang_code ) );
+    t2->load( d.filePath( "qt_" + iso3166 ) );
 
     installTranslator( t1 );
     installTranslator( t2 );
@@ -91,11 +91,11 @@ Unicorn::Application::translate()
 }
 
 
-Unicorn::Application::~Application()
+unicorn::Application::~Application()
 {
     // we do this here, rather than when the setting is changed because if we 
     // did it then the user would be unable to change their mind
-    if (Unicorn::Settings().logOutOnExit() || m_logoutAtQuit)
+    if (Settings().logOutOnExit() || m_logoutAtQuit)
     {
         CoreSettings s;
         s.remove( "SessionKey" );
@@ -105,15 +105,15 @@ Unicorn::Application::~Application()
 
 
 void
-Unicorn::Application::onUserGotInfo( WsReply* r )
+unicorn::Application::onUserGotInfo( WsReply* r )
 {
     try
     {
-        const char* key = Unicorn::UserSettings::subscriptionKey();
+        const char* key = UserSettings::subscriptionKey();
         bool const value = r->lfm()["user"]["subscriber"].text().toInt() == 1;
-        Unicorn::UserSettings().setValue( key, value );
+        UserSettings().setValue( key, value );
     }
-    catch (CoreDomElement& e)
+    catch (WsDomElement& e)
     {
         qWarning() << e;
     }

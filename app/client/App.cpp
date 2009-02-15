@@ -77,7 +77,7 @@ struct Settings
 
 
 App::App( int& argc, char** argv ) throw( StubbornUserException )
-   : Unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_stateMachine( 0 )
+   : unicorn::Application( argc, argv ), m_scrobbler( 0 ), m_radio( 0 ), m_resolver( 0 ), m_stateMachine( 0 )
 {
 #ifdef Q_WS_MAC
     qt_mac_set_menubar_icons( false );
@@ -372,7 +372,7 @@ App::onUserGotInfo( WsReply* reply )
         }
     #endif
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
     }

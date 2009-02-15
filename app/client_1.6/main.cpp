@@ -17,25 +17,104 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/unicorn/UnicornApplication.h"
+#ifdef __APPLE__
+    // first to prevent compilation errors with Qt 4.5.0
+    #include <Carbon/Carbon.h>
+    #include <ApplicationServices/ApplicationServices.h>
+    static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
+#endif
+
 #include "App.h"
 #include "container.h"
 #include "_version.h"
+#include "app/moose.h"
+#include "lib/unicorn/UnicornApplication.h"
+#include "lib/unicorn/UniqueApplication.h"
+
+Container* gcon;
 
 
 int main( int argc, char** argv )
 {    
-    QCoreApplication::setApplicationName( "Last.fm" );
+    QCoreApplication::setApplicationName( moose::applicationName() );
     QCoreApplication::setApplicationVersion( VERSION );
-    
-    //TODO unique application
-    
-    App app( argc, argv );
+    QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
+    QCoreApplication::setOrganizationDomain( CoreSettings::organizationDomain() );
 
-    Container container;
-    container.show();
+#ifdef NDEBUG
+    UniqueApplication uapp( moose::id() );
+    if (uapp.isAlreadyRunning())
+		return uapp.forward( argc, argv ) ? 0 : 1;
+    uapp.init1();
+#endif	
     
-    app.setContainer( &container );
+    try
+    {
+        App app( argc, argv );
+      #ifdef NDEBUG
+		uapp.init2( &app );
+        app.connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
+      #endif
 
-    return app.exec();
+      #ifdef Q_WS_MAC
+        AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
+        AEInstallEventHandler( 'GURL', 'GURL', h, 0, false );
+        //AEInstallEventHandler( kCoreEventClass, kAEQuitApplication, h, 0, false ); //QCoreApplication handles this for us
+        AEInstallEventHandler( kCoreEventClass, kAEReopenApplication, h, 0, false );
+      #endif
+
+        Container container; gcon = &container;
+        container.show();
+
+        if (!app.arguments().contains( "--tray" ))
+            container.show();
+
+        app.parseArguments( app.arguments() );
+
+        return app.exec();
+    }
+    catch (unicorn::Application::StubbornUserException&)
+    {
+        // user wouldn't log in
+        return 0;
+    }    
 }
+
+
+#ifdef Q_WS_MAC
+static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
+{
+    OSType id = typeWildCard;
+    AEGetAttributePtr( e, keyEventIDAttr, typeType, 0, &id, sizeof(id), 0 );
+    
+    switch (id)
+    {
+        case kAEQuitApplication:
+            gcon->quit();
+            return noErr;
+
+        case kAEReopenApplication:
+        {
+            gcon->show();
+            gcon->raise();
+            return noErr;
+        }
+            
+        case 'GURL':
+        {
+            DescType type;
+            Size size;
+
+            char buf[1024];
+            AEGetParamPtr( e, keyDirectObject, typeChar, &type, &buf, 1023, &size );
+            buf[size] = '\0';
+
+            static_cast<App&>(*qApp).open( QString::fromUtf8( buf ) );
+            return noErr;
+        }
+            
+        default:
+            return unimpErr;
+    }
+}
+#endif

@@ -20,32 +20,31 @@
 #ifndef UNICORN_CORE_APPLICATION_H
 #define UNICORN_CORE_APPLICATION_H
 
+#include "lib/DllExportMacro.h"
 #include <QCoreApplication>
 #include <QFileInfo>
-#include "lib/DllExportMacro.h"
-
-namespace Unicorn { class Application; }
 
 
-class UNICORN_DLLEXPORT UnicornCoreApplication : public QCoreApplication
+namespace unicorn
 {
-    Q_DISABLE_COPY(UnicornCoreApplication);
-
-	friend class Unicorn::Application;
+    class UNICORN_DLLEXPORT CoreApplication : public QCoreApplication
+    {
+    	friend class Application;
 	
-	static void init();
-	static void qMsgHandler( QtMsgType, const char* );
+    	static void init();
+    	static void qMsgHandler( QtMsgType, const char* );
 	
-public:
-	UnicornCoreApplication( int& argc, char** argv );
+    public:
+    	CoreApplication( int& argc, char** argv );
 	
-	static QFileInfo log()
-	{
-		Q_ASSERT( applicationName().size() );
-		return log( applicationName() );
-	}
+    	static QFileInfo log()
+    	{
+    		Q_ASSERT( applicationName().size() );
+    		return log( applicationName() );
+    	}
 	
-	static QFileInfo log( const QString& productName );
-};
+    	static QFileInfo log( const QString& productName );
+    };
+}
 
 #endif

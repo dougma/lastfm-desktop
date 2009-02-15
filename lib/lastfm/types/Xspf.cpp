@@ -19,7 +19,7 @@
 
 #include "Xspf.h"
 #include "../ws/WsReply.h"
-#include "../core/CoreDomElement.h"
+#include "../ws/WsDomElement.h"
 #include <QUrl>
 
 
@@ -27,7 +27,7 @@ lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
 {
     try
     {
-        CoreDomElement e( playlist_node );
+        WsDomElement e( playlist_node );
         
         m_title = e.optional( "title" ).text();
             
@@ -38,7 +38,7 @@ lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
         m_title = QUrl::fromPercentEncoding( m_title.toAscii());
         m_title = m_title.trimmed();
         
-        foreach (CoreDomElement e, e.optional( "trackList" ).children( "track" ))
+        foreach (WsDomElement e, e.optional( "trackList" ).children( "track" ))
         {
             MutableTrack t;
             try
@@ -51,7 +51,7 @@ lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
                 t.setDuration( e.optional( "duration" ).text().toInt() / 1000 );
                 t.setSource( src );
             }
-            catch (CoreDomElement::Exception& exception)
+            catch (WsDomElement::Exception& exception)
             {
                 qWarning() << exception << e;
             }
@@ -59,7 +59,7 @@ lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
             m_tracks += t; // outside since location is enough basically
         }
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;        
     }

@@ -20,7 +20,7 @@
 #ifndef LASTFM_MBID_H
 #define LASTFM_MBID_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QString>
 
 

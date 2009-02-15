@@ -24,13 +24,17 @@
 #include "lib/lastfm/core/CoreSysInfo.h"
 #include "common/c++/Logger.h"
 #include <QDebug>
+#include <QLocale>
 
 #ifdef WIN32
 extern void qWinMsgHandler( QtMsgType t, const char* msg );
 #endif
+#ifdef __APPLE__
+static QLocale qMacLocale();
+#endif
 
 
-UnicornCoreApplication::UnicornCoreApplication( int& argc, char** argv )
+unicorn::CoreApplication::CoreApplication( int& argc, char** argv )
                       : QCoreApplication( argc, argv )
 {
 	init();
@@ -42,14 +46,22 @@ UnicornCoreApplication::UnicornCoreApplication( int& argc, char** argv )
 
 
 void //static
-UnicornCoreApplication::init()
+unicorn::CoreApplication::init()
 {
 	QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
     QCoreApplication::setOrganizationDomain( CoreSettings::organizationDomain() );
 
-    // HI! DON'T USE OURS! GET YOUR OWN! http://www.last.fm/api
+    // OHAI! DON'T USE OURS! GET YOUR OWN! http://www.last.fm/api
     Ws::SharedSecret = "73582dfc9e556d307aead069af110ab8";
     Ws::ApiKey = "c8c7b163b11f92ef2d33ba6cd3c2c3c3";
+
+	QVariant const v = CoreSettings().value( "Locale" );
+    if (v.isValid())
+        QLocale::setDefault( QLocale::Language(v.toInt()) );
+#ifdef __APPLE__
+    else
+        QLocale::setDefault( qMacLocale() );
+#endif
 
     CoreDir::mkpaths();
 
@@ -69,7 +81,7 @@ UnicornCoreApplication::init()
 
 
 void
-UnicornCoreApplication::qMsgHandler( QtMsgType type, const char* msg )
+unicorn::CoreApplication::qMsgHandler( QtMsgType type, const char* msg )
 {
 #ifndef NDEBUG
 #ifdef WIN32
@@ -101,7 +113,7 @@ UnicornCoreApplication::qMsgHandler( QtMsgType type, const char* msg )
 
 
 QFileInfo
-UnicornCoreApplication::log( const QString& productName )
+unicorn::CoreApplication::log( const QString& productName )
 {
 #ifdef NDEBUG
     return CoreDir::logs().filePath( productName + ".log" );
@@ -109,3 +121,25 @@ UnicornCoreApplication::log( const QString& productName )
     return CoreDir::logs().filePath( productName + ".debug.log" );
 #endif
 }
+
+
+#ifdef __APPLE__
+#include "lib/lastfm/core/mac/CFStringToQString.h"
+static QLocale qMacLocale()
+{
+	//TODO see what Qt's version does
+	CFArrayRef languages = (CFArrayRef) CFPreferencesCopyValue( 
+		    CFSTR( "AppleLanguages" ),
+			kCFPreferencesAnyApplication,
+			kCFPreferencesCurrentUser,
+			kCFPreferencesAnyHost );
+	
+	if (languages == NULL)
+		return QLocale::system();
+
+	CFStringRef uxstylelangs = CFStringCreateByCombiningStrings( kCFAllocatorDefault, languages, CFSTR( ":" ) );
+
+	QString const s = CFStringToQString( uxstylelangs ).split( ':' ).value( 0 );
+	return QLocale( s );
+}
+#endif

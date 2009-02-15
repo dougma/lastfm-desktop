@@ -20,6 +20,7 @@
 #include "WsRequestBuilder.h"
 #include "WsKeys.h"
 #include "WsReply.h"
+#include "WsRequestParameters.h"
 #include "WsAccessManager.h"
 #include <QCoreApplication>
 #include <QEventLoop>
@@ -42,24 +43,41 @@ WsRequestBuilder::WsRequestBuilder( const QString& method )
         // does gets cleaned up when this thread ends
         nam.setLocalData( new WsAccessManager( 0 ) );
     }
-    
-    params.add( "method", method );
+
+    params["method"] = method;
+}
+
+
+WsRequestBuilder&
+WsRequestBuilder::add( const QString& key, const QString& value )
+{
+    if (!key.isEmpty())
+        params[key] = value;
+    return *this; 
 }
 
 
 WsReply*
-WsRequestBuilder::start()
+WsRequestBuilder::start( RequestMethod method )
 {
+    WsRequestParameters wsparams;
+    
+    QMapIterator<QString, QString> i( params );
+    while (i.hasNext()) {
+        i.next();
+        wsparams.add( i.key(), i.value() );
+    }
+    
     QUrl url( !qApp->arguments().contains( "--debug")
             ? "http://" LASTFM_WS_HOSTNAME "/2.0/"
             : "http://ws.staging.audioscrobbler.com/2.0/" );
 
     typedef QPair<QString, QString> Pair; // don't break foreach macro
-    QList<Pair> params = this->params;
+    QList<Pair> params( wsparams );
 
-    switch (request_method)
+    switch (method)
     {
-        case GET:
+        case Get:
         {
             // Qt setQueryItems doesn't encode a bunch of stuff, so we do it manually
             foreach (Pair pair, params)
@@ -71,7 +89,7 @@ WsRequestBuilder::start()
             return new WsReply( nam.localData()->get( QNetworkRequest( url ) ) );
         }
 
-        case POST:
+        case Post:
 		{
 			QByteArray query;
 			foreach (Pair param, params)

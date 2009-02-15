@@ -76,7 +76,7 @@ class FirehoseItem : public QObject
 	int m_id;
 
 public:
-    FirehoseItem( const class CoreDomElement& );
+    FirehoseItem( const class WsDomElement& );
     
     QString track() const { return m_track; }
     QString user() const { return m_user; }

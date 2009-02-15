@@ -21,39 +21,26 @@
 #define FINGERPRINTER_APP_H
 
 #include "lib/unicorn/UnicornApplication.h"
-#include <QTranslator>
-
 #include "MainWindow.h"
 #include "FingerprinterProgressBar.h"
-#include "logindialog.h"
 
-#include "libFingerprint/FingerprintScheduler.h"
-#include "libLastFmTools/TrackInfo.h"
-#include "libLastFmTools/LastMessageBox.h"
 
 /** @author <petgru@last.fm>
   * @author <adam@last.fm>
   */
-class App : public Unicorn::Application
+class App : public unicorn::Application
 {
     Q_OBJECT
 
     public:
-        FingerprinterApplication( int& argc, char** argv );
-        ~FingerprinterApplication ();
+        App( int& argc, char** argv );
 
         void getTracksFromDirs( QStringList& dirs, QStringList& output);
         void getTracksFromDir( QString dir, QStringList& output );
 
     public slots:
-        // Switch the app to a different language
-        void setLanguage( QString langCode );
-        void exit();
-        
         void onCloseEvent( QCloseEvent* event );
-
         void logout();
-        
         void logTrack( QString filename, QString reason = "It's just plain wrong!" );
         
     protected:
@@ -75,18 +62,12 @@ class App : public Unicorn::Application
         void initTranslator();
         bool checkAbort();
 
-        QString m_lang;
         QStringList m_tracksToFingerprint;
         /*
             Number of tracks to send to fingerprinter simultaneously.
             Should not be too high, as it requires quite a bit of processing.
         */
         int m_chunkSize;
-
-        QTranslator m_translatorApp;
-        QTranslator m_translatorQt;
-        
-        LoginDialog* m_loginDialog;
         
         MainWindow m_mainWindow;
         FingerprinterProgressBar m_progressBar;
@@ -97,7 +78,6 @@ class App : public Unicorn::Application
 
     private slots:
         void init();
-        void login();
         void startFingerprinting( QStringList dirs );
 
 };

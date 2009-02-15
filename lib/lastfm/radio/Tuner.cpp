@@ -125,7 +125,7 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
             emit trackAvailable();
         }
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
         if (!tryAgain())

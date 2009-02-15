@@ -134,7 +134,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
         {
             try
             {
-                CoreDomElement session = reply->lfm()["session"];
+                WsDomElement session = reply->lfm()["session"];
                 
                 // replace username; because eg. perhaps the user typed their
                 // username with the wrong camel case
@@ -151,7 +151,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
 			#endif
                 break;
             }
-            catch (CoreDomElement::Exception& e)
+            catch (WsDomElement::Exception& e)
             {
                 qWarning() << e;
             }

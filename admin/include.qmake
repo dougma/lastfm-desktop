@@ -5,14 +5,6 @@ include( qmake/3rdparty.pro.inc )
 include( qmake/1stparty.pro.inc )
 
 
-# TODO ./configure --tests && make && _bin/tests
-# TODO move useful stuff in tests/ to admin?
-
-# TODO remove dependency on Ruby
-# make qmake files .in files and push sources into their truncated .in versions?
-## this would be somewhat a pita, but only is needed for qpp needing ones anyway..
-
-
 linux*{
 	CONFIG += link_pkgconfig
 	# use KDE phonon if installed in preference

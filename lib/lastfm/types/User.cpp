@@ -80,7 +80,7 @@ User::list( WsReply* r )
 	QList<User> users;
     try
     {
-        foreach (CoreDomElement e, r->lfm().children( "user" ))
+        foreach (WsDomElement e, r->lfm().children( "user" ))
         {
             User u( e["name"].text() );
             u.m_smallImage = e["image size=small"].text();
@@ -90,7 +90,7 @@ User::list( WsReply* r )
             users += u;
         }
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
     }    
@@ -148,7 +148,7 @@ AuthenticatedUser::getInfoString( WsReply* reply )
     QString text;
 	try
 	{
-    	CoreDomElement e = reply->lfm()["user"];
+    	WsDomElement e = reply->lfm()["user"];
     	Gender gender = e["gender"].text();
     	QString age = e["age"].text();
     	uint const scrobbles = e["playcount"].text().toUInt();
@@ -164,7 +164,7 @@ AuthenticatedUser::getInfoString( WsReply* reply )
             text = tr("%L1 scrobbles").arg( scrobbles );
     	}    
     }
-	catch (CoreDomElement::Exception& e)
+	catch (WsDomElement::Exception& e)
 	{
         qWarning() << e;
 	}

@@ -20,7 +20,7 @@
 #ifndef LASTFM_WS_KEYS_H
 #define LASTFM_WS_KEYS_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QString>
 
 

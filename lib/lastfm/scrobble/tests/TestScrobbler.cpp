@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/WsKeys>
 #include "../Scrobbler.cpp"
 #include "../Scrobble.cpp"
 #include "../ScrobbleCache.cpp"
@@ -55,7 +55,7 @@ public:
         Ws::ApiKey       = "4f416bb10aaf87d2293029f4f52fdd96";
         Ws::SharedSecret = "4734bf8d5475953f1c5c9a99b5caf827";
 
-        MutableTrack t;
+        lastfm::MutableTrack t;
         t.setArtist( "Testy McTesterson" );
         t.setTitle( "Fire in the Test Station" );
         tracks += t;

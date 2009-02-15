@@ -30,7 +30,7 @@
 
 #include "libLastFmTools/containerutils.h"
 
-#include "FingerprinterApplication.h"
+#include "App.h"
 #include "FingerprinterSettings.h"
 
 #include "tag.h"
@@ -38,46 +38,21 @@
 
 
 
-FingerprinterApplication::FingerprinterApplication( int& argc, char** argv )
-    : QApplication(argc,argv),
+App::App( int& argc, char** argv )
+    : unicorn::Application( argc, argv ),
       m_mainWindow(),
       m_progressBar( &m_mainWindow ),
       m_fingerprintScheduler( 1 /*number of threads*/)
 {
-    initTranslator();
-    
     m_chunkSize = 20;
-
-    // This is needed so that relative paths will work on Windows regardless
-    // of where the app is launched from.
-    QDir::setCurrent( applicationDirPath() );
     
-    m_loginDialog = 0;
-    
-    // run login() as soon as event loop starts
-    QTimer::singleShot( 0, this, SLOT(login()) );
-    
-    connect( &m_mainWindow, SIGNAL( logout() ),
-             this, SLOT( logout() ) );
-             
-    connect( &m_mainWindow, SIGNAL( wantsToClose( QCloseEvent* ) ),
-             this, SLOT( onCloseEvent( QCloseEvent* ) ) );
+    connect( &m_mainWindow, SIGNAL(logout()), SLOT(logout()) );
+    connect( &m_mainWindow, SIGNAL(wantsToClose( QCloseEvent* )), SLOT(onCloseEvent( QCloseEvent* )) );
 }
 
-FingerprinterApplication::~FingerprinterApplication ()
-{
-    //delete m_loginDialog;
-    qDebug() << "FingerprinterApplication destructor";
-}
 
-void FingerprinterApplication::exit()
-{
-    qDebug() << "Exiting Fingerprinter";
-    QApplication::exit( 0 );
-    return;
-}
-
-void FingerprinterApplication::onCloseEvent( QCloseEvent* event )
+void
+App::onCloseEvent( QCloseEvent* event )
 {
     if ( m_progressBar.isRunning() )
     {
@@ -94,7 +69,7 @@ void FingerprinterApplication::onCloseEvent( QCloseEvent* event )
     event->accept();
 }
 
-void FingerprinterApplication::logout()
+void App::logout()
 {
     qDebug() << "Logging out";
     FingerprinterSettings::instance().setRememberPassword( false );
@@ -104,7 +79,7 @@ void FingerprinterApplication::logout()
     login();
 }
 
-void FingerprinterApplication::login()
+void App::login()
 {
     qDebug() << "Opening LoginDialog";
     
@@ -128,7 +103,7 @@ void FingerprinterApplication::login()
     m_loginDialog->start();
 }
 
-void FingerprinterApplication::init()
+void App::init()
 {
     m_mainWindow.start();
 
@@ -168,7 +143,7 @@ void FingerprinterApplication::init()
     m_fingerprintScheduler.setPasswordMd5Lower( FingerprinterSettings::instance().currentPasswordLower() );
 }
 
-void FingerprinterApplication::initTranslator()
+void App::initTranslator()
 {
     QString langCode;
 
@@ -186,7 +161,7 @@ void FingerprinterApplication::initTranslator()
     setLanguage( langCode );
 }
 
-void FingerprinterApplication::setLanguage( QString langCode )
+void App::setLanguage( QString langCode )
 {
     m_lang = langCode;
 
@@ -198,7 +173,7 @@ void FingerprinterApplication::setLanguage( QString langCode )
     installTranslator( &m_translatorQt );
 }
 
-void FingerprinterApplication::getTracksFromDirs( QStringList& dirs, QStringList& output)
+void App::getTracksFromDirs( QStringList& dirs, QStringList& output)
 {
     foreach( QString dir, dirs )
     {
@@ -207,7 +182,7 @@ void FingerprinterApplication::getTracksFromDirs( QStringList& dirs, QStringList
     }
 }
 
-void FingerprinterApplication::getTracksFromDir( QString dir, QStringList& output )
+void App::getTracksFromDir( QString dir, QStringList& output )
 {
     QDir realDir( dir );
         
@@ -234,13 +209,13 @@ void FingerprinterApplication::getTracksFromDir( QString dir, QStringList& outpu
     }
 }
 
-bool FingerprinterApplication::checkAbort()
+bool App::checkAbort()
 {
     QApplication::processEvents();
     return m_abort;
 }
 
-bool FingerprinterApplication::trackInfoFromFile( QString filename, TrackInfo& track )
+bool App::trackInfoFromFile( QString filename, TrackInfo& track )
 {
 #ifdef Q_WS_MAC
     TagLib::FileRef f( filename.toUtf8().data() );
@@ -296,7 +271,7 @@ bool FingerprinterApplication::trackInfoFromFile( QString filename, TrackInfo& t
     return true;
 }
 
-void FingerprinterApplication::startFingerprinting( QStringList dirs )
+void App::startFingerprinting( QStringList dirs )
 {
     m_tracksToFingerprint.clear();
     m_progressBar.reset();
@@ -342,7 +317,7 @@ void FingerprinterApplication::startFingerprinting( QStringList dirs )
     sendTracksForFingerprinting();
 }
 
-void FingerprinterApplication::sendTracksForFingerprinting()
+void App::sendTracksForFingerprinting()
 {
     QList<TrackInfo> tracks;
     
@@ -369,7 +344,7 @@ void FingerprinterApplication::sendTracksForFingerprinting()
     }
 }
 
-void FingerprinterApplication::abortFingerprint()
+void App::abortFingerprint()
 {
     m_abort = true;
 
@@ -377,7 +352,7 @@ void FingerprinterApplication::abortFingerprint()
     m_fingerprintScheduler.stop();
 }
 
-void FingerprinterApplication::onFingerprintingStopped( bool finished )
+void App::onFingerprintingStopped( bool finished )
 {
     // This function will be called when each chunk finishes, so it doesn't
     // mean we're totally done. However, the refilling of the scheduler is
@@ -393,11 +368,11 @@ void FingerprinterApplication::onFingerprintingStopped( bool finished )
 
 }
 
-void FingerprinterApplication::onTrackFingerprinted()
+void App::onTrackFingerprinted()
 {
 }
 
-void FingerprinterApplication::onNetworkError( FingerprintScheduler::NetworkErrors error, QString msg )
+void App::onNetworkError( FingerprintScheduler::NetworkErrors error, QString msg )
 {
     QApplication::changeOverrideCursor( Qt::ArrowCursor );
 
@@ -437,12 +412,12 @@ void FingerprinterApplication::onNetworkError( FingerprintScheduler::NetworkErro
     }
 }
 
-void FingerprinterApplication::onSchedulerCantFingerprintTrack( TrackInfo& track, QString reason )
+void App::onSchedulerCantFingerprintTrack( TrackInfo& track, QString reason )
 {
     logTrack( track.path(), reason );
 }
 
-void FingerprinterApplication::logTrack( QString path, QString reason )
+void App::logTrack( QString path, QString reason )
 {
     qDebug() << QString( "BadTrack: \"%1\"               %2" ).arg( path ).arg( reason );
 }

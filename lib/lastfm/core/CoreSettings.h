@@ -20,19 +20,17 @@
 #ifndef CORE_SETTINGS_H
 #define CORE_SETTINGS_H
 
-#include "lib/lastfm/core/CoreLocale.h"
 #include <QSettings>
 
 
 /** Settings that are global to all Last.fm libraries */
-class CoreSettings : public QSettings
+struct CoreSettings : QSettings
 {
-public:
-    /** applicationName allows you to create arbituary settings for other 
+    /** applicationName allows you to create arbituary settings for other
       * Last.fm applications, but don't use it pls */
 	CoreSettings( const QString& applicationName = "" ) : QSettings( organizationName(), applicationName )
 	{}
-    
+
     static const char* organizationName()
     {
     #ifdef NDEBUG
@@ -41,7 +39,7 @@ public:
         return "Last.am";
     #endif
     }
-    
+
     static const char* organizationDomain()
     {
     #ifdef NDEBUG
@@ -50,12 +48,6 @@ public:
         return "last.am";
     #endif
     }
-
-	CoreLocale locale() const
-	{
-		QVariant const v = value( "Locale" );
-		return v.isValid() ? QLocale( QLocale::Language(v.toInt()) ) : CoreLocale::system();
-	}
 };
 
 #endif

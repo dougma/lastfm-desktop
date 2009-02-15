@@ -51,7 +51,7 @@
 
 
 App::App( int& argc, char** argv ) 
-   : Unicorn::Application( argc, argv )
+   : unicorn::Application( argc, argv )
    , machine( 0 )
    , radio( 0 )
    , scrobbler( 0 )
@@ -338,7 +338,7 @@ App::onUserGotInfo( WsReply* reply )
         }
     #endif
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
     }

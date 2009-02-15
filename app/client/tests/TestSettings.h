@@ -106,7 +106,7 @@ private slots:
         do { b = !b;
              reset();
              moose::MutableSettings().setLogOutOnExit( b );
-             QVERIFY( Unicorn::Settings().logOutOnExit() == b );
+             QVERIFY( unicorn::Settings().logOutOnExit() == b );
         } while (b);
     }
 };

@@ -16,34 +16,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
-
-#ifndef LASTFM_CORE_LOCALE_H
-#define LASTFM_CORE_LOCALE_H
-
-#include <lastfm/public.h>
-#include <QLocale>
-
-
-class LASTFM_CORE_DLLEXPORT CoreLocale
-{
-	QLocale::Language m_language;
-	
-public:
-	/** constructs a CoreLocale that returns true from isNull() */
-	CoreLocale( const QLocale& l ) : m_language( l.language() ) {}
-	CoreLocale( QLocale::Language l ) : m_language( l ) {}
-
-	/** @returns the equivalent ISO language code as used in HTTP headers */
-	QString iso639() const;
-	
-	/** the two letter langauge codes we use on the site */
-	QString code() const;
-	
-	QLocale qlocale() const { return QLocale( m_language ); }
-	
-	/** this is the system locale, we reimplement it because on OS X it is
-      * broken */
-	static CoreLocale system();
-};
-
-#endif
+ 
+ #define SCROBBLE_EXCLUSION_DIRS "ExclusionDirs"
+ 

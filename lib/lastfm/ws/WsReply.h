@@ -20,9 +20,8 @@
 #ifndef LASTFM_WS_REPLY_H
 #define LASTFM_WS_REPLY_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/CoreDomElement.h>
-#include <lastfm/ws/WsError.h>
+#include <lastfm/WsDomElement>
+#include <lastfm/WsError>
 #include <QDateTime>
 #include <QDomDocument>
 #include <QNetworkReply>
@@ -57,7 +56,7 @@ class LASTFM_WS_DLLEXPORT WsReply : public QObject
 
 public:
     /** the <lfm> element from the XML response, see http://last.fm/api */
-    CoreDomElement lfm() const { return CoreDomElement( m_lfm ); }
+    WsDomElement lfm() const { return WsDomElement( m_lfm ); }
 
     Ws::Error error() const { return m_error; }
     QNetworkReply::NetworkError networkError() const { return m_reply->error(); }

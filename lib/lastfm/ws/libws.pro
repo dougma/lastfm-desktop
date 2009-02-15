@@ -15,6 +15,6 @@ win32 {
 
 macx*:LIBS += -framework SystemConfiguration
 
-headers.files = WsAccessManager.h WsError.h WsKeys.h WsRequestBuilder.h WsReply.h
+headers.files = WsAccessManager.h WsError.h WsKeys.h WsRequestBuilder.h WsReply.h WsDomElement.h
 headers.path = $$INSTALL_DIR/include/lastfm/ws
 INSTALLS = target headers

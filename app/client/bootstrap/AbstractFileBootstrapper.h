@@ -20,7 +20,7 @@
 #ifndef ABSTRACT_FILE_BOOTSTRAPPER_H
 #define ABSTRACT_FILE_BOOTSTRAPPER_H
 
-#include "lib/lastfm/public.h"
+#include "lib/lastfm/global.h"
 #include "AbstractBootstrapper.h"
 #include <QDomDocument>
 #include <QDomElement>

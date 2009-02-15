@@ -20,7 +20,7 @@
 #ifndef LEGACY_TUNER_H
 #define LEGACY_TUNER_H
 
-#include "lib/lastfm/public.h"
+#include "lib/lastfm/global.h"
 #include "AbstractTrackSource.h"
 #include "RadioStation.h"
 

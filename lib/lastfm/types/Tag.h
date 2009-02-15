@@ -20,8 +20,7 @@
 #ifndef LASTFM_TAG_H
 #define LASTFM_TAG_H
 
-#include <lastfm/public.h>
-#include <lastfm/core/WeightedStringList.h>
+#include <lastfm/WeightedStringList>
 #include <QString>
 #include <QUrl>
 

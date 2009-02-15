@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_CORE_EXCEPTION_H
-#define LASTFM_CORE_EXCEPTION_H
+#ifndef CORE_EXCEPTION_H
+#define CORE_EXCEPTION_H
 
 #include <QDebug>
 
@@ -28,9 +28,9 @@ class CoreException
     QString s;
 
 protected:
-    CoreException( QString x ) : s( x )
+    CoreException( QString s ) : s( s )
     {}
-	
+
 	// objects that may be used polymorphically must have a virtual function!
 	virtual ~CoreException()
 	{}

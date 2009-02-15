@@ -20,7 +20,7 @@
 #ifndef TRACK_DASHBOARD_HEADER_H
 #define TRACK_DASHBOARD_HEADER_H
 
-#include "lib/lastfm/public.h"
+#include "lib/lastfm/global.h"
 #include <QWidget>
 #include <QMouseEvent>
 

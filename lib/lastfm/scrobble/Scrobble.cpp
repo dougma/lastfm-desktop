@@ -21,7 +21,7 @@
 #include "ScrobblePoint.h"
 #include <QFSFileEngine>
 #include "lib/lastfm/core/CoreSettings.h"
-#include "lib/lastfm/private.h"
+#include "private.h"
 
 
 static inline QString dirToString( const QDir& d )
@@ -85,7 +85,7 @@ Scrobble::isValid( Invalidity* v ) const
     {       
         QString const path = dirToString( QFileInfo(url().path()).dir() );
 
-        foreach (QString const forbidden_path, CoreSettings().value( LASTFM_SCROBBLE_SETTINGS_KEY_EXCLUSION_DIRS ).toStringList())
+        foreach (QString const forbidden_path, CoreSettings().value( SCROBBLE_EXCLUSION_DIRS ).toStringList())
         {
             QDir d( forbidden_path );
             if (!d.exists()) continue;

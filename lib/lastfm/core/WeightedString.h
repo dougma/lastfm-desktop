@@ -20,7 +20,7 @@
 #ifndef LASTFM_WEIGHTED_STRING_H
 #define LASTFM_WEIGHTED_STRING_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QString>
 
 

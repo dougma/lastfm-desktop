@@ -20,8 +20,7 @@
 #ifndef LASTFM_SCROBBLE_H
 #define LASTFM_SCROBBLE_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Track.h>
+#include <lastfm/Track>
 
 
 struct LASTFM_SCROBBLE_DLLEXPORT Scrobble : lastfm::Track

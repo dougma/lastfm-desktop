@@ -23,8 +23,10 @@ namespace Qt
 {
     template <class T> static inline QList<T> reverse( QList<T> list )
     {
-        for (int x = 0; x < list.size() / 2; ++x)
-            qSwap( list[x], list[list.size()-1-x] );
+        const int N = list.size();
+        const int n = N/2;
+        for (int x = 0; x < n; ++x)
+            list.swap( x, N-1-x );
         return list;
     }
 }

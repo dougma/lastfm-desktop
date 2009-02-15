@@ -20,7 +20,7 @@
 #ifndef LASTFM_SCROBBLER_H
 #define LASTFM_SCROBBLER_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QByteArray>
 #include <QList>
 #include <QString>

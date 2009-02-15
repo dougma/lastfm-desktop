@@ -17,10 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_REQUEST_PARAMETERS_H
-#define LASTFM_WS_REQUEST_PARAMETERS_H
+#ifndef WS_REQUEST_PARAMETERS_H
+#define WS_REQUEST_PARAMETERS_H
 
-#include <lastfm/public.h>
 #include <QString>
 #include <QList>
 #include <QPair>

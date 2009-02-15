@@ -20,12 +20,10 @@
 #ifndef LASTFM_TRACK_H
 #define LASTFM_TRACK_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Album.h>
-#include <lastfm/types/Artist.h>
-#include <lastfm/types/FingerprintId.h>
-#include <lastfm/types/Mbid.h>
-#include <lastfm/core/WeightedStringList.h>
+#include <lastfm/Album>
+#include <lastfm/FingerprintId>
+#include <lastfm/Mbid>
+#include <lastfm/WeightedStringList>
 #include <QDateTime>
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>
@@ -176,6 +174,11 @@ private:
 
 /** This class allows you to change Track objects, it is easy to use:
   * MutableTrack( some_track_object ).setTitle( "Arse" );
+  *
+  * We have a separate MutableTrack class because in our usage, tracks
+  * only get mutated once, and then after that, very rarely. This pattern
+  * encourages such usage, which is generally sensible. You can feel more
+  * comfortable that the data hasn't accidently changed behind your back.
   */
 class LASTFM_TYPES_DLLEXPORT MutableTrack : public Track
 {

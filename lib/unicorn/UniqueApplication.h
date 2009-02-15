@@ -20,7 +20,7 @@
 #ifndef LASTFM_UNIQUE_APPLICATION_H
 #define LASTFM_UNIQUE_APPLICATION_H
 
-#include <lastfm/public.h>
+#include <lastfm/global.h>
 #include <QObject>
 #include <QStringList>
 #ifdef Q_WS_MAC
@@ -38,6 +38,9 @@
   * Basically, make a unique app, try to forward the command line arguments
   * over, or test isAlreadyRunning() if forwarding fails or !isAlreadyRunning(),
   * continue, otherwise exit( 0 )
+  *
+  * I added this to core because it could be generally useful to Qt 
+  * applications. Even though it's a little heavy --mxcl
   */
 class LASTFM_CORE_DLLEXPORT UniqueApplication : public QObject
 {
@@ -61,7 +64,7 @@ public:
     bool forward( const class QStringList& );
 	/** this function adds a fake argv[0] */
     bool forward( const QString& arg ) { return forward( QStringList() << "fake_argv[0]" << arg ); }
-    
+
 signals:
     /** the first one is argv[0] ie. the application path */
     void arguments( const class QStringList& );

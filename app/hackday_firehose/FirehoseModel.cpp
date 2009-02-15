@@ -19,7 +19,8 @@
 
 #include "FirehoseModel.h"
 #include "app/moose.h"
-#include "lib/lastfm/core/CoreDomElement.h"
+#include "lib/lastfm/ws/WsDomElement.h"
+#include <QLocale>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTcpSocket>
@@ -91,10 +92,10 @@ FirehoseModel::onData()
     
     try
     {
-        CoreDomElement e( xml.documentElement() );
+        WsDomElement e( xml.documentElement() );
         connect( new FirehoseItem( e ), SIGNAL(finished( FirehoseItem* )), SLOT(onItemReady( FirehoseItem* )) );
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << e;
         qDebug() << data;
@@ -102,7 +103,7 @@ FirehoseModel::onData()
 }
 
 #include <QtNetwork/QHttp>
-FirehoseItem::FirehoseItem( const CoreDomElement& e )
+FirehoseItem::FirehoseItem( const WsDomElement& e )
             : m_user( e["user"]["name"].text() )
 {	
     m_track = e["track"]["artist"]["name"].text() + " - " + e["track"]["name"].text();
@@ -125,7 +126,7 @@ FirehoseItem::onAvatarDownloaded( int id )
     
     m_avatar.loadFromData( data );
     if (m_avatar.isNull())
-        m_avatar = QPixmap( ":/lastfm/no/user.png" );
+        m_avatar = QPixmap( ":/lastfm/no/avatar.png" );
     emit finished( this );
 }
 
@@ -171,7 +172,7 @@ FirehoseModel::data(const QModelIndex &index, int role) const
         case moose::SecondaryDisplayRole: return m_tracks[row];
         case moose::SmallDisplayRole:
         {
-            QString format = CoreLocale::system().qlocale().timeFormat( QLocale::ShortFormat );
+            QString format = QLocale().timeFormat( QLocale::ShortFormat );
             return m_timestamps[row].toString( format );
         }
     }

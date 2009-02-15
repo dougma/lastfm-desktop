@@ -20,8 +20,7 @@
 #ifndef LASTFM_XSPF_H
 #define LASTFM_XSPF_H
 
-#include <lastfm/public.h>
-#include <lastfm/types/Track.h>
+#include <lastfm/Track>
 #include <QList>
 
 

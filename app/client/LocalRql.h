@@ -20,7 +20,7 @@
 #ifndef LOCAL_RQL_H
 #define LOCAL_RQL_H
 
-#include "lib/lastfm/public.h"
+#include "lib/lastfm/global.h"
 #include <QObject>
 #include "app/clientplugins/ILocalRql.h"
 

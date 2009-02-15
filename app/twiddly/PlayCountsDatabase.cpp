@@ -24,9 +24,9 @@
 #include "common/qt/msleep.cpp"
 #include "common/c++/fileCreationTime.cpp"
 #include "lib/unicorn/UnicornSettings.h"
+#include "lib/unicorn/UniqueApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "lib/lastfm/core/mac/AppleScript.h"
-#include "lib/lastfm/core/UniqueApplication.h"
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>

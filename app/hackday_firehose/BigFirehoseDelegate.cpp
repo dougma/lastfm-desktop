@@ -19,7 +19,6 @@
 
 #include "BigFirehoseDelegate.h"
 #include "app/moose.h"
-#include "lib/lastfm/core/CoreLocale.h"
 #include <QPainter>
 
 #define AGING_MOOSE 0x646464

@@ -510,7 +510,7 @@ SideBarModel::sortTags( WeightedStringList tagsToSort, SideBar::SortOrder sortOr
 {
     if ( sortOrder == SideBar::MostWeightOrder )
     {
-        tagsToSort.weightedSort( Qt::DescendingOrder );
+        tagsToSort.sortByWeight( Qt::DescendingOrder );
     }
     else if ( sortOrder == SideBar::AscendingOrder )
     {

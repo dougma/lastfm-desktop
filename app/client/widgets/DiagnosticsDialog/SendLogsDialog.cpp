@@ -70,7 +70,7 @@ static QString systemInformationString()
 {
     QString s;
 
-    s += "Operating system: " + CoreSysInfo::platform() + "\n\n";
+    s += "Operating system: " + QString(CoreSysInfo::platform()) + "\n\n";
 
 #ifdef Q_WS_X11
     s += "CPU: \n";

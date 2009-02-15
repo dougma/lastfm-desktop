@@ -18,8 +18,6 @@
  ***************************************************************************/
 
 #include "UrlBuilder.h"
-#include "CoreLocale.h"
-#include "CoreSettings.h"
 #include <QRegExp>
 #include <QStringList>
 
@@ -29,7 +27,7 @@ lastfm::UrlBuilder::url() const
 {
     QUrl url;
     url.setScheme( "http" );
-    url.setHost( hostForLocale( CoreSettings().locale() ) );
+    url.setHost( host() );
     url.setEncodedPath( path );
     return url;
 }
@@ -49,32 +47,30 @@ lastfm::UrlBuilder::encode( QString s )
 
 
 QString //static
-lastfm::UrlBuilder::hostForLocale( const CoreLocale& locale )
+lastfm::UrlBuilder::host( const QLocale& locale )
 {
-	QString const code = locale.code();
-	
-    if (code == "en") return "www.last.fm"; //first as optimisation
-    if (code == "pt") return "www.lastfm.com.br";
-    if (code == "tr") return "www.lastfm.com.tr";
-    if (code == "cn") return "cn.last.fm";
-    if (code == "sv") return "www.lastfm.se";
-	
-    QStringList const simple_hosts = QStringList()
-		<< "fr" << "it" << "de" << "es" << "pl"
-		<< "ru" << "jp" << "se";
-	
-    if (simple_hosts.contains( code ))
-        return "www.lastfm." + code;
-	
-    // else default to english site
-    return "www.last.fm";
+    switch (locale.language())
+    {
+        case QLocale::Portuguese: return "www.lastfm.com.br";
+        case QLocale::Turkish:    return "www.lastfm.com.tr";                    
+        case QLocale::French:     return "www.lastfm.fr";
+        case QLocale::Italian:    return "www.lastfm.it";
+        case QLocale::German:     return "www.lastfm.de";
+        case QLocale::Spanish:    return "www.lastfm.es";
+        case QLocale::Polish:     return "www.lastfm.pl";
+        case QLocale::Russian:    return "www.lastfm.ru";
+        case QLocale::Japanese:   return "www.lastfm.jp";
+        case QLocale::Swedish:    return "www.lastfm.se";
+        case QLocale::Chinese:    return "cn.last.fm";
+        default:                  return "www.last.fm";
+    }
 }
 
 
 QUrl //static
 lastfm::UrlBuilder::localize( QUrl url)
 {
-	url.setHost( url.host().replace( QRegExp("^(www.)?last.fm"), hostForLocale( CoreSettings().locale() ) ) );
+	url.setHost( url.host().replace( QRegExp("^(www.)?last.fm"), host() ) );
 	return url;
 }
 

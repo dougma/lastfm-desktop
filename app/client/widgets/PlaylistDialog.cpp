@@ -165,7 +165,7 @@ static QList<PlaylistMetaData> meh( WsReply* r )
     
     try
 	{
-		foreach (CoreDomElement e, r->lfm()["playlists"].children( "playlist" ))
+		foreach (WsDomElement e, r->lfm()["playlists"].children( "playlist" ))
 		{
             try
             {
@@ -178,13 +178,13 @@ static QList<PlaylistMetaData> meh( WsReply* r )
                 p.description = e["description"].text();
                 playlists += p;
             }
-            catch (CoreDomElement::Exception& e)
+            catch (WsDomElement::Exception& e)
             {
                 qWarning() << e;
             }   
 		}
 	}
-	catch (CoreDomElement::Exception& e)
+	catch (WsDomElement::Exception& e)
 	{
 		qWarning() << e;
 	}
@@ -278,14 +278,14 @@ PlaylistDialog::onPlaylistCreated( WsReply* reply )
     
     try
     {
-        CoreDomElement e = reply->lfm()["playlists"]["playlist"];
+        WsDomElement e = reply->lfm()["playlists"]["playlist"];
         m_model->ids[i] = e["id"].text().toInt();
         m_model->urls[i] = e["url"].text();
         m_model->sizes[i] = 0;
         QModelIndex index = m_model->index( i );
         emit m_model->dataChanged( index, index );
     }
-    catch (CoreDomElement& e)
+    catch (WsDomElement& e)
     {
         m_model->descriptions[i] = tr("Error creating playlist");
         qWarning() << e;

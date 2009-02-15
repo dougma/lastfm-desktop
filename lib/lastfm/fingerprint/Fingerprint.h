@@ -20,10 +20,9 @@
 #ifndef LASTFM_FINGERPRINT_H
 #define LASTFM_FINGERPRINT_H
 
-#include <lastfm/public.h>
-#include <lastfm/fingerprint/FpError.h>
-#include <lastfm/types/FingerprintId.h>
-#include <lastfm/types/Track.h>
+#include "lib/lastfm/fingerprint/FpError.h"
+#include <lastfm/FingerprintId>
+#include <lastfm/Track>
 namespace fingerprint { class FingerprintExtractor; }
 class QNetworkReply;
 class QNetworkAccessManager;

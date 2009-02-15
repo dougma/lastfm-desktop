@@ -251,7 +251,7 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
 
 	try
     {
-		CoreDomElement e = reply->lfm()["artist"];
+		WsDomElement e = reply->lfm()["artist"];
 		QString name = e["name"].text();
 		QString url = e["url"].text();
 		uint plays = e["stats"]["playcount"].text().toUInt();
@@ -279,10 +279,10 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
                  << "<button onclick=\"toggleMoreInfo();\">More..</button>";
         }
 
-        foreach (CoreDomElement artist, e["similar"].children( "artist" ))
+        foreach (WsDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
     }
-	catch (CoreDomElement::Exception& e)
+	catch (WsDomElement::Exception& e)
 	{
 		qWarning() << e;
 

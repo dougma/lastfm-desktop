@@ -8,6 +8,6 @@ include( _files.qmake )
 
 DEFINES += _TYPES_DLLEXPORT
 
-headers.files = $$HEADERS
+headers.files = Track.h Mbid.h Artist.h Album.h FingerprintId.h Playlist.h Tag.h User.h Xspf.h
 headers.path = $$INSTALL_DIR/include/lastfm/types
 INSTALLS = target headers

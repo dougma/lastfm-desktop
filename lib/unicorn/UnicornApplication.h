@@ -26,7 +26,7 @@
 class WsReply;
 
 
-namespace Unicorn
+namespace unicorn
 {
     class UNICORN_DLLEXPORT Application : public QApplication
     {

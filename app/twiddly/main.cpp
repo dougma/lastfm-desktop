@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright  Ltd.                                           *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -21,8 +21,8 @@
 #include "app/twiddly.h"
 #include "app/client/Settings.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
+#include "lib/unicorn/UniqueApplication.h"
 #include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/UniqueApplication.h"
 #include "plugins/iTunes/ITunesExceptions.h"
 #include <iostream>
 #include <QtCore>
@@ -63,7 +63,7 @@ main( int argc, char** argv )
 	argv2[0] = qstrdup( argv[0] );
 	argv2[1] = qstrdup( argv[1] );
 
-    UnicornCoreApplication app( argc, argv );
+    unicorn::CoreApplication app( argc, argv );
     if (b) uapp.init2( &app );
     
     try

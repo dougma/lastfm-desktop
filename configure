@@ -114,8 +114,8 @@ fi
 
 
 header 'Generating Build System'
-middle "Running qpp..."
 
+middle "Running qpp..."
 for x in `admin/findsrc pro lib` `admin/findsrc pro app`
 do
     cwd=`pwd`
@@ -123,6 +123,14 @@ do
     $cwd/admin/qpp `basename $x` || die "Ruby not installed?"
     popd &> /dev/null
 done
+
+middle "Running penis..."
+[ -d _include ] && rm -r _include
+for x in `admin/findsrc pro lib/lastfm` 
+do
+    admin/penis $x
+done
+echo '#include "../../lib/lastfm/global.h"' > _include/lastfm/global.h
 
 
 middle "Running qmake..."
@@ -160,7 +168,8 @@ else
             BUILD_CMD='open Last.fm.xcodeproj'
             rm _files.qmake _version.h
         else
-            if [[ $EXTRA_QMAKE_FLAGS == '' ]]; then
+            # prevent qmake interpreting "" as "."
+            if [ -e "$EXTRA_QMAKE_FLAGS" ]; then
                 EXTRA_QMAKE_FLAGS='NOTHING=""'
             fi
         

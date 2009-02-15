@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_PUBLIC_H
-#define LASTFM_PUBLIC_H
+#ifndef LASTFM_GLOBAL_H
+#define LASTFM_GLOBAL_H
 
 /** Exports symbols when compiled as part of the lib
   * Imports when included from some other target */
@@ -130,4 +130,4 @@ using lastfm::Playlist;
 //convenience
 class WsReply;
 
-#endif //LASTFM_PUBLIC_H
+#endif //LASTFM_GLOBAL_H

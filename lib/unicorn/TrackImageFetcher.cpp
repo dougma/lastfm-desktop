@@ -115,7 +115,7 @@ TrackImageFetcher::downloadImage( WsReply* reply, const QString& root_node )
             connect( get, SIGNAL(finished()), SLOT(onArtistImageDownloaded()) );
             return true;
         }
-        catch (CoreDomElement::Exception& e)
+        catch (WsDomElement::Exception& e)
         {}
     }
     

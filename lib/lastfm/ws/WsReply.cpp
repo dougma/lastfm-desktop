@@ -127,7 +127,7 @@ WsReply::onFinished()
     {
         emit finished( this );
     }
-    catch (CoreDomElement::Exception& e)
+    catch (WsDomElement::Exception& e)
     {
         qWarning() << "Naughty programmer! Unhandled exception:" << e;
     }

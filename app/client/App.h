@@ -27,7 +27,7 @@
 #include "the/definitions.h"
 
 
-class App : public Unicorn::Application
+class App : public unicorn::Application
 {
     Q_OBJECT
 

@@ -14,7 +14,6 @@ macx:LIBS += -framework Carbon
 
 win32:LIBS += user32.lib shell32.lib
 
-headers.files = $$HEADERS
-headers.files -= CoreSettings.h
+headers.files = CoreDir.h UrlBuilder.h CoreException.h CoreSysInfo.h WeightedString.h CoreProcess.h WeightedStringList.h
 headers.path = $$INSTALL_DIR/include/lastfm/core
 INSTALLS = target headers

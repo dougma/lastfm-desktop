@@ -59,7 +59,7 @@ namespace moose
 
     struct MutableSettings : Settings
     {
-        void setLogOutOnExit( bool b ) { Unicorn::UserSettings().setValue( "LogOutOnExit", b ); }
+        void setLogOutOnExit( bool b ) { unicorn::UserSettings().setValue( "LogOutOnExit", b ); }
         void setScrobblePoint( int i ) { UserSettings().setValue( "ScrobblePoint", qBound( 0, i, 100 ) ); }
         void setIPodScrobblingEnabled( bool b ) { UserSettings().setValue( "iPodScrobblingEnabled", b ); }
         void setAlwaysConfirmIPodScrobbles( bool b ) { UserSettings().setValue( "AlwaysConfirmIPodScrobbles", b ); }

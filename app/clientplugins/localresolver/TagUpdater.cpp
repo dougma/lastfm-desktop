@@ -124,7 +124,7 @@ TagUpdater::onWsFinished(WsReply* r)
             // no tags with weight lower than TAGUPDATER_LOWEST_ARTIST_TAG_WEIGHT
             // and no more than TAGUPDATER_ARTIST_TAG_LIMIT number of tags
             WeightedStringList wsl(Tag::list(r));
-            wsl.weightedSort(Qt::DescendingOrder);
+            wsl.sortByWeight(Qt::DescendingOrder);
             WeightedStringList::iterator cutoff = wsl.begin();
             while ( cutoff < wsl.end() && 
                 (cutoff - wsl.begin()) < TAGUPDATER_ARTIST_TAG_LIMIT  &&
