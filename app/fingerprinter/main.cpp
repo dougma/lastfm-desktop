@@ -18,10 +18,12 @@
  ***************************************************************************/
 
 #include "App.h"
+#include "_version.h"
 
 
 int main( int argc, char** argv )
 {
     QCoreApplication::setApplicationName( "Batch Fingerprinter" );
+    QCoreApplication::setApplicationVersion( VERSION );
     return App( argc, argv ).exec();
 }
