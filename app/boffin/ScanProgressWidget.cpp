@@ -131,7 +131,15 @@ ScanProgressWidget::timerEvent( QTimerEvent* )
         int steps = images[i]->steps;
         
         images[i]->opacity = float(steps > 100 ? 200 - steps : steps) / 100.0f;        
+
+#ifdef Q_WS_WIN
+        // 0.5 pixel movements chug on windows
+        images[i]->x += 1;
+#else
+        // 0.5 pixel movements look great on mac
         images[i]->x += 0.5;
+#endif
+
         images[i]->steps++;
         
         if (steps == 200) remove.prepend( i );

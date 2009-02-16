@@ -30,7 +30,13 @@ TagCloudView::TagCloudView( QWidget* parent )
              : QAbstractItemView( parent )
 {
     QFont f = font();
+
+#ifdef Q_WS_WIN
+    f.setPointSize( 10 );
+#else
     f.setPointSize( 14 );
+#endif
+
     setFont( f );
     viewport()->setMouseTracking( true );
     

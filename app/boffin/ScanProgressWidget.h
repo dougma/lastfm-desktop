@@ -57,7 +57,12 @@ private slots:
 };
 
  
-class ScanProgressWidget : public QGLWidget
+class ScanProgressWidget :
+#ifdef Q_WS_WIN
+    public QWidget
+#else
+    public QGLWidget
+#endif
 {
     Q_OBJECT
 
