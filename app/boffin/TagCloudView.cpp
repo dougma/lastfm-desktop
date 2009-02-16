@@ -49,10 +49,12 @@ TagCloudView::~TagCloudView()
 
 
 void 
-TagCloudView::setSelection( const QRect& r, QItemSelectionModel::SelectionFlags f )
+TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFlags f )
 {
     if (state() == DragSelectingState)
         return;
+
+    QRect r = rect.translated( 0, verticalScrollBar()->value());
     foreach( QModelIndex i, m_rectIndex.keys() )
     {
         if( m_rectIndex[ i ].intersects( r ))
@@ -80,8 +82,7 @@ TagCloudView::paintEvent( QPaintEvent* e )
     QPainter p( viewport() );
     p.setClipRect( e->rect());
     QStyleOptionViewItem opt = viewOptions();
-    int rowHeight = 0;
-
+    
     QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
     while( i != m_rectIndex.constEnd() )
     {
