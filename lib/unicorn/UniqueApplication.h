@@ -17,10 +17,10 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_UNIQUE_APPLICATION_H
-#define LASTFM_UNIQUE_APPLICATION_H
+#ifndef UNIQUE_APPLICATION_H
+#define UNIQUE_APPLICATION_H
 
-#include "../DllExportMacro.h"
+#include "lib/DllExportMacro.h"
 #include <QObject>
 #include <QStringList>
 #ifdef Q_WS_MAC

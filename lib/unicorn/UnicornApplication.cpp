@@ -27,6 +27,7 @@
 #include "lib/lastfm/ws/WsKeys.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include <QDebug>
+#include <QLocale>
 #include <QTranslator>
 
 
