@@ -17,6 +17,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include <QDebug> //first or function stamping doesn't happen
 #include "TagifierRequest.h"
 #include "LocalCollection.h"
 #include "AutoTransaction.h"
@@ -92,8 +93,6 @@ Batcher::doBatch()
 
 void Batcher::process(int fileId, QString tag, float weight)
 {
-    qDebug() << tag;
-    
     m_fileIds << fileId;
     m_tags << tag;
     m_weights << weight;
@@ -158,7 +157,7 @@ TagifierRequest::onFinished()
         handleResponse();
     }
 
-    delete m_reply;
+    m_reply->deleteLater();
     m_reply = 0;
     m_body.clear();
     m_requestedFileIds.clear();

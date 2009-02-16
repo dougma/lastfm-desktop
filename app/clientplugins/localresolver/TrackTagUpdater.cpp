@@ -95,7 +95,7 @@ TrackTagUpdater::doUpdateTags()
                 return;     // onFinished will be signalled. bail now.
             }
 
-            delete req;
+            req->deleteLater();
         } 
         catch(QueryError& e) {
             qWarning() << "TrackTagUpdater::doUpdateTags: " + e.text();
@@ -113,8 +113,8 @@ void
 TrackTagUpdater::onFinished(int requestIdCount, int responseIdCount, int responseTagCount)
 {
     m_outstandingRequest = false;
-    delete sender();
     int timeTaken = secondsSinceLastRequest();
     emit tagsUpdated(requestIdCount, responseIdCount, responseTagCount, timeTaken);
     doUpdateTags();
+    sender()->deleteLater();
 }

@@ -23,7 +23,7 @@
 #include <QUrl>
 #include <QByteArray>
 #include <QVariantList>
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/WsAccessManager>
 
 /* @brief Queries the LocalCollection db for all tracks needing tags, 
  * then makes the web service request and handles the response.
