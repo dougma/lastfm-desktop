@@ -16,53 +16,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#ifndef APP_H
-#define APP_H
+
+#ifndef SCROB_SOCKET_H
+#define SCROB_SOCKET_H
 
 #include <lastfm/global.h>
-#include "lib/unicorn/UnicornApplication.h"
+#include <lastfm/Track>
+#include <QTcpSocket>
 
-
-class App : public unicorn::Application
+/** @author Christian Muehlhaeuser <chris@last.fm>
+  * @contributor Erik Jaelevik <erik@last.fm>
+  * @rewrite Max Howell <max@last.fm>
+  */
+class ScrobSocket : public QTcpSocket
 {
     Q_OBJECT
-    
+
 public:
-    App( int& argc, char* argv[] );
-    ~App();
+    ScrobSocket( QObject* parent );
 
-    void init( class MainWindow* ) throw( int /*exitcode*/ );
-
-    void openXspf( QString filename );
-    void play( QStringList tags );
-    
 public slots:
-    void play();
-    
-private slots:
-    void onOutputDeviceActionTriggered( QAction* );
-    void onScanningFinished();
-    void onTrackSpooled( const lastfm::Track& );
-    void onPlayActionToggled( bool );
-    void onRadioStopped();
-    
-private:
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
-    class ILocalRqlPlugin* m_localRqlPlugin;
-    class LocalRql* m_localRql;
-    class ITrackResolverPlugin* m_trackResolver;
+    void start( const lastfm::Track& );
+    void pause();
+    void resume();
+    void stop();
 
-    class Radio* m_radio;
-    class Resolver* m_resolver;
-    
-    class MainWindow* m_mainwindow;
-    
-    class TagCloudView* m_cloud;
-    
-    class ScrobSocket* m_scrobsocket;
+private slots:
+    void transmit( const QString& data );
+    void onError( QAbstractSocket::SocketError );
+
+private:    
+    Track m_track;
 };
 
-#endif //APP_H
+#endif

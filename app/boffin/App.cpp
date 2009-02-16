@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "PickDirsDialog.h"
 #include "ScanProgressWidget.h"
+#include "ScrobSocket.h"
 #include "app/clientplugins/localresolver/LocalContentScannerThread.h"
 #include "app/clientplugins/localresolver/LocalContentScanner.h"
 #include "app/clientplugins/localresolver/LocalContentConfig.h"
@@ -53,6 +54,7 @@ App::App( int& argc, char** argv )
    , m_resolver( 0 )
    , m_mainwindow( 0 )
    , m_cloud( 0 )
+   , m_scrobsocket( 0 )
 {}
 
 
@@ -75,9 +77,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     window->ui.play->setEnabled( false );
     window->ui.pause->setEnabled( false );
     window->ui.skip->setEnabled( false );
-    
-    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
-    
+        
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
     Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
@@ -100,10 +100,15 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     
 	m_radio = new Radio( audioOutput );
-	
-	
     connect( m_radio, SIGNAL(trackSpooled( lastfm::Track )), SLOT(onTrackSpooled( lastfm::Track )) );
     connect( m_radio, SIGNAL(stopped()), SLOT(onRadioStopped()) );
+
+    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
+    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
+
+    m_scrobsocket = new ScrobSocket( this );
+    connect( m_radio, SIGNAL(trackStarted( lastfm::Track )), m_scrobsocket, SLOT(start( lastfm::Track )) );
+    connect( m_radio, SIGNAL(stopped()), m_scrobsocket, SLOT(stop()) );
 
 /// content scanner
     try
@@ -190,7 +195,7 @@ App::onScanningFinished()
     QTime time;
     time.start();
     
-    qDebug() << "Hi!";
+    qDebug() << "BEGIN tag cloud generation";
     
     disconnect( sender(), 0, this, 0 ); //only once pls
     
@@ -201,10 +206,10 @@ App::onScanningFinished()
     
     m_cloud->setFrameStyle( QFrame::NoFrame );
 
-    qDebug() << "Bye!" << time.elapsed() << "ms";
+    qDebug() << "END:" << time.elapsed() << "ms";
     
     m_mainwindow->ui.play->setEnabled( true );
-    m_mainwindow->ui.pause->setEnabled( true );
+//    m_mainwindow->ui.pause->setEnabled( true );
     m_mainwindow->ui.skip->setEnabled( true );
 }
 
@@ -212,8 +217,10 @@ App::onScanningFinished()
 void
 App::play()
 {
-    qDebug() << "HI";
-    if (m_cloud) play( m_cloud->currentTags() );
+    if (m_cloud) { 
+        play( m_cloud->currentTags() );
+        m_cloud->setEnabled( false ); //prevent interaction until stop pushed
+    }
 }
 
 
@@ -262,6 +269,7 @@ void
 App::onRadioStopped()
 {
     m_mainwindow->setWindowTitle( Track() );
+    m_cloud->setEnabled( true );
 }
 
 
