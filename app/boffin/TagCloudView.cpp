@@ -132,11 +132,11 @@ TagCloudView::updateGeometries()
             opt.state |= QStyle::State_Selected;
 
         opt.rect.setSize( itemDelegate()->sizeHint( opt, index ));
-        opt.rect.translate( 0, ( rowHeight - (opt.rect.height() * 0.9)));
+        opt.rect.translate( 0, ( rowHeight - opt.rect.height()));
 
         m_rectIndex.insert( index, opt.rect );
         
-        opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - (opt.rect.height() * 0.9)) );
+        opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - opt.rect.height()) );
         
         if( opt.rect.right() + k_RightMargin > viewport()->rect().right())
         {
