@@ -85,7 +85,7 @@ TagCloudModel::fetchTags()
 {
     QSqlQuery query( "select name, tag, sum(weight) from tracktags join tags "
                      "where tracktags.tag = tags.id group by tags.id order by sum(weight) desc "
-                     "limit 100"
+                     "limit 60"
                         , m_db );
     m_tagHash.clear();
     m_maxWeight = 0;

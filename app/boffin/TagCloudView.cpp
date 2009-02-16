@@ -84,7 +84,7 @@ TagCloudView::paintEvent( QPaintEvent* e )
     QStyleOptionViewItem opt = viewOptions();
     
     QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
-    while( i != m_rectIndex.constEnd() )
+    for( ; i != m_rectIndex.constEnd(); i++ )
     {
         const QModelIndex& index = i.key();
         const QRect& rect = i.value();
@@ -97,8 +97,6 @@ TagCloudView::paintEvent( QPaintEvent* e )
             opt.state |= QStyle::State_Selected;
 
         itemDelegate()->paint( &p, opt, index );
-
-        i++;
     }
 }
 
@@ -108,7 +106,7 @@ TagCloudView::updateGeometries()
 {
     int rowHeight = 0;
     QStyleOptionViewItem opt = viewOptions();
-    for( int i = 0; i < model()->rowCount(); i++ )
+    for( int i = 0; i < model()->rowCount(); ++i )
     {
         QModelIndex index = model()->index( i, 0 );
 
@@ -118,15 +116,14 @@ TagCloudView::updateGeometries()
             rect.setSize( itemDelegate()->sizeHint( opt, index ));
             int count = i;
             int x = rect.right();
-            while( rect.right() < (viewport()->rect().right() - k_RightMargin) && count < model()->rowCount())
+            while( x < viewport()->rect().right() && count < model()->rowCount() - 1)
             {
                 const QSize sizeHint = itemDelegate()->sizeHint( opt, model()->index( count, 0 )); 
-                x += sizeHint.width() + k_RightMargin;
                 rowHeight = qMax( rowHeight, sizeHint.height());
+                x += itemDelegate()->sizeHint( opt, model()->index( count + 1, 0 )).width() + k_RightMargin;
                 count++;
             }
         }
-
 
         opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
 
@@ -140,9 +137,9 @@ TagCloudView::updateGeometries()
         
         opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - opt.rect.height()) );
         
-        if( opt.rect.right() + k_RightMargin > viewport()->rect().right())
+        if( i < model()->rowCount() -1 &&  opt.rect.right() + itemDelegate()->sizeHint( opt, model()->index( i + 1, 0 )).width() > viewport()->rect().right() + k_RightMargin )
         {
-            opt.rect.moveLeft( rect().left());
+            opt.rect.moveLeft( viewport()->rect().left());
             opt.rect.moveTop( opt.rect.top() + rowHeight ); 
             rowHeight = 0;
         }

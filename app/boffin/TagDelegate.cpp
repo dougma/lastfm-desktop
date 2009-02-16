@@ -22,8 +22,8 @@
 #include <QPainter>
 #include <math.h>
 
-static const float k_exponentFactor = 0.4;
-static const float k_factor = 9;
+static const float k_exponentFactor = 0.6;
+static const float k_factor = 4;
 static const int k_margin = 4;
 
 TagDelegate::TagDelegate( QObject* parent ) 
@@ -31,6 +31,7 @@ TagDelegate::TagDelegate( QObject* parent )
 {
 
 }
+
 
 void 
 TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
@@ -65,7 +66,6 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
 }
 
 
-#include <QDebug>
 QSize 
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
