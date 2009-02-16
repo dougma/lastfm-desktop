@@ -281,6 +281,7 @@ App::onRadioStopped()
 {
     m_mainwindow->setWindowTitle( Track() );
     m_cloud->setEnabled( true );
+    m_mainwindow->ui.play->setChecked( false );
 }
 
 
