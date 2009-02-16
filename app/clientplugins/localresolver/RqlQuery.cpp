@@ -72,7 +72,7 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
                     mmi->title().toUtf8(), // result.m_title.toUtf8(),
                     mmi->album().toUtf8(), // result.m_album.toUtf8(),
                     mmi->artist().toUtf8(), // result.m_artist.toUtf8(),
-                    QUrl::fromLocalFile(filename).toEncoded(),
+                    QUrl::fromLocalFile(filename).toString().toUtf8(), 
                     mmi->duration());  //result.m_duration);
                 return;
             }
