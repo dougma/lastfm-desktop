@@ -38,7 +38,8 @@ namespace Ws
     LASTFM_WS_DLLEXPORT extern const char* ApiKey;
 
 	/** optional, if you don't assign this, we create one for you, this is so
-	  * we can create pretty logs with your app's usage information */
+	  * we can create pretty logs with your app's usage information.
+	  * You should set QCoreApplication::version() */
 	LASTFM_WS_DLLEXPORT extern const char* UserAgent;
 
     /** You will need to assign this before using any webservices */

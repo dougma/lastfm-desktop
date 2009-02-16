@@ -40,7 +40,7 @@ namespace lastfm
         {}
 
         /** will be QUrl() unless you got this back from a getInfo or something call */
-        QUrl imageUrl( lastfm::ImageSize size = lastfm::Large ) const { return m_images.value( size ); }
+        QUrl imageUrl( ImageSize size = Large ) const { return m_images.value( size ); }
 
         bool isNull() const { return m_name.isEmpty(); }
         

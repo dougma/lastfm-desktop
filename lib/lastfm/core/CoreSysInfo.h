@@ -61,8 +61,10 @@ namespace CoreSysInfo
 
              default:                      return "Unknown";
          }
+         #elif defined Q_WS_X11
+             return "Unix X11";
          #else
-         return "Unix";
+             return "Unknown";
          #endif
      }
 };

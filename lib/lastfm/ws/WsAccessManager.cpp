@@ -20,6 +20,7 @@
 #include "WsAccessManager.h"
 #include "WsConnectionMonitor.h"
 #include "WsKeys.h"
+#include "../core/CoreSysInfo.h"
 #include <QCoreApplication>
 #include <QNetworkRequest>
 #ifdef WIN32
@@ -80,8 +81,13 @@ WsAccessManager::WsAccessManager( QObject* parent )
             #endif
 {
     // can't be done in above init, as applicationName() won't be set
-	if (!Ws::UserAgent)
-		Ws::UserAgent = qstrdup(QCoreApplication::applicationName().toAscii()); //has to be latin1 I believe
+	if (!Ws::UserAgent) 
+	{
+        QByteArray name = QCoreApplication::applicationName().toUtf8();
+        QByteArray version = QCoreApplication::applicationVersion().toUtf8();
+        if (version.size()) version.prepend( ' ' );
+		Ws::UserAgent = qstrdup( name + version + " (" + CoreSysInfo::platform() + ")" );
+	}
 }
 
 
