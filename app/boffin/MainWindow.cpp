@@ -41,7 +41,7 @@ MainWindow::MainWindow()
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
 
     ui.rescan = menuBar()->addMenu( tr("Tools") )->addAction( tr("&Scan Music Again") );
- 
+
     setUnifiedTitleAndToolBarOnMac( true );
     QToolBar* toolbar;
     addToolBar( toolbar = new QToolBar );
@@ -50,7 +50,7 @@ MainWindow::MainWindow()
     ui.skip = toolbar->addAction( tr("Skip") );
     ui.play->setCheckable( true );
 
-    toolbar->setIconSize( QSize( 49, 49 ) );
+    toolbar->setIconSize( QSize( 41, 41 ) );
 
 //    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 
