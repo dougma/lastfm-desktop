@@ -20,6 +20,7 @@
 #include <QWidget>
 #include "lib/lastfm/ws/WsReply.h"
 #include "lib/lastfm/types/Track.h"
+#include <QGLWidget>
 #include <QHash>
 /** @author Max Howell <max@last.fm> */
 
@@ -56,7 +57,7 @@ private slots:
 };
 
  
-class ScanProgressWidget : public QWidget
+class ScanProgressWidget : public QGLWidget
 {
     Q_OBJECT
 

@@ -1,5 +1,5 @@
 CONFIG += core types unicorn resolver radio sqlite3 taglib
-QT = gui xml sql
+QT += opengl sql
 VERSION = 0.0.1
 
 include( $$ROOT_DIR/admin/include.qmake )

@@ -76,31 +76,28 @@ ScanProgressWidget::onFinished()
 void
 ScanProgressWidget::paintEvent( QPaintEvent* e )
 {
+    QPainter p( this );    
+    int y = height() - 6;
+    QString text;
+
+    if (m_artist_count != 0 && m_track_count != 0)
     {
-        QPainter p( this );
-        int y = height() - 6;
-        QString text;
+        text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
+        if (m_done) text.prepend( tr("Preparation complete. ") );
+    }
+    else
+        text = tr("Starting up...");
 
-        if (m_artist_count != 0 && m_track_count != 0)
-        {
-            text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
-            if (m_done) text.prepend( tr("Preparation complete. ") );
-        }
-        else
-            text = tr("Starting up...");
-
-        p.drawText( 6, height() - 6, text );
-        p.setPen( Qt::lightGray );
-        foreach (Track track, tracks)
-        {
-            y -= 18;
-            p.drawText( 6, y, track.url().path() );
-        }
+    p.drawText( 6, height() - 6, text );
+    p.setPen( Qt::lightGray );
+    foreach (Track track, tracks)
+    {
+        y -= 18;
+        p.drawText( 6, y, track.url().path() );
     }
 
     for (int i = 0; i < images.count(); ++i)
     {
-        QPainter p( this );
         p.setRenderHint( QPainter::Antialiasing );
         p.setRenderHint( QPainter::SmoothPixmapTransform );
 
@@ -114,7 +111,9 @@ ScanProgressWidget::paintEvent( QPaintEvent* e )
         QRectF rect( pt.x(), y + (images[i]->pixmap.height() * 0.75) + 4, images[i]->pixmap.width(), height() );
         QString text = images[i]->artist;
         text = p.fontMetrics().elidedText( text, Qt::ElideRight, rect.width() );
-        text += "\n" + QString( "%L1 tracks" ).arg( count( images[i]->artist ) );
+
+        int const n = count( images[i]->artist );
+        text += "\n" + (n == 1 ? tr("1 track") : tr( "%L1 tracks" ).arg( n ));
 
         p.setPen( Qt::black );
         p.drawText( rect, Qt::AlignTop | Qt::AlignHCenter, text );
