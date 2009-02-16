@@ -18,13 +18,13 @@
  ***************************************************************************/
  
 #include "TagCloudView.h"
-#include <QPainter>
+#include <QDebug>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QScrollBar>
 
 static const int k_RightMargin = 10;
 
-#include <QDebug>
 
 TagCloudView::TagCloudView( QWidget* parent ) 
              : QAbstractItemView( parent )
@@ -146,6 +146,7 @@ TagCloudView::updateGeometries()
     }
 
     verticalScrollBar()->setRange( 0, opt.rect.bottom() -viewport()->rect().height() );
+    verticalScrollBar()->setPageStep( viewport()->height() );
     
     QAbstractItemView::updateGeometries();
 }
