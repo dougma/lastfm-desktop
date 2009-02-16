@@ -144,6 +144,7 @@ LocalCollection::initDatabase()
                     "tag                INTEGER NOT NULL,"      // tags foreign key
                     "weight             FLOAT NOT NULL);" );    // 0-1
         QUERY( "CREATE INDEX tracktags_file_idx ON tracktags ( file ); ");
+        QUERY( "CREATE INDEX tracktags_tag_idx ON tracktags ( tag ); ");
 
         QUERY( "CREATE TABLE directories ("
                     "id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
