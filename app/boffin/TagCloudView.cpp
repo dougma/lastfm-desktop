@@ -74,11 +74,38 @@ TagCloudView::currentTags() const
 
 
 void 
-TagCloudView::paintEvent( QPaintEvent* )
+TagCloudView::paintEvent( QPaintEvent* e )
 {    
     QPainter p( viewport() );
+    p.setClipRect( e->rect());
     QStyleOptionViewItem opt = viewOptions();
     int rowHeight = 0;
+
+    QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
+    while( i != m_rectIndex.constEnd() )
+    {
+        const QModelIndex& index = i.key();
+        const QRect& rect = i.value();
+
+        opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
+
+        opt.rect = rect;
+        
+        if( selectionModel()->isSelected( index ) )
+            opt.state |= QStyle::State_Selected;
+
+        itemDelegate()->paint( &p, opt, index );
+
+        i++;
+    }
+}
+
+
+void 
+TagCloudView::updateGeometries()
+{
+    int rowHeight = 0;
+    QStyleOptionViewItem opt = viewOptions();
     for( int i = 0; i < model()->rowCount(); i++ )
     {
         QModelIndex index = model()->index( i, 0 );
@@ -101,30 +128,24 @@ TagCloudView::paintEvent( QPaintEvent* )
 
         opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
 
-        opt.rect.setSize( itemDelegate()->sizeHint( opt, index ));
-        opt.rect.translate( 0, ( rowHeight - (opt.rect.height() * 0.9)));
-
         if( selectionModel()->isSelected( index ) )
             opt.state |= QStyle::State_Selected;
 
+        opt.rect.setSize( itemDelegate()->sizeHint( opt, index ));
+        opt.rect.translate( 0, ( rowHeight - (opt.rect.height() * 0.9)));
 
         m_rectIndex.insert( index, opt.rect );
-        itemDelegate()->paint( &p, opt, index );
+        
         opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - (opt.rect.height() * 0.9)) );
         
-        if( opt.rect.right() + k_RightMargin > rect().right())
+        if( opt.rect.right() + k_RightMargin > viewport()->rect().right())
         {
             opt.rect.moveLeft( rect().left());
             opt.rect.moveTop( opt.rect.top() + rowHeight ); 
             rowHeight = 0;
         }
     }
-}
-
-
-void 
-TagCloudView::updateGeometries()
-{
+    
     QAbstractItemView::updateGeometries();
 }
 
