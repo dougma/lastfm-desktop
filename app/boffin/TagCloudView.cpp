@@ -84,12 +84,12 @@ TagCloudView::paintEvent( QPaintEvent* e )
     QStyleOptionViewItem opt = viewOptions();
     
     QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
-    for( ; i != m_rectIndex.constEnd(); i++ )
+    for( ; i != m_rectIndex.constEnd(); ++i )
     {
         const QModelIndex& index = i.key();
         const QRect& rect = i.value();
 
-        opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
+        opt.state = (index != m_hoverIndex || !isEnabled() ? QStyle::State_None : QStyle::State_MouseOver);
 
         opt.rect = rect.translated( 0, -verticalScrollBar()->value());
         

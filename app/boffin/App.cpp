@@ -221,6 +221,14 @@ void
 App::play()
 {
     if (m_cloud) { 
+        if( m_cloud->currentTags().isEmpty())
+        {
+            MessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
+                                             .setText( tr("Select at least one tag from the cloud below to start playing music." ))
+                                             .sheet()
+                                             .exec();
+            return;
+        }
         play( m_cloud->currentTags() );
         m_cloud->setEnabled( false ); //prevent interaction until stop pushed
     }

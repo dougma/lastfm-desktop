@@ -24,7 +24,7 @@
 
 static const float k_exponentFactor = 0.6;
 static const float k_factor = 4;
-static const int k_margin = 4;
+static const int k_margin = 7;
 
 TagDelegate::TagDelegate( QObject* parent ) 
             : QAbstractItemDelegate( parent )
@@ -54,7 +54,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     p.setWidth( 3 );
     painter->setPen( p );
 
-    painter->drawRoundedRect( option.rect.adjusted( k_margin, k_margin, -k_margin, -k_margin ), 10.0f, 10.0f );
+    painter->drawRoundedRect( option.rect.adjusted( 4, 4, -4, -4 ), 10.0f, 10.0f );
     painter->restore();
 
     QFont f = option.font;
@@ -73,7 +73,7 @@ TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& in
     f.setPointSize( k_factor * pow( f.pointSize(), k_exponentFactor * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 )));
     f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
     QFontMetrics fm( f );
-    const QSize fmSize = fm.size( Qt::TextSingleLine, index.data().toString() + "  " );
+    const QSize fmSize = fm.size( Qt::TextSingleLine, index.data().toString() ) + QSize( 2* k_margin, 2* k_margin );
     return fmSize; 
 }
 
