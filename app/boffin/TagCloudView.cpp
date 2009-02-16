@@ -20,6 +20,7 @@
 #include "TagCloudView.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QScrollBar>
 
 static const int k_RightMargin = 10;
 
@@ -89,7 +90,7 @@ TagCloudView::paintEvent( QPaintEvent* e )
 
         opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
 
-        opt.rect = rect;
+        opt.rect = rect.translated( 0, -verticalScrollBar()->value());
         
         if( selectionModel()->isSelected( index ) )
             opt.state |= QStyle::State_Selected;
@@ -145,6 +146,8 @@ TagCloudView::updateGeometries()
             rowHeight = 0;
         }
     }
+
+    verticalScrollBar()->setRange( 0, opt.rect.bottom() -viewport()->rect().height() );
     
     QAbstractItemView::updateGeometries();
 }
@@ -160,8 +163,9 @@ TagCloudView::selectAll()
 
 
 QModelIndex 
-TagCloudView::indexAt( const QPoint& p ) const
+TagCloudView::indexAt( const QPoint& pos ) const
 {
+    QPoint p = pos + QPoint( 0, verticalScrollBar()->value());
     foreach( QModelIndex i, m_rectIndex.keys() )
     {
         if( m_rectIndex[ i ].contains( p ))
@@ -176,7 +180,7 @@ TagCloudView::indexAt( const QPoint& p ) const
 QRect 
 TagCloudView::visualRect( const QModelIndex& i ) const
 {
-    return m_rectIndex[ i ];
+    return m_rectIndex[ i ].translated( 0, -verticalScrollBar()->value());
 }
 
 
