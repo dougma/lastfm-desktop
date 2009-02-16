@@ -150,6 +150,15 @@ TagCloudView::updateGeometries()
 }
 
 
+void 
+TagCloudView::selectAll()
+{
+    QItemSelection allSelection( model()->index( 0 , 0 ), model()->index( model()->rowCount(), 0 ));
+    selectionModel()->select( allSelection, QItemSelectionModel::Toggle );
+    viewport()->update();
+}
+
+
 QModelIndex 
 TagCloudView::indexAt( const QPoint& p ) const
 {

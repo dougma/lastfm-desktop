@@ -35,7 +35,11 @@ public:
     virtual QRect visualRect( const QModelIndex& ) const;
 
     QStringList currentTags() const;
-    
+   
+
+public slots:
+    virtual void selectAll();
+
 protected slots:
     virtual void updateGeometries();
 
