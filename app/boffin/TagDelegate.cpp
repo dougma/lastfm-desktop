@@ -20,6 +20,7 @@
 #include "TagDelegate.h"
 #include "TagCloudModel.h"
 #include <QPainter>
+#include <math.h>
 
 TagDelegate::TagDelegate( QObject* parent ) 
             : QAbstractItemDelegate( parent )
@@ -27,24 +28,37 @@ TagDelegate::TagDelegate( QObject* parent )
 
 }
 
-
+#include <QDebug>
 void 
 TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
-    QFont f = option.font;
-    f.setPointSize( f.pointSize() * ( index.data( TagCloudModel::WeightRole ).value<float>() +0.5) );
-    {
-        painter->save();
-        painter->setRenderHint( QPainter::Antialiasing );
-        QPen p = ((option.state & QStyle::State_MouseOver) ? QColor( 200, 200, 200 ): QColor( 255,255,255));
-        p.setWidth( 3 );
-        painter->setPen( p );
-        painter->drawRoundedRect( option.rect.adjusted( 4, 4, -4, -4 ), 10.0f,160.0f );
-        painter->restore();
-    } 
 
+    painter->save();
+    painter->setRenderHint( QPainter::Antialiasing );
+    QPen p = ((option.state & QStyle::State_MouseOver) ? QColor( 100, 100, 100 ): Qt::transparent);
+    if( option.state & QStyle::State_Selected )
+    {
+        painter->setBrush( option.palette.highlight() );
+        painter->setPen( option.palette.highlightedText().color() );
+    }
+    else
+    {
+        painter->setBrush( Qt::transparent );
+    }
+  
+  
+    p.setWidth( 3 );
+    painter->setPen( p );
+
+    painter->drawRoundedRect( option.rect.adjusted( 4, 4, -4, -4 ), 10.0f, 10.0f );
+    painter->restore();
+
+    QFont f = option.font;
+    f.setPointSize( 10 * pow( f.pointSize(), 0.4 * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 ) ));
+    f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
     painter->setFont( f );
-    painter->drawText( option.rect, Qt::AlignCenter, index.data().toString());
+    QFontMetrics fm( f );
+    painter->drawText( option.rect, Qt::AlignHCenter | Qt::AlignBottom , index.data().toString());
 }
 
 
@@ -52,8 +66,9 @@ QSize
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
     QFont f = option.font;
-    f.setPointSize( f.pointSize() * ( index.data( TagCloudModel::WeightRole ).value<float>() + 0.6 ));
+    f.setPointSize( 10 * pow( f.pointSize(), 0.4 * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 )));
+    f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
     QFontMetrics fm( f );
-    return fm.size( Qt::TextSingleLine, index.data().toString() );
+    return fm.size( Qt::TextSingleLine, index.data().toString() + "  " );
 }
 

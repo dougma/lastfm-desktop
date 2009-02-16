@@ -23,14 +23,19 @@
 
 static const int k_RightMargin = 10;
 
+#include <QDebug>
+
 TagCloudView::TagCloudView( QWidget* parent ) 
              : QAbstractItemView( parent )
 {
     QFont f = font();
-    f.setPointSize( 50 );
+    f.setPointSize( 14 );
     setFont( f );
     viewport()->setMouseTracking( true );
     
+    setSelectionMode( QAbstractItemView::MultiSelection );
+    setSelectionBehavior( QAbstractItemView::SelectItems );
+
     //Needed to repaint on mouse move:
     viewport()->setAttribute( Qt::WA_Hover );
 }
@@ -43,28 +48,84 @@ TagCloudView::~TagCloudView()
 
 
 void 
+TagCloudView::setSelection( const QRect& r, QItemSelectionModel::SelectionFlags f )
+{
+    if (state() == DragSelectingState)
+        return;
+    foreach( QModelIndex i, m_rectIndex.keys() )
+    {
+        if( m_rectIndex[ i ].intersects( r ))
+        {
+            selectionModel()->select(i, f);
+        }
+    }
+}
+
+
+QStringList 
+TagCloudView::currentTags() const
+{
+    QStringList ret;
+    foreach( QModelIndex i, selectionModel()->selectedIndexes() )
+        ret << i.data( Qt::DisplayRole ).toString();
+    
+    return ret;
+}
+
+
+void 
 TagCloudView::paintEvent( QPaintEvent* )
 {    
     QPainter p( viewport() );
-    QStyleOptionViewItem opt;
-    opt.initFrom( this );
-    opt.font = font();
+    QStyleOptionViewItem opt = viewOptions();
+    int rowHeight = 0;
     for( int i = 0; i < model()->rowCount(); i++ )
     {
         QModelIndex index = model()->index( i, 0 );
 
-        opt.state = index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver;
+        if( rowHeight == 0 )
+        {
+            QRect rect = viewport()->rect();
+            rect.setSize( itemDelegate()->sizeHint( opt, index ));
+            int count = i;
+            int x = rect.right();
+            while( rect.right() < (viewport()->rect().right() - k_RightMargin) && count < model()->rowCount())
+            {
+                const QSize sizeHint = itemDelegate()->sizeHint( opt, model()->index( count, 0 )); 
+                x += sizeHint.width() + k_RightMargin;
+                rowHeight = qMax( rowHeight, sizeHint.height());
+                count++;
+            }
+        }
+
+
+        opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
 
         opt.rect.setSize( itemDelegate()->sizeHint( opt, index ));
-        if( opt.rect.right() > rect().right())
-        {
-            opt.rect.moveLeft( rect().left());
-            opt.rect.moveTop( opt.rect.bottom()); 
-        }
+        opt.rect.translate( 0, ( rowHeight - (opt.rect.height() * 0.9)));
+
+        if( selectionModel()->isSelected( index ) )
+            opt.state |= QStyle::State_Selected;
+
+
         m_rectIndex.insert( index, opt.rect );
         itemDelegate()->paint( &p, opt, index );
-        opt.rect.translate( opt.rect.width() + k_RightMargin, 0 );
+        opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - (opt.rect.height() * 0.9)) );
+        
+        if( opt.rect.right() + k_RightMargin > rect().right())
+        {
+            opt.rect.moveLeft( rect().left());
+            opt.rect.moveTop( opt.rect.top() + rowHeight ); 
+            rowHeight = 0;
+        }
     }
+}
+
+
+void 
+TagCloudView::updateGeometries()
+{
+    QAbstractItemView::updateGeometries();
 }
 
 
@@ -74,7 +135,9 @@ TagCloudView::indexAt( const QPoint& p ) const
     foreach( QModelIndex i, m_rectIndex.keys() )
     {
         if( m_rectIndex[ i ].contains( p ))
+        {
             return i;
+        }
     }
     return QModelIndex();
 }
@@ -96,7 +159,6 @@ TagCloudView::viewportEvent( QEvent* event )
         {
             QMouseEvent* e = static_cast< QMouseEvent* >( event );
             m_hoverIndex = indexAt( e->pos() );
-            //viewport()->update();
         }
         break;
         default:
@@ -105,9 +167,3 @@ TagCloudView::viewportEvent( QEvent* event )
     return QAbstractItemView::viewportEvent( event );
 }
 
-
-QString
-TagCloudView::currentTag() const
-{
-    return "rock";
-}

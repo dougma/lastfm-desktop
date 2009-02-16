@@ -213,7 +213,7 @@ void
 App::play()
 {
     qDebug() << "HI";
-    if (m_cloud) play( QStringList() << m_cloud->currentTag() );
+    if (m_cloud) play( m_cloud->currentTags() );
 }
 
 

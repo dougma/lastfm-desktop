@@ -24,6 +24,7 @@
 
 class TagCloudView : public QAbstractItemView
 {
+    Q_OBJECT
 public:
     TagCloudView( QWidget* parent = 0 );
     ~TagCloudView();
@@ -33,7 +34,10 @@ public:
     virtual void scrollTo( const QModelIndex&, ScrollHint ){};
     virtual QRect visualRect( const QModelIndex& ) const;
 
-    QString currentTag() const;
+    QStringList currentTags() const;
+    
+protected slots:
+    virtual void updateGeometries();
 
 protected:
     virtual void paintEvent( QPaintEvent* );
@@ -43,7 +47,7 @@ protected:
     virtual QModelIndex moveCursor( CursorAction, Qt::KeyboardModifiers ){ return QModelIndex(); }
     virtual int horizontalOffset() const{ return 0; }
     virtual int verticalOffset() const{ return 0; }
-    virtual void setSelection( const QRect&, QItemSelectionModel::SelectionFlags ){};
+    virtual void setSelection( const QRect&, QItemSelectionModel::SelectionFlags );
 
     virtual bool viewportEvent(QEvent *event);
 

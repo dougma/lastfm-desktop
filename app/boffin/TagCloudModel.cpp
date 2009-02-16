@@ -64,7 +64,7 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
         {
             QHash< QString, float>::const_iterator i = m_tagHash.constBegin();
             i += index.row();
-            return ((i.value() - m_minWeight) / m_totalWeight);
+            return QVariant::fromValue<float>((i.value() / m_totalWeight));
         }
 
         default:
@@ -73,12 +73,19 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
 }
 
 
+Qt::ItemFlags 
+TagCloudModel::flags( const QModelIndex & index ) const
+{
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+}
+
+
 void 
 TagCloudModel::fetchTags()
 {
     QSqlQuery query( "select name, tag, sum(weight) from tracktags join tags "
                      "where tracktags.tag = tags.id group by tags.id order by sum(weight) desc "
-                     "limit 40"
+                     "limit 50"
                         , m_db );
     m_tagHash.clear();
     m_totalWeight = 0;
@@ -86,8 +93,7 @@ TagCloudModel::fetchTags()
     while( query.next())
     {
         const float weight = query.value( 2 ).value<float>();
-        m_minWeight = weight < m_minWeight ? weight : m_minWeight;
-        m_totalWeight += weight;
+        m_totalWeight = qMax( weight, m_totalWeight );
         m_tagHash.insert( query.value( 0 ).toString(), weight );
     }
     reset();

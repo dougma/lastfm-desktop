@@ -43,7 +43,7 @@ public:
     virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
     virtual int columnCount( const QModelIndex& =QModelIndex() ) const { return 1; }
     virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
-    
+    Qt::ItemFlags flags( const QModelIndex & index ) const;
     void fetchTags();
 
 protected:
