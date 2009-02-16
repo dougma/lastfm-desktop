@@ -20,6 +20,8 @@
 #ifndef AUTO_TRANSACTION_H
 #define AUTO_TRANSACTION_H
 
+
+// todo: add mutex support (see use of this with LocalCollection)
 template<typename TDatabase>
 class AutoTransaction
 {

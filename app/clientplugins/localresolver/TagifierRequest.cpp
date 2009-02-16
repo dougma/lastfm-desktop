@@ -76,6 +76,7 @@ Batcher::doBatch()
         m_firstBatch = false;
     }
     {
+        QMutexLocker locker( m_collection->getMutex() );
         AutoTransaction<LocalCollection> trans(*m_collection);
         m_collection->updateTrackTags(
             m_fileIds, 

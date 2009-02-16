@@ -34,10 +34,11 @@ extern void addUserFuncs(QSqlDatabase db);
 #define LEVENSHTEIN_ARTIST_THRESHOLD "0.7"
 #define LEVENSHTEIN_TITLE_THRESHOLD "0.7"
 
-// these macros add-in the function name for 
-// the call to the method of the same name
-#define PREPARE(a) prepare((a),(Q_FUNC_INFO))
-#define QUERY(a) query((a),(Q_FUNC_INFO))
+#define QUERY(a) ChainableQuery(m_db, &ms_activeQueryMutex).prepare((a),(Q_FUNC_INFO)).exec()
+
+
+QMutex LocalCollection::ms_activeQueryMutex(QMutex::Recursive);
+
 
 
 LocalCollection*
@@ -65,18 +66,6 @@ LocalCollection::~LocalCollection()
 
 //    m_db = QSqlDatabase(); // to make the db "not in use" (removes a qt warning)
 //    QSqlDatabase::removeDatabase( m_connectionName );
-}
-
-QSqlQuery
-LocalCollection::query( const QString& sql, const char *funcName ) const
-{
-    return prepare( sql, funcName ).exec();
-}
-
-ChainableQuery 
-LocalCollection::prepare( const QString& sql, const char *funcName ) const 
-{
-    return ChainableQuery( m_db ).prepare( sql, funcName );
 }
 
 void
@@ -180,7 +169,9 @@ LocalCollection::initDatabase()
 int
 LocalCollection::version() const 
 {   
-    QSqlQuery q = QUERY( "SELECT value FROM metadata WHERE key='version'" );
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare( "SELECT value FROM metadata WHERE key='version'" ).exec();
+
     if ( q.next() ) {
         bool ok = false;
         int version = q.value( 0 ).toInt( &ok );
@@ -209,7 +200,8 @@ LocalCollection::setFingerprint( const QString& filePath, QString fpId )
 QList<LocalCollection::Source>
 LocalCollection::getAllSources()
 {
-    QSqlQuery q = QUERY( "SELECT id, volume, path, available FROM sources" );
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare( "SELECT id, volume, path, available FROM sources" ).exec();
 
     QList<LocalCollection::Source> result;
     while ( q.next() ) {
@@ -230,7 +222,8 @@ LocalCollection::getAllSources()
 void
 LocalCollection::setSourceAvailability(int sourceId, bool available)
 {
-    PREPARE( "UPDATE sources SET available = :available WHERE id = :sourceId" ).
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare( "UPDATE sources SET available = :available WHERE id = :sourceId" ).
     bindValue( ":available", available ? 1 : 0 ).
     bindValue( ":sourceId", sourceId ).
     exec();
@@ -239,18 +232,19 @@ LocalCollection::setSourceAvailability(int sourceId, bool available)
 QList<LocalCollection::Exclusion>
 LocalCollection::getExcludedDirectories(int sourceId)
 {
-    QSqlQuery query = PREPARE(
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare(
         "SELECT path, subDirs FROM exclusions "
         "WHERE exclusions.source = :sourceId" ).
     bindValue( ":sourceId", sourceId ).
     exec();
 
     QList<Exclusion> result;
-    while (query.next()) {
+    while (q.next()) {
         bool ok;
-        int subdirsExcluded = query.value( 1 ).toInt( &ok );
+        int subdirsExcluded = q.value( 1 ).toInt( &ok );
         if ( ok ) {
-            result << Exclusion(query.value( 0 ).toString(), subdirsExcluded != 0);
+            result << Exclusion(q.value( 0 ).toString(), subdirsExcluded != 0);
         }
     }
     return result;
@@ -259,7 +253,8 @@ LocalCollection::getExcludedDirectories(int sourceId)
 bool
 LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 {
-    QSqlQuery query = PREPARE(
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare(
         "SELECT id FROM directories "
         "WHERE path = :path AND source = :sourceId" ).
     bindValue( ":path", path ).
@@ -267,8 +262,8 @@ LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
     exec();
 
     bool ok = false;
-    if (query.next()) {
-        result = query.value( 0 ).toInt( &ok );
+    if (q.next()) {
+        result = q.value( 0 ).toInt( &ok );
     }
     return ok;
 }
@@ -276,21 +271,24 @@ LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 bool 
 LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 {
-    bool ok;
-    resultId = PREPARE(
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare(
         "INSERT into directories ( id, source, path ) "
         "VALUES ( NULL, :sourceId, :path )" ).
     bindValue( ":sourceId", sourceId ).
     bindValue( ":path", path ).
-    exec().
-    lastInsertId().toInt( &ok );
+    exec();
+
+    bool ok;
+    resultId = q.lastInsertId().toInt( &ok );
     return ok;
 }
 
 QList<LocalCollection::File> 
 LocalCollection::getFiles(int directoryId)
 {
-    QSqlQuery query = PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         "SELECT id, filename, modification_date "
         "FROM files "
         "WHERE directory = :directoryId" ).
@@ -317,7 +315,8 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
     if ( artist.isEmpty() || title.isEmpty() )
         return QList<LocalCollection::ResolveResult>();
 
-    QSqlQuery query = PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         // original, naive and slow:
 
         //"SELECT a.lowercase_name, f.album, f.lowercase_title, "
@@ -383,8 +382,8 @@ LocalCollection::resolve(const QString artist, const QString album, const QStrin
 void
 LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& info)
 {
-    QSqlQuery query = 
-    PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         "UPDATE files SET "
         "modification_date = :modification_date , "
         "lowercase_title = :lowercase_title , "
@@ -406,7 +405,8 @@ LocalCollection::updateFile(int fileId, unsigned lastModified, const FileMeta& i
 bool 
 LocalCollection::getCounts(int& outArtists, int& outFiles)
 {
-    QSqlQuery q = QUERY( "SELECT COUNT(DISTINCT artist), COUNT(id) FROM files" );
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare( "SELECT COUNT(DISTINCT artist), COUNT(id) FROM files" ).exec();
     bool ok1 = false, ok2 = false;
     if (q.next()) {
         outArtists = q.value( 0 ).toInt( &ok1 );
@@ -423,7 +423,8 @@ LocalCollection::getArtistId(QString artistName, Creation flag)
     QString lowercase_name( artistName.simplified().toLower() );
 
     {
-        QSqlQuery query = PREPARE( "SELECT id FROM artists where lowercase_name = :lowercase_name" ).
+        ChainableQuery query(m_db, &ms_activeQueryMutex);
+        query.prepare( "SELECT id FROM artists where lowercase_name = :lowercase_name" ).
         bindValue( ":lowercase_name", lowercase_name ).
         exec();
         if ( query.next() ) {
@@ -434,8 +435,8 @@ LocalCollection::getArtistId(QString artistName, Creation flag)
     }
 
     if ( flag == Create ) {
-        int artistId = 
-        PREPARE(
+        ChainableQuery query(m_db, &ms_activeQueryMutex);
+        int artistId = query.prepare(
             "INSERT INTO artists (lowercase_name) "
             "VALUES (:lowercase_name)" ).
         bindValue( ":lowercase_name", lowercase_name ).
@@ -455,7 +456,8 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
     int artistId = getArtistId( info.m_artist, Create );
     Q_ASSERT( artistId > 0 );
 
-    PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         "INSERT INTO files (id, directory, filename, modification_date, lowercase_title, artist, album, kbps, duration) "
         "VALUES (NULL, :directory, :filename, :modification_date, :lowercase_title, :artist, :album, :kbps, :duration)" ).
     bindValue( ":directory", directoryId ).
@@ -473,11 +475,11 @@ int
 LocalCollection::getSourceId(const QString& volume, const QString& path, Creation flag)
 {
     {
-        QSqlQuery q =
-            PREPARE("SELECT id FROM sources WHERE volume = :volume AND path = :path").
-            bindValue( ":volume", volume ).
-            bindValue( ":path", path ).
-            exec();
+        ChainableQuery q(m_db, &ms_activeQueryMutex);
+        q.prepare("SELECT id FROM sources WHERE volume = :volume AND path = :path").
+        bindValue( ":volume", volume ).
+        bindValue( ":path", path ).
+        exec();
         if (q.next()) {
             int id = q.value( 0 ).toInt();
             Q_ASSERT( id );
@@ -486,13 +488,13 @@ LocalCollection::getSourceId(const QString& volume, const QString& path, Creatio
     }
 
     if ( flag == Create ) {
-        int id = PREPARE(
-            "INSERT INTO sources (id, volume, path, available) "
+        ChainableQuery q(m_db, &ms_activeQueryMutex);
+        q.prepare("INSERT INTO sources (id, volume, path, available) "
             "VALUES (NULL, :volume, :path, 1)" ).
         bindValue( ":volume", volume ).
         bindValue( ":path", path ).
-        exec().
-        lastInsertId().toInt();
+        exec();
+        int id = q.lastInsertId().toInt();
         Q_ASSERT(id > 0);
         return id;
     }
@@ -505,20 +507,30 @@ LocalCollection::deleteSource( const QString& volume, const QString &path )
     int id = getSourceId( volume, path, LocalCollection::NoCreate );
     if (id) {
         // todo: can we have cascading deletes?
+        QMutexLocker locker( &ms_activeQueryMutex );
         AutoTransaction<LocalCollection> trans(*this);
-        PREPARE( "DELETE FROM tracktags WHERE file IN ("
+
+        ChainableQuery(m_db, 0).
+        prepare( "DELETE FROM tracktags WHERE file IN ("
             "SELECT files.id FROM files "
             "INNER JOIN directories ON directories.id = files.directory "
             "WHERE directories.source = :id )").
-            bindValue( ":id", id).exec();
-        PREPARE( "DELETE FROM files WHERE directory IN ("
+        bindValue( ":id", id).exec();
+        
+        ChainableQuery(m_db, 0).
+        prepare( "DELETE FROM files WHERE directory IN ("
             "SELECT directories.id FROM directories "
             "WHERE directories.source = :id )" ).
-            bindValue( ":id", id ).exec();
-        PREPARE( "DELETE FROM directories WHERE source = :id ").
-            bindValue( ":id", id ).exec();
-        PREPARE( "DELETE FROM sources WHERE id = :id " ).
-            bindValue( ":id", id ).exec();
+        bindValue( ":id", id ).exec();
+        
+        ChainableQuery(m_db, 0).
+        prepare( "DELETE FROM directories WHERE source = :id ").
+        bindValue( ":id", id ).exec();
+    
+        ChainableQuery(m_db, 0).
+        prepare( "DELETE FROM sources WHERE id = :id " ).
+        bindValue( ":id", id ).exec();
+
         trans.commit();
     }
 }
@@ -526,7 +538,8 @@ LocalCollection::deleteSource( const QString& volume, const QString &path )
 void
 LocalCollection::removeDirectory(int directoryId)
 {
-    PREPARE( "DELETE FROM directories WHERE id = :directoryId" ).
+    ChainableQuery(m_db, &ms_activeQueryMutex).
+    prepare( "DELETE FROM directories WHERE id = :directoryId" ).
     bindValue( ":directoryId", directoryId ).
     exec();
 }
@@ -556,7 +569,8 @@ LocalCollection::getTagId(QString tag, Creation flag)
     tag = tag.simplified().toLower();
 
     {
-        QSqlQuery query = PREPARE( "SELECT id FROM tags WHERE name = :name" ).
+        ChainableQuery query(m_db, &ms_activeQueryMutex);
+        query.prepare( "SELECT id FROM tags WHERE name = :name" ).
         bindValue( ":name", tag ).
         exec();
         if ( query.next() ) {
@@ -567,10 +581,10 @@ LocalCollection::getTagId(QString tag, Creation flag)
     }
 
     if ( flag == Create ) {
-        int id = PREPARE( "INSERT INTO tags (name) VALUES (:name)" ).
+        int id = ChainableQuery(m_db, &ms_activeQueryMutex).
+        prepare( "INSERT INTO tags (name) VALUES (:name)" ).
         bindValue( ":name", tag ).
-        exec().
-        lastInsertId().toInt();
+        exec().lastInsertId().toInt();
 
         Q_ASSERT( id > 0 );
         return id;
@@ -588,7 +602,7 @@ void
 LocalCollection::deleteTrackTagsForArtist(int artistId, unsigned userId)
 {
     Q_ASSERT( artistId > 0 );
-    PREPARE( 
+    ChainableQuery(m_db, &ms_activeQueryMutex).prepare(
         "DELETE FROM tracktags "
         "WHERE user_id == :userId "
         "AND file IN "
@@ -628,7 +642,7 @@ LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int we
 {
     Q_ASSERT(artistId > 0 && tagId > 0);
 
-    PREPARE(
+    ChainableQuery(m_db, &ms_activeQueryMutex).prepare(
         "INSERT INTO tracktags (file, tag, weight, user_id) "
         "SELECT id, :tagId, :weight, :userId "
         "FROM files WHERE artist == :artistId " ).
@@ -659,11 +673,11 @@ LocalCollection::filesWithTag(QString tag, Availablity flag)
                 "INNER JOIN sources on directories.source = sources.id "
                 "WHERE tag = :tagId AND sources.available = 1 ";
         }
-        QSqlQuery query = 
-            PREPARE( queryString ).
-            setForwardOnly( true ).
-            bindValue( ":tagId", tagId ).
-            exec();
+        ChainableQuery query(m_db, &ms_activeQueryMutex);
+        query.prepare( queryString ).
+        setForwardOnly( true ).
+        bindValue( ":tagId", tagId ).
+        exec();
         while ( query.next() ) {
             uint id = query.value( 0 ).toUInt();
             float weight = query.value( 1 ).toDouble();
@@ -696,10 +710,11 @@ LocalCollection::filesByArtist(QString artist, Availablity flag)
             "AND sources.available = 1 ";
     }
 
-    QSqlQuery query = PREPARE( queryString ).
-        setForwardOnly( true ).
-        bindValue( ":artist", artist.simplified().toLower() ).
-        exec();
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare( queryString ).
+    setForwardOnly( true ).
+    bindValue( ":artist", artist.simplified().toLower() ).
+    exec();
 
     QList<unsigned> results;
     while (query.next()) {
@@ -723,10 +738,11 @@ LocalCollection::filesByArtistId(int artistId, Availablity flag)
             "WHERE files.artist = :artistId AND sources.available = 1 ";
     }
 
-    QSqlQuery query = PREPARE( queryString ).
-        setForwardOnly( true ).
-        bindValue( ":artistId", artistId ).
-        exec();
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare( queryString ).
+    setForwardOnly( true ).
+    bindValue( ":artistId", artistId ).
+    exec();
 
     QList<unsigned> results;
     while (query.next()) {
@@ -738,8 +754,9 @@ LocalCollection::filesByArtistId(int artistId, Availablity flag)
 LocalCollection::EntryList
 LocalCollection::allTags()
 {
-    QSqlQuery query =
-        PREPARE( "SELECT artist, tag, avg(weight) "
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
+            "SELECT artist, tag, avg(weight) "
             "FROM tracktags "
             "INNER JOIN files on tracktags.file = files.id "
             "GROUP BY artist, tag "
@@ -785,7 +802,8 @@ LocalCollection::allTags()
 bool 
 LocalCollection::getFileById(uint fileId, LocalCollection::FileResult &out)
 {
-    QSqlQuery query = PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         "SELECT album, artists.lowercase_name, lowercase_title, "
         "sources.volume, directories.path, filename, duration "
         "FROM files "
@@ -815,7 +833,8 @@ LocalCollection::getFilesToTag(int maxTagAgeDays)
         QDateTime::currentDateTime().toUTC().toTime_t() 
         - maxTagAgeDays * 24* 60* 60;
 
-    QSqlQuery query = PREPARE(
+    ChainableQuery query(m_db, &ms_activeQueryMutex);
+    query.prepare(
         "SELECT files.id, artists.lowercase_name, files.album, files.lowercase_title "
         "FROM files "
         "INNER JOIN artists ON artists.id = files.artist "
@@ -845,7 +864,7 @@ LocalCollection::deleteTrackTags_batch(QString ids)
 void
 LocalCollection::setFileTagTime_batch(QString ids)
 {
-    PREPARE(
+    ChainableQuery(m_db, &ms_activeQueryMutex).prepare(
         "UPDATE files SET tag_time = :tagTime WHERE id IN (" + ids + ")" ).
         bindValue( ":tagTime", QDateTime::currentDateTime().toUTC().toTime_t() ).
         exec();
@@ -855,6 +874,7 @@ void
 LocalCollection::setFileTagTime(QVariantList fileIds)
 {
     // do it in a transaction to attempt to speed it up
+    QMutexLocker locker( &ms_activeQueryMutex );
     AutoTransaction<LocalCollection> trans(*this);
     batch(fileIds, &LocalCollection::setFileTagTime_batch);
     trans.commit();
@@ -864,6 +884,7 @@ void
 LocalCollection::deleteTrackTags(QVariantList fileIds)
 {
     // do it in a transaction to attempt to speed it up
+    QMutexLocker locker( &ms_activeQueryMutex );
     AutoTransaction<LocalCollection> trans(*this);
     batch(fileIds, &LocalCollection::deleteTrackTags_batch);
     trans.commit();
@@ -902,7 +923,7 @@ LocalCollection::batch(QVariantList fileIds, void (LocalCollection::*batchFunc)(
 void
 LocalCollection::updateTrackTags(QVariantList fileIds, QVariantList tagIds, QVariantList weights)
 {
-    PREPARE(
+    ChainableQuery(m_db, &ms_activeQueryMutex).prepare(
         "INSERT INTO tracktags (file, tag, weight) "
         "VALUES (:fileIds, :tags, :weights)" ).
         bindValue( ":fileIds", fileIds ).
@@ -938,22 +959,55 @@ LocalCollection::resolveTags(QStringList tags, QMap<QString, int>& map)
     return result;
 }
 
+QList< QPair< QString, float > >
+LocalCollection::getTopTags(int limit)
+{
+    QList< QPair< QString, float > > result;
+
+    ChainableQuery q(m_db, &ms_activeQueryMutex);
+    q.prepare(
+        "SELECT name, sum(weight) FROM tracktags "
+        "INNER JOIN tags WHERE tracktags.tag = tags.id "
+        "GROUP BY tags.id "
+        "ORDER BY sum(weight) DESC "
+        "LIMIT :limit ").
+        bindValue(":limit", limit).
+        exec();
+    while ( q.next() ) {
+        result << ( QPair< QString, float >( q.value(0).toString(), q.value(1).toDouble() ) );
+    }
+    return result;
+}
+
+
 void 
 LocalCollection::transactionBegin()
 {
-    QUERY("BEGIN IMMEDIATE");
+    bool ok = m_db.transaction();
+    Q_ASSERT( ok );
+//    QUERY("BEGIN IMMEDIATE");
 }
 
 void 
 LocalCollection::transactionCommit()
 {
-    QUERY("COMMIT");
+    bool ok = m_db.commit();
+    Q_ASSERT( ok );
+//    QUERY("COMMIT");
 }
 
 void 
 LocalCollection::transactionRollback()
 {
-    QUERY("ROLLBACK");
+    bool ok = m_db.rollback();
+    Q_ASSERT( ok );
+//    QUERY("ROLLBACK");
+}
+
+QMutex*
+LocalCollection::getMutex()
+{
+    return &ms_activeQueryMutex;
 }
 
 //////////////////////////////////////////////////////////////

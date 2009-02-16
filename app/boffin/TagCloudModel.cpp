@@ -19,15 +19,13 @@
  
 #include "TagCloudModel.h"
 #include "lib/lastfm/core/CoreDir.h"
-#include <QSqlQuery>
+#include "app/clientplugins/localresolver/LocalCollection.h"
 #include <QDebug>
 
 TagCloudModel::TagCloudModel( QObject* parent )
               :QAbstractItemModel( parent )
 {
-    m_db = QSqlDatabase::addDatabase( "QSQLITE", "TagCloud");
-    m_db.setDatabaseName( CoreDir::data().path() + "/LocalCollection.db" );
-    m_db.open();
+    m_collection = LocalCollection::create( "TagCloud" );
     fetchTags();
 }
 
@@ -76,6 +74,7 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
 Qt::ItemFlags 
 TagCloudModel::flags( const QModelIndex & index ) const
 {
+    Q_UNUSED( index );
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
@@ -83,17 +82,17 @@ TagCloudModel::flags( const QModelIndex & index ) const
 void 
 TagCloudModel::fetchTags()
 {
-    QSqlQuery query( "select name, tag, sum(weight) from tracktags join tags "
-                     "where tracktags.tag = tags.id group by tags.id order by sum(weight) desc "
-                     "limit 60"
-                        , m_db );
     m_tagHash.clear();
     m_maxWeight = 0;
-    while( query.next())
+
+    typedef QPair< QString, float > Pair;
+
+    QList< Pair > tags = m_collection->getTopTags(100);
+    foreach(const Pair& tag, tags)
     {
-        const float weight = query.value( 2 ).value<float>();
-        m_maxWeight = qMax( weight, m_maxWeight );
-        m_tagHash.insert( weight, query.value( 0 ).toString() );
+        m_maxWeight = qMax( tag.second, m_maxWeight );
+        m_tagHash.insert( tag.second, tag.first );
     }
+
     reset();
 }

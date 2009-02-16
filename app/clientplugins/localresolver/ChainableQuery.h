@@ -22,29 +22,33 @@
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QMutex>
 
 // ChainableQuery allows us to chain calls to 
 // (QSqlQuery's) prepare(), bindValue() and exec().
 //
-// exec() ends the chain by returning a QSqlQuery
 
 // All errors are thrown as type QueryError
 
 class ChainableQuery : public QSqlQuery
 {
+    bool m_locked;
+    QMutex *m_mutex;
     const char *m_func;
     QString m_sql;
 
     friend class QueryError;
 
 public:
-    ChainableQuery(QSqlDatabase db);
-    ChainableQuery prepare(const QString& sql, const char *funcName = 0);
-    ChainableQuery bindValue(const QString& name, const QVariant& value);
-    ChainableQuery setForwardOnly(bool forward);
-    QSqlQuery exec();
-    QSqlQuery execBatch(QSqlQuery::BatchExecutionMode mode = QSqlQuery::ValuesAsRows);
+    ChainableQuery(QSqlDatabase db, QMutex *mutex);
+    ~ChainableQuery();
+    ChainableQuery& prepare(const QString& sql, const char *funcName = 0);
+    ChainableQuery& bindValue(const QString& name, const QVariant& value);
+    ChainableQuery& setForwardOnly(bool forward);
+    ChainableQuery& exec();
+    ChainableQuery& execBatch(QSqlQuery::BatchExecutionMode mode = QSqlQuery::ValuesAsRows);
 };
+
 
 
 

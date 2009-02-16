@@ -235,26 +235,29 @@ public:
     void setFileTagTime(QVariantList fileIds);
     QVariantList resolveTags(QStringList tagNames);
     QVariantList resolveTags(QStringList tagNames, QMap<QString, int>& map);
+    QList< QPair< QString, float > > LocalCollection::getTopTags(int limit);
 
     void transactionBegin();
     void transactionCommit();
     void transactionRollback();
+    QMutex* getMutex();
 
 private:
     LocalCollection(QString connectionName);
+
+    typedef std::auto_ptr<ChainableQuery> AutoQueryPtr;
 
     /** the database version
         * version 1: from 2.?.? */
     int version() const;
     void initDatabase();
-    QSqlQuery query( const QString& sql, const char *funcName ) const;
-    ChainableQuery prepare( const QString& sql, const char *funcName ) const;
 
     void batch(QVariantList ids, void (LocalCollection::*op)(QString) );
     void deleteTrackTags_batch(QString ids);
     void setFileTagTime_batch(QString ids);
 
     QSqlDatabase m_db;
+    static QMutex ms_activeQueryMutex;
     QString m_dbPath;
     QString m_connectionName;
 };

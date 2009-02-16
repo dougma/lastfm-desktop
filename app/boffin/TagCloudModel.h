@@ -21,8 +21,6 @@
 #define TAG_CLOUD_MODEL_H
 
 #include <QAbstractItemModel>
-#include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QMap>
 
 class TagCloudModel: public QAbstractItemModel
@@ -47,7 +45,7 @@ public:
     void fetchTags();
 
 protected:
-    QSqlDatabase m_db;
+    class LocalCollection* m_collection;
     QMultiMap< float, QString> m_tagHash;
     float m_maxWeight;
 };

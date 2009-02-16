@@ -20,7 +20,7 @@
 #ifndef LASTFM_UNIQUE_APPLICATION_H
 #define LASTFM_UNIQUE_APPLICATION_H
 
-#include <lastfm/global.h>
+#include "../DllExportMacro.h"
 #include <QObject>
 #include <QStringList>
 #ifdef Q_WS_MAC
@@ -42,7 +42,7 @@
   * I added this to core because it could be generally useful to Qt 
   * applications. Even though it's a little heavy --mxcl
   */
-class LASTFM_CORE_DLLEXPORT UniqueApplication : public QObject
+class UNICORN_DLLEXPORT UniqueApplication : public QObject
 {
     Q_OBJECT
     

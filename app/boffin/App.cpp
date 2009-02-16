@@ -119,17 +119,20 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
         if (dirs.isEmpty()) 
         {
             PickDirsDialog picker( window );
-            picker.setDirs( cfg.getScanDirs() );
+            picker.setDirs( dirs );
             if (picker.exec() == QDialog::Rejected)
-                throw 1;
+                throw 1;        // abort the whole app
             cfg.setScanDirs( picker.getDirs() );
             cfg.updateVolumeAvailability();
         }
     } 
     catch (QueryError e)
     {
-        //TODO this is unacceptable error handling
-        // just let the rest of the app continue regardless? FIXME soon!
+        // not expecting problems, but: log, warn, and continue anyway.
+        qCritical() << "Database problem: " + e.text();
+        QMessageBox::warning(window,
+            "Warning",
+            "Boffin suffered a database problem, consult the log for the gory details");
     }
 
     m_contentScanner = new LocalContentScanner;

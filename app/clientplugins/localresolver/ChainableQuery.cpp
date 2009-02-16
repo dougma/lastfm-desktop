@@ -21,12 +21,20 @@
 #include "QueryError.h"
 
 
-ChainableQuery::ChainableQuery(QSqlDatabase db)
-:QSqlQuery(db)
+ChainableQuery::ChainableQuery(QSqlDatabase db, QMutex* mutex)
+: QSqlQuery( db )
+, m_mutex( mutex )
+, m_locked( false )
 {
 }
 
-ChainableQuery 
+ChainableQuery::~ChainableQuery()
+{
+    if (m_mutex && m_locked)
+        m_mutex->unlock();
+}
+
+ChainableQuery&
 ChainableQuery::prepare(const QString& sql, const char *funcName)
 {
     m_sql = sql;
@@ -37,32 +45,44 @@ ChainableQuery::prepare(const QString& sql, const char *funcName)
     return *this;
 }
 
-ChainableQuery 
+ChainableQuery&
 ChainableQuery::bindValue(const QString& name, const QVariant& value)
 {
     QSqlQuery::bindValue(name, value);
     return *this;
 }
 
-ChainableQuery 
+ChainableQuery& 
 ChainableQuery::setForwardOnly(bool forward)
 {
     QSqlQuery::setForwardOnly(forward);
     return *this;
 }
 
-QSqlQuery
+ChainableQuery&
 ChainableQuery::exec()
 {
-    if (!QSqlQuery::exec())
+    if (m_mutex) {
+        m_mutex->lock();
+        m_locked = true;
+    }
+
+    if (!QSqlQuery::exec()) {
+        QString text = lastError().text();
         throw QueryError(lastError(), *this);
+    }
     return *this;
 }
 
 
-QSqlQuery 
+ChainableQuery& 
 ChainableQuery::execBatch(QSqlQuery::BatchExecutionMode mode /*= QSqlQuery::ValuesAsRows*/)
 {
+    if (m_mutex) {
+        m_mutex->lock();
+        m_locked = true;
+    }
+
     if (!QSqlQuery::execBatch(mode))
         throw QueryError(lastError(), *this);
     return *this;
