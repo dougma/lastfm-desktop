@@ -22,6 +22,9 @@
 #include <QPainter>
 #include <math.h>
 
+static const float k_exponentFactor = 0.4;
+static const float k_factor = 10;
+
 TagDelegate::TagDelegate( QObject* parent ) 
             : QAbstractItemDelegate( parent )
 {
@@ -54,7 +57,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     painter->restore();
 
     QFont f = option.font;
-    f.setPointSize( 10 * pow( f.pointSize(), 0.4 * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 ) ));
+    f.setPointSize( k_factor * pow( f.pointSize(), k_exponentFactor * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 ) ));
     f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
     painter->setFont( f );
     QFontMetrics fm( f );
@@ -66,7 +69,7 @@ QSize
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
     QFont f = option.font;
-    f.setPointSize( 10 * pow( f.pointSize(), 0.4 * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 )));
+    f.setPointSize( k_factor * pow( f.pointSize(), k_exponentFactor * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 )));
     f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
     QFontMetrics fm( f );
     return fm.size( Qt::TextSingleLine, index.data().toString() + "  " );

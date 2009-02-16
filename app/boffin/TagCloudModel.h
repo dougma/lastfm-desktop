@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QHash>
+#include <QMap>
 
 class TagCloudModel: public QAbstractItemModel
 {
@@ -48,9 +48,8 @@ public:
 
 protected:
     QSqlDatabase m_db;
-    QHash< QString, float> m_tagHash;
-    float m_totalWeight;
-    float m_minWeight;
+    QMultiMap< float, QString> m_tagHash;
+    float m_maxWeight;
 };
 
 #endif //TAG_CLOUD_MODEL_H

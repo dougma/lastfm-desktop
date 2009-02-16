@@ -55,16 +55,16 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
     {
         case Qt::DisplayRole:
         {
-            QHash< QString, float>::const_iterator i = m_tagHash.constBegin();
-            i += index.row();
-            return i.key();
+            QMultiMap< float, QString >::const_iterator i = m_tagHash.constEnd();
+            i -= index.row() + 1;
+            return i.value();
         }
         
         case TagCloudModel::WeightRole:
         {
-            QHash< QString, float>::const_iterator i = m_tagHash.constBegin();
-            i += index.row();
-            return QVariant::fromValue<float>((i.value() / m_totalWeight));
+            QMultiMap< float, QString>::const_iterator i = m_tagHash.constEnd();
+            i -= index.row() + 1;
+            return QVariant::fromValue<float>((i.key() / m_maxWeight));
         }
 
         default:
@@ -85,16 +85,15 @@ TagCloudModel::fetchTags()
 {
     QSqlQuery query( "select name, tag, sum(weight) from tracktags join tags "
                      "where tracktags.tag = tags.id group by tags.id order by sum(weight) desc "
-                     "limit 50"
+                    // "limit 100"
                         , m_db );
     m_tagHash.clear();
-    m_totalWeight = 0;
-    m_minWeight = 65535;
+    m_maxWeight = 0;
     while( query.next())
     {
         const float weight = query.value( 2 ).value<float>();
-        m_totalWeight = qMax( weight, m_totalWeight );
-        m_tagHash.insert( query.value( 0 ).toString(), weight );
+        m_maxWeight = qMax( weight, m_maxWeight );
+        m_tagHash.insert( weight, query.value( 0 ).toString() );
     }
     reset();
 }
