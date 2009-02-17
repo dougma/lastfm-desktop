@@ -54,9 +54,6 @@ PickDirsDialog::PickDirsDialog( QWidget* parent )
     connect( ui.add, SIGNAL(clicked()), SLOT(prompt()) );
     
     ui.group->setMinimumHeight( 78 );
-    
-//    blurb->setWordWrap( true );
-//    blurb->setAttribute( Qt::WA_MacSmallSize );
 
 //////
     setMinimumWidth( 400 );
@@ -100,7 +97,7 @@ PickDirsDialog::getDirs() const
 {
     QStringList dirs;
     foreach (QCheckBox* check, ui.group->findChildren<QCheckBox*>())
-        if (check->isEnabled())
+        if (check->isChecked())
             dirs += check->text();
     dirs.removeAll( "" );
     return dirs;
