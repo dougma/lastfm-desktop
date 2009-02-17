@@ -79,7 +79,7 @@ do
 		    echo "Will generate Xcode project"
 		    XCODE=1;;
         --help | -h | --usage)
-            echo "There is one option, it is: --release"
+            echo "options include: --release, --tests, --xcode"
             exit;;
     esac
     
