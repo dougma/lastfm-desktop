@@ -47,6 +47,7 @@ public:
     
 public slots:
     void openProfileUrl();
+    void openLog();
     
 private slots:
     void onUserGotInfo( class WsReply* );

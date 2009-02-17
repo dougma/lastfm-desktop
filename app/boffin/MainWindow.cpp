@@ -40,7 +40,11 @@ MainWindow::MainWindow()
 #endif
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
 
-    ui.rescan = menuBar()->addMenu( tr("Tools") )->addAction( tr("&Scan Music Again") );
+    QMenu* tools = menuBar()->addMenu( tr("Tools") );
+    ui.rescan = tools->addAction( tr("&Scan Music Again") );
+    QAction* showlog = tools->addAction( tr("Show &Log") );
+
+    connect( showlog, SIGNAL(triggered()), SLOT(openLog()) );
 
     setUnifiedTitleAndToolBarOnMac( true );
     QToolBar* toolbar;
@@ -97,4 +101,13 @@ MainWindow::setWindowTitle( const Track& t )
         QMainWindow::setWindowTitle( tr("Last.fm Boffin") );
     else
         QMainWindow::setWindowTitle( t.toString() );
+}
+
+
+#include <QDesktopServices>
+#include "lib/unicorn/UnicornCoreApplication.h"
+void
+MainWindow::openLog()
+{
+    QDesktopServices::openUrl( QUrl::fromLocalFile( unicorn::CoreApplication::log().absoluteFilePath() ) );
 }
