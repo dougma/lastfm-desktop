@@ -53,7 +53,7 @@ public:
 signals:
     void fullScanStart(const SearchLocation&);
     void fullScanFinished(const SearchLocation&, bool completed);
-    void dirScanStart(const SearchLocation&, const QString&);
+    void dirScanStart(const QString&, const SearchLocation& );
     void fileScanStart(const QString&);
 
     void started(QStringList scanLocations);
