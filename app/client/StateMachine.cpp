@@ -43,7 +43,7 @@ StateMachine::setConnection( PlayerConnection* connection )
     
     if (m_connection)
     {
-        m_connection->setElapsed( m_watch->elapsed() );
+        if (m_watch) m_connection->setElapsed( m_watch->elapsed() );
         disconnect( m_connection, 0, this, 0 );
     }
     

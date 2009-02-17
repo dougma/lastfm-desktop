@@ -26,8 +26,13 @@ DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 macx* {
 	QMAKE_INFO_PLIST = mac/Info.plist
-	debug:ICON = mac/client.icns
-	release:ICON = mac/client_debug.icns
+	debug {
+	    ICON = mac/client_debug.icns
+	}
+	release {
+	    ICON = mac/client.icns
+        CONFIG += app_bundle
+    }
 }
 macx-xcode:debug {
     # must be copied to $$ROOT_DIR before processing because qmake is broken
