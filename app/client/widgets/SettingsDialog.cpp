@@ -23,7 +23,8 @@
 #include "lib/unicorn/UnicornSettings.h"
 #include "lib/lastfm/scrobble/private.h"
 #include <QtGui>
-#include <phonon>
+#include <phonon/audiooutput.h>
+#include <phonon/backendcapabilities.h>
 
 Q_DECLARE_METATYPE( Phonon::AudioOutputDevice );
 
