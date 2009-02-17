@@ -71,18 +71,19 @@ class ScanProgressWidget :
     uint m_track_count;
 
     QList<ImageFucker*> images;
-    QList<Track> tracks;
+    QStringList paths;
     QHash<QString, int> track_counts;
-    
+
     int& count( const Artist& artist ) { return track_counts[ artist.name().toLower() ]; }
 
 public:
     ScanProgressWidget();
-    
+
     virtual void paintEvent( QPaintEvent* );
     virtual void timerEvent( QTimerEvent* );
 
 public slots:
+    void onNewDirectory( const QString& );
     void onNewTrack( const Track&, int, int );
     void onFinished();
 

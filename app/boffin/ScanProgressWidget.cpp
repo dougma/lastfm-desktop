@@ -42,6 +42,13 @@ ScanProgressWidget::ScanProgressWidget()
 
 
 void
+ScanProgressWidget::onNewDirectory( const QString& directory )
+{
+    paths += directory;
+}
+
+
+void
 ScanProgressWidget::onNewTrack( const Track& t, int nartists, int ntracks )
 {
     m_artist_count = nartists;
@@ -49,12 +56,12 @@ ScanProgressWidget::onNewTrack( const Track& t, int nartists, int ntracks )
     
     int& i = count( t.artist() );
     i++;
-    tracks += t;
+    paths += t.url().path();
     
     // so this is a time saving way to keep the list the size of the screen
     // it goes over a bit almost certainly, but it's ok
-    if (tracks.size() > 60)
-        tracks.pop_front();
+    if (paths.size() > 60)
+        paths.pop_front();
     
     if (i == 1)
     {
@@ -90,10 +97,10 @@ ScanProgressWidget::paintEvent( QPaintEvent* e )
 
     p.drawText( 6, height() - 6, text );
     p.setPen( Qt::lightGray );
-    foreach (Track track, tracks)
+    foreach (QString const path, paths)
     {
         y -= 18;
-        p.drawText( 6, y, track.url().path() );
+        p.drawText( 6, y, path );
     }
 
     for (int i = 0; i < images.count(); ++i)

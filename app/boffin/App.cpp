@@ -115,7 +115,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     {
         LocalContentConfig cfg;
         QStringList const dirs = cfg.getScanDirs();
-        
+
         if (dirs.isEmpty() || cfg.getFileCount() == 0) 
         {
             PickDirsDialog picker( window );
@@ -142,7 +142,6 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
             100,        // number of days track tags are good 
             5);         // 5 minute delay between web requests
     connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
-
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
     m_contentScannerThread->start();
 
@@ -159,7 +158,10 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     ScanProgressWidget* progress = new ScanProgressWidget;
     window->setCentralWidget( progress );
     connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track, int, int )) );
-    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection );
+    connect( m_contentScanner, SIGNAL(dirScanStart( QString )), progress, SLOT(onNewDirectory( QString )) );
+    connect( m_contentScanner, SIGNAL(finished()), progress, SLOT(onFinished()) );
+    //queue so the progress widget can update its status label
+    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection ); 
 }
 
 
@@ -193,9 +195,7 @@ App::onOutputDeviceActionTriggered( QAction* a )
 #include "TagCloudModel.h"
 void
 App::onScanningFinished()
-{
-    static_cast<ScanProgressWidget*>(m_mainwindow->centralWidget())->onFinished();
-    
+{    
     QTime time;
     time.start();
     
