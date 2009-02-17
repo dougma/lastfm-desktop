@@ -39,6 +39,8 @@ public:
     
 public slots:
     void play();
+    /** returns false if user cancels the picker dialog */
+    bool scan( bool force_ask_user = true );
     
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
@@ -48,6 +50,8 @@ private slots:
     void onRadioStopped();
     
 private:
+    void cleanup();
+    
     class LocalContentScannerThread* m_contentScannerThread;
     class LocalContentScanner* m_contentScanner;
     class TrackTagUpdater* m_trackTagUpdater;

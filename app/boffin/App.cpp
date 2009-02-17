@@ -60,12 +60,18 @@ App::App( int& argc, char** argv )
 
 App::~App()
 {
+    cleanup();
+    if (m_radio) QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
+}
+
+
+void
+App::cleanup()
+{
     if (m_contentScanner) m_contentScanner->stop();
     if (m_contentScannerThread) m_contentScannerThread->wait();
     delete m_contentScanner;
     delete m_contentScannerThread;    
-    
-    if (m_radio) QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
 }
 
 
@@ -103,25 +109,50 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( m_radio, SIGNAL(trackSpooled( lastfm::Track )), SLOT(onTrackSpooled( lastfm::Track )) );
     connect( m_radio, SIGNAL(stopped()), SLOT(onRadioStopped()) );
 
-    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
-    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
-
     m_scrobsocket = new ScrobSocket( this );
     connect( m_radio, SIGNAL(trackStarted( lastfm::Track )), m_scrobsocket, SLOT(start( lastfm::Track )) );
     connect( m_radio, SIGNAL(stopped()), m_scrobsocket, SLOT(stop()) );
 
+/// local rql
+    m_localRqlPlugin = new LocalRqlPlugin;
+    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
+
+/// parts of the scanning stuff
+    m_trackTagUpdater = TrackTagUpdater::create(
+            "http://musiclookup.last.fm/trackresolve",
+            100,        // number of days track tags are good 
+            5);         // 5 minute delay between web requests
+
+/// content resolver
+    m_trackResolver = new TrackResolver;
+    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
+
+/// connect
+    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
+    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
+    connect( window->ui.rescan, SIGNAL(triggered()), SLOT(scan()) );
+
+/// go!
+    if (!scan()) 
+        throw 1; //abort app
+}
+
+
+bool
+App::scan( bool force_ask_user )
+{
 /// content scanner
     try
     {
         LocalContentConfig cfg;
         QStringList const dirs = cfg.getScanDirs();
 
-        if (dirs.isEmpty() || cfg.getFileCount() == 0) 
+        if (dirs.isEmpty() || cfg.getFileCount() == 0 || force_ask_user)
         {
-            PickDirsDialog picker( window );
+            PickDirsDialog picker( m_mainwindow );
             picker.setDirs( dirs );
             if (picker.exec() == QDialog::Rejected)
-                throw 1;        // abort the whole app
+                return false;        // abort the whole app
             cfg.setScanDirs( picker.getDirs() );
             cfg.updateVolumeAvailability();
         }
@@ -130,37 +161,32 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     {
         // the db is probably an old version
         qCritical() << "Database problem: " + e.text();
-        QMessageBox::warning(window,
-            "Warning",
-            "Boffin suffered a database problem, consult the log for the gory details");
-        throw 1;    // not much we can do.
+        MessageBoxBuilder( m_mainwindow )
+                .setTitle( "Warning" )
+                .setText( "Boffin suffered a database problem, consult the log for the gory details" )
+                .exec();
+        return false; // not much we can do.
     }
 
+    cleanup();
+
     m_contentScanner = new LocalContentScanner;
-    m_trackTagUpdater = TrackTagUpdater::create(
-            "http://musiclookup.last.fm/trackresolve",
-            100,        // number of days track tags are good 
-            5);         // 5 minute delay between web requests
     connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
     m_contentScannerThread->start();
 
-/// local rql
-    m_localRqlPlugin = new LocalRqlPlugin;
-    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
-
-/// content resolver
-    m_trackResolver = new TrackResolver;
-    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
-
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
-    window->setCentralWidget( progress );
+    m_mainwindow->setCentralWidget( progress );
     connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track, int, int )) );
     connect( m_contentScanner, SIGNAL(dirScanStart( QString )), progress, SLOT(onNewDirectory( QString )) );
     connect( m_contentScanner, SIGNAL(finished()), progress, SLOT(onFinished()) );
     //queue so the progress widget can update its status label
-    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection ); 
+    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection );
+    
+    m_mainwindow->ui.rescan->setEnabled( false );
+    
+    return true;
 }
 
 
@@ -214,6 +240,7 @@ App::onScanningFinished()
     m_mainwindow->ui.play->setEnabled( true );
 //    m_mainwindow->ui.pause->setEnabled( true );
     m_mainwindow->ui.skip->setEnabled( true );
+    m_mainwindow->ui.rescan->setEnabled( true );    
 }
 
 
