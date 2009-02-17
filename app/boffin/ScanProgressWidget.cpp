@@ -94,7 +94,7 @@ ScanProgressWidget::paintEvent( QPaintEvent* )
         if (m_done) text.prepend( tr("Preparation complete. ") );
     }
     else
-        text = tr("Starting up...");
+        text = tr("Scanning...");
 
     p.drawText( 6, height() - 6, text );
     p.setPen( Qt::lightGray );
