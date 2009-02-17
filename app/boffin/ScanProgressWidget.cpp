@@ -45,6 +45,7 @@ void
 ScanProgressWidget::onNewDirectory( const QString& directory )
 {
     paths += directory;
+    if (paths.size() > 60) paths.pop_front();
 }
 
 
@@ -81,7 +82,7 @@ ScanProgressWidget::onFinished()
 
 
 void
-ScanProgressWidget::paintEvent( QPaintEvent* e )
+ScanProgressWidget::paintEvent( QPaintEvent* )
 {
     QPainter p( this );    
     int y = height() - 6;
