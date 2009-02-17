@@ -20,7 +20,6 @@
 #include "TagDelegate.h"
 #include "TagCloudModel.h"
 #include <QPainter>
-#include <math.h>
 
 static const float k_factor = 16;
 static const float k_margin = 7;
