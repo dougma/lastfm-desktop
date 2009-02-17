@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "lib/lastfm/core/UrlBuilder.h"
-#include "lib/lastfm/types/Track.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/ws/WsKeys.h"
+#include "lib/unicorn/widgets/AboutDialog.h"
+#include <lastfm/Track>
+#include <lastfm/User>
+#include <lastfm/WsKeys>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QMenuBar>
@@ -43,6 +43,13 @@ MainWindow::MainWindow()
     QMenu* tools = menuBar()->addMenu( tr("Tools") );
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
     QAction* showlog = tools->addAction( tr("Show &Log") );
+
+    QAction* about = menuBar()->addMenu( "Help" )->addAction( "About" );
+#ifdef __APPLE__
+    about->setText( "About " + qApp->applicationName() );
+    about->setMenuRole( QAction::AboutRole );
+#endif
+    connect( about, SIGNAL(triggered()), SLOT(about()) );
 
     connect( showlog, SIGNAL(triggered()), SLOT(openLog()) );
 
@@ -110,4 +117,11 @@ void
 MainWindow::openLog()
 {
     QDesktopServices::openUrl( QUrl::fromLocalFile( unicorn::CoreApplication::log().absoluteFilePath() ) );
+}
+
+
+void
+MainWindow::about()
+{
+    (new AboutDialog( this ))->show();
 }
