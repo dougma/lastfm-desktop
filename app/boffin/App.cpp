@@ -133,7 +133,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( window->ui.rescan, SIGNAL(triggered()), SLOT(scan()) );
 
 /// go!
-    if (!scan()) 
+    if (!scan( false )) 
         throw 1; //abort app
 }
 
