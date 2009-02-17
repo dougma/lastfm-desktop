@@ -20,41 +20,43 @@
 #include "PickDirsDialog.h"
 #include <QtGui>
 
-#define kBlurb "Boffin is a Last.fm technology that will generate a radio station using your local music collection."
+#define kBlurb "Boffin creates Last.fm radio from the music on your computer."
 
 
 PickDirsDialog::PickDirsDialog( QWidget* parent )
               : QDialog( parent, Qt::Sheet )
 {
-    ui.group = new QGroupBox( tr("My music is here:") );
+    ui.group = new QGroupBox( tr("Where is your music?") );
     ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
-    ui.add = new QPushButton( tr("Add") );
+    ui.add = new QPushButton( tr("Add Another Folder") );
     ui.add->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
 
     QLabel* blurb;
 
     QVBoxLayout* v = new QVBoxLayout( ui.group );
     v->addStretch();
-    v->addSpacing( 10 );
-    v->addWidget( ui.add );
-    v->setAlignment( ui.add, Qt::AlignRight );
     v->setMargin( 10 );
 
     v = new QVBoxLayout( this );
     v->addWidget( blurb = new QLabel( kBlurb ) );
-    v->addSpacing( 12 );
-    v->addWidget( ui.group );
     v->addSpacing( 18 );
+    v->addWidget( ui.group );
+    v->addSpacing( 8 );
+    v->addWidget( ui.add );
+    v->setAlignment( ui.add, Qt::AlignLeft );
+    v->addSpacing( 25 );
     v->addWidget( ui.buttons );
-    v->setSpacing( 3 );
+    v->setSpacing( 0 );
 
     connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
     connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
 
     connect( ui.add, SIGNAL(clicked()), SLOT(prompt()) );
     
-    blurb->setWordWrap( true );
-    ui.buttons->button( QDialogButtonBox::Ok )->setText( tr("Prepare Boffin") );
+    ui.group->setMinimumHeight( 78 );
+    
+//    blurb->setWordWrap( true );
+//    blurb->setAttribute( Qt::WA_MacSmallSize );
 
 //////
     setMinimumWidth( 400 );
@@ -62,7 +64,9 @@ PickDirsDialog::PickDirsDialog( QWidget* parent )
 #ifdef Q_OS_MAC
     ui.group->setTitle( "" );
     QLabel* label;
-    v->insertWidget( 2, label = new QLabel( "<b>Folders Containing Music") );
+    v->insertSpacing( 2, 6 );
+    v->insertWidget( 2, label = new QLabel( "<b>Where is your music?") );
+    v->insertSpacing( 0, 12 );
     label->setAttribute( Qt::WA_MacSmallSize );
 #endif
 }
@@ -73,22 +77,12 @@ PickDirsDialog::add( const QString& path )
 {
     if (path.isEmpty()) return;
 
-    QToolButton* remove;
-    QWidget* row = new QLabel( QDir::toNativeSeparators( path ) );
-    QHBoxLayout* h = new QHBoxLayout( row );
-    h->setMargin( 0 );
-    h->addStretch();
-    h->addWidget( remove = new QToolButton );
-    remove->setText( QChar(0x00002212) ); // the minus sign
-    int const W = remove->sizeHint().width() - 7;
-    remove->setFixedSize( W + 4, W );
-    row->setFixedHeight( W );
-    remove->show();
-    connect( remove, SIGNAL(clicked()), row, SLOT(deleteLater()) );
-    connect( row, SIGNAL(destroyed()), this, SLOT(enableDisableOk()) );
+    QCheckBox* check = new QCheckBox( QDir::toNativeSeparators( path ) );
+    check->setChecked( true );
+    connect( check, SIGNAL(toggled( bool )), SLOT(enableDisableOk()) );
     
     QVBoxLayout* v = (QVBoxLayout*)ui.group->layout();
-    v->insertWidget( v->count() - 3, row );
+    v->insertWidget( v->count()-1, check );
     
     enableDisableOk();
 }
@@ -105,8 +99,9 @@ QStringList
 PickDirsDialog::getDirs() const
 {
     QStringList dirs;
-    foreach (QLabel* l, ui.group->findChildren<QLabel*>())
-        dirs += l->text();
+    foreach (QCheckBox* check, ui.group->findChildren<QCheckBox*>())
+        if (check->isEnabled())
+            dirs += check->text();
     dirs.removeAll( "" );
     return dirs;
 }
@@ -132,5 +127,10 @@ PickDirsDialog::setDirs(QStringList dirs)
 void
 PickDirsDialog::enableDisableOk()
 {
-    ui.buttons->button( QDialogButtonBox::Ok )->setEnabled( getDirs().count() );
+    QPushButton* ok = ui.buttons->button( QDialogButtonBox::Ok );
+    ok->setEnabled( true );
+    foreach (QCheckBox* check, ui.group->findChildren<QCheckBox*>())
+        if (check->isChecked()) 
+            return;
+    ok->setEnabled( false );
 }
