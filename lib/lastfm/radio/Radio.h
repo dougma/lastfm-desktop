@@ -34,7 +34,6 @@ namespace Phonon
 	class AudioOutput;
 	class MediaSource;
 }
-class QAction;
 
 
 /** @author <max@last.fm>

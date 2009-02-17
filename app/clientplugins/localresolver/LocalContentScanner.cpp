@@ -103,7 +103,7 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
     const int sourceId = sl.source().m_id;
 	const QString fullPath(sl.source().m_volume + path);
 
-	emit dirScanStart(fullPath, sl);
+	emit dirScanStart(fullPath);
 
     SearchLocation::FileTimeMap map(sl.audioFiles(path));
 

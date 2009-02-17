@@ -56,7 +56,7 @@ public:
         if (id == "wa2") return "Winamp";
         if (id == "wmp") return "Windows Media Player";
         if (id == "ass") return "Last.fm";
-        return QObject::tr( "Unknown media player" );
+        return QObject::tr( "unknown media player" );
     }    
     
 private:

@@ -4,6 +4,9 @@ include( qmake/QtOverride.pro.inc )
 include( qmake/3rdparty.pro.inc )
 include( qmake/1stparty.pro.inc )
 
+mac*{
+	!macx-xcode:CONFIG -= app_bundle
+}
 
 linux*{
 	CONFIG += link_pkgconfig
@@ -11,10 +14,8 @@ linux*{
 	contains( QT, phonon ):LIBS += -L$$system( kde4-config --prefix )/lib
 }
 
-
 #default install target
 target.path = $$INSTALL_DIR/lib
-
 
 defineTest( generateBuildParameters ) {
 	system( echo \'$DESTDIR = \"$$DESTDIR\";\' > _build_parameters.pl.h )

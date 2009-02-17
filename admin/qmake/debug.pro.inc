@@ -3,8 +3,6 @@ CONFIG( debug, debug|release ) {
 		#speeds up debug builds by only compiling x86
 		CONFIG += x86
 		CONFIG -= ppc
-
-        !macx-xcode:CONFIG -= app_bundle
 	}
 
     linux* {
