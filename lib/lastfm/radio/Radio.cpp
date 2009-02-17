@@ -245,6 +245,8 @@ Radio::phononEnqueue()
         // state changes, so we must filter them.
         if (!t.url().isValid()) continue;
         
+        qDebug() << t.url();
+
         m_track = t;
         Phonon::MediaSource ms( t.url() );
 

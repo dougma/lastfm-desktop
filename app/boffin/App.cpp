@@ -147,7 +147,6 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 
 /// local rql
     m_localRqlPlugin = new LocalRqlPlugin;
-    m_localRqlPlugin->init();
     m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
 
 /// content resolver

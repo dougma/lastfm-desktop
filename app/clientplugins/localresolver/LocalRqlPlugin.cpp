@@ -36,6 +36,7 @@ LocalRqlPlugin::~LocalRqlPlugin()
 void 
 LocalRqlPlugin::init()
 {
+    Q_ASSERT(m_queryThread == 0);       // call init once only
     m_queryThread = RqlQueryThread::create();
 }
 
