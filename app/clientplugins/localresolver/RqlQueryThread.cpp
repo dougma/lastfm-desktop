@@ -26,9 +26,9 @@
 #include "RqlQuery.h"
 
 #include "RqlOpProcessor.h"
-#include "rqlParser/parser.h"
+#include "rqlparser/parser.h"
 #include <boost/bind.hpp>
-
+#include <sstream>
 using namespace std;
 using namespace fm::last::query_parser;
 

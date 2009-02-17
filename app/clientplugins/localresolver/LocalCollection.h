@@ -26,6 +26,7 @@
 #ifndef LOCAL_COLLECTION_H
 #define LOCAL_COLLECTION_H
 
+#include <memory>
 #include <QObject>
 #include <QMutex>
 #include <QDateTime>
@@ -235,7 +236,7 @@ public:
     void setFileTagTime(QVariantList fileIds);
     QVariantList resolveTags(QStringList tagNames);
     QVariantList resolveTags(QStringList tagNames, QMap<QString, int>& map);
-    QList< QPair< QString, float > > LocalCollection::getTopTags(int limit);
+    QList< QPair< QString, float > > getTopTags(int limit);
 
     void transactionBegin();
     void transactionCommit();

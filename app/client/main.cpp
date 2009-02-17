@@ -85,11 +85,7 @@ int main( int argc, char** argv )
       #endif
 
         if (!app.arguments().contains( "--tray" ))
-      #ifdef Q_WS_X11 // HACK: Should not be needed. But otherwise crashes. Qt bug?
-            QTimer::singleShot( 0, &window, SLOT( show() ) );
-      #else
             window.show();
-      #endif
         
         app.parseArguments( app.arguments() );
 

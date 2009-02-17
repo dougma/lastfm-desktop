@@ -45,16 +45,15 @@ def find_sources( dir )
       excludes = ['.svn', 'tests', '_build']
       case Platform::IMPL
         when :macosx then excludes << 'win'
-        when :mswin, 
-             :cygwin then excludes << 'mac'
+        when :mswin, :cygwin then excludes << 'mac'
+	else excludes << 'win' << 'mac'
       end
       Find.prune if excludes.include?( File.basename( path ) )
     elsif File.file?( path )
       case Platform::IMPL
         when :macosx then next if /_mac\.cpp$/.match( path )
-        when :mswin, 
-             :cygwin then next if /_win\.cpp$/.match( path )
-      end      
+        when :mswin, :cygwin then next if /_win\.cpp$/.match( path )
+      end
       yield( path, File.extname( path ) )
     end
   end
@@ -62,6 +61,7 @@ end
 
 
 find_sources( dir ) do |path, ext|
+  path.sub!( /^.\//, '' )
   case ext
     when ".h"   then headers   << path
     when ".ui"  then forms     << path
