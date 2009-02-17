@@ -26,7 +26,7 @@
 class TagCloudModel: public QAbstractItemModel
 {
 public:
-    enum CustomRoles { WeightRole = Qt::UserRole };
+    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole };
 
     TagCloudModel( QObject* parent = 0 );
     ~TagCloudModel();
@@ -47,7 +47,9 @@ public:
 protected:
     class LocalCollection* m_collection;
     QMultiMap< float, QString> m_tagHash;
+    QMultiMap< float, QString> m_logTagHash;
     float m_maxWeight;
+    float m_minLogWeight;
 };
 
 #endif //TAG_CLOUD_MODEL_H

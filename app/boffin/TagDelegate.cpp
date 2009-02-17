@@ -22,9 +22,8 @@
 #include <QPainter>
 #include <math.h>
 
-static const float k_exponentFactor = 0.6;
-static const float k_factor = 4;
-static const int k_margin = 7;
+static const float k_factor = 16;
+static const float k_margin = 7;
 
 TagDelegate::TagDelegate( QObject* parent ) 
             : QAbstractItemDelegate( parent )
@@ -58,11 +57,15 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     painter->restore();
 
     QFont f = option.font;
-    f.setPointSize( k_factor * pow( f.pointSize(), k_exponentFactor * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 ) ));
-    f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
+    
+    const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
+
+    f.setPointSize( f.pointSize() + (k_factor * weight ));
+    f.setWeight( 99 * weight );
+    
     painter->setFont( f );
     QFontMetrics fm( f );
-    painter->drawText( option.rect.translated(  0, fm.descent() - (k_margin * 1.5)), Qt::AlignHCenter | Qt::AlignBottom , index.data().toString());
+    painter->drawText( option.rect.translated(  0, -(fm.descent() / 2) - ( 4 * 1.5)), Qt::AlignHCenter | Qt::AlignBottom , index.data().toString());
 }
 
 
@@ -70,8 +73,11 @@ QSize
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
     QFont f = option.font;
-    f.setPointSize( k_factor * pow( f.pointSize(), k_exponentFactor * ( index.data( TagCloudModel::WeightRole ).value<float>() + 1 )));
-    f.setWeight( 99 * index.data( TagCloudModel::WeightRole ).value<float>());
+    
+    const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
+
+    f.setPointSize( f.pointSize() + (k_factor * weight));
+    f.setWeight( 99 * weight );
     QFontMetrics fm( f );
     const QSize fmSize = fm.size( Qt::TextSingleLine, index.data().toString() ) + QSize( 2* k_margin, 2* k_margin );
     return fmSize; 

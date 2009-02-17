@@ -20,7 +20,10 @@
 #include "TagCloudModel.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "app/clientplugins/localresolver/LocalCollection.h"
+#include <float.h> 
+#include <math.h>
 #include <QDebug>
+
 
 TagCloudModel::TagCloudModel( QObject* parent )
               :QAbstractItemModel( parent )
@@ -65,6 +68,14 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
             return QVariant::fromValue<float>((i.key() / m_maxWeight));
         }
 
+        case TagCloudModel::LinearWeightRole:
+        {
+            QMultiMap< float, QString >::const_iterator i = m_logTagHash.constEnd();
+            i -= index.row() + 1;
+
+            return QVariant::fromValue<float>( ( i.key() - m_minLogWeight ) / ((m_logTagHash.constEnd() -1 ).key() - m_minLogWeight));
+        }
+
         default:
             return QVariant();
     }
@@ -83,14 +94,20 @@ void
 TagCloudModel::fetchTags()
 {
     m_tagHash.clear();
+    m_logTagHash.clear();
+
     m_maxWeight = 0;
 
     typedef QPair< QString, float > Pair;
 
     QList< Pair > tags = m_collection->getTopTags(100);
+    m_minLogWeight = FLT_MAX;
     foreach(const Pair& tag, tags)
     {
         m_maxWeight = qMax( tag.second, m_maxWeight );
+        float logWeight = log( tag.second );
+        m_minLogWeight = logWeight < m_minLogWeight ? logWeight : m_minLogWeight;
+        m_logTagHash.insert( logWeight, tag.first );
         m_tagHash.insert( tag.second, tag.first );
     }
 

@@ -114,12 +114,13 @@ TagCloudView::paintEvent( QPaintEvent* e )
     }
 }
 
-
+#include <limits.h>
 void 
 TagCloudView::updateGeometries()
 {
     int rowHeight = 0;
     QStyleOptionViewItem opt = viewOptions();
+    int minRowHeight = INT_MAX;
     for( int i = 0; i < model()->rowCount(); ++i )
     {
         QModelIndex index = model()->index( i, 0 );
@@ -137,6 +138,7 @@ TagCloudView::updateGeometries()
                 x += itemDelegate()->sizeHint( opt, model()->index( count + 1, 0 )).width() + k_RightMargin;
                 count++;
             }
+            minRowHeight = rowHeight > 0 && rowHeight < minRowHeight ? rowHeight : minRowHeight;
         }
 
         opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
@@ -161,7 +163,9 @@ TagCloudView::updateGeometries()
 
     verticalScrollBar()->setRange( 0, opt.rect.bottom() -viewport()->rect().height() );
     verticalScrollBar()->setPageStep( viewport()->height() );
-    
+    verticalScrollBar()->setSingleStep( minRowHeight ); 
+
+
     QAbstractItemView::updateGeometries();
 }
 
