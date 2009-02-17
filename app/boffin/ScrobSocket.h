@@ -34,6 +34,7 @@ class ScrobSocket : public QTcpSocket
 
 public:
     ScrobSocket( QObject* parent );
+    ~ScrobSocket();
 
 public slots:
     void start( const lastfm::Track& );

@@ -33,12 +33,18 @@ ScrobSocket::ScrobSocket( QObject* parent ) : QTcpSocket( parent )
 }
 
 
+ScrobSocket::~ScrobSocket()
+{
+    stop();
+}
+
+
 void
 ScrobSocket::transmit( const QString& data )
 {
     qDebug() << data.trimmed();
     connectToHost( QHostAddress::LocalHost, kDefaultPort );
-    if (waitForConnected( 100 )) write( data.toUtf8() );
+    if (waitForConnected( 5000 )) write( data.toUtf8() ); //lol blocking
     disconnect();
 }
 
