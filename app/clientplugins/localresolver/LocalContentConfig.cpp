@@ -164,3 +164,16 @@ LocalContentConfig::updateVolumeAvailability()
         }
     }
 }
+
+int 
+LocalContentConfig::getFileCount()
+{
+    int artists, files;
+    return m_collection->getCounts(artists, files) ? files : 0;
+}
+
+int LocalContentConfig::getArtistCount()
+{
+    int artists, files;
+    return m_collection->getCounts(artists, files) ? artists : 0;
+}

@@ -51,6 +51,8 @@ public:
     LocalContentConfig();
     ~LocalContentConfig();
 
+    int getFileCount();
+    int getArtistCount();
     QStringList getScanDirs();
     void setScanDirs(QStringList dirs);
     void updateVolumeAvailability();

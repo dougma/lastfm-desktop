@@ -116,7 +116,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
         LocalContentConfig cfg;
         QStringList const dirs = cfg.getScanDirs();
         
-        if (dirs.isEmpty()) 
+        if (dirs.isEmpty() || cfg.getFileCount() == 0) 
         {
             PickDirsDialog picker( window );
             picker.setDirs( dirs );
@@ -128,11 +128,12 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     } 
     catch (QueryError e)
     {
-        // not expecting problems, but: log, warn, and continue anyway.
+        // the db is probably an old version
         qCritical() << "Database problem: " + e.text();
         QMessageBox::warning(window,
             "Warning",
             "Boffin suffered a database problem, consult the log for the gory details");
+        throw 1;    // not much we can do.
     }
 
     m_contentScanner = new LocalContentScanner;
