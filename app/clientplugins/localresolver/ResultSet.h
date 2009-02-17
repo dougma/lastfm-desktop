@@ -62,7 +62,8 @@ public:
     }
 
     // 'unite' the other ResultSet with this one. 
-    // the weights are added when a TrackResult appears in both sets.
+    // the weights are added (and multipled by 10) when a TrackResult appears in both sets.
+    // the multiplication is to make sure the track comes to the front of the resultset.
     ResultSet or(const ResultSet &other)
     {
         ResultSet others;
@@ -75,7 +76,7 @@ public:
                 // operator* gives a const reference, but we're
                 // not modifiing the trackId (the source of the hash)
                 // so we're safe to cast it away
-                const_cast<TrackResult*>(&(*it))->weight += t.weight;
+                const_cast<TrackResult*>(&(*it))->weight = 10 * (it->weight + t.weight);
             }
         }
 
