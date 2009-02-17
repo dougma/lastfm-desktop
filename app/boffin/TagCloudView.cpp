@@ -90,6 +90,14 @@ TagCloudView::paintEvent( QPaintEvent* e )
     QStyleOptionViewItem opt = viewOptions();
     
     QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
+
+    if( model()->rowCount() == 0 )
+    {
+        p.drawText( viewport()->rect(), Qt::AlignCenter,  "No tags have been found!" );
+        
+        return;
+    }
+
     for( ; i != m_rectIndex.constEnd(); ++i )
     {
         const QModelIndex& index = i.key();
