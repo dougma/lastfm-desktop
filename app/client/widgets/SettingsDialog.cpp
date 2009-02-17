@@ -26,7 +26,9 @@
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
 
+#ifndef Q_WS_X11
 Q_DECLARE_METATYPE( Phonon::AudioOutputDevice );
+#endif
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
