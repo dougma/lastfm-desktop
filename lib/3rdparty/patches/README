@@ -1,0 +1,4 @@
+tbytevector_cpp.patch is for Taglib 1.5 to fix v.slow parsing of 
+some rare MP3 files, see: http://bugs.kde.org/show_bug.cgi?id=159821
+
+****
