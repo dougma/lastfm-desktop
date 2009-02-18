@@ -253,16 +253,27 @@ LocalCollection::getExcludedDirectories(int sourceId)
 bool
 LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 {
-    ChainableQuery q(m_db, &ms_activeQueryMutex);
-    q.prepare(
+    // mess about to avoid Qt from treating an empty path as a NULL
+    bool pathIsEmpty = path == "";
+    QString queryText( pathIsEmpty ?
         "SELECT id FROM directories "
-        "WHERE path = :path AND source = :sourceId" ).
-    bindValue( ":path", path ).
-    bindValue( ":source", sourceId ).
-    exec();
+        "WHERE path = \"\" AND source = :sourceId"
+        :
+        "SELECT id FROM directories "
+        "WHERE path = :path AND source = :sourceId" );
+
+    ChainableQuery q( m_db, &ms_activeQueryMutex );
+    q.prepare( queryText ).
+    bindValue( ":sourceId", sourceId );
+
+    if (!pathIsEmpty) {
+        // would be nice if we could simply add this always, but then Qt
+        // complains about parameter mismatch in the pathIsEmpty case
+        q.bindValue( ":path", path );
+    }
 
     bool ok = false;
-    if (q.next()) {
+    if (q.exec().next()) {
         result = q.value( 0 ).toInt( &ok );
     }
     return ok;
@@ -271,16 +282,27 @@ LocalCollection::getDirectoryId(int sourceId, QString path, int &result)
 bool 
 LocalCollection::addDirectory(int sourceId, QString path, int &resultId)
 {
-    ChainableQuery q(m_db, &ms_activeQueryMutex);
-    q.prepare(
+    // mess about to avoid Qt from treating an empty path as a NULL
+    bool pathIsEmpty = path == "";
+    QString queryText( pathIsEmpty ?
         "INSERT into directories ( id, source, path ) "
-        "VALUES ( NULL, :sourceId, :path )" ).
-    bindValue( ":sourceId", sourceId ).
-    bindValue( ":path", path ).
-    exec();
+        "VALUES ( NULL, :sourceId, \"\" )" 
+        :
+        "INSERT into directories ( id, source, path ) "
+        "VALUES ( NULL, :sourceId, :path )" );
+
+    ChainableQuery q( m_db, &ms_activeQueryMutex );
+    q.prepare( queryText ).
+    bindValue( ":sourceId", sourceId );
+
+    if (!pathIsEmpty) {
+        // would be nice if we could simply add this always, but then Qt
+        // complains about parameter mismatch in the pathIsEmpty case
+        q.bindValue( ":path", path );
+    }
 
     bool ok;
-    resultId = q.lastInsertId().toInt( &ok );
+    resultId = q.exec().lastInsertId().toInt( &ok );
     return ok;
 }
 
