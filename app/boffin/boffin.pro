@@ -1,4 +1,4 @@
-CONFIG += types unicorn resolver sqlite3 taglib
+CONFIG += types unicorn resolver sqlite3 taglib radio
 QT += opengl sql phonon
 VERSION = 0.0.3
 
@@ -20,6 +20,5 @@ HEADERS += ../client/Resolver.h \
 	       ../client/ResolvingTrackSource.h \
 	       ../client/XspfResolvingTrackSource.h \
 	       ../client/LocalRql.h \
-	       ../client/LocalRadioTrackSource.h \
-	       ../../lib/lastfm/radio/AbstractTrackSource.h
+	       ../client/LocalRadioTrackSource.h 
 	       
