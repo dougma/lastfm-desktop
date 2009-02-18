@@ -41,6 +41,6 @@ private slots:
 public:
     PickDirsDialog( QWidget* parent );
     
-    QStringList getDirs() const;
+    QStringList dirs() const;
     void setDirs(QStringList dirs);
 };

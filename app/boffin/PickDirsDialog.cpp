@@ -93,7 +93,7 @@ PickDirsDialog::prompt()
 
 
 QStringList
-PickDirsDialog::getDirs() const
+PickDirsDialog::dirs() const
 {
     QStringList dirs;
     foreach (QCheckBox* check, ui.group->findChildren<QCheckBox*>())

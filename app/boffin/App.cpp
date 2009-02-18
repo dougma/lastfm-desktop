@@ -145,7 +145,7 @@ App::scan( bool force_ask_user )
             picker.setDirs( dirs );
             if (picker.exec() == QDialog::Rejected)
                 return false;        // abort the whole app
-            cfg.setScanDirs( picker.getDirs() );
+            cfg.setScanDirs( picker.dirs() );
             cfg.updateVolumeAvailability();
         }
     } 

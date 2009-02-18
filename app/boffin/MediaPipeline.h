@@ -20,8 +20,11 @@
 #include <lastfm/global.h>
 #include <lastfm/Track>
 #include <lastfm/WsError>
+#include <QPointer>
 #include <QObject>
 #include <phonon/phononnamespace.h>
+
+class AbstractTrackSource;
 
 namespace Phonon
 {
@@ -67,7 +70,7 @@ private:
     class LocalRql* m_localRql;
     class ITrackResolverPlugin* m_trackResolver;
     class Resolver* m_resolver;
-    class AbstractTrackSource* m_source;
+    QPointer<AbstractTrackSource> m_source;
     Track m_track;
     bool m_phonon_sucks;
     

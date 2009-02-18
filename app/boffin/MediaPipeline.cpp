@@ -169,11 +169,14 @@ void
 MediaPipeline::stop()
 {
     using namespace Phonon;
-    
+
     // lol @ Phonon's shit API. We're 99% sure we're using it right
     mo->stop();
     mo->setCurrentSource( MediaSource() );
     mo->setQueue( QList<MediaSource>() );
+
+    delete m_source;
+    m_source = 0;
 }
 
 
