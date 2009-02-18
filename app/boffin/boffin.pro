@@ -1,6 +1,6 @@
-CONFIG += core types unicorn resolver radio sqlite3 taglib
-QT += opengl sql
-VERSION = 0.0.2
+CONFIG += types unicorn resolver sqlite3 taglib
+QT += opengl sql phonon
+VERSION = 0.0.3
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
@@ -20,5 +20,6 @@ HEADERS += ../client/Resolver.h \
 	       ../client/ResolvingTrackSource.h \
 	       ../client/XspfResolvingTrackSource.h \
 	       ../client/LocalRql.h \
-	       ../client/LocalRadioTrackSource.h
+	       ../client/LocalRadioTrackSource.h \
+	       ../../lib/lastfm/radio/AbstractTrackSource.h
 	       

@@ -17,56 +17,58 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef APP_H
-#define APP_H
-
 #include <lastfm/global.h>
-#include "lib/unicorn/UnicornApplication.h"
-namespace Phonon { class AudioOutput; }
+#include <lastfm/Track>
+#include <lastfm/WsError>
+#include <QObject>
+#include <phonon/phononnamespace.h>
+
+namespace Phonon
+{
+	class MediaObject;
+ 	class AudioOutput;
+    class MediaSource;
+}
 
 
-class App : public unicorn::Application
+class MediaPipeline : public QObject
 {
     Q_OBJECT
-    
-public:
-    App( int& argc, char* argv[] );
-    ~App();
 
-    void init( class MainWindow* ) throw( int /*exitcode*/ );
+public: 
+    MediaPipeline( Phonon::AudioOutput*, QObject* parent );
+    ~MediaPipeline();
 
-    void play( QStringList tags );
-    
+    void playTags( QStringList );
+    void playXspf( const QString& path );
+
 public slots:
-    void play();
-    /** returns false if user cancels the picker dialog */
-    bool scan( bool force_ask_user = true );
-    
-private slots:
-    void onOutputDeviceActionTriggered( QAction* );
-    void onPlayActionToggled( bool );
-        
-    void onStarted( const Track& );
-    void onResumed();
-    void onPaused();
-    void onStopped();
-    
-    void onScanningFinished();
-    
-    void onPlaybackError( const QString& );
-    
-private:
-    void cleanup();
-    
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
-    class MainWindow* m_mainwindow;
-    class TagCloudView* m_cloud;
-    class ScrobSocket* m_scrobsocket;
-    class MediaPipeline* m_pipe;
-    
-    Phonon::AudioOutput* m_audioOutput;
-};
+    void setPaused( bool );
+    void stop();
+    void skip();
 
-#endif //APP_H
+signals:
+    void started( const Track& );
+    void paused();
+    void resumed();
+    void stopped();
+    void error( const QString& );
+
+private slots:
+    void onPhononStateChanged( Phonon::State, Phonon::State );
+    void onSourceError( Ws::Error );
+    void enqueue();
+
+private:
+	Phonon::MediaObject* mo;    
+    Phonon::AudioOutput* ao;
+    class ILocalRqlPlugin* m_localRqlPlugin;
+    class LocalRql* m_localRql;
+    class ITrackResolverPlugin* m_trackResolver;
+    class Resolver* m_resolver;
+    class AbstractTrackSource* m_source;
+    Track m_track;
+    bool m_phonon_sucks;
+    
+    void play( AbstractTrackSource* );
+};

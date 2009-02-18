@@ -19,21 +19,15 @@
  
 #include "App.h"
 #include "MainWindow.h"
+#include "MediaPipeline.h"
 #include "PickDirsDialog.h"
 #include "ScanProgressWidget.h"
 #include "ScrobSocket.h"
 #include "app/clientplugins/localresolver/LocalContentScannerThread.h"
 #include "app/clientplugins/localresolver/LocalContentScanner.h"
 #include "app/clientplugins/localresolver/LocalContentConfig.h"
-#include "app/clientplugins/localresolver/LocalRqlPlugin.h"
-#include "app/clientplugins/localresolver/TrackResolver.h"
 #include "app/clientplugins/localresolver/TrackTagUpdater.h"
 #include "app/clientplugins/localresolver/QueryError.h"
-#include "app/client/Resolver.h"
-#include "app/client/XspfResolvingTrackSource.h"
-#include "app/client/LocalRql.h"
-#include "app/client/LocalRadioTrackSource.h"
-#include "lib/lastfm/radio/Radio.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QMenu>
 #include <QVBoxLayout>
@@ -48,20 +42,19 @@ App::App( int& argc, char** argv )
    , m_contentScannerThread( 0 )
    , m_contentScanner( 0 )
    , m_trackTagUpdater( 0 )
-   , m_localRql( 0 )
-   , m_trackResolver( 0 )
-   , m_radio( 0 )
-   , m_resolver( 0 )
    , m_mainwindow( 0 )
    , m_cloud( 0 )
    , m_scrobsocket( 0 )
+   , m_pipe( 0 )
+   , m_audioOutput( 0 )
 {}
 
 
 App::~App()
 {
     cleanup();
-    if (m_radio) QSettings().setValue( OUTPUT_DEVICE_KEY, m_radio->audioOutput()->outputDevice().name() );
+    if (m_audioOutput) QSettings().setValue( OUTPUT_DEVICE_KEY, m_audioOutput->outputDevice().name() );
+    delete m_pipe;
 }
 
 
@@ -71,7 +64,7 @@ App::cleanup()
     if (m_contentScanner) m_contentScanner->stop();
     if (m_contentScannerThread) m_contentScannerThread->wait();
     delete m_contentScanner;
-    delete m_contentScannerThread;    
+    delete m_contentScannerThread;
 }
 
 
@@ -86,8 +79,8 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
         
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
-    Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
-	audioOutput->setVolume( 1.0 /* Settings().volume() */ );
+    m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+	m_audioOutput->setVolume( 1.0 /* Settings().volume() */ );
 
     QActionGroup* actiongroup = new QActionGroup( window->ui.outputdevice );
 
@@ -96,8 +89,8 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
         QAction* a = window->ui.outputdevice->addAction( d.name() );
         a->setCheckable( true );
         if (name == d.name())
-            audioOutput->setOutputDevice( d );
-        if (audioOutput->outputDevice().name() == d.name())
+            m_audioOutput->setOutputDevice( d );
+        if (m_audioOutput->outputDevice().name() == d.name())
             a->setChecked( true );
             
         actiongroup->addAction( a );
@@ -105,17 +98,18 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     
-	m_radio = new Radio( audioOutput );
-    connect( m_radio, SIGNAL(trackSpooled( lastfm::Track )), SLOT(onTrackSpooled( lastfm::Track )) );
-    connect( m_radio, SIGNAL(stopped()), SLOT(onRadioStopped()) );
+	m_pipe = new MediaPipeline( m_audioOutput, this );
+    connect( m_pipe, SIGNAL(started( Track )), SLOT(onStarted( Track )) );
+    connect( m_pipe, SIGNAL(paused()), SLOT(onPaused()) );
+    connect( m_pipe, SIGNAL(resumed()), SLOT(onResumed()) );
+    connect( m_pipe, SIGNAL(stopped()), SLOT(onStopped()) );
+    connect( m_pipe, SIGNAL(error( QString )), SLOT(onPlaybackError( QString )) );
 
     m_scrobsocket = new ScrobSocket( this );
-    connect( m_radio, SIGNAL(trackStarted( lastfm::Track )), m_scrobsocket, SLOT(start( lastfm::Track )) );
-    connect( m_radio, SIGNAL(stopped()), m_scrobsocket, SLOT(stop()) );
-
-/// local rql
-    m_localRqlPlugin = new LocalRqlPlugin;
-    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
+    connect( m_pipe, SIGNAL(started( Track )), m_scrobsocket, SLOT(start( Track )) );
+    connect( m_pipe, SIGNAL(paused()), m_scrobsocket, SLOT(pause()) );
+    connect( m_pipe, SIGNAL(resumed()), m_scrobsocket, SLOT(resume()) );
+    connect( m_pipe, SIGNAL(stopped()), m_scrobsocket, SLOT(stop()) );
 
 /// parts of the scanning stuff
     m_trackTagUpdater = TrackTagUpdater::create(
@@ -123,13 +117,10 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
             100,        // number of days track tags are good 
             5);         // 5 minute delay between web requests
 
-/// content resolver
-    m_trackResolver = new TrackResolver;
-    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
-
 /// connect
     connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
-    connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
+    connect( window->ui.pause, SIGNAL(toggled( bool )), m_pipe, SLOT(setPaused( bool )) );
+    connect( window->ui.skip, SIGNAL(triggered()), m_pipe, SLOT(skip()) );
     connect( window->ui.rescan, SIGNAL(triggered()), SLOT(scan()) );
 
 /// go!
@@ -191,15 +182,6 @@ App::scan( bool force_ask_user )
 
 
 void
-App::openXspf( QString filename )
-{
-    XspfResolvingTrackSource* src = new XspfResolvingTrackSource( m_resolver, filename );
-    m_radio->play( RadioStation( "XSPF" ), src );
-    src->start();
-}
-
-
-void
 App::onOutputDeviceActionTriggered( QAction* a )
 {
     //FIXME for some reason setOutputDevice just returns false! :(
@@ -208,8 +190,8 @@ App::onOutputDeviceActionTriggered( QAction* a )
     
     foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
         if (d.name() == name) {
-            qDebug() << m_radio->audioOutput()->setOutputDevice( d );
-            qDebug() << m_radio->audioOutput()->outputDevice().name();
+            qDebug() << m_audioOutput->setOutputDevice( d );
+            qDebug() << m_audioOutput->outputDevice().name();
             return;
         }
 }
@@ -238,8 +220,8 @@ App::onScanningFinished()
     qDebug() << "END:" << time.elapsed() << "ms";
     
     m_mainwindow->ui.play->setEnabled( true );
-//    m_mainwindow->ui.pause->setEnabled( true );
-    m_mainwindow->ui.skip->setEnabled( true );
+    m_mainwindow->ui.pause->setEnabled( false );
+    m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
 }
 
@@ -256,59 +238,60 @@ App::play()
                                              .exec();
             return;
         }
-        play( m_cloud->currentTags() );
+        m_pipe->playTags( m_cloud->currentTags() );
         m_cloud->setEnabled( false ); //prevent interaction until stop pushed
     }
 }
 
 
 void
-App::play( QStringList tags )
+App::onStarted( const Track& t )
 {
-    for (int i = 0; i < tags.count(); ++i)
-        tags[i] = "tag:\"" + tags[i] + '"';
-    QString const rql = tags.join( " or " );
-    LocalRqlResult* result = m_localRql->startParse( rql );
-    
-    if (!result)
-    {
-        MessageBoxBuilder( m_mainwindow )
-                .setTitle( tr("Local Radio Error") )
-                .setText( tr("Could not load plugin") )
-                .sheet()
-                .exec();
-        return;
-    }
-
-    //FIXME this synconicity is evil, but so is asyncronicity here
-    QEventLoop loop;
-    connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
-    connect( result, SIGNAL(parseBad( int, QString, int )), &loop, SLOT(quit()) );
-    loop.exec();
-
-    LocalRadioTrackSource* source = new LocalRadioTrackSource( result );
-    m_radio->play( RadioStation( tags.join( ", " ) ), source  );
-    source->start();
-}
-
-
-void
-App::onTrackSpooled( const Track& t )
-{    
     m_mainwindow->setWindowTitle( t );
-    
     m_mainwindow->ui.play->blockSignals( true );
-    m_mainwindow->ui.play->setChecked( !t.isNull() );
+    m_mainwindow->ui.play->setChecked( true );
     m_mainwindow->ui.play->blockSignals( false );
+    m_mainwindow->ui.pause->blockSignals( true );
+    m_mainwindow->ui.pause->setChecked( false );
+    m_mainwindow->ui.pause->setEnabled( true );
+    m_mainwindow->ui.pause->blockSignals( false );
+    
+    m_mainwindow->ui.skip->setEnabled( true );
 }
 
 
 void
-App::onRadioStopped()
+App::onPaused()
+{
+    m_mainwindow->ui.pause->blockSignals( true );
+    m_mainwindow->ui.pause->setChecked( true );
+    m_mainwindow->ui.pause->blockSignals( false );
+}
+
+
+void
+App::onResumed()
+{
+    m_mainwindow->ui.pause->blockSignals( true );
+    m_mainwindow->ui.pause->setChecked( false );
+    m_mainwindow->ui.pause->blockSignals( false );
+}
+
+
+void
+App::onStopped()
 {
     m_mainwindow->setWindowTitle( Track() );
     m_cloud->setEnabled( true );
+    m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( false );
+    m_mainwindow->ui.play->blockSignals( false );
+    m_mainwindow->ui.pause->blockSignals( true );
+    m_mainwindow->ui.pause->setChecked( false );
+    m_mainwindow->ui.pause->setEnabled( false );
+    m_mainwindow->ui.pause->blockSignals( false );
+    
+    m_mainwindow->ui.skip->setEnabled( false );
 }
 
 
@@ -318,5 +301,15 @@ App::onPlayActionToggled( bool b )
     if (b)
         play();
     else
-        m_radio->stop();
+        m_pipe->stop();
+}
+
+
+void
+App::onPlaybackError( const QString& msg )
+{
+    MessageBoxBuilder( m_mainwindow )
+            .setTitle( "Playback Error" )
+            .setText( msg )
+            .exec();
 }

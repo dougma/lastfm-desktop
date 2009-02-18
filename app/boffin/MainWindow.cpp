@@ -60,6 +60,7 @@ MainWindow::MainWindow()
     ui.pause = toolbar->addAction( tr("Pause") );
     ui.skip = toolbar->addAction( tr("Skip") );
     ui.play->setCheckable( true );
+    ui.pause->setCheckable( true );
 
     toolbar->setIconSize( QSize( 41, 41 ) );
 

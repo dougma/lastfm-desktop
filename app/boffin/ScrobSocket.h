@@ -37,7 +37,7 @@ public:
     ~ScrobSocket();
 
 public slots:
-    void start( const lastfm::Track& );
+    void start( const Track& );
     void pause();
     void resume();
     void stop();
@@ -45,6 +45,7 @@ public slots:
 private slots:
     void transmit( const QString& data );
     void onError( QAbstractSocket::SocketError );
+    void onReadyRead();
 
 private:    
     Track m_track;

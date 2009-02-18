@@ -28,6 +28,7 @@ static int const kDefaultPort = 33367;
 
 ScrobSocket::ScrobSocket( QObject* parent ) : QTcpSocket( parent )
 {
+    connect( this, SIGNAL(readyRead()), SLOT(onReadyRead()) );    
     connect( this, SIGNAL(error( QAbstractSocket::SocketError )), SLOT(onError( QAbstractSocket::SocketError )) );
     transmit( "INIT c=bof\n" );
 }
@@ -45,7 +46,6 @@ ScrobSocket::transmit( const QString& data )
     qDebug() << data.trimmed();
     connectToHost( QHostAddress::LocalHost, kDefaultPort );
     if (waitForConnected( 5000 )) write( data.toUtf8() ); //lol blocking
-    disconnect();
 }
 
 
@@ -105,4 +105,13 @@ void
 ScrobSocket::stop()
 {
     transmit( "STOP c=bof\n" );
+}
+
+
+void
+ScrobSocket::onReadyRead()
+{
+    QByteArray bytes = readAll();
+    if (bytes != "OK\n") qWarning() << bytes.trimmed();
+    disconnectFromHost();
 }
