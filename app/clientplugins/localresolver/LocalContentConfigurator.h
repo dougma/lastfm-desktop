@@ -17,14 +17,16 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef LOCAL_CONTENT_CONFIG_H
-#define LOCAL_CONTENT_CONFIG_H
+#ifndef LOCAL_CONTENT_CONFIGURATOR_H
+#define LOCAL_CONTENT_CONFIGURATOR_H
 
 #include <QSet>
 #include <QString>
 #include <QStringList>
 
-class LocalContentConfig
+// this class is for manipulating the sources table of the LocalCollection database
+//
+class LocalContentConfigurator
 {
 public:
     struct VolPath
@@ -48,8 +50,8 @@ private:
     QSet<VolPath> m_sourceSet;
 
 public:
-    LocalContentConfig();
-    ~LocalContentConfig();
+    LocalContentConfigurator();
+    ~LocalContentConfigurator();
 
     int getFileCount();
     int getArtistCount();
@@ -58,7 +60,7 @@ public:
     void updateVolumeAvailability();
 };
 
-int qHash(const LocalContentConfig::VolPath &vp);
+int qHash(const LocalContentConfigurator::VolPath &vp);
 
 
 #endif

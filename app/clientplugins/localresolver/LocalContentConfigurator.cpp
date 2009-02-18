@@ -17,7 +17,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "LocalContentConfig.h"
+#include "LocalContentConfigurator.h"
 #include "LocalCollection.h"
 #include <QDir>
 
@@ -27,7 +27,7 @@ QStringList getAvailableVolumes();
 bool isVolumeImplicitlyAvailable(const QString& volume);
 
 
-int qHash(const LocalContentConfig::VolPath &vp)
+int qHash(const LocalContentConfigurator::VolPath &vp)
 {
     return qHash(vp.m_vol + vp.m_path);
 }
@@ -102,18 +102,18 @@ splitPath(const QString& path)
 #endif
 
 
-LocalContentConfig::LocalContentConfig()
+LocalContentConfigurator::LocalContentConfigurator()
 {
     m_collection = LocalCollection::create("LocalContentConfig");
 }
 
-LocalContentConfig::~LocalContentConfig()
+LocalContentConfigurator::~LocalContentConfigurator()
 {
     delete m_collection;
 }
 
 QStringList
-LocalContentConfig::getScanDirs()
+LocalContentConfigurator::getScanDirs()
 {
     QStringList result;
     m_sourceSet.clear();
@@ -129,7 +129,7 @@ LocalContentConfig::getScanDirs()
 }
 
 void
-LocalContentConfig::setScanDirs(QStringList dirs)
+LocalContentConfigurator::setScanDirs(QStringList dirs)
 {
     foreach (const QString& dir, dirs) {
         QPair<QString, QString> split = splitPath( dir );
@@ -153,7 +153,7 @@ LocalContentConfig::setScanDirs(QStringList dirs)
 
 
 void
-LocalContentConfig::updateVolumeAvailability()
+LocalContentConfigurator::updateVolumeAvailability()
 {
     QStringList volumes = getAvailableVolumes();
 
@@ -166,13 +166,13 @@ LocalContentConfig::updateVolumeAvailability()
 }
 
 int 
-LocalContentConfig::getFileCount()
+LocalContentConfigurator::getFileCount()
 {
     int artists, files;
     return m_collection->getCounts(artists, files) ? files : 0;
 }
 
-int LocalContentConfig::getArtistCount()
+int LocalContentConfigurator::getArtistCount()
 {
     int artists, files;
     return m_collection->getCounts(artists, files) ? artists : 0;

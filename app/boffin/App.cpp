@@ -25,7 +25,7 @@
 #include "ScrobSocket.h"
 #include "app/clientplugins/localresolver/LocalContentScannerThread.h"
 #include "app/clientplugins/localresolver/LocalContentScanner.h"
-#include "app/clientplugins/localresolver/LocalContentConfig.h"
+#include "app/clientplugins/localresolver/LocalContentConfigurator.h"
 #include "app/clientplugins/localresolver/TrackTagUpdater.h"
 #include "app/clientplugins/localresolver/QueryError.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
@@ -136,7 +136,7 @@ App::scan( bool force_ask_user )
 /// content scanner
     try
     {
-        LocalContentConfig cfg;
+        LocalContentConfigurator cfg;
         QStringList const dirs = cfg.getScanDirs();
 
         if (dirs.isEmpty() || cfg.getFileCount() == 0 || force_ask_user)
