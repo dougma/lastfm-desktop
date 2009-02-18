@@ -44,7 +44,7 @@ public slots:
     void startAgain();
     
 private slots:
-    void onOutputDeviceActionTriggered( QAction* );
+    void onOutputDeviceActionTriggered( class QAction* );
 
     void onPreparing();
     void onStarted( const Track& );
