@@ -33,6 +33,10 @@ probably go:
 I wrote that from memory as I'm working on a Mac today. If it's wrong please
 write and correct me. KTHXBAI.
 
+Ubuntu install deps line:
+
+sudo apt-get install libsqlite3-dev libqt4-sql-sqlite
+
 Mac OS X
 --------
 We suggest you grab the Qt 4.4 dmg installer from the Qt website. Then, the

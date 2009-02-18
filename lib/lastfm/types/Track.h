@@ -239,7 +239,9 @@ TrackData::TrackData()
 #include <QDebug>
 inline QDebug operator<<( QDebug d, const lastfm::Track& t )
 {
-    return d << t.toString( '-' ) << t.url();
+    return !t.isNull() 
+            ? d << t.toString( '-' ) << t.url()
+            : d << "Null Track object";
 }
 
 

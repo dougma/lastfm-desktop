@@ -33,7 +33,7 @@ CONFIG( samplerate ) {
 }
 
 CONFIG( sqlite3 ) {
-    !macx*{
+    win32 {
         CONFIG += link_pkgconfig
         PKGCONFIG += sqlite3
     }

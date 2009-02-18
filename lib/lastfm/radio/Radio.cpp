@@ -39,7 +39,7 @@ Radio::Radio( Phonon::AudioOutput* output )
     m_mediaObject = new Phonon::MediaObject;
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-	connect( m_mediaObject, SIGNAL(currentSourceChanged( const Phonon::MediaSource &)), SLOT(onPhononCurrentSourceChanged( const Phonon::MediaSource &)) );
+	connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononCurrentSourceChanged( Phonon::MediaSource )) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
     connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
     Phonon::createPath( m_mediaObject, m_audioOutput );    
@@ -250,7 +250,7 @@ Radio::phononEnqueue()
         m_track = t;
         Phonon::MediaSource ms( t.url() );
 
-        // it is important to make this distinction:
+        // if we are playing a track now, enqueue, otherwise start now!
         if (m_mediaObject->currentSource().url().isValid()) {
             m_mediaObject->enqueue( ms );
         } else {

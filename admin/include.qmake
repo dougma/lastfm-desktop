@@ -11,7 +11,7 @@ mac*{
 linux*{
 	CONFIG += link_pkgconfig
 	# use KDE phonon if installed in preference
-	contains( QT, phonon ):LIBS += -L$$system( kde4-config --prefix )/lib
+	contains( QT, phonon ):LIBS += -L$$system( kde4-config --prefix &2> /dev/null )/lib
 }
 
 #default install target

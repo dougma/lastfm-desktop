@@ -93,4 +93,6 @@ LegacyPlayerListener::onDataReady()
             socket->write( s.toUtf8() );
         }
     }
+    
+    socket->close();
 }

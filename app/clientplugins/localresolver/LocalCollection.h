@@ -40,7 +40,7 @@
 #include <QVariantList>
 #include "ChainableQuery.h"
 #include "lib/lastfm/core/WeightedStringList.h"
-
+#include <memory>
 
 class LocalCollection : public QObject
 {

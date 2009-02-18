@@ -71,8 +71,6 @@ INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
 
 .PHONY = bundle bundle-clean bundle-install dmg dmg-clean everything
 
-MOOSE: all moose_extra
-
 \$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
 	perl -pi -e 's/@SHORT_VERSION@/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
