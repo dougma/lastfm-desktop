@@ -29,6 +29,7 @@
 #include "app/clientplugins/localresolver/TrackTagUpdater.h"
 #include "app/clientplugins/localresolver/QueryError.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
+#include <QFileDialog>
 #include <QMenu>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
@@ -122,11 +123,20 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( window->ui.play, SIGNAL(triggered()), SLOT(play()) );
     connect( window->ui.pause, SIGNAL(toggled( bool )), m_pipe, SLOT(setPaused( bool )) );
     connect( window->ui.skip, SIGNAL(triggered()), m_pipe, SLOT(skip()) );
-    connect( window->ui.rescan, SIGNAL(triggered()), SLOT(scan()) );
+    connect( window->ui.rescan, SIGNAL(triggered()), SLOT(startAgain()) );
+    connect( window->ui.xspf, SIGNAL(triggered()), SLOT(xspf()) );
 
 /// go!
-    if (!scan( false )) 
+    if (!scan( false ))
         throw 1; //abort app
+}
+
+
+void
+App::startAgain()
+{
+    //TODO add the wipe database function
+    scan( true );
 }
 
 
@@ -240,7 +250,19 @@ App::play()
             return;
         }
         m_pipe->playTags( m_cloud->currentTags() );
-        m_cloud->setEnabled( false ); //prevent interaction until stop pushed
+        m_mainwindow->QMainWindow::setWindowTitle( "Boffing up..." );
+    }
+}
+
+
+void
+App::xspf()
+{
+    QString path = QFileDialog::getOpenFileName( m_mainwindow, "Open XSPF File", "*.xspf" );
+    if (path.size())
+    {
+        m_mainwindow->QMainWindow::setWindowTitle( "Resolving XSPF..." );
+        m_pipe->playXspf( path );
     }
 }
 
@@ -248,6 +270,8 @@ App::play()
 void
 App::onPreparing() //MediaPipeline is preparing to play a new station
 {
+    m_cloud->setEnabled( false ); //prevent interaction until stop pushed
+        
     QAction* a = m_mainwindow->ui.play;
     a->setIcon( QPixmap(":/stop.png") );
     disconnect( a, SIGNAL(triggered()), this, 0 );

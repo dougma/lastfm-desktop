@@ -34,13 +34,14 @@ public:
     ~App();
 
     void init( class MainWindow* ) throw( int /*exitcode*/ );
-
-    void play( QStringList tags );
     
 public slots:
     void play();
+    void xspf(); //prompts to choose a xspf to resolve
+    
     /** returns false if user cancels the picker dialog */
     bool scan( bool force_ask_user = true );
+    void startAgain();
     
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
@@ -51,10 +52,9 @@ private slots:
     void onPaused();
     void onStopped();
     
-    void onScanningFinished();
-    
+    void onScanningFinished();    
     void onPlaybackError( const QString& );
-    
+
 private:
     void cleanup();
     

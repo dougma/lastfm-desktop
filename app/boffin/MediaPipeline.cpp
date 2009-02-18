@@ -169,11 +169,24 @@ void
 MediaPipeline::stop()
 {
     using namespace Phonon;
-
-    // lol @ Phonon's shit API. We're 99% sure we're using it right
-    mo->stop();
-    mo->setCurrentSource( MediaSource() );
-    mo->setQueue( QList<MediaSource>() );
+    
+    qDebug() << mo->state();
+    
+    if (mo->state() != Phonon::StoppedState)
+    {
+        // lol @ Phonon's shit API. We're 99% sure we're using it right
+        mo->stop();
+        mo->setCurrentSource( MediaSource() );
+        mo->setQueue( QList<MediaSource>() );
+        
+        if (mo->state() == Phonon::LoadingState)
+            emit stopped(); //phonon is broken and shit
+    }
+    else if (m_source)
+        // otherwise we have a source and it is doing something, but it could be
+        // slow. Slow enough that the user wants to push the stop() button. So
+        // the user did push the stop button. So tell the GUI that we stopped.
+        emit stopped();
 
     delete m_source;
     m_source = 0;
@@ -248,13 +261,14 @@ MediaPipeline::enqueue()
         // consume next track from the track source. a null track 
         // response means wait until the trackAvailable signal
         Track t = m_source->takeNextTrack();
-        if (t.isNull()) break;
+        if (t.isNull()) { qDebug() << t; break; }
 
         // Invalid urls won't trigger the correct phonon
         // state changes, so we must prefilter them.
         if (!t.url().isValid()) continue;
         
         m_track = t;
+        qDebug() << "Will play:" << t;
 
         // if we are playing a track now, enqueue, otherwise start now!
         if (mo->currentSource().url().isValid())

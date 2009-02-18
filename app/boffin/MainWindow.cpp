@@ -41,6 +41,7 @@ MainWindow::MainWindow()
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
 
     QMenu* tools = menuBar()->addMenu( tr("Tools") );
+    ui.xspf = tools->addAction( "Resolve XSPF" );
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
     QAction* showlog = tools->addAction( tr("Show &Log") );
 
