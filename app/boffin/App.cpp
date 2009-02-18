@@ -99,6 +99,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     
 	m_pipe = new MediaPipeline( m_audioOutput, this );
+    connect( m_pipe, SIGNAL(preparing()), SLOT(onPreparing()) );
     connect( m_pipe, SIGNAL(started( Track )), SLOT(onStarted( Track )) );
     connect( m_pipe, SIGNAL(paused()), SLOT(onPaused()) );
     connect( m_pipe, SIGNAL(resumed()), SLOT(onResumed()) );
@@ -118,7 +119,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
             5);         // 5 minute delay between web requests
 
 /// connect
-    connect( window->ui.play, SIGNAL(toggled( bool )), SLOT(onPlayActionToggled( bool )) );
+    connect( window->ui.play, SIGNAL(triggered()), SLOT(play()) );
     connect( window->ui.pause, SIGNAL(toggled( bool )), m_pipe, SLOT(setPaused( bool )) );
     connect( window->ui.skip, SIGNAL(triggered()), m_pipe, SLOT(skip()) );
     connect( window->ui.rescan, SIGNAL(triggered()), SLOT(scan()) );
@@ -245,6 +246,16 @@ App::play()
 
 
 void
+App::onPreparing() //MediaPipeline is preparing to play a new station
+{
+    QAction* a = m_mainwindow->ui.play;
+    a->setIcon( QPixmap(":/stop.png") );
+    disconnect( a, SIGNAL(triggered()), this, 0 );
+    connect( a, SIGNAL(triggered()), m_pipe, SLOT(stop()) );
+}
+
+
+void
 App::onStarted( const Track& t )
 {
     m_mainwindow->setWindowTitle( t );
@@ -292,16 +303,11 @@ App::onStopped()
     m_mainwindow->ui.pause->blockSignals( false );
     
     m_mainwindow->ui.skip->setEnabled( false );
-}
 
-
-void
-App::onPlayActionToggled( bool b )
-{
-    if (b)
-        play();
-    else
-        m_pipe->stop();
+    QAction* a = m_mainwindow->ui.play;
+    a->setIcon( QPixmap(":/play.png") );
+    disconnect( a, SIGNAL(triggered()), m_pipe, 0 );
+    connect( a, SIGNAL(triggered()), SLOT(play()) );
 }
 
 

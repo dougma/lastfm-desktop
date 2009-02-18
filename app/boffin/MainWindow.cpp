@@ -59,17 +59,13 @@ MainWindow::MainWindow()
     ui.play = toolbar->addAction( tr("Play") );
     ui.pause = toolbar->addAction( tr("Pause") );
     ui.skip = toolbar->addAction( tr("Skip") );
-    ui.play->setCheckable( true );
     ui.pause->setCheckable( true );
 
     toolbar->setIconSize( QSize( 41, 41 ) );
 
 //    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
 
-    QIcon playicon( QPixmap(":/play.png") );
-    playicon.addPixmap( QPixmap(":/stop.png"), QIcon::Normal, QIcon::On );
-
-    ui.play->setIcon( playicon );
+    ui.play->setIcon( QPixmap(":/play.png") );
     ui.pause->setIcon( QPixmap(":/pause.png") );
     ui.skip->setIcon( QPixmap(":/skip.png") );
             

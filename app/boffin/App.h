@@ -44,8 +44,8 @@ public slots:
     
 private slots:
     void onOutputDeviceActionTriggered( QAction* );
-    void onPlayActionToggled( bool );
-        
+
+    void onPreparing();
     void onStarted( const Track& );
     void onResumed();
     void onPaused();

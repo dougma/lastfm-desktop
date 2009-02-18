@@ -48,6 +48,7 @@ public slots:
     void skip();
 
 signals:
+    void preparing(); //before station starts, only happens one after play*() is called
     void started( const Track& );
     void paused();
     void resumed();

@@ -52,17 +52,15 @@ ScrobSocket::transmit( const QString& data )
 void
 ScrobSocket::onError( SocketError error )
 {
-    qDebug() << lastfm::qMetaEnumString<QAbstractSocket>( error, "SocketError" );
-    
     switch (error)
     {
         case RemoteHostClosedError:
             // expected
             break;
         
-        case ConnectionRefusedError:
         default: // may as well
-            //if (portstep()) write( m_written );
+            qDebug() << lastfm::qMetaEnumString<QAbstractSocket>( error, "SocketError" );
+        case ConnectionRefusedError: // happens if client isn't running
             break;
     }
 }

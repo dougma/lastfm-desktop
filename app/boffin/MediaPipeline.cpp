@@ -41,7 +41,7 @@ MediaPipeline::MediaPipeline( Phonon::AudioOutput* ao, QObject* parent )
     mo = new Phonon::MediaObject;
     connect( mo, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
     connect( mo, SIGNAL(aboutToFinish()), SLOT(enqueue()) ); // fires just before track finishes
-    Phonon::createPath( mo, ao );    
+    Phonon::createPath( mo, ao );
     
 /// local rql
     m_localRqlPlugin = new LocalRqlPlugin;
@@ -132,6 +132,8 @@ MediaPipeline::play( AbstractTrackSource* trackSource )
 
 	connect( m_source, SIGNAL(trackAvailable()), SLOT(enqueue()) );
 	connect( m_source, SIGNAL(error( Ws::Error )), SLOT(onSourceError( Ws::Error )) );
+	
+    emit preparing();
 }
 
 
