@@ -28,34 +28,6 @@ EndProject'
     echo "$FIRST_BIT$LAST_BIT" >> Last.sln
 }
 
-qCheck()
-{
-    while [ $# -gt 0 ]
-    do
-        $1 -v &> /dev/null
-        if [[ $? != 127 ]]
-        then
-            # valid qmake output
-            # QMake version 2.01a
-            # Using Qt version 4.2.2 in /opt/qt/4.2.2/lib
-
-            middle "Checking if $1 is a valid version..."
-
-            min=4
-            $1 -v 2> /dev/null | grep -q "^Using Qt version 4.[$min-9]"
-            
-            if [[ $? == 0 ]]
-            then
-                QMAKE=$1
-                return 0
-            else
-                QMAKE='toolow'
-            fi
-        fi
-        shift
-    done
-}
-
 
 ######################################################################## usage
 header "Configuring Last.fm"
@@ -89,7 +61,7 @@ done
 [ $XCODE ] && [ $RELEASE ] && die 'Incompatible arguments'
 
 
-qCheck qmake qmake-qt4
+QMAKE=`ruby admin/which_qmake.rb`
 
 if [[ $QMAKE == 'toolow' ]]
 then
@@ -112,6 +84,7 @@ then
     exit 2
 fi
 
+echo 'Using '`which $QMAKE`
 
 header 'Generating Build System'
 
