@@ -440,6 +440,7 @@ App::ban()
 {
 	MutableTrack t = m_stateMachine->track();
 	t.ban();
+	m_scrobbler->cache( t );
 	m_radio->skip();
 }
 
