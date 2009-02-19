@@ -26,7 +26,7 @@
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
 
-#ifndef Q_WS_X11
+#if QT_VERSION <= 0x00040500
 Q_DECLARE_METATYPE( Phonon::AudioOutputDevice );
 #endif
 
