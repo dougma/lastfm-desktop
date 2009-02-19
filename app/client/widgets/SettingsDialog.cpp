@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "_configure.h"
 #include "SettingsDialog.h"
 #include "Settings.h"
 #include "the/radio.h"
@@ -26,9 +27,14 @@
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
 
-#if QT_VERSION <= 0x00040500
-Q_DECLARE_METATYPE( Phonon::AudioOutputDevice );
+#if QT_VERSION < 0x00040500
+#ifndef UBUNTU_8_10
+Q_DECLARE_METATYPE( Phonon::AudioOutputDevice )
 #endif
+#else
+#include <phonon/objectdescription.h>
+#endif
+
 
 // Visual Studio sucks, thus we do this
 static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
