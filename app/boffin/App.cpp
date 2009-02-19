@@ -175,7 +175,6 @@ App::scan( bool force_ask_user )
     m_contentScanner = new LocalContentScanner;
     connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
-    m_contentScannerThread->start();
 
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
@@ -187,6 +186,8 @@ App::scan( bool force_ask_user )
     connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection );
     
     m_mainwindow->ui.rescan->setEnabled( false );
+
+    m_contentScannerThread->start();
     
     return true;
 }
