@@ -1011,6 +1011,8 @@ LocalCollection::resolveTags(QStringList tags, QMap<QString, int>& map)
     return result;
 }
 
+// returns a list (of up to 'limit') of the weightiest tags
+// considers files from available sources
 QList< QPair< QString, float > >
 LocalCollection::getTopTags(int limit)
 {
@@ -1019,7 +1021,11 @@ LocalCollection::getTopTags(int limit)
     ChainableQuery q(m_db, &ms_activeQueryMutex);
     q.prepare(
         "SELECT name, sum(weight) FROM tracktags "
-        "INNER JOIN tags WHERE tracktags.tag = tags.id "
+        "INNER JOIN tags ON tracktags.tag = tags.id "
+        "INNER JOIN files ON tracktags.file = files.id "
+        "INNER JOIN directories ON files.directory = directories.id "
+        "INNER JOIN sources ON directories.source = sources.id "
+        "WHERE sources.available = 1 "
         "GROUP BY tags.id "
         "ORDER BY sum(weight) DESC "
         "LIMIT :limit ").
@@ -1037,7 +1043,6 @@ LocalCollection::transactionBegin()
 {
     bool ok = m_db.transaction();
     Q_ASSERT( ok );
-//    QUERY("BEGIN IMMEDIATE");
 }
 
 void 
@@ -1045,7 +1050,6 @@ LocalCollection::transactionCommit()
 {
     bool ok = m_db.commit();
     Q_ASSERT( ok );
-//    QUERY("COMMIT");
 }
 
 void 
@@ -1053,7 +1057,6 @@ LocalCollection::transactionRollback()
 {
     bool ok = m_db.rollback();
     Q_ASSERT( ok );
-//    QUERY("ROLLBACK");
 }
 
 QMutex*
