@@ -25,56 +25,53 @@
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QMenuBar>
+#include <QShortcut>
 #include <QToolBar>
 #include <QVBoxLayout>
 
 
 MainWindow::MainWindow()
-{    
+{   
+    QAction* showlog;
+    QAction* about; 
+    
     ui.account = menuBar()->addMenu( Ws::Username );
     ui.profile = ui.account->addAction( tr("Visit &Profile"), this, SLOT(openProfileUrl()) );
     ui.account->addSeparator();
     ui.account->addAction( tr("Log &Out && Quit"), qApp, SLOT(logout()) );
-#ifndef Q_OS_MAC
-    ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
-#endif
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
 
     QMenu* tools = menuBar()->addMenu( tr("Tools") );
     ui.xspf = tools->addAction( "Resolve XSPF" );
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
-    QAction* showlog = tools->addAction( tr("Show &Log") );
-
-    QAction* about = menuBar()->addMenu( "Help" )->addAction( "About" );
-#ifdef __APPLE__
-    about->setText( "About " + qApp->applicationName() );
-    about->setMenuRole( QAction::AboutRole );
-#endif
-    connect( about, SIGNAL(triggered()), SLOT(about()) );
-
-    connect( showlog, SIGNAL(triggered()), SLOT(openLog()) );
-
-    setUnifiedTitleAndToolBarOnMac( true );
-    QToolBar* toolbar;
-    addToolBar( toolbar = new QToolBar );
-    ui.play = toolbar->addAction( tr("Play") );
-    ui.pause = toolbar->addAction( tr("Pause") );
-    ui.skip = toolbar->addAction( tr("Skip") );
-    ui.pause->setCheckable( true );
-
+    showlog = tools->addAction( tr("Show &Log"), this, SLOT(openLog()) );
+    about = menuBar()->addMenu( "Help" )->addAction( "About", this, SLOT(about()) );
+    
+    QToolBar* toolbar = new QToolBar;
     toolbar->setIconSize( QSize( 41, 41 ) );
 
-//    toolbar->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-
+    ui.play = toolbar->addAction( tr("Play") );
     ui.play->setIcon( QPixmap(":/play.png") );
+    ui.pause = toolbar->addAction( tr("Pause") );
     ui.pause->setIcon( QPixmap(":/pause.png") );
+    ui.pause->setCheckable( true );
+    ui.skip = toolbar->addAction( tr("Skip") );
     ui.skip->setIcon( QPixmap(":/skip.png") );
             
+    addToolBar( toolbar );
     setWindowTitle( Track() );
+    setUnifiedTitleAndToolBarOnMac( true );
+    resize( 750, 550 );
 
     connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
     
-    resize( 750, 550 );
+#ifdef __APPLE__
+    about->setText( "About " + qApp->applicationName() );
+    about->setMenuRole( QAction::AboutRole );
+    new QShortcut( QKeySequence(Qt::CTRL+Qt::Key_W), this, SLOT(close()) );
+#else
+    ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
+#endif
 }
 
 
