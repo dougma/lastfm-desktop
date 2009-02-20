@@ -129,7 +129,7 @@ LocalContentConfigurator::getScanDirs()
 }
 
 void
-LocalContentConfigurator::setScanDirs(QStringList dirs)
+LocalContentConfigurator::changeScanDirs(QStringList dirs)
 {
     foreach (const QString& dir, dirs) {
         QPair<QString, QString> split = splitPath( dir );
@@ -147,7 +147,8 @@ LocalContentConfigurator::setScanDirs(QStringList dirs)
     foreach (const VolPath& vp, m_sourceSet) {
         m_collection->deleteSource( vp.m_vol, vp.m_path );
     }
-    m_sourceSet.clear();
+
+    getScanDirs();
 }
 
 
@@ -172,8 +173,16 @@ LocalContentConfigurator::getFileCount()
     return m_collection->getCounts(artists, files) ? files : 0;
 }
 
-int LocalContentConfigurator::getArtistCount()
+int 
+LocalContentConfigurator::getArtistCount()
 {
     int artists, files;
     return m_collection->getCounts(artists, files) ? artists : 0;
+}
+
+
+void 
+LocalContentConfigurator::deleteAllFiles()
+{
+    m_collection->deleteAllFiles();
 }

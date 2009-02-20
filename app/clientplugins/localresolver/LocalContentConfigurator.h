@@ -56,7 +56,8 @@ public:
     int getFileCount();
     int getArtistCount();
     QStringList getScanDirs();
-    void setScanDirs(QStringList dirs);
+    void changeScanDirs(QStringList dirs);
+    void deleteAllFiles();
     void updateVolumeAvailability();
 };
 

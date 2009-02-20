@@ -496,13 +496,22 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
 int
 LocalCollection::getSourceId(const QString& volume, const QString& path, Creation flag)
 {
+    bool pathIsEmpty = path == "";
+
     {
-        ChainableQuery q(m_db, &ms_activeQueryMutex);
-        q.prepare("SELECT id FROM sources WHERE volume = :volume AND path = :path").
-        bindValue( ":volume", volume ).
-        bindValue( ":path", path ).
-        exec();
-        if (q.next()) {
+        ChainableQuery q( m_db, &ms_activeQueryMutex );
+        QString queryText( pathIsEmpty ?
+            "SELECT id FROM sources WHERE volume = :volume AND path = \"\""
+            :
+            "SELECT id FROM sources WHERE volume = :volume AND path = :path" );
+
+        q.prepare(queryText).bindValue( ":volume", volume );
+
+        if (!pathIsEmpty) {
+            q.bindValue( ":path", path );
+        }
+
+        if (q.exec().next()) {
             int id = q.value( 0 ).toInt();
             Q_ASSERT( id );
             return id;
@@ -510,13 +519,21 @@ LocalCollection::getSourceId(const QString& volume, const QString& path, Creatio
     }
 
     if ( flag == Create ) {
-        ChainableQuery q(m_db, &ms_activeQueryMutex);
-        q.prepare("INSERT INTO sources (id, volume, path, available) "
-            "VALUES (NULL, :volume, :path, 1)" ).
-        bindValue( ":volume", volume ).
-        bindValue( ":path", path ).
-        exec();
-        int id = q.lastInsertId().toInt();
+        ChainableQuery q( m_db, &ms_activeQueryMutex );
+        QString queryText( pathIsEmpty ?
+            "INSERT INTO sources (id, volume, path, available) "
+            "VALUES (NULL, :volume, \"\", 1)" 
+            :
+            "INSERT INTO sources (id, volume, path, available) "
+            "VALUES (NULL, :volume, :path, 1)" );
+
+        q.prepare(queryText).bindValue( ":volume", volume );
+
+        if (!pathIsEmpty) {
+            q.bindValue( ":path", path );
+        }
+
+        int id = q.exec().lastInsertId().toInt();
         Q_ASSERT(id > 0);
         return id;
     }
@@ -555,6 +572,19 @@ LocalCollection::deleteSource( const QString& volume, const QString &path )
 
         trans.commit();
     }
+}
+
+// deletes all files, and their tracktags and directories too!
+void
+LocalCollection::deleteAllFiles()
+{
+    QMutexLocker locker( &ms_activeQueryMutex );
+    AutoTransaction<LocalCollection> trans(*this);
+
+    ChainableQuery(m_db, 0).prepare( "DELETE FROM tracktags" ).exec();
+    ChainableQuery(m_db, 0).prepare( "DELETE FROM files" ).exec();
+    ChainableQuery(m_db, 0).prepare( "DELETE FROM directories" ).exec();
+    trans.commit();
 }
 
 void

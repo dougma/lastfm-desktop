@@ -40,7 +40,7 @@ public slots:
     void xspf(); //prompts to choose a xspf to resolve
     
     /** returns false if user cancels the picker dialog */
-    bool scan( bool force_ask_user = true );
+    bool scan( bool delete_all_files_first );
     void startAgain();
     
 private slots:

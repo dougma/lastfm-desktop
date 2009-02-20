@@ -135,27 +135,31 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 void
 App::startAgain()
 {
-    //TODO add the wipe database function
     scan( true );
 }
 
 
 bool
-App::scan( bool force_ask_user )
+App::scan( bool delete_all_files_first )
 {
 /// content scanner
     try
     {
         LocalContentConfigurator cfg;
-        QStringList const dirs = cfg.getScanDirs();
 
-        if (dirs.isEmpty() || cfg.getFileCount() == 0 || force_ask_user)
+        if ( delete_all_files_first ) 
+        {
+            cfg.deleteAllFiles();
+        }
+
+        QStringList const dirs = cfg.getScanDirs();
+        if (dirs.isEmpty() || cfg.getFileCount() == 0)
         {
             PickDirsDialog picker( m_mainwindow );
             picker.setDirs( dirs );
             if (picker.exec() == QDialog::Rejected)
                 return false;        // abort the whole app
-            cfg.setScanDirs( picker.dirs() );
+            cfg.changeScanDirs( picker.dirs() );
             cfg.updateVolumeAvailability();
         }
     } 
