@@ -343,10 +343,9 @@ App::onStopped()
 void
 App::onPlaybackError( const QString& msg )
 {
-#if 0
+    //TODO: need to make this more like client 2's subtle yellow box.
     MessageBoxBuilder( m_mainwindow )
             .setTitle( "Playback Error" )
             .setText( msg )
             .exec();
-#endif
 }
