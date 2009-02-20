@@ -5,8 +5,14 @@ VERSION = 0.0.3
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
 DEFINES += LASTFM_COLLAPSE_NAMESPACE
+!macx-xcode:generateBuildParameters()
 
-macx*:QMAKE_INFO_PLIST = mac/Info.plist
+macx-g++:release {
+	system( $$ROOT_DIR/admin/dist/mac/Makefile.dmg.pl $$LIBS > Makefile.dmg )
+	QMAKE_EXTRA_INCLUDES += Makefile.dmg
+    ICON = ../client/mac/client.icns
+    CONFIG += app_bundle
+}
 
 SOURCES += ../client/Resolver.cpp \
            ../client/XspfTrackSource.cpp \
