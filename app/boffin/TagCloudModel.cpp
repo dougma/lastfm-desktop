@@ -60,7 +60,7 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
             i -= index.row() + 1;
             return i.value();
         }
-        
+                
         case TagCloudModel::WeightRole:
         {
             QMultiMap< float, QString>::const_iterator i = m_tagHash.constEnd();

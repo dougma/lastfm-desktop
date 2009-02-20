@@ -21,64 +21,82 @@
 #include "TagCloudModel.h"
 #include <QPainter>
 
-static const float k_factor = 16;
-static const float k_margin = 7;
+
+static inline QFont font( QFont f, float const weight )
+{
+    static const float k_factor = 16;
+
+    f.setPointSize( f.pointSize() + (k_factor * weight ));
+    f.setWeight( 99 * weight );
+    return f;
+}
+
+
+static inline QSize margins( float const weight )
+{
+    return QSize( 17 + (11*weight), 20 - (10*weight) );
+}
+
 
 TagDelegate::TagDelegate( QObject* parent ) 
             : QAbstractItemDelegate( parent )
-{
-
-}
+{}
 
 
 void 
 TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
+    QPen p( Qt::NoPen );
+    QBrush b( Qt::NoBrush );
+    QColor const dark = option.palette.color( QPalette::Highlight ).darker();    
+    
+    if( option.state & (QStyle::State_Selected | QStyle::State_Active) )
+    {
+        b = option.state & QStyle::State_Enabled
+                ? option.palette.highlight()
+                : QColor(0x646464);
+    }
+    if( option.state & QStyle::State_MouseOver )
+        p = option.palette.color( QPalette::Highlight );
 
-    painter->save();
-    painter->setRenderHint( QPainter::Antialiasing );
-    QPen p = ((option.state & QStyle::State_MouseOver) ? QColor( 100, 100, 100 ): Qt::transparent);
-    if( option.state & QStyle::State_Selected )
-    {
-        painter->setBrush( option.palette.highlight() );
-        painter->setPen( option.palette.highlightedText().color() );
-    }
-    else
-    {
-        painter->setBrush( Qt::transparent );
-    }
-  
-  
+    if( option.state & QStyle::State_Active )
+        p = dark;
+
     p.setWidth( 3 );
     painter->setPen( p );
+    painter->setBrush( b );
+    painter->setRenderHint( QPainter::Antialiasing, true );
+    painter->drawRoundedRect( option.rect.adjusted( 2, 2, -2, -2 ), 5.0f, 5.0f );
 
-    painter->drawRoundedRect( option.rect.adjusted( 4, 4, -4, -4 ), 10.0f, 10.0f );
-    painter->restore();
-
-    QFont f = option.font;
-    
     const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
+    painter->setFont( font( option.font, weight ) );
 
-    f.setPointSize( f.pointSize() + (k_factor * weight ));
-    f.setWeight( 99 * weight );
-    
-    painter->setFont( f );
-    QFontMetrics fm( f );
-    painter->drawText( option.rect.translated(  0, -(fm.descent() / 2) - ( 4 * 1.5)), Qt::AlignHCenter | Qt::AlignBottom , index.data().toString());
+    painter->setRenderHint( QPainter::Antialiasing, false );
+    painter->setPen( option.state & (QStyle::State_Selected|QStyle::State_Active)
+            ? option.palette.color( QPalette::HighlightedText )
+            : option.palette.color( QPalette::Text ) );
+
+    QString const text = index.data().toString();
+    QFontMetrics const metrics = painter->fontMetrics();
+
+    QPoint pt;
+    pt.setX( option.rect.x() + (option.rect.width() - metrics.width( text ))/2 );
+    pt.setY( option.rect.y() + margins( weight ).height()/2 + metrics.ascent() );
+    painter->drawText( pt, text );
 }
 
 
+#include <QDebug>
+extern int gBaseline;
+extern int gLeftMargin;
 QSize 
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
-    QFont f = option.font;
-    
     const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
-
-    f.setPointSize( f.pointSize() + (k_factor * weight));
-    f.setWeight( 99 * weight );
-    QFontMetrics fm( f );
-    const QSize fmSize = fm.size( Qt::TextSingleLine, index.data().toString() ) + QSize( 2* k_margin, 2* k_margin );
-    return fmSize; 
+    QFontMetrics fm( font( option.font, weight ) );
+    
+    const QSize margin = margins( weight );
+    gBaseline = margin.height()/2 + fm.ascent();
+    gLeftMargin = margin.width()/2;
+    return fm.size( Qt::TextSingleLine, index.data().toString() ) + margin;
 }
-

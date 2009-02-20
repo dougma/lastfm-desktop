@@ -18,12 +18,13 @@
  ***************************************************************************/
  
 #include "TagCloudView.h"
+#include "TagCloudModel.h"
+#include <QApplication>
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
-
-static const int k_RightMargin = 10;
+#include <limits.h>
 
 
 TagCloudView::TagCloudView( QWidget* parent ) 
@@ -42,15 +43,6 @@ TagCloudView::TagCloudView( QWidget* parent )
     
     setSelectionMode( QAbstractItemView::MultiSelection );
     setSelectionBehavior( QAbstractItemView::SelectItems );
-
-    //Needed to repaint on mouse move:
-    viewport()->setAttribute( Qt::WA_Hover );
-}
-
-
-TagCloudView::~TagCloudView()
-{
-    m_rectIndex.clear();
 }
 
 
@@ -61,9 +53,9 @@ TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFla
         return;
 
     QRect r = rect.translated( 0, verticalScrollBar()->value());
-    foreach( QModelIndex i, m_rectIndex.keys() )
+    foreach( QModelIndex i, m_rects.keys() )
     {
-        if( m_rectIndex[ i ].intersects( r ))
+        if( m_rects[ i ].intersects( r ))
         {
             selectionModel()->select(i, f);
         }
@@ -89,82 +81,106 @@ TagCloudView::paintEvent( QPaintEvent* e )
     p.setClipRect( e->rect());
     QStyleOptionViewItem opt = viewOptions();
     
-    QHash< QModelIndex, QRect >::const_iterator i = m_rectIndex.constBegin();
+    QHash< QModelIndex, QRect >::const_iterator i = m_rects.constBegin();
 
     if( model()->rowCount() == 0 )
     {
         p.drawText( viewport()->rect(), Qt::AlignCenter,  "No tags have been found!" );
-        
         return;
     }
 
-    for( ; i != m_rectIndex.constEnd(); ++i )
+    for( ; i != m_rects.constEnd(); ++i )
     {
         const QModelIndex& index = i.key();
         const QRect& rect = i.value();
 
-        opt.state = (index != m_hoverIndex || !isEnabled() ? QStyle::State_None : QStyle::State_MouseOver);
+        opt.state = QStyle::State_None;
+        if( m_hoverIndex == index && isEnabled() )
+            opt.state = qApp->mouseButtons() == Qt::NoButton
+                    ? QStyle::State_MouseOver
+                    : QStyle::State_Active;
 
-        opt.rect = rect.translated( 0, -verticalScrollBar()->value());
+        opt.rect = rect.translated( 0, -verticalScrollBar()->value() );
         
         if( selectionModel()->isSelected( index ) )
             opt.state |= QStyle::State_Selected;
+
+        if( isEnabled() )
+            opt.state |= QStyle::State_Enabled;
 
         itemDelegate()->paint( &p, opt, index );
     }
 }
 
-#include <limits.h>
-void 
+int gBaseline, gLeftMargin; //filthy but easiest
+void
+TagCloudView::rectcalc()
+{
+    QStyleOptionViewItem const opt = viewOptions();
+    int baseline = 0;
+
+    for (int j = 0; j < model()->rowCount(); ++j)
+    {
+        QModelIndex const i = model()->index( j, 0 );
+        QRect r( QPoint(), itemDelegate()->sizeHint( opt, i ) );
+        if (baseline == 0)
+            baseline = gBaseline;
+            
+        r.moveTo( gLeftMargin, baseline-gBaseline );
+            
+        m_rects[i] = r;
+    }
+}
+
+
+void
 TagCloudView::updateGeometries()
 {
-    int rowHeight = 0;
-    QStyleOptionViewItem opt = viewOptions();
-    int minRowHeight = INT_MAX;
-    for( int i = 0; i < model()->rowCount(); ++i )
+    qDebug() << "SDLKFJDLSKFJSLKDFJLSDKFJLKSDFJKLDSJF";
+    
+    rectcalc(); //TODO only needs to be done once when data is set!
+    
+    const int VIEWPORT_MARGIN = 10;
+    
+    int y = VIEWPORT_MARGIN;
+    int left_margin = 0; // the left baseline to align text against
+    
+    for (int j = 0; j < model()->rowCount(); ++j)
     {
-        QModelIndex index = model()->index( i, 0 );
-
-        if( rowHeight == 0 )
-        {
-            QRect rect = viewport()->rect();
-            rect.setSize( itemDelegate()->sizeHint( opt, index ));
-            int count = i;
-            int x = rect.right();
-            while( x < viewport()->rect().right() && count < model()->rowCount() - 1)
-            {
-                const QSize sizeHint = itemDelegate()->sizeHint( opt, model()->index( count, 0 )); 
-                rowHeight = qMax( rowHeight, sizeHint.height());
-                x += itemDelegate()->sizeHint( opt, model()->index( count + 1, 0 )).width() + k_RightMargin;
-                count++;
-            }
-            minRowHeight = rowHeight > 0 && rowHeight < minRowHeight ? rowHeight : minRowHeight;
-        }
-
-        opt.state = (index != m_hoverIndex ? QStyle::State_None : QStyle::State_MouseOver);
-
-        if( selectionModel()->isSelected( index ) )
-            opt.state |= QStyle::State_Selected;
-
-        opt.rect.setSize( itemDelegate()->sizeHint( opt, index ));
-        opt.rect.translate( 0, ( rowHeight - opt.rect.height()));
-
-        m_rectIndex.insert( index, opt.rect );
+        QModelIndex const i = model()->index( j, 0 );
+        QRect r = m_rects[i];
         
-        opt.rect.translate( opt.rect.width() + k_RightMargin, -( rowHeight - opt.rect.height()) );
-        
-        if( i < model()->rowCount() -1 &&  opt.rect.right() + itemDelegate()->sizeHint( opt, model()->index( i + 1, 0 )).width() > viewport()->rect().right() + k_RightMargin )
+        if (left_margin == 0) left_margin = r.x();
+    
+        qDebug() << "new row";
+    
+        // do new row
+        int x = VIEWPORT_MARGIN + (left_margin - r.x());
+        int tallest = 0;
+        for (; j < model()->rowCount(); ++j)
         {
-            opt.rect.moveLeft( viewport()->rect().left());
-            opt.rect.moveTop( opt.rect.top() + rowHeight ); 
-            rowHeight = 0;
+            QModelIndex const i = model()->index( j, 0 );
+            QRect r = m_rects[i];
+            
+            r.moveTo( x, y + r.y() );
+
+            x += r.width();
+            if (tallest != 0 //need at least one thing per row
+                && x > viewport()->width() - VIEWPORT_MARGIN) { --j; break; }
+
+            qDebug() << r;
+
+            m_rects[i] = r;
+
+            tallest = qMax( tallest, r.bottom() - y );
         }
+        
+        y += tallest;
     }
-
-    verticalScrollBar()->setRange( 0, opt.rect.bottom() -viewport()->rect().height() );
+    
+    verticalScrollBar()->setRange( 0, y + VIEWPORT_MARGIN - viewport()->height() );
     verticalScrollBar()->setPageStep( viewport()->height() );
-    verticalScrollBar()->setSingleStep( minRowHeight ); 
-
+    verticalScrollBar()->setSingleStep( 20 /*TODO*/ ); 
 
     QAbstractItemView::updateGeometries();
 }
@@ -183,9 +199,9 @@ QModelIndex
 TagCloudView::indexAt( const QPoint& pos ) const
 {
     QPoint p = pos + QPoint( 0, verticalScrollBar()->value());
-    foreach( QModelIndex i, m_rectIndex.keys() )
+    foreach( QModelIndex i, m_rects.keys() )
     {
-        if( m_rectIndex[ i ].contains( p ))
+        if( m_rects[ i ].contains( p ))
         {
             return i;
         }
@@ -197,7 +213,7 @@ TagCloudView::indexAt( const QPoint& pos ) const
 QRect 
 TagCloudView::visualRect( const QModelIndex& i ) const
 {
-    return m_rectIndex[ i ].translated( 0, -verticalScrollBar()->value());
+    return m_rects[ i ].translated( 0, -verticalScrollBar()->value());
 }
 
 
@@ -209,11 +225,21 @@ TagCloudView::viewportEvent( QEvent* event )
         case QEvent::MouseMove:
         {
             QMouseEvent* e = static_cast< QMouseEvent* >( event );
+            QModelIndex const oldindex = m_hoverIndex;
             m_hoverIndex = indexAt( e->pos() );
+            if (oldindex != m_hoverIndex)
+                viewport()->update();
+            break;
         }
-        break;
+        
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+            if (m_hoverIndex.isValid())
+                viewport()->update();
+            break;
+
         default:
-        break;
+            break;
     }
     return QAbstractItemView::viewportEvent( event );
 }

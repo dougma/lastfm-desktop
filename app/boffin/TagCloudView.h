@@ -27,16 +27,14 @@ class TagCloudView : public QAbstractItemView
     Q_OBJECT
 public:
     TagCloudView( QWidget* parent = 0 );
-    ~TagCloudView();
     
-//QAbstractItemView pure virtual functions:
+    // QAbstractItemView pure virtual functions:
     virtual QModelIndex indexAt( const QPoint& ) const;
-    virtual void scrollTo( const QModelIndex&, ScrollHint ){};
+    virtual void scrollTo( const QModelIndex&, ScrollHint ) {};
     virtual QRect visualRect( const QModelIndex& ) const;
 
     QStringList currentTags() const;
    
-
 public slots:
     virtual void selectAll();
 
@@ -44,11 +42,13 @@ protected slots:
     virtual void updateGeometries();
 
 protected:
+    void rectcalc();
+    
     virtual void paintEvent( QPaintEvent* );
     virtual bool isIndexHidden( const QModelIndex& ) const{ return false; }
     virtual void setSelection( const QRect&, QItemSelectionModel ){};
     virtual QRegion visualRegionForSelection( const QItemSelection& ) const{ return QRegion(); }
-    virtual QModelIndex moveCursor( CursorAction, Qt::KeyboardModifiers ){ return QModelIndex(); }
+    virtual QModelIndex moveCursor( CursorAction, Qt::KeyboardModifiers ) { return QModelIndex(); }
     virtual int horizontalOffset() const{ return 0; }
     virtual int verticalOffset() const{ return 0; }
     virtual void setSelection( const QRect&, QItemSelectionModel::SelectionFlags );
@@ -56,7 +56,7 @@ protected:
     virtual bool viewportEvent(QEvent *event);
 
     QModelIndex m_hoverIndex;
-    QHash< QModelIndex, QRect> m_rectIndex;
+    QHash<QModelIndex, QRect> m_rects;
 };
 
 #endif //TAG_CLOUD_VIEW_H

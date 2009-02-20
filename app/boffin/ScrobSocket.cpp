@@ -36,7 +36,7 @@ ScrobSocket::ScrobSocket( QObject* parent ) : QTcpSocket( parent )
 
 ScrobSocket::~ScrobSocket()
 {
-    stop();
+    if (!m_track.isNull()) stop();
 }
 
 
