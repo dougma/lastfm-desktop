@@ -57,6 +57,9 @@ $DEPOSX = "\$(DIST_TOOLS_DIR)/deposx.sh";
 $dmg = "\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION)-\$(REVISION).dmg";
 
 print <<END;
+
+FORCE2: FORCE
+
 DIST_TOOLS_DIR = $root/admin/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
 CONTENTS = \$(BUNDLE)/Contents
@@ -66,12 +69,10 @@ BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
 BUNDLE_RESOURCES = \$(CONTENTS)/Resources
 BUNDLE_PLUGINS = \$(CONTENTS)/MacOS/plugins
-
 INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
+.PHONY = bundle bundle-clean bundle-install dmg dmg-clean
 
-.PHONY = bundle bundle-clean bundle-install dmg dmg-clean everything
-
-\$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy: \$(TARGET) $plist
+\$(OBJECTS_DIR)Makefile.dmg.dummy: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
 	perl -pi -e 's/@SHORT_VERSION@/'`echo \$(VERSION) | cut -d'.' -f1,2,3`'/g' $plist
 	$DEPOSX \$(TARGET) $QT_FRAMEWORKS_DIR
