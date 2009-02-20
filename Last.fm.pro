@@ -8,9 +8,10 @@ SUBDIRS = lib/lastfm/core/libcore.pro \
           lib/lastfm/scrobble/libscrobble.pro \
           lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
+          app/clientplugins/localresolver/libresolver.pro \
           app/client \
           app/twiddly \
-          app/clientplugins/localresolver/libresolver.pro
+          app/boffin
 
 debug:win32 {
 	# make the client the default project in visual studio

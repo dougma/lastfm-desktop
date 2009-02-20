@@ -111,19 +111,6 @@ if [ $RELEASE ]
 then
     qmake -config release -recursive "CONFIG -= debug debug_and_release" Last.fm.pro
     which nmake &> /dev/null && BUILD_CMD='nmake' || BUILD_CMD='make'
-
-    if [[ `uname` == 'Darwin' ]]
-    then
-        cat <<END>>Makefile
-
-dmg: all
-	cd app/client && make -f Makefile dmg
-bundle: all
-	cd app/client && make -f Makefile bundle
-install: all
-	cd app/client && make -f Makefile bundle-install    
-END
-    fi
 else
     case `uname` in
         Darwin)
@@ -143,7 +130,7 @@ else
         else
             # prevent qmake interpreting "" as "."
             if [ -z "$EXTRA_QMAKE_FLAGS" ]; then
-                EXTRA_QMAKE_FLAGS='NOTHING=""'
+                EXTRA_QMAKE_FLAGS='NOOP=""'
             fi
         
             qmake -config debug -recursive Last.fm.pro "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
