@@ -177,13 +177,13 @@ App::scan( bool delete_all_files_first )
     cleanup();
 
     m_contentScanner = new LocalContentScanner;
-    connect(m_contentScanner, SIGNAL(trackScanned(Track, int, int)), m_trackTagUpdater, SLOT(needsUpdate()));
+    connect(m_contentScanner, SIGNAL(trackScanned(Track)), m_trackTagUpdater, SLOT(needsUpdate()));
     m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
 
 ////// scanning widget
     ScanProgressWidget* progress = new ScanProgressWidget;
     m_mainwindow->setCentralWidget( progress );
-    connect( m_contentScanner, SIGNAL(trackScanned(Track, int, int)), progress, SLOT(onNewTrack( Track, int, int )) );
+    connect( m_contentScanner, SIGNAL(trackScanned( Track )), progress, SLOT(onNewTrack( Track )) );
     connect( m_contentScanner, SIGNAL(dirScanStart( QString )), progress, SLOT(onNewDirectory( QString )) );
     connect( m_contentScanner, SIGNAL(finished()), progress, SLOT(onFinished()) );
     //queue so the progress widget can update its status label
@@ -343,8 +343,10 @@ App::onStopped()
 void
 App::onPlaybackError( const QString& msg )
 {
+#if 0
     MessageBoxBuilder( m_mainwindow )
             .setTitle( "Playback Error" )
             .setText( msg )
             .exec();
+#endif
 }

@@ -23,6 +23,7 @@
 #include <QRunnable>
 #include "SearchLocation.h"
 #include "lib/lastfm/types/Track.h"
+#include "boost/function.hpp"
 
 
 class LocalContentScanner : public QObject
@@ -33,11 +34,13 @@ class LocalContentScanner : public QObject
     volatile bool m_bStopping;
     class LocalCollection* m_pCol;
 
+    typedef boost::function<void (LocalCollection*, int)> AddFileFunc;
+
     void announceStarted();
     void startFullScan();
     void scan(const SearchLocation& sl);
     bool dirScan(const SearchLocation& sl, const QString& path);
-    void newFileScan(const QString& fullpath, const QString& filename, int directoryId, unsigned lastModified);
+    AddFileFunc newFileScan(const QString& fullpath, const QString& filename, unsigned lastModified);
     void oldFileRescan(const QString& pathname, int fileId, unsigned lastModified);
     void exception(const QString&) const;
     bool stopping() { return m_bStopping; }
@@ -57,7 +60,7 @@ signals:
     void fileScanStart(const QString&);
 
     void started(QStringList scanLocations);
-    void trackScanned(Track, int totalArtistCount, int totalFileCount);
+    void trackScanned(Track);
     void finished();
 };
 

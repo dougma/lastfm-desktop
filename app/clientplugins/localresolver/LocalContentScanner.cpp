@@ -20,6 +20,7 @@
 #include <QThreadPool>
 #include "LocalContentScanner.h"
 #include "LocalCollection.h"
+#include "AutoTransaction.h"
 #include "MediaMetaInfo.h"
 #include "SearchLocation.h"
 #include "QueryError.h"
@@ -142,23 +143,46 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
         m_pCol->removeFiles(missing);
 
 		// files remaining in the map are new:
+
+        // this bit is a little bit optimised:
+        // 1. newFileScan returns an AddFileFunc object to perform the db insert
+        // 2. build up a list of AddFileFuncs
+        // 3. call them all within a transaction
+
+        QList<AddFileFunc> ops;
         for (SearchLocation::FileTimeMap::const_iterator it = map.constBegin(); 
             it != map.constEnd() && !stopping(); 
             it++) 
         {
-            newFileScan( fullPath, it.key() /* filename */, directoryId, it.value() /* last modified time */ );
+            ops << newFileScan( fullPath, it.key() /* filename */, it.value() /* last modified time */ );
 		}
+
+        {
+            QMutexLocker locker( m_pCol->getMutex() );
+            AutoTransaction<LocalCollection> trans( *m_pCol );
+            foreach ( const AddFileFunc& func, ops ) {
+                func( m_pCol, directoryId );
+            }
+            trans.commit();
+        }
     }
     return !stopping();
 }
 
-void 
-LocalContentScanner::newFileScan(const QString& fullpath, const QString& filename, int directoryId, unsigned lastModified)
+
+void doNothing(LocalCollection *, int)
 {
+}
+
+
+LocalContentScanner::AddFileFunc
+LocalContentScanner::newFileScan(const QString& fullpath, const QString& filename, unsigned lastModified)
+{
+    AddFileFunc result = boost::bind(&doNothing, _1, _2);
+
     try {
         bool good = false;
         Track track;
-        int artistCount = -1, fileCount = -1;
 
         QString pathname(fullpath + filename);
         emit fileScanStart(pathname);
@@ -166,14 +190,17 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
             std::auto_ptr<MediaMetaInfo> p( MediaMetaInfo::create( pathname ) );
             MediaMetaInfo *info = p.get();
             if (info) {
-                m_pCol->addFile(
-					directoryId,
+                LocalCollection::FileMeta fileMeta( info->artist(), info->album(), info->title(), info->kbps(), info->duration() );
+
+                result = boost::bind(
+                    &LocalCollection::addFile, 
+                    _1, /* LocalCollection* */
+                    _2, /* int directoryId */
 					filename,
 					lastModified, 
-                    LocalCollection::FileMeta(
-                        info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
+                    fileMeta);
+                        
                 track = mediaMetaToTrack( info, pathname );
-                m_pCol->getCounts( artistCount, fileCount );
                 good = true;
             }
         }
@@ -185,12 +212,13 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
         }
 
         if (good) {
-            emit trackScanned( track, artistCount, fileCount );
+            emit trackScanned( track );
         }
     } 
     catch (...) {
         exception("NewFileScan::run signalling");
     }
+    return result;
 }
 
 void
@@ -199,7 +227,6 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
     try {
         bool good = false;
         Track track;
-        int artistCount = -1, fileCount = -1;
 
         emit fileScanStart(pathname);
         try {
@@ -212,7 +239,6 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
                     LocalCollection::FileMeta(
                         info->artist(), info->album(), info->title(), info->kbps(), info->duration() ));
                 track = mediaMetaToTrack( info, pathname );
-                m_pCol->getCounts( artistCount, fileCount );
                 good = true;
             }
         }
@@ -224,7 +250,7 @@ LocalContentScanner::oldFileRescan(const QString& pathname, int fileId, unsigned
         }
 
         if (good) {
-            emit trackScanned( track, artistCount, fileCount );
+            emit trackScanned( track );
         }
     } 
     catch (...) {

@@ -36,6 +36,7 @@ MediaPipeline::MediaPipeline( Phonon::AudioOutput* ao, QObject* parent )
              , mo( 0 )
              , ao( ao )
              , m_source( 0 )
+             , m_errorRecover( false )
              , m_phonon_sucks( false )
 {
     mo = new Phonon::MediaObject;
@@ -221,11 +222,18 @@ MediaPipeline::onPhononStateChanged( Phonon::State newstate, Phonon::State oldst
     switch (newstate)
     {
         case StoppedState:
-            m_track = Track();
-            emit stopped();
+            if (m_errorRecover) {
+                m_errorRecover = false;
+                skip();
+            } else {
+                m_track = Track();
+                emit stopped();
+            }
             break;
             
         case ErrorState:
+            // need to request a stop to clear the error state before we trying to play the next track
+            m_errorRecover = true;
             mo->stop();
             emit error( "There was an error during playback." );
             break;
@@ -267,6 +275,8 @@ MediaPipeline::enqueue()
         // state changes, so we must prefilter them.
         if (!t.url().isValid()) continue;
         
+        qDebug() << t.url().toString();
+
         m_track = t;
         qDebug() << "Will play:" << t;
 

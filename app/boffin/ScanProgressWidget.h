@@ -84,7 +84,7 @@ public:
 
 public slots:
     void onNewDirectory( const QString& );
-    void onNewTrack( const Track&, int, int );
+    void onNewTrack( const Track& );
     void onFinished();
 
 private slots:

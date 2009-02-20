@@ -72,6 +72,7 @@ private:
     class Resolver* m_resolver;
     QPointer<AbstractTrackSource> m_source;
     Track m_track;
+    bool m_errorRecover;
     bool m_phonon_sucks;
     
     void play( AbstractTrackSource* );
