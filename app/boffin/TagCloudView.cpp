@@ -136,8 +136,6 @@ TagCloudView::rectcalc()
 void
 TagCloudView::updateGeometries()
 {
-    qDebug() << "SDLKFJDLSKFJSLKDFJLSDKFJLKSDFJKLDSJF";
-    
     rectcalc(); //TODO only needs to be done once when data is set!
     
     const int VIEWPORT_MARGIN = 10;
@@ -152,8 +150,6 @@ TagCloudView::updateGeometries()
         
         if (left_margin == 0) left_margin = r.x();
     
-        qDebug() << "new row";
-    
         // do new row
         int x = VIEWPORT_MARGIN + (left_margin - r.x());
         int tallest = 0;
@@ -167,8 +163,6 @@ TagCloudView::updateGeometries()
             x += r.width();
             if (tallest != 0 //need at least one thing per row
                 && x > viewport()->width() - VIEWPORT_MARGIN) { --j; break; }
-
-            qDebug() << r;
 
             m_rects[i] = r;
 

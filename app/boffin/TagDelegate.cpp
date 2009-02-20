@@ -86,7 +86,6 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
 }
 
 
-#include <QDebug>
 extern int gBaseline;
 extern int gLeftMargin;
 QSize 
