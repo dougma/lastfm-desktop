@@ -2,7 +2,7 @@ TARGET = scrobble
 TEMPLATE = lib
 QT = core network xml
 CONFIG += core ws types
-DEFINES += _SCROBBLE_DLLEXPORT
+DEFINES += _SCROBBLE_DLLEXPORT LASTFM_COLLAPSE_NAMESPACE
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )

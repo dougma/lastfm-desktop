@@ -67,8 +67,13 @@ signals:
     /** emitted up to twice, as first time may not have a title for the station
       * but the second time will */
     void tuningIn( const RadioStation& );
+#ifndef LASTFM_COLLAPSE_NAMESPACE
     void trackSpooled( const lastfm::Track& ); /** and we're now prebuffering */
     void trackStarted( const lastfm::Track& );
+#else
+    void trackSpooled( const Track& );
+    void trackStarted( const Track& );
+#endif
     void buffering( int );
     void stopped();
 	

@@ -19,7 +19,6 @@
 
 #ifndef LASTFM_SCROBBLER_H
 #define LASTFM_SCROBBLER_H
-
 #include <lastfm/global.h>
 #include <QByteArray>
 #include <QList>
@@ -44,14 +43,21 @@ public:
     ~Scrobbler();
 
 public slots:
+#ifndef LASTFM_COLLAPSE_NAMESPACE
     /** will ask Last.fm to update the now playing information for the 
       * authenticated user */
     void nowPlaying( const lastfm::Track& );
     /** will cache the track, but we won't submit it until you call submit() */
     void cache( const lastfm::Track& );
-    void cache( const QList<lastfm::Track>& );
+#else
+    void nowPlaying( const Track& );
+    void cache( const Track& );
+#endif
     /** will submit the submission cache for this user */
     void submit();
+
+public:
+    void cache( const QList<lastfm::Track>& );
 
     /** provided the current session is invalid, we will rehandshake.
       * if the current session is valid, we do nothing. Basically, I don't want
