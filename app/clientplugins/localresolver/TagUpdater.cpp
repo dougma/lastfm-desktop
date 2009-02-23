@@ -123,19 +123,15 @@ TagUpdater::onWsFinished(WsReply* r)
             // limit the number of tags:
             // no tags with weight lower than TAGUPDATER_LOWEST_ARTIST_TAG_WEIGHT
             // and no more than TAGUPDATER_ARTIST_TAG_LIMIT number of tags
-            WeightedStringList wsl(Tag::list(r));
-            wsl.sortByWeight(Qt::DescendingOrder);
-            WeightedStringList::iterator cutoff = wsl.begin();
-            while ( cutoff < wsl.end() && 
-                (cutoff - wsl.begin()) < TAGUPDATER_ARTIST_TAG_LIMIT  &&
-                cutoff->weighting() > TAGUPDATER_LOWEST_ARTIST_TAG_WEIGHT)
-            {
-                cutoff++;
-            }
-            wsl.erase(cutoff, wsl.end());
-
+            QMap<int, QString> tags = Tag::list(r);
+            
+            while (tags.begin().key() < TAGUPDATER_LOWEST_ARTIST_TAG_WEIGHT)
+                tags.erase( tags.begin() );
+            while (tags.count() > TAGUPDATER_ARTIST_TAG_LIMIT)
+                tags.erase( tags.begin() );
+                
             // set the tags in the db
-            m_collection->setGlobalTagsForArtist(artist, wsl);
+            m_collection->setGlobalTagsForArtist(artist, tags);
 
             // that worked, set times for updateArtistDownload call
             now = QDateTime::currentDateTime();

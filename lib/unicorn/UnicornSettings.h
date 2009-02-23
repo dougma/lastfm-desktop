@@ -20,40 +20,27 @@
 #ifndef UNICORN_SETTINGS_H
 #define UNICORN_SETTINGS_H
 
-#include "lib/DllExportMacro.h"
-#include "lib/lastfm/core/CoreSettings.h"
+#include <QSettings>
 #include <QString>
 
 
 namespace unicorn
-{   
-    /** Clearly no use until a username() has been assigned. But this is 
+{
+    /** Clearly no use until a username() has been assigned. But this is
       * automatic if you use unicorn::Application anyway. */
-    class UserSettings : public CoreSettings
+    class UserSettings : public QSettings
     {
     public:
         UserSettings()
         {
             QString const username = value( "Username" ).toString();
             beginGroup( username );
-            // it shouldn't be possible, since Unicorn::Application enforces 
+            // it shouldn't be possible, since unicorn::Application enforces
             // assignment of the username parameter before anything else
             Q_ASSERT( !username.isEmpty() );
         }
-        
+
         static const char* subscriptionKey() { return "subscription"; }
-    };
-
-    /** Settings that may be of use to the entire Last.fm suite 
-      */
-    class UNICORN_DLLEXPORT Settings
-    {
-    public:
-        Settings()
-        {}
-
-        // all Unicorn::Applications obey this
-        bool logOutOnExit() const { return UserSettings().value( "LogOutOnExit", false ).toBool(); }
     };
 }
 

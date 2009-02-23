@@ -20,7 +20,6 @@
 #ifndef LASTFM_USER_H
 #define LASTFM_USER_H
 
-#include <lastfm/WeightedStringList>
 #include <lastfm/WsKeys>
 #include <QString>
 #include <QUrl>

@@ -244,8 +244,8 @@ SeedsWidget::onUserGetFriendsReturn( WsReply* r )
 void 
 SeedsWidget::onUserGetTopTagsReturn( WsReply* r )
 {
-    WeightedStringList tags = Tag::list( r );
-    if( tags.count() < 1 )
+    QStringList tags = Tag::list( r ).values();
+    if( tags.isEmpty() )
         return;
     
     QIcon tagIcon;
@@ -253,7 +253,7 @@ SeedsWidget::onUserGetTopTagsReturn( WsReply* r )
     tagIcon.addPixmap( QPixmap( ":/buckets/tag_39.png" ), QIcon::Selected );
     tagIcon.addPixmap( QPixmap( ":/buckets/tag_21.png" ) );
     tagIcon.addPixmap( QPixmap( ":/buckets/tag_21.png" ), QIcon::Selected );
-    foreach( WeightedString tag, tags )
+    foreach( QString const tag, tags )
     {
         Seed* n = new Seed( tag, ui.tagsBucket );
         n->setIcon( tagIcon );

@@ -770,7 +770,7 @@ SideBarTree::contextMenuHandler( const QModelIndex& index, ContextMenuActionType
             arg( "\"" + text + "\"" )
 
         #define confirm( text ) \
-                MessageBoxBuilder( this ) \
+                QMessageBoxBuilder( this ) \
                     .setButtons( QMessageBox::Yes | QMessageBox::No ) \
                     .setTitle( tr("Confirm") ) \
                     .setText( text ).exec() == QMessageBox::Yes

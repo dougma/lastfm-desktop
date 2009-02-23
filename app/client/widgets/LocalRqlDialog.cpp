@@ -49,7 +49,7 @@ LocalRqlDialog::onParseBad(int errorLineNumber, QString errorLine, int errorOffs
     Q_UNUSED( errorLineNumber );
     Q_UNUSED( errorOffset );
     
-    MessageBoxBuilder( this )
+    QMessageBoxBuilder( this )
             .setTitle( "RQL parse error" )
             .setText( errorLine )
             .sheet()

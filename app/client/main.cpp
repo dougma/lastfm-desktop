@@ -74,8 +74,6 @@ int main( int argc, char** argv )
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
         AEInstallEventHandler( 'GURL', 'GURL', h, 0, false );
-        //AEInstallEventHandler( kCoreEventClass, kAEQuitApplication, h, 0, false ); //QCoreApplication handles this for us
-        AEInstallEventHandler( kCoreEventClass, kAEReopenApplication, h, 0, false );
       #endif
         
         MainWindow window;
@@ -113,18 +111,6 @@ static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
     
     switch (id)
     {
-        case kAEQuitApplication:
-            qApp->quit();
-            return noErr;
-
-        case kAEReopenApplication:
-        {
-            MainWindow& w = The::mainWindow();
-            w.show();
-            w.raise();
-            return noErr;
-        }
-            
         case 'GURL':
         {
             DescType type;

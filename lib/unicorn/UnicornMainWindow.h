@@ -17,53 +17,70 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_WEIGHTED_STRING_LIST_H
-#define LASTFM_WEIGHTED_STRING_LIST_H
+#ifndef UNICORN_MAIN_WINDOW
+#define UNICORN_MAIN_WINDOW
 
-#include <lastfm/WeightedString>
-#include <QtAlgorithms>
-#include <QStringList>
+#include "lib/DllExportMacro.h"
+#include <QMainWindow>
+#include <QPointer>
+#include <QDialog>
+class AboutDialog;
+class WsReply;
 
 
-class WeightedStringList : public QList<WeightedString>
-{
-	void reverse()
-	{
-		int const N = count();
-		int const n = N/2;
-		for (int i = 0; i < n; ++i)
-			swap( i, N-i-1 );
-	}
-	
-public:
-    WeightedStringList()
-	{}
-
-    WeightedStringList( QList<WeightedString> list ) : QList<WeightedString>( list )
-	{}
-
-    operator QStringList()
+template <class D> struct OneDialogPointer : public QPointer<D>
+{    
+    OneDialogPointer& operator=( QDialog* d )
     {
-        QStringList strings;
-        QListIterator<WeightedString> i( *this );
-        while (i.hasNext())
-            strings += i.next();
-        return strings;
-    }
-
-    void sortByWeight( Qt::SortOrder order = Qt::AscendingOrder ) 
-    {
-        qSort( begin(), end() );
-		if (order == Qt::DescendingOrder)
-			reverse();
+        QPointer<D>::operator=( (D*)d );
+    	d->setAttribute( Qt::WA_DeleteOnClose ); \
+    	d->setWindowFlags( Qt::Dialog | Qt::WindowMinimizeButtonHint ); \
+    	d->setModal( false );
+        d->show();
+        return *this;
     }
     
-    void sort( Qt::SortOrder order = Qt::AscendingOrder )
+    void show()
     {
-        qSort( begin(), end(), qLess<QString>() );
-		if (order == Qt::DescendingOrder)
-			reverse();
+        QDialog* d = (QDialog*)QPointer<D>::data();
+        d->show();
+        d->raise();
+        d->activateWindow();
     }
 };
+
+
+namespace unicorn
+{
+    class UNICORN_DLLEXPORT MainWindow : public QMainWindow
+    {
+        Q_OBJECT
+
+    public:
+        MainWindow();
+        ~MainWindow();
+
+    public slots:
+        void about();
+        void visitProfile();
+        void openLog();
+
+    protected:
+        struct Ui {
+            Ui() : account( 0 ), profile( 0 )
+            {}
+
+            QMenu* account;
+            QAction* profile;
+            OneDialogPointer<AboutDialog> about;
+        } ui;
+
+        /** call this to add the account menu and about menu action, etc. */
+        void finishUi();
+
+    private slots:
+        void onUserGotInfo( WsReply* );        
+    };
+}
 
 #endif

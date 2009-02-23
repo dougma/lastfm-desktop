@@ -186,7 +186,7 @@ SendLogsDialog::onSuccess()
     ui.spinner->movie()->stop();
     ui.spinner->hide();
 
-    MessageBoxBuilder( this )
+    QMessageBoxBuilder( this )
         .setIcon( QMessageBox::Information )
         .setTitle( tr("Logs sent") )
         .setText( tr( "Thank you, we will get back to you as soon as possible.") )
@@ -202,7 +202,7 @@ SendLogsDialog::onSuccess()
 void
 SendLogsDialog::onError()
 {
-    MessageBoxBuilder( this )
+    QMessageBoxBuilder( this )
         .setIcon( QMessageBox::Information )
         .setTitle( tr("Couldn't send logs") )
         .setText( tr("Please try again later.") )

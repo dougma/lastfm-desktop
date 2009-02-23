@@ -1,4 +1,4 @@
-CONFIG += types unicorn resolver sqlite3 taglib radio
+CONFIG += types unicorn resolver sqlite3 taglib radio boost
 QT += opengl sql phonon
 VERSION = 0.0.3
 

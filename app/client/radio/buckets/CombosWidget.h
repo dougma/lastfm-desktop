@@ -25,12 +25,9 @@
 #include <QListView>
 #include <QAbstractListModel>
 #include <QStackedLayout>
-#include "lib/lastfm/types/User.h"
+#include <lastfm/User>
 #include "widgets/UnicornWidget.h"
-
 #include "RqlStationTemplate.h"
-
-
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QLabel>

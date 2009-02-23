@@ -57,7 +57,7 @@ Tuner::onTuneReturn( WsReply* reply )
 	try {
 		emit title( reply->lfm()["station"]["name"].text() );
 	}
-	catch (CoreException&)
+	catch (std::runtime_error&)
 	{}
 	
 	fetchFiveMoreTracks();
@@ -125,9 +125,9 @@ Tuner::onGetPlaylistReturn( WsReply* reply )
             emit trackAvailable();
         }
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
         if (!tryAgain())
             emit error( Ws::TryAgainLater );
     }

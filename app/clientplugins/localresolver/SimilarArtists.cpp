@@ -42,16 +42,6 @@ operator<(const TagDataset::Entry& e, TagDataset::ArtistId i)
 }
 
 
-//
-
-
-bool
-orderByWeightDesc(const WeightedString& a, const WeightedString& b)
-{
-    return a.weighting() > b.weighting();
-}
-
-
 // Returns a TagDataset::Entry containing tags for the artist.
 // Calls the last.fm webservice to get the tags and blocks
 // for up to 10 seconds while waiting for the response.
@@ -74,19 +64,18 @@ dlArtistTags(LocalCollection& coll, const QString& artist, int artistId)
 
     if (reply) {
         // parse result and sort higher weights to top
-        WeightedStringList wsl = Tag::list(reply);
-        qSort(wsl.begin(), wsl.end(), orderByWeightDesc);
+        QMap<int, QString> tags = Tag::list(reply);
 
         // take the top ten tags having non-zero weight
-        int count = 0;
-        WeightedStringList::iterator p = wsl.begin();
-        while (p != wsl.end() && p->weighting() > 0  && count < 10) {
-            TagDataset::TagId tagId = coll.getTagId(*p, LocalCollection::Create);
+        QMapIterator<int, QString> i( tags );
+        i.toBack();
+        for (int x = 0; x < 10; ++x) {
+            if (i.hasPrevious() == false) break;
+            if (i.previous().key() <= 0) break;
+            TagDataset::TagId tagId = coll.getTagId(i.value(), LocalCollection::Create);
             // webservice gives weight 0..100; we want it 0..1
-            TagDataset::TagWeight tagWeight = p->weighting() / 100.0;     
+            TagDataset::TagWeight tagWeight = i.key() / 100.0;
             result.tagVec.push_back( qMakePair(tagId, tagWeight) );
-            p++;
-            count++;
         }
         result.norm = TagDataset::calcNormal(result.tagVec);
     }

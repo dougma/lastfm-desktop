@@ -22,7 +22,7 @@
 
 #include "CheckDirTree.h"
 #include "ui_mainwindow.h"
-#include <QMainWindow>
+#include "lib/unicorn/UnicornMainWindow.h"
 #include <QDragEnterEvent>
 
 
@@ -30,7 +30,7 @@
   * @author <adam@last.fm>
   * @motherfuckingrewrite <max@last.fm>
   */
-class MainWindow : public QMainWindow
+class MainWindow : public unicorn::MainWindow
 {
     Q_OBJECT
     

@@ -29,4 +29,10 @@ namespace Qt
             list.swap( x, N-1-x );
         return list;
     }
+    
+    //"specialise" for QStringList
+    static inline QStringList reverse( QList<QString> strings )
+    {
+        return (QStringList)reverse<QString>( strings );
+    }
 }

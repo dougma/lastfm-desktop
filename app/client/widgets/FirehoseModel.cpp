@@ -103,9 +103,9 @@ FirehoseModel::onData()
         WsDomElement e( xml.documentElement() );
         connect( new FirehoseItem( e ), SIGNAL(finished( FirehoseItem* )), SLOT(onItemReady( FirehoseItem* )) );
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
         qDebug() << data;
     }
 }

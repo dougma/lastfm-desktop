@@ -244,4 +244,3 @@ TagCloudView::viewportEvent( QEvent* event )
     }
     return QAbstractItemView::viewportEvent( event );
 }
-

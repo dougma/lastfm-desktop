@@ -245,7 +245,7 @@ App::onWsError( Ws::Error e )
         case Ws::OperationFailed:
             //TODOCOPY
             //TODO use the non intrusive status messages
-            MessageBoxBuilder( container )
+            QMessageBoxBuilder( container )
                     .setTitle( "Oops" )
                     .setText( "Last.fm is b0rked" )
                     .exec();
@@ -301,7 +301,7 @@ App::onScrobblerStatusChanged( int e )
     switch (e)
     {
         case Scrobbler::ErrorBannedClientVersion:
-            MessageBoxBuilder( container )
+            QMessageBoxBuilder( container )
                 .setIcon( QMessageBox::Warning )
                 .setTitle( tr("Upgrade Required") )
                 .setText( tr("Scrobbling will not work because this software is too old.") )
@@ -313,7 +313,7 @@ App::onScrobblerStatusChanged( int e )
             break;
 
         case Scrobbler::ErrorBadTime:
-            MessageBoxBuilder( container )
+            QMessageBoxBuilder( container )
                 .setIcon( QMessageBox::Warning )
                 .setTitle( tr("Incorrect Time") )
                 .setText( tr("<p>Last.fm cannot authorise any scrobbling! :("

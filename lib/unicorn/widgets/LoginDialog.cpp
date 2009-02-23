@@ -151,9 +151,9 @@ LoginDialog::onAuthenticated( WsReply* reply )
 			#endif
                 break;
             }
-            catch (WsDomElement::Exception& e)
+            catch (std::runtime_error& e)
             {
-                qWarning() << e;
+                qWarning() << e.what();
             }
 			
             // FALL THROUGH!
@@ -161,7 +161,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
 			
         case Ws::AuthenticationFailed:
             // COPYTODO
-            MessageBoxBuilder( this )
+            QMessageBoxBuilder( this )
 					.setIcon( QMessageBox::Critical )
 					.setTitle( tr("Login Failed") )
 					.setText( tr("Sorry, we don't recognise that username, or you typed the password wrongly.") )
@@ -170,7 +170,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
 			
         default:
             // COPYTODO
-            MessageBoxBuilder( this )
+            QMessageBoxBuilder( this )
 					.setIcon( QMessageBox::Critical )
 					.setTitle( tr("Last.fm Unavailable") )
 					.setText( tr("There was a problem communicating with the Last.fm services. Please try again later.") )
@@ -181,7 +181,7 @@ LoginDialog::onAuthenticated( WsReply* reply )
         case Ws::UrLocalNetworkIsFuckedLol:
             // TODO proxy prompting?
             // COPYTODO
-            MessageBoxBuilder( this )
+            QMessageBoxBuilder( this )
 					.setIcon( QMessageBox::Critical )
 					.setTitle( tr("Cannot connect to Last.fm") )
 					.setText( tr("Last.fm cannot be reached. Please check your firewall or proxy settings.") )

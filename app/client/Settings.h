@@ -20,30 +20,14 @@
 #ifndef MOOSE_SETTINGS_H
 #define MOOSE_SETTINGS_H
 
-#include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/scrobble/ScrobblePoint.h"
 #include "lib/unicorn/UnicornSettings.h"
 
 
 namespace moose
 {
-    /** Clearly no use until a username() has been assigned. But this is 
-      * automatic if you use Unicorn::Application anyway. 
-      */
-    class UserSettings : public QSettings
-    {
-    public:
-        UserSettings()
-        {
-            QString const username = CoreSettings().value( "Username" ).toString();
-            beginGroup( username );
-            // it shouldn't be possible, since Unicorn::Application enforces 
-            // assignment of the username parameter before anything else
-            Q_ASSERT( !username.isEmpty() );
-        }
-    };
-
-
+    using unicorn::UserSettings;
+    
     /** Usage: only put interesting settings in here, which mostly means ones set in
       * in the settings dialog. For class local settings, just make a small 
       * QSettings local derived class.
@@ -59,7 +43,6 @@ namespace moose
 
     struct MutableSettings : Settings
     {
-        void setLogOutOnExit( bool b ) { unicorn::UserSettings().setValue( "LogOutOnExit", b ); }
         void setScrobblePoint( int i ) { UserSettings().setValue( "ScrobblePoint", qBound( 0, i, 100 ) ); }
         void setIPodScrobblingEnabled( bool b ) { UserSettings().setValue( "iPodScrobblingEnabled", b ); }
         void setAlwaysConfirmIPodScrobbles( bool b ) { UserSettings().setValue( "AlwaysConfirmIPodScrobbles", b ); }

@@ -51,16 +51,16 @@ lastfm::Xspf::Xspf( const QDomElement& playlist_node, Track::Source src )
                 t.setDuration( e.optional( "duration" ).text().toInt() / 1000 );
                 t.setSource( src );
             }
-            catch (WsDomElement::Exception& exception)
+            catch (std::runtime_error& exception)
             {
-                qWarning() << exception << e;
+                qWarning() << exception.what() << e;
             }
             
             m_tracks += t; // outside since location is enough basically
         }
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;        
+        qWarning() << e.what();
     }
 }

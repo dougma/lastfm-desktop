@@ -39,7 +39,6 @@
 #include <QStringList>
 #include <QVariantList>
 #include "ChainableQuery.h"
-#include "lib/lastfm/core/WeightedStringList.h"
 #include <memory>
 
 class LocalCollection : public QObject
@@ -221,7 +220,7 @@ public:
 
     // tag handling
     int getTagId(QString tag, Creation flag);
-    void setGlobalTagsForArtist(QString artist, WeightedStringList globalTags);
+    void setGlobalTagsForArtist(QString artist, QMap<int, QString> globalTags);
 
     void deleteUserTrackTagsForArtist(int artistId, unsigned userId);
     void deleteGlobalTrackTagsForArtist(int artistId);

@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include "RestStateMessage.h"
-#include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPainter>

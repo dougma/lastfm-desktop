@@ -21,9 +21,9 @@
 #define LOCAL_CONTENT_SCANNER_H
 
 #include <QRunnable>
+#include <boost/function.hpp>
+#include <lastfm/Track>
 #include "SearchLocation.h"
-#include "lib/lastfm/types/Track.h"
-#include "boost/function.hpp"
 
 
 class LocalContentScanner : public QObject

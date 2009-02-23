@@ -46,6 +46,8 @@ namespace unicorn
     	}
 	
     	static QFileInfo log( const QString& productName );
+    	
+        static const char* platformString();
     };
 }
 

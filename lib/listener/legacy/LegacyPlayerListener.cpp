@@ -86,10 +86,11 @@ LegacyPlayerListener::onDataReady()
             
             socket->write( "OK\n" );
         }
-        catch (CoreException& e)
+        catch (std::invalid_argument& e)
         {
-            qWarning() << line << e;
-            QString s = "ERROR: " + e.what() + "\n";
+            QString const error = QString::fromUtf8( e.what() );
+            qWarning() << line << error;
+            QString s = "ERROR: " + error + "\n";
             socket->write( s.toUtf8() );
         }
     }

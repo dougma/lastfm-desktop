@@ -22,6 +22,7 @@
 #include "lib/lastfm/core/mac/AppleScript.h"
 #include <QDateTime>
 #include <QFileInfo>
+#include <QStringList>
 
 
 ITunesLibrary::ITunesLibrary( const QString& pid, bool )

@@ -665,15 +665,15 @@ LocalCollection::deleteTrackTagsForArtist(int artistId, unsigned userId)
 }
 
 void
-LocalCollection::setGlobalTagsForArtist(QString artist, WeightedStringList globalTags)
+LocalCollection::setGlobalTagsForArtist(QString artist, QMap<int, QString> globalTags)
 {
     int artistId = getArtistId( artist, Create );
     deleteGlobalTrackTagsForArtist( artistId );
-    foreach(const WeightedString& tag, globalTags) {
-        insertGlobalArtistTag( 
-            artistId, 
-            getTagId( tag, Create ),
-            tag.weighting() );
+    QMapIterator<int, QString> i( globalTags );
+    while(i.hasNext()) {
+        QString tag = i.next().value();
+        int weighting = i.key();
+        insertGlobalArtistTag( artistId, getTagId( tag, Create ), weighting );
     }
 }
 

@@ -52,7 +52,7 @@ macx-xcode:debug {
 macx-g++:release {
     QT += sql # to make Makefile.dmg copy the QtSql framework into the bundle
 	system( $$ROOT_DIR/admin/dist/mac/Makefile.dmg.pl $$LIBS > Makefile.dmg )
-	QMAKE_EXTRA_INCLUDES += Makefile.dmg
+	QMAKE_EXTRA_INCLUDES += Makefile.dmg mac/Makefile.dmg.extra
 }
 
 win32 {

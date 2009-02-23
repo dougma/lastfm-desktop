@@ -20,7 +20,8 @@
 #ifndef LASTFM_ARTIST_H
 #define LASTFM_ARTIST_H
 
-#include <lastfm/WeightedStringList>
+#include <lastfm/global.h>
+#include <QMap>
 #include <QString>
 #include <QUrl>
 
@@ -65,7 +66,12 @@ namespace lastfm
         static Artist getInfo( WsReply* );
 	
     	WsReply* getSimilar() const;
-    	static WeightedStringList getSimilar( WsReply* );
+    	/** The match percentage is returned from last.fm as a 4 significant 
+    	  * figure floating point value. So we multply it by 100 to make an 
+    	  * integer in the range of 0 to 10,000. This is possible confusing 
+    	  * for you, but I felt it best not to lose any precision, and floats 
+    	  * aren't much fun. */
+    	static QMap<int, QString> getSimilar( WsReply* );
     
         /** use Tag::list to get the tag list out of the finished reply */
         WsReply* getTags() const;

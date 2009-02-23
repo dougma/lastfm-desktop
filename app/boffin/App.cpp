@@ -167,7 +167,8 @@ App::scan( bool delete_all_files_first )
     {
         // the db is probably an old version
         qCritical() << "Database problem: " + e.text();
-        MessageBoxBuilder( m_mainwindow )
+        
+        QMessageBoxBuilder( m_mainwindow )
                 .setTitle( "Warning" )
                 .setText( "Boffin suffered a database problem, consult the log for the gory details" )
                 .exec();
@@ -248,7 +249,7 @@ App::play()
     if (m_cloud) { 
         if( m_cloud->currentTags().isEmpty())
         {
-            MessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
+            QMessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
                                              .setText( tr("Select at least one tag from the cloud below to start playing music." ))
                                              .sheet()
                                              .exec();
@@ -344,7 +345,7 @@ void
 App::onPlaybackError( const QString& msg )
 {
     //TODO: need to make this more like client 2's subtle yellow box.
-    MessageBoxBuilder( m_mainwindow )
+    QMessageBoxBuilder( m_mainwindow )
             .setTitle( "Playback Error" )
             .setText( msg )
             .exec();

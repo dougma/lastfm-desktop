@@ -21,7 +21,6 @@
 #define LASTFM_CORE_DIR_H
 
 #include <lastfm/global.h>
-#include <QCoreApplication>
 #include <QDir>
 
 
@@ -48,7 +47,7 @@ namespace CoreDir
       */
     inline QDir logs()
     {
-        #ifdef Q_WS_MAC
+        #ifdef __APPLE__
             return QDir::home().filePath( "Library/Logs/Last.fm" );
         #else
             return data();    
@@ -59,19 +58,11 @@ namespace CoreDir
     /** @returns path to directory for storing cached images etc. */
     inline QDir cache()
     {
-        #ifdef Q_WS_MAC
+        #ifdef __APPLE__
             return QDir::home().filePath( "Library/Cache/Last.fm" );
         #else
             return data().filePath( "cache/" );
         #endif
-    }
-
-
-    inline void mkpaths()
-    {
-        cache().mkpath( "." );
-        data().mkpath( "." );
-        logs().mkpath( "." );
     }
 
     
@@ -80,7 +71,7 @@ namespace CoreDir
     LASTFM_CORE_DLLEXPORT QDir programFiles();
 #endif
     
-#ifdef Q_WS_MAC
+#ifdef __APPLE__
     /** eg. /Applications/Last.fm.app/ */
     LASTFM_CORE_DLLEXPORT QDir bundle();
 #endif

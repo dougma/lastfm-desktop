@@ -27,7 +27,7 @@
 #endif
 
 
-PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketFailure )
+PlayerListener::PlayerListener( QObject* parent ) throw( std::runtime_error )
               : QLocalServer( parent )
 {
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );
@@ -42,7 +42,7 @@ PlayerListener::PlayerListener( QObject* parent ) throw( PlayerListener::SocketF
 #endif
     
     if (!listen( name ))
-        throw SocketFailure( errorString() );
+        throw std::runtime_error( errorString().toStdString() );
 }
 
 
@@ -99,10 +99,10 @@ PlayerListener::onDataReady()
             
             socket->write( "OK\n" );
         }
-        catch (PlayerCommandParser::Exception& e)
+        catch (std::invalid_argument& e)
         {
-            qWarning() << e;
-            QString s = "ERROR: " + e.what() + "\n";
+            qWarning() << e.what();
+            QString s = "ERROR: " + QString::fromStdString(e.what()) + "\n";
             socket->write( s.toUtf8() );
         }
     }

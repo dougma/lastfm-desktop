@@ -21,7 +21,6 @@
 #include "Settings.h"
 #include "lib/lastfm/types/Tag.h"
 #include "lib/lastfm/ws/WsReply.h"
-#include "the/mainWindow.h"
 #include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/SeedsWidget.h"
@@ -147,12 +146,14 @@ TagListWidget::setTagsRequest( WsReply* r )
 
 void
 TagListWidget::onTagsRequestFinished( WsReply* r )
-{    
-	foreach (WeightedString tag, Tag::list( r ))
+{   
+    QMap<int, QString> tags = Tag::list( r );
+    QMapIterator<int, QString> i( tags );
+    while (i.hasNext())
 	{
-        QTreeWidgetItem *entry = createNewItem( tag );
+        QTreeWidgetItem *entry = createNewItem( i.next().value() );
 		// I couldn't make it sort properly otherwise, even the QVariant methods wouldn't work!
-		entry->setText( 1, QString::number( 10 * 1000 + tag.weighting() ) );
+		entry->setText( 1, QString::number( 10 * 1000 + i.key() ) );
 	}
 	m_currentReply = 0;
 }

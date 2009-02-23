@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QStringList>
 #include <fstream>
 
 using lastfm::Track;

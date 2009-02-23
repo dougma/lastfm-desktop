@@ -19,9 +19,10 @@
 
 #include "MyTagsTuner.h"
 #include "StationDelegate.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/radio/RadioStation.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/User>
+#include <lastfm/RadioStation>
+#include <lastfm/WsReply>
+
 
 MyTagsTuner::MyTagsTuner()
 {
@@ -35,18 +36,19 @@ MyTagsTuner::MyTagsTuner()
 void
 MyTagsTuner::onFetchedTags( WsReply* r )
 {
-	const WeightedStringList& tags = Tag::list( r );
+	QMap<int, QString> tags = Tag::list( r );
 	
-	if( tags.isEmpty() ) 
+	if( tags.isEmpty() )
 		return;
 	
-	static_cast<StationDelegate*>( itemDelegate() )->setMaxCount( tags.first().weighting() );
-	
-	foreach( const WeightedString& tag, tags )
+	static_cast<StationDelegate*>( itemDelegate() )->setMaxCount( tags.keys().last() );
+
+    QMapIterator<int, QString> i( tags );
+    while (i.hasNext())
 	{
-		QListWidgetItem* i = new QListWidgetItem( tag, this );
-		i->setData( StationDelegate::CountRole, tag.weighting() );
-		addItem( i );
+		QListWidgetItem* item = new QListWidgetItem( i.next().value() );
+		item->setData( StationDelegate::CountRole, i.key() );
+		addItem( item );
 	}
 }
 

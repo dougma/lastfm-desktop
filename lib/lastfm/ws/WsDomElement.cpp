@@ -35,16 +35,16 @@ WsDomElement::operator[]( const QString& name ) const
             if (e.e.attribute( attributeName ) == attributeValue)
                 return e;
     }
-    return WsDomElement( e.firstChildElement( name ) );
+    return WsDomElement( e.firstChildElement( name ), name.toUtf8().data() );
 }
 
 
 QString
-WsDomElement::nonEmptyText() const 
+WsDomElement::nonEmptyText() const
 {
     QString const s = e.text();
     if (s.isEmpty())
-        throw Exception::emptyTextNode( e.tagName() );
+        throw std::runtime_error( "Unexpected empty text node: " + s.toStdString() );
     return s;
 }
 

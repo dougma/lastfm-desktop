@@ -47,8 +47,8 @@ namespace lastfm
     	bool operator==( const Album& that ) const { return m_title == that.m_title && m_artist == that.m_artist; }
     	bool operator!=( const Album& that ) const { return m_title != that.m_title || m_artist != that.m_artist; }
 	
-        operator QString() const { return m_title; }
-        QString title() const { return m_title; }
+        operator QString() const { return title(); }
+        QString title() const { return m_title.isEmpty() ? "[unknown]" : m_title; }
         Artist artist() const { return m_artist; }
         Mbid mbid() const { return m_mbid; }
 

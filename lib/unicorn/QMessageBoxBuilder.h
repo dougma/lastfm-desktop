@@ -24,25 +24,25 @@
 #include <QtGui/QMessageBox>
 
 
-class UNICORN_DLLEXPORT MessageBoxBuilder
+class UNICORN_DLLEXPORT QMessageBoxBuilder
 {
     QMessageBox box;
 
 public:
     /** Try not to use 0! */
-    MessageBoxBuilder( QWidget* parent ) : box( parent )
+    QMessageBoxBuilder( QWidget* parent ) : box( parent )
     {}
     
-    MessageBoxBuilder& setTitle( const QString& x );
-    MessageBoxBuilder& setText( const QString& x );
+    QMessageBoxBuilder& setTitle( const QString& x );
+    QMessageBoxBuilder& setText( const QString& x );
     /** the default is Information */
-    MessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
+    QMessageBoxBuilder& setIcon( QMessageBox::Icon x ) { box.setIcon( x ); return *this; }
     /** the default is a single OK button */
-    MessageBoxBuilder& setButtons( QMessageBox::StandardButtons buttons ) { box.setStandardButtons( buttons ); return *this; }
+    QMessageBoxBuilder& setButtons( QMessageBox::StandardButtons buttons ) { box.setStandardButtons( buttons ); return *this; }
 
     int exec();
 	
-	MessageBoxBuilder& sheet()
+	QMessageBoxBuilder& sheet()
 	{
 	#ifdef Q_WS_MAC
 		box.setWindowFlags( Qt::Sheet | (box.windowFlags() & ~Qt::Drawer) );

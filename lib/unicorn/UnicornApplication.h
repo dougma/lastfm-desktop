@@ -20,8 +20,9 @@
 #ifndef UNICORN_APPLICATION_H
 #define UNICORN_APPLICATION_H
 
-#include "lib/DllExportMacro.h"
 #include "common/HideStupidWarnings.h"
+#include "lib/DllExportMacro.h"
+#include "lib/lastfm/core/CoreSettings.h"
 #include <QApplication>
 class WsReply;
 
@@ -43,15 +44,16 @@ namespace unicorn
         Application( int&, char** ) throw( StubbornUserException );
         ~Application();
 
-        /** when the application exits, the user will be logged out
-          * the verb is "to log out", not "to logout". Demonstrated by, eg. "He
-          * logged out", or, "she logs out" */
-        void logoutAtQuit() { m_logoutAtQuit = true; }
+        struct Settings
+        {
+            bool logOutOnExit() { return CoreSettings().value( "LogOutOnExit", false ).toBool(); }
+            void setLogOutOnExit( bool b ) { CoreSettings().setValue( "LogOutOnExit", b ); }
+        };
 
     public slots:
         void logout()
         {
-            logoutAtQuit();
+            m_logoutAtQuit = true;
             quit();
         }
 

@@ -25,8 +25,7 @@
 #include <QLocalServer>
 #include <QMap>
 #include "lib/DllExportMacro.h"
-
-class PlayerConnection;
+#include <stdexcept>
 
 
 /** listens to external clients via a TcpSocket and notifies a receiver to their
@@ -36,17 +35,7 @@ class LISTENER_DLLEXPORT PlayerListener : public QLocalServer
     Q_OBJECT
 
 public:
-    struct SocketFailure : private QString
-    {
-        SocketFailure( const QString& what ) : QString( what )
-        {}
-        
-        QString what() const { return *this; }
-    };
-    
-    PlayerListener( QObject* parent = 0 ) throw( SocketFailure );
-    
-    uint port() const { return 33367; }
+    PlayerListener( QObject* parent = 0 ) throw( std::runtime_error );
     
 signals:
     void newConnection( class PlayerConnection* );

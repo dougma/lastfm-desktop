@@ -20,6 +20,7 @@
 
 #include "Collection.h"
 #include "lib/lastfm/core/CoreDir.h"
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFileInfo>
 #include <QMutexLocker>

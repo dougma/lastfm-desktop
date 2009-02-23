@@ -17,11 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <lastfm/Track>
-#include <QMainWindow>
+#include <lastfm/global.h>
+#include "lib/unicorn/UnicornMainWindow.h"
 
 
-class MainWindow : public QMainWindow
+class MainWindow : public unicorn::MainWindow
 {
     Q_OBJECT
 
@@ -29,14 +29,10 @@ class MainWindow : public QMainWindow
 
     struct Ui
     {
-        class QMenu* account;
-        class QMenu* outputdevice;
-        class QAction* profile;
-        
+        QMenu* outputdevice;
         QAction* play;
         QAction* pause;
-        QAction* skip;
-        
+        QAction* skip;    
         QAction* xspf;
         QAction* rescan;
     } ui;
@@ -45,12 +41,4 @@ public:
     MainWindow();
 
     void setWindowTitle( const Track& );
-    
-public slots:
-    void openProfileUrl();
-    void openLog();
-    void about();
-    
-private slots:
-    void onUserGotInfo( class WsReply* );
 };

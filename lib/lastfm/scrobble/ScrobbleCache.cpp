@@ -19,6 +19,7 @@
 
 #include "ScrobbleCache.h"
 #include "lib/lastfm/core/CoreDir.h"
+#include <QCoreApplication>
 #include <QFile>
 #include <QDomElement>
 #include <QDomDocument>

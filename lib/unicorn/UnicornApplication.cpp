@@ -17,6 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifdef __APPLE__
+    // first to prevent compilation errors with Qt 4.5.0-beta1
+    #include <Carbon/Carbon.h>
+    #include <ApplicationServices/ApplicationServices.h>
+    static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
+    #include <QMainWindow>
+#endif
+
 #include "UnicornApplication.h"
 #include "QMessageBoxBuilder.h"
 #include "UnicornCoreApplication.h"
@@ -36,7 +44,12 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
                       m_logoutAtQuit( false )
 {
     CoreApplication::init();
-    
+
+#ifdef __APPLE__
+    AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
+    AEInstallEventHandler( kCoreEventClass, kAEReopenApplication, h, 0, false );
+#endif
+
     translate();
 
     CoreSettings s;
@@ -64,6 +77,10 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
     Ws::SessionKey = s.value( "SessionKey" ).toString();
     
     connect( AuthenticatedUser().getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
+
+#ifdef __APPLE__
+    setQuitOnLastWindowClosed( false );
+#endif
 }
 
 
@@ -121,3 +138,30 @@ unicorn::Application::onUserGotInfo( WsReply* r )
     
     emit userGotInfo( r );
 }
+
+
+#ifdef __APPLE__
+static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
+{
+    OSType id = typeWildCard;
+    AEGetAttributePtr( e, keyEventIDAttr, typeType, 0, &id, sizeof(id), 0 );
+    
+    switch (id)
+    {
+        case kAEQuitApplication:
+            qApp->quit();
+            return noErr;
+
+        case kAEReopenApplication:
+        {
+            foreach (QWidget* w, qApp->topLevelWidgets())
+                if (qobject_cast<QMainWindow*>(w))
+                    w->show(), w->raise();
+            return noErr;
+        }
+
+        default:
+            return unimpErr;
+    }
+}
+#endif

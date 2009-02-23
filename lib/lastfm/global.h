@@ -130,4 +130,8 @@ using lastfm::Playlist;
 //convenience
 class WsReply;
 
+
+//convenience for development
+#include <QDebug>
+
 #endif //LASTFM_GLOBAL_H

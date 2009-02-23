@@ -18,34 +18,19 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include "lib/unicorn/widgets/AboutDialog.h"
 #include <lastfm/Track>
-#include <lastfm/User>
-#include <lastfm/WsKeys>
-#include <QCoreApplication>
-#include <QDesktopServices>
 #include <QMenuBar>
-#include <QShortcut>
 #include <QToolBar>
-#include <QVBoxLayout>
 
 
 MainWindow::MainWindow()
 {   
-    QAction* showlog;
-    QAction* about; 
-    
-    ui.account = menuBar()->addMenu( Ws::Username );
-    ui.profile = ui.account->addAction( tr("Visit &Profile"), this, SLOT(openProfileUrl()) );
-    ui.account->addSeparator();
-    ui.account->addAction( tr("Log &Out && Quit"), qApp, SLOT(logout()) );
     ui.outputdevice = menuBar()->addMenu( tr("Output Device") );
 
     QMenu* tools = menuBar()->addMenu( tr("Tools") );
     ui.xspf = tools->addAction( "Resolve XSPF" );
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
-    showlog = tools->addAction( tr("Show &Log"), this, SLOT(openLog()) );
-    about = menuBar()->addMenu( "Help" )->addAction( "About", this, SLOT(about()) );
+    tools->addAction( tr("Show &Log"), this, SLOT(openLog()) );
     
     QToolBar* toolbar = new QToolBar;
     toolbar->setIconSize( QSize( 41, 41 ) );
@@ -62,37 +47,8 @@ MainWindow::MainWindow()
     setWindowTitle( Track() );
     setUnifiedTitleAndToolBarOnMac( true );
     resize( 750, 550 );
-
-    connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
     
-#ifdef __APPLE__
-    about->setText( "About " + qApp->applicationName() );
-    about->setMenuRole( QAction::AboutRole );
-    new QShortcut( QKeySequence(Qt::CTRL+Qt::Key_W), this, SLOT(close()) );
-#else
-    ui.account->addAction( tr("&Quit"), qApp, SLOT(quit()) );
-#endif
-}
-
-
-void
-MainWindow::onUserGotInfo( WsReply* reply )
-{
-    QString const text = AuthenticatedUser::getInfoString( reply );
-
-    if (text.size())
-    {
-        QAction* act = ui.account->addAction( text );
-        act->setEnabled( false );
-        ui.account->insertAction( ui.profile, act );
-    }
-}
-
-
-void
-MainWindow::openProfileUrl()
-{
-    QDesktopServices::openUrl( AuthenticatedUser().www() );
+    finishUi();
 }
 
 
@@ -103,20 +59,4 @@ MainWindow::setWindowTitle( const Track& t )
         QMainWindow::setWindowTitle( tr("Last.fm Boffin") );
     else
         QMainWindow::setWindowTitle( t.toString() );
-}
-
-
-#include <QDesktopServices>
-#include "lib/unicorn/UnicornCoreApplication.h"
-void
-MainWindow::openLog()
-{
-    QDesktopServices::openUrl( QUrl::fromLocalFile( unicorn::CoreApplication::log().absoluteFilePath() ) );
-}
-
-
-void
-MainWindow::about()
-{
-    (new AboutDialog( this ))->show();
 }

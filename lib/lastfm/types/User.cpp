@@ -90,9 +90,9 @@ User::list( WsReply* r )
             users += u;
         }
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
     }    
     return users;
 }
@@ -164,9 +164,9 @@ AuthenticatedUser::getInfoString( WsReply* reply )
             text = tr("%L1 scrobbles").arg( scrobbles );
     	}    
     }
-	catch (WsDomElement::Exception& e)
+	catch (std::runtime_error& e)
 	{
-        qWarning() << e;
+        qWarning() << e.what();
 	}
     return text;
     

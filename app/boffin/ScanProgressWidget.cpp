@@ -181,9 +181,9 @@ ImageFucker::onArtistGotInfo( WsReply* wsreply )
         QNetworkReply* reply = nam.get( QNetworkRequest(url) );
         connect( reply, SIGNAL(finished()), SLOT(onImageDownloaded()) );
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
     }
 }
 

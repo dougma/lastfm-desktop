@@ -21,7 +21,7 @@
 #include "SettingsDialog.h"
 #include "Settings.h"
 #include "the/radio.h"
-#include "lib/unicorn/UnicornSettings.h"
+#include "lib/unicorn/UnicornApplication.h"
 #include "lib/lastfm/scrobble/private.h"
 #include <QtGui>
 #include <phonon/audiooutput.h>
@@ -37,8 +37,8 @@ Q_DECLARE_METATYPE( Phonon::AudioOutputDevice )
 
 
 // Visual Studio sucks, thus we do this
-static const unsigned char kChinese[]  = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
-static const unsigned char kRussian[]  = { 0xD0, 0xA0, 0xD1, 0x83, 0xD1, 0x81, 0xD1, 0x81, 0xD0, 0xBA, 0xD0, 0xB8, 0xD0, 0xB9, 0x0 };
+static const unsigned char  kChinese[] = { 0xE4, 0xB8, 0xAD, 0xE6, 0x96, 0x87, 0x0 };
+static const unsigned char  kRussian[] = { 0xD0, 0xA0, 0xD1, 0x83, 0xD1, 0x81, 0xD1, 0x81, 0xD0, 0xBA, 0xD0, 0xB8, 0xD0, 0xB9, 0x0 };
 static const unsigned char kJapanese[] = { 0xE6, 0x97, 0xA5, 0xE6, 0x9C, 0xAC, 0xE8, 0xAA, 0x9E, 0x0 };
 
 
@@ -67,7 +67,7 @@ SettingsDialog::SettingsDialog( QWidget* parent )
     ui.languages->addItem( QString::fromUtf8( (const char*) kRussian ), QLocale::Russian );
     ui.languages->addItem( QString::fromUtf8( (const char*) kChinese ), QLocale::Chinese );
 
-    ui.logOutOnExit->setChecked( unicorn::Settings().logOutOnExit() );
+    ui.logOutOnExit->setChecked( unicorn::Application::Settings().logOutOnExit() );
 
     moose::Settings s;
     ui.fingerprintingEnabled->setChecked( s.fingerprintingEnabled() );
@@ -106,7 +106,8 @@ SettingsDialog::accept()
 
     // note, don't delete the username/password from the settings yet, do that
     // at exit, in case the user changes his/her mind
-    s.setLogOutOnExit( ui.logOutOnExit->isChecked() );
+    unicorn::Application::Settings().setLogOutOnExit( ui.logOutOnExit->isChecked() );
+
     s.setFingerprintingEnabled( ui.fingerprintingEnabled->isChecked() );
     s.setAlwaysConfirmIPodScrobbles( ui.alwaysConfirmIPodScrobbles->isChecked() );
 
@@ -114,14 +115,14 @@ SettingsDialog::accept()
     if (i != -1)
         cs.setValue( "Locale", ui.languages->itemData( i ).toInt() );
 
-    Phonon::AudioOutputDevice d = ui.outputDevice->itemData( ui.outputDevice->currentIndex() ).value<Phonon::AudioOutputDevice>();    
+    Phonon::AudioOutputDevice d = ui.outputDevice->itemData( ui.outputDevice->currentIndex() ).value<Phonon::AudioOutputDevice>();
     if (s.audioOutputDeviceName() != d.name())
     {
         s.setAudioOutputDeviceName( d.name() );
         The::radio().audioOutput()->setOutputDevice( d );
     }
-    
+
     cs.setValue( SCROBBLE_EXCLUSION_DIRS, ui.forbiddenPaths->toPlainText().split( '\n' ) );
-    
+
     QDialog::accept();
 }

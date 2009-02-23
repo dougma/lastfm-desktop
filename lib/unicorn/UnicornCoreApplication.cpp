@@ -63,13 +63,15 @@ unicorn::CoreApplication::init()
         QLocale::setDefault( qMacLocale() );
 #endif
 
-    CoreDir::mkpaths();
+    CoreDir::cache().mkpath( "." );
+    CoreDir::data().mkpath( "." );
+    CoreDir::logs().mkpath( "." );
 
 #ifdef WIN32
-    QString bytes = log( applicationName() ).absoluteFilePath();
+    QString bytes = CoreApplication::log( applicationName() ).absoluteFilePath();
     const wchar_t* path = bytes.utf16();
 #else
-    QByteArray bytes = log( applicationName() ).absoluteFilePath().toLocal8Bit();
+    QByteArray bytes = CoreApplication::log( applicationName() ).absoluteFilePath().toLocal8Bit();
     const char* path = bytes.data();
 #endif
     new Logger( path );

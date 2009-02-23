@@ -66,10 +66,10 @@
 #include "RqlStationTemplate.h"
 
 
-struct Settings
+struct AppSettings
 {    
-    bool isScrobblingEnabled() const { return moose::UserSettings().value( "ScrobblingEnabled", true ).toBool(); }
-    void setScrobblingEnabled( bool b ) { moose::UserSettings().setValue( "ScrobblingEnabled", b ); }
+    bool isScrobblingEnabled() const { return unicorn::UserSettings().value( "ScrobblingEnabled", true ).toBool(); }
+    void setScrobblingEnabled( bool b ) { unicorn::UserSettings().setValue( "ScrobblingEnabled", b ); }
     
     uint volume() const { return QSettings().value( "Volume", 80 ).toUInt(); }
     void setVolume( uint i ) { QSettings().value( "Volume", i ); }
@@ -125,10 +125,9 @@ App::App( int& argc, char** argv ) throw( StubbornUserException )
         m_listener = new PlayerListener( this );
         connect( m_listener, SIGNAL(newConnection( PlayerConnection* )), mediator, SLOT(follow( PlayerConnection* )) );
     }
-    catch (PlayerListener::SocketFailure& e)
+    catch (std::runtime_error& e)
     {
         m_listener = 0;
-
         qWarning() << e.what();
         //TODO diagnostics dialog warning
     }
@@ -157,7 +156,7 @@ App::App( int& argc, char** argv ) throw( StubbornUserException )
 
 ////// radio
     Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
-	audioOutput->setVolume( Settings().volume() );
+	audioOutput->setVolume( AppSettings().volume() );
 
     QString audioOutputDeviceName = moose::Settings().audioOutputDeviceName();
     if (audioOutputDeviceName.size())
@@ -196,7 +195,7 @@ App::App( int& argc, char** argv ) throw( StubbornUserException )
 
 App::~App()
 {
-    Settings().setVolume( m_radio->audioOutput()->volume() );
+    AppSettings().setVolume( m_radio->audioOutput()->volume() );
     
     delete m_scrobbler;
     delete m_radio;
@@ -213,7 +212,6 @@ App::setMainWindow( MainWindow* window )
 
     connect( window->ui.love, SIGNAL(triggered( bool )), SLOT(love( bool )) );
     connect( window->ui.ban,  SIGNAL(triggered()), SLOT(ban()) );
-    connect( window->ui.logout, SIGNAL(triggered()), SLOT(logout()) );
 	connect( window->ui.skip, SIGNAL(triggered()), m_radio, SLOT(skip()) );
     connect( window->ui.scrobble, SIGNAL(toggled( bool )), SLOT(setScrobblingEnabled( bool )) );
 
@@ -233,7 +231,7 @@ App::setMainWindow( MainWindow* window )
              SLOT(onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason )) );
 #endif
 
-    if (Settings().isScrobblingEnabled())
+    if (AppSettings().isScrobblingEnabled())
     {
         // only do if true, otherwise the state machine will be fucked
         setScrobblingEnabled( true );
@@ -267,7 +265,7 @@ App::setScrobblingEnabled( bool b )
         delete m_scrobbler->findChild<WsConnectionMonitor*>();
     }
     
-    Settings().setScrobblingEnabled( b );
+    AppSettings().setScrobblingEnabled( b );
 }
 
 
@@ -279,7 +277,7 @@ App::onWsError( Ws::Error e )
         case Ws::OperationFailed:
             //TODOCOPY
             //TODO use the non intrusive status messages
-            MessageBoxBuilder( m_mainWindow )
+            QMessageBoxBuilder( m_mainWindow )
                     .setTitle( "Oops" )
                     .setText( "Last.fm is b0rked" )
                     .exec();
@@ -335,7 +333,7 @@ App::onScrobblerStatusChanged( int e )
     switch (e)
     {
         case Scrobbler::ErrorBannedClientVersion:
-            MessageBoxBuilder( m_mainWindow )
+            QMessageBoxBuilder( m_mainWindow )
                 .setIcon( QMessageBox::Warning )
                 .setTitle( tr("Upgrade Required") )
                 .setText( tr("Scrobbling will not work because this software is too old.") )
@@ -347,7 +345,7 @@ App::onScrobblerStatusChanged( int e )
             break;
 
         case Scrobbler::ErrorBadTime:
-            MessageBoxBuilder( m_mainWindow )
+            QMessageBoxBuilder( m_mainWindow )
                 .setIcon( QMessageBox::Warning )
                 .setTitle( tr("Incorrect Time") )
                 .setText( tr("<p>Last.fm cannot authorise any scrobbling! :("
@@ -372,9 +370,9 @@ App::onUserGotInfo( WsReply* reply )
         }
     #endif
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
     }
 } 
 
@@ -488,7 +486,7 @@ App::openLocalContent( const RadioStation& station )
     
     if (!result)
     {
-        MessageBoxBuilder( m_mainWindow )
+        QMessageBoxBuilder( m_mainWindow )
                 .setTitle( tr("Local Radio Error") )
                 .setText( tr("Could not load plugin") )
                 .sheet()

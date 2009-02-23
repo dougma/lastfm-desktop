@@ -13,6 +13,14 @@
    <string>Last.fm</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>22</y>
+     <width>374</width>
+     <height>529</height>
+    </rect>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_2" />
   </widget>
   <widget class="QMenuBar" name="menubar" >
@@ -24,24 +32,12 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="account" >
-    <property name="title" >
-     <string>Account</string>
-    </property>
-    <addaction name="profile" />
-    <addaction name="scrobble" />
-    <addaction name="separator" />
-    <addaction name="logout" />
-    <addaction name="separator" />
-    <addaction name="quit" />
-   </widget>
    <widget class="QMenu" name="help" >
     <property name="title" >
      <string>&amp;Help</string>
     </property>
     <addaction name="diagnostics_action" />
     <addaction name="separator" />
-    <addaction name="about" />
    </widget>
    <widget class="QMenu" name="view" >
     <property name="title" >
@@ -64,7 +60,6 @@
     <addaction name="separator" />
     <addaction name="bringAllToFront" />
    </widget>
-   <addaction name="account" />
    <addaction name="view" />
    <addaction name="windowMenu" />
    <addaction name="help" />
@@ -72,16 +67,6 @@
   <action name="settings" >
    <property name="text" >
     <string>&amp;Settings</string>
-   </property>
-  </action>
-  <action name="logout" >
-   <property name="text" >
-    <string>Log &amp;Out &amp;&amp; Quit</string>
-   </property>
-  </action>
-  <action name="quit" >
-   <property name="text" >
-    <string>E&amp;xit</string>
    </property>
   </action>
   <action name="diagnostics_action" >
@@ -103,11 +88,6 @@
    </property>
    <property name="text" >
     <string>Sources</string>
-   </property>
-  </action>
-  <action name="about" >
-   <property name="text" >
-    <string>About</string>
    </property>
   </action>
   <action name="viewDashboard" >

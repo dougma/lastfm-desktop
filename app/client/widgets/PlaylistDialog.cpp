@@ -178,15 +178,15 @@ static QList<PlaylistMetaData> meh( WsReply* r )
                 p.description = e["description"].text();
                 playlists += p;
             }
-            catch (WsDomElement::Exception& e)
+            catch (std::runtime_error& e)
             {
-                qWarning() << e;
+                qWarning() << e.what();
             }   
 		}
 	}
-	catch (WsDomElement::Exception& e)
+	catch (std::runtime_error& e)
 	{
-		qWarning() << e;
+		qWarning() << e.what();
 	}
     
     return playlists;
@@ -285,9 +285,9 @@ PlaylistDialog::onPlaylistCreated( WsReply* reply )
         QModelIndex index = m_model->index( i );
         emit m_model->dataChanged( index, index );
     }
-    catch (WsDomElement& e)
+    catch (std::runtime_error& e)
     {
         m_model->descriptions[i] = tr("Error creating playlist");
-        qWarning() << e;
+        qWarning() << e.what();
     }
 }

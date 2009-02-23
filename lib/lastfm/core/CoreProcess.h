@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_CORE_PROCESS_H
-#define LASTFM_CORE_PROCESS_H
+#ifndef CORE_PROCESS_H
+#define CORE_PROCESS_H
 
 #include <lastfm/global.h>
 #include <QString>
@@ -27,9 +27,8 @@
 class LASTFM_CORE_DLLEXPORT CoreProcess
 {
     Q_DISABLE_COPY( CoreProcess )
-	
-	CoreProcess();
-	~CoreProcess();
+	CoreProcess();  //undefined
+	~CoreProcess(); //undefined
 
 public:
 	/** pass, eg. iTunes.exe, is case-sensitive */

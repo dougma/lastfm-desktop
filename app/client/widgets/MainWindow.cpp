@@ -21,7 +21,7 @@
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/SeedsWidget.h"
 #include "Settings.h"
-#include "the/app.h" 
+#include "the/app.h"
 #include "widgets/DiagnosticsDialog.h"
 #include "widgets/Firehose.h"
 #include "widgets/ImageButton.h"
@@ -32,15 +32,12 @@
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
 #include "widgets/TrackDashboard.h"
+#include "widgets/TrackDashboardHeader.h"
 #include "layouts/SideBySideLayout.h"
 #include "lib/lastfm/types/User.h"
-#include "lib/unicorn/widgets/AboutDialog.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include "lib/lastfm/ws/WsReply.h"
 #include <QtGui>
-#include <QSplitter>
-#include <QPainter>
-#include "widgets/TrackDashboardHeader.h"
 
 #ifdef Q_WS_X11
 #include <QX11Info>
@@ -52,50 +49,33 @@
 #include "windows.h"
 #endif
 
-#define SETTINGS_POSITION_KEY "MainWindowPosition"
-
 
 MainWindow::MainWindow()
 {
     setupUi();
+    finishUi();
 
-    QShortcut* close = new QShortcut( QKeySequence( "CTRL+W" ), this );
-    close->setContext( Qt::ApplicationShortcut );
-    connect( close, SIGNAL(activated()), SLOT(close()) );
-
-    connect( ui.about, SIGNAL(triggered()), SLOT(showAboutDialog()) );
     connect( ui.settings, SIGNAL(triggered()), SLOT(showSettingsDialog()) );
     connect( ui.viewLocalRql, SIGNAL(triggered()), SLOT(showLocalRqlDialog()) );
     connect( ui.diagnostics_action, SIGNAL(triggered()), ui.diagnostics, SLOT(show()) );
     connect( ui.share, SIGNAL(triggered()), SLOT(showShareDialog()) );
 	connect( ui.tag, SIGNAL(triggered()), SLOT(showTagDialog()) );
     connect( ui.playlist, SIGNAL(triggered()), SLOT(showPlaylistDialog()) );
-    connect( ui.quit, SIGNAL(triggered()), qApp, SLOT(quit()) );
 
     connect( qApp, SIGNAL(trackSpooled( Track )), SLOT(onTrackSpooled( Track )) );
 	connect( qApp, SIGNAL(stateChanged( State )), SLOT(onStateChanged( State )) );
-
     connect( qApp, SIGNAL(error( QString )), ui.messagebar, SLOT(show( QString )) );
     connect( qApp, SIGNAL(status( QString, QString )), ui.messagebar, SLOT(show( QString, QString )) );
 
     // set up window in default state
     onTrackSpooled( Track() );
 
-    QVariant v = moose::UserSettings().value( SETTINGS_POSITION_KEY );
-    if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
-
 	setAcceptDrops( true );
-	
+
 #ifdef SUPER_MEGA_DEBUG
 	// causes all events from the whole application to get logged
 	qApp->installEventFilter( this );
-#endif	
-}
-
-
-MainWindow::~MainWindow()
-{
-    moose::UserSettings().setValue( SETTINGS_POSITION_KEY, pos() );
+#endif
 }
 
 
@@ -159,16 +139,12 @@ MainWindow::setupUi()
         ag->addAction( ui.viewDashboard );
     }
 
-    ui.account->setTitle( Ws::Username );
-   	connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
-
     setDockOptions( AnimatedDocks | AllowNestedDocks );
     setCentralWidget( new QWidget );
     new QVBoxLayout( centralWidget() );
     centralWidget()->layout()->setContentsMargins( 0, 0, 0, 0 );
     centralWidget()->layout()->setSpacing( 0 );
 
-    
     QWidget* sourceDashboard = new QWidget( centralWidget() );
     SideBySideLayout* sourceDashboardLayout = new SideBySideLayout( sourceDashboard );
 
@@ -180,10 +156,8 @@ MainWindow::setupUi()
     centralWidget()->layout()->addWidget( sourceDashboard );
     
     // these ones should be on top, so created last
-    #define T( x, y ) x = y; centralWidget()->layout()->addWidget( x );
-    T( ui.dashboardHeader, new TrackDashboardHeader );
-    T( ui.amp, new Amp );
-    #undef T
+    centralWidget()->layout()->addWidget( ui.dashboardHeader = new TrackDashboardHeader );
+    centralWidget()->layout()->addWidget( ui.amp = new Amp );
     
     QVBoxLayout* v = new QVBoxLayout( ui.dashboard );
     v->addWidget( ui.messagebar = new MessageBar );
@@ -253,42 +227,40 @@ MainWindow::setupUi()
 void
 MainWindow::showSettingsDialog()
 {
-    UNICORN_UNIQUE_DIALOG( SettingsDialog )
+    if (!ui.settingsDialog) ui.settingsDialog = new SettingsDialog( this );
+    ui.settingsDialog.show();
 }
 
 
 void
 MainWindow::showLocalRqlDialog()
 {
-    UNICORN_UNIQUE_DIALOG( LocalRqlDialog )
-}
-
-
-void
-MainWindow::showAboutDialog()
-{
-    AboutDialog( this ).exec();
+    if (!ui.localRqlDialog) ui.localRqlDialog = new LocalRqlDialog( this );
+    ui.localRqlDialog.show();
 }
 
 
 void
 MainWindow::showShareDialog()
 {
-	UNICORN_UNIQUE_PER_TRACK_DIALOG( ShareDialog, m_track )
+    if (!ui.shareDialog || ui.shareDialog->track() != m_track) ui.shareDialog = new ShareDialog( m_track, this );
+    ui.shareDialog.show();
 }
 
 
 void
 MainWindow::showTagDialog()
 {
-	UNICORN_UNIQUE_PER_TRACK_DIALOG( TagDialog, m_track )
+    if (!ui.tagDialog || ui.tagDialog->track() != m_track) ui.tagDialog = new TagDialog( m_track, this );
+    ui.tagDialog.show();
 }
 
 
 void 
 MainWindow::showPlaylistDialog()
 {
-    UNICORN_UNIQUE_PER_TRACK_DIALOG( PlaylistDialog, m_track );
+    if (!ui.playlistDialog || ui.playlistDialog->track() != m_track) ui.playlistDialog = new PlaylistDialog( m_track, this );
+    ui.playlistDialog.show();
 }
 
 
@@ -433,20 +405,6 @@ MainWindow::dropEvent( QDropEvent* e )
                 break;
             }
         }
-    }
-}
-
-
-void
-MainWindow::onUserGotInfo( WsReply* reply )
-{
-    QString const text = AuthenticatedUser::getInfoString( reply );
-
-    if (text.size())
-    {
-        QAction* act = ui.account->addAction( text );
-        act->setEnabled( false );
-        ui.account->insertAction( ui.profile, act );
     }
 }
 

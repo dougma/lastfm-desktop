@@ -58,8 +58,6 @@ $dmg = "\$(DESTDIR)\$(QMAKE_TARGET)-\$(VERSION)-\$(REVISION).dmg";
 
 print <<END;
 
-FORCE2: FORCE
-
 DIST_TOOLS_DIR = $root/admin/dist/mac
 BUNDLE = \$(DESTDIR)\$(QMAKE_TARGET).app
 CONTENTS = \$(BUNDLE)/Contents
@@ -69,8 +67,9 @@ BUNDLE_FRAMEWORKS = $bundle_frameworks
 BUNDLE_MACOS = $bundle_macos
 BUNDLE_RESOURCES = \$(CONTENTS)/Resources
 BUNDLE_PLUGINS = \$(CONTENTS)/MacOS/plugins
-INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
-.PHONY = bundle bundle-clean bundle-install dmg dmg-clean
+.PHONY = bundle bundle-extra dmg
+
+thirst: first
 
 \$(OBJECTS_DIR)Makefile.dmg.dummy: \$(TARGET) $plist
 	perl -pi -e 's/@VERSION@/'\$(VERSION)'/g' $plist
@@ -78,17 +77,7 @@ INSTALLDIR = /Applications/\$(QMAKE_TARGET).app
 	$DEPOSX \$(TARGET) $QT_FRAMEWORKS_DIR
 	touch \$\@
 
-bundle-clean:
-	rm -rf \$(BUNDLE_FRAMEWORKS)
-	rm -f \$(BUNDLE_MACOS)
-	rm -rf \$(CONTENTS)/MacOS/imageformats
-	rm -f \$(CONTENTS)/COPYING
-	rm -f \$(CONTENTS)/Resources/qt.conf
-
 dmg: $dmg
-
-dmg-clean: bundle-clean
-	rm -f $dmg
 
 $dmg: bundle
 	rm -f '\$\@'
@@ -118,13 +107,9 @@ sub plugins
 	
 	my $from = abs_path( "$QT_FRAMEWORKS_DIR/../plugins/$d" );
 	my $to = "\$(CONTENTS)/MacOS/$d";
-	my $install = "\$(INSTALLDIR)/Contents/MacOS/$d";
 
 print <<END;
 $to:
-	mkdir -p \$\@
-
-$install:
 	mkdir -p \$\@
 
 END
@@ -138,13 +123,8 @@ END
 $to/$name: $from/$name |$to
 	cp $from/$name \$\@
 	$DEPOSX \$\@ $QT_FRAMEWORKS_DIR
-
-$install/$name: $to/$name |$install
-	cp $to/$name \$\@
-
 END
 		$bundle_deps .= " $to/$name";
-		$install_deps .= " $install/$name";
 	}
 	closedir( DIR );
 }
@@ -153,13 +133,9 @@ END
 sub QtFrameworks
 {
 	my $to = "\$(CONTENTS)/Frameworks";
-	my $install = "\$(INSTALLDIR)/Contents/Frameworks";
 	
 	print <<END;
 $to:
-	mkdir -p \$\@
-
-$install:
 	mkdir -p \$\@
 END
 	foreach my $module (@QT_MODULES)
@@ -172,56 +148,24 @@ $to/$module.framework: $QT_FRAMEWORKS_DIR/$module.framework |$to
 	$DEPOSX \$\@/$module $QT_FRAMEWORKS_DIR
 	install_name_tool -id \$\@/Versions/4/$module \$\@/Versions/4/$module
 
-$install/$module.framework: $to/$module.framework
-	cp -Rf $to/$module.framework $install
-
 END
-		$install_deps .= " $install/$module.framework";
 	}
 }
 
 sub dylibs
 {
-	my $to = "\$(CONTENTS)/MacOS";
-	my $install = "\$(INSTALLDIR)/Contents/MacOS";
-	
 	foreach my $dylib (@DYLIBS)
 	{
 		print <<END;
 
-$to/$dylib: \$(DESTDIR)$dylib
+\$(CONTENTS)/MacOS/$dylib: \$(DESTDIR)$dylib
 	cp \$(DESTDIR)$dylib \$\@
 	$DEPOSX \$\@ $QT_FRAMEWORKS_DIR
-
-$install/$dylib: $to/$dylib |$install
-	cp $to/$dylib \$\@
 END
-		$install_deps .= " $install/$dylib";
 	}	
 }
 
-print <<END;
+print <<END
 
-\$(INSTALLDIR)/Contents:
-	mkdir -p \$\@
-
-\$(INSTALLDIR)/Contents/MacOS:
-	mkdir -p \$\@
-	
-\$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET): \$(TARGET) |\$(INSTALLDIR)/Contents/MacOS
-	cp \$(TARGET) \$(INSTALLDIR)/Contents/MacOS
-
-\$(INSTALLDIR)/Contents/Info.plist: |\$(INSTALLDIR)/Contents
-	cp \$(CONTENTS)/Info.plist \$(INSTALLDIR)/Contents
-
-\$(INSTALLDIR)/Contents/Resources/qt.conf: \$(INSTALLDIR)/Contents/Resources
-	cp \$(CONTENTS)/Resources/qt.conf \$(INSTALLDIR)/Contents/Resources
-
-\$(INSTALLDIR)/Contents/Resources: |\$(INSTALLDIR)/Contents
-	cp -r \$(CONTENTS)/Resources \$(INSTALLDIR)/Contents
-
-bundle-install: bundle \$(INSTALLDIR)/Contents/MacOS/\$(QMAKE_TARGET) \$(INSTALLDIR)/Contents/Info.plist $install_deps \$(INSTALLDIR)/Contents/Resources/qt.conf
-
-bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(DESTDIR)\$(QMAKE_TARGET)-makefile-dmg-dummy \$(CONTENTS)/Resources/qt.conf $bundle_deps
-
+bundle: all \$(BUNDLE_FRAMEWORKS) \$(BUNDLE_MACOS) \$(CONTENTS)/COPYING \$(CONTENTS)/Resources/qt.conf \$(OBJECTS_DIR)Makefile.dmg.dummy $bundle_deps
 END

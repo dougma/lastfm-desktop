@@ -21,8 +21,8 @@
 #include <QApplication>
 
 
-MessageBoxBuilder&
-MessageBoxBuilder::setTitle( const QString& title )
+QMessageBoxBuilder& 
+QMessageBoxBuilder::setTitle( const QString& title )
 {
 #ifdef Q_WS_MAC
     box.setText( title + "\t\t\t" );
@@ -33,8 +33,8 @@ MessageBoxBuilder::setTitle( const QString& title )
 }
 
 
-MessageBoxBuilder&
-MessageBoxBuilder::setText( const QString& text )
+QMessageBoxBuilder&
+QMessageBoxBuilder::setText( const QString& text )
 {
 #ifdef Q_WS_MAC
     box.setInformativeText( text );
@@ -46,7 +46,7 @@ MessageBoxBuilder::setText( const QString& text )
 
 
 int
-MessageBoxBuilder::exec()
+QMessageBoxBuilder::exec()
 {
     QApplication::setOverrideCursor( Qt::ArrowCursor );
     int const r = box.exec();

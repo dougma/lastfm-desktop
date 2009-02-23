@@ -21,11 +21,10 @@
 #define LASTFM_WS_DOM_ELEMENT_H
 
 #include <lastfm/global.h>
-#include <lastfm/CoreException>
-#include <QDebug>
 #include <QDomElement>
 #include <QList>
 #include <QStringList>
+#include <stdexcept>
 
 
 /** @author <max@last.fm>
@@ -46,20 +45,10 @@ class LASTFM_WS_DLLEXPORT WsDomElement
     {}
     
 public:
-    class Exception : public CoreException
+    /** will throw std::runtime_error if the e.isNull() */
+    WsDomElement( const QDomElement& e, const char* name = "" ) : e( e )
     {
-        Exception( QString s ) : CoreException( s )
-        {}
-
-    public:
-        static Exception nullNode() { return Exception( "Expected node absent." ); }
-        static Exception emptyTextNode( QString name ) { return Exception( "Unexpected empty text node: " + name ); }
-    };
-
-
-    WsDomElement( const QDomElement& x ) : e( x )
-    {
-        if (e.isNull()) throw Exception::nullNode();
+        if (e.isNull()) throw std::runtime_error( "Expected node absent." + std::string(name) );
     }
 
     /** returns a null element unless the node @p name exists */
@@ -69,7 +58,7 @@ public:
         {
             return this->operator[]( name );
         }
-        catch (Exception&)
+        catch (std::runtime_error&)
         {
             return WsDomElement();
         }
@@ -82,7 +71,8 @@ public:
     WsDomElement operator[]( const QString& name ) const;
     
     /** use in all cases where empty would be an error, it throws if empty,
-      * ignores optional() since you are explicitly asking for a throw! */
+      * ignores any previous optional() usage, since you are explicitly asking
+      * for a throw! */
     QString nonEmptyText() const;
 
     QString text() const { return e.text(); }
@@ -92,12 +82,12 @@ public:
 };
 
 
-inline QDebug operator<<( QDebug debug, const WsDomElement& e )
+inline QDebug operator<<( QDebug d, const WsDomElement& e )
 {
 	QString s;
 	QTextStream t( &s, QIODevice::WriteOnly );
 	e.e.save( t, 2 );
-	return debug << s;
+	return d << s;
 }
 
 #endif

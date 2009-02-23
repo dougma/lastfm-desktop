@@ -20,11 +20,11 @@
 #ifndef MOOSE_H
 #define MOOSE_H
 
-#include "app/client/Settings.h"
+#include "lib/lastfm/core/CoreSettings.h"
 #include "lib/lastfm/core/CoreDir.h"
 
 
-namespace moose 
+namespace moose
 {
     static inline const char* id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
     /** passed to QCoreApplication::setApplicationName() */

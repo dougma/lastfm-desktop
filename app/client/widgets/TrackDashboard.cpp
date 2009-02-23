@@ -282,9 +282,9 @@ TrackDashboard::onArtistGotInfo( WsReply* reply )
         foreach (WsDomElement artist, e["similar"].children( "artist" ))
             ui.similarArtists->addItem( artist["name"].text() );
     }
-	catch (WsDomElement::Exception& e)
+	catch (std::runtime_error& e)
 	{
-		qWarning() << e;
+		qWarning() << e.what();
 
         html << "<h1>" << m_track.artist() << "</h1>"
              << "<p>" << tr( "Unable to contact Last.fm.<br>Your scrobbles are being cached." );
@@ -327,9 +327,10 @@ void
 TrackDashboard::onArtistGotTopTags( WsReply* reply )
 {
     ui.tags->clear();
-    WeightedStringList tags = Tag::list( reply );
-    for (int x = 0, n = qMin( tags.size(), 8 ); x < n; ++x)
-        ui.tags->addItem( tags[x] );
+    QStringList tags = Tag::list( reply ).values();
+    int x = 8;
+    while (x--)
+        ui.tags->addItem( tags.takeLast() );
 }
 
 

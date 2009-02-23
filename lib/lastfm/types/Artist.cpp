@@ -84,23 +84,22 @@ Artist::search( int limit ) const
 }
 
 
-WeightedStringList /* static */
+QMap<int, QString> /* static */
 Artist::getSimilar( WsReply* r )
 {
-	WeightedStringList artists;
-	try
+	QMap<int, QString> artists;
+	foreach (WsDomElement e, r->lfm().children( "artist" ))
 	{
-		foreach (WsDomElement e, r->lfm().children( "artist" ))
-		{
-			QString artistName = e["name"].text();
-			float match = e["match"].text().toFloat();
-			artists.push_back( WeightedString( artistName, match ));
-		}
-		
-	}
-	catch( WsDomElement::Exception& e)
-	{
-		qWarning() << e;
+	    try
+    	{
+    	    // convert floating percentage to int in range 0 to 10,000
+    		int const match = e["match"].text().toFloat() * 100;
+		    artists.insertMulti( match, e["name"].text() );
+	    }
+    	catch (std::runtime_error& e)
+    	{
+    		qWarning() << e.what();
+    	}		
 	}
 	return artists;
 }
@@ -127,9 +126,9 @@ Artist::list( WsReply* r )
             images( artist.m_images, e );
     		artists += artist;
 	    }
-    	catch (WsDomElement::Exception& e)
+    	catch (std::runtime_error& e)
     	{
-    		qWarning() << e;
+    		qWarning() << e.what();
     	}
 	}
 	return artists;

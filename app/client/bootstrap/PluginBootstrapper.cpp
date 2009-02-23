@@ -71,7 +71,7 @@ PluginBootstrapper::onUploadCompleted( int status )
     {
         QFile::remove( savePath );
 
-        MessageBoxBuilder( 0 )
+        QMessageBoxBuilder( 0 )
                 .setIcon( QMessageBox::Information )
                 .setTitle( tr("Media Library Import Complete") )
                 .setText( tr( "Last.fm has submitted your listening history to the server.\n"
@@ -79,7 +79,7 @@ PluginBootstrapper::onUploadCompleted( int status )
     }
     else if( status == Bootstrap_Denied )
     {
-        MessageBoxBuilder( 0 )
+        QMessageBoxBuilder( 0 )
             .setIcon( QMessageBox::Warning )
             .setTitle( tr("Library Import Failed") )
             .setText( tr( "Sorry, Last.fm was unable to import your listening history. "

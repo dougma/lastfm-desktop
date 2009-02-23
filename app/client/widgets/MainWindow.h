@@ -17,42 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QSystemTrayIcon> // due to a poor design decision in Qt
 #include <QPointer>
 #include "State.h"
 #include "ui_MainWindow.h"
-#include "widgets/UnicornWidget.h"
-
+#include "lib/unicorn/UnicornMainWindow.h"
 class ShareDialog;
 class TagDialog;
 class SettingsDialog;
-class DiagnosticsDialog;
 class PlaylistDialog;
 class LocalRqlDialog;
+
 
 /** ok it's private, that's insane yeah? Yeah. But this is a global singleton
   * and I had a bug where some stupid insignificant class was manipulating the size
   * of the window! And I spent ages tracing it. So now only a small amount of stuff
   * is public, add what you need, but be conservative! */
-class MainWindow : private QMainWindow
+class MainWindow : private unicorn::MainWindow
 {
     Q_OBJECT
-    
+
     friend class App;
 
 public:
     MainWindow();
-    ~MainWindow();
-    
+
     using QMainWindow::move;
     using QMainWindow::show;
     using QMainWindow::raise;
     using QMainWindow::setWindowTitle;
-    
+
 	struct Ui : ::Ui::MainWindow
 	{
 		class Amp* amp;
@@ -60,10 +58,14 @@ public:
         class TrackDashboardHeader* dashboardHeader;
         class TrackDashboard* dashboard;
         class MessageBar* messagebar;
-        
-        QAction* localRadio;
-        
+        class QAction* localRadio;
         class DiagnosticsDialog* diagnostics;
+
+    	OneDialogPointer<ShareDialog> shareDialog;
+    	OneDialogPointer<TagDialog> tagDialog;
+    	OneDialogPointer<SettingsDialog> settingsDialog;
+        OneDialogPointer<PlaylistDialog> playlistDialog;
+        OneDialogPointer<LocalRqlDialog> localRqlDialog;
     } ui;
 
 protected:
@@ -74,7 +76,6 @@ protected:
 
 public slots:
     void showSettingsDialog();
-    void showAboutDialog();
     void showShareDialog();
 	void showTagDialog();
     void showPlaylistDialog();
@@ -83,32 +84,25 @@ public slots:
 signals:
 	void loved();
 	void banned();
-	
+
 private slots:
     void onSystemTrayIconActivated( QSystemTrayIcon::ActivationReason );
-	void onUserGotInfo( class WsReply* );
     void onTrackSpooled( const Track& );
     void onStateChanged( State );
-    
+
 private:
     void setupUi();
-    
+
     /** add this widget as a drag handle to move the window */
     void addDragHandleWidget( QWidget* );
-	
+
 	virtual void dragEnterEvent( QDragEnterEvent* );
 	virtual void dropEvent( QDropEvent* );
     virtual QSize sizeHint() const;
-    
+
     Track m_track;
-    
-    QMap< QWidget*, QPoint > m_dragHandleMouseDownPos;
-	
-	UNICORN_UNIQUE_DIALOG_DECL( ShareDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( TagDialog );
-	UNICORN_UNIQUE_DIALOG_DECL( SettingsDialog );
-    UNICORN_UNIQUE_DIALOG_DECL( PlaylistDialog );
-    UNICORN_UNIQUE_DIALOG_DECL( LocalRqlDialog );
+
+    QMap<QWidget*, QPoint> m_dragHandleMouseDownPos;
 };
 
-#endif //MAINWINDOW_H
+#endif //HEADER_GUARD

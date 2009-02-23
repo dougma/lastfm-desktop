@@ -3,7 +3,7 @@
 
 QT_LIB_DIR = $(QMAKE)/../../lib
 
-moose_extra: $(BUNDLE_RESOURCES)/AudioScrobbler.bundle $(BUNDLE_RESOURCES)/twiddly $(BUNDLE_PLUGINS)/libresolver.1.dylib
+bundle-extra: $(BUNDLE_RESOURCES)/AudioScrobbler.bundle $(BUNDLE_RESOURCES)/twiddly $(BUNDLE_PLUGINS)/libresolver.1.dylib
 $(BUNDLE_RESOURCES):
 	mkdir $@
 $(BUNDLE_RESOURCES)/AudioScrobbler.bundle: |$(BUNDLE_RESOURCES)

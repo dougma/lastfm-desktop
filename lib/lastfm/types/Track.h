@@ -23,7 +23,6 @@
 #include <lastfm/Album>
 #include <lastfm/FingerprintId>
 #include <lastfm/Mbid>
-#include <lastfm/WeightedStringList>
 #include <QDateTime>
 #include <QDomElement>
 #include <QExplicitlySharedDataPointer>

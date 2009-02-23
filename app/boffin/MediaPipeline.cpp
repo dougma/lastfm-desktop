@@ -75,14 +75,13 @@ MediaPipeline::~MediaPipeline()
     }
 #endif
 
-    //delete mo; don't as crashes often
+    //delete mo; //don't as crashes often
 }
 
 
 static inline QWidget* findTopLevelWidget( QObject* o )
 {
-    int x = 0;
-    for (;;) {
+    for (int x = 0;;) {
         o = o->parent();
         if (!o) return 0;
         if (o->isWidgetType()) return (QWidget*)o;

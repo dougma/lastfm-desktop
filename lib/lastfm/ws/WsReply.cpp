@@ -127,9 +127,9 @@ WsReply::onFinished()
     {
         emit finished( this );
     }
-    catch (WsDomElement::Exception& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << "Naughty programmer! Unhandled exception:" << e;
+        qWarning() << "Naughty programmer! Unhandled exception:" << e.what();
     }
 
     // prevents memory leaks, but I don't like it anyway

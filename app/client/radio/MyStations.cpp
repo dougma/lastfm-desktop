@@ -139,6 +139,5 @@ MyStations::onArtistSearchResults( WsReply* r )
 void
 MyStations::onTagSearchResults( WsReply* r )
 {
-	QStringList results = Tag::search( r );
-	m_searchResults->addTags( results );
+	m_searchResults->addTags( Tag::list( r ).values() );
 }

@@ -20,12 +20,13 @@
 #include "PlayerCommandParser.h"
 #include <QStringList>
 #include <QUrl>
+using std::invalid_argument;
 
 
-PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandParser::Exception )
+PlayerCommandParser::PlayerCommandParser( QString line ) throw( std::invalid_argument )
 {
     line = line.trimmed();
-    if (line.isEmpty()) throw Exception( "Command string seems to be empty" );
+    if (line.isEmpty()) throw invalid_argument( "Command string seems to be empty" );
 
     qDebug() << line;
 
@@ -40,13 +41,13 @@ PlayerCommandParser::PlayerCommandParser( QString line ) throw( PlayerCommandPar
     {
         QChar const c = required[i];
         if (!args.contains( c ))
-            throw Exception( "Mandatory argument unspecified: " + QString(c) );
+            throw invalid_argument( "Mandatory argument unspecified: " + c.toAscii() );
     }
 
     m_playerId = args['c'];
     
     if (m_playerId.isEmpty())
-        throw Exception( "Player ID cannot be zero length" );
+        throw invalid_argument( "Player ID cannot be zero length" );
 
     switch (m_command)
     {
@@ -68,7 +69,7 @@ PlayerCommand
 PlayerCommandParser::extractCommand( QString& line )
 {
     int const n = line.indexOf( ' ' );
-    if (n == -1) throw Exception( "Unable to parse" );
+    if (n == -1) throw invalid_argument( "Unable to parse" );
 
     QString const command = line.left( n ).toUpper();
 
@@ -83,7 +84,7 @@ PlayerCommandParser::extractCommand( QString& line )
     if (command == "INIT") return CommandInit;
     if (command == "TERM") return CommandTerm;
 
-    throw Exception( "Invalid command" );
+    throw invalid_argument( "Invalid command" );
 }
 
 
@@ -135,10 +136,10 @@ PlayerCommandParser::extractArgs( const QString& line )
     foreach (Pair pair, mxcl::split( line ))
     {
         if (pair.key == QChar()) 
-            throw Exception( "Invalid pair: " + QString(pair.key) + '=' + pair.value );
+            throw invalid_argument( "Invalid pair: " + pair.key.toAscii() + '=' + std::string(pair.value.toUtf8().data()) );
 
         if (map.contains( pair.key ))
-            throw Exception( "Field identifier occurred twice in request: " + QString(pair.key) );
+            throw invalid_argument( "Field identifier occurred twice in request: " + pair.key.toAscii() );
 
         map[pair.key] = pair.value.trimmed();
     }

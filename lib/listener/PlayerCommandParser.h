@@ -21,21 +21,15 @@
 #define PLAYER_COMMAND_PARSER_H
 
 #include "common/HideStupidWarnings.h"
-#include "lib/lastfm/core/CoreException.h"
-#include "lib/lastfm/types/Track.h"
 #include "PlayerCommand.h"
+#include <lastfm/Track>
+#include <stdexcept>
 
 
 class PlayerCommandParser
 {
 public:
-    struct Exception : CoreException
-    {
-        Exception( QString s ) : CoreException( s )
-        {}
-    };
-
-    PlayerCommandParser( QString line ) throw( Exception );
+    PlayerCommandParser( QString line ) throw( std::invalid_argument );
 
     PlayerCommand command() const { return m_command; }
     QString playerId() const { return m_playerId; }

@@ -135,7 +135,7 @@ Seed::onArtistSearchFinished( WsReply* r )
             connect( get, SIGNAL( finished()), SLOT( iconDataDownloaded()));
         }
     }
-    catch( WsDomElement::Exception e )
+    catch (std::runtime_error& e)
     {
         return;
     }
