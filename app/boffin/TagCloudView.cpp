@@ -216,6 +216,13 @@ TagCloudView::viewportEvent( QEvent* event )
 {
     switch( event->type() )
     {
+        case QEvent::Wheel:
+            // do first so it moves the view
+            bool b = QAbstractItemView::viewportEvent( event );
+            // then calculate the new tag under the mouse
+            m_hoverIndex = indexAt( viewport()->mapFromGlobal( QCursor::pos() ) );
+            return b;
+            
         case QEvent::MouseMove:
         {
             QMouseEvent* e = static_cast< QMouseEvent* >( event );
