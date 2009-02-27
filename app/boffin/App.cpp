@@ -276,7 +276,7 @@ App::xspf()
 void
 App::onPreparing() //MediaPipeline is preparing to play a new station
 {
-    m_cloud->viewport()->setEnabled( false ); //prevent interaction until stop pushed
+    m_cloud->setEnabled( false ); //prevent interaction until stop pushed
         
     QAction* a = m_mainwindow->ui.play;
     a->setIcon( QPixmap(":/stop.png") );
@@ -323,7 +323,7 @@ void
 App::onStopped()
 {
     m_mainwindow->setWindowTitle( Track() );
-    m_cloud->viewport()->setEnabled( true );
+    m_cloud->setEnabled( true );
     m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( false );
     m_mainwindow->ui.play->blockSignals( false );
