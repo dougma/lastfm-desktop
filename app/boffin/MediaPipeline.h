@@ -42,6 +42,8 @@ public:
     MediaPipeline( Phonon::AudioOutput*, QObject* parent );
     ~MediaPipeline();
 
+    Phonon::State state() const;
+
     void playTags( QStringList );
     void playXspf( const QString& path );
 

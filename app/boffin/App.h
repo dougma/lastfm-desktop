@@ -43,6 +43,8 @@ public slots:
     bool scan( bool delete_all_files_first );
     void startAgain();
     
+    void playPause();
+    
 private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
@@ -67,6 +69,8 @@ private:
     class MediaPipeline* m_pipe;
     
     Phonon::AudioOutput* m_audioOutput;
+    
+    bool m_playing;
 };
 
 #endif //APP_H

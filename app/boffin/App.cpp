@@ -31,6 +31,7 @@
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QFileDialog>
 #include <QMenu>
+#include <QShortcut>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
@@ -48,6 +49,7 @@ App::App( int& argc, char** argv )
    , m_scrobsocket( 0 )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
+   , m_playing( false )
 {}
 
 
@@ -78,6 +80,10 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     window->ui.pause->setEnabled( false );
     window->ui.skip->setEnabled( false );
         
+    QShortcut* cut = new QShortcut( Qt::Key_Space, window );
+    connect( cut, SIGNAL(activated()), SLOT(playPause()) );
+    cut->setContext( Qt::ApplicationShortcut );
+
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
     m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
@@ -246,18 +252,28 @@ App::onScanningFinished()
 void
 App::play()
 {
-    if (m_cloud) { 
-        if( m_cloud->currentTags().isEmpty())
-        {
-            QMessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
-                                             .setText( tr("Select at least one tag from the cloud below to start playing music." ))
-                                             .sheet()
-                                             .exec();
-            return;
-        }
-        m_pipe->playTags( m_cloud->currentTags() );
-        m_mainwindow->QMainWindow::setWindowTitle( "Boffing up..." );
+    if (!m_cloud) return;
+    if( m_cloud->currentTags().isEmpty())
+    {
+        QMessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
+                                         .setText( tr("Select at least one tag from the cloud below to start playing music." ))
+                                         .sheet()
+                                         .exec();
+        return;
     }
+    m_pipe->playTags( m_cloud->currentTags() );
+}
+
+
+void
+App::playPause()
+{
+    if (m_playing)
+        m_mainwindow->ui.pause->toggle();
+    else if (!m_cloud->isEnabled()) //preparing
+        m_pipe->stop();
+    else
+        play();
 }
 
 
@@ -276,6 +292,7 @@ App::xspf()
 void
 App::onPreparing() //MediaPipeline is preparing to play a new station
 {
+    m_mainwindow->QMainWindow::setWindowTitle( "Boffing up..." );
     m_cloud->setEnabled( false ); //prevent interaction until stop pushed
         
     QAction* a = m_mainwindow->ui.play;
@@ -288,6 +305,8 @@ App::onPreparing() //MediaPipeline is preparing to play a new station
 void
 App::onStarted( const Track& t )
 {
+    m_playing = true; // because phonon is shit and we can't rely on its state
+    
     m_mainwindow->setWindowTitle( t );
     m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( true );
@@ -338,6 +357,8 @@ App::onStopped()
     a->setIcon( QPixmap(":/play.png") );
     disconnect( a, SIGNAL(triggered()), m_pipe, 0 );
     connect( a, SIGNAL(triggered()), SLOT(play()) );
+    
+    m_playing = false;
 }
 
 

@@ -142,7 +142,7 @@ MediaPipeline::setPaused( bool b )
 {
     if (b)
         mo->pause();
-    else
+    else if (mo->state() == Phonon::PausedState)
         mo->play();
 }
 
@@ -297,4 +297,11 @@ MediaPipeline::onSourceError( Ws::Error e )
 {
     qCritical() << e;
     emit error( "There was an error generating the playlist." );
+}
+
+
+Phonon::State
+MediaPipeline::state() const
+{
+    return mo->state(); 
 }

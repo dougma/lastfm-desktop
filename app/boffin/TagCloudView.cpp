@@ -239,6 +239,10 @@ TagCloudView::viewportEvent( QEvent* event )
                 viewport()->update();
             break;
 
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+            return false;
+
         default:
             break;
     }
