@@ -225,7 +225,7 @@ MediaPipeline::onPhononStateChanged( Phonon::State newstate, Phonon::State oldst
                 m_errorRecover = false;
                 skip();
             } else {
-                m_track = Track();
+                m_track = m_next_track = Track();
                 emit stopped();
             }
             break;
@@ -245,6 +245,8 @@ MediaPipeline::onPhononStateChanged( Phonon::State newstate, Phonon::State oldst
             if (oldstate == PausedState)
                 emit resumed();
             else {
+                m_track = m_next_track;
+                m_next_track = Track();
                 emit started( m_track );
                 enqueue();
             }
@@ -276,7 +278,7 @@ MediaPipeline::enqueue()
         
         qDebug() << t.url().toString();
 
-        m_track = t;
+        m_next_track = t;
         qDebug() << "Will play:" << t;
 
         // if we are playing a track now, enqueue, otherwise start now!
