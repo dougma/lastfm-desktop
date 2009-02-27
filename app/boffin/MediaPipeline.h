@@ -73,8 +73,9 @@ private:
     class ITrackResolverPlugin* m_trackResolver;
     class Resolver* m_resolver;
     QPointer<AbstractTrackSource> m_source;
-    Track m_track;
-    Track m_next_track;
+
+    QMap<QUrl, Track> m_tracks;
+
     bool m_errorRecover;
     bool m_phonon_sucks;
     
