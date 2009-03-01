@@ -328,7 +328,7 @@ TrackDashboard::onArtistGotTopTags( WsReply* reply )
 {
     ui.tags->clear();
     QStringList tags = Tag::list( reply ).values();
-    int x = 8;
+    int x = qMin( 8, tags.count() );
     while (x--)
         ui.tags->addItem( tags.takeLast() );
 }
