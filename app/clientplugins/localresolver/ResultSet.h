@@ -25,8 +25,15 @@
 
 struct TrackResult
 {
+    TrackResult(uint t, uint a, float w)
+        : trackId(t)
+        , artistId(a)
+        , weight(w)
+    {
+    }
+
     uint trackId;
-//    uint artistId;
+    uint artistId;
     float weight;
 
     bool operator==(const TrackResult& that) const
@@ -90,6 +97,10 @@ public:
         return *this;
     }
 
+    void insertTrackResult(int trackId, int artistId, float weight)
+    {
+        insert( TrackResult(trackId, artistId, weight) );
+    }
 };
 
 

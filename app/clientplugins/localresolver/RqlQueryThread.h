@@ -72,6 +72,12 @@ class RqlQueryThread :
     class LocalCollection* m_pCollection;
     SimilarArtists m_sa;
 
+    // keep a track of recently played tracks, so if you stop a station 
+    // and restart the same one, you won't get the same tunes!  
+    //
+    QSet<uint> m_recentTracks;       // a set of recently played track ids for...
+    QString m_recentRql;            // this rql.  
+
     void parse(QString, ILocalRqlParseCallback*);
     void nextTrack(class RqlQuery*, ILocalRqlTrackCallback*);
 

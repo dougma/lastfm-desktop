@@ -40,6 +40,7 @@
 #include <QVariantList>
 #include "ChainableQuery.h"
 #include <memory>
+#include <boost/function.hpp>
 
 class LocalCollection : public QObject
 {
@@ -213,8 +214,8 @@ public:
 
     // rql support
     EntryList allTags();
-    QList< QPair<unsigned, float> > filesWithTag(QString tag, Availablity flag);
-    QList<unsigned> filesByArtist(QString artist, Availablity flag);
+    void filesWithTag(QString tag, Availablity flag, boost::function<void (int, int, float)> /* trackId, artistId, weight */ ); 
+    void filesByArtist(QString artist, Availablity flag, boost::function<void (int, int)> /* trackId, artistId */ ); 
     QList<unsigned> filesByArtistId(int artistId, Availablity flag);
     bool getFileById(uint fileId, LocalCollection::FileResult &out);
 

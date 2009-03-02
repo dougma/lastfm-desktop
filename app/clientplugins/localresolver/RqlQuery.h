@@ -29,11 +29,12 @@ class RqlQuery : public ILocalRqlTrackSource
 {
     class RqlQueryThread* m_queryThread;
     ResultSet m_tracks;
+    uint m_previousArtistId;
 
 public:
     RqlQuery(class RqlQueryThread* queryThread, ResultSet tracks);
 
-    void getNextTrack(LocalCollection&, ILocalRqlTrackCallback*);
+    void getNextTrack(LocalCollection&, ILocalRqlTrackCallback*, QSet<uint>& recentTracks);
     unsigned tracksLeft();
 
     // ILocalRqlTrackSource

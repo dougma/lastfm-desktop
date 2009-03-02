@@ -118,6 +118,10 @@ RqlQueryThread::parse(QString rql, ILocalRqlParseCallback *cb)
                 &leaf2op);
             
             ResultSet results = RqlOpProcessor::process(ops, *m_pCollection, m_sa);
+            if (rql != m_recentRql) {
+                m_recentRql = rql;
+                m_recentTracks.clear();
+            }
             cb->parseOk(
                 new RqlQuery(this, results),
                 results.size() );
@@ -144,7 +148,7 @@ RqlQueryThread::nextTrack(RqlQuery* query, ILocalRqlTrackCallback* cb)
 {
 	try 
 	{
-        query->getNextTrack(*m_pCollection, cb);
+        query->getNextTrack(*m_pCollection, cb, m_recentTracks);
         return;
     }
 	catch(QueryError &e) {

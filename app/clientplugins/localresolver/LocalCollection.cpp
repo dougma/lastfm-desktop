@@ -705,55 +705,54 @@ LocalCollection::insertTrackTag(int artistId, int tagId, unsigned userId, int we
     exec();
 }
 
-QList<QPair<unsigned, float> >
-LocalCollection::filesWithTag(QString tag, Availablity flag)
+void
+LocalCollection::filesWithTag(QString tag, Availablity flag, boost::function<void (int, int, float)> cb)
 {
-    QList<QPair<unsigned, float> > result;
-
     int tagId = getTagId( tag, NoCreate );
-    if ( tagId > 0 ) {
-        QString queryString;
+    if (tagId == 0) return;
 
-        if (flag == AllSources) {
-            queryString = "SELECT file, weight FROM tracktags WHERE tag = :tagId";
-        } else {
-            Q_ASSERT( flag == AvailableSources );
-            queryString = 
-                "SELECT tracktags.file, tracktags.weight FROM tracktags "
-                "INNER JOIN files on tracktags.file = files.id "
-                "INNER JOIN directories on files.directory = directories.id "
-                "INNER JOIN sources on directories.source = sources.id "
-                "WHERE tag = :tagId AND sources.available = 1 ";
-        }
-        ChainableQuery query(m_db, &ms_activeQueryMutex);
-        query.prepare( queryString ).
-        setForwardOnly( true ).
-        bindValue( ":tagId", tagId ).
-        exec();
-        while ( query.next() ) {
-            uint id = query.value( 0 ).toUInt();
-            float weight = query.value( 1 ).toDouble();
-            result << qMakePair(id, weight);
-        }
+    QString queryString;
+    if (flag == AllSources) {
+        queryString = 
+            "SELECT file, files.artist, weight FROM tracktags "
+            "INNER JOIN files on tracktags.file = files.id "
+            "WHERE tag = :tagId";
+    } else {
+        Q_ASSERT( flag == AvailableSources );
+        queryString = 
+            "SELECT tracktags.file, files.artist, tracktags.weight FROM tracktags "
+            "INNER JOIN files on tracktags.file = files.id "
+            "INNER JOIN directories on files.directory = directories.id "
+            "INNER JOIN sources on directories.source = sources.id "
+            "WHERE tag = :tagId AND sources.available = 1 ";
     }
-
-    return result;
+    ChainableQuery query( m_db, &ms_activeQueryMutex );
+    query.prepare( queryString ).
+    setForwardOnly( true ).
+    bindValue( ":tagId", tagId ).
+    exec();
+    while ( query.next() ) {
+        uint trackId = query.value( 0 ).toUInt();
+        uint artistId = query.value( 1 ).toUInt();
+        float weight = query.value( 2 ).toDouble();
+        cb( trackId, artistId, weight );
+    }
 }
 
 // get all the files by an artist, fuzzy match on the artist's name
-QList<unsigned> 
-LocalCollection::filesByArtist(QString artist, Availablity flag)
+void
+LocalCollection::filesByArtist(QString artist, Availablity flag, boost::function<void (int, int)> cb)
 {
     QString queryString;
     if (flag == AllSources) {
         queryString = 
-            "SELECT id FROM files WHERE artist IN "
+            "SELECT id, artist FROM files WHERE artist IN "
             "(SELECT id FROM artists "
             " WHERE levenshtein(lowercase_name, :artist) > "LEVENSHTEIN_ARTIST_THRESHOLD")";
     } else {
         Q_ASSERT( flag == AvailableSources );
         queryString = 
-            "SELECT files.id FROM files "
+            "SELECT files.id, files.artist FROM files "
             "INNER JOIN directories on files.directory = directories.id "
             "INNER JOIN sources on directories.source = sources.id "
             "WHERE files.artist IN "
@@ -767,12 +766,11 @@ LocalCollection::filesByArtist(QString artist, Availablity flag)
     setForwardOnly( true ).
     bindValue( ":artist", artist.simplified().toLower() ).
     exec();
-
-    QList<unsigned> results;
     while (query.next()) {
-        results << query.value( 0 ).toUInt();
+        uint trackId = query.value( 0 ).toUInt();
+        uint artistId = query.value( 1 ).toUInt();
+        cb( trackId, artistId );
     }
-    return results;
 }
 
 QList<unsigned> 

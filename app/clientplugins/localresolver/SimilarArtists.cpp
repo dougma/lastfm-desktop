@@ -185,11 +185,7 @@ SimilarArtists::filesBySimilarArtist(LocalCollection& coll, const char* artist)
         if (!artistFilter.contains(pArtist->first)) {
             QList<uint> tracks = coll.filesByArtistId(pArtist->first, LocalCollection::AvailableSources);
             foreach(uint trackId, tracks) {
-                TrackResult tr;
-                tr.trackId = trackId;
-//                tr.artistId =  pArtist->first;
-                tr.weight = pArtist->second;
-                result << tr;
+                result << TrackResult(trackId, pArtist->first, pArtist->second);
             }
             trackCount += tracks.size();
             artistCount++;

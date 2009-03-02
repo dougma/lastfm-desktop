@@ -22,6 +22,7 @@
 #include "rqlparser/enums.h"
 #include "LocalCollection.h"
 #include "SimilarArtists.h"
+#include <boost/bind.hpp>
 
 
 using namespace fm::last::query_parser;
@@ -102,17 +103,11 @@ RqlOpProcessor::unsupported()
 ResultSet 
 RqlOpProcessor::globalTag()
 {
-    typedef QPair<uint, float> TrackPair;
-
-    QList<TrackPair> tracks(m_collection.filesWithTag(m_it->name.data(), LocalCollection::AvailableSources));
-
     ResultSet rs;
-    foreach(const TrackPair& tp, tracks) {
-        TrackResult tr;
-        tr.trackId = tp.first;
-        tr.weight = tp.second;
-        rs << tr;
-    }
+    m_collection.filesWithTag(
+        m_it->name.data(), 
+        LocalCollection::AvailableSources, 
+        boost::bind( &ResultSet::insertTrackResult, &rs, _1, _2, _3 ) );
     normalise(m_it->weight, rs);
     return rs;
 }
@@ -127,19 +122,12 @@ RqlOpProcessor::userTag()
 ResultSet 
 RqlOpProcessor::artist()
 {
-    QList<uint> tracks(m_collection.filesByArtist(m_it->name.data(), LocalCollection::AvailableSources));
     ResultSet rs;
-    int count = tracks.size();
-    if (count) {
-        float weight = m_it->weight / count;
-        foreach(uint id, tracks) {
-            TrackResult tr;
-            tr.trackId = id;
-            tr.weight = weight;
-            rs << tr;
-        }
-        normalise(m_it->weight, rs);
-    }
+    m_collection.filesByArtist( 
+        m_it->name.data(), 
+        LocalCollection::AvailableSources,
+        boost::bind( &ResultSet::insertTrackResult, &rs, _1, _2, 1.0f) );
+    normalise(m_it->weight, rs); 
     return rs;
 }
 

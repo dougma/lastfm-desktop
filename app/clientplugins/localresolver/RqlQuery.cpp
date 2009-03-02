@@ -24,12 +24,13 @@
 #include <QUrl>
 
 extern QString remapVolumeName(const QString& volume);
-extern TrackResult sample(ResultSet rs);
+extern TrackResult sample(const ResultSet& rs, int previousArtistId, QSet<uint> recentTracks);
 
 
 RqlQuery::RqlQuery(RqlQueryThread* queryThread, ResultSet tracks)
 :m_queryThread(queryThread)
 ,m_tracks(tracks)
+,m_previousArtistId(0)
 {
 }
 
@@ -50,13 +51,13 @@ RqlQuery::getNextTrack(ILocalRqlTrackCallback* cb)
 }
 
 void
-RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
+RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb, QSet<uint>& recentTracks)
 {
     // loop until we get a sample from the resultset for 
     // which we can read id3 tags:
 
     while (m_tracks.size()) {
-        TrackResult tr(sample(m_tracks));
+        TrackResult tr( sample( m_tracks, m_previousArtistId, recentTracks ) );
         bool removed = m_tracks.remove(tr);
         Q_ASSERT(removed);
 
@@ -74,6 +75,9 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb)
                     mmi->artist().toUtf8(), // result.m_artist.toUtf8(),
                     QUrl::fromLocalFile(filename).toString().toUtf8(), 
                     mmi->duration());  //result.m_duration);
+
+                recentTracks.insert(tr.trackId);
+                m_previousArtistId = tr.artistId;
                 return;
             }
         }

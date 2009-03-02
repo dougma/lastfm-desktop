@@ -22,6 +22,11 @@
 
 #include "SampleFromDistribution.h"
 
+// todo: lift these out somewhere useful.
+#define PREVIOUS_ARTIST_PUSHDOWN_FACTOR 0.001f
+#define RECENT_TRACK_PUSHDOWN_FACTOR 0.001f
+
+
 using namespace fm::last::algo;
 
 
@@ -60,13 +65,24 @@ bool orderByWeightDesc(const TrackResult& a, const TrackResult& b)
     return a.weight > b.weight;
 }
 
+// return a weighted sampling from the ResultSet 
+// weights are reduced for recently played tracks
+// and for all tracks by the previous artist
 TrackResult
-sample(ResultSet rs)
+sample(const ResultSet& rs, int previousArtistId, QSet<uint> recentTracks)
 {
     // convert the ResultSet to a vector for sorting
     std::vector<TrackResult> tracks;
+    tracks.reserve(rs.size());
+
     float totalWeight = 0;
-    foreach (const TrackResult& tr, rs) {
+    foreach (TrackResult tr, rs) {
+        if (recentTracks.contains(tr.trackId)) {
+            tr.weight *= RECENT_TRACK_PUSHDOWN_FACTOR;
+        }
+        if (tr.artistId == previousArtistId) {
+            tr.weight *= PREVIOUS_ARTIST_PUSHDOWN_FACTOR;
+        }
         tracks.push_back(tr);
         totalWeight += tr.weight;
     }
