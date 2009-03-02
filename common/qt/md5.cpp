@@ -17,8 +17,9 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include <QByteArray>
 #include <QCryptographicHash>
-
+#include <QString>
 
 namespace Qt
 {

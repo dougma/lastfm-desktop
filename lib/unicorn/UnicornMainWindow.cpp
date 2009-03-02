@@ -20,11 +20,13 @@
 #include "UnicornMainWindow.h"
 #include "UnicornCoreApplication.h"
 #include "widgets/AboutDialog.h"
+#include "widgets/UpdateDialog.h"
 #include "UnicornSettings.h"
 #include <lastfm/AuthenticatedUser>
 #include <QDesktopServices>
 #include <QMenuBar>
 #include <QShortcut>
+
 
 #define SETTINGS_POSITION_KEY "MainWindowPosition"
 
@@ -58,10 +60,15 @@ unicorn::MainWindow::finishUi()
 #endif
 
     menuBar()->insertMenu( menuBar()->actions().first(), ui.account );
-    QAction* about = menuBar()->addMenu( tr("Help") )->addAction( tr("About"), this, SLOT(about()) );
+    QMenu* help = menuBar()->addMenu( tr("Help") );
+    QAction* about = help->addAction( tr("About"), this, SLOT(about()) );
+    QAction* c4u = help->addAction( tr("Check for Updates"), this, SLOT(checkForUpdates()) );
 #ifdef __APPLE__
     about->setMenuRole( QAction::AboutRole );
+    c4u->setMenuRole( QAction::ApplicationSpecificRole );
 #endif
+
+    ui.update = new UpdateDialog( this );
 }
 
 
@@ -89,6 +96,14 @@ unicorn::MainWindow::about()
 {
     if (!ui.about) ui.about = new AboutDialog( this );
     ui.about.show();
+}
+
+
+void
+unicorn::MainWindow::checkForUpdates()
+{
+    if (!ui.update) ui.update = new UpdateDialog( this );
+    ui.update.show();
 }
 
 

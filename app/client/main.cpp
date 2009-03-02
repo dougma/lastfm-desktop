@@ -19,8 +19,8 @@
 
 #ifdef __APPLE__
     // first to prevent compilation errors with Qt 4.5.0
-    #include <Carbon/Carbon.h>
-    #include <ApplicationServices/ApplicationServices.h>
+    //TODO shorten this mother fucker
+    #include </System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/AE.framework/Versions/A/Headers/AppleEvents.h>
     static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
 #endif
 

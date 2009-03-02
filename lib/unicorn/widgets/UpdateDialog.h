@@ -17,76 +17,35 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef UNICORN_MAIN_WINDOW
-#define UNICORN_MAIN_WINDOW
-
+#ifndef UPDATE_DIALOG_H 
+#define UPDATE_DIALOG_H
 
 #include "lib/DllExportMacro.h"
-#include <QMainWindow>
-#include <QPointer>
-#include <QDialog>
-class AboutDialog;
-class UpdateDialog;
-class WsReply;
+#include <lastfm/WsAccessManager>
+#include <QProgressDialog>
+#include <QTemporaryFile>
 
 
-template <typename D> struct OneDialogPointer : public QPointer<D>
-{    
-    OneDialogPointer& operator=( QDialog* d )
-    {
-        QPointer<D>::operator=( (D*)d );
-    	d->setAttribute( Qt::WA_DeleteOnClose ); \
-    	d->setWindowFlags( Qt::Dialog | Qt::WindowMinimizeButtonHint ); \
-    	d->setModal( false );
-        return *this;
-    }
-    
-    void show()
-    {
-        QDialog* d = (QDialog*)QPointer<D>::data();
-        d->show();
-        d->raise();
-        d->activateWindow();
-    }
-};
-
-
-namespace unicorn
+class UNICORN_DLLEXPORT UpdateDialog : public QProgressDialog
 {
-    class UNICORN_DLLEXPORT MainWindow : public QMainWindow
-    {
-        Q_OBJECT
+    Q_OBJECT
+    
+    WsAccessManager nam;
+    QNetworkReply* checking;
+    QByteArray md5;
+    QUrl url;
+    QTemporaryFile tmp;
 
-    public:
-        MainWindow();
-        ~MainWindow();
-
-    public slots:
-        void about();
-        void checkForUpdates();
-        void visitProfile();
-        void openLog();
-
-    protected:
-
-        
-        struct Ui {
-            Ui() : account( 0 ), profile( 0 )
-            {}
-
-            QMenu* account;
-            QAction* profile;
-            OneDialogPointer<UpdateDialog> update;
-            OneDialogPointer<AboutDialog> about;
-            
-        } ui;
-
-        /** call this to add the account menu and about menu action, etc. */
-        void finishUi();
-
-    private slots:
-        void onUserGotInfo( WsReply* );        
-    };
-}
+public:
+    /** auto deletes if the check comes back false
+      * call show() if you want the whole process to be visible */
+    UpdateDialog( QWidget* parent );
+    
+private slots:
+    void onGot();
+    void onProgress( qint64 received, qint64 total );
+    void onDownloaded();
+    void install();
+};
 
 #endif
