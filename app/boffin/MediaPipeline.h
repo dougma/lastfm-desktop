@@ -61,6 +61,7 @@ signals:
     void error( const QString& );
 
 private slots:
+    void onPhononSourceChanged( const Phonon::MediaSource& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
     void onSourceError( Ws::Error );
     void enqueue();

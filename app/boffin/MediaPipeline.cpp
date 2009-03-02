@@ -42,6 +42,7 @@ MediaPipeline::MediaPipeline( Phonon::AudioOutput* ao, QObject* parent )
     mo = new Phonon::MediaObject;
     connect( mo, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
     connect( mo, SIGNAL(aboutToFinish()), SLOT(enqueue()) ); // fires just before track finishes
+    connect( mo, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononSourceChanged( Phonon::MediaSource )) ); 
     Phonon::createPath( mo, ao );
     
 /// local rql
@@ -246,15 +247,20 @@ MediaPipeline::onPhononStateChanged( Phonon::State newstate, Phonon::State oldst
         case PlayingState:
             if (oldstate == PausedState)
                 emit resumed();
-            else {
-                emit started( m_tracks.value( mo->currentSource().url() ) );
+            else
                 enqueue();
-            }
             break;
 
         default:
             break;
     }
+}
+
+
+void
+MediaPipeline::onPhononSourceChanged( const Phonon::MediaSource& source )
+{
+    emit started( m_tracks.value( source.url() ) );
 }
 
 
