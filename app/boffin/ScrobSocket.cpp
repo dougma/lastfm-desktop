@@ -30,6 +30,8 @@ ScrobSocket::ScrobSocket( QObject* parent ) : QTcpSocket( parent )
 {
     connect( this, SIGNAL(readyRead()), SLOT(onReadyRead()) );    
     connect( this, SIGNAL(error( QAbstractSocket::SocketError )), SLOT(onError( QAbstractSocket::SocketError )) );
+    connect( this, SIGNAL(connected()), SLOT(onConnected()) );
+    connect( this, SIGNAL(disconnected()), SLOT(onDisconnected()) );
     transmit( "INIT c=bof\n" );
 }
 
@@ -43,9 +45,29 @@ ScrobSocket::~ScrobSocket()
 void
 ScrobSocket::transmit( const QString& data )
 {
-    qDebug() << data.trimmed();
-    connectToHost( QHostAddress::LocalHost, kDefaultPort );
-    if (waitForConnected( 5000 )) write( data.toUtf8() ); //lol blocking
+    m_msgQueue.enqueue( data );
+    qDebug() << "Connection state == " << state();
+    if( state() == QAbstractSocket::UnconnectedState )
+        connectToHost( QHostAddress::LocalHost, kDefaultPort );
+}
+
+
+void 
+ScrobSocket::onConnected()
+{
+    if( !m_msgQueue.empty())
+    {
+        qDebug() << m_msgQueue.head().trimmed();
+        write( m_msgQueue.takeFirst().toUtf8());
+    }
+}
+
+
+void 
+ScrobSocket::onDisconnected()
+{
+    if( !m_msgQueue.empty())
+        connectToHost( QHostAddress::LocalHost, kDefaultPort );
 }
 
 
