@@ -62,9 +62,9 @@ bool orderByWeightDesc(const TrackResult& a, const TrackResult& b)
     return a.weight > b.weight;
 }
 
-// return a weighted sampling from the ResultSet 
-// weights are reduced for recently played tracks
-// and for all tracks by the previous artist
+// Returns a weighted sampling from the ResultSet.
+// The weight of each entry in the ResultSet is first multiplied
+// by the pushdownFactor(artistId, trackId) function
 TrackResult
 sample(const ResultSet& rs, boost::function<float(uint,uint)> pushdownFactor)
 {

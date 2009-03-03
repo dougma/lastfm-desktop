@@ -22,11 +22,13 @@
 #include "LocalCollection.h"
 #include "MediaMetaInfo.h"
 #include <QUrl>
+#include <QDebug>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
 #define ARTIST_HISTORY_LIMIT 4
-
+#define RECENT_ARTIST_PUSHDOWN_FACTOR 0.001f
+#define RECENT_TRACK_PUSHDOWN_FACTOR 0.001f
 
 extern QString remapVolumeName(const QString& volume);
 extern TrackResult sample(const ResultSet& rs, boost::function<float(uint, uint)> pushdown);
@@ -77,23 +79,28 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb, 
 
             // read id3 tags from the file
             // todo: check that they kinda match what we have in our db?
-            MediaMetaInfo* mmi = MediaMetaInfo::create(filename);
-            if (mmi) {
-                cb->trackOk(
-                    mmi->title().toUtf8(), // result.m_title.toUtf8(),
-                    mmi->album().toUtf8(), // result.m_album.toUtf8(),
-                    mmi->artist().toUtf8(), // result.m_artist.toUtf8(),
-                    QUrl::fromLocalFile(filename).toString().toUtf8(), 
-                    mmi->duration());  //result.m_duration);
+            try {
+                std::auto_ptr<MediaMetaInfo> p( MediaMetaInfo::create(filename) );
+                MediaMetaInfo* mmi = p.get();
+                if (mmi) {
+                    cb->trackOk(
+                        mmi->title().toUtf8(), // result.m_title.toUtf8(),
+                        mmi->album().toUtf8(), // result.m_album.toUtf8(),
+                        mmi->artist().toUtf8(), // result.m_artist.toUtf8(),
+                        QUrl::fromLocalFile(filename).toString().toUtf8(), 
+                        mmi->duration());  //result.m_duration);
 
-                recentTracks.insert( tr.trackId );
+                    recentTracks.insert( tr.trackId );
 
-                // remember a fixed (and small) number of recent artists
-                if (m_artistHistory.size() == ARTIST_HISTORY_LIMIT ) {
-                    m_artistHistory.dequeue();
+                    // remember a fixed (and small) number of recent artists
+                    if (m_artistHistory.size() == ARTIST_HISTORY_LIMIT ) {
+                        m_artistHistory.dequeue();
+                    }
+                    m_artistHistory.enqueue( tr.artistId );
+                    return;
                 }
-                m_artistHistory.enqueue( tr.artistId );
-                return;
+            } catch (...) {
+                qDebug() << "unexpected exception in RqlQuery::getNextTrack reading tags from " + filename;
             }
         }
     }
@@ -103,9 +110,9 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb, 
 float 
 RqlQuery::pushdownFactor(const QSet<uint>& recentTracks, uint artistId, uint trackId)
 {
-    float f = m_artistHistory.contains( artistId ) ? 0.001f : 1.0f;
-    f *= recentTracks.contains( trackId ) ? 0.001f : 1.0f;
-    return f;
+    float af = m_artistHistory.contains( artistId ) ? RECENT_ARTIST_PUSHDOWN_FACTOR : 1.0f;
+    float tf = recentTracks.contains( trackId ) ? RECENT_TRACK_PUSHDOWN_FACTOR : 1.0f;
+    return af * tf;
 }
 
 void
