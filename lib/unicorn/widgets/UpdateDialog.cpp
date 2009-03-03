@@ -28,6 +28,11 @@
 #include <QNetworkReply>
 #include <QVBoxLayout>
 
+#ifdef WIN32
+#include <QApplication>
+#include <windows.h>
+#include <shellapi.h>
+#endif
 
 UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 {
@@ -45,7 +50,8 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
     setAttribute( Qt::WA_DeleteOnClose );
 
     QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + '/' + qApp->applicationVersion() + ".txt" );
-//    QUrl url( "http://static.last.fm/client/update_test/200.txt" );
+//    QString temp = url.toString();
+//   QUrl url( "http://static.last.fm/client/update_test/200.txt" );
     checking = nam.get( QNetworkRequest(url) );
     checking->setParent( this );
 
