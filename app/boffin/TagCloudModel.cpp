@@ -20,6 +20,7 @@
 #include "TagCloudModel.h"
 #include "lib/lastfm/core/CoreDir.h"
 #include "app/clientplugins/localresolver/LocalCollection.h"
+#include "app/clientplugins/localresolver/QueryError.h"
 #include <float.h> 
 #include <math.h>
 #include <QDebug>
@@ -100,15 +101,22 @@ TagCloudModel::fetchTags()
 
     typedef QPair< QString, float > Pair;
 
-    QList< Pair > tags = m_collection->getTopTags(100);
-    m_minLogWeight = FLT_MAX;
-    foreach(const Pair& tag, tags)
+    try 
     {
-        m_maxWeight = qMax( tag.second, m_maxWeight );
-        float logWeight = log( tag.second );
-        m_minLogWeight = logWeight < m_minLogWeight ? logWeight : m_minLogWeight;
-        m_logTagHash.insert( logWeight, tag.first );
-        m_tagHash.insert( tag.second, tag.first );
+        QList< Pair > tags = m_collection->getTopTags(100);
+        m_minLogWeight = FLT_MAX;
+        foreach(const Pair& tag, tags)
+        {
+            m_maxWeight = qMax( tag.second, m_maxWeight );
+            float logWeight = log( tag.second );
+            m_minLogWeight = logWeight < m_minLogWeight ? logWeight : m_minLogWeight;
+            m_logTagHash.insert( logWeight, tag.first );
+            m_tagHash.insert( tag.second, tag.first );
+        }
+    }
+    catch (QueryError e) 
+    {
+        qDebug() << e.text();
     }
 
     reset();
