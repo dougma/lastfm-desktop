@@ -223,7 +223,7 @@ App::setMainWindow( MainWindow* window )
 
     QMenu* menu = new QMenu;
 	menu->addAction( tr( "Open" ), window, SLOT(show()) );
-    menu->addAction( window->ui.quit );
+    menu->addAction( tr("Quit"), this, SLOT(quit()) );
     m_trayIcon->setContextMenu( menu );
     connect( m_trayIcon, 
              SIGNAL(activated( QSystemTrayIcon::ActivationReason )), 
