@@ -161,14 +161,11 @@ App::scan( bool delete_all_files_first )
             if (picker.exec() == QDialog::Rejected)
                 return false;        // abort the whole app
 
-            if ( delete_all_files_first ) 
-            {
+            if ( delete_all_files_first )
                 cfg.deleteAllFiles();
-            }
-
             cfg.changeScanDirs( picker.dirs() );
-            cfg.updateVolumeAvailability();
         }
+        cfg.updateVolumeAvailability();
     } 
     catch (QueryError e)
     {
