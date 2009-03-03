@@ -17,4 +17,5 @@ CONFIG( debug, debug|release ) {
 else {
     CONFIG += warn_off
 	DEFINES += NDEBUG
+	CONFIG += ppc x86
 }
