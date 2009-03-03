@@ -22,14 +22,17 @@
 
 #include "SimilarArtists.h"
 #include "../ILocalRql.h"
-#include <QVector>
+#include <QQueue>
 
 
 class RqlQuery : public ILocalRqlTrackSource
 {
     class RqlQueryThread* m_queryThread;
     ResultSet m_tracks;
-    uint m_previousArtistId;
+    QQueue<uint> m_artistHistory;
+
+private:
+    float pushdownFactor(const QSet<uint>& recentTracks, uint artistId, uint trackId);
 
 public:
     RqlQuery(class RqlQueryThread* queryThread, ResultSet tracks);

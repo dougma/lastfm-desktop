@@ -22,15 +22,19 @@
 #include "LocalCollection.h"
 #include "MediaMetaInfo.h"
 #include <QUrl>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+
+#define ARTIST_HISTORY_LIMIT 4
+
 
 extern QString remapVolumeName(const QString& volume);
-extern TrackResult sample(const ResultSet& rs, int previousArtistId, QSet<uint> recentTracks);
+extern TrackResult sample(const ResultSet& rs, boost::function<float(uint, uint)> pushdown);
 
 
 RqlQuery::RqlQuery(RqlQueryThread* queryThread, ResultSet tracks)
 :m_queryThread(queryThread)
 ,m_tracks(tracks)
-,m_previousArtistId(0)
 {
 }
 
@@ -57,7 +61,13 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb, 
     // which we can read id3 tags:
 
     while (m_tracks.size()) {
-        TrackResult tr( sample( m_tracks, m_previousArtistId, recentTracks ) );
+        TrackResult tr( 
+            sample( 
+                m_tracks, 
+                boost::bind( 
+                    &RqlQuery::pushdownFactor, this, 
+                    recentTracks, _1, _2 ) ) );
+
         bool removed = m_tracks.remove(tr);
         Q_ASSERT(removed);
 
@@ -76,13 +86,26 @@ RqlQuery::getNextTrack(LocalCollection& collection, ILocalRqlTrackCallback* cb, 
                     QUrl::fromLocalFile(filename).toString().toUtf8(), 
                     mmi->duration());  //result.m_duration);
 
-                recentTracks.insert(tr.trackId);
-                m_previousArtistId = tr.artistId;
+                recentTracks.insert( tr.trackId );
+
+                // remember a fixed (and small) number of recent artists
+                if (m_artistHistory.size() == ARTIST_HISTORY_LIMIT ) {
+                    m_artistHistory.dequeue();
+                }
+                m_artistHistory.enqueue( tr.artistId );
                 return;
             }
         }
     }
     cb->trackFail();
+}
+
+float 
+RqlQuery::pushdownFactor(const QSet<uint>& recentTracks, uint artistId, uint trackId)
+{
+    float f = m_artistHistory.contains( artistId ) ? 0.001f : 1.0f;
+    f *= recentTracks.contains( trackId ) ? 0.001f : 1.0f;
+    return f;
 }
 
 void
