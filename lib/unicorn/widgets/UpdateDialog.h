@@ -22,11 +22,13 @@
 
 #include "lib/DllExportMacro.h"
 #include <lastfm/WsAccessManager>
-#include <QProgressDialog>
+#include <QDialog>
 #include <QTemporaryFile>
 
 
-class UNICORN_DLLEXPORT UpdateDialog : public QProgressDialog
+/** we did use QProgressDialog, but it's so amazingly shit. We stopped.
+  * GJ as usual Trolltech. */
+class UNICORN_DLLEXPORT UpdateDialog : public QDialog
 {
     Q_OBJECT
     
@@ -35,6 +37,10 @@ class UNICORN_DLLEXPORT UpdateDialog : public QProgressDialog
     QByteArray md5;
     QUrl url;
     QTemporaryFile tmp;
+    
+    class QLabel* text;
+    class QProgressBar* bar;
+    class QPushButton* button;
 
 public:
     /** auto deletes if the check comes back false

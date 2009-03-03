@@ -21,55 +21,69 @@
 #include "common/qt/md5.cpp"
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QFileInfo>
+#include <QLabel>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QNetworkReply>
+#include <QVBoxLayout>
 
 
-UpdateDialog::UpdateDialog( QWidget* parent ) : QProgressDialog( parent ), checking( 0 )
+UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 {
-    setMinimumDuration( 60 * 60 * 1000 ); //don't fucking show mother fucker
-    setRange( 0, 0 ); //indeterminate
-    setLabelText( tr("Checking for updates...") );
-    setAutoClose( false );
+    QVBoxLayout* v = new QVBoxLayout( this );
+    v->addWidget( text = new QLabel( tr("Checking for updates...") ) );
+    v->addWidget( bar = new QProgressBar );
+    v->addSpacing( 12 );
+    v->addWidget( button = new QPushButton( tr("Cancel") ) );
+    v->setSizeConstraint( QLayout::SetFixedSize );
+    v->setAlignment( button, Qt::AlignRight );
+    
+    bar->setMinimumWidth( text->sizeHint().width() * 3 / 2 );
+        
+    bar->setRange( 0, 0 ); //indeterminate
     setAttribute( Qt::WA_DeleteOnClose );
 
     QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + '/' + qApp->applicationVersion() + ".txt" );
+//    QUrl url( "http://static.last.fm/client/update_test/200.txt" );
     checking = nam.get( QNetworkRequest(url) );
     checking->setParent( this );
 
     connect( checking, SIGNAL(finished()), SLOT(onGot()) );
+    connect( button, SIGNAL(clicked()), SLOT(close()) );
 }    
 
 void
 UpdateDialog::onGot()
 {
-    QByteArray data = static_cast<QNetworkReply*>(sender())->readAll();
+    QByteArray data = static_cast<QNetworkReply*>(sender())->readAll().trimmed();
     url = QUrl::fromEncoded( data.mid( 32 ) );
     md5 = data.left( 32 );
 
     if (url.isEmpty() || !url.isValid()) 
     {
-        if (!isVisible())
-            deleteLater();
-        else {
-            setLabelText( tr("No updates available") );
-            setRange( 0, 100 );
-            setValue( 100 );
-        }            
+        text->setText( tr("No updates available") );
+        bar->setRange( 0, 100 );
+        bar->setValue( 100 );
         qDebug() << "No updates available";
+        if (!isVisible()) deleteLater();
     }
     else {
         QNetworkReply* reply = nam.get( QNetworkRequest(url) );
         reply->setParent( this );
         connect( reply, SIGNAL(downloadProgress( qint64, qint64 )), SLOT(onProgress( qint64, qint64 )) );
         connect( reply, SIGNAL(finished()), SLOT(onDownloaded()) );
+        
+        // ensure the extension still is at end, so QDesktopServices works
+        tmp.setFileTemplate( "XXXXXX_" + QFileInfo( url.path() ).fileName() );
     }
 }
 
 void
 UpdateDialog::onProgress( qint64 received, qint64 total )
 {
-    setMaximum( total );
-    setValue( received );
+    bar->setRange( 0, total );
+    bar->setValue( received );
 }
 
 void 
@@ -79,35 +93,38 @@ UpdateDialog::onDownloaded()
     
     if (Qt::md5( data ) != md5) {
         qWarning() << "Downloaded" << data.size() << "bytes from" << url << ", but md5 was not" << md5;
-        if (isVisible()) setLabelText( tr( "Download failed. Please try again later.") );
+        text->setText( tr( "Download failed, please try again later.") );
+        if (!isVisible()) deleteLater();
         return;
     }
     
-    setMaximum( 100 );
-    setValue( 100 );
-    setLabelText( tr( "Download complete" ) );
-#ifdef Q_OS_MAC
-    setCancelButtonText( tr("Quit") ); //will open DMG file now
+    bar->setRange( 0, 100 );
+    bar->setValue( 100 );
+    text->setText( tr( "A new version of Last.fm is available" ) );
+#ifdef __APPLE__
+    button->setText( tr("Thanks!") ); //will open DMG file now
 #else
-    setCancelButtonText( tr("Quit & Install") );
+    button->setText( tr("Quit && Install") );
 #endif
 
     show();
 
+    tmp.setAutoRemove( false ); //TODO naughty! maybe a script that waits on the dmg open complete and then deletes
     tmp.open();
     tmp.write( data );
-    tmp.close();
 
-    tmp.setAutoRemove( false );
-    
-    connect( this, SIGNAL(canceled()), SLOT(install()) );
+    disconnect( button, SIGNAL(clicked()), this, SLOT(close()) );
+    connect( button, SIGNAL(clicked()), SLOT(install()) );
 }
 
 void 
 UpdateDialog::install()
 {
 #ifdef __APPLE__
+    qDebug() << tmp.fileName();
+
     QDesktopServices::openUrl( QUrl::fromLocalFile( tmp.fileName() ) );
+    qApp->quit();
     //TODO auto shut this instance if possible
 #endif
 #ifdef WIN32
@@ -115,7 +132,8 @@ UpdateDialog::install()
     // doesn't appear when launching the installer on Vista.
 
     QString const path = tmp.fileName();
-
+    tmp.close();
+    
     SHELLEXECUTEINFOW sei;
     memset(&sei, 0, sizeof(sei));
 
@@ -136,7 +154,7 @@ UpdateDialog::install()
     }
     else {
         qWarning() << "Couldn't open" << path;
-        setLabelText( tr("The installer could not be launched") );
+        text->setText( tr("The installer could not be launched") );
     }
     
     qApp->quit();
