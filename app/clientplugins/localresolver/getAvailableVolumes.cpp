@@ -20,7 +20,7 @@
 #include <QDir>
 #include <QString>
 #include <QStringList>
-
+#include "LocalCollection.h"
 
 #ifdef WIN32
 
@@ -72,8 +72,6 @@ QStringList getAvailableVolumes()
             }
         }
     }
-#else
-    result << "/";
 #endif
 
     return result;
@@ -146,13 +144,18 @@ remapVolumeName(const QString& volume)
     return result;
 }
 
-
+#include <QDebug>
 // recognise the sources which don't appear in
 // getAvailableVolumes(), but are available
 bool
-isVolumeImplicitlyAvailable(const QString& )
+isSourceAvailable(const LocalCollection::Source& s)
 {
-    // there are none!      
+#ifdef Q_OS_WIN
+    return true;
+#else
+    if( QFile::exists( s.m_volume + s.m_path ))
+        return true;
     return false;
+#endif
 }
 

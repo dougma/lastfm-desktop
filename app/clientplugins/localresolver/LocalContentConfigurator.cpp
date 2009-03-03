@@ -24,7 +24,7 @@
 //todo: header file for these:
 extern QString remapVolumeName(const QString& volume);
 QStringList getAvailableVolumes();
-bool isVolumeImplicitlyAvailable(const QString& volume);
+bool isSourceAvailable(const LocalCollection::Source& src);
 
 
 int qHash(const LocalContentConfigurator::VolPath &vp)
@@ -159,7 +159,8 @@ LocalContentConfigurator::updateVolumeAvailability()
     QStringList volumes = getAvailableVolumes();
 
     foreach(const LocalCollection::Source &src, m_collection->getAllSources()) {
-        bool available = volumes.contains( src.m_volume ) || isVolumeImplicitlyAvailable( src.m_volume );
+        
+        bool available = volumes.contains( src.m_volume ) || isSourceAvailable( src );
         if (available != src.m_available) {
             m_collection->setSourceAvailability( src.m_id, available );
         }
