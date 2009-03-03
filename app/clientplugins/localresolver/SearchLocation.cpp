@@ -127,8 +127,11 @@ SearchLocation::subdirectories(const QString& path)
         } while (FindNextFileW(hFind, &data));
         FindClose(hFind);
     }
+    // working through a sorted list of directories gives the user some idea of progress
+    result.sort();  
     return result;
 #else
+    // seems to be sorted already
     return QDir(path).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 #endif
 }
