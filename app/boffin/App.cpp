@@ -153,18 +153,19 @@ App::scan( bool delete_all_files_first )
     {
         LocalContentConfigurator cfg;
 
-        if ( delete_all_files_first ) 
-        {
-            cfg.deleteAllFiles();
-        }
-
         QStringList const dirs = cfg.getScanDirs();
-        if (dirs.isEmpty() || cfg.getFileCount() == 0)
+        if (delete_all_files_first || dirs.isEmpty() || cfg.getFileCount() == 0)
         {
             PickDirsDialog picker( m_mainwindow );
             picker.setDirs( dirs );
             if (picker.exec() == QDialog::Rejected)
                 return false;        // abort the whole app
+
+            if ( delete_all_files_first ) 
+            {
+                cfg.deleteAllFiles();
+            }
+
             cfg.changeScanDirs( picker.dirs() );
             cfg.updateVolumeAvailability();
         }
