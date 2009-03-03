@@ -36,6 +36,12 @@ static inline QLabel* label( const QString& text, Qt::WidgetAttribute size = Qt:
 AboutDialog::AboutDialog( QWidget* parent )
            : QDialog( parent )
 {
+    const char* authors = "Max Howell <max@last.fm>\n"
+                          "Jono Cole <jono@last.fm>\n"
+                          "Doug Mansell <doug@last.fm>\n"
+                          "Matt Brown <mattb@last.fm>";
+    QLabel* lauthors;
+
     Q_ASSERT( qApp->applicationVersion().size() );
     
     QVBoxLayout* v = new QVBoxLayout( this );
@@ -46,8 +52,13 @@ AboutDialog::AboutDialog( QWidget* parent )
     v->addWidget( label( "<a href='irc://irc.audioscrobbler.com#audioscrobbler'>irc.audioscrobbler.com</a>" ) );
     v->addSpacing( 10 );
     v->addWidget( label( QString::fromUtf8("Copyright © 2005-2009 Last.fm Ltd.") ) );
+    v->addSpacing( 10 );
+    v->addWidget( lauthors = label( authors, Qt::WA_MacMiniSize ) );
+
     v->setSizeConstraint( QLayout::SetFixedSize );
     v->setSpacing( 2 );
+
+    lauthors->setTextInteractionFlags( Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse );
 
 #ifdef Q_WS_MAC
     foreach (QLabel* l, findChildren<QLabel*>())
