@@ -49,8 +49,17 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
     bar->setRange( 0, 0 ); //indeterminate
     setAttribute( Qt::WA_DeleteOnClose );
 
-    QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + '/' + qApp->applicationVersion() + ".txt" );
-//    QString temp = url.toString();
+#ifdef __APPLE__
+    #define PLATFORM "/mac/"
+#endif
+#ifdef WIN32
+    #define PLATFORM "/win/"
+#endif
+#ifdef Q_WS_X11
+    #define PLATFORM "/x11/"
+#endif
+
+    QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + PLATFORM + qApp->applicationVersion() + ".txt" );
 //   QUrl url( "http://static.last.fm/client/update_test/200.txt" );
     checking = nam.get( QNetworkRequest(url) );
     checking->setParent( this );
