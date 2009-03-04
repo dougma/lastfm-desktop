@@ -136,8 +136,6 @@ void
 UpdateDialog::install()
 {
 #ifdef __APPLE__
-    qDebug() << tmp.fileName();
-
     QDesktopServices::openUrl( QUrl::fromLocalFile( tmp.fileName() ) );
     qApp->quit();
     //TODO auto shut this instance if possible

@@ -80,9 +80,6 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     window->ui.pause->setEnabled( false );
     window->ui.skip->setEnabled( false );
     window->ui.wordle->setEnabled( false );
-    QShortcut* cut = new QShortcut( Qt::Key_Space, window );
-    connect( cut, SIGNAL(activated()), SLOT(playPause()) );
-    cut->setContext( Qt::ApplicationShortcut );
 
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
@@ -132,7 +129,12 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( window->ui.skip, SIGNAL(triggered()), m_pipe, SLOT(skip()) );
     connect( window->ui.rescan, SIGNAL(triggered()), SLOT(startAgain()) );
     connect( window->ui.xspf, SIGNAL(triggered()), SLOT(xspf()) );
+    connect( m_mainwindow->ui.wordle, SIGNAL( triggered()), SLOT( onWordle()));
 
+    QShortcut* cut = new QShortcut( Qt::Key_Space, window );
+    connect( cut, SIGNAL(activated()), SLOT(playPause()) );
+    cut->setContext( Qt::ApplicationShortcut );
+    
 /// go!
     if (!scan( false ))
         throw 1; //abort app
@@ -246,7 +248,6 @@ App::onScanningFinished()
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
-    connect( m_mainwindow->ui.wordle, SIGNAL( triggered()), SLOT( onWordle()));
 }
 
 
@@ -384,6 +385,7 @@ App::onWordle()
     QString output;
     TagCloudModel m( this, 0 );
     TagCloudModel::CustomRoles role = TagCloudModel::WeightRole;
+    w->show();
     
     for( int i = 0; i < m.rowCount(); ++i )
     {
@@ -391,5 +393,4 @@ App::onWordle()
         output += m.index( i, 0 ).data().toString().replace(QRegExp( "\\s" ), "~") + ":" + QString::number(weight) + "\n";
     }
     w->setText( output );
-    w->show();
  }
