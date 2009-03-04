@@ -55,7 +55,7 @@ ScrobSocket::transmit( const QString& data )
 void 
 ScrobSocket::onConnected()
 {
-    if( !m_msgQueue.empty())
+    if( !m_msgQueue.empty() )
     {
         qDebug() << m_msgQueue.head().trimmed();
         write( m_msgQueue.takeFirst().toUtf8());
@@ -76,6 +76,13 @@ ScrobSocket::onError( SocketError error )
 {
     switch (error)
     {
+        case SocketTimeoutError:
+            // TODO look, really we should store at least one start message forever
+            // then if last time we didn't connect and this time it's a pause we 
+            // send the start first
+            m_msgQueue.clear();
+            break;
+        
         case RemoteHostClosedError:
             // expected
             break;
