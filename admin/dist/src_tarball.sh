@@ -1,6 +1,10 @@
 #!/bin/bash
 
-d=Boffin-$1
+# OSX copies special file attributes to ._files when you tar!
+export COPY_EXTENDED_ATTRIBUTES_DISABLE=true
+export COPYFILE_DISABLE=true
+
+d=boffin-$1
 mkdir -p $d/app/client
 
 cp -R common admin lib $d
@@ -53,5 +57,5 @@ Please, I'm not a support dude! I'd appreciate it if you don't email me until
 you're sure it's our fault it isn't compiling! Thanks. <max@last.fm>
 END
 
-tar cjf $d.tar.bz2 $d
+tar pcjf $d.tar.bz2 $d
 rm -rf $d
