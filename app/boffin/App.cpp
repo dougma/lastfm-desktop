@@ -87,7 +87,6 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 ////// radio
     QString const name = QSettings().value( OUTPUT_DEVICE_KEY ).toString();
     m_audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
-	m_audioOutput->setVolume( 1.0 /* Settings().volume() */ );
 
     QActionGroup* actiongroup = new QActionGroup( window->ui.outputdevice );
 
@@ -102,6 +101,8 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
             
         actiongroup->addAction( a );
     }
+
+	m_audioOutput->setVolume( 1.0 /* Settings().volume() */ );
 
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
     

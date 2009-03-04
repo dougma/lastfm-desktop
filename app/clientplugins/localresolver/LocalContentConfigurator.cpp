@@ -79,8 +79,15 @@ splitPath(const QString& p)
 
     QString volume, path;
     if (!err) {
-        volume = getVolumeName( wcscat(drive, L"\\") );
-        path = removeLeadingSlash( QString::fromUtf16( dir ) );
+        if (0 == wcslen(drive)) {
+            // no drive letter, it's a UNC.
+            volume = QString::fromWCharArray( dir );
+            path = "";
+        } else {
+            // convert drive letter -> volume name
+            volume = getVolumeName( wcscat(drive, L"\\") );
+            path = removeLeadingSlash( QString::fromUtf16( dir ) );
+        }
     }
 
     return QPair<QString, QString>( volume, path );
