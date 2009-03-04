@@ -266,6 +266,8 @@ App::play()
 void
 App::playPause()
 {
+    if (!m_cloud) return;
+    
     if (m_playing)
         m_mainwindow->ui.pause->toggle();
     else if (!m_cloud->isEnabled()) //preparing

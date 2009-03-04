@@ -22,6 +22,7 @@
 
 #include <lastfm/global.h>
 #include "lib/unicorn/UnicornApplication.h"
+#include <QPointer>
 namespace Phonon { class AudioOutput; }
 
 
@@ -64,7 +65,7 @@ private:
     class LocalContentScanner* m_contentScanner;
     class TrackTagUpdater* m_trackTagUpdater;
     class MainWindow* m_mainwindow;
-    class TagCloudView* m_cloud;
+    QPointer<TagCloudView> m_cloud;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
     
