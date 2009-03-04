@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="d81df4a9-959c-4583-be16-0b004104246b" Name="Last.fm" Language="1033" Version="1.0.0.0" Manufacturer="Last.fm" UpgradeCode="2b30baf0-ec7d-48fd-b5e6-cedf588c53fd">
+		<Package 
+        Description="Last.fm" 
+        Manufacturer="Last.fm Ltd." 
+        InstallerVersion="200"
+        Compressed="yes" />
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="Last.fm v2">
+					<Component Id="MainBit" Guid="d8f98724-51fe-4398-96df-2e156b19fc21">
+            <File Id="lastfmexe" Name="Last.fm.exe" Source="Last.fm.exe" />
+            <File Id="twiddlyexe" Name="twiddly.exe" Source="twiddly.exe" DefaultLanguage="0" />
+            <File Id="coredll" Name="core.dll" Source="core.dll" />
+            <File Id="fingerprintdll" Name="fingerprint.dll" Source="fingerprint.dll" />
+            <File Id="libfftw3f3dll" Name="libfftw3f-3.dll" Source="libfftw3f-3.dll" />
+            <File Id="listenerdll" Name="listener.dll" Source="listener.dll" />
+            <File Id="radiodll" Name="radio.dll" Source="radio.dll" />
+            <File Id="scrobbledll" Name="scrobble.dll" Source="scrobble.dll" />
+            <File Id="sqlite3dll" Name="sqlite3.dll" Source="sqlite3.dll" />
+            <File Id="tagdll" Name="tag.dll" Source="tag.dll" />
+            <File Id="typesdll" Name="types.dll" Source="types.dll" />
+            <File Id="unicorndll" Name="unicorn.dll" Source="unicorn.dll" />
+            <File Id="wsdll" Name="ws.dll" Source="ws.dll" />
+            <RegistryKey Root="HKLM" Key="Software">
+              <RegistryKey Key="Last.fm" Action="create">
+                <RegistryValue Key="Client" Name="Path" Action="write" Type="string" Value="[INSTALLDIR]Last.fm.exe" />
+              </RegistryKey>
+            </RegistryKey>
+            
+            <!-- register association and icon for .xspf -->
+            <ProgId Id="Last.fm.xspf" Description="XML Shareable Playlist Format">
+              <Extension Id="xspf" ContentType="application/xspf+xml">
+                <Verb Id='open' Command='Open' TargetFile='lastfmexe' Argument='"%1"' />
+              </Extension>
+            </ProgId>
+            <RegistryValue Id='icon' Root="HKCR" Key='Last.fm.xspf\DefaultIcon' Action='write' Type='string' Value='[INSTALLDIR]Last.fm.exe,1' />
+
+          </Component>
+
+          <Component Id="Qt4" Guid="A78D4DC2-2523-438b-B5F5-EF441911124F">
+            <File Id="qtwebkit4dll" Name="qtwebkit4.dll" Source="qtwebkit4.dll" DefaultLanguage="0" />
+            <File Id="phonon4dll" Name="phonon4.dll" Source="phonon4.dll" DefaultLanguage="0" />
+            <File Id="qtsvg4dll" Name="qtsvg4.dll" Source="qtsvg4.dll" DefaultLanguage="0" />
+            <File Id="qtxml4dll" Name="qtxml4.dll" Source="qtxml4.dll" DefaultLanguage="0" />
+            <File Id="qtgui4dll" Name="qtgui4.dll" Source="qtgui4.dll" DefaultLanguage="0" />
+            <File Id="qtnetwork4dll" Name="qtnetwork4.dll" Source="qtnetwork4.dll" DefaultLanguage="0" />
+            <File Id="qtcore4dll" Name="qtcore4.dll" Source="qtcore4.dll" DefaultLanguage="0" />
+          </Component>
+
+          <Directory Id="PluginsFolder" Name="plugins">
+            <Component Id="ResolverPlugin" Guid="86552379-CE2B-411d-BDF6-588FC95658BD">
+              <File Id="resolverdll" Name="resolver.dll" Source="resolver.dll" />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+
+
+    <!-- clean up: 
+    ideally we'd remove ..\AppData\Local\Last.fm for each user,
+    but we msi doesn't provide any mechanism to help us with that -->
+<!--    
+    <Directory Id="" Name="AppData">
+     
+    </Directory>
+-->
+
+    <Feature Id="Complete" Title="feature" Level="1">
+			<ComponentRef Id="MainBit" />
+      <ComponentRef Id="Qt4" />
+      <ComponentRef Id="ResolverPlugin" />
+    </Feature>
+	</Product>
+</Wix>
