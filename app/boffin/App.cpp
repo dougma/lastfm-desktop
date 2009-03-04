@@ -390,7 +390,7 @@ App::onWordle()
     for( int i = 0; i < m.rowCount(); ++i )
     {
         float weight = m.index( i, 0 ).data( role ).value<float>();
-        output += m.index( i, 0 ).data().toString().replace(QRegExp( "\\s" ), "~") + ":" + QString::number(weight) + "\n";
+        output += m.index( i, 0 ).data().toString().simplified().replace(' ', '~' ) + ":" + QString::number(weight) + "\n";
     }
     w->setText( output );
  }

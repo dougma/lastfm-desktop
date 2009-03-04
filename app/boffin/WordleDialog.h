@@ -60,6 +60,7 @@ public:
     void setText( const QString& t )
     {
         output->setText( t );
+        //output->selectAll(); //looks wrong
         QApplication::clipboard()->setText( t );
     }
 };
