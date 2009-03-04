@@ -383,27 +383,13 @@ App::onWordle()
     WordleDialog* w = new WordleDialog( m_mainwindow );
     QString output;
     TagCloudModel m( this, 0 );
-    TagCloudModel::CustomRoles role = TagCloudModel::LinearWeightRole;
+    TagCloudModel::CustomRoles role = TagCloudModel::WeightRole;
     
-    float inc;
-    if( m.rowCount() > 1 )
-    {
-        inc = m.index( m.rowCount() - 2, 0 ).data(role).value<float>() -
-              m.index( m.rowCount() - 1, 0 ).data(role).value<float>() ;
-    }
-    else
-    {
-        inc = 0.1f;
-    }
-
     for( int i = 0; i < m.rowCount(); ++i )
     {
         float weight = m.index( i, 0 ).data( role ).value<float>();
-        for( float c = 0; c < weight; c+= inc )
-        {
-            output += m.index( i, 0 ).data().toString().replace(QRegExp( "\\s" ), "~") + " ";
-        }
+        output += m.index( i, 0 ).data().toString().replace(QRegExp( "\\s" ), "~") + ":" + QString::number(weight) + "\n";
     }
     w->setText( output );
     w->show();
-}
+ }
