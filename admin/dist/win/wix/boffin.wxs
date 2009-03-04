@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product 
+		Id="C57A8E40-FE11-480c-9C61-22E325FDAD45" 
+		Name="Boffin" Language="1033" Version="1.0.0.0" Manufacturer="Last.fm" 
+		UpgradeCode="835A5BD7-58E3-40a5-959C-1FB316053472">
+		
+		<Package 
+        Description="Boffin" 
+        Manufacturer="Last.fm Ltd." 
+        InstallerVersion="300"
+        Compressed="yes" />
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="eula.rtf" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- start menu items -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="boffinMenuFolder" Name="Last.fm Boffin">
+          
+          <Component Id="boffinShortcutComponent" Guid="AA45A306-B9DC-4ca4-8F0B-95FB5F41AF86">
+            <RegistryKey Root="HKCU" Key="Software\Last.fm\Boffin\shortcut">
+              <RegistryValue Value="" Type="string" KeyPath="yes"/>
+            </RegistryKey>
+            <Shortcut Id="launchBoffin"
+                      Name="Boffin"
+                      Target="[INSTALLDIR]boffin.exe"
+                      Arguments="/x C57A8E40-FE11-480c-9C61-22E325FDAD45"
+                      Directory="boffinMenuFolder"
+                      Description="Starts Boffin" />
+            <RemoveFolder Id="removeShortcutFolder" On="uninstall" />
+          </Component>
+          
+          <Component Id="uninstallShortcutComponent" Guid="4A724AFE-7C2E-4258-BF90-F13DEB95B5C9">
+            <RegistryKey Root="HKCU" Key="Software\Last.fm\Boffin\uninstall">
+              <RegistryValue Value="" Type="string" KeyPath="yes"/>
+            </RegistryKey>
+            <Shortcut Id="uninstallBoffin"
+                      Name="Uninstall Boffin"
+                      Target="[System64Folder]msiexec.exe"
+                      Arguments="/x {C57A8E40-FE11-480c-9C61-22E325FDAD45}"
+                      Directory="boffinMenuFolder"
+                      Description="Uninstalls Boffin" />
+          </Component>
+          
+        </Directory>
+      </Directory>
+
+      <!-- program files items -->
+      <Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLDIR" Name="Boffin">
+					<Component Id="MainBit" Guid="56F99AE3-1859-4677-B4D8-F4A173FD12D8">
+            <File Id="boffinexe" Name="boffin.exe" Source="boffin.exe" />
+            <File Id="qtconf" Name="qt.conf" Source="qt.conf" />
+            <File Id="coredll" Name="core.dll" Source="core.dll" />
+            <File Id="radiodll" Name="radio.dll" Source="radio.dll" />
+            <File Id="sqlite3dll" Name="sqlite3.dll" Source="sqlite3.dll" />
+            <File Id="tagdll" Name="tag.dll" Source="tag.dll" />
+            <File Id="typesdll" Name="types.dll" Source="types.dll" />
+            <File Id="unicorndll" Name="unicorn.dll" Source="unicorn.dll" />
+            <File Id="wsdll" Name="ws.dll" Source="ws.dll" />
+
+            <RegistryKey Root="HKLM" Key="Software">
+              <RegistryKey Key="Last.fm" Action="create">
+                <RegistryValue Key="Boffin" Name="Path" Action="write" Type="string" Value="[INSTALLDIR]boffin.exe" />
+              </RegistryKey>
+            </RegistryKey>
+
+            <!-- register association and icon for .xspf -->
+<!--			
+            <ProgId Id="Boffin.xspf" Description="XML Shareable Playlist Format">
+              <Extension Id="xspf" ContentType="application/xspf+xml">
+                <Verb Id='open' Command='Open' TargetFile='boffinexe' Argument='"%1"' />
+              </Extension>
+            </ProgId>
+            <RegistryValue Id='icon' Root="HKCR" Key='Boffin.xspf\DefaultIcon' Action='write' Type='string' Value='[INSTALLDIR]boffin.exe,0' />
+-->
+          </Component>
+
+          <Component Id="Qt4" Guid="0A0987A0-8CB1-491d-A074-2A8005DA326A">
+<!--            <File Id="qtwebkit4dll" Name="qtwebkit4.dll" Source="qtwebkit4.dll" DefaultLanguage="0" /> -->
+<!--            <File Id="qtsvg4dll" Name="qtsvg4.dll" Source="qtsvg4.dll" DefaultLanguage="0" /> -->
+            <File Id="phonon4dll" Name="phonon4.dll" Source="phonon4.dll" DefaultLanguage="0" />
+            <File Id="qtsql4dll" Name="qtsql4.dll" Source="qtsql4.dll" DefaultLanguage="0" />
+            <File Id="qtxml4dll" Name="qtxml4.dll" Source="qtxml4.dll" DefaultLanguage="0" />
+            <File Id="qtgui4dll" Name="qtgui4.dll" Source="qtgui4.dll" DefaultLanguage="0" />
+            <File Id="qtnetwork4dll" Name="qtnetwork4.dll" Source="qtnetwork4.dll" DefaultLanguage="0" />
+            <File Id="qtcore4dll" Name="qtcore4.dll" Source="qtcore4.dll" DefaultLanguage="0" />
+            <File Id="qtopengl4dll" Name="qtopengl4.dll" Source="qtopengl4.dll" DefaultLanguage="0" />
+          </Component>
+
+          <Directory Id="imageformatsDir" Name="imageformats">
+            <Component Id="imageformatsComponent" Guid="52944572-8766-4a99-8207-5F110EA00705">
+              <File Id="qjpeg4dll" Name="qjpeg4.dll" Source="imageformats\qjpeg4.dll" />
+              <File Id="qgif4dll" Name="qgif4.dll" Source="imageformats\qgif4.dll" />
+              <File Id="qmng4dll" Name="qmng4.dll" Source="imageformats\qmng4.dll" />
+            </Component>
+          </Directory>
+
+          <Directory Id="sqldriversDir" Name="sqldrivers">
+            <Component Id="sqldriversComponent" Guid="97429E06-A2EC-489d-8672-79385F85E804">
+              <File Id="qsqlite4dll" Name="qsqlite4.dll" Source="sqldrivers\qsqlite4.dll" />
+            </Component>
+          </Directory>
+
+          <Directory Id="phononBackendDir" Name="phonon_backend">
+            <Component Id="phononBackendComponent" Guid="9E1C98AB-52E8-4ca6-86A8-FDF6B3C23DE0">
+              <File Id="phonon_ds94dll" Name="phonon_ds94.dll" Source="phonon_backend\phonon_ds94.dll" />
+            </Component>
+          </Directory>
+
+          <Merge Id="crt" Language="0" SourceFile="Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- clean up: 
+    ideally we'd remove ..\AppData\Local\Last.fm for each user,
+    but we msi doesn't provide any mechanism to help us with that -->
+<!--    
+    <Directory Id="" Name="AppData">
+    </Directory>
+-->
+
+    <Feature Id="Complete" Title="feature" Level="1">
+			<ComponentRef Id="MainBit" />
+      <ComponentRef Id="Qt4" />
+      <ComponentRef Id="imageformatsComponent" />
+      <ComponentRef Id="sqldriversComponent" />
+      <ComponentRef Id="phononBackendComponent" />
+      <ComponentRef Id="boffinShortcutComponent" />
+      <ComponentRef Id="uninstallShortcutComponent" />
+      <MergeRef Id="crt" />
+    </Feature>
+	</Product>
+</Wix>
