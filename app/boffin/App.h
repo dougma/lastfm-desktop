@@ -24,7 +24,7 @@
 #include "lib/unicorn/UnicornApplication.h"
 #include <QPointer>
 namespace Phonon { class AudioOutput; }
-
+class TagCloudView;
 
 class App : public unicorn::Application
 {
