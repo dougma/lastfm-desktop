@@ -181,6 +181,8 @@ public:
     typedef QList< Entry > EntryList;
 
 
+    /** Be careful not to use the same connection name on different threads 
+      * QSqlDatabase warns against this */
     static LocalCollection* create(QString connectionName);
     ~LocalCollection();
 

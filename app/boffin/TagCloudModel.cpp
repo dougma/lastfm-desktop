@@ -26,10 +26,11 @@
 #include <QDebug>
 
 
-TagCloudModel::TagCloudModel( QObject* parent )
-              :QAbstractItemModel( parent )
+TagCloudModel::TagCloudModel( QObject* parent, int limit )
+              :QAbstractItemModel( parent ),
+               m_limit( limit )
 {
-    m_collection = LocalCollection::create( "TagCloud" );
+    m_collection = LocalCollection::create( QString( "TagCloudModel"));
     fetchTags();
 }
 
@@ -73,7 +74,6 @@ TagCloudModel::data( const QModelIndex& index, int role ) const
         {
             QMultiMap< float, QString >::const_iterator i = m_logTagHash.constEnd();
             i -= index.row() + 1;
-
             return QVariant::fromValue<float>( ( i.key() - m_minLogWeight ) / ((m_logTagHash.constEnd() -1 ).key() - m_minLogWeight));
         }
 
@@ -103,7 +103,7 @@ TagCloudModel::fetchTags()
 
     try 
     {
-        QList< Pair > tags = m_collection->getTopTags(100);
+        QList< Pair > tags = m_collection->getTopTags( m_limit );
         m_minLogWeight = FLT_MAX;
         foreach(const Pair& tag, tags)
         {

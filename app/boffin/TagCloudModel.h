@@ -28,10 +28,10 @@ class TagCloudModel: public QAbstractItemModel
 public:
     enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole };
 
-    TagCloudModel( QObject* parent = 0 );
+    TagCloudModel( QObject* parent = 0, int limit = 100 );
     ~TagCloudModel();
 
-    virtual QModelIndex index( int row, int column, const QModelIndex& parent ) const
+    virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const
     {
         if( parent.isValid() ) return QModelIndex();
         return createIndex( row, column );
@@ -43,13 +43,13 @@ public:
     virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
     Qt::ItemFlags flags( const QModelIndex & index ) const;
     void fetchTags();
-
 protected:
     class LocalCollection* m_collection;
     QMultiMap< float, QString> m_tagHash;
     QMultiMap< float, QString> m_logTagHash;
     float m_maxWeight;
     float m_minLogWeight;
+    int m_limit;
 };
 
 #endif //TAG_CLOUD_MODEL_H

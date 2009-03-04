@@ -57,6 +57,7 @@ private slots:
     
     void onScanningFinished();    
     void onPlaybackError( const QString& );
+    void onWordle();
 
 private:
     void cleanup();

@@ -31,7 +31,7 @@ MainWindow::MainWindow()
     ui.xspf = tools->addAction( "Resolve XSPF" );
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
     tools->addAction( tr("Show &Log"), this, SLOT(openLog()) );
-    
+    ui.wordle = tools->addAction( tr("Wordlize"));
     QToolBar* toolbar = new QToolBar;
     toolbar->setIconSize( QSize( 41, 41 ) );
 
@@ -42,7 +42,7 @@ MainWindow::MainWindow()
     ui.pause->setCheckable( true );
     ui.skip = toolbar->addAction( tr("Skip") );
     ui.skip->setIcon( QPixmap(":/skip.png") );
-            
+
     addToolBar( toolbar );
     setWindowTitle( Track() );
     setUnifiedTitleAndToolBarOnMac( true );

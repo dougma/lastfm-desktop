@@ -35,10 +35,12 @@ class MainWindow : public unicorn::MainWindow
         QAction* skip;    
         QAction* xspf;
         QAction* rescan;
+        QAction* wordle;
     } ui;
 
 public:
     MainWindow();
 
     void setWindowTitle( const Track& );
+
 };

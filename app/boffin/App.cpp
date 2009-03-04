@@ -79,7 +79,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     window->ui.play->setEnabled( false );
     window->ui.pause->setEnabled( false );
     window->ui.skip->setEnabled( false );
-        
+    window->ui.wordle->setEnabled( false );
     QShortcut* cut = new QShortcut( Qt::Key_Space, window );
     connect( cut, SIGNAL(activated()), SLOT(playPause()) );
     cut->setContext( Qt::ApplicationShortcut );
@@ -244,6 +244,8 @@ App::onScanningFinished()
     m_mainwindow->ui.pause->setEnabled( false );
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
+    m_mainwindow->ui.wordle->setEnabled( true );
+    connect( m_mainwindow->ui.wordle, SIGNAL( triggered()), SLOT( onWordle()));
 }
 
 
@@ -370,4 +372,37 @@ App::onPlaybackError( const QString& msg )
             .setTitle( "Playback Error" )
             .setText( msg )
             .exec();
+}
+
+
+#include "WordleDialog.h"
+void 
+App::onWordle()
+{
+    WordleDialog* w = new WordleDialog( m_mainwindow );
+    QString output;
+    TagCloudModel m( this, 0 );
+    TagCloudModel::CustomRoles role = TagCloudModel::LinearWeightRole;
+    
+    float inc;
+    if( m.rowCount() > 1 )
+    {
+        inc = m.index( m.rowCount() - 2, 0 ).data(role).value<float>() -
+              m.index( m.rowCount() - 1, 0 ).data(role).value<float>() ;
+    }
+    else
+    {
+        inc = 0.1f;
+    }
+
+    for( int i = 0; i < m.rowCount(); ++i )
+    {
+        float weight = m.index( i, 0 ).data( role ).value<float>();
+        for( float c = 0; c < weight; c+= inc )
+        {
+            output += m.index( i, 0 ).data().toString().replace(QRegExp( "\\s" ), "~") + " ";
+        }
+    }
+    w->setText( output );
+    w->show();
 }

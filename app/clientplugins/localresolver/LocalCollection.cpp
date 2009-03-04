@@ -86,9 +86,13 @@ LocalCollection::versionCheck()
 void
 LocalCollection::initDatabase()
 {
-    if ( !m_db.isValid() )  {
-        m_db = QSqlDatabase::addDatabase( "QSQLITE", m_connectionName );
-        m_db.setDatabaseName( m_dbPath );
+    if ( !m_db.isValid()) {
+        if( !QSqlDatabase::contains( m_connectionName )) {
+            m_db = QSqlDatabase::addDatabase( "QSQLITE", m_connectionName );
+            m_db.setDatabaseName( m_dbPath );
+        } else {
+            m_db = QSqlDatabase::database( m_connectionName, false );
+        }
     }
     m_db.open();
 
@@ -1017,18 +1021,23 @@ LocalCollection::getTopTags(int limit)
     QList< QPair< QString, float > > result;
 
     ChainableQuery q(m_db, &ms_activeQueryMutex);
-    q.prepare(
-        "SELECT name, sum(weight) FROM tracktags "
-        "INNER JOIN tags ON tracktags.tag = tags.id "
-        "INNER JOIN files ON tracktags.file = files.id "
-        "INNER JOIN directories ON files.directory = directories.id "
-        "INNER JOIN sources ON directories.source = sources.id "
-        "WHERE sources.available = 1 "
-        "GROUP BY tags.id "
-        "ORDER BY sum(weight) DESC "
-        "LIMIT :limit ").
-        bindValue(":limit", limit).
-        exec();
+    QString query = "SELECT name, sum(weight) FROM tracktags "
+                    "INNER JOIN tags ON tracktags.tag = tags.id "
+                    "INNER JOIN files ON tracktags.file = files.id "
+                    "INNER JOIN directories ON files.directory = directories.id "
+                    "INNER JOIN sources ON directories.source = sources.id "
+                    "WHERE sources.available = 1 "
+                    "GROUP BY tags.id "
+                    "ORDER BY sum(weight) DESC ";
+
+    if( limit > 0 )
+        query += "LIMIT :limit ";
+
+    q.prepare( query );
+    if( limit > 0 )
+        q.bindValue(":limit", limit);
+
+    q.exec();
     while ( q.next() ) {
         result << ( QPair< QString, float >( q.value(0).toString(), q.value(1).toDouble() ) );
     }
