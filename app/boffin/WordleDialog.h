@@ -45,8 +45,10 @@ public:
         layout()->addWidget( hint = new QLabel);
         hint->setOpenExternalLinks( true );
         hint->setTextFormat( Qt::RichText );
-        hint->setText( tr("We copied the wordlist to your clipboard already.<br>"
-                          "So just visit <a href='http://www.wordle.net/advanced'>Wordle Advanced</a> and paste!") );
+        hint->setText( tr("<p>We copied the wordlist to your clipboard already.<br>"
+                      "So just visit <a href='http://www.wordle.net/advanced'>Wordle Advanced</a> and paste!</p>"
+                      "<p>Why not save your Wordle with username \"boffin\" and your<br>"
+                      "Last.fm username as the title so we can start a <a href='http://www.wordle.net/gallery?username=Boffin'>community</a>?</p>") );
         
         QDialogButtonBox* buttons;
         layout()->addWidget( buttons = new QDialogButtonBox( QDialogButtonBox::Ok ));
