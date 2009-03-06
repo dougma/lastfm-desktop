@@ -55,7 +55,6 @@ public:
         connect( buttons, SIGNAL(accepted()), SLOT( accept()));
         buttons->button( QDialogButtonBox::Ok )->setText( tr("Close") );
         
-        setModal( true );
         setWindowTitle( tr("Your Wordlized Tags") );
     }
 

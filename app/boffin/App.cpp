@@ -378,19 +378,21 @@ App::onPlaybackError( const QString& msg )
 
 
 #include "WordleDialog.h"
-void 
+void
 App::onWordle()
 {
-    WordleDialog* w = new WordleDialog( m_mainwindow );
-    QString output;
-    TagCloudModel m( this, 0 );
-    TagCloudModel::CustomRoles role = TagCloudModel::WeightRole;
-    w->show();
-    
-    for( int i = 0; i < m.rowCount(); ++i )
-    {
-        float weight = m.index( i, 0 ).data( role ).value<float>();
-        output += m.index( i, 0 ).data().toString().simplified().replace(' ', '~' ) + ":" + QString::number(weight) + "\n";
+    static OneDialogPointer<WordleDialog> d;
+    if(!d) {
+        d = new WordleDialog( m_mainwindow );
+        QString output;
+        TagCloudModel model( this, 0 );
+        for(int i = 0; i < model.rowCount(); ++i) {
+            QModelIndex index = model.index( i, 0 );
+            QString weight = index.data( TagCloudModel::WeightRole ).toString();
+            QString tag = index.data().toString().trimmed().simplified().replace( ' ', '~' );
+            output += tag + ':' + weight + '\n';
+        }
+        d->setText( output );
     }
-    w->setText( output );
- }
+    d.show();
+}
