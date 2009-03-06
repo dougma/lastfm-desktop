@@ -234,6 +234,7 @@ MediaPipeline::onPhononStateChanged( Phonon::State newstate, Phonon::State oldst
             break;
             
         case ErrorState:
+            qWarning() << mo->errorString();
             // need to request a stop to clear the error state before we trying to play the next track
             m_errorRecover = true;
             mo->stop();

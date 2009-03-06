@@ -36,13 +36,24 @@ static inline QLabel* label( const QString& text, Qt::WidgetAttribute size = Qt:
 AboutDialog::AboutDialog( QWidget* parent )
            : QDialog( parent )
 {
-    const char* authors = "Max Howell <max@last.fm>\n"
-                          "Jono Cole <jono@last.fm>\n"
-                          "Doug Mansell <doug@last.fm>\n"
-                          "Matt Brown <mattb@last.fm>";
     QLabel* lauthors;
 
     Q_ASSERT( qApp->applicationVersion().size() );
+
+    QStringList authors, raw_authors;
+    raw_authors << "Max Howell" << "mxcl" << "max@last.fm"
+                << "Jono Cole" << "jonocole" << "jono@last.fm"
+                << "Doug Mansell" << "dougma" << "doug@last.fm"
+                << "Matt Brown" << "irvinebrown" << "mattb@last.fm";
+    QStringListIterator i( raw_authors );
+    while(i.hasNext()) {
+        QString name = i.next();
+        QString twit = i.next();
+        QString mail = i.next();
+        authors << "&lt;<a href='mailto:" + mail + "'>" + mail + "</a>&gt; " 
+                 + name + ' '
+                 + "<a href='http://twitter.com/" + twit + "'>@" + twit + "</a>";
+    }
     
     QVBoxLayout* v = new QVBoxLayout( this );
     v->addWidget( new QLabel( "<b>" + qApp->applicationName() ) );
@@ -53,7 +64,7 @@ AboutDialog::AboutDialog( QWidget* parent )
     v->addSpacing( 10 );
     v->addWidget( label( QString::fromUtf8("Copyright © 2005-2009 Last.fm Ltd.") ) );
     v->addSpacing( 10 );
-    v->addWidget( lauthors = label( authors, Qt::WA_MacMiniSize ) );
+    v->addWidget( lauthors = label( authors.join( "<br>" ), Qt::WA_MacMiniSize ) );
 
     v->setSizeConstraint( QLayout::SetFixedSize );
     v->setSpacing( 2 );
