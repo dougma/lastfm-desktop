@@ -21,7 +21,9 @@
 #include "common/qt/md5.cpp"
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QTemporaryFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
@@ -33,6 +35,7 @@
 #include <windows.h>
 #include <shellapi.h>
 #endif
+
 
 UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 {
@@ -60,7 +63,7 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 #endif
 
     QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + PLATFORM + qApp->applicationVersion() + ".txt" );
-//   QUrl url( "http://static.last.fm/client/update_test/200.txt" );
+//    QUrl url( "http://static.last.fm/client/update_test/201.txt" );
     checking = nam.get( QNetworkRequest(url) );
     checking->setParent( this );
 
@@ -88,9 +91,6 @@ UpdateDialog::onGot()
         reply->setParent( this );
         connect( reply, SIGNAL(downloadProgress( qint64, qint64 )), SLOT(onProgress( qint64, qint64 )) );
         connect( reply, SIGNAL(finished()), SLOT(onDownloaded()) );
-        
-        // ensure the extension still is at end, so QDesktopServices works
-        tmp.setFileTemplate( "XXXXXX_" + QFileInfo( url.path() ).fileName() );
     }
 }
 
@@ -115,7 +115,7 @@ UpdateDialog::onDownloaded()
     
     bar->setRange( 0, 100 );
     bar->setValue( 100 );
-    text->setText( tr( "A new version of Last.fm is available" ) );
+    text->setText( tr( "A new version of %1 is available" ).arg( qApp->applicationName() ) );
 #ifdef __APPLE__
     button->setText( tr("Thanks!") ); //will open DMG file now
 #else
@@ -124,9 +124,15 @@ UpdateDialog::onDownloaded()
 
     show();
 
-    tmp.setAutoRemove( false ); //TODO naughty! maybe a script that waits on the dmg open complete and then deletes
-    tmp.open();
-    tmp.write( data );
+    // ensure the extension is still at end (so we can launch it)
+    QString templ = QDir::tempPath() + "/" + "XXXXXX_" + QFileInfo( url.path() ).fileName();
+    {
+        QTemporaryFile temp( templ );
+        temp.setAutoRemove( false );
+        temp.open();
+        temp.write( data );
+        tmpFileName = QDir::toNativeSeparators( temp.fileName() );
+    }
 
     disconnect( button, SIGNAL(clicked()), this, SLOT(close()) );
     connect( button, SIGNAL(clicked()), SLOT(install()) );
@@ -136,7 +142,7 @@ void
 UpdateDialog::install()
 {
 #ifdef __APPLE__
-    QDesktopServices::openUrl( QUrl::fromLocalFile( tmp.fileName() ) );
+    QDesktopServices::openUrl( QUrl::fromLocalFile( tmpFileName ) );
     qApp->quit();
     //TODO auto shut this instance if possible
 #endif
@@ -144,9 +150,6 @@ UpdateDialog::install()
     // Must use ShellExecute because otherwise the elevation dialog
     // doesn't appear when launching the installer on Vista.
 
-    QString const path = tmp.fileName();
-    tmp.close();
-    
     SHELLEXECUTEINFOW sei;
     memset(&sei, 0, sizeof(sei));
 
@@ -154,7 +157,7 @@ UpdateDialog::install()
     sei.fMask  = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT;
     sei.hwnd   = GetForegroundWindow();
     sei.lpVerb = L"open";
-    sei.lpFile = reinterpret_cast<LPCWSTR>(path.utf16());
+    sei.lpFile = reinterpret_cast<LPCWSTR>( tmpFileName.utf16() );
     sei.lpParameters = 0;
     sei.nShow  = SW_SHOWNORMAL;
 
@@ -166,10 +169,14 @@ UpdateDialog::install()
         QApplication::restoreOverrideCursor();
     }
     else {
-        qWarning() << "Couldn't open" << path;
+        qWarning() << "Couldn't open" << tmpFileName;
         text->setText( tr("The installer could not be launched") );
     }
     
     qApp->quit();
+
 #endif
+
+    // TODO: remove downloaded msi/exe/dmg turd, somehow
+    
 }

@@ -23,7 +23,6 @@
 #include "lib/DllExportMacro.h"
 #include <lastfm/WsAccessManager>
 #include <QDialog>
-#include <QTemporaryFile>
 
 
 /** we did use QProgressDialog, but it's so amazingly shit. We stopped.
@@ -36,7 +35,7 @@ class UNICORN_DLLEXPORT UpdateDialog : public QDialog
     QNetworkReply* checking;
     QByteArray md5;
     QUrl url;
-    QTemporaryFile tmp;
+    QString tmpFileName;
     
     class QLabel* text;
     class QProgressBar* bar;
