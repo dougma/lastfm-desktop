@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product 
-		Id="C57A8E40-FE11-480c-9C61-22E325FDAD45" 
-		Name="Boffin" Language="1033" Version="1.0.0.0" Manufacturer="Last.fm" 
+  <Product
+		Id="C57A8E40-FE11-480c-9C61-22E325FDAD45"
+		Name="Boffin" Language="1033" Version="0.0.6.0" Manufacturer="Last.fm" 
 		UpgradeCode="835A5BD7-58E3-40a5-959C-1FB316053472">
-		
+    
 		<Package 
         Description="Boffin" 
         Manufacturer="Last.fm Ltd." 
@@ -58,6 +58,7 @@
 				<Directory Id="INSTALLDIR" Name="Boffin">
 					<Component Id="MainBit" Guid="56F99AE3-1859-4677-B4D8-F4A173FD12D8">
             <File Id="boffinexe" Name="boffin.exe" Source="boffin.exe" />
+<!--            <File Id="boffinexemanifest" Name="boffin.exe.manifest" Source="boffin.exe.manifest" /> -->
             <File Id="qtconf" Name="qt.conf" Source="qt.conf" />
             <File Id="coredll" Name="core.dll" Source="core.dll" />
             <File Id="radiodll" Name="radio.dll" Source="radio.dll" />
@@ -116,15 +117,16 @@
             </Component>
           </Directory>
 
-          <Merge Id="crt" Language="0" SourceFile="Microsoft_VC80_CRT_x86.msm" DiskId="1" />
-
+          <Merge Id="crt1" Language="0" SourceFile="Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+          <Merge Id="crt2" Language="0" SourceFile="policy_8_0_Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+          
         </Directory>
       </Directory>
     </Directory>
 
     <!-- clean up: 
     ideally we'd remove ..\AppData\Local\Last.fm for each user,
-    but we msi doesn't provide any mechanism to help us with that -->
+    but the msi doesn't provide any mechanism to help us with that -->
 <!--    
     <Directory Id="" Name="AppData">
     </Directory>
@@ -138,7 +140,14 @@
       <ComponentRef Id="phononBackendComponent" />
       <ComponentRef Id="boffinShortcutComponent" />
       <ComponentRef Id="uninstallShortcutComponent" />
-      <MergeRef Id="crt" />
+      <MergeRef Id="crt1" />
+      <MergeRef Id="crt2" />
     </Feature>
-	</Product>
+
+    <InstallExecuteSequence>
+      <Custom Action="launchAppAction" After="InstallFinalize" />
+    </InstallExecuteSequence>
+    <CustomAction Id="launchAppAction" FileKey="boffinexe" ExeCommand="" Return="asyncNoWait" />
+
+  </Product>
 </Wix>
