@@ -157,13 +157,19 @@ LocalContentScanner::dirScan(const SearchLocation& sl, const QString& path)
             ops << newFileScan( fullPath, it.key() /* filename */, it.value() /* last modified time */ );
 		}
 
-        {
+        try {
             QMutexLocker locker( m_pCol->getMutex() );
             AutoTransaction<LocalCollection> trans( *m_pCol );
             foreach ( const AddFileFunc& func, ops ) {
                 func( m_pCol, directoryId );
             }
             trans.commit();
+        }
+        catch (QueryError &e) {
+            exception("dirScan QueryError: " + e.text());
+        }
+        catch (...) {
+            exception("dirScan unhandled exception");
         }
     }
     return !stopping();
@@ -203,9 +209,6 @@ LocalContentScanner::newFileScan(const QString& fullpath, const QString& filenam
                 track = mediaMetaToTrack( info, pathname );
                 good = true;
             }
-        }
-        catch (QueryError &e) {
-            exception("QueryError: " + e.text());
         }
         catch (...) {
             exception("NewFileScan::run scanning file");

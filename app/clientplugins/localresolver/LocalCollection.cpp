@@ -446,6 +446,10 @@ LocalCollection::getCounts(int& outArtists, int& outFiles)
 int
 LocalCollection::getArtistId(QString artistName, Creation flag)
 {
+    if (artistName.isNull()) {
+        artistName = "";
+    }
+
     QString lowercase_name( artistName.simplified().toLower() );
 
     {
@@ -489,9 +493,9 @@ LocalCollection::addFile(int directoryId, QString filename, unsigned lastModifie
     bindValue( ":directory", directoryId ).
     bindValue( ":filename", filename ).
     bindValue( ":modification_date", lastModified ).
-    bindValue( ":lowercase_title", info.m_title.simplified().toLower() ).
+    bindValue( ":lowercase_title", info.m_title.isNull() ? "" : info.m_title.simplified().toLower() ).
     bindValue( ":artist", artistId ).
-    bindValue( ":album", info.m_album ).
+    bindValue( ":album", info.m_album.isNull() ? "" : info.m_album ).
     bindValue( ":kbps", info.m_kbps ).
     bindValue( ":duration", info.m_duration ).
     exec();
