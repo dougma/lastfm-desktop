@@ -71,13 +71,18 @@ SearchLocation::audioFiles(const QString& path) const
     HANDLE hFind = FindFirstFileW(match.utf16(), &data);
     if (hFind != INVALID_HANDLE_VALUE) {
         do {
+            QString filename( QString::fromUtf16(&data.cFileName[0]) );
+            // strangely we get results as if we matched "*.mp3*"... so filter the rubbish out
+            if (!filename.endsWith(".mp3"))
+                continue;
+
             const unsigned skip = FILE_ATTRIBUTE_OFFLINE | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_TEMPORARY;
             if (data.dwFileAttributes & skip)
                 continue;
 
             if (!(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
                 unsigned t = fileTimeToUnixTime32(&data.ftLastWriteTime);   // NT's FILETIME times are UTC
-                result[QString::fromUtf16(&data.cFileName[0])] = t;
+                result[filename] = t;
             }
         } while (FindNextFileW(hFind, &data));
         FindClose(hFind);

@@ -52,6 +52,9 @@ TaglibMetaInfo::readFile(const FILENAME_CHAR *filename)
 void
 TaglibMetaInfo::readFile(TagLib::FileRef fr)
 {
+    if (fr.isNull())
+        return;
+
     TagLib::Tag *tag = fr.tag();
 	if (tag) {
         // to8Bit will convert to utf8
