@@ -33,6 +33,7 @@
 #ifdef WIN32
 #include <QApplication>
 #include <windows.h>
+#include <process.h>
 #include <shellapi.h>
 #endif
 
@@ -147,36 +148,56 @@ UpdateDialog::install()
     //TODO auto shut this instance if possible
 #endif
 #ifdef WIN32
-    // Must use ShellExecute because otherwise the elevation dialog
-    // doesn't appear when launching the installer on Vista.
+    bool good = false;
 
-    SHELLEXECUTEINFOW sei;
-    memset(&sei, 0, sizeof(sei));
+    // for testing msi launching:
+    // tmpFileName = "C:\\tmp\\boffin.msi";
 
-    sei.cbSize = sizeof(sei);
-    sei.fMask  = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT;
-    sei.hwnd   = GetForegroundWindow();
-    sei.lpVerb = L"open";
-    sei.lpFile = reinterpret_cast<LPCWSTR>( tmpFileName.utf16() );
-    sei.lpParameters = 0;
-    sei.nShow  = SW_SHOWNORMAL;
+    if (tmpFileName.endsWith(".msi")) {
+        // to do a so-called "minor upgrade", we need to use msiexec
+        // see: http://www.tramontana.co.hu/wix/lesson4.php
+        // msiexec /i SampleUpgrade2.msi REINSTALL=ALL REINSTALLMODE=vomus
+        if (-1 != _wspawnlp(_P_NOWAIT, L"msiexec.exe", 
+            L"msiexec.exe", L"/i", tmpFileName.toStdWString().data(), 
+            L"REINSTALL=ALL", L"REINSTALLMODE=vomus", 
+            NULL)) 
+        {
+            good = true;
+        }
+    } else {
+        // Must use ShellExecute because otherwise the elevation dialog
+        // doesn't appear when launching the installer on Vista.
 
-    BOOL const b = ShellExecuteExW( &sei );
-    if (b) {
-        QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-        WaitForSingleObject(sei.hProcess, 10*1000);
-        CloseHandle(sei.hProcess);
-        QApplication::restoreOverrideCursor();
+        SHELLEXECUTEINFOW sei;
+        memset(&sei, 0, sizeof(sei));
+
+        sei.cbSize = sizeof(sei);
+        sei.fMask  = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT;
+        sei.hwnd   = GetForegroundWindow();
+        sei.lpVerb = L"open";
+        sei.lpFile = reinterpret_cast<LPCWSTR>( tmpFileName.utf16() );
+        sei.lpParameters = 0;
+        sei.nShow  = SW_SHOWNORMAL;
+
+        BOOL const b = ShellExecuteExW( &sei );
+        if (b) {
+            QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+            WaitForSingleObject(sei.hProcess, 10*1000);
+            CloseHandle(sei.hProcess);
+            QApplication::restoreOverrideCursor();
+            good = true;
+        }
     }
-    else {
+
+    if (!good) {
         qWarning() << "Couldn't open" << tmpFileName;
         text->setText( tr("The installer could not be launched") );
+    } else {
+        qApp->quit();
     }
-    
-    qApp->quit();
 
 #endif
 
     // TODO: remove downloaded msi/exe/dmg turd, somehow
-    
 }
+
