@@ -46,10 +46,14 @@ END
 cat <<END>$d/README
 Dependencies
 ============
-Taglib 1.5
+taglib 1.5
 Qt 4.4
 sqlite3
 boost
+
+Build Dependencies
+==================
+ruby
 
 Compile Errors
 ==============

@@ -9,9 +9,6 @@ CONFIG( debug, debug|release ) {
         QMAKE_CXXFLAGS_DEBUG = -ggdb
     }
 
-	#if debug is specified first, remove the release stuff! --mxcl
-	CONFIG -= release
-
 	VERSION_UPDATE_PATTERN = *.*.*.*
 }
 else {

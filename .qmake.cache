@@ -26,4 +26,7 @@ macx* {
 	QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
 }
 
-INSTALL_DIR = /usr/local
+CONFIG( debug, debug|release ):CONFIG -= release
+
+release:INSTALL_DIR = $$(DESTDIR)$$(PREFIX)
+else:INSTALL_DIR = prefix

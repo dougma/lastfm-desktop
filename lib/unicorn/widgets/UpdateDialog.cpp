@@ -64,7 +64,11 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 #endif
 
     QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + PLATFORM + qApp->applicationVersion() + ".txt" );
+<<<<<<< .mine
+    //QUrl url( "http://static.last.fm/client/update_test/200.txt" );
+=======
 //    QUrl url( "http://static.last.fm/client/update_test/201.txt" );
+>>>>>>> .r124078
     checking = nam.get( QNetworkRequest(url) );
     checking->setParent( this );
 

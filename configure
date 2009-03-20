@@ -107,6 +107,8 @@ echo '#include "../../lib/lastfm/global.h"' > _include/lastfm/global.h
 
 
 middle "Running qmake..."
+test -z "$PREFIX" && PREFIX=/usr/local
+    
 if [ $RELEASE ]
 then
     qmake -config release -recursive "CONFIG -= debug debug_and_release" Last.fm.pro
