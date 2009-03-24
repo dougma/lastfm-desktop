@@ -48,8 +48,11 @@ Dependencies
 ============
 taglib 1.5
 Qt 4.4
+phonon [1]
 sqlite3
 boost
+
+[1] phonon may or may not come with Qt
 
 Build Dependencies
 ==================
