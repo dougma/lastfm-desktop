@@ -5,8 +5,12 @@ CONFIG( taglib ) {
 }
 
 CONFIG( mad ) {
-    win32: LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
-    else {
+    win32{
+		LIBS += -L$$COMMON_LIBS_DIR/libmad -lmad
+	}else:CONFIG( app_bundle ){
+		LIBS += /opt/local/lib/libmad.a
+		INCLUDEPATH += /opt/local/include
+	}else{
         CONFIG += link_pkgconfig
         PKGCONFIG += mad
     } 
@@ -17,16 +21,24 @@ CONFIG( boost ) {
 }
 
 CONFIG( fftw3f ) {
-    win32: LIBS += -L$$COMMON_LIBS_DIR/libfftw -lfftw3f
-    else {
+    win32{
+		LIBS += -L$$COMMON_LIBS_DIR/libfftw -lfftw3f
+	}else:CONFIG( app_bundle ){
+		LIBS += /opt/local/lib/libfftw3f.a
+		INCLUDEPATH += /opt/local/include
+	}else{
         CONFIG += link_pkgconfig
         PKGCONFIG += fftw3f
     }
 }
 
 CONFIG( samplerate ) {
-    win32: LIBS += -L$$COMMON_LIBS_DIR/libsamplerate -lsamplerate
-    else: {
+    win32{
+		LIBS += -L$$COMMON_LIBS_DIR/libsamplerate -lsamplerate
+	}else:CONFIG( app_bundle ){
+		LIBS += /opt/local/lib/libsamplerate.a
+		INCLUDEPATH += /opt/local/include
+	}else{
         CONFIG += link_pkgconfig
         PKGCONFIG += samplerate
     }

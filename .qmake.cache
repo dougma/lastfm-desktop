@@ -27,6 +27,3 @@ macx* {
 }
 
 CONFIG( debug, debug|release ):CONFIG -= release
-
-release:INSTALL_DIR = $$(DESTDIR)$$(PREFIX)
-else:INSTALL_DIR = prefix

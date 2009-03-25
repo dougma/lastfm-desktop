@@ -134,8 +134,8 @@ else
             if [ -z "$EXTRA_QMAKE_FLAGS" ]; then
                 EXTRA_QMAKE_FLAGS='NOOP=""'
             fi
-        
-            qmake -config debug -recursive Last.fm.pro "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
+
+            qmake -config debug -recursive Last.fm.pro "CONFIG -= app_bundle" "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
             BUILD_CMD='make'        
         fi;;
             
