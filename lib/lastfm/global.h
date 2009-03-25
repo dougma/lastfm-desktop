@@ -112,6 +112,8 @@ namespace lastfm
     class AuthenticatedUser;
     class Xspf;
     class Playlist;
+    class Fingerprint;
+    class FingerprintId;
 }
 
 
@@ -124,11 +126,14 @@ using lastfm::AuthenticatedUser;
 using lastfm::Tag;
 using lastfm::Xspf;
 using lastfm::Playlist;
+using lastfm::Fingerprint;
+using lastfm::FingerprintId;
 #endif
 
 
 //convenience
 class WsReply;
+class QNetworkReply;
 
 
 //convenience for development

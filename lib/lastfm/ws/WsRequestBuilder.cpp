@@ -29,20 +29,13 @@
 #include <QThread>
 
 
-QThreadStorage<WsAccessManager*> WsRequestBuilder::nam;
+QThreadStorage<WsAccessManager*> WsRequestBuilder::nam_store;
 
 
 WsRequestBuilder::WsRequestBuilder( const QString& method )
 {
     static QMutex lock;
     QMutexLocker locker( &lock );
-
-    if (!nam.hasLocalData())
-    {
-        // WsAccessManager will be unparented, but it
-        // does gets cleaned up when this thread ends
-        nam.setLocalData( new WsAccessManager( 0 ) );
-    }
 
     params["method"] = method;
 }
@@ -86,7 +79,7 @@ WsRequestBuilder::start( RequestMethod method )
                 QByteArray const value = QUrl::toPercentEncoding( pair.second );
                 url.addEncodedQueryItem( key, value );
             }
-            return new WsReply( nam.localData()->get( QNetworkRequest( url ) ) );
+            return new WsReply( nam()->get( QNetworkRequest( url ) ) );
         }
 
         case Post:
@@ -99,8 +92,20 @@ WsRequestBuilder::start( RequestMethod method )
 					  + QUrl::toPercentEncoding( param.second )
 					  + "&";
 			}
-			return new WsReply( nam.localData()->post( QNetworkRequest( url ), query ) );
+			return new WsReply( nam()->post( QNetworkRequest( url ), query ) );
 		}
     }
 	return 0;
+}
+
+
+WsAccessManager* //static private
+WsRequestBuilder::nam()
+{
+    if (!nam_store.hasLocalData())
+        // WsAccessManager will be unparented, but it
+        // does gets cleaned up when this thread ends
+        nam_store.setLocalData( new WsAccessManager );
+
+    return nam_store.localData();
 }

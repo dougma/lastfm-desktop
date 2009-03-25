@@ -21,7 +21,6 @@
 #define LASTFM_TRACK_H
 
 #include <lastfm/Album>
-#include <lastfm/FingerprintId>
 #include <lastfm/Mbid>
 #include <QDateTime>
 #include <QDomElement>
@@ -46,7 +45,7 @@ struct TrackData : QSharedData
     short source;
     short rating;
     QString mbid; /// musicbrainz id
-    int fpid;
+    uint fpid;
     QUrl url;
     QDateTime time; /// the time the track was started at
 
@@ -122,7 +121,7 @@ public:
     QUrl url() const { return d->url; }
     QDateTime timestamp() const { return d->time; }
     Source source() const { return (Source)d->source; }
-    FingerprintId fingerprintId() const { return d->fpid; }
+    uint fingerprintId() const { return d->fpid; }
 
     QString durationString() const { return durationString( d->duration ); }
     static QString durationString( int seconds );
@@ -205,7 +204,7 @@ public:
     void setSource( Source s ) { d->source = s; }
     
     void setMbid( Mbid id ) { d->mbid = id; }
-    void setFingerprintId( int id ) { d->fpid = id; }
+    void setFingerprintId( uint id ) { d->fpid = id; }
     
     /** you also must scrobble this track for the love to become permenant */
     WsReply* love();

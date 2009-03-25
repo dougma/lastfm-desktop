@@ -22,6 +22,8 @@
 #include "Sha256.h"
 #include "MP3_Source_Qt.h"
 #include "fplib/include/FingerprintExtractor.h"
+#include "../ws/WsRequestBuilder.h"
+#include "../ws/WsAccessManager.h"
 #include <QFileInfo>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -34,11 +36,10 @@ static const uint k_bufferSize = 1024 * 8;
 static const int k_minTrackDuration = 30;
 
 
-Fingerprint::Fingerprint( const Track& t )
-           : m_track( t ),
-             m_extractor( 0 ),
-             m_id( -1 ),
-             m_complete( false )
+lastfm::Fingerprint::Fingerprint( const Track& t )
+                   : m_track( t )
+                   , m_id( -1 ), m_duration( 0 )
+                   , m_complete( false )
 {
     QString id = Collection::instance().getFingerprintId( t.url().toLocalFile() );   
     if (id.size()) {
@@ -49,60 +50,61 @@ Fingerprint::Fingerprint( const Track& t )
 }
 
 
-Fingerprint::~Fingerprint()
-{
-    delete m_extractor;
-}
-
-
 void
-Fingerprint::generate() throw( Fp::Error )
+lastfm::Fingerprint::generate() throw( Error )
 {
-    #define CATCH( y ) catch (const std::exception& e) { qWarning() << e.what(); throw( y ); }
-    
     QString const path = m_track.url().toLocalFile();
     
     if (!QFileInfo( path ).isReadable())
-        throw Fp::ReadError;
+        throw ReadError;
 
-    int duration, sampleRate, bitrate, numChannels;
+    int sampleRate, bitrate, numChannels;
     MP3_Source ms;
     
     try
     {
-        MP3_Source::getInfo( path, duration, sampleRate, bitrate, numChannels );
+        MP3_Source::getInfo( path, m_duration, sampleRate, bitrate, numChannels );
         ms.init( path );
     }
-    CATCH( Fp::GetInfoError )
+    catch (std::exception& e)
+    {
+        qWarning() << e.what();
+        throw HeadersError;
+    }
     
-    if (duration < k_minTrackDuration)
-        throw Fp::TrackTooShortError;
+
+    if (m_duration < k_minTrackDuration)
+        throw TrackTooShortError;
     
     ms.skipSilence();
     
     bool fpDone = false;
+    fingerprint::FingerprintExtractor* extractor;
     try
     {
-        delete m_extractor;
-        m_extractor = new fingerprint::FingerprintExtractor;
+        extractor = new fingerprint::FingerprintExtractor;
         
         if (m_complete)
         {
-            m_extractor->initForFullSubmit( sampleRate, numChannels );
+            extractor->initForFullSubmit( sampleRate, numChannels );
         }
         else 
         {
-            m_extractor->initForQuery( sampleRate, numChannels, duration );
+            extractor->initForQuery( sampleRate, numChannels, m_duration );
             
             // Skippety skip for as long as the skipper sez (optimisation)
-            ms.skip( m_extractor->getToSkipMs() );
-            float secsToSkip = m_extractor->getToSkipMs() / 1000.0f;
-            fpDone = m_extractor->process( 0,
+            ms.skip( extractor->getToSkipMs() );
+            float secsToSkip = extractor->getToSkipMs() / 1000.0f;
+            fpDone = extractor->process( 0,
                                          (size_t) sampleRate * numChannels * secsToSkip,
                                          false );
         }
     }
-    CATCH( Fp::ExtractorInitError)
+    catch (std::exception& e)
+    {
+        qWarning() << e.what();
+        throw DecodeError;
+    }
     
     const size_t PCMBufSize = 131072; 
     short* pPCMBuffer = new short[PCMBufSize];
@@ -115,26 +117,27 @@ Fingerprint::generate() throw( Fp::Error )
         
         try
         {
-            fpDone = m_extractor->process( pPCMBuffer, readData, ms.eof() );
+            fpDone = extractor->process( pPCMBuffer, readData, ms.eof() );
         }
         catch ( const std::exception& e )
         {
             qWarning() << e.what();
             delete[] pPCMBuffer;
-            throw Fp::ExtractorProcessError;
+            throw InternalError;
         }
     }
     
     delete[] pPCMBuffer;
     
     if (!fpDone)
-        throw Fp::ExtractorNotEnoughDataError;
+        throw InternalError;
     
     // We succeeded
-    std::pair<const char*, size_t> fpData = m_extractor->getFingerprint();
+    std::pair<const char*, size_t> fpData = extractor->getFingerprint();
+    delete extractor;
     
     if (fpData.first == NULL || fpData.second == 0)
-        throw Fp::ExtractorNotReadyError;
+        throw InternalError;
     
     m_data = QByteArray::fromRawData( fpData.first, fpData.second );
 }
@@ -190,9 +193,14 @@ static QString sha256( const QString& path )
 }
 
 
-QNetworkReply*
-Fingerprint::submit( QNetworkAccessManager* nam ) const
+static QByteArray number( uint n )
 {
+    return n ? QByteArray::number( n ) : "";
+}
+
+QNetworkReply*
+lastfm::Fingerprint::submit() const
+{    
     if (m_data.isEmpty())
         return 0;
     
@@ -210,13 +218,13 @@ Fingerprint::submit( QNetworkAccessManager* nam ) const
     url.addEncodedQueryItem( "artist", e(t.artist()) );
     url.addEncodedQueryItem( "album", e(t.album()) );
     url.addEncodedQueryItem( "track", e(t.title()) );
-    url.addEncodedQueryItem( "duration", QByteArray::number(t.duration()) );
+    url.addEncodedQueryItem( "duration", number( m_duration > 0 ? m_duration : t.duration() ) );
     url.addEncodedQueryItem( "mbid", e(t.mbid()) );
     url.addEncodedQueryItem( "filename", e(fi.completeBaseName()) );
     url.addEncodedQueryItem( "fileextension", e(fi.completeSuffix()) );
-    url.addEncodedQueryItem( "tracknum", QByteArray::number( t.trackNumber() ) );
+    url.addEncodedQueryItem( "tracknum", number( t.trackNumber() ) );
     url.addEncodedQueryItem( "sha256", sha256( path ).toAscii() );
-    url.addEncodedQueryItem( "time", QByteArray::number(QDateTime::currentDateTime().toTime_t()) );
+    url.addEncodedQueryItem( "time", number(QDateTime::currentDateTime().toTime_t()) );
     url.addEncodedQueryItem( "fpversion", QByteArray::number((int)fingerprint::FingerprintExtractor::getVersion()) );
     url.addEncodedQueryItem( "fulldump", m_complete ? "true" : "false" );
     url.addEncodedQueryItem( "noupdate", "false" );
@@ -239,12 +247,12 @@ Fingerprint::submit( QNetworkAccessManager* nam ) const
     qDebug() << url;
     qDebug() << "Fingerprint size:" << bytes.size() << "bytes";
 
-    return nam->post( request, bytes );
+    return WsRequestBuilder::nam()->post( request, bytes );
 }
 
 
 void
-Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested )
+lastfm::Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested )
 {
     // The response data will consist of a number and a string.
     // The number is the fpid and the string is either FOUND or NEW
@@ -261,6 +269,12 @@ Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested 
         qWarning() << "Null response";
         return;
     }
+    
+    if (response == "No response to client error")
+        throw InternalError;
+    
+    if (list.count() != 2)
+        qWarning() << "Response looks bad:" << response;
 
     QString const fpid = list.value( 0 );
     QString const status = list.value( 1 );

@@ -17,35 +17,40 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_FP_ERROR_H
-#define LASTFM_FP_ERROR_H
+#include "lib/lastfm/types/FingerprintId.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
+#include "lib/lastfm/ws/WsRequestBuilder.h"
+#include <QtNetwork>
+#include <QtXml>
+ 
 
-
-namespace Fp
+QNetworkReply*
+lastfm::FingerprintId::getSuggestions() const
 {
-    enum Error
-    {
-        /** File does not exist or cannot be read */
-        ReadError = 0,
-
-        /** GetInfo failed to extract samplerate, bitrate, channels, duration etc */
-        GetInfoError,
-        
-        /** Track is shorter than minimum track duration for fingerprinting */
-        TrackTooShortError,
-        
-        /** Could not initialize the fingerprintExtractor (probably ran out of RAM) */
-        ExtractorInitError,
-        
-        /** The fingerprintExtractor has not been initialized before process() is called */
-        ExtractorProcessError,
-        
-        /** The fingerprintExtractor has been starved of data to generate a fingerprint */
-        ExtractorNotEnoughDataError,
-        
-        /** FingerprintExtractor::getFingerprint() has been called prematurely */
-        ExtractorNotReadyError
-    };
+    if (isNull()) return 0;
+    
+    QUrl const url( "http://ws.audioscrobbler.com/fingerprint/" + QString(*this) + ".xml" );
+    QNetworkRequest const request( url );
+    return WsRequestBuilder::nam()->get( request );
 }
 
-#endif
+
+QMap<float, lastfm::Track> //static
+lastfm::FingerprintId::getSuggestions( QNetworkReply* reply )
+{
+    QDomDocument xml;
+    xml.setContent( reply->readAll() );
+    QDomNodeList nodes = xml.documentElement().elementsByTagName( "track" );
+    
+    QMap<float, Track> tracks;
+    for (int x = 0; x < nodes.count(); ++x)
+    {
+        QDomElement const e = nodes.at(x).toElement();
+
+        MutableTrack t;
+        t.setTitle( e.firstChildElement( "title" ).text() );
+        t.setArtist( e.firstChildElement( "artist" ).text() );
+        tracks.insert( e.attribute( "confidence", "0.0" ).toFloat(), t );
+    }
+    return tracks;
+}

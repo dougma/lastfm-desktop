@@ -17,42 +17,46 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_WS_REQUEST_MANAGER_H
-#define LASTFM_WS_REQUEST_MANAGER_H
+#include <lastfm/Fingerprint>
+#include <lastfm/FingerprintId>
+#include <QtCore>
+#include <QtNetwork>
 
-#include <lastfm/WsReply> //for your convenience <3 x
-#include <QMap>
-#include <QThreadStorage>
+using namespace lastfm;
 
 
-/** A convenience class to create a WsReply for Last.fm webservices.
-  * We add the session key, api signature and session key to every request */
-class LASTFM_WS_DLLEXPORT WsRequestBuilder
+static void finish( QNetworkReply* reply )
 {
-    static QThreadStorage<class WsAccessManager*> nam_store; // one per thread
-    QMap<QString, QString> params;
+    QEventLoop loop;
+    loop.connect( reply, SIGNAL(finished()), SLOT(quit()) );
+    loop.exec();
+}
 
-    static WsAccessManager* nam();
 
-    enum RequestMethod { Get, Post };
-    /** starts the request, connect to finished() to get the results */
-    WsReply* start( RequestMethod );
+int main( int argc, char** argv )
+{
+    QCoreApplication app( argc, argv );
+    
+    MutableTrack t;
+    t.setArtist( "Air" );
+    t.setTitle( "Redhead Girl" );
+    t.setAlbum( "Pocket Symphony" );
+    t.setUrl( QUrl::fromLocalFile( "/Users/mxcl/Music/iTunes/iTunes Music/Air/Pocket Symphony/1-11 Redhead Girl.mp3") );
 
-    friend class lastfm::FingerprintId;
-    friend class lastfm::Fingerprint;
+    Fingerprint fp( t );
+    
+    if(fp.id().isNull()){
+        fp.generate();
+        finish( fp.submit() );
+        fp.decode( reply );
+    }
+    
+    if (fp.id().isNull()) { 
+        qWarning() << "Still null :(";
+        return 1;
+    }
+    
+    finish( fp.id().getSuggestions() );
 
-public:
-    WsRequestBuilder( const QString& methodName );
-
-    WsReply* get() { return start( Get ); }
-    WsReply* post() { return start( Post ); }
-
-    /** add a parameter to the request, if @p key isEmpty() we silently ignore it */
-    WsRequestBuilder& add( const QString& key, const QString& value );
-    /** for convenience */
-    WsRequestBuilder& add( const QString& key, int const value ) { return add( key, QString::number( value ) ); }
-    /** for convenience */
-    WsRequestBuilder& addIfNotEmpty( const QString& key, const QString& s ) { if (s.size()) add( key, s ); return *this; }
-};
-
-#endif
+    qDebug() << FingerprintId::getSuggestions( reply );
+}

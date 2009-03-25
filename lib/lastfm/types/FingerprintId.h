@@ -20,32 +20,42 @@
 #ifndef LASTFM_FINGERPRINT_ID_H
 #define LASTFM_FINGERPRINT_ID_H
 
-#include <lastfm/global.h>
+#include <lastfm/Track>
 #include <QDebug>
+#include <QList>
 #include <QString>
+class QNetworkReply;
+ 
 
-
-class LASTFM_TYPES_DLLEXPORT FingerprintId
+namespace lastfm
 {
-    int id;
+    class LASTFM_TYPES_DLLEXPORT FingerprintId
+    {
+        int id;
 
-public:
-    FingerprintId() : id( -1 )
-    {}
+    public:
+        FingerprintId() : id( -1 )
+        {}
 
-    FingerprintId( uint i ) : id( i )
-    {}
+        FingerprintId( uint i ) : id( i )
+        {}
 
-    bool isNull() const { return id == -1; }
+        bool isNull() const { return id == -1; }
 
-    /** -1 if you need to generate it */
-    operator int() { return id; }
-    /** isEmpty() if you need to generate it */
-    operator QString() { return id == -1 ? "" : QString::number( id ); }
-};
+        /** we query Last.fm for suggested metadata, how awesome is that? 
+          * @returns null if isNull() */
+        QNetworkReply* getSuggestions() const;
+        static QMap<float,Track> getSuggestions( QNetworkReply* );
+
+        /** -1 if you need to generate it */
+        operator int() const { return id; }
+        /** isEmpty() if you need to generate it */
+        operator QString() const { return id == -1 ? "" : QString::number( id ); }
+    };
+}
 
 
-inline QDebug operator<<( QDebug d, FingerprintId id)
+inline QDebug operator<<( QDebug d, lastfm::FingerprintId id)
 {
     if (id.isNull())
         return d << "(null)";
