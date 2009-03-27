@@ -64,6 +64,11 @@ namespace lastfm
         
             /** there is a minimum track duration for fingerprinting */
             TrackTooShortError,
+            
+            /** the fingerprint service went wrong, or we submitted bad data, 
+              * or myabe the request failed, whatever, we couldn't parse the 
+              * result */
+            BadResponseError,
         
             /** sorry, liblastfm sucks, report bug with log! */
             InternalError            
@@ -78,11 +83,10 @@ namespace lastfm
         QNetworkReply* submit() const;
 
         /** Pass a finished reply from submit(), if the response is sound, id()
-          * will be valid. Otherwise query QNetworkReply for an error, if there is
-          * no error, then the reply was malformed, try submit() again. 
-          * The return value of id() will be updated by this function, if possible.
+          * will be valid. Otherwise we will throw. You always get a valid id
+          * or a throw.
           */
-        void decode( QNetworkReply*, bool* lastfm_needs_a_complete_fingerprint = 0 );
+        void decode( QNetworkReply*, bool* lastfm_needs_a_complete_fingerprint = 0 ) throw( Error );
     };
 
 
@@ -94,6 +98,21 @@ namespace lastfm
             m_complete = true;
         }
     };
+}
+
+
+inline QDebug operator<<( QDebug d, lastfm::Fingerprint::Error e )
+{
+    #define CASE(x) case lastfm::Fingerprint::x: return d << #x;
+    switch (e)
+    {
+        CASE(ReadError)
+        CASE(HeadersError)
+        CASE(DecodeError)
+        CASE(TrackTooShortError)
+        CASE(BadResponseError)
+        CASE(InternalError)
+    }
 }
 
 #endif

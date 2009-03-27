@@ -252,7 +252,7 @@ lastfm::Fingerprint::submit() const
 
 
 void
-lastfm::Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested )
+lastfm::Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_requested ) throw( Error )
 {
     // The response data will consist of a number and a string.
     // The number is the fpid and the string is either FOUND or NEW
@@ -264,24 +264,18 @@ lastfm::Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_re
     
     QString const response( reply->readAll() );
     QStringList const list = response.split( ' ' );
-       
-    if (response.isEmpty() || list.count() < 2) {
-        qWarning() << "Null response";
-        return;
-    }
-    
-    if (response == "No response to client error")
-        throw InternalError;
-    
-    if (list.count() != 2)
-        qWarning() << "Response looks bad:" << response;
 
     QString const fpid = list.value( 0 );
     QString const status = list.value( 1 );
-    
+       
+    if (response.isEmpty() || list.count() < 2 || response == "No response to client error")
+        goto bad_response;
+    if (list.count() != 2)
+        qWarning() << "Response looks bad but continuing anyway:" << response;
+
     bool b;
     uint fpid_as_uint = fpid.toUInt( &b );
-    if (!b) return;
+    if (!b) goto bad_response;
     
     Collection::instance().setFingerprintId( m_track.url().toLocalFile(), fpid );
     
@@ -289,4 +283,9 @@ lastfm::Fingerprint::decode( QNetworkReply* reply, bool* complete_fingerprint_re
         *complete_fingerprint_requested = (status == "NEW");
 
     m_id = (int)fpid_as_uint;
+    return;
+
+bad_response:
+    qWarning() << "Response is bad:" << response;
+    throw BadResponseError;
 }

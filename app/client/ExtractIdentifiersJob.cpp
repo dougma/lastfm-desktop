@@ -72,14 +72,12 @@ ExtractIdentifiersJob::fpid()
     if (!fp.id().isNull())
         return fp.id();
 
-    WsAccessManager wam;    
-    
     try
     {
         qDebug() << "Doing partial fingerprint for" << m_track;
         fp.generate();
 
-        QNetworkReply* reply = fp.submit( &wam );
+        QNetworkReply* reply = fp.submit();
         WAIT_FOR_FINISHED( reply );
         
         bool complete_fp_required = false;
@@ -88,14 +86,14 @@ ExtractIdentifiersJob::fpid()
         if (complete_fp_required)
         {
             qDebug() << "Doing complete fingerprint for" << m_track;
-            CompleteFingerprint fp( m_track );
+            lastfm::CompleteFingerprint fp( m_track );
             fp.generate();
-            fp.submit( &wam );
+            fp.submit();
             WAIT_FOR_FINISHED( reply );
         }
 
     }
-    catch (Fp::Error e)
+    catch (Fingerprint::Error e)
     {
         qWarning() << e;
     }
