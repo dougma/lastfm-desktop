@@ -35,7 +35,7 @@ PlayerListener::PlayerListener( QObject* parent ) throw( std::runtime_error )
 #ifdef WIN32
     std::string s;
     DWORD r = scrobSubPipeName( &s );
-    if (r != 0) throw SocketFailure( QString::fromStdString( formatWin32Error( r ) ) );
+    if (r != 0) throw std::runtime_error( formatWin32Error( r ) );
     QString const name = QString::fromStdString( s );
 #else
     QString const name = "lastfm_scrobsub";
