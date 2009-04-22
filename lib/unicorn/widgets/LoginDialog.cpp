@@ -98,7 +98,7 @@ LoginDialog::authenticate()
     WsReply* reply = WsRequestBuilder( "auth.getMobileSession" )
             .add( "username", m_username )
             // always lowercase the username before generating the md5
-            .add( "authToken", Qt::md5( (m_username + m_password).toLower().toUtf8() ) )
+            .add( "authToken", Qt::md5( (m_username + m_password).toUtf8() ) )
             .get();
 	reply->setParent( this );
 
