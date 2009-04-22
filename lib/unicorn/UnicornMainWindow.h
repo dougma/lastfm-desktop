@@ -61,6 +61,9 @@ namespace unicorn
         MainWindow();
         ~MainWindow();
 
+        /** call this to add the account menu and about menu action, etc. */
+        void finishUi();
+
     public slots:
         void about();
         void checkForUpdates();
@@ -68,8 +71,6 @@ namespace unicorn
         void openLog();
 
     protected:
-
-        
         struct Ui {
             Ui() : account( 0 ), profile( 0 )
             {}
@@ -80,9 +81,6 @@ namespace unicorn
             OneDialogPointer<AboutDialog> about;
             
         } ui;
-
-        /** call this to add the account menu and about menu action, etc. */
-        void finishUi();
 
     private slots:
         void onUserGotInfo( WsReply* );        

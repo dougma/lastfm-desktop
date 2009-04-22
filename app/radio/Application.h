@@ -17,41 +17,31 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LEGACY_TUNER_H
-#define LEGACY_TUNER_H
-
-#include "lib/lastfm/global.h"
-#include "AbstractTrackSource.h"
-#include "RadioStation.h"
+#include "lib/unicorn/UnicornApplication.h"
+#include "lib/lastfm/ws/WsError.h"
 
 
-class LASTFM_RADIO_DLLEXPORT LegacyTuner : public AbstractTrackSource
+namespace moralistfad
 {
-	Q_OBJECT
-	
-public:
-	/** You need to have assigned Ws::* for this to work, creating the tuner
-	  * automatically fetches the first 5 tracks for the station */
-    LegacyTuner( const RadioStation&, const QString& password_md5 );
+	class Application : public unicorn::Application
+	{
+	    Q_OBJECT
+   
+	public:
+	    Application( int&, char** );
 
-    virtual lastfm::Track takeNextTrack();
+	signals:    
+	    /** something should show it. Currently MainWindow does */
+	    void error( const QString& message );
+	    void status( const QString& message, const QString& id );
 
-private slots:
-	void onHandshakeReturn();
-    void onAdjustReturn();
-	void onGetPlaylistReturn();
+	public slots:
+		void parseArguments( const QStringList& args );
 
-private:
-	/** Tries again up to 5 times
-	  * @returns true if we tried again, otherwise you should emit error */
-	bool tryAgain();
-    bool fetchFiveMoreTracks();
-
-    class QNetworkAccessManager* m_nam;
-	uint m_retry_counter;
-    RadioStation m_station;
-    QByteArray m_session;
-    QList<lastfm::Track> m_queue;
-};
-
-#endif
+	private slots:    
+	    /** all webservices connect to this and emit in the case of bad errors that
+	     * need to be handled at a higher level */
+	    void onWsError( Ws::Error );
+	    void onRadioError( int, const class QVariant& );
+	};
+}

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "Radio.h"
-#include "AbstractTrackSource.h"
+#include <lastfm/Tuner>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <QThread>
@@ -30,8 +30,7 @@ using lastfm::MutableTrack;
 
 
 Radio::Radio( Phonon::AudioOutput* output )
-     : m_trackSource( 0 ),
-       m_audioOutput( output ),
+     : m_audioOutput( output ),
        m_mediaObject( 0 ),
        m_state( Radio::Stopped ),
        m_bErrorRecover( false )
@@ -71,7 +70,7 @@ Radio::~Radio()
 
 
 void
-Radio::play( const RadioStation& station, AbstractTrackSource* trackSource )
+Radio::play( const RadioStation& station )
 {
     if (m_state != Stopped)
     {
@@ -84,12 +83,12 @@ Radio::play( const RadioStation& station, AbstractTrackSource* trackSource )
     }
 
 	m_station = station;
-	delete m_trackSource;
-    m_trackSource = trackSource;
+	delete m_tuner;
+    m_tuner = new Tuner(station);
 
-	connect( m_trackSource, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
-	connect( m_trackSource, SIGNAL(trackAvailable()), SLOT(enqueue()) );
-	connect( m_trackSource, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
+	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
+	connect( m_tuner, SIGNAL(trackAvailable()), SLOT(enqueue()) );
+	connect( m_tuner, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
 
     changeState( TuningIn );
 }
@@ -155,8 +154,7 @@ Radio::onTunerError( Ws::Error e )
 void
 Radio::stop()
 {
-    delete m_trackSource;
-    m_trackSource = 0;
+    delete m_tuner;
     
     m_mediaObject->blockSignals( true ); //prevent the error state due to setting current source to null
 	m_mediaObject->stop();
@@ -175,8 +173,7 @@ Radio::clear()
 {
     m_track = Track();
     m_station = RadioStation();
-    delete m_trackSource;
-    m_trackSource = 0;    
+    delete m_tuner;
 }
 
 
@@ -230,7 +227,7 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 void
 Radio::phononEnqueue()
 {
-    if (m_mediaObject->queue().size() || !m_trackSource) return;
+    if (m_mediaObject->queue().size() || !m_tuner) return;
 
     // keep only one track in the phononQueue
     // Loop until we get a null url or a valid url.
@@ -238,7 +235,7 @@ Radio::phononEnqueue()
     {
         // consume next track from the track source. a null track 
         // response means wait until the trackAvailable signal
-        Track t = m_trackSource->takeNextTrack();
+        Track t = m_tuner->takeNextTrack();
         if (t.isNull()) break;
 
         // Invalid urls won't trigger the correct phonon

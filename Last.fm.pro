@@ -4,14 +4,11 @@ SUBDIRS = lib/lastfm/core/libcore.pro \
           lib/lastfm/ws/libws.pro \
           lib/lastfm/types/libtypes.pro \
           lib/lastfm/radio/libradio.pro \
-          lib/lastfm/fingerprint/libfingerprint.pro \
           lib/lastfm/scrobble/libscrobble.pro \
           lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
-          app/clientplugins/localresolver/libresolver.pro \
-          app/client \
-          app/twiddly \
-          app/boffin
+          app/radio \
+          app/twiddly
 
 debug:win32 {
 	# make the client the default project in visual studio

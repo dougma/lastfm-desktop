@@ -17,16 +17,15 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef LASTFM_RADIO_H
-#define LASTFM_RADIO_H
-
 #include <lastfm/Track>
 #include <lastfm/RadioStation>
 #include <lastfm/WsError>
 #include <phonon/phononnamespace.h>
 #include <QList>
+#include <QPointer>
 #include <QThread>
 #include <QVariant>
+class Tuner;
 
 namespace Phonon
 {
@@ -38,7 +37,7 @@ namespace Phonon
 
 /** @author <max@last.fm>
  */
-class LASTFM_RADIO_DLLEXPORT Radio : public QObject
+class Radio : public QObject
 {
     Q_OBJECT
     
@@ -59,7 +58,7 @@ public:
     Phonon::AudioOutput* audioOutput() const { return m_audioOutput; }
 
 public slots:
-    void play( const RadioStation& station, class AbstractTrackSource* );
+    void play( const RadioStation& station );
     void skip();
     void stop();
 
@@ -67,13 +66,8 @@ signals:
     /** emitted up to twice, as first time may not have a title for the station
       * but the second time will */
     void tuningIn( const RadioStation& );
-#ifndef LASTFM_COLLAPSE_NAMESPACE
-    void trackSpooled( const lastfm::Track& ); /** and we're now prebuffering */
-    void trackStarted( const lastfm::Track& );
-#else
     void trackSpooled( const Track& );
     void trackStarted( const Track& );
-#endif
     void buffering( int );
     void stopped();
 	
@@ -100,11 +94,11 @@ private:
 	/** emits signals if appropriate */
 	void changeState( State );
 	
-	class AbstractTrackSource* m_trackSource;
+	QPointer<Tuner> m_tuner;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
 	Radio::State m_state;
-	lastfm::Track m_track;
+	Track m_track;
 	RadioStation m_station;
     bool m_bErrorRecover;
 };
@@ -135,4 +129,4 @@ inline QDebug operator<<( QDebug d, Phonon::State s )
 Q_DECLARE_METATYPE( Radio::State );
 
 
-#endif //RADIO_H
+extern Radio* radio;
