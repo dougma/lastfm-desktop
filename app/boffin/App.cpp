@@ -224,6 +224,9 @@ App::onOutputDeviceActionTriggered( QAction* a )
 #include "TagCloudView.h"
 #include "TagDelegate.h"
 #include "TagCloudModel.h"
+#include "PlaydarTagCloudModel.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
+
 void
 App::onScanningFinished()
 {    
@@ -234,8 +237,13 @@ App::onScanningFinished()
     
     disconnect( sender(), 0, this, 0 ); //only once pls
     
+    PlaydarApi api("http://localhost:8888", "67adc74f-e373-4e1f-ab5a-4c9d6ca20c3a");
+    WsAccessManager* wam = new WsAccessManager(this);
+    PlaydarTagCloudModel* model = new PlaydarTagCloudModel(api, wam);
+
     m_cloud = new TagCloudView;
-    m_cloud->setModel( new TagCloudModel );
+//    m_cloud->setModel( new TagCloudModel );
+    m_cloud->setModel( model );
     m_cloud->setItemDelegate( new TagDelegate );
     m_mainwindow->setCentralWidget( m_cloud );
     
@@ -248,6 +256,8 @@ App::onScanningFinished()
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
+
+    model->startGetTags();
 }
 
 
