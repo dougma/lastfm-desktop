@@ -23,6 +23,7 @@
     #include <ApplicationServices/ApplicationServices.h>
     static pascal OSErr appleEventHandler( const AppleEvent*, AppleEvent*, long );
     #include <QMainWindow>
+    extern void qt_mac_set_menubar_icons( bool );    
 #endif
 
 #include "UnicornApplication.h"
@@ -43,6 +44,10 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
                     : QApplication( argc, argv ),
                       m_logoutAtQuit( false )
 {
+#ifdef Q_WS_MAC
+    qt_mac_set_menubar_icons( false );
+#endif    
+    
     CoreApplication::init();
 
 #ifdef __APPLE__
