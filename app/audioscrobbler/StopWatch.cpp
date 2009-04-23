@@ -30,6 +30,12 @@ StopWatch::StopWatch( ScrobblePoint timeout, uint elapsed ) : m_point( timeout )
     connect( m_timer, SIGNAL(timeout()), SLOT(finished()) );
 }
 
+StopWatch::~StopWatch()
+{
+    if (!isTimedOut() && (m_point*1000) - elapsed() < 4000)
+        emit timeout();
+}
+
 
 void
 StopWatch::start() //private

@@ -7,6 +7,7 @@ SUBDIRS = lib/lastfm/core/libcore.pro \
           lib/lastfm/scrobble/libscrobble.pro \
           lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
+          app/audioscrobbler \
           app/radio \
           app/twiddly
 

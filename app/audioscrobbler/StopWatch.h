@@ -24,7 +24,7 @@
 #include <QDateTime>
 #include <QObject>
 #include <QTimer>
-
+namespace audioscrobbler { class Application; }
 
 namespace mxcl
 {
@@ -54,7 +54,7 @@ class StopWatch : public QObject
     Q_OBJECT
     Q_DISABLE_COPY( StopWatch )
 
-    friend class StateMachine; //for access to timeout() signal 
+    friend class audioscrobbler::Application; //for access to timeout() signal 
     friend class TestStopWatch; //for testing, duh!
     
 public:
@@ -62,6 +62,7 @@ public:
       * The watch will not timeout() if elapsed is greater that the 
       * scrobble point */
     StopWatch( ScrobblePoint timeout_in_seconds, uint elapsed_in_ms = 0 );
+    ~StopWatch();
 
     bool isTimedOut() const { return m_remaining == 0 && !m_timer->isActive(); }
 
@@ -69,7 +70,6 @@ public:
     void resume();
     
     /** in milliseconds */
-    uint remaining() const { return m_remaining; }
     uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()); }
 
     ScrobblePoint scrobblePoint() const { return m_point; }
