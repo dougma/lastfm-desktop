@@ -23,7 +23,7 @@
 #include "lib/DllExportMacro.h"
 #include "PlayerCommand.h"
 #include "app/client/State.h" //FIXME
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 /** delete yourself when the player closes/quits */

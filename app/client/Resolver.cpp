@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "Resolver.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 Resolver::Resolver( const QList<ITrackResolverPlugin*>& plugins)

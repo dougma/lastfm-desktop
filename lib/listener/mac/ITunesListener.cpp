@@ -19,9 +19,9 @@
 
 #include "ITunesListener.h"
 #include "../PlayerConnection.h"
-#include "lib/lastfm/core/CoreProcess.h"
-#include "lib/lastfm/core/mac/AppleScript.h"
-#include "lib/lastfm/core/mac/CFStringToQString.h"
+#include <lastfm/CoreProcess>
+#include <lastfm/AppleScript>
+#include <lastfm/CFStringToQString>
 #include <QThread>
 
 

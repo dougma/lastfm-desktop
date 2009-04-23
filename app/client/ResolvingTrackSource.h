@@ -20,7 +20,7 @@
 #ifndef RESOLVING_TRACK_SOURCE_H
 #define RESOLVING_TRACK_SOURCE_H
 
-#include "lib/lastfm/radio/AbstractTrackSource.h"
+#include <lastfm/AbstractTrackSource>
 #include <QList>
 
 

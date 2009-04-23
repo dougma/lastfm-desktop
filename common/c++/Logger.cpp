@@ -113,7 +113,7 @@ Logger::log( const char* message )
     EnterCriticalSection( &mMutex );
 #else
     pthread_mutex_lock( &mMutex );
-#endif#include "lib/lastfm/core/CoreDir.h"
+#endif#include <lastfm/CoreDir>
     mFileOut << "[" << time() << "] " << message << std::endl;
 
 #ifdef WIN32

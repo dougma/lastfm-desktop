@@ -22,7 +22,7 @@
 #include "Settings.h"
 #include "the/radio.h"
 #include "lib/unicorn/UnicornApplication.h"
-#include "lib/lastfm/scrobble/private.h"
+#include <lastfm/private>
 #include <QtGui>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>

@@ -22,7 +22,7 @@
 #include "app/client/Settings.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/unicorn/UniqueApplication.h"
-#include "lib/lastfm/core/CoreDir.h"
+#include "../liblastfm/src/core/CoreDir.h"
 #include "plugins/iTunes/ITunesExceptions.h"
 #include <iostream>
 #include <QtCore>

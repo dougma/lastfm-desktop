@@ -20,8 +20,8 @@
 #ifndef ITUNES_LIBRARY_H
 #define ITUNES_LIBRARY_H
 
-#include "lib/lastfm/types/Track.h"
 #include "ITunesLibraryTrack.h"
+#include <lastfm/Track>
 #include <QList>
 
 

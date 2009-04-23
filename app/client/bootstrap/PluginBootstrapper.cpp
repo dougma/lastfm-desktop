@@ -19,8 +19,8 @@
 
 #include "PluginBootstrapper.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/CoreDir>
+#include <lastfm/WsKeys.h"
 #include <QSettings>
 #include <QFile>
 
@@ -40,7 +40,7 @@ PluginBootstrapper::bootStrap()
     QSettings bootstrap( QSettings::NativeFormat, QSettings::UserScope, "Last.fm", "Bootstrap", this );
 
     bootstrap.setValue( m_pluginId, Ws::Username );
-    bootstrap.setValue( "data_path",  CoreDir::data().path() );
+    bootstrap.setValue( "data_pa>,  CoreDir::data().path() );
 
     bootstrap.setValue( "Strings/progress_label",       tr("Last.fm is importing your current media library...") );
     bootstrap.setValue( "Strings/complete_label",       tr("Last.fm has imported your media library.\n\n Click OK to continue.") );

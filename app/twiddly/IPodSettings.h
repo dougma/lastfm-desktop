@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/lastfm/core/CoreSettings.h"
+#include "../liblastfm/src/core/CoreSettings.h"
 
 enum IPodType { IPodUnknownType, IPodAutomaticType, IPodManualType };
 

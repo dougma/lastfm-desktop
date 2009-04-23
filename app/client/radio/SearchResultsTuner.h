@@ -20,7 +20,7 @@
 #ifndef SEARCH_RESULTS_TUNER_H
 #define SEARCH_RESULTS_TUNER_H
 
-#include "lib/lastfm/global.h"
+#include <lastfm/global.h>
 #include <QTabWidget>
 
 

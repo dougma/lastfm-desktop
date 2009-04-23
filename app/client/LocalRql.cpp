@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "LocalRql.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 LocalRqlResult::LocalRqlResult()

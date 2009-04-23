@@ -22,7 +22,7 @@
   * @contributor Max Howell <max@last.fm>
   */
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 class ITunesDevice : public QObject

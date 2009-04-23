@@ -18,7 +18,7 @@
  ***************************************************************************/
  
 #include "TagCloudModel.h"
-#include "lib/lastfm/core/CoreDir.h"
+#include <lastfm/CoreDir>
 #include "app/clientplugins/localresolver/LocalCollection.h"
 #include "app/clientplugins/localresolver/QueryError.h"
 #include <float.h> 

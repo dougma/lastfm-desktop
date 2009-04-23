@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "TrackImageFetcher.h"
-#include "lib/lastfm/types/Track.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/Track>
+#include <lastfm/WsAccessManager>
+#include <lastfm/WsReply>
 #include <QImage>
 
 

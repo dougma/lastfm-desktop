@@ -1,4 +1,4 @@
-#include "lib/lastfm/radio/Radio.h"
+#include <lastfm/Radio>
 
 namespace The
 {

@@ -31,10 +31,10 @@
 #include "UnicornCoreApplication.h"
 #include "widgets/LoginDialog.h"
 #include "lib/unicorn/UnicornSettings.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/ws/WsKeys.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include "../liblastfm/src/core/CoreDir.h"
+#include <lastfm/User>
+#include <lastfm/WsKeys>
+#include <lastfm/WsReply>
 #include <QDebug>
 #include <QLocale>
 #include <QTranslator>

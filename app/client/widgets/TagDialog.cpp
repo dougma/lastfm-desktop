@@ -24,9 +24,9 @@
 #include "TrackWidget.h"
 #include "TagDialog/TagBuckets.h"
 #include "radio/buckets/DelegateDragHint.h"
-#include "lib/lastfm/types/User.h"
+#include <lastfm/User>
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/WsReply>
 #include <QtCore>
 #include <QtGui>
 

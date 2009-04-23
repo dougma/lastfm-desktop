@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UniqueApplication.h"
-#include "lib/lastfm/core/CoreSettings.h"
+#include <lastfm/CoreSettings>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QProcess>

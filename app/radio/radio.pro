@@ -1,7 +1,8 @@
 TEMPLATE = app
 TARGET = moralistfad
-CONFIG += unicorn radio
 VERSION = 2.0.0
+QT = core gui xml network phonon
+LIBS += -llastfm -lunicorn
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )

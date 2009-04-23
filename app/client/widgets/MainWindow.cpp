@@ -34,9 +34,9 @@
 #include "widgets/TrackDashboard.h"
 #include "widgets/TrackDashboardHeader.h"
 #include "layouts/SideBySideLayout.h"
-#include "lib/lastfm/types/User.h"
+#include <lastfm/User>
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/WsReply>
 #include <QtGui>
 
 #ifdef Q_WS_X11

@@ -19,8 +19,8 @@
 
 #include "TagListWidget.h"
 #include "Settings.h"
-#include "lib/lastfm/types/Tag.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/Tag>
+#include <lastfm/WsReply>
 #include "radio/buckets/DelegateDragHint.h"
 #include "radio/buckets/Amp.h"
 #include "radio/buckets/SeedsWidget.h"

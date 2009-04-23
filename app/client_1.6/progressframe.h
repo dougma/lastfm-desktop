@@ -23,7 +23,7 @@
 #define PROGRESSFRAME_H
 
 #include "StopWatch.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QFrame>
 #include <QPointer>
 #include <QTimer>

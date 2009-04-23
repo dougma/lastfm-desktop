@@ -21,7 +21,6 @@
 #include "lib/unicorn/UnicornApplication.h"
 #include <QPointer>
 #include <QSystemTrayIcon>
-class Scrobbler;
 class PlayerMediator;
 class PlayerConnection;
 class StopWatch;
@@ -34,7 +33,7 @@ namespace audioscrobbler
         Q_OBJECT
         
         QPointer<QSystemTrayIcon> tray;
-        QPointer<Scrobbler> as;
+        QPointer<Audioscrobbler> as;
         QPointer<PlayerMediator> mediator;
         QPointer<PlayerConnection> connection;
         QPointer<StopWatch> watch;

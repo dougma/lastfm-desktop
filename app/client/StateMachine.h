@@ -20,7 +20,7 @@
 #include "State.h"
 #include "StopWatch.h" //for QPointer
 #include "lib/listener/PlayerConnection.h" //for QPointer
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include "lib/unicorn/UnicornApplication.h"
 #include <QPointer>
 

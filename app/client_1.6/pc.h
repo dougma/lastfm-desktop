@@ -1,5 +1,5 @@
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track.h"
 class TrackInfo : public Track
 {
 public:
@@ -11,9 +11,9 @@ public:
 #define MetaData TrackInfo
 
 
-#include "State.h"
-#include "lib/lastfm/ws/WsError.h"
-#include "RadioEnums.h"
+#include "State>
+#include <lastfm/WsError.h"
+#include "RadioEnums>
 #define RadioError Ws::Error
 
 
@@ -21,11 +21,11 @@ class WsReply;
 #define Request WsReply
 
 
-#include "lib/lastfm/radio/RadioStation.h"
+#include <lastfm/RadioStation.h"
 #define Station RadioStation
 
 
-#include "UnicornCommon.h"
+#include "UnicornCommon>
 
 
 

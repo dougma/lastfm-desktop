@@ -23,9 +23,9 @@
 #include "PlayCountsDatabase.h"
 #include "common/qt/msleep.cpp"
 #include "plugins/iTunes/ITunesExceptions.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/mac/AppleScript.h"
-#include "lib/lastfm/types/Track.h"
+#include "../liblastfm/src/core/CoreDir.h"
+#include "../liblastfm/src/core/mac/AppleScript.h"
+#include <lastfm/Track>
 #include <QtCore>
 #include <QtXml>
 #include <iostream>

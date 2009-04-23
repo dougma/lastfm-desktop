@@ -20,7 +20,7 @@
 #ifndef TRACK_WIDGET_H
 #define TRACK_WIDGET_H
 
-#include "lib/lastfm/global.h"
+#include <lastfm/global.h>
 #include <QWidget>
 
 

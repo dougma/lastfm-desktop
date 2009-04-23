@@ -22,7 +22,7 @@
 
 #include <QObject>
 #include <lib/DllExportMacro.h>
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 /** @author <max@last.fm>

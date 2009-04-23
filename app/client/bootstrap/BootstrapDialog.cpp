@@ -19,10 +19,10 @@
 
 #include "BootstrapDialog.h"
 #include "iTunesBootstrapper.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track.h"
 
 #ifdef WIN32
-#include "PluginBootstrapper.h"
+#include "PluginBootstrapper>
 #include "lib/listener/PlayerListener.h"
 #include "win/CKillProcessHelper.h"
 #endif

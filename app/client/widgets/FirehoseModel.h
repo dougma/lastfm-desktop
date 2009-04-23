@@ -25,7 +25,7 @@
 #include <QList>
 #include <QPixmap>
 #include <QVariant>
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 class FirehoseModel : public QAbstractItemModel

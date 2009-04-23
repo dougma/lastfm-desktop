@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "LegacyTuner.h"
-#include "lib/lastfm/ws/WsDomElement.h"
-#include "lib/lastfm/core/CoreSettings.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/types/Xspf.h"
+#include <lastfm/WsDomElement>
+#include <lastfm/CoreSettings>
+#include <lastfm/WsAccessManager>
+#include <lastfm/Xspf>
 #include <QCoreApplication>
 #include <QtNetwork>
 

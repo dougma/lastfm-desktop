@@ -20,8 +20,8 @@
 #ifndef DIAGNOSTICS_DIALOG_H
 #define DIAGNOSTICS_DIALOG_H
 
-#include "lib/lastfm/global.h"
-#include "ui_DiagnosticsDialog.h"
+#include <lastfm/global.h"
+#include "ui_DiagnosticsDialog>
 #include <QDateTime>
 #include <QPointer>
 #include <QProcess> //Qt enums

@@ -21,7 +21,7 @@
 
 #include "TrackProgressFrame.h"
 #include "UglySettings.h"
-#include "lib/lastfm/scrobble/Scrobble.h"
+#include <lastfm/Scrobble>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QMouseEvent>

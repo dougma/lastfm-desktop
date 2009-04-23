@@ -21,10 +21,10 @@
 #include "SendLogsRequest.h"
 #include "Settings.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/CoreProcess.h"
-#include "lib/lastfm/core/CoreSysInfo.h"
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/CoreDir>
+#include <lastfm/CoreProcess>
+#include <lastfm/CoreSysInfo>
+#include <lastfm/WsKeys>
 #include <QDir>
 #include <QFileInfo>
 #include <QStringList>

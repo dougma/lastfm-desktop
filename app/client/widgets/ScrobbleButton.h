@@ -19,8 +19,8 @@
 
 #include "ActionButton.h"
 #include <QPointer>
-#include "lib/lastfm/scrobble/Scrobble.h"
-#include "lib/lastfm/scrobble/ScrobblePoint.h"
+#include <lastfm/Scrobble>
+#include <lastfm/ScrobblePoint>
 class ScrobbleButtonAnimation;
 
 

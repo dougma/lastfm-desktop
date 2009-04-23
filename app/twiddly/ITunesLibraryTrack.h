@@ -112,6 +112,7 @@ struct IPodLibraryTrackData : public ITunesLibraryTrackData
 
 
 #else //MAC
+    #include <lastfm/Track>
     #include "PlayCountsDatabase.h"
     
     template <typename T> class QList;
@@ -131,7 +132,7 @@ struct IPodLibraryTrackData : public ITunesLibraryTrackData
         ITunesLibraryTrack( const QString& uid, int c ) : PlayCountsDatabase::Track( uid, c )
         {}
         
-        ::Track lastfmTrack() const;
+        lastfm::Track lastfmTrack() const;
 
         using PlayCountsDatabase::Track::isNull;
         using PlayCountsDatabase::Track::uniqueId;

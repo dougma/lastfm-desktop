@@ -21,9 +21,9 @@
 #define XSPF_TRACK_SOURCE
  
 #include <QList>
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/types/Xspf.h"
-#include "lib/lastfm/radio/AbstractTrackSource.h"
+#include <lastfm/WsAccessManager>
+#include <lastfm/Xspf>
+#include <lastfm/AbstractTrackSource>
 
 
 // Represent a xspf url as an AbstractTrackSource

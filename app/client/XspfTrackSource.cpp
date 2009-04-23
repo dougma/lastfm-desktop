@@ -19,7 +19,7 @@
 
 #include "XspfTrackSource.h"
 #include <QNetworkRequest>
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/WsReply>
 
 
  XspfTrackSource::XspfTrackSource(QUrl url)

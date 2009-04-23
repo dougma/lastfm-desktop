@@ -20,7 +20,7 @@
 #ifndef PLAYLIST_DIALOG_H
 #define PLAYLIST_DIALOG_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QDialog>
 
 

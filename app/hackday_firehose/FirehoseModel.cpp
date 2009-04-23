@@ -19,7 +19,7 @@
 
 #include "FirehoseModel.h"
 #include "app/moose.h"
-#include "lib/lastfm/ws/WsDomElement.h"
+#include <lastfm/WsDomElement>
 #include <QLocale>
 #include <QNetworkReply>
 #include <QNetworkRequest>

@@ -23,9 +23,9 @@
 #include "UnicornWidget.h"
 #include "widgets/HelpTextLineEdit.h"
 #include "app/moose.h"
-#include "lib/lastfm/ws/WsReply.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/types/Playlist.h"
+#include <lastfm/WsReply>
+#include <lastfm/User>
+#include <lastfm/Playlist>
 #include <QtGui>
 
 struct UserPlaylistsModel : QAbstractItemModel

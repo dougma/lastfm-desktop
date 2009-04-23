@@ -1,5 +1,5 @@
 #include "MetaDataWidget.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/WsReply>
 #include <QPalette>
 
 static const QString css = 

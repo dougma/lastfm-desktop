@@ -22,7 +22,7 @@
 
 #include <QListWidgetItem>
 #include <QNetworkReply>
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/WsAccessManager>
 #include "app/moose.h"
 
 class Seed : public QObject

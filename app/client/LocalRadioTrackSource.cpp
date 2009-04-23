@@ -19,7 +19,7 @@
 
 #include "LocalRadioTrackSource.h"
 #include "LocalRql.h"
-#include "lib/lastfm/ws/WsError.h"
+#include <lastfm/WsError>
 
 
 ///////////////////////////////////////////////////////////////////////////

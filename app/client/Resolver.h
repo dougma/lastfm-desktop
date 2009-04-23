@@ -20,7 +20,7 @@
 #ifndef RESOLVER_H
 #define RESOLVER_H
 
-#include "lib/lastfm/radio/Radio.h"
+#include <lastfm/Radio>
 #include "app/clientplugins/ITrackResolver.h"
 #include <QList>
 #include <QMap>

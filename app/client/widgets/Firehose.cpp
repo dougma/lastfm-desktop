@@ -22,8 +22,8 @@
 #include "FirehoseModel.h"
 #include "widgets/UnicornWidget.h"
 #include "widgets/UnicornTabWidget.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/User>
+#include <lastfm/WsReply>
 #include <QVBoxLayout>
 
 

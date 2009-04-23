@@ -19,7 +19,7 @@
 
 #include "AbstractBootstrapper.h"
 #include "common/qt/md5.cpp"
-#include "lib/lastfm/core/CoreSettings.h"
+#include <lastfm/CoreSettings>
 #include <QDebug>
 #include <QDir>
 #include <QFile>

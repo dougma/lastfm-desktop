@@ -1,5 +1,5 @@
 CONFIG -= app_bundle
-CONFIG += core types unicorn
+LIBS += -lunicorn -llastfm
 QT = core xml sql
 
 include( $$ROOT_DIR/admin/include.qmake )

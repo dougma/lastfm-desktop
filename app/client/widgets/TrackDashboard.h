@@ -21,7 +21,7 @@
 #define TRACK_DASHBOARD_H
 
 #include <QWidget>
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 /** @author <max@last.fm> */

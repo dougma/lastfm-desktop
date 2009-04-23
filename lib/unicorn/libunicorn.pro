@@ -1,7 +1,7 @@
 TARGET = unicorn
 TEMPLATE = lib
-QT = core gui
-CONFIG += ws core types
+QT = core gui xml network
+LIBS += -llastfm
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )

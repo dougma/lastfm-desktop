@@ -20,8 +20,8 @@
 #ifndef BATCH_SCROBBLE_DIALOG_H
 #define BATCH_SCROBBLE_DIALOG_H
 
-#include "lib/lastfm/types/Track.h"
-#include "ui_BatchScrobbleDialog.h"
+#include <lastfm/Track.h"
+#include "ui_BatchScrobbleDialog>
 
 
 class BatchScrobbleDialog : public QDialog

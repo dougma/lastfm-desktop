@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "Radio.h"
-#include <lastfm/Tuner>
+#include <lastfm/RadioTuner>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <QThread>
@@ -84,7 +84,7 @@ Radio::play( const RadioStation& station )
 
 	m_station = station;
 	delete m_tuner;
-    m_tuner = new Tuner(station);
+    m_tuner = new RadioTuner(station);
 
 	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(trackAvailable()), SLOT(enqueue()) );

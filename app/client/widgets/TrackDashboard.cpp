@@ -23,9 +23,9 @@
 #include "UnicornWidget.h"
 #include "lib/unicorn/TrackImageFetcher.h"
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include "lib/lastfm/types/Tag.h"
-#include "lib/lastfm/ws/WsReply.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/Tag>
+#include <lastfm/WsReply>
+#include <lastfm/WsAccessManager>
 #include "radio/buckets/SeedTypes.h"
 #include "PlayableMimeData.h"
 #include <QtGui>

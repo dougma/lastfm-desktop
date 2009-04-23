@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include "lib/lastfm/ws/WsReply.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/WsReply>
+#include <lastfm/Track>
 #include <QGLWidget>
 #include <QHash>
 /** @author Max Howell <max@last.fm> */

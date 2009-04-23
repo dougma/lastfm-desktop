@@ -23,14 +23,14 @@
 #include "SeedListModel.h"
 #include "Seed.h"
 #include "PlayableMimeData.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/WsAccessManager>
 #include <QVBoxLayout>
 #include <QListView>
 #include <QScrollBar>
 #include <QPushButton>
 #include "widgets/ImageButton.h"
 #include "widgets/UnicornWidget.h"
-#include "lib/lastfm/radio/RadioStation.h"
+#include <lastfm/RadioStation>
 #include "app/moose.h"
 
 

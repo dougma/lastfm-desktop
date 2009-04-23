@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "ExtractIdentifiersJob.h"
-#include "lib/lastfm/fingerprint/Fingerprint.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/Fingerprint>
+#include <lastfm/WsAccessManager>
 #include <QDebug>
 #include <QEventLoop>
 #include <QNetworkReply>

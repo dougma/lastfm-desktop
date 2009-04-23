@@ -20,7 +20,7 @@
 #include "LocalCollection.h"
 #include "QueryError.h"
 #include "AutoTransaction.h"
-#include "lib/lastfm/core/CoreDir.h"
+#include <lastfm/CoreDir>
 #include <QFileInfo>
 #include <QVariant>
 #include <QSqlDriver>

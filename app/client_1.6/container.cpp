@@ -73,10 +73,10 @@
 #include "app/client/widgets/DiagnosticsDialog.h"
 #include "app/client/widgets/SettingsDialog.h"
 
-#include "lib/lastfm/core/CoreDir.h"
+#include <lastfm/CoreDir>
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/unicorn/widgets/AboutDialog.h"
-#include "lib/lastfm/scrobble/Scrobble.h"
+#include <lastfm/Scrobble.h"
 
 #include <QShortcut>
 #include <QLabel>
@@ -89,7 +89,7 @@
 #ifndef Q_WS_MAC
     #include "winstyleoverrides.h"
 #else
-    #include "macstyleoverrides.h"
+    #include "macstyleoverrides>
 #endif
 #endif
 

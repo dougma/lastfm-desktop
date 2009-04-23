@@ -1,11 +1,6 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS = lib/lastfm/core/libcore.pro \
-          lib/lastfm/ws/libws.pro \
-          lib/lastfm/types/libtypes.pro \
-          lib/lastfm/radio/libradio.pro \
-          lib/lastfm/scrobble/libscrobble.pro \
-          lib/unicorn/libunicorn.pro \
+SUBDIRS = lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
           app/audioscrobbler \
           app/radio \

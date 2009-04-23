@@ -22,7 +22,7 @@
 
 #include "common/HideStupidWarnings.h"
 #include "lib/DllExportMacro.h"
-#include "lib/lastfm/core/CoreSettings.h"
+#include "../liblastfm/src/core/CoreSettings.h"
 #include <QApplication>
 class WsReply;
 

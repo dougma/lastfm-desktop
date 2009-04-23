@@ -20,7 +20,7 @@
 #ifndef IPOD_SCROBBLE_H
 #define IPOD_SCROBBLE_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 
 
 struct IPodScrobble : public MutableTrack

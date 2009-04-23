@@ -19,7 +19,7 @@
 
 #include "FirehoseDelegate.h"
 #include "app/moose.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QPainter>
 
 #define AGING_MOOSE 0x646464

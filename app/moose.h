@@ -20,8 +20,8 @@
 #ifndef MOOSE_H
 #define MOOSE_H
 
-#include "lib/lastfm/core/CoreSettings.h"
-#include "lib/lastfm/core/CoreDir.h"
+#include "../liblastfm/src/core/CoreSettings.h"
+#include "../liblastfm/src/core/CoreDir.h"
 
 
 namespace moose

@@ -23,7 +23,7 @@
 #include <QString>
 #include <QStringList>
 #include <QByteArray>
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/WsAccessManager>
 #include <QNetworkReply>
 #include "lib/DllExportMacro.h"
 

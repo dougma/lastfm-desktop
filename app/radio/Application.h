@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "lib/unicorn/UnicornApplication.h"
-#include "lib/lastfm/ws/WsError.h"
+#include <lastfm/WsError>
 
 
 namespace moralistfad

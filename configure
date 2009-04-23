@@ -97,14 +97,6 @@ do
     popd &> /dev/null
 done
 
-middle "Running penis..."
-[ -d _include ] && rm -r _include
-for x in `admin/findsrc pro lib/lastfm` 
-do
-    admin/penis $x
-done
-echo '#include "../../lib/lastfm/global.h"' > _include/lastfm/global.h
-
 
 middle "Running qmake..."
 test -z "$PREFIX" && PREFIX=/usr/local

@@ -22,8 +22,8 @@
 #include "SearchResultsTuner.h"
 #include "the/app.h"
 #include "the/mainWindow.h"
-#include "lib/lastfm/types/Tag.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/Tag>
+#include <lastfm/WsReply>
 #include "lib/unicorn/widgets/SpinnerLabel.h"
 #include <QListWidgetItem>
 #include <QDebug>

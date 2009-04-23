@@ -26,7 +26,7 @@
 #include "widgets/UnicornWidget.h"
 #include "widgets/ShareDialog.h"
 #include "widgets/TagDialog.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
+#include <lastfm/WsAccessManager>
 #include <QApplication>
 #include <QLabel>
 #include <QMenu>
@@ -199,7 +199,7 @@ TrackDashboardHeader::onContextMenuRequested( const QPoint& pos )
 
 
 #include <QtNetwork>
-#include "lib/lastfm/types/User.h"
+#include <lastfm/User>
 void
 TrackDashboardHeader::onPraiseClientTeam()
 {

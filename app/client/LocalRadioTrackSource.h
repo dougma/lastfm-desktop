@@ -20,7 +20,7 @@
 #ifndef LOCAL_RADIO_TRACK_SOURCE_H
 #define LOCAL_RADIO_TRACK_SOURCE_H
 
-#include "lib/lastfm/radio/AbstractTrackSource.h"
+#include <lastfm/AbstractTrackSource>
 
 
 class LocalRadioTrackSource : public AbstractTrackSource

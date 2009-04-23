@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "UnicornCoreApplication.h"
-#include "lib/lastfm/ws/WsKeys.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/core/CoreSettings.h"
-#include "lib/lastfm/core/CoreSysInfo.h"
+#include <lastfm/WsKeys>
+#include "../liblastfm/src/core/CoreDir.h"
+#include "../liblastfm/src/core/CoreSettings.h"
+#include "../liblastfm/src/core/CoreSysInfo.h"
 #include "common/c++/Logger.h"
 #include <QDebug>
 #include <QLocale>
@@ -126,7 +126,7 @@ unicorn::CoreApplication::log( const QString& productName )
 
 
 #ifdef __APPLE__
-#include "lib/lastfm/core/mac/CFStringToQString.h"
+#include "../liblastfm/src/core/mac/CFStringToQString.h"
 static QLocale qMacLocale()
 {
 	//TODO see what Qt's version does

@@ -19,8 +19,8 @@
 
 #include "TagBuckets.h"
 #include "common/qt/reverse.cpp"
-#include "lib/lastfm/types/Tag.h"
-#include "PlayableMimeData.h"
+#include <lastfm/Tag.h"
+#include "PlayableMimeData>
 #include "radio/buckets/SeedTypes.h"
 #include <QtGui>
 

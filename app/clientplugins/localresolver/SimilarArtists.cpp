@@ -18,9 +18,9 @@
  ***************************************************************************/
 
 #include "SimilarArtists.h"
-#include "lib/lastfm/types/Tag.h"
-#include "lib/lastfm/types/Artist.h"
-#include "lib/lastfm/ws/WsReplyBlock.h"
+#include <lastfm/Tag>
+#include <lastfm/Artist>
+#include <lastfm/WsReplyBlock>
 #include "similarity/CosSimilarity.h"
 #include <boost/bind.hpp>
 #include <QtAlgorithms>

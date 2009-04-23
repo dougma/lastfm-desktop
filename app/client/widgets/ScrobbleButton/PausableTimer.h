@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/lastfm/scrobble/ScrobblePoint.h"
+#include <lastfm/ScrobblePoint>
 #include <QBasicTimer>
 #include <QObject>
 #include <QTime>

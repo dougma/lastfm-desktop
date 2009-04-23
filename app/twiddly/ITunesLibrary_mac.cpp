@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright  Ltd.                                           *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,7 +19,7 @@
 
 #include "ITunesLibrary.h"
 #include "IPodScrobble.h"
-#include "lib/lastfm/core/mac/AppleScript.h"
+#include "../liblastfm/src/core/mac/AppleScript.h"
 #include <QDateTime>
 #include <QFileInfo>
 #include <QStringList>

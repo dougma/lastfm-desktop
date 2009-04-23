@@ -19,8 +19,8 @@
 
 #include "AbstractFileBootstrapper.h"
 #include "app/twiddly/IPodScrobble.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/CoreDir>
+#include <lastfm/Track>
 #include <QFile>
 
 static const int k_maxPlaysPerTrack = 10000;

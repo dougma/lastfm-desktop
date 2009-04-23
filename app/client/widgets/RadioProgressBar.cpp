@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "RadioProgressBar.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include "widgets/UnicornWidget.h"
 #include "the/radio.h"
 #include <QApplication>

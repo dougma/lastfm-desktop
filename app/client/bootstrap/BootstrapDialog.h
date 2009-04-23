@@ -17,11 +17,11 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "lib/lastfm/global.h"
+#include <lastfm/global.h"
 #include <QProgressDialog>
 #include <QList>
 #ifdef WIN32
-#include "Settings.h"
+#include "Settings>
 #endif
 
 

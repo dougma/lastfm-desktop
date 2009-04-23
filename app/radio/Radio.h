@@ -25,7 +25,6 @@
 #include <QPointer>
 #include <QThread>
 #include <QVariant>
-class Tuner;
 
 namespace Phonon
 {
@@ -33,6 +32,14 @@ namespace Phonon
 	class AudioOutput;
 	class MediaSource;
 }
+
+namespace lastfm 
+{
+    class RadioStation;
+    class RadioTuner;
+}
+using lastfm::RadioStation;
+using lastfm::RadioTuner;
 
 
 /** @author <max@last.fm>
@@ -94,7 +101,7 @@ private:
 	/** emits signals if appropriate */
 	void changeState( State );
 	
-	QPointer<Tuner> m_tuner;
+	QPointer<RadioTuner> m_tuner;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
 	Radio::State m_state;

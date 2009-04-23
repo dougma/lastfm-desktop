@@ -194,7 +194,7 @@ signals:
 private:
 };
 
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/WsKeys>
 class LastFmSettings : public AppSettings<QSettings>
 {
     Q_OBJECT

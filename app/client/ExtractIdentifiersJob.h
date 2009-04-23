@@ -20,7 +20,7 @@
 #ifndef MBID_JOB_H
 #define MBID_JOB_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QRunnable>
 #include <QObject>
 

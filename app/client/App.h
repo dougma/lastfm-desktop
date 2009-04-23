@@ -21,9 +21,9 @@
 #define CLIENT_APP_H
 
 #include "State.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include "lib/unicorn/UnicornApplication.h"
-#include "lib/lastfm/ws/WsError.h"
+#include <lastfm/WsError>
 #include "the/definitions.h"
 
 

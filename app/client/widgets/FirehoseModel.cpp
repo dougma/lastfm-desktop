@@ -19,9 +19,9 @@
 
 #include "FirehoseModel.h"
 #include "app/moose.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/ws/WsConnectionMonitor.h"
-#include "lib/lastfm/ws/WsDomElement.h"
+#include <lastfm/WsAccessManager>
+#include <lastfm/WsConnectionMonitor>
+#include <lastfm/WsDomElement>
 #include <QLocale>
 #include <QNetworkReply>
 #include <QNetworkRequest>

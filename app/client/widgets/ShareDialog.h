@@ -20,7 +20,7 @@
 #ifndef SHARE_DIALOG_H
 #define SHARE_DIALOG_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QDialogButtonBox>
 #include <QDialog>
 

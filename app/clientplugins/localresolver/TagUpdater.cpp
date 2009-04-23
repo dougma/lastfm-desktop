@@ -20,9 +20,9 @@
 #include "TagUpdater.h"
 #include "QueryError.h"
 #include "LocalCollection.h"
-#include "lib/lastfm/ws/WsReply.h"
-#include "lib/lastfm/types/Artist.h"
-#include "lib/lastfm/types/Tag.h"
+#include <lastfm/WsReply>
+#include <lastfm/Artist>
+#include <lastfm/Tag>
 #include <QDateTime>
 #include <QTimer>
 

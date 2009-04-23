@@ -29,7 +29,6 @@
 #include "_version.h"
 #include "Application.h"
 #include "Radio.h"
-#include "lib/lastfm/core/CoreSettings.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/unicorn/UnicornMainWindow.h"
@@ -59,8 +58,6 @@ int main( int argc, char** argv )
 {
     QCoreApplication::setApplicationName( "Moralist Fad" );
     QCoreApplication::setApplicationVersion( VERSION );
-    QCoreApplication::setOrganizationName( CoreSettings::organizationName() );
-    QCoreApplication::setOrganizationDomain( CoreSettings::organizationDomain() );
 
     // ATTENTION! Under no circumstance change these strings! --mxcl
 #ifdef WIN32

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "SendLogsRequest.h"
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/WsKeys>
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextDocument>

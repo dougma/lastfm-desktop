@@ -19,10 +19,10 @@
 
 #include "NeighboursTuner.h"
 #include "StationDelegate.h"
-#include "lib/lastfm/radio/RadioStation.h"
-#include "lib/lastfm/types/User.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/RadioStation>
+#include <lastfm/User>
+#include <lastfm/WsAccessManager>
+#include <lastfm/WsReply>
 
 Q_DECLARE_METATYPE(QListWidgetItem*);
 

@@ -20,7 +20,7 @@
 #include "ScrobbleButton.h"
 #include "ScrobbleButton/PausableTimer.h"
 #include "StopWatch.h"
-#include "lib/lastfm/ws/WsConnectionMonitor.h"
+#include <lastfm/WsConnectionMonitor>
 #include <QApplication>
 #include <QLabel>
 #include <QPainter>

@@ -20,7 +20,7 @@
 #include "Seed.h"
 #include "SeedListModel.h"
 #include "SeedListView.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/WsReply>
 #include <QTimeLine>
 #include <QPainter>
 #include "app/moose.h"

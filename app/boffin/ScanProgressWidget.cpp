@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "ScanProgressWidget.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/WsAccessManager>
+#include <lastfm/Track>
 #include <QtGui>
 #include <QtNetwork>
 

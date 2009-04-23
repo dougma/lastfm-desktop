@@ -21,11 +21,11 @@
 //TODO #include "DiagnosticsDialog/SendLogsDialog.h"
 #include "app/twiddly.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
-#include "lib/lastfm/core/CoreDir.h"
-#include "lib/lastfm/scrobble/Scrobbler.h"
-#include "lib/lastfm/scrobble/ScrobbleCache.h"
-#include "lib/lastfm/scrobble/Scrobble.h"
-#include "lib/lastfm/ws/WsKeys.h"
+#include <lastfm/CoreDir>
+#include <lastfm/Scrobbler>
+#include <lastfm/ScrobbleCache>
+#include <lastfm/Scrobble>
+#include <lastfm/WsKeys>
 #include <QByteArray>
 #include <QHeaderView>
 #include <QProcess>

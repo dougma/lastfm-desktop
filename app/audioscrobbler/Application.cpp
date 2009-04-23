@@ -22,7 +22,7 @@
 #include "lib/listener/legacy/LegacyPlayerListener.h"
 #include "lib/listener/PlayerListener.h"
 #include "lib/listener/PlayerMediator.h"
-#include <lastfm/Scrobbler>
+#include <lastfm/Audioscrobbler>
 using audioscrobbler::Application;
 
 Application::Application(int& argc, char** argv) : unicorn::Application(argc, argv)
@@ -31,7 +31,7 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
     connect(tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onTrayActivated(QSystemTrayIcon::ActivationReason)));
     tray->show();
     
-    as = new Scrobbler("ass");
+    as = new Audioscrobbler("ass");
     
     mediator = new PlayerMediator(this);
     connect(mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), SLOT(setConnection( PlayerConnection* )) );

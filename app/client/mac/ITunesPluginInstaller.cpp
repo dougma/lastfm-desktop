@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "ITunesPluginInstaller.h"
-#include "lib/lastfm/core/mac/CFStringToQString.h"
-#include "lib/lastfm/core/CoreDir.h"
+#include <lastfm/CFStringToQString>
+#include <lastfm/CoreDir>
 #include <QDebug>
 #include <QDir>
 #include <QProcess>

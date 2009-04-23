@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include "FriendsTuner.h"
-#include "lib/lastfm/types/User.h"
-#include "StationDelegate.h"
-#include "lib/lastfm/radio/RadioStation.h"
-#include "lib/lastfm/ws/WsAccessManager.h"
-#include "lib/lastfm/ws/WsReply.h"
+#include <lastfm/User.h"
+#include "StationDelegate>
+#include <lastfm/RadioStation>
+#include <lastfm/WsAccessManager>
+#include <lastfm/WsReply>
 #include <QNetworkRequest>
 
 

@@ -30,7 +30,7 @@
 #include <QHash>
 
 #include "RadioEnums.h"
-#include "lib/lastfm/core/WeightedStringList.h"
+#include <lastfm/WeightedStringList>
 
 
 namespace SideBar

@@ -20,7 +20,7 @@
 #ifndef TAG_DIALOG_H
 #define TAG_DIALOG_H
 
-#include "lib/lastfm/types/Track.h"
+#include <lastfm/Track>
 #include <QModelIndex>
 #include <QDialog>
 
