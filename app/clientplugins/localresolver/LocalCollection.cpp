@@ -142,7 +142,7 @@ LocalCollection::initDatabase()
         QUERY( "CREATE TABLE directories ("
                     "id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     "source      INTEGER,"          // sources foreign key
-                    "path        TEXT NON NULL );" );
+                    "path        TEXT NOT NULL );" );
 
         QUERY( "CREATE INDEX directories_path_idx ON directories ( path );" );
 
@@ -154,7 +154,7 @@ LocalCollection::initDatabase()
 
         QUERY( "CREATE TABLE exclusions ("
                     "id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                    "path       TEXT NON NULL,"           
+                    "path       TEXT NOT NULL,"           
                     "source     INTEGER,"           // sources foreign key
                     "subDirs    INTEGER );" );     
 

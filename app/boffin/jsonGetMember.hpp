@@ -17,65 +17,37 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef APP_H
-#define APP_H
+#ifndef JSON_GET_MEMBER_HPP
+#define JSON_GET_MEMBER_HPP
 
-#include <QPointer>
-#include <lastfm/global.h>
-#include "lib/unicorn/UnicornApplication.h"
-#include "PlaydarApi.h"
+#include <boost/foreach.hpp>
+#include "json_spirit/json_spirit.h"
 
-
-namespace Phonon { class AudioOutput; }
-
-class TagCloudView;
-
-
-class App : public unicorn::Application
+// gets the named property from the json value
+//
+// returns true if it's got ok.
+//
+// todo: support nested objects,    eg: "playable.result.id"
+// todo: support arrays,            eg: "results[1].id"
+//
+// ( T can be any type acceptable to json_spirit's get_value method )
+//
+template <typename T>
+bool
+jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
 {
-    Q_OBJECT
-    
-public:
-    App( int& argc, char* argv[] );
-    ~App();
+    using namespace json_spirit;
 
-    void init( class MainWindow* ) throw( int /*exitcode*/ );
-    void play( class TrackSource *);
+    if (value.type() == obj_type) {
+        // yeah, only objects have values.
+        BOOST_FOREACH(const Pair& pair, value.get_obj()) {
+            if (pair.name_ == name) {
+                out = pair.value_.get_value<T>();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
-public slots:
-    void play();
-    void xspf(); //prompts to choose a xspf to resolve
-    
-    void playPause();
-    
-private slots:
-    void onOutputDeviceActionTriggered( class QAction* );
-
-    void onReadyToPlay();
-    void onPreparing();
-    void onStarted( const Track& );
-    void onResumed();
-    void onPaused();
-    void onStopped();
-    
-    void onScanningFinished();    
-    void onPlaybackError( const QString& );
-    void onWordle();
-
-private:
-    void cleanup();
-    
-    class MainWindow* m_mainwindow;
-    QPointer<TagCloudView> m_cloud;
-    class ScrobSocket* m_scrobsocket;
-    class MediaPipeline* m_pipe;
-    
-    Phonon::AudioOutput* m_audioOutput;
-    
-    bool m_playing;
-
-    PlaydarApi m_api;
-    class WsAccessManager* m_wam;
-};
-
-#endif //APP_H
+#endif
