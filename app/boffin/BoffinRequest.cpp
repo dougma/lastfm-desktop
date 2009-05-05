@@ -1,3 +1,22 @@
+/***************************************************************************
+ *   Copyright 2009 Last.fm Ltd.                                           *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ ***************************************************************************/
+
 #include <QNetworkReply>
 #include <QTimer>
 
@@ -79,13 +98,13 @@ BoffinRequest::handleJsonPollResponse(int poll,
     BOOST_FOREACH(const json_spirit::Value& i, results) {
         std::string tagName, hostName;
         int count;
-        double score;
+        double weight;
         if (jsonGetMember(i, "name", tagName) &&
             jsonGetMember(i, "source", hostName) &&
             jsonGetMember(i, "count", count) &&
-            jsonGetMember(i, "score", score))
+            jsonGetMember(i, "weight", weight))
         {
-            taglist << BoffinTagItem(tagName, hostName, count, static_cast<float>(score));
+            taglist << BoffinTagItem(tagName, hostName, count, static_cast<float>(weight));
         }
     }
     emit tags(taglist);

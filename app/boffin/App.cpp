@@ -51,7 +51,7 @@ App::App( int& argc, char** argv )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
    , m_playing( false )
-   , m_api( "http://localhost:8888", "" )
+   , m_api( "http://localhost:8888", "fd91e3fb-311d-4903-91d7-87af53281d3f" )
 {
     m_wam = new WsAccessManager( this );
 }
@@ -162,6 +162,8 @@ App::onOutputDeviceActionTriggered( QAction* a )
 #include "TagCloudView.h"
 #include "TagDelegate.h"
 #include "PlaydarTagCloudModel.h"
+#include "PlaydarStatRequest.h"
+#include "PlaydarStatus.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 
 void
@@ -190,7 +192,12 @@ App::onScanningFinished()
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
 
-    model->startGetTags();
+    PlaydarStatRequest* stat = new PlaydarStatRequest(m_wam, m_api);
+    connect(stat, SIGNAL(stat(QString, QString, QString, bool)), m_mainwindow->m_playdarStatus, SLOT(onStat(QString, QString, QString, bool)));
+    connect(stat, SIGNAL(error()), m_mainwindow->m_playdarStatus, SLOT(onError()));
+    stat->start();
+
+    model->startGetTags();    // todo: tie this to stat signal
 }
 
 

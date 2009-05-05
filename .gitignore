@@ -1,0 +1,9 @@
+*.idb
+*.pdb
+*.ncb
+*.vcproj*
+*.sln
+*.suo
+*.qmake
+_build/
+

@@ -43,4 +43,7 @@ public:
 
     void setWindowTitle( const Track& );
 
+    class PlaydarHostsModel* m_hostsModel;
+    class PlaydarStatus* m_playdarStatus;
+
 };

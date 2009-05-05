@@ -17,47 +17,35 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_POLLING_REQUEST_H
-#define PLAYDAR_POLLING_REQUEST_H
+#ifndef PLAYDAR_STATUS_H
+#define PLAYDAR_STATUS_H
 
-#include <string>
-#include "json_spirit/json_spirit.h"
+#include <QLabel>
 
-
-// abstract base class for polling kind of requests
-//
-class PlaydarPollingRequest
+class PlaydarStatus : public QLabel
 {
+    Q_OBJECT
+
 public:
-    PlaydarPollingRequest();
-    ~PlaydarPollingRequest();
+    PlaydarStatus();
 
-    void start();
-
-    const std::string& qid();
-
-private:
-    virtual void issueRequest() = 0;
-    virtual void issuePoll(unsigned msDelay) = 0;
-
-    // return true if another poll should be made
-    virtual bool handleJsonPollResponse(
-        int poll, 
-        const json_spirit::Object& query, 
-        const json_spirit::Array& results) = 0;
-
-    virtual void fail(const char* message) = 0;
-
-protected:
-    // derived class calls this with the response of the initial request
-    void handleResponse(const char *data, unsigned size);
-
-    // derived class calls this with the response from a poll
-    void handlePollResponse(const char *data, unsigned size);
+public slots:
+    void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
+    void onError();
 
 private:
-    std::string m_qid;
-    int m_pollCount;
+    void updateText();
+
+    enum State
+    {
+        Connecting, NotPresent, NotAuthenticated, Authenticated
+    };
+
+    State m_state;
+    QString m_name;
+    QString m_version;
+    QString m_hostname;
 };
 
 #endif
+

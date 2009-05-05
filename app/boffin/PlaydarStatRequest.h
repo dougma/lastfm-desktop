@@ -17,47 +17,37 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_POLLING_REQUEST_H
-#define PLAYDAR_POLLING_REQUEST_H
+#ifndef PLAYDAR_STAT_REQUEST_H
+#define PLAYDAR_STAT_REQUEST_H
 
-#include <string>
-#include "json_spirit/json_spirit.h"
+#include <QObject>
+#include "PlaydarApi.h"
 
+class WsAccessManager;
+class QNetworkReply;
 
-// abstract base class for polling kind of requests
-//
-class PlaydarPollingRequest
+class PlaydarStatRequest
+    : public QObject
 {
-public:
-    PlaydarPollingRequest();
-    ~PlaydarPollingRequest();
+    Q_OBJECT
 
+public:
+    PlaydarStatRequest(WsAccessManager* wam, PlaydarApi& api);
     void start();
 
-    const std::string& qid();
+signals:
+    void error();
+    void stat(QString name, QString version, QString hostname, bool bAuthenticated);
+
+private slots:
+    void onReqFinished();
 
 private:
-    virtual void issueRequest() = 0;
-    virtual void issuePoll(unsigned msDelay) = 0;
+    void fail(const char* message);
 
-    // return true if another poll should be made
-    virtual bool handleJsonPollResponse(
-        int poll, 
-        const json_spirit::Object& query, 
-        const json_spirit::Array& results) = 0;
-
-    virtual void fail(const char* message) = 0;
-
-protected:
-    // derived class calls this with the response of the initial request
-    void handleResponse(const char *data, unsigned size);
-
-    // derived class calls this with the response from a poll
-    void handlePollResponse(const char *data, unsigned size);
-
-private:
-    std::string m_qid;
-    int m_pollCount;
+    WsAccessManager* m_wam;
+    PlaydarApi m_api;
+    QNetworkReply* m_statReply;
 };
 
 #endif

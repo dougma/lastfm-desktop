@@ -17,47 +17,39 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_POLLING_REQUEST_H
-#define PLAYDAR_POLLING_REQUEST_H
+#include "PlaydarStatus.h"
 
-#include <string>
-#include "json_spirit/json_spirit.h"
-
-
-// abstract base class for polling kind of requests
-//
-class PlaydarPollingRequest
+PlaydarStatus::PlaydarStatus()
+:m_state(Connecting)
 {
-public:
-    PlaydarPollingRequest();
-    ~PlaydarPollingRequest();
+    updateText();
+}
 
-    void start();
+void 
+PlaydarStatus::onStat(QString name, QString version, QString hostname, bool bAuthenticated)
+{
+    m_name = name;
+    m_version = version;
+    m_hostname = hostname;
+    m_state = bAuthenticated ? Authenticated : NotAuthenticated;
+    updateText();
+}
 
-    const std::string& qid();
+void
+PlaydarStatus::onError()
+{
+    m_state = NotPresent;
+    updateText();
+}
 
-private:
-    virtual void issueRequest() = 0;
-    virtual void issuePoll(unsigned msDelay) = 0;
-
-    // return true if another poll should be made
-    virtual bool handleJsonPollResponse(
-        int poll, 
-        const json_spirit::Object& query, 
-        const json_spirit::Array& results) = 0;
-
-    virtual void fail(const char* message) = 0;
-
-protected:
-    // derived class calls this with the response of the initial request
-    void handleResponse(const char *data, unsigned size);
-
-    // derived class calls this with the response from a poll
-    void handlePollResponse(const char *data, unsigned size);
-
-private:
-    std::string m_qid;
-    int m_pollCount;
-};
-
-#endif
+void
+PlaydarStatus::updateText()
+{
+    switch (m_state) {
+        case Connecting: setText("Connecting to Playdar"); break;
+        case NotPresent: setText("Playdar not present"); break;
+        case NotAuthenticated: setText("Needs Playdar authorisation"); break;
+        case Authenticated: setText("Connected to Playdar"); break;
+        default: setText("PlaydarStatus::updateText is broken!");
+    }
+}

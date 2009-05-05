@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2009 Last.fm Ltd.                                           *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -14,50 +14,29 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
-
-#ifndef PLAYDAR_POLLING_REQUEST_H
-#define PLAYDAR_POLLING_REQUEST_H
-
-#include <string>
-#include "json_spirit/json_spirit.h"
+ 
+#include "PlaydarHostsModel.h"
 
 
-// abstract base class for polling kind of requests
-//
-class PlaydarPollingRequest
+//virtual 
+QVariant 
+PlaydarHostsModel::data(const QModelIndex &index, int role /* = Qt::DisplayRole */) const
 {
-public:
-    PlaydarPollingRequest();
-    ~PlaydarPollingRequest();
+    return (index.row() < m_hosts.size()) ? m_hosts[m_hosts.size()] : QVariant();
+}
 
-    void start();
+//virtual 
+int 
+PlaydarHostsModel::rowCount(const QModelIndex &parent /* = QModelIndex() */) const
+{
+    return m_hosts.size();
+}
+    
 
-    const std::string& qid();
-
-private:
-    virtual void issueRequest() = 0;
-    virtual void issuePoll(unsigned msDelay) = 0;
-
-    // return true if another poll should be made
-    virtual bool handleJsonPollResponse(
-        int poll, 
-        const json_spirit::Object& query, 
-        const json_spirit::Array& results) = 0;
-
-    virtual void fail(const char* message) = 0;
-
-protected:
-    // derived class calls this with the response of the initial request
-    void handleResponse(const char *data, unsigned size);
-
-    // derived class calls this with the response from a poll
-    void handlePollResponse(const char *data, unsigned size);
-
-private:
-    std::string m_qid;
-    int m_pollCount;
-};
-
-#endif
+void 
+PlaydarHostsModel::onHost(QString hostname)
+{
+    m_hosts.push_back(hostname);
+}

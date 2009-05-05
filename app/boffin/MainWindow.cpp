@@ -18,10 +18,13 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
-#include <lastfm/Track>
 #include <QMenuBar>
 #include <QToolBar>
-
+#include <QComboBox>
+#include <QStatusBar>
+#include <lastfm/Track>
+#include "PlaydarHostsModel.h"
+#include "PlaydarStatus.h"
 
 MainWindow::MainWindow()
 {   
@@ -48,6 +51,14 @@ MainWindow::MainWindow()
     setUnifiedTitleAndToolBarOnMac( true );
     resize( 750, 550 );
     
+    QStatusBar* status = new QStatusBar();
+
+    QComboBox* hosts = new QComboBox();
+    hosts->setModel(m_hostsModel = new PlaydarHostsModel());
+    status->addPermanentWidget(m_playdarStatus = new PlaydarStatus());
+    status->addPermanentWidget(hosts);
+    setStatusBar(status);
+
     finishUi();
 }
 
