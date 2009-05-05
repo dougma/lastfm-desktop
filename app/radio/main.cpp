@@ -28,6 +28,7 @@
 
 #include "_version.h"
 #include "Application.h"
+#include "MainWidget.h"
 #include "Radio.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
@@ -35,7 +36,6 @@
 #include <lastfm/RadioStation>
 #include <QLineEdit>
 void setupRadio();
-void setupMainWindow( QMainWindow& );
 void cleanup();
 
 class QMainObject : public QObject
@@ -94,7 +94,8 @@ int main( int argc, char** argv )
       #endif
         
         unicorn::MainWindow window;
-		setupMainWindow( window );
+	    window.setCentralWidget(new MainWidget);
+        window.setWindowTitle( app.applicationName() );
 		window.finishUi();
 		window.show();
 		
@@ -136,12 +137,6 @@ static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
 }
 #endif
 
-void setupMainWindow( QMainWindow& window )
-{
-	QLineEdit* edit = new QLineEdit;
-	window.setCentralWidget( edit );
-	q->connect( edit, SIGNAL(returnPressed()), SLOT(onReturnPressed()) );
-}
 
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
