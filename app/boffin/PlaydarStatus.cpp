@@ -17,9 +17,11 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include <QTimer>
 #include "PlaydarStatus.h"
 #include "PlaydarStatRequest.h"
 #include "PlaydarAuthRequest.h"
+#include "PlaydarRosterRequest.h"
 #include "lib/lastfm/ws/WsAccessManager.h"
 
 
@@ -59,20 +61,48 @@ PlaydarStatus::onStat(QString name, QString version, QString hostname, bool bAut
 void
 PlaydarStatus::onError()
 {
-    m_state = (m_state == Connecting) ? NotPresent : NotAuthorised;
-    updateText();
-
     sender()->deleteLater();
+    switch (m_state) {
+        case Connecting : 
+            m_state = NotPresent; 
+            break;
+        case Authorising : 
+            m_state = NotAuthorised; 
+            break;
+        case Authorised : 
+            m_state = Connecting; 
+            start();
+            break;
+    }
+    updateText();
 }
 
 void
 PlaydarStatus::onAuth(QString authToken)
 {
+    sender()->deleteLater();
     m_api.setAuthToken(authToken);
     m_state = Authorised;
     updateText();
+    emit connected();
+    makeRosterRequest();
+}
 
+void
+PlaydarStatus::onLanRoster(const QStringList& roster)
+{
     sender()->deleteLater();
+    m_hostsModel.setStringList(roster);
+    QTimer::singleShot(60 * 1000, this, SLOT(makeRosterRequest()));
+}
+
+void
+PlaydarStatus::makeRosterRequest()
+{
+    PlaydarRosterRequest* req = new PlaydarRosterRequest(m_wam, m_api);
+    connect(req, SIGNAL(roster(QStringList)), SLOT(onLanRoster(QStringList)));
+    connect(req, SIGNAL(error()), SLOT(onError()));
+    req->start();
 }
 
 void
@@ -89,4 +119,10 @@ PlaydarStatus::updateText()
             s = "PlaydarStatus::updateText is broken!";
     }
     emit changed(s);
+}
+
+QStringListModel*
+PlaydarStatus::hostsModel()
+{
+    return &m_hostsModel;
 }

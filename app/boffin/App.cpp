@@ -33,6 +33,7 @@
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QFileDialog>
 #include <QMenu>
+#include <QComboBox>
 #include <QLabel>
 #include <QShortcut>
 #include <QVBoxLayout>
@@ -179,8 +180,9 @@ App::onScanningFinished()
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
+    m_mainwindow->ui.playdarHosts->setModel( m_playdarStatus->hostsModel() );
 
-    connect(m_playdarStatus, SIGNAL(changed(QString)), m_mainwindow->m_playdarStatusLabel, SLOT(setText(QString)));
+    connect(m_playdarStatus, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
     connect(m_playdarStatus, SIGNAL(connected()), SLOT(onPlaydarConnected()));
     m_playdarStatus->start();
 }

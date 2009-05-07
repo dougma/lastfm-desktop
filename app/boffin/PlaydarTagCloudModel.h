@@ -42,7 +42,8 @@ public:
     void startGetTags();
 
     void setHostFilter(QSet<QString> hosts);            // exclude hosts from tagcloud
-    void setTagMapping(QMap<QString, QString> tagMap);      // map tagname -> preferred tagname
+    void addToHostFilter(const QString& hostname);
+    void setTagMapping(QMap<QString, QString> tagMap);  // map tagname -> preferred tagname
 
     virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const;
     virtual QModelIndex parent( const QModelIndex& ) const;

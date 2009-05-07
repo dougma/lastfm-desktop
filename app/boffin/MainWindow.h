@@ -36,14 +36,12 @@ class MainWindow : public unicorn::MainWindow
         QAction* xspf;
         QAction* rescan;
         QAction* wordle;
+        class QComboBox* playdarHosts;
+        class QLabel* playdarStatus;
     } ui;
 
 public:
     MainWindow();
 
     void setWindowTitle( const Track& );
-
-    class PlaydarHostsModel* m_hostsModel;
-    class QLabel* m_playdarStatusLabel;
-
 };

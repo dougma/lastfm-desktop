@@ -143,9 +143,17 @@ PlaydarTagCloudModel::setHostFilter(QSet<QString> hosts)
     onTags(m_tags);         // recalc things...
 }
 
+void
+PlaydarTagCloudModel::addToHostFilter(const QString& hostname)
+{
+    m_hostFilter.insert(hostname);
+    onTags(m_tags);
+}
+
 void 
 PlaydarTagCloudModel::setTagMapping(QMap<QString, QString> tagMap)
 {
     m_tagMap = tagMap;
     onTags(m_tags);
 }
+

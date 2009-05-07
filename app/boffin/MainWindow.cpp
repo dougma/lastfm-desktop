@@ -53,11 +53,10 @@ MainWindow::MainWindow()
     resize( 750, 550 );
     
     QStatusBar* status = new QStatusBar();
-
-    QComboBox* hosts = new QComboBox();
-    hosts->setModel(m_hostsModel = new PlaydarHostsModel());
-    status->addPermanentWidget(m_playdarStatusLabel = new QLabel());
-    status->addPermanentWidget(hosts);
+    ui.playdarHosts = new QComboBox();
+    ui.playdarStatus = new QLabel();
+    status->addPermanentWidget(ui.playdarStatus);
+    status->addPermanentWidget(ui.playdarHosts);
     setStatusBar(status);
 
     finishUi();

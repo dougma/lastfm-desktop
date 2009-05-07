@@ -80,6 +80,11 @@ public:
         return apiCall(params);
     }
 
+    UrlT lanRoster()
+    {
+        return makeUrl("/lan/roster");
+    }
+
     // boffin does its own thing:
     UrlT boffinTagcloud()
     {
