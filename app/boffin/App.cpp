@@ -33,10 +33,12 @@
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include <QFileDialog>
 #include <QMenu>
+#include <QLabel>
 #include <QShortcut>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
+#include "PlaydarStatus.h"
 #include "BoffinRqlRequest.h"
 
 
@@ -54,6 +56,7 @@ App::App( int& argc, char** argv )
    , m_api( "http://localhost:8888", "fd91e3fb-311d-4903-91d7-87af53281d3f" )
 {
     m_wam = new WsAccessManager( this );
+    m_playdarStatus = new PlaydarStatus(m_wam, m_api);
 }
 
 
@@ -169,22 +172,7 @@ App::onOutputDeviceActionTriggered( QAction* a )
 void
 App::onScanningFinished()
 {    
-    QTime time;
-    time.start();
-    
-    qDebug() << "BEGIN tag cloud generation";
-    
     disconnect( sender(), 0, this, 0 ); //only once pls
-    
-    PlaydarTagCloudModel* model = new PlaydarTagCloudModel(m_api, m_wam);
-    m_cloud = new TagCloudView;
-    m_cloud->setModel( model );
-    m_cloud->setItemDelegate( new TagDelegate );
-    m_mainwindow->setCentralWidget( m_cloud );
-    
-    m_cloud->setFrameStyle( QFrame::NoFrame );
-
-    qDebug() << "END:" << time.elapsed() << "ms";
     
     m_mainwindow->ui.play->setEnabled( true );
     m_mainwindow->ui.pause->setEnabled( false );
@@ -192,12 +180,22 @@ App::onScanningFinished()
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
 
-    PlaydarStatRequest* stat = new PlaydarStatRequest(m_wam, m_api);
-    connect(stat, SIGNAL(stat(QString, QString, QString, bool)), m_mainwindow->m_playdarStatus, SLOT(onStat(QString, QString, QString, bool)));
-    connect(stat, SIGNAL(error()), m_mainwindow->m_playdarStatus, SLOT(onError()));
-    stat->start();
+    connect(m_playdarStatus, SIGNAL(changed(QString)), m_mainwindow->m_playdarStatusLabel, SLOT(setText(QString)));
+    connect(m_playdarStatus, SIGNAL(connected()), SLOT(onPlaydarConnected()));
+    m_playdarStatus->start();
+}
 
-    model->startGetTags();    // todo: tie this to stat signal
+void
+App::onPlaydarConnected()
+{
+    PlaydarTagCloudModel* model = new PlaydarTagCloudModel(m_api, m_wam);
+    m_cloud = new TagCloudView;
+    m_cloud->setModel( model );
+    m_cloud->setItemDelegate( new TagDelegate );
+    m_mainwindow->setCentralWidget( m_cloud );
+    
+    m_cloud->setFrameStyle( QFrame::NoFrame );
+    model->startGetTags();
 }
 
 

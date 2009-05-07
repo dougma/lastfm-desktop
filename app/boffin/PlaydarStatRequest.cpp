@@ -39,7 +39,7 @@ PlaydarStatRequest::start()
     if (m_statReply) {
         connect(m_statReply, SIGNAL(finished()), SLOT(onReqFinished()));
     } else {
-        fail("couldn't issue boffin request");
+        fail("couldn't issue stat request");
     }
 }
 

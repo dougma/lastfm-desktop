@@ -18,11 +18,26 @@
  ***************************************************************************/
 
 #include "PlaydarStatus.h"
+#include "PlaydarStatRequest.h"
+#include "PlaydarAuthRequest.h"
+#include "lib/lastfm/ws/WsAccessManager.h"
 
-PlaydarStatus::PlaydarStatus()
-:m_state(Connecting)
+
+PlaydarStatus::PlaydarStatus(WsAccessManager* wam, PlaydarApi& api)
+: m_wam(wam)
+, m_api(api)
+, m_state(Connecting)
 {
     updateText();
+}
+
+void
+PlaydarStatus::start()
+{
+    PlaydarStatRequest* stat = new PlaydarStatRequest(m_wam, m_api);
+    connect(stat, SIGNAL(stat(QString, QString, QString, bool)), SLOT(onStat(QString, QString, QString, bool)));
+    connect(stat, SIGNAL(error()), SLOT(onError()));
+    stat->start();
 }
 
 void 
@@ -31,25 +46,47 @@ PlaydarStatus::onStat(QString name, QString version, QString hostname, bool bAut
     m_name = name;
     m_version = version;
     m_hostname = hostname;
-    m_state = bAuthenticated ? Authenticated : NotAuthenticated;
+    m_state = bAuthenticated ? Authorised : Authorising;
+    if (!bAuthenticated) {
+        PlaydarAuthRequest* auth = new PlaydarAuthRequest(m_wam, m_api);
+        connect(auth, SIGNAL(authed(QString)), SLOT(onAuth(QString)));
+        connect(auth, SIGNAL(error()), SLOT(onError()));
+        auth->start("Boffin");
+    }
     updateText();
 }
 
 void
 PlaydarStatus::onError()
 {
-    m_state = NotPresent;
+    m_state = (m_state == Connecting) ? NotPresent : NotAuthorised;
     updateText();
+
+    sender()->deleteLater();
+}
+
+void
+PlaydarStatus::onAuth(QString authToken)
+{
+    m_api.setAuthToken(authToken);
+    m_state = Authorised;
+    updateText();
+
+    sender()->deleteLater();
 }
 
 void
 PlaydarStatus::updateText()
 {
+    QString s;
     switch (m_state) {
-        case Connecting: setText("Connecting to Playdar"); break;
-        case NotPresent: setText("Playdar not present"); break;
-        case NotAuthenticated: setText("Needs Playdar authorisation"); break;
-        case Authenticated: setText("Connected to Playdar"); break;
-        default: setText("PlaydarStatus::updateText is broken!");
+        case Connecting: s = "Connecting to Playdar"; break;
+        case NotPresent: s = "Playdar not available"; break;
+        case Authorising: s = "Authorising with Playdar"; break;
+        case Authorised: s = "Connected to Playdar"; break;
+        case NotAuthorised: s = "Couldn't authorise with Playdar"; break;
+        default: 
+            s = "PlaydarStatus::updateText is broken!";
     }
+    emit changed(s);
 }

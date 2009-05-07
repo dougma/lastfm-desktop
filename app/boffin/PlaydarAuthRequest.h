@@ -17,50 +17,38 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_STATUS_H
-#define PLAYDAR_STATUS_H
+#ifndef PLAYDAR_AUTH_REQUEST_H
+#define PLAYDAR_AUTH_REQUEST_H
 
 #include <QObject>
 #include "PlaydarApi.h"
 
-
 class WsAccessManager;
+class QNetworkReply;
 
-class PlaydarStatus : public QObject
+class PlaydarAuthRequest
+    : public QObject
 {
     Q_OBJECT
 
 public:
-    PlaydarStatus(WsAccessManager* wam, PlaydarApi& api);
-
-    void start();
+    PlaydarAuthRequest(WsAccessManager* wam, PlaydarApi& api);
+    void start(QString applicationName);
 
 signals:
-    void changed(QString newStatusMessage);
-    void authed();
-    void connected();
+    void error();
+    void authed(QString token);
 
 private slots:
-    void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
-    void onAuth(QString authToken);
-    void onError();
+    void onAuth1Finished();
+    void onAuth2Finished();
 
 private:
-    void updateText();
-
-    enum State
-    {
-        Connecting, NotPresent, Authorising, Authorised, NotAuthorised
-    };
-
-    State m_state;
-    QString m_name;
-    QString m_version;
-    QString m_hostname;
+    void fail(const char* message);
 
     WsAccessManager* m_wam;
-    PlaydarApi& m_api;
+    PlaydarApi m_api;
+    QString m_applicationName;
 };
 
 #endif
-

@@ -40,14 +40,6 @@ public:
         m_token = token;
     }
 
-    UrlT auth1(const StringT& productName)
-    {
-        ParamsT params;
-        paramsAdd( params, "website", productName);
-        paramsAdd( params, "name", productName);
-        return makeUrl("/auth/", params);
-    }
-
     UrlT apiCall(const ParamsT& params)
     {
         return makeUrl("/api/", params);
@@ -59,6 +51,24 @@ public:
         paramsAdd(params, "method", "stat");
         paramsAdd(params, "auth", m_token);
         return apiCall(params);
+    }
+
+    UrlT auth1(const StringT& applicationName)
+    {
+        ParamsT params;
+        paramsAdd(params, "name", applicationName);
+        paramsAdd(params, "website", "");
+        paramsAdd(params, "json", "");
+        return makeUrl("/auth_1/", params);
+    }
+
+    UrlT auth2(const StringT& applicationName, const StringT& formtoken, ParamsT& outPostParams)
+    {
+        paramsAdd(outPostParams, "name", applicationName);
+        paramsAdd(outPostParams, "website", "");
+        paramsAdd(outPostParams, "formtoken", formtoken);
+        paramsAdd(outPostParams, "json", "");
+        return makeUrl("/auth_2/");
     }
 
     UrlT getResults(const StringT& qid)

@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "MainWindow.h"
+#include <QLabel>
 #include <QMenuBar>
 #include <QToolBar>
 #include <QComboBox>
@@ -55,7 +56,7 @@ MainWindow::MainWindow()
 
     QComboBox* hosts = new QComboBox();
     hosts->setModel(m_hostsModel = new PlaydarHostsModel());
-    status->addPermanentWidget(m_playdarStatus = new PlaydarStatus());
+    status->addPermanentWidget(m_playdarStatusLabel = new QLabel());
     status->addPermanentWidget(hosts);
     setStatusBar(status);
 

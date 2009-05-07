@@ -51,6 +51,7 @@ public slots:
 private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
+    void onPlaydarConnected();
     void onReadyToPlay();
     void onPreparing();
     void onStarted( const Track& );
@@ -69,6 +70,7 @@ private:
     QPointer<TagCloudView> m_cloud;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
+    class PlaydarStatus* m_playdarStatus;
     
     Phonon::AudioOutput* m_audioOutput;
     
