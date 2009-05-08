@@ -19,9 +19,10 @@
 
 #include "TrackImageFetcher.h"
 #include <lastfm/Track>
-#include <lastfm/WsAccessManager>
-#include <lastfm/WsReply>
+#include <lastfm/ws.h>
+#include <lastfm/XmlQuery>
 #include <QImage>
+#include <QStringList>
 
 
 void
@@ -29,8 +30,8 @@ TrackImageFetcher::start()
 {
     if (!album().isNull()) 
     {
-        WsReply* reply = album().getInfo();
-        connect( reply, SIGNAL(finished( WsReply* )), SLOT(onAlbumGotInfo( WsReply* )) );                
+        QNetworkReply* reply = album().getInfo();
+        connect( reply, SIGNAL(finished()), SLOT(onAlbumGotInfo()) );
     }
     else
         artistGetInfo();
@@ -38,9 +39,9 @@ TrackImageFetcher::start()
 
 
 void
-TrackImageFetcher::onAlbumGotInfo( WsReply* reply )
+TrackImageFetcher::onAlbumGotInfo()
 {
-	if (!downloadImage( reply, "album" ))
+	if (!downloadImage( (QNetworkReply*)sender(), "album" ))
         artistGetInfo();
 }
 
@@ -64,8 +65,8 @@ TrackImageFetcher::artistGetInfo()
 {
     if (!artist().isNull())
     {
-        WsReply* reply = artist().getInfo();
-        connect( reply, SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
+        QNetworkReply* reply = artist().getInfo();
+        connect( reply, SIGNAL(finished()), SLOT(onArtistGotInfo()) );
     }
     else
         fail();
@@ -73,9 +74,9 @@ TrackImageFetcher::artistGetInfo()
 
 
 void
-TrackImageFetcher::onArtistGotInfo( WsReply* reply )
+TrackImageFetcher::onArtistGotInfo()
 {
-    if (!downloadImage( reply, "artist" ))
+    if (!downloadImage( (QNetworkReply*)sender(), "artist" ))
         fail();
 }
 
@@ -95,30 +96,28 @@ TrackImageFetcher::onArtistImageDownloaded()
 
 
 bool
-TrackImageFetcher::downloadImage( WsReply* reply, const QString& root_node )
-{    
-    if (reply->failed())
-        return false;
-    
-    foreach (QString size, QStringList() << "extralarge" << "large")
-    {
-        try 
+TrackImageFetcher::downloadImage( QNetworkReply* reply, const QString& root_node )
+{
+    try {
+        XmlQuery lfm = lastfm::ws::parse( reply );
+        foreach (QString size, QStringList() << "extralarge" << "large")
         {
-            QUrl const url = reply->lfm()[root_node]["image size="+size].text();
-            
+            QUrl const url = lfm[root_node]["image size="+size].text();
+
             // we seem to get a load of album.getInfos where the node exists
             // but the value is ""
             if (!url.isValid())
                 return false;
-            
-            QNetworkReply* get = nam->get( QNetworkRequest( url ) );
+
+            QNetworkReply* get = lastfm::nam()->get( QNetworkRequest( url ) );
             connect( get, SIGNAL(finished()), SLOT(onArtistImageDownloaded()) );
             return true;
         }
-        catch (std::runtime_error& e)
-        {}
     }
-    
+    catch (std::runtime_error& e)
+    {
+        qWarning() << e.what();
+    }
     return false;
 }
 

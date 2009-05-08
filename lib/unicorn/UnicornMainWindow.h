@@ -83,7 +83,7 @@ namespace unicorn
         } ui;
 
     private slots:
-        void onUserGotInfo( WsReply* );        
+        void onUserGotInfo();
     };
 }
 

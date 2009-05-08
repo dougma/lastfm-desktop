@@ -17,7 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "../liblastfm/src/core/CoreSettings.h"
+#include "lib/unicorn/UnicornSettings.h"
 
 enum IPodType { IPodUnknownType, IPodAutomaticType, IPodManualType };
 
@@ -27,7 +27,7 @@ enum IPodType { IPodUnknownType, IPodAutomaticType, IPodManualType };
   */
 class IPodSettings
 {
-    class Settings : public CoreSettings
+    class Settings : public unicorn::GlobalSettings
     {
     public:
         Settings( IPodSettings const * const s )

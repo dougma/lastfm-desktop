@@ -19,7 +19,7 @@
 
 #include "ITunesLibrary.h"
 #include "IPodScrobble.h"
-#include "../liblastfm/src/core/mac/AppleScript.h"
+#include "lib/unicorn/mac/AppleScript.h"
 #include <QDateTime>
 #include <QFileInfo>
 #include <QStringList>

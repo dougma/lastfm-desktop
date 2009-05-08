@@ -1,8 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 - 2007 by                                          *
- *      Christian Muehlhaeuser, Last.fm Ltd <chris@last.fm>                *
- *      Erik Jaelevik, Last.fm Ltd <erik@last.fm>                          *
- *      Max Howell, Last.fm Ltd <max@last.fm>                              *
+ *   Copyright 2008-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,34 +17,57 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef SYS_TRAY_H
-#define SYS_TRAY_H
+#ifndef CORE_APPLE_SCRIPT_H
+#define CORE_APPLE_SCRIPT_H
+#ifdef __APPLE__
 
-#include <QSystemTrayIcon>
-#include <QTimer>
+#include <QString>
+#include <Carbon/Carbon.h> // is there a less huge header option?
 
 
-class TrayIcon : public QSystemTrayIcon
+/** @author Max Howell <max@last.fm> 
+  */
+class AppleScript
 {
-    Q_OBJECT
-
 public:
-    TrayIcon( QObject* parent );
+    AppleScript( const QString& code = "" );
+    ~AppleScript();
 
-public slots:
-    void setTrack( const MetaData& );
-    void setUser( class LastFmUserSettings& currentUser );
+    /** add a whole line, newlines are added after every call to this function!
+      * escapes ' to \" for convenience 
+      * NOTE calling exec() and then using this function is unsupported 
+      */
+    AppleScript&
+    operator<<( QString line )
+    {
+        m_code += line.replace( '\'', '"' );
+        m_code += '\n';
+        return *this;
+    }
+        
+    /** execs script set with setScript() 
+      * @returns script output */
+    QString exec();
+    
+    /** AppleScript hates unicode, encode unicode strings with this */
+    static QString asUnicodeText( const QString& );
+    
+    /** if false, you're screwed, we've never yet seen that though */
+    static bool isAppleScriptAvailable();
+    
+    bool isEmpty() const { return m_code.isEmpty(); }
+    QString code() const { return m_code; }
+	
+private:    
+    void compile();
+    void logError();
 
 private:
-    void refreshToolTip();
+    OSAID m_compiled_script;
+    QString m_code;
 
-  #ifdef Q_WS_MAC
-    QPixmap m_pixmap;
-  #endif
-    
-    QString m_artist;
-    QString m_track;
-    QString m_user;
+    static ComponentInstance s_component;
 };
 
-#endif // SYSTRAY_H
+#endif
+#endif

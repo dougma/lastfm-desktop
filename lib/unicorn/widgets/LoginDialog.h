@@ -37,7 +37,7 @@ public:
 private slots:
     void onEdited();
     void authenticate();
-    void onAuthenticated( class WsReply* );
+    void onAuthenticated();
 	void cancel();
 
 private:

@@ -20,8 +20,8 @@
 #ifndef MOOSE_H
 #define MOOSE_H
 
-#include "../liblastfm/src/core/CoreSettings.h"
-#include "../liblastfm/src/core/CoreDir.h"
+#include "lib/unicorn/UnicornSettings.h"
+#include <lastfm/misc.h>
 
 
 namespace moose
@@ -32,7 +32,7 @@ namespace moose
 
     static inline QString path()
     {
-        QString path = CoreSettings( applicationName() ).value( "/Path" ).toString();
+        QString path = unicorn::GlobalSettings( applicationName() ).value( "/Path" ).toString();
         if (path.size())
             return path;
 
@@ -43,7 +43,7 @@ namespace moose
             path = HklmSettings().value( "Path" ).toString();
             if (path.size())
                 return path;
-            return CoreDir::programFiles().filePath( "Last.fm/Last.fm.exe" );
+            return lastfm::dir::programFiles().filePath( "Last.fm/Last.fm.exe" );
         #endif
     }
     

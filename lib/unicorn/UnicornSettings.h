@@ -26,6 +26,17 @@
 
 namespace unicorn
 {
+    inline const char* organizationName() { return "Last.fm"; }
+    inline const char* organizationDomain() { return "last.fm"; }
+
+    class GlobalSettings : public QSettings
+    {
+    public:
+        GlobalSettings( const char* appname = "" ) : QSettings( unicorn::organizationName(), appname )
+        {}
+    };
+
+
     /** Clearly no use until a username() has been assigned. But this is
       * automatic if you use unicorn::Application anyway. */
     class UserSettings : public QSettings

@@ -73,9 +73,9 @@ unicorn::MainWindow::finishUi()
 
 
 void
-unicorn::MainWindow::onUserGotInfo( WsReply* reply )
+unicorn::MainWindow::onUserGotInfo()
 {
-    QString const text = AuthenticatedUser::getInfoString( reply );
+    QString const text = AuthenticatedUser::getInfoString( (QNetworkReply*)sender() );
     if (text.size() && ui.account) {
         QAction* a = ui.account->addAction( text );
         a->setEnabled( false );

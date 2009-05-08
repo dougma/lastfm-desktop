@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "UpdateDialog.h"
-#include "common/qt/md5.cpp"
+#include <lastfm/misc.h>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QTemporaryFile>
@@ -65,7 +65,7 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 
     QUrl url( "http://cdn.last.fm/client/" + qApp->applicationName().toLower() + PLATFORM + qApp->applicationVersion() + ".txt" );
 //    QUrl url( "http://static.last.fm/client/update_test/201.txt" );
-    checking = nam.get( QNetworkRequest(url) );
+    checking = lastfm::nam()->get( QNetworkRequest(url) );
     checking->setParent( this );
 
     connect( checking, SIGNAL(finished()), SLOT(onGot()) );
@@ -88,7 +88,7 @@ UpdateDialog::onGot()
         if (!isVisible()) deleteLater();
     }
     else {
-        QNetworkReply* reply = nam.get( QNetworkRequest(url) );
+        QNetworkReply* reply = lastfm::nam()->get( QNetworkRequest(url) );
         reply->setParent( this );
         connect( reply, SIGNAL(downloadProgress( qint64, qint64 )), SLOT(onProgress( qint64, qint64 )) );
         connect( reply, SIGNAL(finished()), SLOT(onDownloaded()) );
@@ -107,7 +107,7 @@ UpdateDialog::onDownloaded()
 {    
     QByteArray data = static_cast<QNetworkReply*>(sender())->readAll();
     
-    if (Qt::md5( data ) != md5) {
+    if (lastfm::md5( data ) != md5) {
         qWarning() << "Downloaded" << data.size() << "bytes from" << url << ", but md5 was not" << md5;
         text->setText( tr( "Download failed, please try again later.") );
         if (!isVisible()) deleteLater();

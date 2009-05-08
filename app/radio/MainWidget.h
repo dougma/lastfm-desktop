@@ -40,10 +40,10 @@ public:
     MainWidget();
     
 private slots:
-    void onUserGotInfo(WsReply*);
-    void onUserGotFriends(WsReply*);
-    void onUserGotNeighbours(WsReply*);
-    void onUserGotTopTags(WsReply*);
+    void onUserGotInfo( QNetworkReply* );
+    void onUserGotFriends();
+    void onUserGotNeighbours();
+    void onUserGotTopTags();
 };
 
 

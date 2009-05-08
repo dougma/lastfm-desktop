@@ -53,6 +53,11 @@ public slots:
 Radio* radio;
 QMainObject* q;
 
+namespace lastfm
+{
+    extern LASTFM_DLLEXPORT QByteArray UserAgent;
+}
+
 
 int main( int argc, char** argv )
 {
@@ -61,11 +66,11 @@ int main( int argc, char** argv )
 
     // ATTENTION! Under no circumstance change these strings! --mxcl
 #ifdef WIN32
-    Ws::UserAgent = "Last.fm Client " VERSION " (Windows)";
+    lastfm::UserAgent = "Last.fm Client " VERSION " (Windows)";
 #elif __APPLE__
-    Ws::UserAgent = "Last.fm Client " VERSION " (OS X)";
+    lastfm::UserAgent = "Last.fm Client " VERSION " (OS X)";
 #elif defined (Q_WS_X11)
-    Ws::UserAgent = "Last.fm Client " VERSION " (X11)";
+    lastfm::UserAgent = "Last.fm Client " VERSION " (X11)";
 #endif
 
 #ifdef NDEBUG

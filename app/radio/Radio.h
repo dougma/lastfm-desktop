@@ -19,7 +19,7 @@
 
 #include <lastfm/Track>
 #include <lastfm/RadioStation>
-#include <lastfm/WsError>
+#include <lastfm/ws.h>
 #include <phonon/phononnamespace.h>
 #include <QList>
 #include <QPointer>
@@ -87,7 +87,7 @@ private slots:
     void enqueue();
     void onPhononStateChanged( Phonon::State, Phonon::State );
 	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
-	void onTunerError( Ws::Error );
+	void onTunerError( lastfm::ws::Error );
     void phononEnqueue();
     void onBuffering( int );
 

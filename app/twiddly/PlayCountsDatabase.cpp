@@ -25,8 +25,8 @@
 #include "common/c++/fileCreationTime.cpp"
 #include "lib/unicorn/UnicornSettings.h"
 #include "lib/unicorn/UniqueApplication.h"
-#include "../liblastfm/src/core/CoreDir.h"
-#include "../liblastfm/src/core/mac/AppleScript.h"
+#include "lib/unicorn/mac/AppleScript.h"
+#include <lastfm/misc.h>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -241,7 +241,7 @@ PlayCountsDatabase::update( const ITunesLibrary::Track& track )
 
 
 AutomaticIPod::PlayCountsDatabase::PlayCountsDatabase() 
-              : ::PlayCountsDatabase( CoreDir::data().filePath( "iTunesPlays.db" ) )
+              : ::PlayCountsDatabase( lastfm::dir::runtimeData().filePath( "iTunesPlays.db" ) )
 {}
 
 

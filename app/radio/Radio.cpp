@@ -141,7 +141,7 @@ Radio::skip()
 
 
 void
-Radio::onTunerError( Ws::Error e )
+Radio::onTunerError( lastfm::ws::Error e )
 {
     // otherwise leave things be, we'll stop when we run out of content
     if (m_state == TuningIn)

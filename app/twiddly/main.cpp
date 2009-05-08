@@ -22,11 +22,11 @@
 #include "app/client/Settings.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
 #include "lib/unicorn/UniqueApplication.h"
-#include "../liblastfm/src/core/CoreDir.h"
 #include "plugins/iTunes/ITunesExceptions.h"
-#include <iostream>
+#include <lastfm/misc.h>
 #include <QtCore>
 #include <QtXml>
+#include <iostream>
 
 // until breakpad can be installed more easily
 #undef NDEBUG

@@ -42,16 +42,16 @@ MainWidget::MainWidget()
     MACRO(ui.scrobbles)
     MACRO(ui.friends_count)
     MACRO(ui.neighbour_tags)
-    connect(qApp, SIGNAL(userGotInfo(WsReply*)), SLOT(onUserGotInfo(WsReply*)));
+    connect(qApp, SIGNAL(userGotInfo( QNetworkReply* )), SLOT(onUserGotInfo( QNetworkReply* )));
     
     AuthenticatedUser you;
-    connect(you.getFriends(), SIGNAL(finished(WsReply*)), SLOT(onUserGotFriends(WsReply*)));
-    connect(you.getNeighbours(), SIGNAL(finished(WsReply*)), SLOT(onUserGotNeighbours(WsReply*)));
-    connect(you.getTopTags(), SIGNAL(finished(WsReply*)), SLOT(onUserGotTopTags(WsReply*)));
+    connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
+    connect(you.getNeighbours(), SIGNAL(finished()), SLOT(onUserGotNeighbours()));
+    connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
 }
 
 
-QString magic(WsDomElement e, ...)
+QString magic(XmlQuery e, ...)
 {
     qDebug() << "sup";
     QString out;
@@ -71,12 +71,9 @@ QString magic(WsDomElement e, ...)
 
 
 void
-MainWidget::onUserGotInfo(WsReply* r)
+MainWidget::onUserGotInfo(QNetworkReply* r)
 {
-    qDebug() << "HELLO";
-    qDebug() << r;
-    
-    WsDomElement e = r->lfm()["user"];
+    XmlQuery e = XmlQuery(r->readAll())["user"];
     uint count = e["playcount"].text().toUInt();
     ui.scrobbles->setText(tr("%L1 scrobbles").arg(count));
 #if 0
@@ -91,10 +88,13 @@ MainWidget::onUserGotInfo(WsReply* r)
 }
 
 void
-MainWidget::onUserGotFriends(WsReply* r)
+MainWidget::onUserGotFriends()
 {
+    QNetworkReply* r = (QNetworkReply*)sender();
+    XmlQuery lfm = r->readAll();
+    
     uint count = 0; //TODO count is wrong as webservice is paginated
-    foreach (WsDomElement e, r->lfm()["friends"].children("user"))
+    foreach (XmlQuery e, lfm["friends"].children("user"))
     {
         count++;
         ui.friends->addItem(e["name"].text());
@@ -104,20 +104,26 @@ MainWidget::onUserGotFriends(WsReply* r)
 
 
 void
-MainWidget::onUserGotNeighbours(WsReply* r)
+MainWidget::onUserGotNeighbours()
 {
-    foreach (WsDomElement e, r->lfm()["neighbours"].children("user"))
+    QNetworkReply* r = (QNetworkReply*)sender();
+    XmlQuery lfm = r->readAll();
+
+    foreach (XmlQuery e, lfm["neighbours"].children("user"))
     {
         ui.neighbours->addItem(e["name"].text());
     }
 }
 
 void
-MainWidget::onUserGotTopTags(WsReply* r)
+MainWidget::onUserGotTopTags()
 {
+    QNetworkReply* r = (QNetworkReply*)sender();
+    XmlQuery lfm = r->readAll();
+
     QStringList tags;
     uint x = 0;
-    foreach (WsDomElement e, r->lfm()["toptags"].children("tag"))
+    foreach (XmlQuery e, lfm["toptags"].children("tag"))
     {
         if(++x == 3) break;
         tags += e["name"].text();

@@ -22,10 +22,10 @@
 
 #include "common/HideStupidWarnings.h"
 #include "lib/DllExportMacro.h"
-#include "../liblastfm/src/core/CoreSettings.h"
+#include "UnicornSettings.h"
 #include <QApplication>
-class WsReply;
-
+class QNetworkReply;
+ 
 
 namespace unicorn
 {
@@ -46,8 +46,8 @@ namespace unicorn
 
         struct Settings
         {
-            bool logOutOnExit() { return CoreSettings().value( "LogOutOnExit", false ).toBool(); }
-            void setLogOutOnExit( bool b ) { CoreSettings().setValue( "LogOutOnExit", b ); }
+            bool logOutOnExit() { return GlobalSettings().value( "LogOutOnExit", false ).toBool(); }
+            void setLogOutOnExit( bool b ) { GlobalSettings().setValue( "LogOutOnExit", b ); }
         };
 
     public slots:
@@ -61,10 +61,10 @@ namespace unicorn
         void translate();
 
     private slots:
-        void onUserGotInfo( WsReply* );
+        void onUserGotInfo();
 
     signals:
-        void userGotInfo( WsReply* );
+        void userGotInfo( QNetworkReply* );
     };
 }
 

@@ -30,11 +30,10 @@
 #include "QMessageBoxBuilder.h"
 #include "UnicornCoreApplication.h"
 #include "widgets/LoginDialog.h"
-#include "lib/unicorn/UnicornSettings.h"
-#include "../liblastfm/src/core/CoreDir.h"
+#include "UnicornSettings.h"
 #include <lastfm/User>
-#include <lastfm/WsKeys>
-#include <lastfm/WsReply>
+#include <lastfm/ws.h>
+#include <lastfm/XmlQuery>
 #include <QDebug>
 #include <QLocale>
 #include <QTranslator>
@@ -57,7 +56,7 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
 
     translate();
 
-    CoreSettings s;
+    GlobalSettings s;
     if (s.value( "Username" ).toString().isEmpty() || s.value( "SessionKey" ).toString().isEmpty() || Settings().logOutOnExit())
     {
         LoginDialog d( s.value( "Username" ).toString() );
@@ -78,10 +77,10 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
         }
     }
 
-    Ws::Username = s.value( "Username" ).toString();
-    Ws::SessionKey = s.value( "SessionKey" ).toString();
+    lastfm::ws::Username = s.value( "Username" ).toString();
+    lastfm::ws::SessionKey = s.value( "SessionKey" ).toString();
     
-    connect( AuthenticatedUser().getInfo(), SIGNAL(finished( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
+    connect( AuthenticatedUser().getInfo(), SIGNAL(finished()), SLOT(onUserGotInfo()) );
 
 #ifdef __APPLE__
     setQuitOnLastWindowClosed( false );
@@ -96,7 +95,7 @@ unicorn::Application::translate()
     QString const iso3166 = QLocale().name().right( 2 ).toLower();
 
 #ifdef Q_WS_MAC
-    QDir const d = CoreDir::bundle().filePath( "Contents/Resources/qm" );
+    QDir const d = lastfm::dir::bundle().filePath( "Contents/Resources/qm" );
 #else
     QDir const d = qApp->applicationDirPath() + "/i18n";
 #endif
@@ -120,7 +119,7 @@ unicorn::Application::~Application()
     // did it then the user would be unable to change their mind
     if (Settings().logOutOnExit() || m_logoutAtQuit)
     {
-        CoreSettings s;
+        GlobalSettings s;
         s.remove( "SessionKey" );
         s.remove( "Password" );
     }
@@ -128,20 +127,23 @@ unicorn::Application::~Application()
 
 
 void
-unicorn::Application::onUserGotInfo( WsReply* r )
+unicorn::Application::onUserGotInfo()
 {
+    QNetworkReply* reply = (QNetworkReply*)sender();
+    
     try
     {
+        XmlQuery lfm = lastfm::ws::parse( reply );
         const char* key = UserSettings::subscriptionKey();
-        bool const value = r->lfm()["user"]["subscriber"].text().toInt() == 1;
+        bool const value = lfm["user"]["subscriber"].text().toInt() == 1;
         UserSettings().setValue( key, value );
     }
-    catch (WsDomElement& e)
+    catch (std::runtime_error& e)
     {
-        qWarning() << e;
+        qWarning() << e.what();
     }
     
-    emit userGotInfo( r );
+    emit userGotInfo( reply );
 }
 
 

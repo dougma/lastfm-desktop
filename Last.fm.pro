@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS = lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
-          app/audioscrobbler \
+#          app/audioscrobbler \
           app/radio \
           app/twiddly
 

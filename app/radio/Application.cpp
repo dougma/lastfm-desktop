@@ -19,7 +19,6 @@
 
 #include "Application.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
-#include <lastfm/WsError>
 #include "Radio.h"
 using moralistfad::Application;
 
@@ -28,11 +27,11 @@ Application::Application( int& argc, char** argv ) : unicorn::Application( argc,
 {}
 
 void
-Application::onWsError( Ws::Error e )
+Application::onWsError( lastfm::ws::Error e )
 {
     switch (e)
     {
-        case Ws::OperationFailed:
+        case lastfm::ws::OperationFailed:
             //TODOCOPY
             //TODO use the non intrusive status messages
             QMessageBoxBuilder( 0 ) //TODO window pointer
@@ -41,7 +40,7 @@ Application::onWsError( Ws::Error e )
                     .exec();
             break;
 
-        case Ws::InvalidSessionKey:
+        case lastfm::ws::InvalidSessionKey:
             logout();
             break;
 			
@@ -55,21 +54,21 @@ Application::onRadioError( int code, const QVariant& data )
 {
     switch (code)
     {
-        case Ws::NotEnoughContent:
+        case lastfm::ws::NotEnoughContent:
             emit error( tr("Sorry, there is no more content available for this radio station.") );
             break;
             
-        case Ws::MalformedResponse:
-        case Ws::TryAgainLater:
+        case lastfm::ws::MalformedResponse:
+        case lastfm::ws::TryAgainLater:
             emit error( tr("Sorry, there was a radio error at Last.fm. Please try again later.") );
             break;
             
-        case Ws::SubscribersOnly:
+        case lastfm::ws::SubscribersOnly:
             emit error( tr("Sorry, this station is only available to Last.fm subscribers. "
                            "<A href='http://www.last.fm/subscribe'>Sign up</a>.") );
             break;
 
-        case Ws::UnknownError:
+        case lastfm::ws::UnknownError:
             // string contains Phonon generated user readable error message
             emit error( data.toString() );
             break;

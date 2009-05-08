@@ -23,8 +23,8 @@
 #include "PlayCountsDatabase.h"
 #include "common/qt/msleep.cpp"
 #include "plugins/iTunes/ITunesExceptions.h"
-#include "../liblastfm/src/core/CoreDir.h"
-#include "../liblastfm/src/core/mac/AppleScript.h"
+#include "lib/unicorn/mac/AppleScript.h"
+#include <lastfm/misc.h>
 #include <lastfm/Track>
 #include <QtCore>
 #include <QtXml>
@@ -90,7 +90,7 @@ IPod::scrobbleId() const
 QDir
 IPod::saveDir() const 
 {
-    QDir d = CoreDir::data().filePath( "devices/" + uid() );
+    QDir d = lastfm::dir::runtimeData().filePath( "devices/" + uid() );
     d.mkpath( "." );
     return d;
 }

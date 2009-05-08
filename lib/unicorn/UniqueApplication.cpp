@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "UniqueApplication.h"
-#include <lastfm/CoreSettings>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QProcess>

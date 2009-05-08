@@ -21,7 +21,7 @@
 #define UPDATE_DIALOG_H
 
 #include "lib/DllExportMacro.h"
-#include <lastfm/WsAccessManager>
+#include <lastfm/ws.h>
 #include <QDialog>
 
 
@@ -31,7 +31,6 @@ class UNICORN_DLLEXPORT UpdateDialog : public QDialog
 {
     Q_OBJECT
     
-    WsAccessManager nam;
     QNetworkReply* checking;
     QByteArray md5;
     QUrl url;
