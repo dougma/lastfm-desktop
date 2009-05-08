@@ -27,7 +27,7 @@
 #include <QDialog>
 class AboutDialog;
 class UpdateDialog;
-class WsReply;
+class QNetworkReply;
 
 
 template <typename D> struct OneDialogPointer : public QPointer<D>
@@ -83,7 +83,7 @@ namespace unicorn
         } ui;
 
     private slots:
-        void onUserGotInfo();
+        void onUserGotInfo( QNetworkReply* );
     };
 }
 

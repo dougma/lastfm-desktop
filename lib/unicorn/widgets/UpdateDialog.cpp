@@ -75,7 +75,11 @@ UpdateDialog::UpdateDialog( QWidget* parent ) : QDialog( parent ), checking( 0 )
 void
 UpdateDialog::onGot()
 {
-    QByteArray data = static_cast<QNetworkReply*>(sender())->readAll().trimmed();
+    QNetworkReply* reply = static_cast<QNetworkReply*>(sender());
+    if (reply->error() != QNetworkReply::NoError)
+        return;
+    
+    QByteArray data = reply->readAll().trimmed();
     url = QUrl::fromEncoded( data.mid( 32 ) );
     md5 = data.left( 32 );
 

@@ -35,7 +35,7 @@ unicorn::MainWindow::MainWindow()
 {
     new QShortcut( QKeySequence(Qt::CTRL+Qt::Key_W), this, SLOT(close()) );
     new QShortcut( QKeySequence(Qt::ALT+Qt::SHIFT+Qt::Key_L), this, SLOT(openLog()) );
-    connect( qApp, SIGNAL(userGotInfo( WsReply* )), SLOT(onUserGotInfo( WsReply* )) );
+    connect( qApp, SIGNAL(userGotInfo( QNetworkReply* )), SLOT(onUserGotInfo( QNetworkReply* )) );
 
     QVariant v = unicorn::UserSettings().value( SETTINGS_POSITION_KEY );
     if (v.isValid()) move( v.toPoint() ); //if null, let Qt decide
@@ -73,9 +73,9 @@ unicorn::MainWindow::finishUi()
 
 
 void
-unicorn::MainWindow::onUserGotInfo()
+unicorn::MainWindow::onUserGotInfo( QNetworkReply* reply )
 {
-    QString const text = AuthenticatedUser::getInfoString( (QNetworkReply*)sender() );
+    QString const text = AuthenticatedUser::getInfoString( reply );
     if (text.size() && ui.account) {
         QAction* a = ui.account->addAction( text );
         a->setEnabled( false );
