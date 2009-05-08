@@ -17,7 +17,13 @@ CONFIG( mad ) {
 }
 
 CONFIG( boost ) {
-    macx*:INCLUDEPATH += /opt/local/include
+    macx*{
+        INCLUDEPATH += /opt/local/include
+        LIBS += /opt/local/lib/libboost_thread-mt.a
+    }
+    unix: !macx* {
+        LIBS += -lboost_thread
+    }
 }
 
 CONFIG( fftw3f ) {

@@ -1,16 +1,17 @@
 CONFIG( unicorn ) {
-  	LIBS += -lunicorn
-	QT += gui
-	CONFIG += lastfm
+    LIBS += -lunicorn
+    QT += gui
+    CONFIG += lastfm
 }
 CONFIG( listener ) {
-	LIBS += -llistener
-	CONFIG += lastfm
+    LIBS += -llistener
+    CONFIG += lastfm
 }
 CONFIG( fingerprint ) {
-	LIBS += -llastfm_fingerprint
-	CONFIG += lastfm
+    LIBS += -llastfm_fingerprint
+    CONFIG += lastfm
 }
 CONFIG( lastfm ) {
-	QT += core network xml
+    QT += core network xml
+    LIBS += -llastfm
 }
