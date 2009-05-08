@@ -1,4 +1,5 @@
 CONFIG += types unicorn radio boost
+CONFIG -= app_bundle
 QT += opengl sql phonon
 VERSION = 0.0.6
 
@@ -15,3 +16,6 @@ macx-g++:release {
     CONFIG += app_bundle
 }
 
+!win {
+    LIBS +=
+}
