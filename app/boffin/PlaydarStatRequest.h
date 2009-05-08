@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2009 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -14,34 +14,39 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef PLAYDAR_STAT_REQUEST_H
+#define PLAYDAR_STAT_REQUEST_H
+
 #include <lastfm/global.h>
-#include "lib/unicorn/UnicornMainWindow.h"
+#include <QPointer>
+#include <QObject>
+#include "PlaydarApi.h"
 
-
-class MainWindow : public unicorn::MainWindow
+class PlaydarStatRequest
+    : public QObject
 {
     Q_OBJECT
 
-    friend class App;
-
-    struct Ui
-    {
-        QMenu* outputdevice;
-        QAction* play;
-        QAction* pause;
-        QAction* skip;    
-        QAction* xspf;
-        QAction* rescan;
-        QAction* wordle;
-        class QComboBox* playdarHosts;
-        class QLabel* playdarStatus;
-    } ui;
-
 public:
-    MainWindow();
+    PlaydarStatRequest(lastfm::NetworkAccessManager*, PlaydarApi&);
+    void start();
 
-    void setWindowTitle( const Track& );
+signals:
+    void error();
+    void stat(QString name, QString version, QString hostname, bool bAuthenticated);
+
+private slots:
+    void onReqFinished();
+
+private:
+    void fail(const char* message);
+
+    lastfm::NetworkAccessManager* m_wam;
+    PlaydarApi m_api;
+    QPointer<QNetworkReply> m_statReply;
 };
+
+#endif

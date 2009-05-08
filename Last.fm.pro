@@ -4,7 +4,8 @@ SUBDIRS = lib/unicorn/libunicorn.pro \
           lib/listener/liblistener.pro \
 #          app/audioscrobbler \
           app/radio \
-          app/twiddly
+          app/twiddly \
+          app/boffin
 
 debug:win32 {
 	# make the client the default project in visual studio

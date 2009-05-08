@@ -19,12 +19,11 @@
  
 #include <lastfm/global.h>
 #include <lastfm/Track>
-#include <lastfm/WsError>
+#include <lastfm/ws.h>
 #include <QPointer>
 #include <QObject>
 #include <phonon/phononnamespace.h>
 
-class AbstractTrackSource;
 
 namespace Phonon
 {
@@ -32,6 +31,7 @@ namespace Phonon
  	class AudioOutput;
     class MediaSource;
 }
+
 
 
 class MediaPipeline : public QObject
@@ -44,8 +44,7 @@ public:
 
     Phonon::State state() const;
 
-    void playTags( QStringList );
-    void playXspf( const QString& path );
+    void play( class TrackSource* );
 
 public slots:
     void setPaused( bool );
@@ -53,7 +52,6 @@ public slots:
     void skip();
 
 signals:
-    void preparing(); //before station starts, only happens one after play*() is called
     void started( const Track& );
     void paused();
     void resumed();
@@ -63,22 +61,16 @@ signals:
 private slots:
     void onPhononSourceChanged( const Phonon::MediaSource& );
     void onPhononStateChanged( Phonon::State, Phonon::State );
-    void onSourceError( Ws::Error );
+    void onSourceError( lastfm::ws::Error );
     void enqueue();
 
 private:
 	Phonon::MediaObject* mo;    
     Phonon::AudioOutput* ao;
-    class ILocalRqlPlugin* m_localRqlPlugin;
-    class LocalRql* m_localRql;
-    class ITrackResolverPlugin* m_trackResolver;
-    class Resolver* m_resolver;
-    QPointer<AbstractTrackSource> m_source;
+    TrackSource* m_source;
 
     QMap<QUrl, Track> m_tracks;
 
     bool m_errorRecover;
     bool m_phonon_sucks;
-    
-    void play( AbstractTrackSource* );
 };

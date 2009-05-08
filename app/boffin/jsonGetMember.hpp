@@ -16,32 +16,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef JSON_GET_MEMBER_HPP
+#define JSON_GET_MEMBER_HPP
 
-#include <lastfm/global.h>
-#include "lib/unicorn/UnicornMainWindow.h"
+#include <boost/foreach.hpp>
+#include "json_spirit/json_spirit.h"
 
-
-class MainWindow : public unicorn::MainWindow
+// gets the named property from the json value
+//
+// returns true if it's got ok.
+//
+// todo: support nested objects,    eg: "playable.result.id"
+// todo: support arrays,            eg: "results[1].id"
+//
+// ( T can be any type acceptable to json_spirit's get_value method )
+//
+template <typename T>
+bool
+jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
 {
-    Q_OBJECT
+    using namespace json_spirit;
 
-    friend class App;
+    if (value.type() == obj_type) {
+        // yeah, only objects have values.
+        BOOST_FOREACH(const Pair& pair, value.get_obj()) {
+            if (pair.name_ == name) {
+                out = pair.value_.get_value<T>();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
-    struct Ui
-    {
-        QMenu* outputdevice;
-        QAction* play;
-        QAction* pause;
-        QAction* skip;    
-        QAction* xspf;
-        QAction* rescan;
-        QAction* wordle;
-        class QComboBox* playdarHosts;
-        class QLabel* playdarStatus;
-    } ui;
-
-public:
-    MainWindow();
-
-    void setWindowTitle( const Track& );
-};
+#endif

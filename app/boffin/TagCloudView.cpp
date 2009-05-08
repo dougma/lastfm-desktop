@@ -18,7 +18,7 @@
  ***************************************************************************/
  
 #include "TagCloudView.h"
-#include "TagCloudModel.h"
+#include "PlaydarTagCloudModel.h"
 #include <QApplication>
 #include <QDebug>
 #include <QMouseEvent>
@@ -45,6 +45,12 @@ TagCloudView::TagCloudView( QWidget* parent )
     setSelectionBehavior( QAbstractItemView::SelectItems );
 }
 
+void
+TagCloudView::setModel(QAbstractItemModel *model)
+{
+    QAbstractItemView::setModel(model);
+    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
+}
 
 void 
 TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFlags f )
@@ -110,6 +116,14 @@ TagCloudView::paintEvent( QPaintEvent* e )
 
         itemDelegate()->paint( &p, opt, index );
     }
+}
+
+void 
+TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
+{
+    Q_UNUSED(start);
+    Q_UNUSED(end);
+    rectcalc();
 }
 
 int gBaseline, gLeftMargin; //filthy but easiest

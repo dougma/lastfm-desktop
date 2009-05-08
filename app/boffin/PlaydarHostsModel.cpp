@@ -17,40 +17,26 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef TAG_CLOUD_MODEL_H
-#define TAG_CLOUD_MODEL_H
+#include "PlaydarHostsModel.h"
 
-#include <QAbstractItemModel>
-#include <QMap>
 
-class TagCloudModel: public QAbstractItemModel
+//virtual 
+QVariant 
+PlaydarHostsModel::data(const QModelIndex &index, int role /* = Qt::DisplayRole */) const
 {
-public:
-    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole };
+    return (index.row() < m_hosts.size()) ? m_hosts[index.row()] : QVariant();
+}
 
-    TagCloudModel( QObject* parent = 0, int limit = 100 );
-    ~TagCloudModel();
+//virtual 
+int 
+PlaydarHostsModel::rowCount(const QModelIndex &parent /* = QModelIndex() */) const
+{
+    return m_hosts.size();
+}
 
-    virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const
-    {
-        if( parent.isValid() ) return QModelIndex();
-        return createIndex( row, column );
-    }
-    
-    virtual QModelIndex parent( const QModelIndex& ) const{ return QModelIndex(); }
-    virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
-    virtual int columnCount( const QModelIndex& =QModelIndex() ) const { return 1; }
-    virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
-    Qt::ItemFlags flags( const QModelIndex & index ) const;
-    void fetchTags();
-protected:
-    class LocalCollection* m_collection;
-    QMultiMap< float, QString> m_tagHash;
-    QMultiMap< float, QString> m_logTagHash;
-    float m_maxWeight;
-    float m_minLogWeight;
-    int m_limit;
-};
-
-#endif //TAG_CLOUD_MODEL_H
-
+void 
+PlaydarHostsModel::onHosts(const QStringList& hosts)
+{
+    m_hosts = hosts;
+    reset();
+}

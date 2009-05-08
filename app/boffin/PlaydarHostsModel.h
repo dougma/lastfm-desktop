@@ -16,32 +16,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
+ 
+#ifndef PLAYDAR_HOSTS_MODEL_H
+#define PLAYDAR_HOSTS_MODEL_H
 
-#include <lastfm/global.h>
-#include "lib/unicorn/UnicornMainWindow.h"
+#include <QAbstractListModel>
+#include <QStringList>
 
-
-class MainWindow : public unicorn::MainWindow
+class PlaydarHostsModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    friend class App;
-
-    struct Ui
-    {
-        QMenu* outputdevice;
-        QAction* play;
-        QAction* pause;
-        QAction* skip;    
-        QAction* xspf;
-        QAction* rescan;
-        QAction* wordle;
-        class QComboBox* playdarHosts;
-        class QLabel* playdarStatus;
-    } ui;
-
 public:
-    MainWindow();
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
-    void setWindowTitle( const Track& );
+public slots:
+    void onHosts(const QStringList& hosts);
+
+private:
+    QStringList m_hosts;
 };
+
+#endif

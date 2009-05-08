@@ -1,7 +1,13 @@
-_build
+_build/
 _files.qmake
 _version.h
 _build_parameters.pl.h
 Makefile*
-/_bin
-/_include
+/_bin/
+/_include/
+*.idb
+*.pdb
+*.ncb
+*.vcproj*
+*.sln
+*.suo

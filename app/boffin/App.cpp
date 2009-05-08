@@ -23,34 +23,42 @@
 #include "PickDirsDialog.h"
 #include "ScanProgressWidget.h"
 #include "ScrobSocket.h"
-#include "app/clientplugins/localresolver/LocalContentScannerThread.h"
-#include "app/clientplugins/localresolver/LocalContentScanner.h"
-#include "app/clientplugins/localresolver/LocalContentConfigurator.h"
-#include "app/clientplugins/localresolver/TrackTagUpdater.h"
-#include "app/clientplugins/localresolver/QueryError.h"
+#include "TrackSource.h"
+//#include "app/clientplugins/localresolver/LocalContentScannerThread.h"
+//#include "app/clientplugins/localresolver/LocalContentScanner.h"
+//#include "app/clientplugins/localresolver/LocalContentConfigurator.h"
+//#include "app/clientplugins/localresolver/TrackTagUpdater.h"
+//#include "app/clientplugins/localresolver/QueryError.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
+#include <lastfm/NetworkAccessManager>
 #include <QFileDialog>
 #include <QMenu>
+#include <QComboBox>
+#include <QLabel>
 #include <QShortcut>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
+#include "PlaydarStatus.h"
+#include "BoffinRqlRequest.h"
+
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
 
 App::App( int& argc, char** argv )
    : unicorn::Application( argc, argv )
-   , m_contentScannerThread( 0 )
-   , m_contentScanner( 0 )
-   , m_trackTagUpdater( 0 )
    , m_mainwindow( 0 )
    , m_cloud( 0 )
    , m_scrobsocket( 0 )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
    , m_playing( false )
-{}
+   , m_api( "http://localhost:8888", "fd91e3fb-311d-4903-91d7-87af53281d3f" )
+{
+    m_wam = new lastfm::NetworkAccessManager( this );
+    m_playdarStatus = new PlaydarStatus(m_wam, m_api);
+}
 
 
 App::~App()
@@ -64,10 +72,6 @@ App::~App()
 void
 App::cleanup()
 {
-    if (m_contentScanner) m_contentScanner->stop();
-    if (m_contentScannerThread) m_contentScannerThread->wait();
-    delete m_contentScanner;
-    delete m_contentScannerThread;
 }
 
 
@@ -118,10 +122,10 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( m_pipe, SIGNAL(stopped()), m_scrobsocket, SLOT(stop()) );
 
 /// parts of the scanning stuff
-    m_trackTagUpdater = TrackTagUpdater::create(
-            "http://musiclookup.last.fm/trackresolve",
-            100,        // number of days track tags are good 
-            5);         // 5 minute delay between web requests
+    //m_trackTagUpdater = TrackTagUpdater::create(
+    //        "http://musiclookup.last.fm/trackresolve",
+    //        100,        // number of days track tags are good 
+    //        5);         // 5 minute delay between web requests
 
 /// connect
     connect( window->ui.play, SIGNAL(triggered()), SLOT(play()) );
@@ -134,74 +138,12 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     QShortcut* cut = new QShortcut( Qt::Key_Space, window );
     connect( cut, SIGNAL(activated()), SLOT(playPause()) );
     cut->setContext( Qt::ApplicationShortcut );
-    
+
+    onScanningFinished();
+
 /// go!
-    if (!scan( false ))
-        throw 1; //abort app
-}
-
-
-void
-App::startAgain()
-{
-    scan( true );
-}
-
-
-bool
-App::scan( bool delete_all_files_first )
-{
-/// content scanner
-    try
-    {
-        LocalContentConfigurator cfg;
-
-        QStringList const dirs = cfg.getScanDirs();
-        if (delete_all_files_first || dirs.isEmpty() || cfg.getFileCount() == 0)
-        {
-            PickDirsDialog picker( m_mainwindow );
-            picker.setDirs( dirs );
-            if (picker.exec() == QDialog::Rejected)
-                return false;        // abort the whole app
-
-            if ( delete_all_files_first )
-                cfg.deleteAllFiles();
-            cfg.changeScanDirs( picker.dirs() );
-        }
-        cfg.updateVolumeAvailability();
-    } 
-    catch (QueryError e)
-    {
-        // the db is probably an old version
-        qCritical() << "Database problem: " + e.text();
-        
-        QMessageBoxBuilder( m_mainwindow )
-                .setTitle( "Warning" )
-                .setText( "Boffin suffered a database problem, consult the log for the gory details" )
-                .exec();
-        return false; // not much we can do.
-    }
-
-    cleanup();
-
-    m_contentScanner = new LocalContentScanner;
-    connect(m_contentScanner, SIGNAL(trackScanned(Track)), m_trackTagUpdater, SLOT(needsUpdate()));
-    m_contentScannerThread = new LocalContentScannerThread(m_contentScanner);
-
-////// scanning widget
-    ScanProgressWidget* progress = new ScanProgressWidget;
-    m_mainwindow->setCentralWidget( progress );
-    connect( m_contentScanner, SIGNAL(trackScanned( Track )), progress, SLOT(onNewTrack( Track )) );
-    connect( m_contentScanner, SIGNAL(dirScanStart( QString )), progress, SLOT(onNewDirectory( QString )) );
-    connect( m_contentScanner, SIGNAL(finished()), progress, SLOT(onFinished()) );
-    //queue so the progress widget can update its status label
-    connect( m_contentScanner, SIGNAL(finished()), SLOT(onScanningFinished()), Qt::QueuedConnection );
-    
-    m_mainwindow->ui.rescan->setEnabled( false );
-
-    m_contentScannerThread->start();
-    
-    return true;
+    //if (!scan( false ))
+    //    throw 1; //abort app
 }
 
 
@@ -223,31 +165,38 @@ App::onOutputDeviceActionTriggered( QAction* a )
 
 #include "TagCloudView.h"
 #include "TagDelegate.h"
-#include "TagCloudModel.h"
+#include "PlaydarTagCloudModel.h"
+#include "PlaydarStatRequest.h"
+#include "PlaydarStatus.h"
+
 void
 App::onScanningFinished()
 {    
-    QTime time;
-    time.start();
-    
-    qDebug() << "BEGIN tag cloud generation";
-    
     disconnect( sender(), 0, this, 0 ); //only once pls
-    
-    m_cloud = new TagCloudView;
-    m_cloud->setModel( new TagCloudModel );
-    m_cloud->setItemDelegate( new TagDelegate );
-    m_mainwindow->setCentralWidget( m_cloud );
-    
-    m_cloud->setFrameStyle( QFrame::NoFrame );
-
-    qDebug() << "END:" << time.elapsed() << "ms";
     
     m_mainwindow->ui.play->setEnabled( true );
     m_mainwindow->ui.pause->setEnabled( false );
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
+    m_mainwindow->ui.playdarHosts->setModel( m_playdarStatus->hostsModel() );
+
+    connect(m_playdarStatus, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
+    connect(m_playdarStatus, SIGNAL(connected()), SLOT(onPlaydarConnected()));
+    m_playdarStatus->start();
+}
+
+void
+App::onPlaydarConnected()
+{
+    PlaydarTagCloudModel* model = new PlaydarTagCloudModel(m_api, m_wam);
+    m_cloud = new TagCloudView;
+    m_cloud->setModel( model );
+    m_cloud->setItemDelegate( new TagDelegate );
+    m_mainwindow->setCentralWidget( m_cloud );
+    
+    m_cloud->setFrameStyle( QFrame::NoFrame );
+    model->startGetTags();
 }
 
 
@@ -263,7 +212,24 @@ App::play()
                                          .exec();
         return;
     }
-    m_pipe->playTags( m_cloud->currentTags() );
+
+    QStringList tags = m_cloud->currentTags();
+    for (int i = 0; i < tags.count(); ++i)
+        tags[i] = "tag:\"" + tags[i] + '"';
+
+    QString rql = tags.join(" and ");
+    BoffinRqlRequest* req = new BoffinRqlRequest(m_wam, m_api, rql);
+    TrackSource* source = new TrackSource(req);
+    connect(source, SIGNAL(ready()), this, SLOT(onReadyToPlay()));
+    req->start();
+    onPreparing();
+}
+
+
+void
+App::onReadyToPlay()
+{
+    m_pipe->play( (TrackSource*) sender() );
 }
 
 
@@ -288,7 +254,7 @@ App::xspf()
     if (path.size())
     {
         m_mainwindow->QMainWindow::setWindowTitle( "Resolving XSPF..." );
-        m_pipe->playXspf( path );
+ //       m_pipe->playXspf( path );
     }
 }
 
@@ -385,13 +351,13 @@ App::onWordle()
     if(!d) {
         d = new WordleDialog( m_mainwindow );
         QString output;
-        TagCloudModel model( this, 0 );
-        for(int i = 0; i < model.rowCount(); ++i) {
-            QModelIndex index = model.index( i, 0 );
-            QString weight = index.data( TagCloudModel::WeightRole ).toString();
-            QString tag = index.data().toString().trimmed().simplified().replace( ' ', '~' );
-            output += tag + ':' + weight + '\n';
-        }
+        //TagCloudModel model( this, 0 );
+        //for(int i = 0; i < model.rowCount(); ++i) {
+        //    QModelIndex index = model.index( i, 0 );
+        //    QString weight = index.data( TagCloudModel::WeightRole ).toString();
+        //    QString tag = index.data().toString().trimmed().simplified().replace( ' ', '~' );
+        //    output += tag + ':' + weight + '\n';
+        //}
         d->setText( output );
     }
     d.show();

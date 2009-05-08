@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2009 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -14,34 +14,57 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#ifndef PLAYDAR_STATUS_H
+#define PLAYDAR_STATUS_H
+
+#include "PlaydarApi.h"
 #include <lastfm/global.h>
-#include "lib/unicorn/UnicornMainWindow.h"
+#include <QStringListModel>
 
 
-class MainWindow : public unicorn::MainWindow
+class PlaydarStatus : public QObject
 {
     Q_OBJECT
 
-    friend class App;
-
-    struct Ui
-    {
-        QMenu* outputdevice;
-        QAction* play;
-        QAction* pause;
-        QAction* skip;    
-        QAction* xspf;
-        QAction* rescan;
-        QAction* wordle;
-        class QComboBox* playdarHosts;
-        class QLabel* playdarStatus;
-    } ui;
-
 public:
-    MainWindow();
+    PlaydarStatus(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
 
-    void setWindowTitle( const Track& );
+    void start();
+    QStringListModel* hostsModel();
+
+signals:
+    void changed(QString newStatusMessage);
+    void authed();
+    void connected();
+
+private slots:
+    void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
+    void onAuth(QString authToken);
+    void onLanRoster(const QStringList& roster);
+    void onError();
+    void makeRosterRequest();
+
+private:
+    void updateText();
+
+    enum State
+    {
+        Connecting, NotPresent, Authorising, Authorised, NotAuthorised
+    };
+
+    QString m_name;
+    QString m_version;
+    QString m_hostname;
+
+    QStringListModel m_hostsModel;
+
+    lastfm::NetworkAccessManager* m_wam;
+    PlaydarApi& m_api;
+    State m_state;
 };
+
+#endif
+

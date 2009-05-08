@@ -20,11 +20,15 @@
 #ifndef APP_H
 #define APP_H
 
-#include <lastfm/global.h>
+#include "PlaydarApi.h"
 #include "lib/unicorn/UnicornApplication.h"
+#include <lastfm/global.h>
 #include <QPointer>
+
 namespace Phonon { class AudioOutput; }
+
 class TagCloudView;
+
 
 class App : public unicorn::Application
 {
@@ -35,20 +39,19 @@ public:
     ~App();
 
     void init( class MainWindow* ) throw( int /*exitcode*/ );
-    
+    void play( class TrackSource *);
+
 public slots:
     void play();
     void xspf(); //prompts to choose a xspf to resolve
-    
-    /** returns false if user cancels the picker dialog */
-    bool scan( bool delete_all_files_first );
-    void startAgain();
     
     void playPause();
     
 private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
+    void onPlaydarConnected();
+    void onReadyToPlay();
     void onPreparing();
     void onStarted( const Track& );
     void onResumed();
@@ -62,17 +65,18 @@ private slots:
 private:
     void cleanup();
     
-    class LocalContentScannerThread* m_contentScannerThread;
-    class LocalContentScanner* m_contentScanner;
-    class TrackTagUpdater* m_trackTagUpdater;
     class MainWindow* m_mainwindow;
     QPointer<TagCloudView> m_cloud;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
+    class PlaydarStatus* m_playdarStatus;
     
     Phonon::AudioOutput* m_audioOutput;
     
     bool m_playing;
+
+    PlaydarApi m_api;
+    lastfm::NetworkAccessManager* m_wam;
 };
 
 #endif //APP_H

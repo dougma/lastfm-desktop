@@ -17,18 +17,14 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "MediaPipeline.h"
-#include "app/client/Resolver.h"
-#include "app/client/XspfResolvingTrackSource.h"
-#include "app/client/LocalRql.h"
-#include "app/client/LocalRadioTrackSource.h"
-#include "app/clientplugins/localresolver/LocalRqlPlugin.h"
-#include "app/clientplugins/localresolver/TrackResolver.h"
+#include <cmath>
 #include <QEventLoop>
+#include <QStringList>
 #include <QThread>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
-#include <cmath>
+#include "MediaPipeline.h"
+#include "TrackSource.h"
 
 
 MediaPipeline::MediaPipeline( Phonon::AudioOutput* ao, QObject* parent )
@@ -44,13 +40,6 @@ MediaPipeline::MediaPipeline( Phonon::AudioOutput* ao, QObject* parent )
     connect( mo, SIGNAL(aboutToFinish()), SLOT(enqueue()) ); // fires just before track finishes
     connect( mo, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononSourceChanged( Phonon::MediaSource )) ); 
     Phonon::createPath( mo, ao );
-    
-/// local rql
-    m_localRqlPlugin = new LocalRqlPlugin;
-    m_localRql = new LocalRql( QList<ILocalRqlPlugin*>() << m_localRqlPlugin );
-/// content resolver
-    m_trackResolver = new TrackResolver;
-    m_resolver = new Resolver( QList<ITrackResolverPlugin*>() << m_trackResolver );
 }
 
 
@@ -92,49 +81,11 @@ static inline QWidget* findTopLevelWidget( QObject* o )
 
 
 void
-MediaPipeline::playTags( QStringList tags )
+MediaPipeline::play( TrackSource* trackSource )
 {
-    for (int i = 0; i < tags.count(); ++i)
-        tags[i] = "tag:\"" + tags[i] + '"';
-    QString const rql = tags.join( " or " );
-    LocalRqlResult* result = m_localRql->startParse( rql );
-    
-    if (!result) {
-        emit error( "Could not load Local Content plugin." );
-        return;
-    }
-
-    //FIXME this synconicity is evil, but so is asyncronicity here
-    QEventLoop loop;
-    connect( result, SIGNAL(parseGood( unsigned )), &loop, SLOT(quit()) );
-    connect( result, SIGNAL(parseBad( int, QString, int )), &loop, SLOT(quit()) );
-    loop.exec();
-
-    LocalRadioTrackSource* source = new LocalRadioTrackSource( result );
-    play( source );
-    source->start();
-}
-
-
-void
-MediaPipeline::playXspf( const QString& path )
-{
-    XspfResolvingTrackSource* source = new XspfResolvingTrackSource( m_resolver, path );
-    play( source );
-    source->start();
-}
-
-
-void
-MediaPipeline::play( AbstractTrackSource* trackSource )
-{
-	delete m_source;
+//	delete m_source;
     m_source = trackSource;
-
-	connect( m_source, SIGNAL(trackAvailable()), SLOT(enqueue()) );
-	connect( m_source, SIGNAL(error( Ws::Error )), SLOT(onSourceError( Ws::Error )) );
-	
-    emit preparing();
+    enqueue();
 }
 
 
@@ -283,6 +234,8 @@ MediaPipeline::enqueue()
         // state changes, so we must prefilter them.
         if (!t.url().isValid()) continue;
         
+        
+
         qDebug() << t.url().toString();
 
         m_tracks[t.url()] = t;
@@ -302,7 +255,7 @@ MediaPipeline::enqueue()
 
 
 void
-MediaPipeline::onSourceError( Ws::Error e )
+MediaPipeline::onSourceError( lastfm::ws::Error e )
 {
     qCritical() << e;
     emit error( "There was an error generating the playlist." );

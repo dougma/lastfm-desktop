@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product
 		Id="C57A8E40-FE11-480c-9C61-22E325FDAD45"
-		Name="Boffin" Language="1033" Version="0.0.6.0" Manufacturer="Last.fm" 
+		Name="Boffin" Language="1033" Version="0.0.7.0" Manufacturer="Last.fm" 
 		UpgradeCode="835A5BD7-58E3-40a5-959C-1FB316053472">
     
 		<Package 
@@ -10,6 +10,8 @@
         Manufacturer="Last.fm Ltd." 
         InstallerVersion="300"
         Compressed="yes" />
+
+    <Upgrade Id="835A5BD7-58E3-40a5-959C-1FB316053472" />
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 

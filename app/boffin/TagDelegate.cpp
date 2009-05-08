@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "TagDelegate.h"
-#include "TagCloudModel.h"
+#include "PlaydarTagCloudModel.h"
 #include <QPainter>
 
 
@@ -68,7 +68,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     painter->setRenderHint( QPainter::Antialiasing, true );
     painter->drawRoundedRect( option.rect.adjusted( 2, 2, -2, -2 ), 5.0f, 5.0f );
 
-    const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
+    const float weight = index.data( PlaydarTagCloudModel::LinearWeightRole ).value<float>();
     painter->setFont( font( option.font, weight ) );
 
     painter->setRenderHint( QPainter::Antialiasing, false );
@@ -91,7 +91,7 @@ extern int gLeftMargin;
 QSize 
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
-    const float weight = index.data( TagCloudModel::LinearWeightRole ).value<float>();
+    const float weight = index.data( PlaydarTagCloudModel::LinearWeightRole ).value<float>();
     QFontMetrics fm( font( option.font, weight ) );
     
     const QSize margin = margins( weight );

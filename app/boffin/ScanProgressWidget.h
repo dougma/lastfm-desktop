@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include <QWidget>
-#include <lastfm/WsReply>
 #include <lastfm/Track>
 #include <QGLWidget>
 #include <QHash>
@@ -37,7 +36,7 @@ public:
         this->x = this->opacity = 0;
         this->artist = artist;
         
-        connect( artist.getInfo(), SIGNAL(finished( WsReply* )), SLOT(onArtistGotInfo( WsReply* )) );
+        connect( (QObject*)artist.getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()) );
     }
     
     QImage pixmap;
@@ -52,7 +51,7 @@ signals:
     void fucked();
 
 private slots:
-    void onArtistGotInfo( class WsReply* );
+    void onArtistGotInfo();
     void onImageDownloaded();
 };
 

@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "ScanProgressWidget.h"
-#include <lastfm/WsAccessManager>
+#include <lastfm/ws.h>
 #include <lastfm/Track>
 #include <QtGui>
 #include <QtNetwork>
@@ -171,20 +171,11 @@ ScanProgressWidget::onImageFucked()
 
 
 void
-ImageFucker::onArtistGotInfo( WsReply* wsreply )
+ImageFucker::onArtistGotInfo()
 {
-    try 
-    {
-        static WsAccessManager nam;
-        
-        QUrl url = Artist::getInfo( wsreply ).imageUrl();
-        QNetworkReply* reply = nam.get( QNetworkRequest(url) );
-        connect( reply, SIGNAL(finished()), SLOT(onImageDownloaded()) );
-    }
-    catch (std::runtime_error& e)
-    {
-        qWarning() << e.what();
-    }
+    QUrl url = Artist::getInfo( (QNetworkReply*)sender() ).imageUrl();
+    QNetworkReply* reply = lastfm::nam()->get( QNetworkRequest(url) );
+    connect( reply, SIGNAL(finished()), SLOT(onImageDownloaded()) );
 }
 
 

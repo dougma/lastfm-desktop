@@ -33,6 +33,8 @@ public:
     virtual void scrollTo( const QModelIndex&, ScrollHint ) {};
     virtual QRect visualRect( const QModelIndex& ) const;
 
+    void setModel(QAbstractItemModel *model);
+
     QStringList currentTags() const;
    
 public slots:
@@ -40,6 +42,7 @@ public slots:
 
 protected slots:
     virtual void updateGeometries();
+    void onRowsInserted(const QModelIndex & parent, int start, int end);
 
 protected:
     void rectcalc();
