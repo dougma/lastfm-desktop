@@ -18,7 +18,7 @@
  ***************************************************************************/
  
 #include "TagCloudView.h"
-#include "TagCloudModel.h"
+#include "PlaydarTagCloudModel.h"
 #include <QApplication>
 #include <QDebug>
 #include <QMouseEvent>
@@ -121,6 +121,8 @@ TagCloudView::paintEvent( QPaintEvent* e )
 void 
 TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
+    Q_UNUSED(start);
+    Q_UNUSED(end);
     rectcalc();
 }
 
