@@ -2,7 +2,8 @@ TEMPLATE = app
 TARGET = moralistfad
 VERSION = 2.0.0
 QT = core gui xml network phonon
-LIBS += -llastfm -lunicorn
+CONFIG += lastfm
+LIBS += -lunicorn
 
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )

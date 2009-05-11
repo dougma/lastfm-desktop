@@ -1,4 +1,4 @@
-CONFIG += unicorn boost
+CONFIG += lastfm unicorn boost 
 QT += opengl sql phonon
 VERSION = 1.0.0
 

@@ -1,5 +1,6 @@
 TARGET = unicorn
 TEMPLATE = lib
+CONFIG += lastfm
 QT = core gui xml network
 LIBS += -llastfm
 

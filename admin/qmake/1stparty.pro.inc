@@ -14,4 +14,8 @@ CONFIG( fingerprint ) {
 CONFIG( lastfm ) {
     QT += core network xml
     LIBS += -llastfm
+    win32 {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += lastfm
+    }
 }
