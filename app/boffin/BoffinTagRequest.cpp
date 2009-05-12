@@ -24,19 +24,20 @@
 #include "json_spirit/json_spirit.h"
 #include <lastfm/NetworkAccessManager>
 
-#include "BoffinRequest.h"
+#include "BoffinTagRequest.h"
 #include "jsonGetMember.hpp"
 
 
-BoffinRequest::BoffinRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
+BoffinTagRequest::BoffinTagRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql)
 : m_api(api)
 , m_wam(wam)
+, m_rql(rql)
 , m_tagcloudReply(0)
 , m_pollReply(0)
 {
 }
 
-BoffinRequest::~BoffinRequest()
+BoffinTagRequest::~BoffinTagRequest()
 {
     delete m_tagcloudReply;
     delete m_pollReply;
@@ -44,7 +45,7 @@ BoffinRequest::~BoffinRequest()
 
 
 void 
-BoffinRequest::onReqFinished()
+BoffinTagRequest::onReqFinished()
 {
     QNetworkReply *reply = (QNetworkReply*) sender();
     if (reply->error() == QNetworkReply::NoError) {
@@ -55,7 +56,7 @@ BoffinRequest::onReqFinished()
 }
 
 void 
-BoffinRequest::onPollFinished()
+BoffinTagRequest::onPollFinished()
 {
     QNetworkReply *reply = (QNetworkReply*) sender();
     if (reply->error() == QNetworkReply::NoError) {
@@ -67,12 +68,9 @@ BoffinRequest::onPollFinished()
 
 // virtual 
 void 
-BoffinRequest::issueRequest()
+BoffinTagRequest::issueRequest()
 {
-    m_tagcloudReply = m_wam->get(
-        QNetworkRequest(
-            m_api.boffinTagcloud()));
-
+    m_tagcloudReply = m_wam->get( QNetworkRequest( m_api.boffinTagcloud( m_rql ) ) );
     if (m_tagcloudReply) {
         connect(m_tagcloudReply, SIGNAL(finished()), this, SLOT(onReqFinished()));
     } else {
@@ -82,7 +80,7 @@ BoffinRequest::issueRequest()
 
 // virtual 
 void 
-BoffinRequest::issuePoll(unsigned msDelay)
+BoffinTagRequest::issuePoll(unsigned msDelay)
 {
     QTimer::singleShot(msDelay, this, SLOT(onTimer()));
 }
@@ -90,7 +88,7 @@ BoffinRequest::issuePoll(unsigned msDelay)
 
 // virtual
 bool
-BoffinRequest::handleJsonPollResponse(int poll, 
+BoffinTagRequest::handleJsonPollResponse(int poll, 
                                       const json_spirit::Object& , 
                                       const json_spirit::Array& results)
 {
@@ -112,7 +110,7 @@ BoffinRequest::handleJsonPollResponse(int poll,
 }
 
 void
-BoffinRequest::onTimer()
+BoffinTagRequest::onTimer()
 {
     // start the poll now
     delete m_pollReply; // free any previous
@@ -135,7 +133,7 @@ BoffinRequest::onTimer()
 
 //virtual 
 void 
-BoffinRequest::fail(const char* message)
+BoffinTagRequest::fail(const char* message)
 {
     emit error();
 }

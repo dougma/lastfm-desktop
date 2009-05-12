@@ -38,6 +38,7 @@ class MainWindow : public unicorn::MainWindow
         QAction* wordle;
         class QComboBox* playdarHosts;
         class QLabel* playdarStatus;
+
     } ui;
 
 public:

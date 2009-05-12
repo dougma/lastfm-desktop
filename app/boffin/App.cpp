@@ -16,21 +16,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
-#include "App.h"
-#include "MainWindow.h"
-#include "MediaPipeline.h"
-#include "PickDirsDialog.h"
-#include "ScanProgressWidget.h"
-#include "ScrobSocket.h"
-#include "TrackSource.h"
-//#include "app/clientplugins/localresolver/LocalContentScannerThread.h"
-//#include "app/clientplugins/localresolver/LocalContentScanner.h"
-//#include "app/clientplugins/localresolver/LocalContentConfigurator.h"
-//#include "app/clientplugins/localresolver/TrackTagUpdater.h"
-//#include "app/clientplugins/localresolver/QueryError.h"
-#include "lib/unicorn/QMessageBoxBuilder.h"
-#include <lastfm/NetworkAccessManager>
+
+#include <boost/bind.hpp>
 #include <QFileDialog>
 #include <QMenu>
 #include <QComboBox>
@@ -39,8 +26,18 @@
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
+#include <lastfm/NetworkAccessManager>
+#include "lib/unicorn/QMessageBoxBuilder.h"
+#include "App.h"
+#include "MainWindow.h"
+#include "MediaPipeline.h"
+#include "PickDirsDialog.h"
+#include "ScanProgressWidget.h"
+#include "ScrobSocket.h"
+#include "TrackSource.h"
 #include "PlaydarStatus.h"
 #include "BoffinRqlRequest.h"
+#include "PlaydarTagCloudModel.h"
 
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
@@ -49,7 +46,7 @@
 App::App( int& argc, char** argv )
    : unicorn::Application( argc, argv )
    , m_mainwindow( 0 )
-   , m_cloud( 0 )
+   , m_tagcloud( 0 )
    , m_scrobsocket( 0 )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
@@ -162,12 +159,13 @@ App::onOutputDeviceActionTriggered( QAction* a )
         }
 }
 
-
+#include "TagCloudWidget.h"
 #include "TagCloudView.h"
 #include "TagDelegate.h"
 #include "PlaydarTagCloudModel.h"
 #include "PlaydarStatRequest.h"
 #include "PlaydarStatus.h"
+
 
 void
 App::onScanningFinished()
@@ -189,40 +187,23 @@ App::onScanningFinished()
 void
 App::onPlaydarConnected()
 {
-    PlaydarTagCloudModel* model = new PlaydarTagCloudModel(m_api, m_wam);
-    m_cloud = new TagCloudView;
-    m_cloud->setModel( model );
-    m_cloud->setItemDelegate( new TagDelegate );
-    m_mainwindow->setCentralWidget( m_cloud );
-    
-    m_cloud->setFrameStyle( QFrame::NoFrame );
-    model->startGetTags();
+    TagCloudWidget* m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
+//    m_tagcloud->setFrameStyle( QFrame::NoFrame );
+    m_mainwindow->setCentralWidget( m_tagcloud );
 }
 
+
+PlaydarTagCloudModel* 
+App::createTagCloudModel()
+{
+    return new PlaydarTagCloudModel(m_api, m_wam);
+}
 
 void
 App::play()
 {
-    if (!m_cloud) return;
-    if( m_cloud->currentTags().isEmpty())
-    {
-        QMessageBoxBuilder( m_mainwindow ).setTitle( tr("No Tags Selected") )
-                                         .setText( tr("Select at least one tag from the cloud below to start playing music." ))
-                                         .sheet()
-                                         .exec();
-        return;
-    }
-
-    QStringList tags = m_cloud->currentTags();
-    for (int i = 0; i < tags.count(); ++i)
-        tags[i] = "tag:\"" + tags[i] + '"';
-
-    QString rql = tags.join(" and ");
-    BoffinRqlRequest* req = new BoffinRqlRequest(m_wam, m_api, rql);
-    TrackSource* source = new TrackSource(req);
-    connect(source, SIGNAL(ready()), this, SLOT(onReadyToPlay()));
-    req->start();
-    onPreparing();
+    QString s = m_tagcloud->rql();
+    int ii = 0;
 }
 
 
@@ -236,12 +217,8 @@ App::onReadyToPlay()
 void
 App::playPause()
 {
-    if (!m_cloud) return;
-    
     if (m_playing)
         m_mainwindow->ui.pause->toggle();
-    else if (!m_cloud->isEnabled()) //preparing
-        m_pipe->stop();
     else
         play();
 }
@@ -263,7 +240,6 @@ void
 App::onPreparing() //MediaPipeline is preparing to play a new station
 {
     m_mainwindow->QMainWindow::setWindowTitle( "Boffing up..." );
-    m_cloud->setEnabled( false ); //prevent interaction until stop pushed
         
     QAction* a = m_mainwindow->ui.play;
     a->setIcon( QPixmap(":/stop.png") );
@@ -312,7 +288,6 @@ void
 App::onStopped()
 {
     m_mainwindow->setWindowTitle( Track() );
-    m_cloud->setEnabled( true );
     m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( false );
     m_mainwindow->ui.play->blockSignals( false );

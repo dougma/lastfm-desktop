@@ -36,7 +36,7 @@ public:
     void setModel(QAbstractItemModel *model);
 
     QStringList currentTags() const;
-   
+
 public slots:
     virtual void selectAll();
 

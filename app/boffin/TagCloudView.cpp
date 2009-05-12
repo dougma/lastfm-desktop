@@ -120,6 +120,7 @@ TagCloudView::paintEvent( QPaintEvent* e )
 void 
 TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
+    Q_UNUSED(parent);
     Q_UNUSED(start);
     Q_UNUSED(end);
     updateGeometries();
@@ -149,6 +150,9 @@ TagCloudView::rectcalc()
 void
 TagCloudView::updateGeometries()
 {
+    if (!model())
+        return;
+
     rectcalc(); //TODO only needs to be done once when data is set!
     
     const int VIEWPORT_MARGIN = 10;

@@ -17,68 +17,54 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef APP_H
-#define APP_H
+#ifndef SIDE_BY_SIDE_LAYOUT_H
+#define SIDE_BY_SIDE_LAYOUT_H
 
-#include "PlaydarApi.h"
-#include "lib/unicorn/UnicornApplication.h"
-#include <lastfm/global.h>
-#include <QPointer>
+#include <QLayout>
 
-namespace Phonon { class AudioOutput; }
+/** @brief: A layout that allows 2 or more widgets to be laid out side by side
+  *         and scroll forwards and backwards with nice animation.
+  */
 
-class TagCloudView;
-class QItemSelection;
-class PlaydarTagCloudModel;
+/** still to implement: scrollToWidget method
+  *                     handle wrapping around the last/first widgets more nicely 
+  *                     make sure it's robust 
+  */
 
-class App : public unicorn::Application
+class SideBySideLayout : public QLayout
 {
     Q_OBJECT
-    
 public:
-    App( int& argc, char* argv[] );
-    ~App();
-
-    void init( class MainWindow* ) throw( int /*exitcode*/ );
-    void play( class TrackSource *);
+    SideBySideLayout( class QWidget* parent = 0 );
+    ~SideBySideLayout();
+    
+    void addItem(QLayoutItem *item);
+    Qt::Orientations expandingDirections() const;
+    bool hasHeightForWidth() const;
+    int count() const;
+    QLayoutItem *itemAt(int index) const;
+    QSize minimumSize() const;
+    void setGeometry(const QRect &rect);
+    QSize sizeHint() const;
+    QLayoutItem *takeAt(int index);
+    QWidget* currentWidget();
+    int currentItemIndex();
+    
+signals:
+    void animationFinished();
 
 public slots:
-    void play();
-    void xspf(); //prompts to choose a xspf to resolve
-    
-    void playPause();
+    void moveForward();
+    void moveBackward();
     
 private slots:
-    void onOutputDeviceActionTriggered( class QAction* );
-
-    void onPlaydarConnected();
-    void onReadyToPlay();
-    void onPreparing();
-    void onStarted( const Track& );
-    void onResumed();
-    void onPaused();
-    void onStopped();
-    
-    void onScanningFinished();    
-    void onPlaybackError( const QString& );
-    void onWordle();
+    void onFrameChanged( int frame );
 
 private:
-    void cleanup();
-    PlaydarTagCloudModel* createTagCloudModel();
-
-    class MainWindow* m_mainwindow;
-    class TagCloudWidget* m_tagcloud;
-    class ScrobSocket* m_scrobsocket;
-    class MediaPipeline* m_pipe;
-    class PlaydarStatus* m_playdarStatus;
-    
-    Phonon::AudioOutput* m_audioOutput;
-    
-    bool m_playing;
-
-    PlaydarApi m_api;
-    lastfm::NetworkAccessManager* m_wam;
+    void doLayout( const QRect &rect, int hOffset = 0 );
+    QList<QLayoutItem *> m_itemList;
+    QLayoutItem* m_currentItem;
+    class QTimeLine* m_timeLine;
 };
 
-#endif //APP_H
+#endif //SIDE_BY_SIDE_LAYOUT_H
