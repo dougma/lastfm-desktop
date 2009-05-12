@@ -20,7 +20,7 @@
 #ifndef PLAYDAR_TAG_CLOUD_MODEL_H
 #define PLAYDAR_TAG_CLOUD_MODEL_H
 
-#include "BoffinRequest.h"
+#include "BoffinTagRequest.h"
 #include "PlaydarApi.h"
 #include <lastfm/global.h>
 #include <QAbstractItemModel>
@@ -40,7 +40,7 @@ public:
     PlaydarTagCloudModel(PlaydarApi& p, lastfm::NetworkAccessManager* wam);
     ~PlaydarTagCloudModel(void);
 
-    void startGetTags();
+    void startGetTags(const QString& rql = QString());
 
     void setHostFilter(QSet<QString> hosts);            // exclude hosts from tagcloud
     void addToHostFilter(const QString& hostname);

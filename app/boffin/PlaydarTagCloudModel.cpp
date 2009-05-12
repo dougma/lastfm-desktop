@@ -13,11 +13,11 @@ PlaydarTagCloudModel::~PlaydarTagCloudModel()
 }
 
 void 
-PlaydarTagCloudModel::startGetTags()
+PlaydarTagCloudModel::startGetTags(const QString& rql)
 {
     qRegisterMetaType<QList<BoffinTagItem> >("QList<BoffinTagItem>");
 
-    BoffinRequest* req = new BoffinRequest(m_wam, m_api);
+    BoffinTagRequest* req = new BoffinTagRequest(m_wam, m_api, rql);
     connect(req, SIGNAL(tags(QList<BoffinTagItem>)), this, SLOT(onTags(QList<BoffinTagItem>)));
     connect(req, SIGNAL(error()), this, SLOT(onTagError()));
     req->start();

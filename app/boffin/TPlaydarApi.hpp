@@ -86,11 +86,11 @@ public:
     }
 
     // boffin does its own thing:
-    UrlT boffinTagcloud()
+    UrlT boffinTagcloud(const StringT& rql = StringT())
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
-        return makeUrl("/boffin/tagcloud", params);
+        return makeUrl("/boffin/tagcloud/" + rql, params);
     }
 
     UrlT boffinRql(const StringT& rql)

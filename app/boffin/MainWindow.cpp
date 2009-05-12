@@ -36,9 +36,9 @@ MainWindow::MainWindow()
     ui.rescan = tools->addAction( tr("&Scan Music Again") );
     tools->addAction( tr("Show &Log"), this, SLOT(openLog()) );
     ui.wordle = tools->addAction( tr("Wordlize"));
+
     QToolBar* toolbar = new QToolBar;
     toolbar->setIconSize( QSize( 41, 41 ) );
-
     ui.play = toolbar->addAction( tr("Play") );
     ui.play->setIcon( QPixmap(":/play.png") );
     ui.pause = toolbar->addAction( tr("Pause") );
@@ -46,8 +46,8 @@ MainWindow::MainWindow()
     ui.pause->setCheckable( true );
     ui.skip = toolbar->addAction( tr("Skip") );
     ui.skip->setIcon( QPixmap(":/skip.png") );
-
     addToolBar( toolbar );
+
     setWindowTitle( Track() );
     setUnifiedTitleAndToolBarOnMac( true );
     resize( 750, 550 );

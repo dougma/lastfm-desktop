@@ -41,15 +41,15 @@ struct BoffinTagItem
     float m_weight;
 };
 
-class BoffinRequest 
+class BoffinTagRequest 
     : public QObject
     , public PlaydarPollingRequest
 {
     Q_OBJECT
 
 public:
-    BoffinRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
-    ~BoffinRequest();
+    BoffinTagRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql);
+    ~BoffinTagRequest();
 
 signals:
     void error();
@@ -68,6 +68,7 @@ private:
 
     PlaydarApi m_api;
     lastfm::NetworkAccessManager *m_wam;
+    QString m_rql;
     QNetworkReply *m_tagcloudReply;
     QNetworkReply *m_pollReply;
 };

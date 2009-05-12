@@ -28,7 +28,8 @@
 namespace Phonon { class AudioOutput; }
 
 class TagCloudView;
-
+class QItemSelection;
+class PlaydarTagCloudModel;
 
 class App : public unicorn::Application
 {
@@ -64,9 +65,10 @@ private slots:
 
 private:
     void cleanup();
-    
+    PlaydarTagCloudModel* createTagCloudModel();
+
     class MainWindow* m_mainwindow;
-    QPointer<TagCloudView> m_cloud;
+    class TagCloudStack* m_tagStack;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
     class PlaydarStatus* m_playdarStatus;
