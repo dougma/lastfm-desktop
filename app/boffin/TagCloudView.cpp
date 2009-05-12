@@ -20,7 +20,6 @@
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
 #include <QApplication>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -89,7 +88,7 @@ TagCloudView::paintEvent( QPaintEvent* e )
     
     QHash< QModelIndex, QRect >::const_iterator i = m_rects.constBegin();
 
-    if( model()->rowCount() == 0 )
+    if( m_rects.isEmpty() )
     {
         p.drawText( viewport()->rect(), Qt::AlignCenter,  "No tags have been found!" );
         return;
@@ -123,7 +122,7 @@ TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
     Q_UNUSED(start);
     Q_UNUSED(end);
-    rectcalc();
+    updateGeometries();
 }
 
 int gBaseline, gLeftMargin; //filthy but easiest
@@ -190,6 +189,7 @@ TagCloudView::updateGeometries()
     verticalScrollBar()->setPageStep( viewport()->height() );
     verticalScrollBar()->setSingleStep( 20 /*TODO*/ ); 
 
+    viewport()->update();
     QAbstractItemView::updateGeometries();
 }
 

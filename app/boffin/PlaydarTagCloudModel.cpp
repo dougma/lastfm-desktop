@@ -50,6 +50,7 @@ PlaydarTagCloudModel::onTags(QList<BoffinTagItem> tags)
     m_maxWeight = 0;
     m_minLogWeight = FLT_MAX;
 
+    beginInsertRows( QModelIndex(), m_tagHash.size(), m_tagHash.size() + tagWeightMap.size());
     for (TagWeightMapIterator it = tagWeightMap.begin(); it != tagWeightMap.end(); it++)
     {
         float& weight = it.value();
@@ -61,10 +62,10 @@ PlaydarTagCloudModel::onTags(QList<BoffinTagItem> tags)
         m_logTagHash.insert( logWeight, name );
         m_tagHash.insert( weight, name );
     }
+    endInsertRows();
 
     m_tags = tags;
 
-    reset();
 }
 
 void
@@ -110,7 +111,7 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
 QModelIndex 
 PlaydarTagCloudModel::index( int row, int column, const QModelIndex& parent /*= QModelIndex()*/) const
 {
-    return parent.isValid() ? 
+    return parent.isValid() || row > m_tagHash.count() ? 
         QModelIndex() :
         createIndex( row, column );
 }
@@ -118,21 +119,26 @@ PlaydarTagCloudModel::index( int row, int column, const QModelIndex& parent /*= 
 //virtual 
 QModelIndex 
 PlaydarTagCloudModel::parent( const QModelIndex& ) const
-{ 
+{
     return QModelIndex(); 
 }
 
 //virtual 
 int 
-PlaydarTagCloudModel::rowCount( const QModelIndex& ) const
+PlaydarTagCloudModel::rowCount( const QModelIndex& p ) const
 {
+    if( p.isValid())
+        return 0;
+
     return m_tagHash.count();
 }
 
 //virtual 
 int 
-PlaydarTagCloudModel::columnCount( const QModelIndex& ) const 
+PlaydarTagCloudModel::columnCount( const QModelIndex& p ) const 
 { 
+    if( p.isValid() )
+        return 0;
     return 1; 
 }
 

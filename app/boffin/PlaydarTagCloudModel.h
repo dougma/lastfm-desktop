@@ -24,13 +24,14 @@
 #include "PlaydarApi.h"
 #include <lastfm/global.h>
 #include <QAbstractItemModel>
+#include <QAbstractTableModel>
 #include <QSet>
 #include <QMap>
 #include <QList>
 #include <QMultiMap>
 
 
-class PlaydarTagCloudModel : public QAbstractItemModel
+class PlaydarTagCloudModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -51,6 +52,7 @@ public:
     virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
     virtual int columnCount( const QModelIndex& =QModelIndex() ) const;
     virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
+    virtual bool hasChildren( const QModelIndex& = QModelIndex()) const{ return false; }
 
 private slots:
     void onTags(QList<BoffinTagItem> tags);
