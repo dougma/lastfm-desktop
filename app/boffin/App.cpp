@@ -46,7 +46,7 @@
 App::App( int& argc, char** argv )
    : unicorn::Application( argc, argv )
    , m_mainwindow( 0 )
-   , m_tagStack( 0 )
+   , m_tagcloud( 0 )
    , m_scrobsocket( 0 )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
@@ -159,7 +159,7 @@ App::onOutputDeviceActionTriggered( QAction* a )
         }
 }
 
-#include "TagCloudStack.h"
+#include "TagCloudWidget.h"
 #include "TagCloudView.h"
 #include "TagDelegate.h"
 #include "PlaydarTagCloudModel.h"
@@ -187,9 +187,9 @@ App::onScanningFinished()
 void
 App::onPlaydarConnected()
 {
-    TagCloudStack* m_tagStack = new TagCloudStack( boost::bind(&App::createTagCloudModel, this) );
-    m_tagStack->setFrameStyle( QFrame::NoFrame );
-    m_mainwindow->setCentralWidget( m_tagStack );
+    TagCloudWidget* m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
+//    m_tagcloud->setFrameStyle( QFrame::NoFrame );
+    m_mainwindow->setCentralWidget( m_tagcloud );
 }
 
 
@@ -202,7 +202,7 @@ App::createTagCloudModel()
 void
 App::play()
 {
-    QString s = m_tagStack->rql();
+    QString s = m_tagcloud->rql();
     int ii = 0;
 }
 
