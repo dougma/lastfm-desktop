@@ -187,7 +187,7 @@ App::onScanningFinished()
 void
 App::onPlaydarConnected()
 {
-    TagCloudWidget* m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
+    m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
 //    m_tagcloud->setFrameStyle( QFrame::NoFrame );
     m_mainwindow->setCentralWidget( m_tagcloud );
 }
