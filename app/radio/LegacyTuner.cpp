@@ -18,9 +18,7 @@
  ***************************************************************************/
 
 #include "LegacyTuner.h"
-#include <lastfm/WsDomElement>
-#include <lastfm/CoreSettings>
-#include <lastfm/WsAccessManager>
+#include <lastfm/XmlQuery>
 #include <lastfm/Xspf>
 #include <QCoreApplication>
 #include <QtNetwork>
@@ -33,8 +31,7 @@ static inline QByteArray iso3166() { return QLocale().name().right( 2 ).toAscii(
 
 
 LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_md5 )
-     : m_nam( new WsAccessManager( this ) ),
-       m_retry_counter( 0 ),
+     : m_retry_counter( 0 ),
        m_station( station )
 {    
 #ifdef WIN32
@@ -53,12 +50,12 @@ LegacyTuner::LegacyTuner( const RadioStation& station, const QString& password_m
     url.setPath( "/radio/handshake.php" );
     url.addEncodedQueryItem( "version", QCoreApplication::applicationVersion().toAscii() );
     url.addEncodedQueryItem( "platform", PLATFORM );
-    url.addEncodedQueryItem( "username", QUrl::toPercentEncoding(Ws::Username) );
+    url.addEncodedQueryItem( "username", QUrl::toPercentEncoding(lastfm::ws::Username) );
     url.addEncodedQueryItem( "passwordmd5", password_md5.toAscii() );
     url.addEncodedQueryItem( "language", iso3166() );
 
     QNetworkRequest request( url );
-    QNetworkReply* reply = m_nam->get( request );
+    QNetworkReply* reply = lastfm::nam()->get( request );
     connect( reply, SIGNAL(finished()), SLOT(onHandshakeReturn()) );
 }
 
@@ -196,7 +193,7 @@ LegacyTuner::onGetPlaylistReturn()
         {
             // an empty playlist is a bug, if there is no content
             // NotEnoughContent should have been returned with the WsReply
-            emit error( Ws::MalformedResponse );
+            emit error( lastfm::ws::MalformedResponse );
         }
     }
     else {
