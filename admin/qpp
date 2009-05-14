@@ -8,39 +8,8 @@ require 'find'
 require 'ftools'
 require "#{cwd}/platform.rb"
 
-
-if ARGV[0] && File.file?( ARGV[0] )
-  File.open( ARGV[0] ).each_line do |line|
-    line.chomp!
-
-    matches = /^\s*TEMPLATE += (.*)$/.match( line )
-    if !matches.nil?
-      exit if matches[1].downcase == 'subdirs'
-    end
-
-    matches = /^\s*VERSION += +((\d\.){0,2}\d)/.match( line )
-    if !matches.nil? && !File.file?( "_version.h" )
-      File.open( "_version.h", 'w' ) { |f| f.write( "#define VERSION \"#{matches[1]}\"\n" ) }
-    end
-  end
-end
-
-
-sources = Array.new
-headers = Array.new
-forms = Array.new
-resources = Array.new
-
-dir = ARGV[0]
-if dir.nil?
-  dir = '.'
-elsif !File.directory?( dir )
-  dir = File.dirname( dir )
-end
-
-
-def find_sources( dir )
-  Find.find( dir ) do |path|
+def find_sources()
+  Find.find( '.' ) do |path|
     if File.directory?( path )
       excludes = ['.svn', 'tests', '_build']
       case Platform::IMPL
@@ -59,30 +28,48 @@ def find_sources( dir )
   end
 end
 
+########################################################################### impl
+sources = Array.new
+headers = Array.new
+forms = Array.new
+resources = Array.new
 
-find_sources( dir ) do |path, ext|
-  path.sub!( /^.\//, '' )
-  case ext
-    when ".h"   then headers   << path
-    when ".ui"  then forms     << path
-    when ".qrc" then resources << path
-    when ".cpp" then sources   << path
+abort "usage: qpp file.pro.in" unless File.file? ARGV[0]
+
+File.open( ARGV[0] ).each_line do |line|
+  line.chomp!
+
+  matches = /^\s*TEMPLATE += (.*)$/.match( line )
+  if !matches.nil?
+    exit if matches[1].downcase == 'subdirs'
+  end
+
+  matches = /^\s*VERSION += +((\d\.){0,2}\d)/.match( line )
+  if !matches.nil? && !File.file?( "_version.h" )
+    File.open( "_version.h", 'w' ) { |f| f.write( "#define VERSION \"#{matches[1]}\"\n" ) }
   end
 end
 
+Dir.chdir File.dirname(ARGV[0]) do
+  find_sources do |path, ext|
+    path.sub!( /^.\//, '' )
+    case ext
+      when ".h"   then headers   << path
+      when ".ui"  then forms     << path
+      when ".qrc" then resources << path
+      when ".cpp" then sources   << path
+    end
+  end
+end
 
-def write_section( section, array, f )
+def write_section( section, array )
   return if array.empty?
-  f.write( section + " +=" )
-  array.each do |path|
-    f.write( " \\\n\t" )
-    f.write( path )
-  end
-  f.write( "\n" )
+  print "#{section} +="
+  array.each { |path| print " \\\n\t#{path}" }
+  puts
 end
 
-f = File.open( '_files.qmake', 'w' )
-write_section( "SOURCES", sources, f )
-write_section( "HEADERS", headers, f )
-write_section( "FORMS", forms, f )
-write_section( "RESOURCES", resources, f )
+write_section( "SOURCES", sources )
+write_section( "HEADERS", headers )
+write_section( "FORMS", forms )
+write_section( "RESOURCES", resources )
