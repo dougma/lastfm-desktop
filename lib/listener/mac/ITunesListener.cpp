@@ -151,16 +151,15 @@ ITunesDictionaryHelper::determineTrackInformation()
     artist = token<QString>( CFSTR("Artist") );
     album = token<QString>( CFSTR("Album") );
     name = token<QString>( CFSTR("Name") );
+    pid = token<QString>( CFSTR("PersistentID") );
     
     // Get path decoded - iTunes encodes the file location as URL
     CFStringRef location = token<CFStringRef>( CFSTR("Location") );
     QUrl url = QUrl::fromEncoded( lastfm::CFStringToUtf8( location ) );
     path = url.toString().remove( "file://localhost" );
     
-    static AppleScript script( "tell application \"iTunes\" to return persistent ID of current track & player position" );
-    QString const out = script.exec();
-    pid = out.left( 16 );
-    position = out.mid( 16 ).toInt();
+    static AppleScript script( "tell application \"iTunes\" to return player position" );
+    position = script.exec().toInt();
 }
 /******************************************************************************/
 
@@ -251,8 +250,12 @@ ITunesListener::iTunesIsPlaying()
 void
 ITunesListener::setupCurrentTrack()
 {
+    qDebug() << "hi";
+    
     if (!iTunesIsPlaying() || !isMusic())
         return;
+    
+    qDebug() << "hi";
     
     #define ENDL " & \"\n\" & "
     const char* code =

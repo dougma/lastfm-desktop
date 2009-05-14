@@ -73,10 +73,10 @@ public:
     void clear() { m_state = Stopped; m_track = Track(); m_elapsed = 0; }
     
     /** only pass the track for CommandStart */
-    void handleCommand( PlayerCommand, const Track& t = Track() );    
+    void handleCommand( PlayerCommand, Track = Track() );    
     
 signals:
-    void trackStarted( const Track& );
+    void trackStarted( const Track&, const Track& );
     void paused();
     void resumed();
     void stopped();

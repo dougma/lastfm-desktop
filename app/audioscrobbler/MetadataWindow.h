@@ -24,7 +24,6 @@ class MetadataWindow : public unicorn::MainWindow
 {
     Q_OBJECT
 
-    QString previous_artist;
     struct{
         class QLabel* artist_image;
         class QLabel* album_image;
@@ -37,10 +36,10 @@ class MetadataWindow : public unicorn::MainWindow
     } ui;
 
 public:
-    MetadataWindow(const Track&);
+    MetadataWindow();
 
 public slots:
-    void onTrackStarted(const Track&);
+    void onTrackStarted(const Track&, const Track&);
     void onStopped();
 
 private slots:
