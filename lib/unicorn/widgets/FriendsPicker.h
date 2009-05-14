@@ -17,52 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "FriendsPicker.h"
-#include "widgets/HelpTextLineEdit.h"
-#include "widgets/UnicornWidget.h"
+#ifndef FRIENDS_PICKER_H
+#define FRIENDS_PICKER_H
+
+#include <QDialog>
 #include <lastfm/User>
-#include <lastfm/WsReply.h"
-#include <QDebug>
-#include <QDialogButtonBox>
-#include <QListWidget>
-#include <QVBoxLayout>
 
 
-FriendsPicker::FriendsPicker( const User& user )
-{    
-    qDebug() << user;
-    
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new HelpTextLineEdit( tr("Sear>) ) );
-    v->addWidget( ui.list = new QListWidget );
-    v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
- 
-    UnicornWidget::paintItBlack( this );    
-    
-    setWindowTitle( tr("Browse Friends") );
-    
-    WsReply* r = user.getFriends();
-    connect( r, SIGNAL(finished( WsReply* )), SLOT(onGetFriendsReturn( WsReply* )) );
-    
-    connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
-    connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
-}
-
-
-void
-FriendsPicker::onGetFriendsReturn( WsReply* r )
+class FriendsPicker : public QDialog
 {
-    qDebug() << r;
-    
-    foreach (User u, User::list( r ))
+    Q_OBJECT
+
+    struct
     {
-        ui.list->addItem( u );
-    }
-}
+        class QDialogButtonBox* buttons;
+        class QListWidget* list;
+    } ui;
+    
+public:
+    FriendsPicker( const User& = AuthenticatedUser() );
+    
+    QList<User> selection() const;
 
+private slots:
+    void onGetFriendsReturn();
+};
 
-QList<User>
-FriendsPicker::selection() const
-{
-    return QList<User>();
-}
+#endif

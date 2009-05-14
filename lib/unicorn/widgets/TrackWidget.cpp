@@ -20,7 +20,6 @@
 #include "TrackWidget.h"
 #include "lib/unicorn/TrackImageFetcher.h"
 #include <lastfm/Track>
-#include <lastfm/WsAccessManager>
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -40,11 +39,9 @@ TrackWidget::TrackWidget()
 void
 TrackWidget::setTrack( const Track& track )
 {
-    QNetworkAccessManager* nam = new WsAccessManager;
-    TrackImageFetcher* fetcher = new TrackImageFetcher( track, nam );
+    TrackImageFetcher* fetcher = new TrackImageFetcher( track );
     connect( fetcher, SIGNAL(finished( QImage )), SLOT(onCoverDownloaded( QImage )) );
     fetcher->start();
-    nam->setParent( fetcher );
     
     QString title = track.title();
     QString artist = track.artist();

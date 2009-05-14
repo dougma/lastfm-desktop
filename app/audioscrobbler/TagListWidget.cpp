@@ -18,13 +18,9 @@
  ***************************************************************************/
 
 #include "TagListWidget.h"
-#include "Settings.h"
-#include <lastfm/Tag>
-#include <lastfm/WsReply>
-#include "radio/buckets/DelegateDragHint.h"
-#include "radio/buckets/Amp.h"
-#include "radio/buckets/SeedsWidget.h"
 #include "PlayableMimeData.h"
+#include <lastfm/Tag>
+#include <lastfm/ws.h>
 #include <QDesktopServices>
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -135,18 +131,20 @@ TagListWidget::openTagPageForCurrentItem()
 
 
 void
-TagListWidget::setTagsRequest( WsReply* r )
+TagListWidget::setTagsRequest( QNetworkReply* r )
 {
     clear();
 	delete m_currentReply;
 	m_currentReply = r;
-    connect( (QObject*)r, SIGNAL(finished( WsReply* )), SLOT(onTagsRequestFinished( WsReply* )) );
+    connect( r, SIGNAL(finished()), SLOT(onTagsRequestFinished()) );
 }
 
 
 void
-TagListWidget::onTagsRequestFinished( WsReply* r )
+TagListWidget::onTagsRequestFinished()
 {   
+    QNetworkReply* r = (QNetworkReply*)sender();
+    
     QMap<int, QString> tags = Tag::list( r );
     QMapIterator<int, QString> i( tags );
     while (i.hasNext())

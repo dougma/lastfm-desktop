@@ -18,25 +18,62 @@
  ***************************************************************************/
 
 #include "Application.h"
+#include "MetadataWindow.h"
 #include "StopWatch.h"
 #include "lib/listener/legacy/LegacyPlayerListener.h"
+#include "lib/listener/PlayerConnection.h"
 #include "lib/listener/PlayerListener.h"
 #include "lib/listener/PlayerMediator.h"
 #include <lastfm/Audioscrobbler>
+#include <QMenu>
 using audioscrobbler::Application;
+#define ELLIPSIS QString::fromUtf8("…")
+#ifdef Q_WS_X11
+    #define AS_TRAY_ICON ":16x16.png"
+#else
+    #define AS_TRAY_ICON ":22x22.png"
+#endif
 
 Application::Application(int& argc, char** argv) : unicorn::Application(argc, argv)
 {
+////// tray
     tray = new QSystemTrayIcon(this);
     connect(tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onTrayActivated(QSystemTrayIcon::ActivationReason)));
+    tray->setIcon(QIcon(AS_TRAY_ICON));
     tray->show();
+
+////// tray menu
+    QMenu* menu = new QMenu;
+    m_title_action = menu->addAction(tr("Ready"));
+    menu->addAction(tr("Love"));
+    menu->addAction(tr("Tag")+ELLIPSIS);
+    menu->addAction(tr("Share")+ELLIPSIS);
+    menu->addSeparator();
+    m_submit_scrobbles_toggle = menu->addAction(tr("Submit Scrobbles"));
+#ifdef Q_WS_MAC
+    menu->addAction(tr("Preferences")+ELLIPSIS);
+#else
+    menu->addAction(tr("Options")+ELLIPSIS);
+#endif
+    menu->addSeparator();
+    QAction* quit = menu->addAction(tr("Quit Audioscrobbler"));
     
+    connect(quit, SIGNAL(triggered()), SLOT(quit()));
+        
+    m_title_action->setEnabled( false );
+    m_submit_scrobbles_toggle->setCheckable(true);
+    m_submit_scrobbles_toggle->setChecked(true);
+    tray->setContextMenu(menu);
+
+////// scrobbler
     as = new Audioscrobbler("ass");
-    
+
+////// mediator
     mediator = new PlayerMediator(this);
     connect(mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), SLOT(setConnection( PlayerConnection* )) );
     connect(new LegacyPlayerListener(mediator), SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)) );
 
+////// listeners
     try{
         PlayerListener* listener = new PlayerListener(mediator);
         connect(listener, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
@@ -49,7 +86,23 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 
 void
 Application::onTrayActivated(QSystemTrayIcon::ActivationReason)
-{}
+{
+    if (!mw){
+        Track t;
+        if (mediator->activeConnection())
+            t = mediator->activeConnection()->track();
+        
+        //testing
+        MutableTrack mt(t);
+        mt.setTitle("Falling Down");
+        mt.setArtist("Scarlett Johansson");
+        mt.setDuration(321);
+        
+        mw = new MetadataWindow(t);
+        mw->setAttribute(Qt::WA_DeleteOnClose);
+        mw->show();
+    }
+}
 
 void
 Application::setConnection(PlayerConnection*c)
@@ -83,6 +136,8 @@ Application::onTrackStarted(const Track& t, const Track& oldtrack)
         qWarning() << "Can't start null track!";
         return;
     }
+    
+    m_title_action->setText( t.toString() + " [" + t.durationString()+']' );
 
     delete watch;
     as->submit();
