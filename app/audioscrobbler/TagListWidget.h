@@ -17,30 +17,58 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
+#ifndef TAGLISTWIDGET_H
+#define TAGLISTWIDGET_H
 
-#include <QDialog>
-#include <lastfm/User>
+#include <QTreeWidget>
+#include "PlayableMimeData.h"
 
 
-class FriendsPicker : public QDialog
+class TagListWidget : public QTreeWidget
 {
     Q_OBJECT
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
+    TagListWidget( QWidget* parent = 0 );
     
-    QList<User> selection() const;
+    using QTreeWidget::indexFromItem;
+    
+    /** we won't add the tag if we already have it, and in that case we 
+      * return false */
+    bool add( QString );
+    QStringList newTags() const { return m_newTags; }
+
+public slots:
+    void setTagsRequest( QNetworkReply* );
+    
+protected:
+    virtual QMimeData* mimeData( const QList<QTreeWidgetItem *> items ) const;
+    
+private slots:
+    void onTagsRequestFinished();
+    
+private:
+    class QMenu* m_menu;
+    QStringList m_newTags;
+	QNetworkReply *m_currentReply;
+
+    QTreeWidgetItem* createNewItem( QString tag );
 
 private slots:
-    void onGetFriendsReturn( WsReply* );
+    void showMenu( const QPoint& );
+    
+    void sortByPopularity();
+    void sortAlphabetically();
+    void openTagPageForCurrentItem();
 };
 
-#endif
+
+class TagIconView : public TagListWidget
+{
+    virtual void paintEvent( QPaintEvent* );
+
+public:
+    TagIconView();
+};
+
+#endif // TAGLISTWIDGET_H

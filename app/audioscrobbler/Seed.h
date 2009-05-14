@@ -20,9 +20,8 @@
 #ifndef SEED_H
 #define SEED_H
 
+#include <lastfm/global.h>
 #include <QListWidgetItem>
-#include <QNetworkReply>
-#include <lastfm/WsAccessManager>
 #include "app/moose.h"
 
 class Seed : public QObject
@@ -30,9 +29,10 @@ class Seed : public QObject
     Q_OBJECT
     
 public:
+#if 0
 	Seed( class SeedListView* parent = 0 );
 	Seed( const QString& name, SeedListView* parent = 0 );
-
+#endif
     enum Type { 
         Undefined = -1,
         ArtistType = 0, 
@@ -41,7 +41,7 @@ public:
         PreDefinedType, 
         CustomType
     };
-    
+#if 0
     void setupItem()
     {}
     
@@ -73,17 +73,16 @@ public slots:
     void iconDataDownloaded();
     
 private slots:
-    void onArtistSearchFinished( class WsReply* r );
+    void onArtistSearchFinished( QNetworkReply* r );
     
 private:
     QPixmap cropToSize( const QPixmap, const QSize& ) const;
     QPixmap overlayPixmap( const QPixmap source, const QPixmap overlay, const QPoint offset = QPoint( 0, 0)) const;
-    class WsAccessManager* m_networkManager;
     QString m_rql;
     Type m_type;
     QString m_name;
     QIcon m_icon;
-    
+#endif
 };
 
 Q_DECLARE_METATYPE( Seed::Type )

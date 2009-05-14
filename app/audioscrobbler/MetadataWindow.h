@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,60 +17,34 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAG_DIALOG_H
-#define TAG_DIALOG_H
-
+#include "lib/unicorn/UnicornMainWindow.h"
 #include <lastfm/Track>
-#include <QModelIndex>
-#include <QDialog>
 
-namespace Unicorn 
-{
-    class TabWidget;
-}
-
-
-class TagDialog : public QDialog
+class MetadataWindow : public unicorn::MainWindow
 {
     Q_OBJECT
 
-public:
-    TagDialog( const Track&,QWidget *parent );
+    QString previous_artist;
+    struct{
+        class QLabel* artist_image;
+        class QLabel* album_image;
+        class QLabel* title;
+        class QTextBrowser* bio;
 
-	Track track() const { return m_track; }
-
-private slots:
-    void onWsFinished( WsReply* );
-    void onTagActivated( class QTreeWidgetItem *item );
-    void onAddClicked();
-    void onTagListItemDoubleClicked( QTreeWidgetItem*, int);
-    void follow( WsReply* );
-    void removeCurrentTag();
-
-private:
-    struct Ui
-    {
-        class TrackWidget* track;
-        class SpinnerLabel* spinner;
-        class TagBuckets* appliedTags;
-        class TagListWidget* suggestedTags;
-        class TagListWidget* yourTags;
-        class QDialogButtonBox* buttons;
-        Unicorn::TabWidget* tabs;
-        
-        void setupUi( QWidget* parent );
+        class ImageButton* love;
+        class ImageButton* tag;
+        class ImageButton* share;
     } ui;
 
-    void setupUi();
-    
-    virtual void accept();
-    
-    Track m_track;
-    QStringList m_originalTags;
-    QStringList m_publicTags;
-    QStringList m_userTags;
+public:
+    MetadataWindow(const Track&);
 
-    QList<WsReply*> m_activeRequests;
+public slots:
+    void onTrackStarted(const Track&);
+    void onStopped();
+
+private slots:
+    void onArtistGotInfo();
+//    void onAlbumGotInfo();
+    void onArtistImageDownloaded();
 };
-
-#endif

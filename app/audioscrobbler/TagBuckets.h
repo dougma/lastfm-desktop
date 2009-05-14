@@ -17,58 +17,58 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAGLISTWIDGET_H
-#define TAGLISTWIDGET_H
+#include <lastfm/Track>
+#include <QTextEdit>
+#include <QLayout>
+#include <QWidget>
+class TagBucket;
 
-#include <QTreeWidget>
-#include "PlayableMimeData.h"
+
+class TagBuckets : public QWidget
+{
+    Q_OBJECT
+    
+    Track m_track;
+    int m_current_index;
+    
+public:
+    TagBuckets( const Track& );
+    
+    struct {
+        TagBucket* track;
+        TagBucket* artist;
+        TagBucket* album;
+    } ui;
+    
+    TagBucket* currentBucket() { return (TagBucket*)layout()->itemAt( m_current_index )->widget(); }
+
+signals:
+    void suggestedTagsRequest( QNetworkReply* );
+    
+private slots:
+    void onHeaderClicked();
+};
 
 
-class TagListWidget : public QTreeWidget
+class TagBucket : public QTextEdit
 {
     Q_OBJECT
 
-public:
-    TagListWidget( QWidget* parent = 0 );
-    
-    using QTreeWidget::indexFromItem;
-    
-    /** we won't add the tag if we already have it, and in that case we 
-      * return false */
-    bool add( QString );
-    QStringList newTags() const { return m_newTags; }
+    QStringList m_existingTags;
 
+public:
+    TagBucket();
+       
+    QStringList tags() const;
+    QStringList newTags() const;
+    QStringList deletedTags() const;
+    
 public slots:
-    void setTagsRequest( class WsReply* );
+    void onGotTags( QNetworkReply* );
     
 protected:
-    virtual QMimeData* mimeData( const QList<QTreeWidgetItem *> items ) const;
-    
-private slots:
-    void onTagsRequestFinished( WsReply* );
-    
-private:
-    class QMenu* m_menu;
-    QStringList m_newTags;
-	WsReply *m_currentReply;
-
-    QTreeWidgetItem* createNewItem( QString tag );
-
-private slots:
-    void showMenu( const QPoint& );
-    
-    void sortByPopularity();
-    void sortAlphabetically();
-    void openTagPageForCurrentItem();
-};
-
-
-class TagIconView : public TagListWidget
-{
     virtual void paintEvent( QPaintEvent* );
-
-public:
-    TagIconView();
+    virtual void dropEvent( QDropEvent* );
+    virtual void dragMoveEvent( QDragMoveEvent* );
+    virtual void dragEnterEvent( QDragEnterEvent* );
 };
-
-#endif // TAGLISTWIDGET_H

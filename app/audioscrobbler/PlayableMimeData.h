@@ -24,8 +24,7 @@
 #include <lastfm/Artist>
 #include <lastfm/Tag>
 #include <lastfm/User>
-
-#include "radio/buckets/Seed.h"
+#include "Seed.h"
 
 
 class PlayableMimeData : public QMimeData

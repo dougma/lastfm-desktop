@@ -17,58 +17,60 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#ifndef TAG_DIALOG_H
+#define TAG_DIALOG_H
+
 #include <lastfm/Track>
-#include <QTextEdit>
-#include <QLayout>
-#include <QWidget>
-class TagBucket;
+#include <QModelIndex>
+#include <QDialog>
+
+namespace Unicorn
+{
+    class TabWidget;
+}
 
 
-class TagBuckets : public QWidget
+class TagDialog : public QDialog
 {
     Q_OBJECT
+
+public:
+    TagDialog( const Track&, QWidget* parent );
+
+	Track track() const { return m_track; }
+
+private slots:
+    void onWsFinished( QNetworkReply* );
+    void onTagActivated( class QTreeWidgetItem *item );
+    void onAddClicked();
+    void onTagListItemDoubleClicked( QTreeWidgetItem*, int);
+    void follow( QNetworkReply* );
+    void removeCurrentTag();
+
+private:
+    struct Ui
+    {
+        class TrackWidget* track;
+        class SpinnerLabel* spinner;
+        class TagBuckets* appliedTags;
+        class TagListWidget* suggestedTags;
+        class TagListWidget* yourTags;
+        class QDialogButtonBox* buttons;
+        Unicorn::TabWidget* tabs;
+        
+        void setupUi( QWidget* parent );
+    } ui;
+
+    void setupUi();
+    
+    virtual void accept();
     
     Track m_track;
-    int m_current_index;
-    
-public:
-    TagBuckets( const Track& );
-    
-    struct {
-        TagBucket* track;
-        TagBucket* artist;
-        TagBucket* album;
-    } ui;
-    
-    TagBucket* currentBucket() { return (TagBucket*)layout()->itemAt( m_current_index )->widget(); }
+    QStringList m_originalTags;
+    QStringList m_publicTags;
+    QStringList m_userTags;
 
-signals:
-    void suggestedTagsRequest( class WsReply* );
-    
-private slots:
-    void onHeaderClicked();
+    QList<QNetworkReply*> m_activeRequests;
 };
 
-
-class TagBucket : public QTextEdit
-{
-    Q_OBJECT
-
-    QStringList m_existingTags;
-
-public:
-    TagBucket();
-       
-    QStringList tags() const;
-    QStringList newTags() const;
-    QStringList deletedTags() const;
-    
-public slots:
-    void onGotTags( class WsReply* );
-    
-protected:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void dropEvent( QDropEvent* );
-    virtual void dragMoveEvent( QDragMoveEvent* );
-    virtual void dragEnterEvent( QDragEnterEvent* );
-};
+#endif
