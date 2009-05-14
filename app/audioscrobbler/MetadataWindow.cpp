@@ -37,7 +37,7 @@ static inline ImageButton* ib(const char* s)
     return b;
 }
 
-MetadataWindow::MetadataWindow(const Track& t)
+MetadataWindow::MetadataWindow()
 {
     setCentralWidget(new QWidget);
 
@@ -60,6 +60,10 @@ MetadataWindow::MetadataWindow(const Track& t)
     v->addStretch();
     v->addWidget(ui.title = new QLabel);
 
+    QFont f = ui.title->font();
+    f.setBold(true);
+    ui.title->setFont(f);
+
     QPalette p;
     QColor gray(28, 28, 28);
     p.setColor(QPalette::Text, Qt::white);
@@ -76,25 +80,21 @@ MetadataWindow::MetadataWindow(const Track& t)
     setFixedWidth(252);
     setWindowTitle(tr("Last.fm Audioscrobbler"));
     resize(20, 500);
-
-    onTrackStarted(t);
 }
 
 void
-MetadataWindow::onTrackStarted(const Track& t)
+MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
 {
     QString title="%1\n%2 (%3)";
     ui.title->setText(title.arg(t.artist()).arg(t.title()).arg(t.durationString()));
 
-    if (t.artist() == previous_artist)return;
+    if (t.artist() == previous.artist())return;
 
     ui.bio->clear();
     ui.artist_image->clear();
 
     connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
 //    connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
-
-    previous_artist = t.artist();
 }
 
 void

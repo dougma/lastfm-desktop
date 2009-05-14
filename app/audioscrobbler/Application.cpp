@@ -20,10 +20,11 @@
 #include "Application.h"
 #include "MetadataWindow.h"
 #include "StopWatch.h"
-#include "lib/listener/legacy/LegacyPlayerListener.h"
 #include "lib/listener/PlayerConnection.h"
 #include "lib/listener/PlayerListener.h"
 #include "lib/listener/PlayerMediator.h"
+#include "lib/listener/legacy/LegacyPlayerListener.h"
+#include "lib/listener/mac/ITunesListener.h"
 #include <lastfm/Audioscrobbler>
 #include <QMenu>
 using audioscrobbler::Application;
@@ -36,13 +37,13 @@ using audioscrobbler::Application;
 
 Application::Application(int& argc, char** argv) : unicorn::Application(argc, argv)
 {
-////// tray
+/// tray
     tray = new QSystemTrayIcon(this);
     connect(tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onTrayActivated(QSystemTrayIcon::ActivationReason)));
     tray->setIcon(QIcon(AS_TRAY_ICON));
     tray->show();
 
-////// tray menu
+/// tray menu
     QMenu* menu = new QMenu;
     m_title_action = menu->addAction(tr("Ready"));
     menu->addAction(tr("Love"));
@@ -65,18 +66,28 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
     m_submit_scrobbles_toggle->setChecked(true);
     tray->setContextMenu(menu);
 
-////// scrobbler
+/// MetadataWindow
+    mw = new MetadataWindow;
+
+/// scrobbler
     as = new Audioscrobbler("ass");
 
-////// mediator
+/// mediator
     mediator = new PlayerMediator(this);
     connect(mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), SLOT(setConnection( PlayerConnection* )) );
     connect(new LegacyPlayerListener(mediator), SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)) );
 
-////// listeners
+/// listeners
     try{
-        PlayerListener* listener = new PlayerListener(mediator);
-        connect(listener, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
+    #ifdef Q_OS_MAC
+        ITunesListener* itunes = new ITunesListener(mediator);
+        connect(itunes, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
+        itunes->start();
+    #endif
+        QObject* o = new PlayerListener(mediator);
+        connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
+        o = new LegacyPlayerListener(mediator);
+        connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
     }
     catch(std::runtime_error& e){
         qWarning() << e.what();
@@ -87,21 +98,7 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 void
 Application::onTrayActivated(QSystemTrayIcon::ActivationReason)
 {
-    if (!mw){
-        Track t;
-        if (mediator->activeConnection())
-            t = mediator->activeConnection()->track();
-        
-        //testing
-        MutableTrack mt(t);
-        mt.setTitle("Falling Down");
-        mt.setArtist("Scarlett Johansson");
-        mt.setDuration(321);
-        
-        mw = new MetadataWindow(t);
-        mw->setAttribute(Qt::WA_DeleteOnClose);
-        mw->show();
-    }
+    mw->show();
 }
 
 void
@@ -109,17 +106,23 @@ Application::setConnection(PlayerConnection*c)
 {
     if(connection){
         disconnect(connection, 0, this, 0);
+        disconnect(connection, 0, mw, 0);
         if(watch)
             connection->setElapsed(watch->elapsed());
     }
+
     connect(c, SIGNAL(trackStarted(Track, Track)), SLOT(onTrackStarted(Track, Track)));
-    connect(c, SIGNAL(paused()), SLOT(onTrackPaused()));
-    connect(c, SIGNAL(resumed()), SLOT(onTrackResumed()));
-    connect(c, SIGNAL(resumed()), SLOT(onTrackStopped()));
+    connect(c, SIGNAL(paused()), SLOT(onPaused()));
+    connect(c, SIGNAL(resumed()), SLOT(onResumed()));
+    connect(c, SIGNAL(stopped()), SLOT(onStopped()));
+    connect(c, SIGNAL(trackStarted(Track, Track)), mw, SLOT(onTrackStarted(Track, Track)));
+    connect(c, SIGNAL(stopped()), mw, SLOT(onStopped()));
     connection = c;
 
-    if(c->state() == Playing)
+    if(c->state() == Playing){
         onTrackStarted(c->track(), Track());
+        mw->onTrackStarted(c->track(), Track());
+    }
 }
 
 void
@@ -137,7 +140,7 @@ Application::onTrackStarted(const Track& t, const Track& oldtrack)
         return;
     }
     
-    m_title_action->setText( t.toString() + " [" + t.durationString()+']' );
+    m_title_action->setText( t.title() + " [" + t.durationString()+']' );
 
     delete watch;
     as->submit();
