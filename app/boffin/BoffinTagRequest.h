@@ -27,7 +27,7 @@
 
 struct BoffinTagItem
 {
-    BoffinTagItem(const std::string &name, const std::string &host, int count, float weight)
+    BoffinTagItem(const std::string& name, const std::string& host, int count, float weight)
         : m_name(QString::fromStdString(name))
         , m_host(QString::fromStdString(host))
         , m_count(count)

@@ -57,3 +57,12 @@ CONFIG( sqlite3 ) {
     }
     else:LIBS += -lsqlite3
 }
+
+CONFIG( yajl ) {
+	win32 {
+		CONFIG += link_pkgconfig
+		debug:PKGCONFIG += yajl-debug
+		release:PKGCONFIG += yajl-release
+	}
+	else:LIBS += -lyajl
+}

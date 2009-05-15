@@ -39,16 +39,14 @@ struct BoffinPlayableItem
 
 class BoffinRqlRequest
     : public QObject
-    , public PlaydarPollingRequest
 {
     Q_OBJECT
 public:
-    BoffinRqlRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, QString rql);
+    BoffinRqlRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session);
     ~BoffinRqlRequest();
 
 signals:
-    void error();
-    void tracks(QList<BoffinPlayableItem> tracks);
+    void requestMade(QString qid);
 
 private slots:
     void onReqFinished();
@@ -61,12 +59,8 @@ private:
     virtual bool handleJsonPollResponse(int poll, const json_spirit::Object& query, const json_spirit::Array& results);
     virtual void fail(const char* message);
 
-    PlaydarApi m_api;
-    lastfm::NetworkAccessManager *m_wam;
-    QNetworkReply *m_rqlReply;
-    QNetworkReply *m_pollReply;
-
     QString m_rql;
+    QString m_session;
 };
 
 #endif

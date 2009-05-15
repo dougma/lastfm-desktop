@@ -17,59 +17,56 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_STATUS_H
-#define PLAYDAR_STATUS_H
-
-#include "PlaydarApi.h"
-#include <lastfm/global.h>
-#include <QStringListModel>
+#include <QNetworkReply>
+#include "PlaydarCometRequest.h"
+#include <lastfm/NetworkAccessManager>
+#include "comet/CometParser.h"
 
 
-class PlaydarStatus : public QObject
+//todo
+QString makeGuid()
 {
-    Q_OBJECT
+    return "foobar";
+}
 
-public:
-    PlaydarStatus(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
+PlaydarCometRequest::PlaydarCometRequest()
+: m_parser(0)
+, m_reply(0)
+{
+}
 
-    void start();
-    QStringListModel* hostsModel();
+PlaydarCometRequest::~PlaydarCometRequest()
+{
+    if (m_parser) m_parser->deleteLater();
+    if (m_reply) m_reply->deleteLater();
+}
 
-    void boffinTagcloud(const QString& rql, const QObject* receiver, const char* method);
-    void boffinRql(const QString& rql, const QObject* receiver, const char* method);
+void 
+PlaydarCometRequest::start(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
+{
+    m_id = makeGuid();
+    m_reply = wam->get(QNetworkRequest(api.comet(m_id)));
+    if (m_reply) {
+        m_parser = new CometParser();
+        connect(m_parser, SIGNAL(haveObject(QVariantMap)), SIGNAL(receivedObject(QVariantMap)));
+        connect(m_reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
+        connect(m_reply, SIGNAL(finished()), SLOT(onFinished()));
+    } else {
+        fail("couldn't issue comet request");
+    }
+}
 
-signals:
-    void changed(QString newStatusMessage);
-    void authed();
-    void connected();
+void 
+PlaydarCometRequest::onReadyRead()
+{
+    if (!m_parser->push( m_reply->readAll())) {
+        fail("json comet parse problem");
+    }
+}
 
-private slots:
-    void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
-    void onAuth(QString authToken);
-    void onLanRoster(const QStringList& roster);
-    void onError();
-    void makeRosterRequest();
-
-private:
-    void updateText();
-    void makeCometRequest();
-
-    enum State
-    {
-        Connecting, NotPresent, Authorising, Authorised, NotAuthorised
-    };
-
-    QString m_name;
-    QString m_version;
-    QString m_hostname;
-
-    QStringListModel m_hostsModel;
-    class PlaydarCometRequest* m_comet;
-
-    lastfm::NetworkAccessManager* m_wam;
-    PlaydarApi& m_api;
-    State m_state;
-};
-
-#endif
-
+void
+PlaydarCometRequest::fail(const char* message)
+{
+    Q_UNUSED(message);
+    emit error();
+}

@@ -86,18 +86,27 @@ public:
     }
 
     // boffin does its own thing:
-    UrlT boffinTagcloud(const StringT& rql = StringT())
+    UrlT boffinTagcloud(const StringT& cometSession, const StringT& rql = StringT())
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
+        paramsAdd(params, "comet", cometSession);
         return makeUrl("/boffin/tagcloud/" + rql, params);
     }
 
-    UrlT boffinRql(const StringT& rql)
+    UrlT boffinRql(const StringT& cometSession, const StringT& rql)
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
+        paramsAdd(params, "comet", cometSession);
         return makeUrl("/boffin/rql/" + rql, params);
+    }
+
+    UrlT comet(const StringT& session)
+    {
+        ParamsT params;
+        paramsAdd(params, "session", session);
+        return makeUrl("/comet/", params);
     }
 
 private:

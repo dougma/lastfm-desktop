@@ -22,6 +22,7 @@
 #include "PlaydarStatRequest.h"
 #include "PlaydarAuthRequest.h"
 #include "PlaydarRosterRequest.h"
+#include "PlaydarCometRequest.h"
 #include <lastfm/NetworkAccessManager>
 
 
@@ -29,6 +30,7 @@ PlaydarStatus::PlaydarStatus(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 : m_wam(wam)
 , m_api(api)
 , m_state(Connecting)
+, m_comet(0)
 {
     updateText();
 }
@@ -86,6 +88,7 @@ PlaydarStatus::onAuth(QString authToken)
     m_api.setAuthToken(authToken);
     m_state = Authorised;
     updateText();
+
     emit connected();
     makeRosterRequest();
 }
@@ -105,6 +108,13 @@ PlaydarStatus::makeRosterRequest()
     connect(req, SIGNAL(roster(QStringList)), SLOT(onLanRoster(QStringList)));
     connect(req, SIGNAL(error()), SLOT(onError()));
     req->start();
+}
+
+void
+PlaydarStatus::makeCometRequest()
+{
+    m_comet = new PlaydarCometRequest();
+    m_comet->start(m_wam, m_api);
 }
 
 void

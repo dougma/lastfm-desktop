@@ -17,59 +17,37 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_STATUS_H
-#define PLAYDAR_STATUS_H
+#ifndef PLAYDAR_COMET_REQUEST_H
+#define PLAYDAR_COMET_REQUEST_H
 
 #include "PlaydarApi.h"
 #include <lastfm/global.h>
-#include <QStringListModel>
+#include <QVariant>
 
+class CometParser;
 
-class PlaydarStatus : public QObject
+class PlaydarCometRequest : public QObject
 {
-    Q_OBJECT
-
 public:
-    PlaydarStatus(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
+    PlaydarCometRequest();
+    virtual ~PlaydarCometRequest();
 
-    void start();
-    QStringListModel* hostsModel();
-
-    void boffinTagcloud(const QString& rql, const QObject* receiver, const char* method);
-    void boffinRql(const QString& rql, const QObject* receiver, const char* method);
+    void start(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
 
 signals:
-    void changed(QString newStatusMessage);
-    void authed();
-    void connected();
+    void connected(const QString& sessionId);
+    void receivedObject(QVariantMap);
+    void error();
 
 private slots:
-    void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
-    void onAuth(QString authToken);
-    void onLanRoster(const QStringList& roster);
-    void onError();
-    void makeRosterRequest();
+    void onReadyRead();
 
 private:
-    void updateText();
-    void makeCometRequest();
+    void fail(const char* message);
 
-    enum State
-    {
-        Connecting, NotPresent, Authorising, Authorised, NotAuthorised
-    };
-
-    QString m_name;
-    QString m_version;
-    QString m_hostname;
-
-    QStringListModel m_hostsModel;
-    class PlaydarCometRequest* m_comet;
-
-    lastfm::NetworkAccessManager* m_wam;
-    PlaydarApi& m_api;
-    State m_state;
+    QString m_id;
+    QNetworkReply* m_reply;
+    CometParser* m_parser;
 };
 
 #endif
-
