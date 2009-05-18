@@ -16,37 +16,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
-#include "TrackSource.h"
 
-TrackSource::TrackSource(BoffinRqlRequest* req)
-{
-    connect(req, SIGNAL(tracks(QList<BoffinPlayableItem>)), this, SLOT(onPlayableItems(QList<BoffinPlayableItem>)));
-}
+#ifndef PLAYLIST_MODEL_H_
+#define PLAYLIST_MODEL_H_
 
-static Track toTrack(const BoffinPlayableItem& item)
-{
-    Track t;
-    MutableTrack mt(t);
-    mt.setArtist(item.m_artist);
-    mt.setAlbum(item.m_album);
-    mt.setTitle(item.m_track);
-    mt.setDuration(item.m_duration);
-    mt.setUrl(QUrl(item.m_url));
-    mt.setSource(Track::Player);
-    //QString m_source;
-    //QString m_mimetype;
-    return t;
-}
+#include <QAbstractItemModel>
+#include <lastfm/Track>
 
-void 
-TrackSource::onPlayableItems(QList<BoffinPlayableItem> tracks)
+class PlaylistModel : public QAbstractItemModel
 {
-    QList<Track> res;
-    while( !tracks.isEmpty() )
-    {
-        const Track& t( toTrack(tracks.takeFirst()) );
-        res << t;
-    }
-    emit ready( res );
-}
+Q_OBJECT
+public:
+    PlaylistModel( QObject* p = 0 );
+    virtual int columnCount( const QModelIndex& parent = QModelIndex()) const;
+    virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
+    
+    virtual QVariant headerData( int section, Qt::Orientation, int role = Qt::DisplayRole ) const;
+    virtual QVariant data( const QModelIndex& index, int role ) const;
+
+    virtual QModelIndex index( int row, int column, const QModelIndex& p = QModelIndex()) const;
+
+    virtual QModelIndex parent( const QModelIndex& index ) const
+    { return QModelIndex(); }
+
+
+    void addTracks( QList< Track > tracks );
+    void clear();
+
+
+private:
+    QList< Track > m_tracks;
+};
+
+#endif //PLAYLIST_MODEL_H_
 

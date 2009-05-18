@@ -5,8 +5,6 @@
 #include "PlaydarApi.h"
 #include "PlaydarPollingRequest.h"
 
-
-
 struct BoffinPlayableItem
 {
     BoffinPlayableItem(const std::string& artist, 

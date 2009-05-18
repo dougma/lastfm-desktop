@@ -8,7 +8,6 @@
 #include "BoffinRqlRequest.h"
 #include "jsonGetMember.hpp"
 
-
 BoffinRqlRequest::BoffinRqlRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, QString rql)
 : m_wam(wam)
 , m_api(api)

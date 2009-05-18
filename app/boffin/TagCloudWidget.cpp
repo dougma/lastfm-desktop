@@ -52,6 +52,7 @@ TagCloudWidget::onSelectionChanged( const QItemSelection& selected, const QItemS
         m_layout->moveForward();
         setupModelView( view );
     }
+    emit selectionChanged();
 }
 
 void
@@ -79,6 +80,7 @@ TagCloudWidget::onHistoryClicked(int position, const QString& text)
         m_tags.removeLast();
         m_history->pop();
     }
+    emit selectionChanged();
 }
 
 void

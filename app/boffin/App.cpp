@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QShortcut>
 #include <QVBoxLayout>
+#include <QTreeView>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
 #include <lastfm/NetworkAccessManager>
@@ -38,10 +39,9 @@
 #include "PlaydarStatus.h"
 #include "BoffinRqlRequest.h"
 #include "PlaydarTagCloudModel.h"
-
+#include "PlaylistModel.h"
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
-
 
 App::App( int& argc, char** argv )
    : unicorn::Application( argc, argv )
@@ -184,12 +184,24 @@ App::onScanningFinished()
     m_playdarStatus->start();
 }
 
+
 void
 App::onPlaydarConnected()
 {
+    QWidget* centralWidget = new QWidget( m_mainwindow );
     m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
+    connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
+    QTreeView* playlist = new QTreeView( centralWidget );
+    playlist->setSortingEnabled( true );
+    m_playlist = new PlaylistModel( playlist );
+    playlist->setModel( m_playlist );
+    
+    new QVBoxLayout( centralWidget );
+    centralWidget->layout()->addWidget( m_tagcloud );
+    centralWidget->layout()->addWidget( playlist );
+
 //    m_tagcloud->setFrameStyle( QFrame::NoFrame );
-    m_mainwindow->setCentralWidget( m_tagcloud );
+    m_mainwindow->setCentralWidget( centralWidget );
 }
 
 
@@ -199,18 +211,38 @@ App::createTagCloudModel()
     return new PlaydarTagCloudModel(m_api, m_wam);
 }
 
-void
+void 
 App::play()
 {
-    QString s = m_tagcloud->rql();
-    int ii = 0;
+    onPreparing();
+}
+
+void
+App::tagsChanged()
+{
+    if (!m_tagcloud) return;
+
+    QString rql = m_tagcloud->rql();
+    BoffinRqlRequest* req = new BoffinRqlRequest(m_wam, m_api, rql);
+    TrackSource* source = new TrackSource(req);
+    connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
+    req->start();
+    m_playlist->clear();
+}
+
+
+void 
+App::onPlaydarTracksReady( QList<Track> t )
+{
+    qDebug() << "Tracks Ready:" << endl << t << endl;
+    m_playlist->addTracks( t );
 }
 
 
 void
 App::onReadyToPlay()
 {
-    m_pipe->play( (TrackSource*) sender() );
+    //m_playlist->addTracks( ((TrackSource*) sender())->takeTracks() );
 }
 
 

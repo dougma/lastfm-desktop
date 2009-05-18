@@ -219,38 +219,40 @@ MediaPipeline::onPhononSourceChanged( const Phonon::MediaSource& source )
 void
 MediaPipeline::enqueue()
 {    
-    if (mo->queue().size() || !m_source) return;
+    //TIDIL
 
-    // keep only one track in the phononQueue
-    // Loop until we get a null url or a valid url.
-    for (;;)
-    {
-        // consume next track from the track source. a null track 
-        // response means wait until the trackAvailable signal
-        Track t = m_source->takeNextTrack();
-        if (t.isNull()) { qDebug() << t; break; }
-
-        // Invalid urls won't trigger the correct phonon
-        // state changes, so we must prefilter them.
-        if (!t.url().isValid()) continue;
-        
-        
-
-        qDebug() << t.url().toString();
-
-        m_tracks[t.url()] = t;
-        qDebug() << "Will play:" << t;
-
-        // if we are playing a track now, enqueue, otherwise start now!
-        if (mo->currentSource().url().isValid())
-            mo->enqueue( Phonon::MediaSource( t.url() ) );
-        else {
-            m_phonon_sucks = true; //Phonon is shit and broken
-            mo->setCurrentSource( Phonon::MediaSource( t.url() ) );
-            mo->play();
-        }
-        break;
-    }
+//    if (mo->queue().size() || !m_source) return;
+//
+//    // keep only one track in the phononQueue
+//    // Loop until we get a null url or a valid url.
+//    for (;;)
+//    {
+//        // consume next track from the track source. a null track 
+//        // response means wait until the trackAvailable signal
+//        Track t = m_source->takeNextTrack();
+//        if (t.isNull()) { qDebug() << t; break; }
+//
+//        // Invalid urls won't trigger the correct phonon
+//        // state changes, so we must prefilter them.
+//        if (!t.url().isValid()) continue;
+//        
+//        
+//
+//        qDebug() << t.url().toString();
+//
+//        m_tracks[t.url()] = t;
+//        qDebug() << "Will play:" << t;
+//
+//        // if we are playing a track now, enqueue, otherwise start now!
+//        if (mo->currentSource().url().isValid())
+//            mo->enqueue( Phonon::MediaSource( t.url() ) );
+//        else {
+//            m_phonon_sucks = true; //Phonon is shit and broken
+//            mo->setCurrentSource( Phonon::MediaSource( t.url() ) );
+//            mo->play();
+//        }
+//        break;
+//    }
 }
 
 

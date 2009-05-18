@@ -23,6 +23,9 @@ public:
     TagCloudView* getFirstView() const;
     void pop();
     QString rql() const;
+    
+signals:
+    void selectionChanged();
 
 private slots:
     void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
