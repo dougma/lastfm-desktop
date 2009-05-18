@@ -58,11 +58,12 @@ PlaydarConnection::onStat(QString name, QString version, QString hostname, bool 
         connect(auth, SIGNAL(authed(QString)), SLOT(onAuth(QString)));
         connect(auth, SIGNAL(error()), SLOT(onError()));
         auth->start("Boffin");
+    } else {
+//        makeRosterRequest();
+        makeCometRequest();
     }
-    updateText();
 
-//    makeRosterRequest();
-    makeCometRequest();
+    updateText();
 }
 
 void
@@ -97,7 +98,6 @@ PlaydarConnection::onAuth(QString authToken)
     m_state = Connecting;
     updateText();
 
-//    emit connected();
 //    makeRosterRequest();
     makeCometRequest();
 }
@@ -128,6 +128,7 @@ PlaydarConnection::makeCometRequest()
     m_cometSession = m_comet->issueRequest(m_wam, m_api);
     if (m_cometSession.length()) {
         m_state = Connected;
+        emit connected();
     }
 }
 

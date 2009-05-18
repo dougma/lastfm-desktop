@@ -39,14 +39,10 @@ static Track toTrack(const BoffinPlayableItem& item)
 }
 
 void 
-TrackSource::onPlayableItems(QList<BoffinPlayableItem> tracks)
+TrackSource::onPlayableItem(BoffinPlayableItem item)
 {
     QList<Track> res;
-    while( !tracks.isEmpty() )
-    {
-        const Track& t( toTrack(tracks.takeFirst()) );
-        res << t;
-    }
-    emit ready( res );
+    res << toTrack(item);
+    emit ready(res);
 }
 

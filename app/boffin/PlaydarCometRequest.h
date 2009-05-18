@@ -31,6 +31,8 @@ class CometParser;
 //
 class PlaydarCometRequest : public QObject
 {
+    Q_OBJECT
+
 public:
     // returns the sessionId, empty string if request fails
     QString issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api);

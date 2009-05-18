@@ -22,7 +22,7 @@
 #include <QStringList>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 
 PlaydarRosterRequest::PlaydarRosterRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)

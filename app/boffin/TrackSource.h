@@ -37,7 +37,7 @@ signals:
     void ready( QList<Track>  );
 
 private slots:
-    void onPlayableItems(QList<BoffinPlayableItem> tracks);
+    void onPlayableItem(BoffinPlayableItem item);
 
 private:
     QList<BoffinPlayableItem> m_tracks;

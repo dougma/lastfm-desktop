@@ -17,24 +17,18 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
+#include <QUuid>
 #include <QNetworkReply>
 #include "PlaydarCometRequest.h"
 #include <lastfm/NetworkAccessManager>
 #include "comet/CometParser.h"
 
 
-QString makeGuid()
-{
-    //todo
-    return "foobar";
-}
-
-
 // returns the sessionId, empty string if request fails
 QString 
 PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 {
-    QString sessionId = makeGuid();
+    QString sessionId( QUuid::createUuid().toString().mid(1, 36) );
     QNetworkReply* reply = wam->get(QNetworkRequest(api.comet(sessionId)));
     if (!reply) {
         return "";

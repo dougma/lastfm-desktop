@@ -51,13 +51,14 @@ public:
     virtual void receiveResult(const QVariantMap& o);
 
 signals:
+    void error();
     void tagItem(BoffinTagItem item);
 
 private slots:
     void onFinished();
 
 private:
-    virtual void fail(const char* message);
+    void fail(const char* message);
 };
 
 #endif

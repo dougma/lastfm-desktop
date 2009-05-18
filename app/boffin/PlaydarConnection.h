@@ -45,7 +45,7 @@ public:
 signals:
     void changed(QString newStatusMessage);
 //    void authed();
-//    void connected();
+    void connected();
 
 private slots:
     void onStat(QString name, QString version, QString hostname, bool bAuthenticated);
@@ -54,8 +54,6 @@ private slots:
     void onError();
     void makeRosterRequest();
 
-    void onCometConnected(const QString& sessionId);
-    void onCometError();
     void receivedCometObject(const QVariantMap&);
     void onRequestMade(const QString& qid);
     void onRequestDestroyed(QObject* o);

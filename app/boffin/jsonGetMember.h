@@ -20,19 +20,22 @@
 #ifndef JSON_GET_MEMBER_H
 #define JSON_GET_MEMBER_H
 
-#include <boost/foreach.hpp>
-#include "json_spirit/json_spirit.h"
-
-
 // gets the named property from the json value
 //
 // returns true if it's got ok.
 //
 // todo: support nested objects,    eg: "playable.result.id"
 // todo: support arrays,            eg: "results[1].id"
-//
+
+
+// for json_spirit:
 // ( T can be any type acceptable to json_spirit's get_value method )
 //
+
+#include <boost/foreach.hpp>
+#include "json_spirit/json_spirit.h"
+
+
 template <typename T>
 bool
 jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
@@ -51,6 +54,7 @@ jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
     return false;
 }
 
+// for QVariantMaps:
 #include <QVariant>
 bool jsonGetMember(const QVariantMap& o, const char* key, QString& out);
 bool jsonGetMember(const QVariantMap& o, const char* key, int& out);

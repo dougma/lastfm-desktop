@@ -42,14 +42,14 @@ public:
     virtual void receiveResult(const QVariantMap& o);
 
 signals:
+    void error();
     void playableItem(BoffinPlayableItem item);
 
 private slots:
     void onFinished();
-    void onError();
 
 private:
-    virtual void fail(const char* message);
+    void fail(const char* message);
 };
 
 #endif

@@ -10,8 +10,8 @@ class CometRequest : public QObject
     Q_OBJECT
 
 public:
-    const QString& qid();
-
+    CometRequest();
+    const QString& qid() const;
     virtual void receiveResult(const QVariantMap& o) = 0;
 
 protected:

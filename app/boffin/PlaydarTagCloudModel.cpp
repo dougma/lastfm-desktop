@@ -1,7 +1,7 @@
 #include <float.h> 
 #include <math.h>
 #include "PlaydarTagCloudModel.h"
-#include "PlaydarStatus.h"
+#include "PlaydarConnection.h"
 
 
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection *playdar)

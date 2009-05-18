@@ -36,7 +36,7 @@
 #include "ScanProgressWidget.h"
 #include "ScrobSocket.h"
 #include "TrackSource.h"
-#include "PlaydarStatus.h"
+#include "PlaydarConnection.h"
 #include "BoffinRqlRequest.h"
 #include "PlaydarTagCloudModel.h"
 #include "PlaylistModel.h"
@@ -164,7 +164,7 @@ App::onOutputDeviceActionTriggered( QAction* a )
 #include "TagDelegate.h"
 #include "PlaydarTagCloudModel.h"
 #include "PlaydarStatRequest.h"
-#include "PlaydarStatus.h"
+#include "PlaydarConnection.h"
 
 
 void
@@ -223,10 +223,10 @@ App::tagsChanged()
     if (!m_tagcloud) return;
 
     QString rql = m_tagcloud->rql();
-    BoffinRqlRequest* req = new BoffinRqlRequest(m_wam, m_api, rql);
+    BoffinRqlRequest* req = m_playdar->boffinRql(rql);
     TrackSource* source = new TrackSource(req);
+    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
     connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
-    req->start();
     m_playlist->clear();
 }
 

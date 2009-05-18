@@ -25,7 +25,7 @@
 #include <QStatusBar>
 #include <lastfm/Track>
 #include "PlaydarHostsModel.h"
-#include "PlaydarStatus.h"
+#include "PlaydarConnection.h"
 
 MainWindow::MainWindow()
 {   

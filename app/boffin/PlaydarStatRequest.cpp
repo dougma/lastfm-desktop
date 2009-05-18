@@ -20,7 +20,7 @@
 #include <QNetworkReply>
 #include "PlaydarStatRequest.h"
 #include <lastfm/NetworkAccessManager>
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 PlaydarStatRequest::PlaydarStatRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 :m_wam(wam)

@@ -41,7 +41,20 @@ BoffinTagRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& ap
 void 
 BoffinTagRequest::onFinished()
 {
-
+    sender()->deleteLater();
+    QNetworkReply *reply = (QNetworkReply*) sender();
+    if (reply->error() == QNetworkReply::NoError) {
+        QString queryId;
+        if (getQueryId(reply->readAll(), queryId)) {
+            if (queryId == qid()) {
+                // all is good
+                return; 
+            }
+            fail("qid mismatch");            // we can't handle this
+        }
+        fail("bad response");
+    }
+    fail("");
 }
 
 
@@ -61,3 +74,9 @@ BoffinTagRequest::receiveResult(const QVariantMap& o)
     }
 }
 
+void 
+BoffinTagRequest::fail(const char* message)
+{
+    qDebug() << message;
+    emit error();
+}

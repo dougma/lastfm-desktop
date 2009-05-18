@@ -71,3 +71,10 @@ BoffinRqlRequest::receiveResult(const QVariantMap& o)
         emit playableItem(BoffinPlayableItem(artist, album, track, source, mimetype, url, duration));
     }
 }
+
+void
+BoffinRqlRequest::fail(const char *message)
+{
+    qDebug() << message;
+    emit error();
+}   
