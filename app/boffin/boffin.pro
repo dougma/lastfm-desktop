@@ -5,7 +5,6 @@ VERSION = 1.0.0
 include( $$ROOT_DIR/admin/include.qmake )
 include( _files.qmake )
 DEFINES += LASTFM_COLLAPSE_NAMESPACE
-!macx-xcode:generateBuildParameters()
 
 macx-g++{
     release {

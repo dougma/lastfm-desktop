@@ -5,7 +5,6 @@
 #include "PlaydarApi.h"
 #include "PlaydarPollingRequest.h"
 #include "CometRequest.h"
-
 struct BoffinPlayableItem
 {
     BoffinPlayableItem(const QString& artist, 

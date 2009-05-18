@@ -19,7 +19,6 @@
 
 #ifndef TPLAYDAR_API_HPP
 #define TPLAYDAR_API_HPP
-
 // Policy needs to provide:
 //
 // void paramsAdd(ParamsT& p, StringT name, StringT value)

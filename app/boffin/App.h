@@ -24,12 +24,14 @@
 #include "lib/unicorn/UnicornApplication.h"
 #include <lastfm/global.h>
 #include <QPointer>
+#include <lastfm/Track>
 
 namespace Phonon { class AudioOutput; }
 
 class TagCloudView;
 class QItemSelection;
 class PlaydarTagCloudModel;
+namespace lastfm{ class Track; }
 
 class App : public unicorn::Application
 {
@@ -51,8 +53,10 @@ public slots:
 private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
+    void tagsChanged();
     void onPlaydarConnected();
     void onReadyToPlay();
+    void onPlaydarTracksReady( QList<Track> );
     void onPreparing();
     void onStarted( const Track& );
     void onResumed();
@@ -69,6 +73,7 @@ private:
 
     class MainWindow* m_mainwindow;
     class TagCloudWidget* m_tagcloud;
+    class PlaylistModel* m_playlist;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
     class PlaydarConnection* m_playdar;
@@ -79,6 +84,7 @@ private:
 
     PlaydarApi m_api;
     lastfm::NetworkAccessManager* m_wam;
+   
 };
 
 #endif //APP_H
