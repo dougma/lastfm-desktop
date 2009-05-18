@@ -18,123 +18,46 @@
  ***************************************************************************/
 
 #include <QNetworkReply>
-#include <QTimer>
-
-#include <boost/foreach.hpp>
-#include "json_spirit/json_spirit.h"
 #include <lastfm/NetworkAccessManager>
-
+#include "PlaydarApi.h"
 #include "BoffinTagRequest.h"
 #include "jsonGetMember.hpp"
 
 
-BoffinTagRequest::BoffinTagRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql)
-: m_api(api)
-, m_wam(wam)
-, m_rql(rql)
-, m_tagcloudReply(0)
-, m_pollReply(0)
-{
-}
-
-BoffinTagRequest::~BoffinTagRequest()
-{
-    delete m_tagcloudReply;
-    delete m_pollReply;
-}
-
-
-void 
-BoffinTagRequest::onReqFinished()
-{
-    QNetworkReply *reply = (QNetworkReply*) sender();
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray ba( reply->readAll() );
-        handleResponse(ba.constData(), ba.size());
-    }
-    fail("");
-}
-
-void 
-BoffinTagRequest::onPollFinished()
-{
-    QNetworkReply *reply = (QNetworkReply*) sender();
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray ba( reply->readAll() );
-        handlePollResponse(ba.constData(), ba.size());
-    }
-    fail("");
-}
 
 // virtual 
 void 
-BoffinTagRequest::issueRequest()
+BoffinTagRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session)
 {
-    m_tagcloudReply = m_wam->get( QNetworkRequest( m_api.boffinTagcloud( m_rql ) ) );
-    if (m_tagcloudReply) {
-        connect(m_tagcloudReply, SIGNAL(finished()), this, SLOT(onReqFinished()));
+    QNetworkReply* reply = wam->get(QNetworkRequest(api.boffinTagcloud(session, qid(), rql)));
+    if (reply) {
+        connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
     } else {
         fail("couldn't issue boffin request");
     }
 }
 
-// virtual 
+
 void 
-BoffinTagRequest::issuePoll(unsigned msDelay)
+BoffinTagRequest::onFinished()
 {
-    QTimer::singleShot(msDelay, this, SLOT(onTimer()));
+
 }
 
 
 // virtual
-bool
-BoffinTagRequest::handleJsonPollResponse(int poll, 
-                                      const json_spirit::Object& , 
-                                      const json_spirit::Array& results)
-{
-    QList<BoffinTagItem> taglist;
-    BOOST_FOREACH(const json_spirit::Value& i, results) {
-        std::string tagName, hostName;
-        int count;
-        double weight;
-        if (jsonGetMember(i, "name", tagName) &&
-            jsonGetMember(i, "source", hostName) &&
-            jsonGetMember(i, "count", count) &&
-            jsonGetMember(i, "weight", weight))
-        {
-            taglist << BoffinTagItem(tagName, hostName, count, static_cast<float>(weight));
-        }
-    }
-    emit tags(taglist);
-    return poll < 4;
-}
-
 void
-BoffinTagRequest::onTimer()
+BoffinTagRequest::receiveResult(const QVariantMap& o)
 {
-    // start the poll now
-    delete m_pollReply; // free any previous
-
-    m_pollReply = m_wam->get(
-        QNetworkRequest(
-            m_api.getResults(
-                QString::fromStdString(qid()))));
-
-    if (m_pollReply) {
-        connect(m_pollReply, SIGNAL(finished()), this, SLOT(onPollFinished()));
-    } else {
-        fail("couldn't poll for boffin results");
+    QString tagName, hostName;
+    int count;
+    double weight;
+    if (jsonGetMember(o, "name", tagName) &&
+        jsonGetMember(o, "source", hostName) &&
+        jsonGetMember(o, "count", count) &&
+        jsonGetMember(o, "weight", weight))
+    {
+        emit tagItem(BoffinTagItem(tagName, hostName, count, static_cast<float>(weight)));
     }
-}
-
-// returns true if another poll should be made
-// virtual 
-
-
-//virtual 
-void 
-BoffinTagRequest::fail(const char* message)
-{
-    emit error();
 }
 

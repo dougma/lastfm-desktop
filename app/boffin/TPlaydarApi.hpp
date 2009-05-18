@@ -85,20 +85,28 @@ public:
         return makeUrl("/lan/roster");
     }
 
-    // boffin does its own thing:
-    UrlT boffinTagcloud(const StringT& cometSession, const StringT& rql = StringT())
+    // qid optional
+    // rql optional
+    UrlT boffinTagcloud(const StringT& cometSession, const StringT& qid = StringT(), const StringT& rql = StringT())
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
         paramsAdd(params, "comet", cometSession);
+        if (qid != "") {
+            paramsAdd(params, "qid", qid);
+        }
         return makeUrl("/boffin/tagcloud/" + rql, params);
     }
 
-    UrlT boffinRql(const StringT& cometSession, const StringT& rql)
+    // qid optional
+    UrlT boffinRql(const StringT& cometSession, const StringT& qid, const StringT& rql)
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
         paramsAdd(params, "comet", cometSession);
+        if (qid != "") {
+            paramsAdd(params, "qid", qid);
+        }
         return makeUrl("/boffin/rql/" + rql, params);
     }
 

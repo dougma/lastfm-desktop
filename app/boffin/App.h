@@ -71,7 +71,7 @@ private:
     class TagCloudWidget* m_tagcloud;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
-    class PlaydarStatus* m_playdarStatus;
+    class PlaydarConnection* m_playdar;
     
     Phonon::AudioOutput* m_audioOutput;
     

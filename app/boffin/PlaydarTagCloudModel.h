@@ -30,6 +30,7 @@
 #include <QList>
 #include <QMultiMap>
 
+class PlaydarConnection;
 
 class PlaydarTagCloudModel : public QAbstractTableModel
 {
@@ -38,7 +39,7 @@ class PlaydarTagCloudModel : public QAbstractTableModel
 public:
     enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole };
 
-    PlaydarTagCloudModel(PlaydarApi& p, lastfm::NetworkAccessManager* wam);
+    PlaydarTagCloudModel(PlaydarConnection *playdar);
     ~PlaydarTagCloudModel(void);
 
     void startGetTags(const QString& rql = QString());
@@ -59,8 +60,7 @@ private slots:
     void onTagError();
 
 private:
-    PlaydarApi m_api;
-    lastfm::NetworkAccessManager* m_wam;
+    PlaydarConnection* m_playdar;
 
     QSet<QString> m_hostFilter;
     QMap<QString, QString> m_tagMap;

@@ -30,7 +30,7 @@
 
 #include "YajlCallbacks.hpp"
 
-// parses a neverending json comet stream should be like:
+// parses a neverending json comet stream like:
 //      "[ {}, {}, ...."
 //
 // signal emitted for each top-level object
@@ -60,7 +60,7 @@ class CometParser : public QObject
     friend class CometCallbacks;
 
 public:
-    CometParser();
+    CometParser(QObject *parent = 0);
     ~CometParser();
 
     bool push(const QByteArray& ba);        // push data in...

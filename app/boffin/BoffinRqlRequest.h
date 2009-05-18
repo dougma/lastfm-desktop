@@ -4,24 +4,23 @@
 #include <lastfm/global.h>
 #include "PlaydarApi.h"
 #include "PlaydarPollingRequest.h"
-
-
+#include "CometRequest.h"
 
 struct BoffinPlayableItem
 {
-    BoffinPlayableItem(const std::string& artist, 
-        const std::string& album, 
-        const std::string& track, 
-        const std::string& source, 
-        const std::string& mimetype, 
-        const std::string& url,
+    BoffinPlayableItem(const QString& artist, 
+        const QString& album, 
+        const QString& track, 
+        const QString& source, 
+        const QString& mimetype, 
+        const QString& url,
         int duration)
-        : m_artist(QString::fromStdString(artist))
-        , m_album(QString::fromStdString(album))
-        , m_track(QString::fromStdString(track))
-        , m_source(QString::fromStdString(source))
-        , m_mimetype(QString::fromStdString(mimetype))
-        , m_url(QUrl::fromPercentEncoding(QByteArray(url.data())))
+        : m_artist(artist)
+        , m_album(album)
+        , m_track(track)
+        , m_source(source)
+        , m_mimetype(mimetype)
+        , m_url(QUrl::fromPercentEncoding(QByteArray(url.toUtf8())))
         , m_duration(duration)
     {
     }
@@ -35,32 +34,23 @@ struct BoffinPlayableItem
     int m_duration;
 };
 
-
-
-class BoffinRqlRequest
-    : public QObject
+class BoffinRqlRequest : public CometRequest
 {
     Q_OBJECT
+
 public:
-    BoffinRqlRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session);
-    ~BoffinRqlRequest();
+    void issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session);
+    virtual void receiveResult(const QVariantMap& o);
 
 signals:
-    void requestMade(QString qid);
+    void playableItem(BoffinPlayableItem item);
 
 private slots:
-    void onReqFinished();
-    void onPollFinished();
-    void onTimer();
+    void onFinished();
+    void onError();
 
 private:
-    virtual void issueRequest();
-    virtual void issuePoll(unsigned msDelay);
-    virtual bool handleJsonPollResponse(int poll, const json_spirit::Object& query, const json_spirit::Array& results);
     virtual void fail(const char* message);
-
-    QString m_rql;
-    QString m_session;
 };
 
 #endif

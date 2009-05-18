@@ -23,6 +23,7 @@
 #include <boost/foreach.hpp>
 #include "json_spirit/json_spirit.h"
 
+
 // gets the named property from the json value
 //
 // returns true if it's got ok.
@@ -49,5 +50,11 @@ jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
     }
     return false;
 }
+
+#include <QVariant>
+bool jsonGetMember(const QVariantMap& o, const char* key, QString& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, int& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, double& out);
+
 
 #endif

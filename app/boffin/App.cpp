@@ -54,7 +54,7 @@ App::App( int& argc, char** argv )
    , m_api( "http://localhost:8888", "fd91e3fb-311d-4903-91d7-87af53281d3f" )
 {
     m_wam = new lastfm::NetworkAccessManager( this );
-    m_playdarStatus = new PlaydarStatus(m_wam, m_api);
+    m_playdar = new PlaydarConnection(m_wam, m_api);
 }
 
 
@@ -177,11 +177,11 @@ App::onScanningFinished()
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );    
     m_mainwindow->ui.wordle->setEnabled( true );
-    m_mainwindow->ui.playdarHosts->setModel( m_playdarStatus->hostsModel() );
+    m_mainwindow->ui.playdarHosts->setModel( m_playdar->hostsModel() );
 
-    connect(m_playdarStatus, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
-    connect(m_playdarStatus, SIGNAL(connected()), SLOT(onPlaydarConnected()));
-    m_playdarStatus->start();
+    connect(m_playdar, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
+    connect(m_playdar, SIGNAL(connected()), SLOT(onPlaydarConnected()));
+    m_playdar->start();
 }
 
 void
@@ -196,7 +196,7 @@ App::onPlaydarConnected()
 PlaydarTagCloudModel* 
 App::createTagCloudModel()
 {
-    return new PlaydarTagCloudModel(m_api, m_wam);
+    return new PlaydarTagCloudModel(m_playdar);
 }
 
 void

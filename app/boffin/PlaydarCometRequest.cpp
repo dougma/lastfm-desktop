@@ -23,50 +23,44 @@
 #include "comet/CometParser.h"
 
 
-//todo
 QString makeGuid()
 {
+    //todo
     return "foobar";
 }
 
-PlaydarCometRequest::PlaydarCometRequest()
-: m_parser(0)
-, m_reply(0)
-{
-}
 
-PlaydarCometRequest::~PlaydarCometRequest()
+// returns the sessionId, empty string if request fails
+QString 
+PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 {
-    if (m_parser) m_parser->deleteLater();
-    if (m_reply) m_reply->deleteLater();
-}
-
-void 
-PlaydarCometRequest::start(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
-{
-    m_id = makeGuid();
-    m_reply = wam->get(QNetworkRequest(api.comet(m_id)));
-    if (m_reply) {
-        m_parser = new CometParser();
-        connect(m_parser, SIGNAL(haveObject(QVariantMap)), SIGNAL(receivedObject(QVariantMap)));
-        connect(m_reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
-        connect(m_reply, SIGNAL(finished()), SLOT(onFinished()));
-    } else {
-        fail("couldn't issue comet request");
+    QString sessionId = makeGuid();
+    QNetworkReply* reply = wam->get(QNetworkRequest(api.comet(sessionId)));
+    if (!reply) {
+        return "";
     }
+
+    m_parser = new CometParser(this);
+    connect(m_parser, SIGNAL(haveObject(QVariantMap)), SIGNAL(receivedObject(QVariantMap)));
+    connect(reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
+    connect(reply, SIGNAL(finished()), SLOT(onFinished()));
+    return sessionId;
 }
 
 void 
 PlaydarCometRequest::onReadyRead()
 {
-    if (!m_parser->push( m_reply->readAll())) {
-        fail("json comet parse problem");
+    QNetworkReply* reply = (QNetworkReply*) sender();
+    if (!m_parser->push(reply->readAll())) {
+        qDebug() << "json comet parse problem";
+        reply->abort();     // can't recover from this
+        onFinished();       // assuming abort() doesn't emit finished
     }
 }
 
 void
-PlaydarCometRequest::fail(const char* message)
+PlaydarCometRequest::onFinished()
 {
-    Q_UNUSED(message);
-    emit error();
+    sender()->deleteLater();
+    emit finished();
 }

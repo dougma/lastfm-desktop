@@ -23,13 +23,14 @@
 #include <lastfm/global.h>
 #include "PlaydarApi.h"
 #include "PlaydarPollingRequest.h"
+#include "CometRequest.h"
 
 
 struct BoffinTagItem
 {
-    BoffinTagItem(const std::string& name, const std::string& host, int count, float weight)
-        : m_name(QString::fromStdString(name))
-        , m_host(QString::fromStdString(host))
+    BoffinTagItem(const QString& name, const QString& host, int count, float weight)
+        : m_name(name)
+        , m_host(host)
         , m_count(count)
         , m_weight(weight)
     {
@@ -41,36 +42,22 @@ struct BoffinTagItem
     float m_weight;
 };
 
-class BoffinTagRequest 
-    : public QObject
-    , public PlaydarPollingRequest
+class BoffinTagRequest : public CometRequest
 {
     Q_OBJECT
 
 public:
-    BoffinTagRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql);
-    ~BoffinTagRequest();
+    void issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session);
+    virtual void receiveResult(const QVariantMap& o);
 
 signals:
-    void error();
-    void tags(QList<BoffinTagItem> tags);
+    void tagItem(BoffinTagItem item);
 
 private slots:
-    void onReqFinished();
-    void onPollFinished();
-    void onTimer();
+    void onFinished();
 
 private:
-    virtual void issueRequest();
-    virtual void issuePoll(unsigned msDelay);
-    virtual bool handleJsonPollResponse(int poll, const json_spirit::Object& query, const json_spirit::Array& results);
     virtual void fail(const char* message);
-
-    PlaydarApi m_api;
-    lastfm::NetworkAccessManager *m_wam;
-    QString m_rql;
-    QNetworkReply *m_tagcloudReply;
-    QNetworkReply *m_pollReply;
 };
 
 #endif

@@ -26,28 +26,25 @@
 
 class CometParser;
 
+// makes a request to playdar for comet results, 
+// emits signals as result objects arrive
+//
 class PlaydarCometRequest : public QObject
 {
 public:
-    PlaydarCometRequest();
-    virtual ~PlaydarCometRequest();
-
-    void start(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
+    // returns the sessionId, empty string if request fails
+    QString issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
 
 signals:
-    void connected(const QString& sessionId);
     void receivedObject(QVariantMap);
-    void error();
+    void finished();
 
 private slots:
     void onReadyRead();
+    void onFinished();
 
 private:
-    void fail(const char* message);
-
-    QString m_id;
-    QNetworkReply* m_reply;
-    CometParser* m_parser;
+    CometParser *m_parser;
 };
 
 #endif

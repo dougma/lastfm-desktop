@@ -23,20 +23,22 @@
 #include "PlaydarAuthRequest.h"
 #include "PlaydarRosterRequest.h"
 #include "PlaydarCometRequest.h"
+#include "BoffinRqlRequest.h"
+#include "BoffinTagRequest.h"
 #include <lastfm/NetworkAccessManager>
 
 
-PlaydarStatus::PlaydarStatus(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
+PlaydarConnection::PlaydarConnection(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 : m_wam(wam)
 , m_api(api)
-, m_state(Connecting)
+, m_state(Querying)
 , m_comet(0)
 {
     updateText();
 }
 
 void
-PlaydarStatus::start()
+PlaydarConnection::start()
 {
     PlaydarStatRequest* stat = new PlaydarStatRequest(m_wam, m_api);
     connect(stat, SIGNAL(stat(QString, QString, QString, bool)), SLOT(onStat(QString, QString, QString, bool)));
@@ -45,12 +47,12 @@ PlaydarStatus::start()
 }
 
 void 
-PlaydarStatus::onStat(QString name, QString version, QString hostname, bool bAuthenticated)
+PlaydarConnection::onStat(QString name, QString version, QString hostname, bool bAuthenticated)
 {
     m_name = name;
     m_version = version;
     m_hostname = hostname;
-    m_state = bAuthenticated ? Authorised : Authorising;
+    m_state = bAuthenticated ? Connecting : Authorising;
     if (!bAuthenticated) {
         PlaydarAuthRequest* auth = new PlaydarAuthRequest(m_wam, m_api);
         connect(auth, SIGNAL(authed(QString)), SLOT(onAuth(QString)));
@@ -58,21 +60,27 @@ PlaydarStatus::onStat(QString name, QString version, QString hostname, bool bAut
         auth->start("Boffin");
     }
     updateText();
+
+//    makeRosterRequest();
+    makeCometRequest();
 }
 
 void
-PlaydarStatus::onError()
+PlaydarConnection::onError()
 {
     sender()->deleteLater();
     switch (m_state) {
-        case Connecting : 
+        case Querying : 
             m_state = NotPresent; 
             break;
         case Authorising : 
             m_state = NotAuthorised; 
             break;
-        case Authorised : 
-            m_state = Connecting; 
+        case Connecting:
+            m_state = Connecting;
+            break;
+        case Connected : 
+            m_state = Querying; 
             start();
             break;
         default:
@@ -82,19 +90,20 @@ PlaydarStatus::onError()
 }
 
 void
-PlaydarStatus::onAuth(QString authToken)
+PlaydarConnection::onAuth(QString authToken)
 {
     sender()->deleteLater();
     m_api.setAuthToken(authToken);
-    m_state = Authorised;
+    m_state = Connecting;
     updateText();
 
-    emit connected();
-    makeRosterRequest();
+//    emit connected();
+//    makeRosterRequest();
+    makeCometRequest();
 }
 
 void
-PlaydarStatus::onLanRoster(const QStringList& roster)
+PlaydarConnection::onLanRoster(const QStringList& roster)
 {
     sender()->deleteLater();
     m_hostsModel.setStringList(roster);
@@ -102,7 +111,7 @@ PlaydarStatus::onLanRoster(const QStringList& roster)
 }
 
 void
-PlaydarStatus::makeRosterRequest()
+PlaydarConnection::makeRosterRequest()
 {
     PlaydarRosterRequest* req = new PlaydarRosterRequest(m_wam, m_api);
     connect(req, SIGNAL(roster(QStringList)), SLOT(onLanRoster(QStringList)));
@@ -111,30 +120,95 @@ PlaydarStatus::makeRosterRequest()
 }
 
 void
-PlaydarStatus::makeCometRequest()
+PlaydarConnection::makeCometRequest()
 {
     m_comet = new PlaydarCometRequest();
-    m_comet->start(m_wam, m_api);
+    connect(m_comet, SIGNAL(error()), SLOT(onError()));
+    connect(m_comet, SIGNAL(receivedObject(QVariantMap)), SLOT(receivedCometObject(QVariantMap)));
+    m_cometSession = m_comet->issueRequest(m_wam, m_api);
+    if (m_cometSession.length()) {
+        m_state = Connected;
+    }
 }
 
 void
-PlaydarStatus::updateText()
+PlaydarConnection::updateText()
 {
     QString s;
     switch (m_state) {
-        case Connecting: s = "Connecting to Playdar"; break;
+        case Querying: s = "Looking for Playdar"; break;
         case NotPresent: s = "Playdar not available"; break;
         case Authorising: s = "Authorising with Playdar"; break;
-        case Authorised: s = "Connected to Playdar"; break;
         case NotAuthorised: s = "Couldn't authorise with Playdar"; break;
+        case Connecting: s = "Connecting to Playdar"; break;
+        case Connected: s = "Connected to Playdar"; break;
         default: 
-            s = "PlaydarStatus::updateText is broken!";
+            s = "PlaydarConnection::updateText is broken!";
     }
     emit changed(s);
 }
 
 QStringListModel*
-PlaydarStatus::hostsModel()
+PlaydarConnection::hostsModel()
 {
     return &m_hostsModel;
 }
+
+BoffinRqlRequest* 
+PlaydarConnection::boffinRql(const QString& rql)
+{
+    if (!m_cometSession.length()) {
+        return 0;
+    }
+    BoffinRqlRequest* r = new BoffinRqlRequest();
+    r->issueRequest(m_wam, m_api, rql, m_cometSession);
+    connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
+    connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    return r;
+}
+
+BoffinTagRequest*
+PlaydarConnection::boffinTagcloud(const QString& rql)
+{
+    if (!m_cometSession.length()) {
+        return 0;
+    }
+    BoffinTagRequest* r = new BoffinTagRequest();
+    r->issueRequest(m_wam, m_api, rql, m_cometSession);
+    connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
+    connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    return r;
+}
+
+void
+PlaydarConnection::onRequestMade(const QString& qid)
+{
+    m_cometReqMap[qid] = (CometRequest*) sender();
+}
+
+void
+PlaydarConnection::onRequestDestroyed(QObject* o)
+{
+    m_cometReqMap.remove(((CometRequest*)o)->qid());
+}
+
+void
+PlaydarConnection::receivedCometObject(const QVariantMap& obj)
+{
+    QVariantMap::const_iterator qit = obj.find("query");
+    if (qit != obj.end() && qit->type() == QVariant::String) {
+        QVariantMap::const_iterator rit = obj.find("result");
+        if (rit != obj.end() && rit->type() == QVariant::Map) {
+            // obj is the right shape, find it in
+            // the request map and emit the callback
+            QMap<QString, CometRequest*>::const_iterator reqIt = m_cometReqMap.find(qit->toString());
+            if (reqIt != m_cometReqMap.end()) {
+                reqIt.value()->receiveResult(rit->toMap());
+            } else {
+                // unknown query id.
+                qDebug() << "warning: result for unknown query id was discarded";
+            }
+        }
+    }
+}
+

@@ -1,10 +1,11 @@
-#include "PlaydarTagCloudModel.h"
 #include <float.h> 
 #include <math.h>
+#include "PlaydarTagCloudModel.h"
+#include "PlaydarStatus.h"
 
-PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarApi& p, lastfm::NetworkAccessManager* wam)
-:m_api(p)
-,m_wam(wam)
+
+PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection *playdar)
+:m_playdar(playdar)
 {
 }
 
@@ -17,10 +18,10 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
 {
     qRegisterMetaType<QList<BoffinTagItem> >("QList<BoffinTagItem>");
 
-    BoffinTagRequest* req = new BoffinTagRequest(m_wam, m_api, rql);
-    connect(req, SIGNAL(tags(QList<BoffinTagItem>)), this, SLOT(onTags(QList<BoffinTagItem>)));
+    BoffinTagRequest* req = m_playdar->boffinTagcloud(rql);
+//    connect(req, SIGNAL(tags(QList<BoffinTagItem>)), this, SLOT(onTags(QList<BoffinTagItem>)));
+// todo: ^
     connect(req, SIGNAL(error()), this, SLOT(onTagError()));
-    req->start();
 }
 
 void 
