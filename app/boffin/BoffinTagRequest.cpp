@@ -21,7 +21,7 @@
 #include <lastfm/NetworkAccessManager>
 #include "PlaydarApi.h"
 #include "BoffinTagRequest.h"
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 
 

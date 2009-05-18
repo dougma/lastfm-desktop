@@ -17,8 +17,8 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
  
-#ifndef JSON_GET_MEMBER_HPP
-#define JSON_GET_MEMBER_HPP
+#ifndef JSON_GET_MEMBER_H
+#define JSON_GET_MEMBER_H
 
 #include <boost/foreach.hpp>
 #include "json_spirit/json_spirit.h"

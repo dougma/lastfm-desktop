@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <QTimer>
-#include "PlaydarStatus.h"
+#include "PlaydarConnection.h"
 #include "PlaydarStatRequest.h"
 #include "PlaydarAuthRequest.h"
 #include "PlaydarRosterRequest.h"

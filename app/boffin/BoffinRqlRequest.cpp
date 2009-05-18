@@ -20,7 +20,7 @@
 #include <QNetworkReply>
 #include <lastfm/NetworkAccessManager>
 #include "BoffinRqlRequest.h"
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 
 void 
