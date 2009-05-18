@@ -64,5 +64,5 @@ CONFIG( yajl ) {
 		debug:PKGCONFIG += yajl-debug
 		release:PKGCONFIG += yajl-release
 	}
-	else:LIBS += -lyajl
+	else:LIBS += /usr/local/lib/libyajl_s.a
 }
