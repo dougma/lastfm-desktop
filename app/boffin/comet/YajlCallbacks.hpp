@@ -44,12 +44,12 @@ private:
 
     static int _number(void *ctx, const char *numberVal, unsigned int numberLen)
     {
-        return ((T*)ctx)->json_number(stringize(numberVal, numberLen));
+        return ((T*)ctx)->json_number(Policy::stringize(numberVal, numberLen));
     }
 
     static int _string(void *ctx, const unsigned char *stringVal, unsigned int stringLen)
     {
-        return ((T*)ctx)->json_string(stringize((const char *)stringVal, stringLen));
+        return ((T*)ctx)->json_string(Policy::stringize((const char *)stringVal, stringLen));
     }
 
     static int _start_map(void *ctx)
@@ -59,7 +59,7 @@ private:
 
     static int _map_key(void *ctx, const unsigned char *key, unsigned int stringLen)
     {
-        return ((T*)ctx)->json_map_key(stringize((const char *)key, stringLen));
+        return ((T*)ctx)->json_map_key(Policy::stringize((const char *)key, stringLen));
     }
 
     static int _end_map(void *ctx)

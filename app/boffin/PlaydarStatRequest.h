@@ -24,7 +24,7 @@
 #include <QPointer>
 #include <QObject>
 #include "PlaydarApi.h"
-
+#include <QNetworkReply>
 class PlaydarStatRequest
     : public QObject
 {
@@ -40,7 +40,8 @@ signals:
 
 private slots:
     void onReqFinished();
-
+    void onError( QNetworkReply::NetworkError code );
+    
 private:
     void fail(const char* message);
 

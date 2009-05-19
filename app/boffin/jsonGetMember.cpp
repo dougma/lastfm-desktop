@@ -1,4 +1,4 @@
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 bool jsonGetMember(const QVariantMap& o, const char* key, QString& out)
 {

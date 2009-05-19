@@ -29,10 +29,10 @@
 
 
 PlaydarConnection::PlaydarConnection(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
-: m_wam(wam)
+: m_comet(0)
+, m_wam(wam)
 , m_api(api)
 , m_state(Querying)
-, m_comet(0)
 {
     updateText();
 }
@@ -46,7 +46,7 @@ PlaydarConnection::start()
     stat->start();
 }
 
-void 
+void
 PlaydarConnection::onStat(QString name, QString version, QString hostname, bool bAuthenticated)
 {
     m_name = name;
@@ -71,17 +71,17 @@ PlaydarConnection::onError()
 {
     sender()->deleteLater();
     switch (m_state) {
-        case Querying : 
-            m_state = NotPresent; 
+        case Querying :
+            m_state = NotPresent;
             break;
-        case Authorising : 
-            m_state = NotAuthorised; 
+        case Authorising :
+            m_state = NotAuthorised;
             break;
         case Connecting:
             m_state = Connecting;
             break;
-        case Connected : 
-            m_state = Querying; 
+        case Connected :
+            m_state = Querying;
             start();
             break;
         default:
@@ -143,7 +143,7 @@ PlaydarConnection::updateText()
         case NotAuthorised: s = "Couldn't authorise with Playdar"; break;
         case Connecting: s = "Connecting to Playdar"; break;
         case Connected: s = "Connected to Playdar"; break;
-        default: 
+        default:
             s = "PlaydarConnection::updateText is broken!";
     }
     emit changed(s);
@@ -155,7 +155,7 @@ PlaydarConnection::hostsModel()
     return &m_hostsModel;
 }
 
-BoffinRqlRequest* 
+BoffinRqlRequest*
 PlaydarConnection::boffinRql(const QString& rql)
 {
     if (!m_cometSession.length()) {
@@ -175,9 +175,9 @@ PlaydarConnection::boffinTagcloud(const QString& rql)
         return 0;
     }
     BoffinTagRequest* r = new BoffinTagRequest();
-    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
     connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     return r;
 }
 

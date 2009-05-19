@@ -24,7 +24,6 @@
 #include <QLabel>
 #include <QShortcut>
 #include <QVBoxLayout>
-#include <QTreeView>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
 #include <lastfm/NetworkAccessManager>
@@ -39,6 +38,7 @@
 #include "PlaydarConnection.h"
 #include "BoffinRqlRequest.h"
 #include "PlaydarTagCloudModel.h"
+#include "PlaylistWidget.h"
 #include "PlaylistModel.h"
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
@@ -191,8 +191,7 @@ App::onPlaydarConnected()
     QWidget* centralWidget = new QWidget( m_mainwindow );
     m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
     connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
-    QTreeView* playlist = new QTreeView( centralWidget );
-    playlist->setSortingEnabled( true );
+    PlaylistWidget* playlist = new PlaylistWidget( centralWidget );
     m_playlist = new PlaylistModel( playlist );
     playlist->setModel( m_playlist );
     
@@ -234,7 +233,6 @@ App::tagsChanged()
 void 
 App::onPlaydarTracksReady( QList<Track> t )
 {
-    qDebug() << "Tracks Ready:" << endl << t << endl;
     m_playlist->addTracks( t );
 }
 

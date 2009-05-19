@@ -38,6 +38,7 @@ PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi&
     connect(m_parser, SIGNAL(haveObject(QVariantMap)), SIGNAL(receivedObject(QVariantMap)));
     connect(reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
     connect(reply, SIGNAL(finished()), SLOT(onFinished()));
+    connect(reply, SIGNAL(error( QNetworkReply::NetworkError )), SIGNAL( error()));
     return sessionId;
 }
 

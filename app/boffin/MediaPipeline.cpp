@@ -69,17 +69,6 @@ MediaPipeline::~MediaPipeline()
 }
 
 
-static inline QWidget* findTopLevelWidget( QObject* o )
-{
-    for (int x = 0;;) {
-        o = o->parent();
-        if (!o) return 0;
-        if (o->isWidgetType()) return (QWidget*)o;
-        if (x++ >= 10) return 0; // code that cannot be proved to exit is evil
-    }
-}
-
-
 void
 MediaPipeline::play( TrackSource* trackSource )
 {
@@ -219,7 +208,7 @@ MediaPipeline::onPhononSourceChanged( const Phonon::MediaSource& source )
 void
 MediaPipeline::enqueue()
 {    
-    //TIDIL
+    //TODO
 
 //    if (mo->queue().size() || !m_source) return;
 //

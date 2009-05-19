@@ -14,7 +14,6 @@ CometRequest::qid() const
     return m_qid;
 }
 
-
 bool 
 CometRequest::getQueryId(const QByteArray& data, QString& out)
 {

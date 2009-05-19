@@ -57,7 +57,7 @@ class CometParser : public QObject
     typedef boost::function<void(const QString&, const QVariant&)> Inserter;
     typedef boost::function<void()> AtEnd;
 
-    friend class CometCallbacks;
+    friend class TYajlCallbacks<CometParser, QStringPolicy>;
 
 public:
     CometParser(QObject *parent = 0);

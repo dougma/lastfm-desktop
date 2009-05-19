@@ -1,5 +1,5 @@
 #include "PlaydarPollingRequest.h"
-#include "jsonGetMember.hpp"
+#include "jsonGetMember.h"
 
 using namespace std;
 using namespace json_spirit;
@@ -20,18 +20,18 @@ PlaydarPollingRequest::start()
     issueRequest();
 }
 
-const string& 
+const string&
 PlaydarPollingRequest::qid()
 {
     return m_qid;
 }
 
-void 
+void
 PlaydarPollingRequest::handleResponse(const char *data, unsigned size)
 {
     Value v;
-    if (read(string(data, size), v) && 
-        jsonGetMember(v, "qid", m_qid)) 
+    if (read(string(data, size), v) &&
+        jsonGetMember(v, "qid", m_qid))
     {
         issuePoll(0);
         return;
@@ -39,11 +39,11 @@ PlaydarPollingRequest::handleResponse(const char *data, unsigned size)
     fail("bad json in poll response");
 }
 
-void 
+void
 PlaydarPollingRequest::handlePollResponse(const char *data, unsigned size)
 {
     m_pollCount++;
-    
+
     Value v;
     string qid;
     int refresh_interval;

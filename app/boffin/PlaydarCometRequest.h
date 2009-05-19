@@ -40,6 +40,7 @@ public:
 signals:
     void receivedObject(QVariantMap);
     void finished();
+    void error();
 
 private slots:
     void onReadyRead();
