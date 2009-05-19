@@ -38,6 +38,7 @@ PlaydarStatRequest::start()
     m_statReply = m_wam->get( QNetworkRequest( m_api.stat() ) );
     if (m_statReply) {
         connect(m_statReply, SIGNAL(finished()), SLOT(onReqFinished()));
+        connect(m_statReply, SIGNAL(error( QNetworkReply::NetworkError )), SLOT(onError( QNetworkReply::NetworkError )));
     } else {
         fail("couldn't issue stat request");
     }
@@ -71,6 +72,13 @@ PlaydarStatRequest::onReqFinished()
         fail("bad json in poll response");
     }
     fail("");
+}
+
+void 
+PlaydarStatRequest::onError( QNetworkReply::NetworkError code )
+{
+    QObject* s = sender();
+    qDebug() << "StatRequest error: " << code << endl;
 }
 
 void 

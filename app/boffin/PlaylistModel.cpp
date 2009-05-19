@@ -62,19 +62,26 @@ PlaylistModel::headerData( int section, Qt::Orientation, int role ) const
 QVariant 
 PlaylistModel::data( const QModelIndex& index, int role ) const
 {
-    if( role != Qt::DisplayRole || 
-        index.row() >= m_tracks.size() ||
+    if( index.row() >= m_tracks.size() ||
         index.column() >= columnCount( index.parent())) 
         return QVariant();
 
+
     Track t = m_tracks[ index.row() ]; 
-    switch( index.column() )
-    {
-        case 0: return QString(t.artist());
-        case 1: return t.title();
-        case 2: return t.url().toString();
-        default: return QVariant();
+
+    if( role == UrlRole )
+        return t.url();
+    
+    if( role == Qt::DisplayRole ) {
+        switch( index.column() )
+        {
+            case 0: return QString(t.artist());
+            case 1: return t.title();
+            case 2: return t.url().toString();
+        }
     }
+
+    return QVariant();
 }
 
 QModelIndex 

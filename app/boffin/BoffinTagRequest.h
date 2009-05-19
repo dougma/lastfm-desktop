@@ -53,7 +53,7 @@ public:
 signals:
     void error();
     void tagItem(BoffinTagItem item);
-
+    void requestMade( const QString& );
 private slots:
     void onFinished();
 

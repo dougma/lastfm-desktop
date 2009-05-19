@@ -27,6 +27,8 @@ class PlaylistModel : public QAbstractItemModel
 {
 Q_OBJECT
 public:
+    enum ItemDataRole{ UrlRole = Qt::UserRole };
+
     PlaylistModel( QObject* p = 0 );
     virtual int columnCount( const QModelIndex& parent = QModelIndex()) const;
     virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;

@@ -6,13 +6,11 @@ HistoryWidget::HistoryWidget(QWidget* parent)
     : QWidget(parent)
 {
     m_layout = new QHBoxLayout(this);
+    m_layout->setAlignment( Qt::AlignLeft );
 }
 
 HistoryWidget::~HistoryWidget()
-{
-    while (pop())
-        ;
-}
+{}
 
 bool 
 HistoryWidget::pop()
