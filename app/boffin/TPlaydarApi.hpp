@@ -113,6 +113,7 @@ public:
     {
         ParamsT params;
         paramsAdd(params, "session", session);
+        paramsAdd(params, "auth", m_token);
         return makeUrl("/comet/", params);
     }
 
