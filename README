@@ -10,6 +10,8 @@ Build Dependencies
 * Qt >= 4.4 (built with Phonon if you want sound :P)
 * Ruby
 * Perl
+* liblastfm
+* http://lloyd.github.com/yajl/
 
 Qt is readily available as a simple binary installer on all platforms.
 
