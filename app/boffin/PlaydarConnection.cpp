@@ -123,13 +123,20 @@ void
 PlaydarConnection::makeCometRequest()
 {
     m_comet = new PlaydarCometRequest();
-    connect(m_comet, SIGNAL(error()), SLOT(onError()));
-    connect(m_comet, SIGNAL(receivedObject(QVariantMap)), SLOT(receivedCometObject(QVariantMap)));
-    m_cometSession = m_comet->issueRequest(m_wam, m_api);
-    if (m_cometSession.length()) {
-        m_state = Connected;
-        emit connected();
+    if (m_comet->issueRequest(m_wam, m_api)) {
+        connect(m_comet, SIGNAL(connected(QString)), SLOT(onCometConnected(QString)));
+        connect(m_comet, SIGNAL(error()), SLOT(onError()));
+        connect(m_comet, SIGNAL(receivedObject(QVariantMap)), SLOT(receivedCometObject(QVariantMap)));
     }
+}
+
+void
+PlaydarConnection::onCometConnected(const QString& sessionId)
+{
+    m_cometSession = sessionId;
+    m_state = Connected;
+    updateText();
+    emit connected();
 }
 
 void

@@ -24,22 +24,29 @@
 #include "comet/CometParser.h"
 
 
+PlaydarCometRequest::PlaydarCometRequest()
+:m_parser(0)
+,m_sessionId( QUuid::createUuid().toString().mid(1, 36) )
+{
+}
+
 // returns the sessionId, empty string if request fails
-QString 
+bool 
 PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 {
-    QString sessionId( QUuid::createUuid().toString().mid(1, 36) );
-    QNetworkReply* reply = wam->get(QNetworkRequest(api.comet(sessionId)));
+    QNetworkReply* reply = wam->get(QNetworkRequest(api.comet(m_sessionId)));
     if (!reply) {
-        return "";
+        return false;
     }
 
     m_parser = new CometParser(this);
     connect(m_parser, SIGNAL(haveObject(QVariantMap)), SIGNAL(receivedObject(QVariantMap)));
+    connect(reply, SIGNAL(readyRead()), SLOT(onFirstReadyRead()));
     connect(reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
     connect(reply, SIGNAL(finished()), SLOT(onFinished()));
     connect(reply, SIGNAL(error( QNetworkReply::NetworkError )), SIGNAL( error()));
-    return sessionId;
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(onDownloadProgress(qint64, qint64)));
+    return true;
 }
 
 void 
@@ -51,6 +58,13 @@ PlaydarCometRequest::onReadyRead()
         reply->abort();     // can't recover from this
         onFinished();       // assuming abort() doesn't emit finished
     }
+}
+
+void
+PlaydarCometRequest::onFirstReadyRead()
+{
+    sender()->disconnect(this, SLOT(onFirstReadyRead()));
+    emit connected(m_sessionId);
 }
 
 void

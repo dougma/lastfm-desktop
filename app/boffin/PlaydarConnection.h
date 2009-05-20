@@ -54,6 +54,7 @@ private slots:
     void onError();
     void makeRosterRequest();
 
+    void onCometConnected(const QString& sessionId);
     void receivedCometObject(const QVariantMap&);
     void onRequestMade(const QString& qid);
     void onRequestDestroyed(QObject* o);

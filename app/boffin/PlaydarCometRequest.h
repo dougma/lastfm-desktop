@@ -34,20 +34,25 @@ class PlaydarCometRequest : public QObject
     Q_OBJECT
 
 public:
+    PlaydarCometRequest();
+
     // returns the sessionId, empty string if request fails
-    QString issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
+    bool issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api);
 
 signals:
     void receivedObject(QVariantMap);
+    void connected(QString);
     void finished();
     void error();
 
 private slots:
     void onReadyRead();
+    void onFirstReadyRead();
     void onFinished();
 
 private:
     CometParser *m_parser;
+    QString m_sessionId;
 };
 
 #endif
