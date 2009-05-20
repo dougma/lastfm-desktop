@@ -45,7 +45,6 @@ PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi&
     connect(reply, SIGNAL(readyRead()), SLOT(onReadyRead()));
     connect(reply, SIGNAL(finished()), SLOT(onFinished()));
     connect(reply, SIGNAL(error( QNetworkReply::NetworkError )), SIGNAL( error()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(onDownloadProgress(qint64, qint64)));
     return true;
 }
 
