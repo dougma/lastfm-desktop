@@ -93,6 +93,7 @@ for x in `admin/findsrc pro.in lib` `admin/findsrc pro.in app`
 do
     pro=`dirname "$x"`/`basename "$x" .in`
     cp "$x" "$pro"
+    echo "#### GENERATED FILE!!! Edit the pro.in file instead! ####" >> "$pro"
     admin/qpp "$x" >> "$pro"
 done
 
