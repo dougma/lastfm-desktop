@@ -99,21 +99,23 @@ TagCloudView::paintEvent( QPaintEvent* e )
         const QModelIndex& index = i.key();
         const QRect& rect = i.value();
 
-        opt.state = QStyle::State_None;
-        if( m_hoverIndex == index && isEnabled() )
-            opt.state = qApp->mouseButtons() == Qt::NoButton
-                    ? QStyle::State_MouseOver
-                    : QStyle::State_Active;
-
         opt.rect = rect.translated( 0, -verticalScrollBar()->value() );
-        
-        if( selectionModel()->isSelected( index ) )
-            opt.state |= QStyle::State_Selected;
 
-        if( isEnabled() )
-            opt.state |= QStyle::State_Enabled;
+        if( e->rect().intersects( opt.rect )) {
+            opt.state = QStyle::State_None;
+            if( m_hoverIndex == index && isEnabled() )
+                opt.state = qApp->mouseButtons() == Qt::NoButton
+                        ? QStyle::State_MouseOver
+                        : QStyle::State_Active;
 
-        itemDelegate()->paint( &p, opt, index );
+            if( selectionModel()->isSelected( index ) )
+                opt.state |= QStyle::State_Selected;
+
+            if( isEnabled() )
+                opt.state |= QStyle::State_Enabled;
+
+            itemDelegate()->paint( &p, opt, index );
+        }
     }
 }
 

@@ -70,6 +70,7 @@ private:
     BoffinTagItem m_tag;    // the last taglist provided via onTags
 
     float m_maxWeight;
+    float m_maxLogWeight;
     float m_minLogWeight;
 };
 

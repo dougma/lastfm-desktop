@@ -8,6 +8,7 @@ PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection *playdar)
 :m_playdar(playdar)
 ,m_minLogWeight( FLT_MAX )
 ,m_maxWeight( 0 )
+,m_maxLogWeight( 0 )
 {
 }
 
@@ -40,6 +41,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		tag.m_logWeight = log( tag.m_weight );
 		m_tagList << tag;
 		m_maxWeight = qMax( tag.m_weight, m_maxWeight );
+        m_maxLogWeight = qMax( m_maxLogWeight, tag.m_logWeight );
 		m_minLogWeight = qMin( m_minLogWeight, tag.m_logWeight );
 	endInsertRows();
 
@@ -94,23 +96,26 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
     {
         case Qt::DisplayRole:
         {
-            QList< BoffinTagItem >::const_iterator i = m_tagList.constEnd();
-            i -= index.row() + 1;
+            QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
+            i += index.row();
             return i->m_name;
         }
 
         case PlaydarTagCloudModel::WeightRole:
         {
-            QList< BoffinTagItem >::const_iterator i = m_tagList.constEnd();
-            i -= index.row() + 1;
+            QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
+            i += index.row();
             return QVariant::fromValue<float>((i->m_weight / m_maxWeight));
         }
 
         case PlaydarTagCloudModel::LinearWeightRole:
         {
-            QList< BoffinTagItem >::const_iterator i = m_tagList.constEnd();
-            i -= index.row() + 1;
-            return QVariant::fromValue<float>( ( i->m_logWeight - m_minLogWeight ) / (log(m_maxWeight) - m_minLogWeight));
+            if (m_tagList.count() == 1) {
+                return 1;
+            }
+            QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
+            i += index.row();
+            return QVariant::fromValue<float>( ( i->m_logWeight - m_minLogWeight ) / (m_maxLogWeight - m_minLogWeight));
         }
 
         default:

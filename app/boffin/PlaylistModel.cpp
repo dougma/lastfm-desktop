@@ -114,8 +114,10 @@ PlaylistModel::addTracks( QList< Track > tracks )
 void 
 PlaylistModel::clear()
 {
-    beginRemoveRows( QModelIndex(), 0, m_tracks.size() -1 ); 
-    m_tracks.clear(); 
-    endRemoveRows(); 
+    if (m_tracks.size()) {
+        beginRemoveRows( QModelIndex(), 0, m_tracks.size() -1 ); 
+        m_tracks.clear(); 
+        endRemoveRows(); 
+    }
 }
 
