@@ -28,7 +28,7 @@ CometParser::CometParser(QObject *parent)
 
 CometParser::~CometParser()
 {
-    if (m_handle) 
+    if (m_handle)
         yajl_free(m_handle);
 }
 
@@ -40,37 +40,37 @@ CometParser::push(const QByteArray& ba)
 }
 
 
-//static 
-void 
+//static
+void
 CometParser::objectInserter(CometParser::Object* o, const QString& name, const QVariant& value)
 {
     o->insert(name, value);
 }
 
-//static 
-void 
+//static
+void
 CometParser::arrayInserter(CometParser::Array* a, const QString&, const QVariant& value)
 {
     a->push_back(value);
 }
 
-//static 
-void 
+//static
+void
 CometParser::postObjectInserter(CometParser::Inserter i, const QString& name, Object* o)
 {
     i(name, *o);
     delete o;
 }
 
-//static 
-void 
+//static
+void
 CometParser::postArrayInserter(CometParser::Inserter i, const QString& name, Array* a)
 {
     i(name, *a);
     delete a;
 }
 
-void 
+void
 CometParser::haveObject(const QString&, const QVariant& v)
 {
     if (v.type() == QVariant::Map) {
@@ -78,8 +78,8 @@ CometParser::haveObject(const QString&, const QVariant& v)
     }
 }
 
-//static 
-void 
+//static
+void
 CometParser::nop()
 {
 }
@@ -87,20 +87,20 @@ CometParser::nop()
 ////////////////////////////////
 
 // yajl callbacks:
-int 
+int
 CometParser::json_null()
 {
     return 1;
 }
 
-int 
+int
 CometParser::json_boolean(int boolVal)
 {
     m_insertStack.top()( m_key, QVariant(boolVal ? true : false) );
     return 1;
 }
 
-int 
+int
 CometParser::json_number(const QString& s)
 {
     bool ok;
@@ -115,14 +115,14 @@ CometParser::json_number(const QString& s)
     return 1;
 }
 
-int 
+int
 CometParser::json_string(const QString& s)
 {
     m_insertStack.top()( m_key, QVariant(s) );
     return 1;
 }
 
-int 
+int
 CometParser::json_start_map()
 {
     if (m_insertStack.size() == 0)
@@ -134,14 +134,14 @@ CometParser::json_start_map()
     return 1;
 }
 
-int 
+int
 CometParser::json_map_key(const QString& s)
 {
     m_key = s;
     return 1;
 }
 
-int 
+int
 CometParser::json_start_array()
 {
     Array *a = new Array();
@@ -157,7 +157,7 @@ CometParser::json_start_array()
     return 1;
 }
 
-int 
+int
 CometParser::json_end_map()
 {
     m_insertStack.pop();
@@ -165,11 +165,11 @@ CometParser::json_end_map()
     return 1;
 }
 
-int 
+int
 CometParser::json_end_array()
-{ 
+{
     m_insertStack.pop();
     m_atEndStack.pop()();
-    return 1;        
+    return 1;
 }
 

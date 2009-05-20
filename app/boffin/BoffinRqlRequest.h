@@ -44,6 +44,7 @@ public:
 signals:
     void error();
     void playableItem(BoffinPlayableItem item);
+    void requestMade( const QString );
 
 private slots:
     void onFinished();

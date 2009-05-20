@@ -16,7 +16,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
- 
+
 #ifndef PLAYDAR_TAG_CLOUD_MODEL_H
 #define PLAYDAR_TAG_CLOUD_MODEL_H
 
@@ -51,24 +51,24 @@ public:
     virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const;
     virtual QModelIndex parent( const QModelIndex& ) const;
     virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
-    virtual int columnCount( const QModelIndex& =QModelIndex() ) const;
+    virtual int columnCount( const QModelIndex& = QModelIndex() ) const;
     virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
     virtual bool hasChildren( const QModelIndex& = QModelIndex()) const{ return false; }
 
 private slots:
-    void onTags(QList<BoffinTagItem> tags);
+    void onTag(BoffinTagItem tag);
     void onTagError();
 
 private:
     PlaydarConnection* m_playdar;
 
     QSet<QString> m_hostFilter;
-    QMap<QString, QString> m_tagMap;
 
-    QList<BoffinTagItem> m_tags;    // the last taglist provided via onTags
+    QList< BoffinTagItem > m_tagList;
+    //QMap< BoffinTagItem, float > m_logWeightMap;
 
-    QMultiMap<float, QString> m_tagHash;
-    QMultiMap<float, QString> m_logTagHash;
+    BoffinTagItem m_tag;    // the last taglist provided via onTags
+
     float m_maxWeight;
     float m_minLogWeight;
 };

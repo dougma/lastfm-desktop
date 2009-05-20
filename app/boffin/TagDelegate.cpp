@@ -38,18 +38,18 @@ static inline QSize margins( float const weight )
 }
 
 
-TagDelegate::TagDelegate( QObject* parent ) 
+TagDelegate::TagDelegate( QObject* parent )
             : QAbstractItemDelegate( parent )
 {}
 
 
-void 
+void
 TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
     QPen p( Qt::NoPen );
     QBrush b( Qt::NoBrush );
-    QColor const dark = option.palette.color( QPalette::Highlight ).darker();    
-    
+    QColor const dark = option.palette.color( QPalette::Highlight ).darker();
+
     if( option.state & (QStyle::State_Selected | QStyle::State_Active) )
     {
         b = option.state & QStyle::State_Enabled
@@ -88,12 +88,12 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
 
 extern int gBaseline;
 extern int gLeftMargin;
-QSize 
+QSize
 TagDelegate::sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
     const float weight = index.data( PlaydarTagCloudModel::LinearWeightRole ).value<float>();
     QFontMetrics fm( font( option.font, weight ) );
-    
+
     const QSize margin = margins( weight );
     gBaseline = margin.height()/2 + fm.ascent();
     gLeftMargin = margin.width()/2;

@@ -28,11 +28,15 @@
 
 struct BoffinTagItem
 {
+	BoffinTagItem(): m_valid( false )
+	{}
+
     BoffinTagItem(const QString& name, const QString& host, int count, float weight)
         : m_name(name)
         , m_host(host)
         , m_count(count)
         , m_weight(weight)
+        , m_valid( true )
     {
     }
 
@@ -40,6 +44,8 @@ struct BoffinTagItem
     QString m_host;
     int m_count;
     float m_weight;
+    float m_logWeight;
+    bool m_valid;
 };
 
 class BoffinTagRequest : public CometRequest
@@ -53,7 +59,7 @@ public:
 signals:
     void error();
     void tagItem(BoffinTagItem item);
-    void requestMade( const QString& );
+    void requestMade( const QString );
 private slots:
     void onFinished();
 
