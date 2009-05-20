@@ -51,4 +51,3 @@ private:
 };
 
 #endif //PLAYLIST_MODEL_H_
-

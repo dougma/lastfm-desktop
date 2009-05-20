@@ -1,7 +1,10 @@
 TARGET = listener
 TEMPLATE = lib
-QT = core xml network dbus
+QT = core xml network
 LIBS += -llastfm -lunicorn
+
+# basically not easy to support on other platforms, but feel free to fork
+linux*:QT += dbus
 
 include( $$ROOT_DIR/admin/include.qmake )
 
