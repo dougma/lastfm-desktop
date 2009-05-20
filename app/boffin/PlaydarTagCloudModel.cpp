@@ -30,8 +30,15 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
 void
 PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 {
-    typedef QMultiMap<float, QString> TagMap;
-    typedef TagMap::iterator TagMapIterator;
+    if( int i = m_tagList.indexOf( tag ) >= 0 )
+    {
+    	m_tagList[ i ].m_weight += tag.m_weight;
+    	m_tagList[ i ].m_logWeight = log( m_tagList[i].m_weight );
+    	m_maxWeight = qMax( m_tagList[i].m_weight, m_maxWeight);
+    	m_maxLogWeight = qMax( m_tagList[i].m_logWeight, m_maxLogWeight);
+    	emit dataChanged( createIndex( i, 0), createIndex( i, 0));
+    	return;
+    }
 
 	// check if the host is being filtered.
     if (m_hostFilter.contains(tag.m_host))
