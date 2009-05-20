@@ -20,6 +20,7 @@
 #include "Application.h"
 #include "MetadataWindow.h"
 #include "StopWatch.h"
+#include "lib/listener/DBusListener.h"
 #include "lib/listener/PlayerConnection.h"
 #include "lib/listener/PlayerListener.h"
 #include "lib/listener/PlayerMediator.h"
@@ -88,6 +89,11 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
         connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
         o = new LegacyPlayerListener(mediator);
         connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
+        
+    #ifdef QT_DBUS_LIB
+        DBusListener* dbus = new DBusListener(mediator);
+        connect(dbus, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
+    #endif
     }
     catch(std::runtime_error& e){
         qWarning() << e.what();
