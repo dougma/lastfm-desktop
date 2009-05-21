@@ -38,8 +38,6 @@
 #include "PlaydarConnection.h"
 #include "BoffinRqlRequest.h"
 #include "PlaydarTagCloudModel.h"
-#include "PlaylistWidget.h"
-#include "PlaylistModel.h"
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
@@ -76,7 +74,7 @@ void
 App::init( MainWindow* window ) throw( int /*exitcode*/ )
 {
     m_mainwindow = window;
-    
+
     window->ui.play->setEnabled( false );
     window->ui.pause->setEnabled( false );
     window->ui.skip->setEnabled( false );
@@ -88,7 +86,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 
     QActionGroup* actiongroup = new QActionGroup( window->ui.outputdevice );
 
-    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices()) 
+    foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
     {
         QAction* a = window->ui.outputdevice->addAction( d.name() );
         a->setCheckable( true );
@@ -96,14 +94,14 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
             m_audioOutput->setOutputDevice( d );
         if (m_audioOutput->outputDevice().name() == d.name())
             a->setChecked( true );
-            
+
         actiongroup->addAction( a );
     }
 
 	m_audioOutput->setVolume( 1.0 /* Settings().volume() */ );
 
     connect( actiongroup, SIGNAL(triggered( QAction* )), SLOT(onOutputDeviceActionTriggered( QAction* )) );
-    
+
 	m_pipe = new MediaPipeline( m_audioOutput, this );
     connect( m_pipe, SIGNAL(preparing()), SLOT(onPreparing()) );
     connect( m_pipe, SIGNAL(started( Track )), SLOT(onStarted( Track )) );
@@ -121,7 +119,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
 /// parts of the scanning stuff
     //m_trackTagUpdater = TrackTagUpdater::create(
     //        "http://musiclookup.last.fm/trackresolve",
-    //        100,        // number of days track tags are good 
+    //        100,        // number of days track tags are good
     //        5);         // 5 minute delay between web requests
 
 /// connect
@@ -148,9 +146,9 @@ void
 App::onOutputDeviceActionTriggered( QAction* a )
 {
     //FIXME for some reason setOutputDevice just returns false! :(
-    
+
     QString const name = a->text();
-    
+
     foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
         if (d.name() == name) {
             qDebug() << m_audioOutput->setOutputDevice( d );
@@ -159,7 +157,7 @@ App::onOutputDeviceActionTriggered( QAction* a )
         }
 }
 
-#include "TagCloudWidget.h"
+#include "TagBrowserWidget.h"
 #include "TagCloudView.h"
 #include "TagDelegate.h"
 #include "PlaydarTagCloudModel.h"
@@ -169,13 +167,13 @@ App::onOutputDeviceActionTriggered( QAction* a )
 
 void
 App::onScanningFinished()
-{    
+{
     disconnect( sender(), 0, this, 0 ); //only once pls
-    
+
     m_mainwindow->ui.play->setEnabled( true );
     m_mainwindow->ui.pause->setEnabled( false );
     m_mainwindow->ui.skip->setEnabled( false );
-    m_mainwindow->ui.rescan->setEnabled( true );    
+    m_mainwindow->ui.rescan->setEnabled( true );
     m_mainwindow->ui.wordle->setEnabled( true );
     m_mainwindow->ui.playdarHosts->setModel( m_playdar->hostsModel() );
 
@@ -189,28 +187,21 @@ void
 App::onPlaydarConnected()
 {
     QWidget* centralWidget = new QWidget( m_mainwindow );
-    m_tagcloud = new TagCloudWidget( boost::bind(&App::createTagCloudModel, this), "dougma" );
+    m_tagcloud = new TagBrowserWidget( boost::bind(&App::createTagCloudModel, this), "dougma", m_playdar );
     connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
-    PlaylistWidget* playlist = new PlaylistWidget( centralWidget );
-    m_playlist = new PlaylistModel( playlist );
-    playlist->setModel( m_playlist );
-    
-    new QVBoxLayout( centralWidget );
-    centralWidget->layout()->addWidget( m_tagcloud );
-    centralWidget->layout()->addWidget( playlist );
 
 //    m_tagcloud->setFrameStyle( QFrame::NoFrame );
-    m_mainwindow->setCentralWidget( centralWidget );
+    m_mainwindow->setCentralWidget( m_tagcloud );
 }
 
 
-PlaydarTagCloudModel* 
+PlaydarTagCloudModel*
 App::createTagCloudModel()
 {
     return new PlaydarTagCloudModel(m_playdar);
 }
 
-void 
+void
 App::play()
 {
     onPreparing();
@@ -219,21 +210,21 @@ App::play()
 void
 App::tagsChanged()
 {
-    if (!m_tagcloud) return;
-
-    QString rql = m_tagcloud->rql();
-    BoffinRqlRequest* req = m_playdar->boffinRql(rql);
-    TrackSource* source = new TrackSource(req);
-    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
-    connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
-    m_playlist->clear();
+//    if (!m_tagcloud) return;
+//
+//    QString rql = m_tagcloud->rql();
+//    BoffinRqlRequest* req = m_playdar->boffinRql(rql);
+//    TrackSource* source = new TrackSource(req);
+//    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
+//    connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
+//    m_playlist->clear();
 }
 
 
-void 
+void
 App::onPlaydarTracksReady( QList<Track> t )
 {
-    m_playlist->addTracks( t );
+//    m_playlist->addTracks( t );
 }
 
 
@@ -270,7 +261,7 @@ void
 App::onPreparing() //MediaPipeline is preparing to play a new station
 {
     m_mainwindow->QMainWindow::setWindowTitle( "Boffing up..." );
-        
+
     QAction* a = m_mainwindow->ui.play;
     a->setIcon( QPixmap(":/stop.png") );
     disconnect( a, SIGNAL(triggered()), this, 0 );
@@ -282,7 +273,7 @@ void
 App::onStarted( const Track& t )
 {
     m_playing = true; // because phonon is shit and we can't rely on its state
-    
+
     m_mainwindow->setWindowTitle( t );
     m_mainwindow->ui.play->blockSignals( true );
     m_mainwindow->ui.play->setChecked( true );
@@ -291,7 +282,7 @@ App::onStarted( const Track& t )
     m_mainwindow->ui.pause->setChecked( false );
     m_mainwindow->ui.pause->setEnabled( true );
     m_mainwindow->ui.pause->blockSignals( false );
-    
+
     m_mainwindow->ui.skip->setEnabled( true );
 }
 
@@ -325,14 +316,14 @@ App::onStopped()
     m_mainwindow->ui.pause->setChecked( false );
     m_mainwindow->ui.pause->setEnabled( false );
     m_mainwindow->ui.pause->blockSignals( false );
-    
+
     m_mainwindow->ui.skip->setEnabled( false );
 
     QAction* a = m_mainwindow->ui.play;
     a->setIcon( QPixmap(":/play.png") );
     disconnect( a, SIGNAL(triggered()), m_pipe, 0 );
     connect( a, SIGNAL(triggered()), SLOT(play()) );
-    
+
     m_playing = false;
 }
 

@@ -169,9 +169,9 @@ PlaydarConnection::boffinRql(const QString& rql)
         return 0;
     }
     BoffinRqlRequest* r = new BoffinRqlRequest();
-    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
     connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     return r;
 }
 

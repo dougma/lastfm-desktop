@@ -23,7 +23,7 @@
 #include "jsonGetMember.h"
 
 
-void 
+void
 BoffinRqlRequest::onFinished()
 {
     sender()->deleteLater();
@@ -33,7 +33,7 @@ BoffinRqlRequest::onFinished()
         if (getQueryId(reply->readAll(), queryId)) {
             if (queryId == qid()) {
                 // all is good
-                return; 
+                return;
             }
             fail("qid mismatch");            // we can't handle this
         }
@@ -42,7 +42,7 @@ BoffinRqlRequest::onFinished()
     fail("");
 }
 
-void 
+void
 BoffinRqlRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session)
 {
     QNetworkReply *reply = wam->get(QNetworkRequest(api.boffinRql(session, qid(), rql)));
@@ -54,8 +54,8 @@ BoffinRqlRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& ap
     }
 }
 
-//virtual 
-void 
+//virtual
+void
 BoffinRqlRequest::receiveResult(const QVariantMap& o)
 {
     int duration = 0;
@@ -77,5 +77,5 @@ void
 BoffinRqlRequest::fail(const char *message)
 {
     qDebug() << message;
-    emit error();
-}   
+	emit error();
+}
