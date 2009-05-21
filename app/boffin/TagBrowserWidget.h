@@ -1,5 +1,5 @@
-#ifndef TAG_CLOUD_WIDGET_H
-#define TAG_CLOUD_WIDGET_H
+#ifndef TAG_BROWSER_WIDGET_H
+#define TAG_BROWSER_WIDGET_H
 
 #include <boost/function.hpp>
 #include <QStringList>
@@ -10,20 +10,23 @@ class TagCloudView;
 class PlaydarTagCloudModel;
 class SideBySideLayout;
 class HistoryWidget;
+class PlaydarConnection;
+class PlaylistModel;
 
-class TagCloudWidget : public QWidget
+class TagBrowserWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    TagCloudWidget(boost::function<PlaydarTagCloudModel* (void)> modelFactory, 
+    TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)> modelFactory,
         const QString& firstButton,
+        PlaydarConnection*,
         QWidget* parent = 0);
 
     TagCloudView* getFirstView() const;
     void pop();
     QString rql() const;
-    
+
 signals:
     void selectionChanged();
 
@@ -39,6 +42,8 @@ private:
     HistoryWidget* m_history;
     QStringList m_tags;
     boost::function<PlaydarTagCloudModel* (void)> m_modelFactory;
+    PlaylistModel* m_playlist;
+    PlaydarConnection* m_playdar;
 };
 
 #endif

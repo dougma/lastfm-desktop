@@ -40,6 +40,11 @@ struct BoffinTagItem
     {
     }
 
+    bool operator==( const BoffinTagItem& that)
+    {
+    	return m_name == that.m_name;
+    }
+
     QString m_name;
     QString m_host;
     int m_count;

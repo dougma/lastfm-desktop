@@ -32,7 +32,7 @@ public:
     PlaylistModel( QObject* p = 0 );
     virtual int columnCount( const QModelIndex& parent = QModelIndex()) const;
     virtual int rowCount( const QModelIndex& parent = QModelIndex() ) const;
-    
+
     virtual QVariant headerData( int section, Qt::Orientation, int role = Qt::DisplayRole ) const;
     virtual QVariant data( const QModelIndex& index, int role ) const;
 
@@ -42,6 +42,7 @@ public:
     { return QModelIndex(); }
 
 
+public slots:
     void addTracks( QList< Track > tracks );
     void clear();
 

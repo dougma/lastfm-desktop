@@ -38,7 +38,7 @@ static Track toTrack(const BoffinPlayableItem& item)
     return t;
 }
 
-void 
+void
 TrackSource::onPlayableItem(BoffinPlayableItem item)
 {
     QList<Track> res;

@@ -31,7 +31,7 @@ PlaydarCometRequest::PlaydarCometRequest()
 }
 
 // returns the sessionId, empty string if request fails
-bool 
+bool
 PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api)
 {
     QNetworkReply* reply = wam->get(QNetworkRequest(api.comet(m_sessionId)));
@@ -48,7 +48,7 @@ PlaydarCometRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi&
     return true;
 }
 
-void 
+void
 PlaydarCometRequest::onReadyRead()
 {
     QNetworkReply* reply = (QNetworkReply*) sender();

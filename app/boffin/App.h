@@ -16,7 +16,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
+
 #ifndef APP_H
 #define APP_H
 
@@ -36,7 +36,7 @@ namespace lastfm{ class Track; }
 class App : public unicorn::Application
 {
     Q_OBJECT
-    
+
 public:
     App( int& argc, char* argv[] );
     ~App();
@@ -47,9 +47,9 @@ public:
 public slots:
     void play();
     void xspf(); //prompts to choose a xspf to resolve
-    
+
     void playPause();
-    
+
 private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
@@ -62,8 +62,8 @@ private slots:
     void onResumed();
     void onPaused();
     void onStopped();
-    
-    void onScanningFinished();    
+
+    void onScanningFinished();
     void onPlaybackError( const QString& );
     void onWordle();
 
@@ -72,19 +72,18 @@ private:
     PlaydarTagCloudModel* createTagCloudModel();
 
     class MainWindow* m_mainwindow;
-    class TagCloudWidget* m_tagcloud;
-    class PlaylistModel* m_playlist;
+    class TagBrowserWidget* m_tagcloud;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
     class PlaydarConnection* m_playdar;
-    
+
     Phonon::AudioOutput* m_audioOutput;
-    
+
     bool m_playing;
 
     PlaydarApi m_api;
     lastfm::NetworkAccessManager* m_wam;
-   
+
 };
 
 #endif //APP_H
