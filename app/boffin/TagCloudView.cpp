@@ -16,7 +16,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
+
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
 #include <QApplication>
@@ -26,8 +26,9 @@
 #include <limits.h>
 
 
-TagCloudView::TagCloudView( QWidget* parent ) 
+TagCloudView::TagCloudView( QWidget* parent )
              : QAbstractItemView( parent )
+             , m_calcCount( 0 )
 {
     QFont f = font();
 
@@ -39,7 +40,7 @@ TagCloudView::TagCloudView( QWidget* parent )
 
     setFont( f );
     viewport()->setMouseTracking( true );
-    
+
     setSelectionMode( QAbstractItemView::MultiSelection );
     setSelectionBehavior( QAbstractItemView::SelectItems );
 }
@@ -51,7 +52,7 @@ TagCloudView::setModel(QAbstractItemModel *model)
     connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
 }
 
-void 
+void
 TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFlags f )
 {
     if (state() == DragSelectingState)
@@ -68,24 +69,24 @@ TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFla
 }
 
 
-QStringList 
+QStringList
 TagCloudView::currentTags() const
 {
     QStringList ret;
     foreach( QModelIndex i, selectionModel()->selectedIndexes() )
         ret << i.data( Qt::DisplayRole ).toString();
-    
+
     return ret;
 }
 
 
-void 
+void
 TagCloudView::paintEvent( QPaintEvent* e )
-{    
+{
     QPainter p( viewport() );
     p.setClipRect( e->rect());
     QStyleOptionViewItem opt = viewOptions();
-    
+
     QHash< QModelIndex, QRect >::const_iterator i = m_rects.constBegin();
 
     if( m_rects.isEmpty() )
@@ -119,10 +120,15 @@ TagCloudView::paintEvent( QPaintEvent* e )
     }
 }
 
-void 
+
+void
 TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
-    Q_UNUSED(parent);
+	if( start - m_calcCount < 200 )
+		return;
+	m_calcCount = start;
+
+	Q_UNUSED(parent);
     Q_UNUSED(start);
     Q_UNUSED(end);
     updateGeometries();
@@ -141,9 +147,9 @@ TagCloudView::rectcalc()
         QRect r( QPoint(), itemDelegate()->sizeHint( opt, i ) );
         if (baseline == 0)
             baseline = gBaseline;
-            
+
         r.moveTo( gLeftMargin, baseline-gBaseline );
-            
+
         m_rects[i] = r;
     }
 }
@@ -156,19 +162,19 @@ TagCloudView::updateGeometries()
         return;
 
     rectcalc(); //TODO only needs to be done once when data is set!
-    
+
     const int VIEWPORT_MARGIN = 10;
-    
+
     int y = VIEWPORT_MARGIN;
     int left_margin = 0; // the left baseline to align text against
-    
+
     for (int j = 0; j < model()->rowCount(); ++j)
     {
         QModelIndex const i = model()->index( j, 0 );
         QRect r = m_rects[i];
-        
+
         if (left_margin == 0) left_margin = r.x();
-    
+
         // do new row
         int x = VIEWPORT_MARGIN + (left_margin - r.x());
         int tallest = 0;
@@ -176,7 +182,7 @@ TagCloudView::updateGeometries()
         {
             QModelIndex const i = model()->index( j, 0 );
             QRect r = m_rects[i];
-            
+
             r.moveTo( x, y + r.y() );
 
             x += r.width();
@@ -187,20 +193,20 @@ TagCloudView::updateGeometries()
 
             tallest = qMax( tallest, r.bottom() - y );
         }
-        
+
         y += tallest;
     }
-    
+
     verticalScrollBar()->setRange( 0, y + VIEWPORT_MARGIN - viewport()->height() );
     verticalScrollBar()->setPageStep( viewport()->height() );
-    verticalScrollBar()->setSingleStep( 20 /*TODO*/ ); 
+    verticalScrollBar()->setSingleStep( 20 /*TODO*/ );
 
     viewport()->update();
     QAbstractItemView::updateGeometries();
 }
 
 
-void 
+void
 TagCloudView::selectAll()
 {
     QItemSelection allSelection( model()->index( 0 , 0 ), model()->index( model()->rowCount()-1, 0 ));
@@ -209,7 +215,7 @@ TagCloudView::selectAll()
 }
 
 
-QModelIndex 
+QModelIndex
 TagCloudView::indexAt( const QPoint& pos ) const
 {
     QPoint p = pos + QPoint( 0, verticalScrollBar()->value());
@@ -224,7 +230,7 @@ TagCloudView::indexAt( const QPoint& pos ) const
 }
 
 
-QRect 
+QRect
 TagCloudView::visualRect( const QModelIndex& i ) const
 {
     return m_rects[ i ].translated( 0, -verticalScrollBar()->value());
@@ -244,7 +250,7 @@ TagCloudView::viewportEvent( QEvent* event )
                 m_hoverIndex = indexAt( viewport()->mapFromGlobal( QCursor::pos() ) );
                 return b;
             }
-            
+
         case QEvent::MouseMove:
         {
             QMouseEvent* e = static_cast< QMouseEvent* >( event );
@@ -254,7 +260,7 @@ TagCloudView::viewportEvent( QEvent* event )
                 viewport()->update();
             break;
         }
-        
+
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
             if (m_hoverIndex.isValid())

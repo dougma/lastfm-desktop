@@ -16,7 +16,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
- 
+
 #ifndef TAG_CLOUD_VIEW_H
 #define TAG_CLOUD_VIEW_H
 
@@ -27,7 +27,7 @@ class TagCloudView : public QAbstractItemView
     Q_OBJECT
 public:
     TagCloudView( QWidget* parent = 0 );
-    
+
     // QAbstractItemView pure virtual functions:
     virtual QModelIndex indexAt( const QPoint& ) const;
     virtual void scrollTo( const QModelIndex&, ScrollHint ) {};
@@ -46,7 +46,7 @@ protected slots:
 
 protected:
     void rectcalc();
-    
+
     virtual void paintEvent( QPaintEvent* );
     virtual bool isIndexHidden( const QModelIndex& ) const{ return false; }
     virtual void setSelection( const QRect&, QItemSelectionModel ){};
@@ -60,6 +60,8 @@ protected:
 
     QModelIndex m_hoverIndex;
     QHash<QModelIndex, QRect> m_rects;
+
+    int m_calcCount;
 };
 
 #endif //TAG_CLOUD_VIEW_H
