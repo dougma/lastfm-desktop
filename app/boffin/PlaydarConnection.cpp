@@ -169,9 +169,9 @@ PlaydarConnection::boffinRql(const QString& rql)
         return 0;
     }
     BoffinRqlRequest* r = new BoffinRqlRequest();
-    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
     connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    r->issueRequest(m_wam, m_api, rql, m_cometSession);
     return r;
 }
 
@@ -214,7 +214,7 @@ PlaydarConnection::receivedCometObject(const QVariantMap& obj)
                 reqIt.value()->receiveResult(rit->toMap());
             } else {
                 // unknown query id.
-                qDebug() << "warning: result for unknown query id was discarded";
+                qDebug() << "warning: result for unknown query " << qit->toString() << " was discarded";
             }
         }
     }
