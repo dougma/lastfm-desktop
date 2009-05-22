@@ -36,7 +36,6 @@
 #include "ScrobSocket.h"
 #include "TrackSource.h"
 #include "PlaydarConnection.h"
-#include "BoffinRqlRequest.h"
 #include "PlaydarTagCloudModel.h"
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"

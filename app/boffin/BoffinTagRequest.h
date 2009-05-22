@@ -45,6 +45,11 @@ struct BoffinTagItem
     	return m_name == that.m_name;
     }
 
+    bool operator <( const BoffinTagItem& that ) const
+    {
+    	return m_weight < that.m_weight;
+    }
+
     QString m_name;
     QString m_host;
     int m_count;

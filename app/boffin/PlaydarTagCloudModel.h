@@ -37,7 +37,7 @@ class PlaydarTagCloudModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole };
+    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole, CountRole };
 
     PlaydarTagCloudModel(PlaydarConnection *playdar);
     ~PlaydarTagCloudModel(void);
@@ -55,23 +55,30 @@ public:
     virtual QVariant data( const QModelIndex&, int role = Qt::DisplayRole ) const;
     virtual bool hasChildren( const QModelIndex& = QModelIndex()) const{ return false; }
 
+signals:
+	void fetchedTags();
+	void tagItem( const BoffinTagItem& );
+
 private slots:
     void onTag(BoffinTagItem tag);
     void onTagError();
+    void onFetchedTags();
 
 private:
     PlaydarConnection* m_playdar;
 
     QSet<QString> m_hostFilter;
 
+    QList< BoffinTagItem > m_tagListBuffer;
     QList< BoffinTagItem > m_tagList;
-    //QMap< BoffinTagItem, float > m_logWeightMap;
 
     BoffinTagItem m_tag;    // the last taglist provided via onTags
 
     float m_maxWeight;
     float m_maxLogWeight;
     float m_minLogWeight;
+
+    class QTimer* m_loadingTimer;
 };
 
 #endif

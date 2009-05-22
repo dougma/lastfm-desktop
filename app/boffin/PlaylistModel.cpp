@@ -25,99 +25,99 @@ PlaylistModel::PlaylistModel( QObject* p )
 {}
 
 
-int 
+int
 PlaylistModel::columnCount( const QModelIndex& parent ) const
-{ 
+{
     if( parent.isValid())
         return 0;
     else
-        return 3; 
+        return 4;
 }
 
-int 
+int
 PlaylistModel::rowCount( const QModelIndex& parent ) const
-{ 
+{
     if( parent.isValid() )
         return 0;
     else
-        return m_tracks.size(); 
+        return m_tracks.size();
 }
 
-QVariant 
+QVariant
 PlaylistModel::headerData( int section, Qt::Orientation, int role ) const
-{ 
+{
     if( role != Qt::DisplayRole ) return QVariant();
-    
-    switch( section ) 
+
+    switch( section )
     {
-        case 0: return tr( "Artist" );
-        case 1: return tr( "Title" ); 
-        case 2: return tr( "Url" );
+        case 1: return tr( "Artist" );
+        case 2: return tr( "Title" );
+        case 3: return tr( "Url" );
     }
 
-    return QVariant(); 
+    return QVariant();
 }
 
 
-QVariant 
+QVariant
 PlaylistModel::data( const QModelIndex& index, int role ) const
 {
     if( index.row() >= m_tracks.size() ||
-        index.column() >= columnCount( index.parent())) 
+        index.column() >= columnCount( index.parent()))
         return QVariant();
 
 
-    Track t = m_tracks[ index.row() ]; 
+    Track t = m_tracks[ index.row() ];
 
     if( role == UrlRole )
         return t.url();
-    
+
     if( role == Qt::DisplayRole ) {
         switch( index.column() )
         {
-            case 0: return QString(t.artist());
-            case 1: return t.title();
-            case 2: return t.url().toString();
+            case 1: return QString(t.artist());
+            case 2: return t.title();
+            case 3: return t.url().toString();
         }
     }
 
     return QVariant();
 }
 
-QModelIndex 
+QModelIndex
 PlaylistModel::index( int row, int column, const QModelIndex& p) const
 {
-    if ( row < m_tracks.size() && 
-         column < columnCount(p) && 
+    if ( row < m_tracks.size() &&
+         column < columnCount(p) &&
          !p.isValid() )
     {
         return createIndex( row, column );
     }
-    else 
+    else
     {
         return  QModelIndex();
     }
-        
+
 }
 
-void 
+void
 PlaylistModel::addTracks( QList< Track > tracks )
 {
     if( !tracks.isEmpty() )
     {
         beginInsertRows( QModelIndex(), m_tracks.size(), m_tracks.size() + tracks.size() -1 );
-        m_tracks <<  tracks; 
+        m_tracks <<  tracks;
         endInsertRows();
     }
 }
 
-void 
+void
 PlaylistModel::clear()
 {
     if (m_tracks.size()) {
-        beginRemoveRows( QModelIndex(), 0, m_tracks.size() -1 ); 
-        m_tracks.clear(); 
-        endRemoveRows(); 
+        beginRemoveRows( QModelIndex(), 0, m_tracks.size() -1 );
+        m_tracks.clear();
+        endRemoveRows();
     }
 }
 

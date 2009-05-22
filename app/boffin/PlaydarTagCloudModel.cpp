@@ -1,14 +1,15 @@
-	#include <float.h>
+#include <float.h>
 #include <math.h>
 #include "PlaydarTagCloudModel.h"
 #include "PlaydarConnection.h"
-
+#include <QTimer>
 
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection *playdar)
 :m_playdar(playdar)
 ,m_minLogWeight( FLT_MAX )
 ,m_maxWeight( 0 )
 ,m_maxLogWeight( 0 )
+,m_loadingTimer( 0 )
 {
 }
 
@@ -23,70 +24,65 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
 	//		tag results.
 
     BoffinTagRequest* req = m_playdar->boffinTagcloud(rql);
-    connect(req, SIGNAL(tagItem(BoffinTagItem)), this, SLOT(onTag(BoffinTagItem)));
+    connect(req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTag(BoffinTagItem)));
+    connect(req, SIGNAL(tagItem(BoffinTagItem)), SIGNAL(tagItem(BoffinTagItem)));
     connect(req, SIGNAL(error()), this, SLOT(onTagError()));
+    if( m_loadingTimer )
+    {
+    	delete( m_loadingTimer );
+    	m_loadingTimer = 0;
+    }
+
 }
 
 void
 PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 {
-    if( int i = m_tagList.indexOf( tag ) >= 0 )
-    {
-    	m_tagList[ i ].m_weight += tag.m_weight;
-    	m_tagList[ i ].m_logWeight = log( m_tagList[i].m_weight );
-    	m_maxWeight = qMax( m_tagList[i].m_weight, m_maxWeight);
-    	m_maxLogWeight = qMax( m_tagList[i].m_logWeight, m_maxLogWeight);
-    	emit dataChanged( createIndex( i, 0), createIndex( i, 0));
-    	return;
-    }
+	if( m_loadingTimer )
+		m_loadingTimer->stop();
 
 	// check if the host is being filtered.
     if (m_hostFilter.contains(tag.m_host))
 		return;
 
-	beginInsertRows( QModelIndex(), m_tagList.size(), m_tagList.size() + 1);
+    //Merge any existing tags
+    if( int i = m_tagListBuffer.indexOf( tag ) >= 0 )
+    {
+    	m_tagListBuffer[ i ].m_weight += tag.m_weight;
+    	m_tagListBuffer[ i ].m_logWeight = log( m_tagListBuffer[i].m_weight );
+    	m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
+    	m_maxLogWeight = qMax( m_tagListBuffer[i].m_logWeight, m_maxLogWeight);
+    	emit dataChanged( createIndex( i, 0), createIndex( i, 0));
+    	return;
+    }
+
+//	beginInsertRows( QModelIndex(), m_tagListBuffer.size(), m_tagListBuffer.size() + 1);
 		tag.m_logWeight = log( tag.m_weight );
-		m_tagList << tag;
+		m_tagListBuffer << tag;
 		m_maxWeight = qMax( tag.m_weight, m_maxWeight );
         m_maxLogWeight = qMax( m_maxLogWeight, tag.m_logWeight );
 		m_minLogWeight = qMin( m_minLogWeight, tag.m_logWeight );
+//	endInsertRows();
+
+	if( !m_loadingTimer )
+	{
+	    m_loadingTimer = new QTimer();
+	    m_loadingTimer->setSingleShot( true );
+	    connect( m_loadingTimer, SIGNAL( timeout()), SLOT(onFetchedTags()));
+	}
+    m_loadingTimer->start( 1000 );
+}
+
+void
+PlaydarTagCloudModel::onFetchedTags()
+{
+	m_loadingTimer->deleteLater();
+	m_loadingTimer = 0;
+	beginInsertRows( QModelIndex(), m_tagList.size(), m_tagListBuffer.size() );
+		m_tagList = m_tagListBuffer;
+		qSort( m_tagList.begin(), m_tagList.end(), qGreater<BoffinTagItem >() );
 	endInsertRows();
-
-//	TagMapIterator it = m_tagHash.
-//	if (it == tagWeightMap.end()) {
-//		// first instance of this tag
-//		tagWeightMap.insert(tag.m_name, tag.m_weight);
-//	} else {
-//		// multiple hosts have this tag; add their weights:
-//		it.value() += tag.m_weight;
-//	}
-//
-//    beginInsertRows( QModelIndex(), m_tagHash.size(), m_tagHash.size() + tagWeightMap.size());
-//    int lastChangedIndex;
-//    int firstChangedIndex = lastChangedIndex = m_tagHash.size() - 1;
-//
-//    for (TagWeightMapIterator it = tagWeightMap.begin(); it != tagWeightMap.end(); it++)
-//    {
-//        float& weight = it.value();
-//        const QString& name = it.key();
-//
-//        m_maxWeight = qMax( weight, m_maxWeight );
-//        float logWeight = log( weight );
-//        if( logWeight < m_minLogWeight)
-//        {
-//        	m_minLogWeight = logWeight;
-//        	lastChangedIndex = m_tagHash.size();
-//        	firstChangedIndex = 0;
-//        	//the minLogWeight will effect other data in the model
-//        }
-//        m_logTagHash.insert( logWeight, name );
-//        m_tagHash.insert( weight, name );
-//    }
-//    endInsertRows();
-//    if( firstChangedIndex != lastChangedIndex)
-//    	dataChanged( createIndex( firstChangedIndex, 0 ), createIndex(lastChangedIndex, columnCount()));
-//    m_tag = tag;
-
+	emit fetchedTags();
 }
 
 void
@@ -99,7 +95,10 @@ PlaydarTagCloudModel::onTagError()
 QVariant
 PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
 {
-    switch( role )
+	if( index.row() >= m_tagList.count() )
+		return QVariant();
+
+	switch( role )
     {
         case Qt::DisplayRole:
         {
@@ -123,6 +122,13 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
             QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
             i += index.row();
             return QVariant::fromValue<float>( ( i->m_logWeight - m_minLogWeight ) / (m_maxLogWeight - m_minLogWeight));
+        }
+
+        case PlaydarTagCloudModel::CountRole:
+        {
+            QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
+            i += index.row();
+            return QVariant::fromValue<int>( i->m_count );
         }
 
         default:

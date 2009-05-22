@@ -22,6 +22,7 @@
 
 #include <QAbstractItemView>
 
+class BoffinTagItem;
 class TagCloudView : public QAbstractItemView
 {
     Q_OBJECT
@@ -33,7 +34,7 @@ public:
     virtual void scrollTo( const QModelIndex&, ScrollHint ) {};
     virtual QRect visualRect( const QModelIndex& ) const;
 
-    void setModel(QAbstractItemModel *model);
+    void setModel(class PlaydarTagCloudModel *model);
 
     QStringList currentTags() const;
 
@@ -43,6 +44,8 @@ public slots:
 protected slots:
     virtual void updateGeometries();
     void onRowsInserted(const QModelIndex & parent, int start, int end);
+    void onFetchedTags();
+    void onTag( const BoffinTagItem& );
 
 protected:
     void rectcalc();
@@ -62,6 +65,8 @@ protected:
     QHash<QModelIndex, QRect> m_rects;
 
     int m_calcCount;
+    bool m_fetched;
+    QString m_loadedTag;
 };
 
 #endif //TAG_CLOUD_VIEW_H

@@ -29,6 +29,7 @@
 TagCloudView::TagCloudView( QWidget* parent )
              : QAbstractItemView( parent )
              , m_calcCount( 0 )
+             , m_fetched( false )
 {
     QFont f = font();
 
@@ -46,10 +47,22 @@ TagCloudView::TagCloudView( QWidget* parent )
 }
 
 void
-TagCloudView::setModel(QAbstractItemModel *model)
+TagCloudView::setModel(PlaydarTagCloudModel *model)
 {
     QAbstractItemView::setModel(model);
     connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
+    connect(model, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTag(BoffinTagItem)));
+    connect(model, SIGNAL(fetchedTags()), SLOT(onFetchedTags()));
+}
+
+void
+TagCloudView::onTag( const BoffinTagItem& tag )
+{
+	if( m_fetched )
+		return;
+
+	m_loadedTag = tag.m_name;
+	viewport()->update();
 }
 
 void
@@ -85,6 +98,14 @@ TagCloudView::paintEvent( QPaintEvent* e )
 {
     QPainter p( viewport() );
     p.setClipRect( e->rect());
+
+
+    if( !m_fetched )
+    {
+		p.drawText( viewport()->rect(), Qt::AlignCenter, "Fetching tags.." + m_loadedTag );
+		return;
+    }
+
     QStyleOptionViewItem opt = viewOptions();
 
     QHash< QModelIndex, QRect >::const_iterator i = m_rects.constBegin();
@@ -122,10 +143,15 @@ TagCloudView::paintEvent( QPaintEvent* e )
 
 
 void
+TagCloudView::onFetchedTags()
+{
+	m_fetched = true;
+}
+
+
+void
 TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
-	if( start - m_calcCount < 200 )
-		return;
 	m_calcCount = start;
 
 	Q_UNUSED(parent);
