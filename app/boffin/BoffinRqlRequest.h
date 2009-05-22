@@ -13,7 +13,8 @@ struct BoffinPlayableItem
         const QString& source, 
         const QString& mimetype, 
         const QString& url,
-        int duration)
+        int duration,
+        float weight)
         : m_artist(artist)
         , m_album(album)
         , m_track(track)
@@ -21,6 +22,7 @@ struct BoffinPlayableItem
         , m_mimetype(mimetype)
         , m_url(QUrl::fromPercentEncoding(QByteArray(url.toUtf8())))
         , m_duration(duration)
+        , m_weight(weight)
     {
     }
 
@@ -31,6 +33,7 @@ struct BoffinPlayableItem
     QString m_mimetype;
     QUrl m_url;
     int m_duration;
+    float m_weight;
 };
 
 class BoffinRqlRequest : public CometRequest

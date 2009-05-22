@@ -214,7 +214,7 @@ PlaydarConnection::receivedCometObject(const QVariantMap& obj)
                 reqIt.value()->receiveResult(rit->toMap());
             } else {
                 // unknown query id.
-                qDebug() << "warning: result for unknown query id was discarded";
+                qDebug() << "warning: result for unknown query " << qit->toString() << " was discarded";
             }
         }
     }

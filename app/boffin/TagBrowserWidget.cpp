@@ -16,34 +16,25 @@ TagBrowserWidget::TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)>
 , m_modelFactory(modelFactory)
 , m_playdar( playdar )
 {
-    m_layout = new SideBySideLayout();
-
-
     QVBoxLayout* vlayout = new QVBoxLayout(this);
     m_history = new HistoryWidget();
     m_history->newItem(firstButton);
     connect(m_history, SIGNAL(clicked(int, QString)), SLOT(onHistoryClicked(int, QString)));
-    connect( m_layout, SIGNAL(animationFinished()), SLOT(onAnimationFinished()));
     vlayout->addWidget(m_history);
 
     QWidget* w = new QWidget( this );
-    new QVBoxLayout( w );
+    m_view = new TagCloudView( w );
+    m_view->setSelectionMode( QAbstractItemView::SingleSelection );
+    vlayout->addWidget( m_view );
 
-    TagCloudView* view( new TagCloudView( w ) );
-    view->setSelectionMode( QAbstractItemView::SingleSelection );
-    w->layout()->addWidget( view );
+    m_playlistModel = new PlaylistModel( this );
+    m_playlistWidget = new PlaylistWidget( m_playdar, this );
+    m_playlistWidget->setModel( m_playlistModel );
+    vlayout->addWidget( m_playlistWidget );
 
-    PlaylistWidget* playlist = new PlaylistWidget( m_playdar, w );
-    m_playlist = new PlaylistModel( playlist );
-    playlist->setModel( m_playlist );
-    w->layout()->addWidget( playlist );
+    setupModelView( m_view );
 
-
-    m_layout->addWidget( w );
-
-    setupModelView( view );
-
-    vlayout->addLayout(m_layout);
+    this->setLayout(vlayout);
 }
 
 QString
@@ -60,26 +51,12 @@ TagBrowserWidget::onSelectionChanged( const QItemSelection& selected, const QIte
 {
     if (selected.indexes().size()) {
     	//FIXME: wow! this needs to be done properly!
-        TagCloudView* topView = static_cast<TagCloudView*>( m_layout->currentWidget()->layout()->itemAt(0)->widget() );
-        QString tag( topView->model()->data( selected.indexes().at(0) ).toString() );
+        QString tag( m_view->model()->data( selected.indexes().at(0) ).toString() );
         m_tags << tag;
-
         m_history->newItem( tag );
+        setupModelView( m_view );
 
-        QWidget* w = new QWidget( this );
-        new QVBoxLayout( w );
-
-        TagCloudView* view( new TagCloudView( w ) );
-        view->setSelectionMode( QAbstractItemView::SingleSelection );
-        w->layout()->addWidget( view );
-
-        PlaylistWidget* playlist = new PlaylistWidget( m_playdar, w );
-        playlist->loadFromRql( rql() );
-        w->layout()->addWidget( playlist );
-
-        m_layout->addWidget( w );
-        m_layout->moveForward();
-        setupModelView( view );
+        m_playlistWidget->loadFromRql( rql() );
     }
     emit selectionChanged();
 }
@@ -104,7 +81,6 @@ TagBrowserWidget::onHistoryClicked(int position, const QString& text)
 
     // move backward to the clicked-button
     while(m_tags.size() > position) {
-        m_layout->moveBackward();
         // the view is deleted after the animation finishes
         m_tags.removeLast();
         m_history->pop();
@@ -112,12 +88,3 @@ TagBrowserWidget::onHistoryClicked(int position, const QString& text)
     emit selectionChanged();
 }
 
-void
-TagBrowserWidget::onAnimationFinished()
-{
-    // remove anything 'forward' of the current widget
-    int current = m_layout->currentItemIndex();
-    for (int i = m_layout->count() - 1; i > current; i--) {
-    	delete m_layout->takeAt(i)->widget();
-    }
-}

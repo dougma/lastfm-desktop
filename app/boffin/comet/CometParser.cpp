@@ -22,7 +22,7 @@
 CometParser::CometParser(QObject *parent)
 : QObject(parent)
 {
-    yajl_parser_config cfg = { 1 /* allow comments */, 1 /* check the incoming utf8 */ };
+    yajl_parser_config cfg = { 1 /* allow comments */, 0 /* don't check the incoming utf8 */ };
     m_handle = yajl_alloc(&CometCallbacks::callbacks, &cfg, NULL, (void *) this);
 }
 
@@ -90,6 +90,7 @@ CometParser::nop()
 int
 CometParser::json_null()
 {
+    m_insertStack.top()( m_key, QVariant() );
     return 1;
 }
 
