@@ -37,12 +37,13 @@ class PlaydarTagCloudModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole, CountRole };
+    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole, CountRole, RelevanceRole };
 
     PlaydarTagCloudModel(PlaydarConnection *playdar);
     ~PlaydarTagCloudModel(void);
 
     void startGetTags(const QString& rql = QString());
+    void startRelevanceRql(const QString& rql);
 
     void setHostFilter(QSet<QString> hosts);            // exclude hosts from tagcloud
     void addToHostFilter(const QString& hostname);
@@ -63,6 +64,7 @@ private slots:
     void onTag(BoffinTagItem tag);
     void onTagError();
     void onFetchedTags();
+    void onRelevantTagItem( const BoffinTagItem& );
 
 private:
     PlaydarConnection* m_playdar;
@@ -77,6 +79,9 @@ private:
     float m_maxWeight;
     float m_maxLogWeight;
     float m_minLogWeight;
+
+    QMap< BoffinTagItem, float > m_relevanceMap;
+    float m_maxRelevance;
 
     class QTimer* m_loadingTimer;
 };

@@ -23,12 +23,13 @@
 #include "PlaydarConnection.h"
 #include <QTimer>
 
-PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection *playdar)
+PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection* playdar)
 :m_playdar(playdar)
 ,m_minLogWeight( FLT_MAX )
 ,m_maxWeight( 0 )
 ,m_maxLogWeight( 0 )
 ,m_loadingTimer( 0 )
+,m_maxRelevance( 0 )
 {
 }
 
@@ -52,6 +53,28 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     	m_loadingTimer = 0;
     }
 
+}
+
+void
+PlaydarTagCloudModel::startRelevanceRql(const QString& rql)
+{
+	m_maxRelevance = 0;
+	m_relevanceMap.clear();
+	BoffinTagRequest* req = m_playdar->boffinTagcloud( rql );
+	connect( req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onRelevantTagItem(BoffinTagItem)));
+}
+
+void
+PlaydarTagCloudModel::onRelevantTagItem( const BoffinTagItem& tag )
+{
+	if( m_relevanceMap.contains( tag ) )
+		m_relevanceMap[tag] += tag.m_weight;
+	else
+		m_relevanceMap[tag] = tag.m_weight;
+
+	m_maxRelevance = qMax( m_maxRelevance, m_relevanceMap[tag]);
+	int tagIndex = m_tagList.indexOf( tag );
+	emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
 }
 
 void
@@ -148,6 +171,17 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
             QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
             i += index.row();
             return QVariant::fromValue<int>( i->m_count );
+        }
+
+        case PlaydarTagCloudModel::RelevanceRole:
+        {
+        	QMap<BoffinTagItem, float>::const_iterator i
+        		 = m_relevanceMap.find( m_tagList[index.row()] );
+        	if( i == m_relevanceMap.end() )
+        		return 0;
+
+        	else
+        		return QVariant::fromValue<float>( i.value() );
         }
 
         default:
