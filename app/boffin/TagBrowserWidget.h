@@ -12,6 +12,7 @@ class SideBySideLayout;
 class HistoryWidget;
 class PlaydarConnection;
 class PlaylistModel;
+class PlaylistWidget;
 
 class TagBrowserWidget : public QWidget
 {
@@ -23,8 +24,6 @@ public:
         PlaydarConnection*,
         QWidget* parent = 0);
 
-    TagCloudView* getFirstView() const;
-    void pop();
     QString rql() const;
 
 signals:
@@ -33,16 +32,17 @@ signals:
 private slots:
     void onSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
     void onHistoryClicked(int position, const QString& text);
-    void onAnimationFinished();
 
 private:
     void setupModelView(TagCloudView* view);
-
-    SideBySideLayout* m_layout;
+    
     HistoryWidget* m_history;
+    TagCloudView* m_view;
+    PlaylistWidget* m_playlistWidget;
+    PlaylistModel* m_playlistModel;
+
     QStringList m_tags;
     boost::function<PlaydarTagCloudModel* (void)> m_modelFactory;
-    PlaylistModel* m_playlist;
     PlaydarConnection* m_playdar;
 };
 
