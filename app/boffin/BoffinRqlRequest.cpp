@@ -61,15 +61,17 @@ BoffinRqlRequest::receiveResult(const QVariantMap& o)
     int duration = 0;
     jsonGetMember(o, "duration", duration);
 
+    double weight;
     QString artist, album, track, source, mimetype, url;
     if (jsonGetMember(o, "artist", artist) &&
         jsonGetMember(o, "album", album) &&
         jsonGetMember(o, "track", track) &&
         jsonGetMember(o, "source", source) &&
         jsonGetMember(o, "mimetype", mimetype) &&
-        jsonGetMember(o, "url", url) )
+        jsonGetMember(o, "url", url) &&
+        jsonGetMember(o, "weight", weight))
     {
-        emit playableItem(BoffinPlayableItem(artist, album, track, source, mimetype, url, duration));
+        emit playableItem(BoffinPlayableItem(artist, album, track, source, mimetype, url, duration, (float) weight));
     }
 }
 
