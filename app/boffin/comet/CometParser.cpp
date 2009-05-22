@@ -90,6 +90,7 @@ CometParser::nop()
 int
 CometParser::json_null()
 {
+    m_insertStack.top()( m_key, QVariant() );
     return 1;
 }
 
