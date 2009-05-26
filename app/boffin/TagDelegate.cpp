@@ -48,6 +48,12 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
 {
     QPen p( Qt::NoPen );
     QBrush b( Qt::NoBrush );
+
+    float tagRelevance = index.data( PlaydarTagCloudModel::RelevanceRole ).value<float>();
+    QColor bc(255,0,0);
+    bc.setAlphaF( tagRelevance );
+    b = QBrush( bc );
+
     QColor const dark = option.palette.color( QPalette::Highlight ).darker();
 
     if( option.state & (QStyle::State_Selected | QStyle::State_Active) )
@@ -62,10 +68,6 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     if( option.state & QStyle::State_Active )
         p = dark;
 
-    float tagRelevance = index.data( PlaydarTagCloudModel::RelevanceRole ).value<float>();
-    QColor bc(255,0,0);
-    bc.setAlphaF( tagRelevance );
-    b = QBrush( bc );
 
     p.setWidth( 3 );
     painter->setPen( p );

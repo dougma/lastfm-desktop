@@ -30,9 +30,6 @@ public slots:
 signals:
 	void play(const QUrl&);
 
-protected slots:
-
-
 private slots:
 	void onDoubleClicked(const QModelIndex& index) {
 		qDebug() << "Play: "
