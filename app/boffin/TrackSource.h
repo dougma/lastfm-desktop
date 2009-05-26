@@ -25,16 +25,16 @@
 #include "BoffinRqlRequest.h"
 
 
-class TrackSource 
+class TrackSource
     : public QObject
 {
     Q_OBJECT
 
 public:
-    TrackSource(BoffinRqlRequest* req);    
+    TrackSource(BoffinRqlRequest* req);
 
 signals:
-    void ready( QList<Track>  );
+    void ready( Track );
 
 private slots:
     void onPlayableItem(BoffinPlayableItem item);

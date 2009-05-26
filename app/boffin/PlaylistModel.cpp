@@ -112,6 +112,14 @@ PlaylistModel::addTracks( QList< Track > tracks )
 }
 
 void
+PlaylistModel::addTrack( Track t )
+{
+	QList< Track > tl;
+	tl << t;
+	addTracks( tl );
+}
+
+void
 PlaylistModel::clear()
 {
     if (m_tracks.size()) {
