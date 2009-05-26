@@ -82,6 +82,7 @@ private:
     float m_minLogWeight;
 
     QMap< BoffinTagItem, float > m_relevanceMap;
+    float m_minRelevance;
     float m_maxRelevance;
 
     class QTimer* m_loadingTimer;
