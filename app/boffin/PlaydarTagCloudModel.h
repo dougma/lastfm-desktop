@@ -50,6 +50,7 @@ public:
     void setTagMapping(QMap<QString, QString> tagMap);  // map tagname -> preferred tagname
 
     virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const;
+    QModelIndex indexOf( const BoffinTagItem& t );
     virtual QModelIndex parent( const QModelIndex& ) const;
     virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
     virtual int columnCount( const QModelIndex& = QModelIndex() ) const;

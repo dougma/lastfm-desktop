@@ -62,6 +62,12 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     if( option.state & QStyle::State_Active )
         p = dark;
 
+    float tagRelevance = index.data( PlaydarTagCloudModel::RelevanceRole ).value<float>();
+    QColor bc(255,0,0);
+    bc.setAlphaF( tagRelevance );
+    b = QBrush( bc );
+    //qDebug() << "Setting color: " << bc;
+
     p.setWidth( 3 );
     painter->setPen( p );
     painter->setBrush( b );

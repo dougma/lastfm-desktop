@@ -35,11 +35,12 @@ private slots:
 
 private:
     void setupModelView(TagCloudView* view);
-    
+
     HistoryWidget* m_history;
     TagCloudView* m_view;
     PlaylistWidget* m_playlistWidget;
     PlaylistModel* m_playlistModel;
+    PlaydarTagCloudModel* m_tagCloudModel;
 
     QStringList m_tags;
     boost::function<PlaydarTagCloudModel* (void)> m_modelFactory;

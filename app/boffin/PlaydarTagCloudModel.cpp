@@ -52,7 +52,7 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     	delete( m_loadingTimer );
     	m_loadingTimer = 0;
     }
-
+    qDebug() << "Fetching rql: " << rql;
 }
 
 void
@@ -72,7 +72,15 @@ PlaydarTagCloudModel::onRelevantTagItem( const BoffinTagItem& tag )
 	else
 		m_relevanceMap[tag] = tag.m_weight;
 
-	m_maxRelevance = qMax( m_maxRelevance, m_relevanceMap[tag]);
+	if( m_relevanceMap[ tag ] > m_maxRelevance )
+	{
+		foreach( BoffinTagItem tag, m_relevanceMap.keys() )
+		{
+			int tagIndex = m_tagList.indexOf( tag );
+			emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
+		}
+		m_maxRelevance = m_relevanceMap[tag];
+	}
 	int tagIndex = m_tagList.indexOf( tag );
 	emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
 }
@@ -113,6 +121,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 	    connect( m_loadingTimer, SIGNAL( timeout()), SLOT(onFetchedTags()));
 	}
     m_loadingTimer->start( 1000 );
+
 }
 
 void
@@ -181,7 +190,9 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
         		return 0;
 
         	else
-        		return QVariant::fromValue<float>( i.value() );
+        	{
+        		return QVariant::fromValue<float>( i.value() / m_maxRelevance);
+        	}
         }
 
         default:
@@ -197,6 +208,12 @@ PlaydarTagCloudModel::index( int row, int column, const QModelIndex& parent /*= 
     return parent.isValid() || row > m_tagList.count() ?
         QModelIndex() :
         createIndex( row, column );
+}
+
+QModelIndex
+PlaydarTagCloudModel::indexOf( const BoffinTagItem& tag )
+{
+	return createIndex( m_tagList.indexOf( tag ), 0 );
 }
 
 //virtual
