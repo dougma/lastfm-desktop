@@ -18,6 +18,7 @@ TagBrowserWidget::TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)>
 {
 	m_tagCloudModel = modelFactory();
     QVBoxLayout* vlayout = new QVBoxLayout(this);
+
     m_history = new HistoryWidget();
     m_history->newItem(firstButton);
     connect(m_history, SIGNAL(clicked(int, QString)), SLOT(onHistoryClicked(int, QString)));

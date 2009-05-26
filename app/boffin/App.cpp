@@ -181,14 +181,11 @@ App::onScanningFinished()
     m_playdar->start();
 }
 
-
 void
 App::onPlaydarConnected()
 {
-    QWidget* centralWidget = new QWidget( m_mainwindow );
     m_tagcloud = new TagBrowserWidget( boost::bind(&App::createTagCloudModel, this), "dougma", m_playdar );
     connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
-
 //    m_tagcloud->setFrameStyle( QFrame::NoFrame );
     m_mainwindow->setCentralWidget( m_tagcloud );
 }

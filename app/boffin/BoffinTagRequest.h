@@ -28,17 +28,17 @@
 
 struct BoffinTagItem
 {
-	BoffinTagItem(): m_valid( false )
+	BoffinTagItem()//: m_valid( false )
 	{}
 
-	BoffinTagItem( const QString& name ): m_name( name ), m_valid( false ) {};
+	BoffinTagItem( const QString& name ): m_name( name )/*, m_valid( false )*/ {};
 
     BoffinTagItem(const QString& name, const QString& host, int count, float weight)
         : m_name(name)
         , m_host(host)
         , m_count(count)
         , m_weight(weight)
-        , m_valid( true )
+//        , m_valid( true )
     {
     }
 
@@ -57,7 +57,7 @@ struct BoffinTagItem
     int m_count;
     float m_weight;
     float m_logWeight;
-    bool m_valid;
+    //bool m_valid;
 };
 
 class BoffinTagRequest : public CometRequest

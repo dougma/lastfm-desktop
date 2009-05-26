@@ -54,6 +54,8 @@ MainWindow::MainWindow()
     
     QStatusBar* status = new QStatusBar();
     ui.playdarHosts = new QComboBox();
+    ui.playdarHosts->setInsertPolicy( QComboBox::InsertAlphabetically );
+    ui.playdarHosts->setSizeAdjustPolicy( QComboBox::AdjustToContents );
     ui.playdarStatus = new QLabel();
     status->addPermanentWidget(ui.playdarStatus);
     status->addPermanentWidget(ui.playdarHosts);

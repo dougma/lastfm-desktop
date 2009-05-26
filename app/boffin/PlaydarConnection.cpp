@@ -98,7 +98,7 @@ PlaydarConnection::onAuth(QString authToken)
     m_state = Connecting;
     updateText();
 
-//    makeRosterRequest();
+    makeRosterRequest();
     makeCometRequest();
 }
 
