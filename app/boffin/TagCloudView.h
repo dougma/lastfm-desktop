@@ -21,8 +21,8 @@
 #define TAG_CLOUD_VIEW_H
 
 #include <QAbstractItemView>
+#include "BoffinTagRequest.h"
 
-class BoffinTagItem;
 class TagCloudView : public QAbstractItemView
 {
     Q_OBJECT
