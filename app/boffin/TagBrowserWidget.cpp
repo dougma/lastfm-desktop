@@ -1,9 +1,9 @@
 #include <QWidget>
+#include <QVBoxLayout>
 #include "TagBrowserWidget.h"
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
 #include "TagDelegate.h"
-#include "layouts/SideBySideLayout.h"
 #include "HistoryWidget.h"
 #include "PlaylistWidget.h"
 #include "PlaylistModel.h"
@@ -16,6 +16,7 @@ TagBrowserWidget::TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)>
 , m_modelFactory(modelFactory)
 , m_playdar( playdar )
 {
+	m_tagCloudModel = modelFactory();
     QVBoxLayout* vlayout = new QVBoxLayout(this);
     m_history = new HistoryWidget();
     m_history->newItem(firstButton);
@@ -24,7 +25,6 @@ TagBrowserWidget::TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)>
 
     QWidget* w = new QWidget( this );
     m_view = new TagCloudView( w );
-    m_view->setSelectionMode( QAbstractItemView::SingleSelection );
     vlayout->addWidget( m_view );
 
     m_playlistModel = new PlaylistModel( this );
@@ -33,6 +33,7 @@ TagBrowserWidget::TagBrowserWidget(boost::function<PlaydarTagCloudModel* (void)>
     vlayout->addWidget( m_playlistWidget );
 
     setupModelView( m_view );
+    m_tagCloudModel->startGetTags();
 
     this->setLayout(vlayout);
 }
@@ -50,13 +51,17 @@ void
 TagBrowserWidget::onSelectionChanged( const QItemSelection& selected, const QItemSelection& deselected )
 {
     if (selected.indexes().size()) {
-    	//FIXME: wow! this needs to be done properly!
-        QString tag( m_view->model()->data( selected.indexes().at(0) ).toString() );
-        m_tags << tag;
-        m_history->newItem( tag );
-        setupModelView( m_view );
+    	foreach( QModelIndex i, selected.indexes() )
+    	{
+    		QString tag = i.data().toString();
+    		if( m_tags.contains( tag ) ) continue;
 
-        m_playlistWidget->loadFromRql( rql() );
+			m_tags << tag;
+			m_history->newItem( tag );
+			setupModelView( m_view );
+			m_tagCloudModel->startRelevanceRql( rql());
+			m_playlistWidget->loadFromRql( rql() );
+    	}
     }
     emit selectionChanged();
 }
@@ -64,14 +69,13 @@ TagBrowserWidget::onSelectionChanged( const QItemSelection& selected, const QIte
 void
 TagBrowserWidget::setupModelView(TagCloudView* view)
 {
-    PlaydarTagCloudModel* model = m_modelFactory();
-    view->setModel( model );
+    //PlaydarTagCloudModel* model = m_modelFactory();
+    view->setModel( m_tagCloudModel );
     view->setItemDelegate( new TagDelegate );
     connect(
         view->selectionModel(),
         SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
         SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
-    model->startGetTags( rql() );
 }
 
 void
@@ -82,7 +86,10 @@ TagBrowserWidget::onHistoryClicked(int position, const QString& text)
     // move backward to the clicked-button
     while(m_tags.size() > position) {
         // the view is deleted after the animation finishes
-        m_tags.removeLast();
+        QString t = m_tags.takeLast();
+        QModelIndex i = m_tagCloudModel->indexOf( BoffinTagItem( t ));
+        m_view->selectionModel()->select( i, QItemSelectionModel::Deselect );
+        m_view->update( i );
         m_history->pop();
     }
     emit selectionChanged();

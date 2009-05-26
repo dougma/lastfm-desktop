@@ -31,6 +31,8 @@ struct BoffinTagItem
 	BoffinTagItem(): m_valid( false )
 	{}
 
+	BoffinTagItem( const QString& name ): m_name( name ), m_valid( false ) {};
+
     BoffinTagItem(const QString& name, const QString& host, int count, float weight)
         : m_name(name)
         , m_host(host)
