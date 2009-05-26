@@ -26,6 +26,7 @@
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection* playdar)
 :m_playdar(playdar)
 ,m_minLogWeight( FLT_MAX )
+,m_minRelevance( FLT_MAX )
 ,m_maxWeight( 0 )
 ,m_maxLogWeight( 0 )
 ,m_loadingTimer( 0 )
@@ -68,19 +69,32 @@ void
 PlaydarTagCloudModel::onRelevantTagItem( const BoffinTagItem& tag )
 {
 	if( m_relevanceMap.contains( tag ) )
-		m_relevanceMap[tag] += tag.m_weight;
+		m_relevanceMap[tag] += log( tag.m_weight );
 	else
-		m_relevanceMap[tag] = tag.m_weight;
+		m_relevanceMap[tag] = log( tag.m_weight );
 
-	if( m_relevanceMap[ tag ] > m_maxRelevance )
+	bool update = false;
+	if( m_relevanceMap[tag] < m_minRelevance )
+	{
+		m_minRelevance = m_relevanceMap[tag];
+		update = true;
+	}
+
+	if( m_relevanceMap[tag] > m_maxRelevance )
+	{
+		m_maxRelevance = m_relevanceMap[tag];
+		update = true;
+	}
+
+	if( update )
 	{
 		foreach( BoffinTagItem tag, m_relevanceMap.keys() )
 		{
 			int tagIndex = m_tagList.indexOf( tag );
 			emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
 		}
-		m_maxRelevance = m_relevanceMap[tag];
 	}
+
 	int tagIndex = m_tagList.indexOf( tag );
 	emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
 }
@@ -191,7 +205,7 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
 
         	else
         	{
-        		return QVariant::fromValue<float>( i.value() / m_maxRelevance);
+        		return QVariant::fromValue<float>( (i.value() -m_minRelevance)/ (m_maxRelevance - m_minRelevance));
         	}
         }
 

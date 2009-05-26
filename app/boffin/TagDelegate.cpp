@@ -66,7 +66,6 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     QColor bc(255,0,0);
     bc.setAlphaF( tagRelevance );
     b = QBrush( bc );
-    //qDebug() << "Setting color: " << bc;
 
     p.setWidth( 3 );
     painter->setPen( p );
