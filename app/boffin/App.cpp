@@ -213,7 +213,6 @@ App::tagsChanged()
 //    TrackSource* source = new TrackSource(req);
 //    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
 //    connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
-//    m_playlist->clear();
 }
 
 

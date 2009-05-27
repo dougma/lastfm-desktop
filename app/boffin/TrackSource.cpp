@@ -20,7 +20,7 @@
 
 TrackSource::TrackSource(BoffinRqlRequest* req)
 {
-    connect(req, SIGNAL(tracks(QList<BoffinPlayableItem>)), this, SLOT(onPlayableItems(QList<BoffinPlayableItem>)));
+    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), SLOT(onPlayableItem(BoffinPlayableItem)));
 }
 
 static Track toTrack(const BoffinPlayableItem& item)
@@ -41,8 +41,6 @@ static Track toTrack(const BoffinPlayableItem& item)
 void
 TrackSource::onPlayableItem(BoffinPlayableItem item)
 {
-    QList<Track> res;
-    res << toTrack(item);
-    emit ready(res);
+    emit ready(toTrack(item));
 }
 

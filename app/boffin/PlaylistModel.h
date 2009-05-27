@@ -44,6 +44,7 @@ public:
 
 public slots:
     void addTracks( QList< Track > tracks );
+    void addTrack( Track t );
     void clear();
 
 
