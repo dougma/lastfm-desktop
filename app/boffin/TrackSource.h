@@ -31,7 +31,6 @@ class TrackSource
     Q_OBJECT
 
 public:
-    TrackSource(BoffinRqlRequest* req);
 
 signals:
     void ready( Track );

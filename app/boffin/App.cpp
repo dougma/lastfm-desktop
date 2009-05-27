@@ -184,17 +184,10 @@ App::onScanningFinished()
 void
 App::onPlaydarConnected()
 {
-    m_tagcloud = new TagBrowserWidget( boost::bind(&App::createTagCloudModel, this), "dougma", m_playdar );
+    m_tagcloud = new TagBrowserWidget( m_playdar );
     connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
 //    m_tagcloud->setFrameStyle( QFrame::NoFrame );
     m_mainwindow->setCentralWidget( m_tagcloud );
-}
-
-
-PlaydarTagCloudModel*
-App::createTagCloudModel()
-{
-    return new PlaydarTagCloudModel(m_playdar);
 }
 
 void
@@ -206,27 +199,18 @@ App::play()
 void
 App::tagsChanged()
 {
-//    if (!m_tagcloud) return;
-//
-//    QString rql = m_tagcloud->rql();
-//    BoffinRqlRequest* req = m_playdar->boffinRql(rql);
-//    TrackSource* source = new TrackSource(req);
-//    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
-//    connect(source, SIGNAL(ready( QList<Track>)), SLOT(onPlaydarTracksReady(QList<Track>)));
 }
 
 
 void
 App::onPlaydarTracksReady( QList<Track> t )
 {
-//    m_playlist->addTracks( t );
 }
 
 
 void
 App::onReadyToPlay()
 {
-    //m_playlist->addTracks( ((TrackSource*) sender())->takeTracks() );
 }
 
 

@@ -69,7 +69,6 @@ private slots:
 
 private:
     void cleanup();
-    PlaydarTagCloudModel* createTagCloudModel();
 
     class MainWindow* m_mainwindow;
     class TagBrowserWidget* m_tagcloud;

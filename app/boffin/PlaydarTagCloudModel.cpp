@@ -206,6 +206,8 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
 
         	else
         	{
+                float a = i.value();
+                float aa = (i.value() - m_minRelevance)/ (m_maxRelevance - m_minRelevance);
         		return QVariant::fromValue<float>( (i.value() - m_minRelevance)/ (m_maxRelevance - m_minRelevance));
         	}
         }

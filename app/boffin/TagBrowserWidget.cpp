@@ -8,21 +8,26 @@
 #include "PlaylistWidget.h"
 #include "PlaylistModel.h"
 
-TagBrowserWidget::TagBrowserWidget(
-		boost::function<PlaydarTagCloudModel* (void)> modelFactory,
-		const QString& firstButton, PlaydarConnection* playdar, QWidget* parent) :
-	QWidget(parent), m_modelFactory(modelFactory), m_playdar(playdar) {
-	m_tagCloudModel = modelFactory();
+TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) :
+	QWidget(parent), 
+    m_playdar(playdar) 
+{
+	m_tagCloudModel = new PlaydarTagCloudModel(playdar);
+
 	QVBoxLayout* vlayout = new QVBoxLayout(this);
 	m_history = new HistoryWidget();
-	m_history->newItem(firstButton);
+	m_history->newItem("all");
 	connect(m_history, SIGNAL(clicked(int, QString)),
 			SLOT(onHistoryClicked(int, QString)));
 	vlayout->addWidget(m_history);
 
-
 	QWidget* w = new QWidget(this);
 	m_view = new TagCloudView(w);
+	m_view->setModel(m_tagCloudModel);
+	m_view->setItemDelegate(new TagDelegate);
+	connect(m_view->selectionModel(),
+			SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+			SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
 	vlayout->addWidget(m_view);
 
 	m_playlistModel = new PlaylistModel(this);
@@ -30,7 +35,6 @@ TagBrowserWidget::TagBrowserWidget(
 	m_playlistWidget->setModel(m_playlistModel);
 	vlayout->addWidget(m_playlistWidget);
 
-	setupModelView(m_view);
 	m_tagCloudModel->startGetTags();
 
 	this->setLayout(vlayout);
@@ -53,24 +57,20 @@ void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
 					continue;
 
 				m_tags << tag;
+                QString rql(rql());
+                qDebug() << rql;
 				m_history->newItem(tag);
-				setupModelView(m_view);
-				m_tagCloudModel->startRelevanceRql(rql());
+				m_tagCloudModel->startRelevanceRql(rql);
 				((PlaylistModel*)m_playlistWidget->model())->clear();
-				m_playlistWidget->loadFromRql(rql());
+				m_playlistWidget->loadFromRql(rql);
 			}
 	}
+    if (deselected.indexes().size()) {
+        qDebug() << "deselection";
+    }
 	emit selectionChanged();
 }
 
-void TagBrowserWidget::setupModelView(TagCloudView* view) {
-	//PlaydarTagCloudModel* model = m_modelFactory();
-	view->setModel(m_tagCloudModel);
-	view->setItemDelegate(new TagDelegate);
-	connect(view->selectionModel(),
-			SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
-			SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
-}
 
 void TagBrowserWidget::onHistoryClicked(int position, const QString& text) {
 	Q_UNUSED(text);

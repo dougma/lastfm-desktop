@@ -18,10 +18,6 @@
  ***************************************************************************/
 #include "TrackSource.h"
 
-TrackSource::TrackSource(BoffinRqlRequest* req)
-{
-    connect(req, SIGNAL(playableItem(BoffinPlayableItem)), SLOT(onPlayableItem(BoffinPlayableItem)));
-}
 
 static Track toTrack(const BoffinPlayableItem& item)
 {

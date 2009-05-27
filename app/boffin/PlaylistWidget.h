@@ -6,8 +6,11 @@
 #include "PlaydarConnection.h"
 #include "BoffinTagRequest.h"
 #include "TrackSource.h"
+
 class PlaylistWidget: public QTreeView {
-Q_OBJECT
+
+    Q_OBJECT
+
 public:
 	PlaylistWidget(PlaydarConnection* playdar, QWidget* p = 0) :
 		QTreeView(p), m_playdar(playdar) {
@@ -20,11 +23,9 @@ public:
 public slots:
 	void loadFromRql(QString rql) {
 		BoffinRqlRequest* req = m_playdar->boffinRql(rql);
-		TrackSource* source = new TrackSource(req);
-		connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source,
-				SLOT(onPlayableItem(BoffinPlayableItem)));
-		connect(source, SIGNAL(ready( Track)), model(),
-				SLOT(addTrack(Track)));
+		TrackSource* source = new TrackSource();
+		connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
+		connect(source, SIGNAL(ready(Track)), model(), SLOT(addTrack(Track)));
 	}
 
 signals:
