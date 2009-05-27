@@ -23,6 +23,7 @@
 #include <QToolBar>
 #include <QComboBox>
 #include <QStatusBar>
+#include <QPushButton>
 #include <lastfm/Track>
 #include "PlaydarHostsModel.h"
 #include "PlaydarConnection.h"
@@ -53,15 +54,30 @@ MainWindow::MainWindow()
     resize( 750, 550 );
     
     QStatusBar* status = new QStatusBar();
-    ui.playdarHosts = new QComboBox();
-    ui.playdarHosts->setInsertPolicy( QComboBox::InsertAlphabetically );
-    ui.playdarHosts->setSizeAdjustPolicy( QComboBox::AdjustToContents );
+    ui.sourcesMenu = new QMenu();
+    ui.sourcesButton = new QPushButton("Sources");
+    ui.sourcesButton->setMenu(ui.sourcesMenu);
     ui.playdarStatus = new QLabel();
     status->addPermanentWidget(ui.playdarStatus);
-    status->addPermanentWidget(ui.playdarHosts);
+    status->addPermanentWidget(ui.sourcesButton);
     setStatusBar(status);
 
     finishUi();
+}
+
+
+void
+MainWindow::onSourcesReset()
+{
+    QStringList sources = ((QStringListModel*)sender())->stringList();
+    sources.sort();
+
+    ui.sourcesMenu->clear();
+    foreach(const QString& s, sources) {
+        QAction* action = ui.sourcesMenu->addAction(s);
+        action->setCheckable(true);
+        action->setChecked(true);
+    }
 }
 
 

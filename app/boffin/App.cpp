@@ -167,15 +167,16 @@ App::onOutputDeviceActionTriggered( QAction* a )
 void
 App::onScanningFinished()
 {
-    disconnect( sender(), 0, this, 0 ); //only once pls
+    if (sender())
+        disconnect( sender(), 0, this, 0 ); //only once pls
 
     m_mainwindow->ui.play->setEnabled( true );
     m_mainwindow->ui.pause->setEnabled( false );
     m_mainwindow->ui.skip->setEnabled( false );
     m_mainwindow->ui.rescan->setEnabled( true );
     m_mainwindow->ui.wordle->setEnabled( true );
-    m_mainwindow->ui.playdarHosts->setModel( m_playdar->hostsModel() );
-
+    
+    connect(m_playdar->hostsModel(), SIGNAL(modelReset()), m_mainwindow, SLOT(onSourcesReset()));
     connect(m_playdar, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
     connect(m_playdar, SIGNAL(connected()), SLOT(onPlaydarConnected()));
     m_playdar->start();

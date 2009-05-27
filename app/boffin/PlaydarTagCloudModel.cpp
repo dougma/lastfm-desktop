@@ -26,11 +26,9 @@
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection* playdar)
 :m_playdar(playdar)
 ,m_minLogWeight( FLT_MAX )
-,m_minRelevance( FLT_MAX )
 ,m_maxWeight( 0 )
-,m_maxLogWeight( 0 )
+,m_maxLogWeight( FLT_MIN )
 ,m_loadingTimer( 0 )
-,m_maxRelevance( 0 )
 {
 }
 
@@ -59,7 +57,8 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
 void
 PlaydarTagCloudModel::startRelevanceRql(const QString& rql)
 {
-	m_maxRelevance = 0;
+    m_minRelevance = FLT_MAX;
+	m_maxRelevance = FLT_MIN;
 	m_relevanceMap.clear();
 	BoffinTagRequest* req = m_playdar->boffinTagcloud( rql );
 	connect( req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onRelevantTagItem(BoffinTagItem)));
@@ -88,15 +87,19 @@ PlaydarTagCloudModel::onRelevantTagItem( const BoffinTagItem& tag )
 
 	if( update )
 	{
-		foreach( BoffinTagItem tag, m_relevanceMap.keys() )
+        // min/max change so all the relevant tags have changed
+		foreach( BoffinTagItem t, m_relevanceMap.keys() )
 		{
-			int tagIndex = m_tagList.indexOf( tag );
+			int tagIndex = m_tagList.indexOf( t );
 			emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
 		}
-	}
-
-	int tagIndex = m_tagList.indexOf( tag );
-	emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
+    } 
+    else 
+    {
+        // just one change
+	    int tagIndex = m_tagList.indexOf( tag );
+	    emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
+    }
 }
 
 void
@@ -154,7 +157,6 @@ PlaydarTagCloudModel::onFetchedTags()
 void
 PlaydarTagCloudModel::onTagError()
 {
-
 }
 
 // virtual

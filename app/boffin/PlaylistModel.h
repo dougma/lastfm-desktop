@@ -38,7 +38,7 @@ public:
 
     virtual QModelIndex index( int row, int column, const QModelIndex& p = QModelIndex()) const;
 
-    virtual QModelIndex parent( const QModelIndex& index ) const
+    virtual QModelIndex parent( const QModelIndex& ) const
     { return QModelIndex(); }
 
 

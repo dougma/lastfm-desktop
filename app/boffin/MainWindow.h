@@ -37,7 +37,8 @@ class MainWindow : public unicorn::MainWindow
         QAction* xspf;
         QAction* rescan;
         QAction* wordle;
-        class QComboBox* playdarHosts;
+        class QPushButton* sourcesButton;
+        class QMenu* sourcesMenu;
         class QLabel* playdarStatus;
     } ui;
 
@@ -45,4 +46,7 @@ public:
     MainWindow();
 
     void setWindowTitle( const Track& );
+
+public slots:
+    void onSourcesReset();
 };
