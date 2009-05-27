@@ -70,12 +70,13 @@ private slots:
 private:
     PlaydarConnection* m_playdar;
 
-    QSet<QString> m_hostFilter;
+    QSet<QString> m_hostFilter;     // hosts to filter from this tag cloud
+    QSet<QString> m_hosts;          // hosts contributing to this tag cloud
 
     QList< BoffinTagItem > m_tagListBuffer;
     QList< BoffinTagItem > m_tagList;
 
-    BoffinTagItem m_tag;    // the last taglist provided via onTags
+    BoffinTagItem m_tag;    // the last tag provided via onTags
 
     float m_maxWeight;
     float m_maxLogWeight;

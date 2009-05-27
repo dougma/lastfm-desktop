@@ -47,15 +47,6 @@ TagCloudView::TagCloudView( QWidget* parent )
 }
 
 void
-TagCloudView::setModel(PlaydarTagCloudModel *model)
-{
-    QAbstractItemView::setModel(model);
-    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
-    connect(model, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTag(BoffinTagItem)));
-    connect(model, SIGNAL(fetchedTags()), SLOT(onFetchedTags()));
-}
-
-void
 TagCloudView::onTag( const BoffinTagItem& tag )
 {
 	if( m_fetched )

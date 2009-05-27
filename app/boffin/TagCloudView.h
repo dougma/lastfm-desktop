@@ -34,8 +34,6 @@ public:
     virtual void scrollTo( const QModelIndex&, ScrollHint ) {};
     virtual QRect visualRect( const QModelIndex& ) const;
 
-    void setModel(class PlaydarTagCloudModel *model);
-
     QStringList currentTags() const;
 
 public slots:

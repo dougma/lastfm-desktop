@@ -25,9 +25,6 @@
 
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection* playdar)
 :m_playdar(playdar)
-,m_minLogWeight( FLT_MAX )
-,m_maxWeight( 0 )
-,m_maxLogWeight( FLT_MIN )
 ,m_loadingTimer( 0 )
 {
 }
@@ -39,8 +36,14 @@ PlaydarTagCloudModel::~PlaydarTagCloudModel()
 void
 PlaydarTagCloudModel::startGetTags(const QString& rql)
 {
-	//TODO: reset max/minweight member variables and clear current
-	//		tag results.
+    m_hosts.clear();
+    m_tagListBuffer.clear();
+    m_tagList.clear();
+    m_relevanceMap.clear();
+
+    m_maxWeight = 0;
+    m_maxLogWeight = FLT_MIN;
+    m_minLogWeight = FLT_MAX;
 
     BoffinTagRequest* req = m_playdar->boffinTagcloud(rql);
     connect(req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTag(BoffinTagItem)));
@@ -111,6 +114,8 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		// check if the host is being filtered.
 		if (m_hostFilter.contains(tag.m_host))
 			break;
+
+        m_hosts.insert(tag.m_host);
 
 		//Merge any existing tags
 		if( int i = m_tagListBuffer.indexOf( tag ) >= 0 )
@@ -281,4 +286,5 @@ PlaydarTagCloudModel::setTagMapping(QMap<QString, QString> tagMap)
 //    m_tagMap = tagMap;
 //    onTags(m_tags);
 }
+
 
