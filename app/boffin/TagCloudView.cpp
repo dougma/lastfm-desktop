@@ -173,6 +173,7 @@ TagCloudView::rectcalc()
     QStyleOptionViewItem const opt = viewOptions();
     int baseline = 0;
 
+    m_rects.clear();
     for (int j = 0; j < model()->rowCount(); ++j)
     {
         QModelIndex const i = model()->index( j, 0 );
