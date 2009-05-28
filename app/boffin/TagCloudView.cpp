@@ -28,7 +28,6 @@
 
 TagCloudView::TagCloudView( QWidget* parent )
              : QAbstractItemView( parent )
-             , m_calcCount( 0 )
              , m_fetched( false )
 {
     QFont f = font();
@@ -139,17 +138,33 @@ TagCloudView::onFetchedTags()
 	m_fetched = true;
 }
 
+void
+TagCloudView::setModel(QAbstractItemModel *model)
+{
+    QAbstractItemView::setModel(model);
+    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
+    connect(model, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(onRowsRemoved(QModelIndex, int, int)));
+//    connect(model, SIGNAL(modelReset()), SLOT(onModelReset()));
+}
 
 void
 TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
 {
-	m_calcCount = start;
-
 	Q_UNUSED(parent);
     Q_UNUSED(start);
     Q_UNUSED(end);
-    updateGeometries();
+//    updateGeometries();
 }
+
+void
+TagCloudView::onRowsRemoved(const QModelIndex & parent, int start, int end)
+{
+	Q_UNUSED(parent);
+    Q_UNUSED(start);
+    Q_UNUSED(end);
+//    updateGeometries();
+}
+
 
 int gBaseline, gLeftMargin; //filthy but easiest
 void
