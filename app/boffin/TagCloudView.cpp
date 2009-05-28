@@ -62,11 +62,10 @@ TagCloudView::setSelection( const QRect& rect, QItemSelectionModel::SelectionFla
         return;
 
     QRect r = rect.translated( 0, verticalScrollBar()->value());
-    foreach( QModelIndex i, m_rects.keys() )
-    {
-        if( m_rects[ i ].intersects( r ))
-        {
-            selectionModel()->select(i, f);
+    RectsConstIt it = m_rects.constBegin();
+    for (int c = 0; it != m_rects.constEnd(); it++, c++) {
+        if (it->intersects(r)) {
+            selectionModel()->select(model()->index(c, 0), f);
         }
     }
 }
@@ -89,31 +88,25 @@ TagCloudView::paintEvent( QPaintEvent* e )
     QPainter p( viewport() );
     p.setClipRect( e->rect());
 
-
-    if( !m_fetched )
-    {
+    if (!m_fetched) {
 		p.drawText( viewport()->rect(), Qt::AlignCenter, "Fetching tags.." + m_loadedTag );
 		return;
     }
 
-    QStyleOptionViewItem opt = viewOptions();
-
-    QHash< QModelIndex, QRect >::const_iterator i = m_rects.constBegin();
-
-    if( m_rects.isEmpty() )
-    {
+    if (m_rects.isEmpty()) {
         p.drawText( viewport()->rect(), Qt::AlignCenter,  "No tags have been found!" );
         return;
     }
 
-    for( ; i != m_rects.constEnd(); ++i )
+    QStyleOptionViewItem opt = viewOptions();
+    RectsConstIt it = m_rects.constBegin();
+    for (int c = 0; it != m_rects.constEnd(); it++, c++) 
     {
-        const QModelIndex& index = i.key();
-        const QRect& rect = i.value();
-
-        opt.rect = rect.translated( 0, -verticalScrollBar()->value() );
+        opt.rect = it->translated( 0, -verticalScrollBar()->value() );
 
         if( e->rect().intersects( opt.rect )) {
+            const QModelIndex& index = model()->index(c, 0);
+
             opt.state = QStyle::State_None;
             if( m_hoverIndex == index && isEnabled() )
                 opt.state = qApp->mouseButtons() == Qt::NoButton
@@ -183,7 +176,7 @@ TagCloudView::rectcalc()
 
         r.moveTo( gLeftMargin, baseline-gBaseline );
 
-        m_rects[i] = r;
+        m_rects.insert(j, r);
     }
 }
 
@@ -201,29 +194,29 @@ TagCloudView::updateGeometries()
     int y = VIEWPORT_MARGIN;
     int left_margin = 0; // the left baseline to align text against
 
+    // iterate in model-order to lay the tags out left to right
     for (int j = 0; j < model()->rowCount(); ++j)
     {
-        QModelIndex const i = model()->index( j, 0 );
-        QRect r = m_rects[i];
-
-        if (left_margin == 0) left_margin = r.x();
+        QRect r = m_rects[j];
+        if (left_margin == 0) 
+            left_margin = r.x();
 
         // do new row
         int x = VIEWPORT_MARGIN + (left_margin - r.x());
         int tallest = 0;
         for (; j < model()->rowCount(); ++j)
         {
-            QModelIndex const i = model()->index( j, 0 );
-            QRect r = m_rects[i];
-
+            QRect r = m_rects[j];
             r.moveTo( x, y + r.y() );
 
             x += r.width();
             if (tallest != 0 //need at least one thing per row
-                && x > viewport()->width() - VIEWPORT_MARGIN) { --j; break; }
+                && x > viewport()->width() - VIEWPORT_MARGIN) 
+            { 
+                --j; break; 
+            }
 
-            m_rects[i] = r;
-
+            m_rects[j] = r;
             tallest = qMax( tallest, r.bottom() - y );
         }
 
@@ -252,11 +245,10 @@ QModelIndex
 TagCloudView::indexAt( const QPoint& pos ) const
 {
     QPoint p = pos + QPoint( 0, verticalScrollBar()->value());
-    foreach( QModelIndex i, m_rects.keys() )
-    {
-        if( m_rects[ i ].contains( p ))
-        {
-            return i;
+    RectsConstIt it = m_rects.constBegin();
+    for (int c = 0; it != m_rects.constEnd(); it++, c++) {
+        if( it->contains( p )) {
+            return model()->index(c, 0);
         }
     }
     return QModelIndex();
@@ -266,7 +258,7 @@ TagCloudView::indexAt( const QPoint& pos ) const
 QRect
 TagCloudView::visualRect( const QModelIndex& i ) const
 {
-    return m_rects[ i ].translated( 0, -verticalScrollBar()->value());
+    return m_rects[ i.row() ].translated( 0, -verticalScrollBar()->value());
 }
 
 

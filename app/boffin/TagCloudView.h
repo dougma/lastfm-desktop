@@ -62,7 +62,10 @@ protected:
     virtual bool viewportEvent(QEvent *event);
 
     QModelIndex m_hoverIndex;
-    QHash<QModelIndex, QRect> m_rects;
+    QHash<int, QRect> m_rects;      // row -> QRect
+
+    typedef QHash<int, QRect>::const_iterator RectsConstIt;
+    typedef QHash<int, QRect>::iterator RectsIt;
 
     bool m_fetched;
     QString m_loadedTag;
