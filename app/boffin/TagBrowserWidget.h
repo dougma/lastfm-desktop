@@ -37,21 +37,14 @@ public:
             m_req->disconnect(this);
         }
 	    m_req = playdar->boffinTagcloud( rql );
-	    connect( m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
+	    connect(m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
     }
 
-    void showRelevant(bool bShowRelevent)
+    void showRelevant(bool bShowRelevant)
     {
-        if (bShowRelevent) {
-            if (m_showAll) {
-                m_showAll = false;
-                invalidateFilter();
-            }
-        } else {
-            if (!m_showAll) {
-                m_showAll = true;
-                invalidateFilter();
-            }
+        if (bShowRelevant == m_showAll) {
+            m_showAll = !m_showAll;
+            invalidateFilter();
         }
     }
 

@@ -39,7 +39,6 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     m_hosts.clear();
     m_tagListBuffer.clear();
     m_tagList.clear();
-    m_relevanceMap.clear();
 
     m_maxWeight = 0;
     m_maxLogWeight = FLT_MIN;
@@ -55,54 +54,6 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     	m_loadingTimer = 0;
     }
     qDebug() << "Fetching rql: " << rql;
-}
-
-void
-PlaydarTagCloudModel::startRelevanceRql(const QString& rql)
-{
-    m_minRelevance = FLT_MAX;
-	m_maxRelevance = FLT_MIN;
-	m_relevanceMap.clear();
-	BoffinTagRequest* req = m_playdar->boffinTagcloud( rql );
-	connect( req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onRelevantTagItem(BoffinTagItem)));
-}
-
-void
-PlaydarTagCloudModel::onRelevantTagItem( const BoffinTagItem& tag )
-{
-	if( m_relevanceMap.contains( tag ) )
-		m_relevanceMap[tag] += log( tag.m_weight );
-	else
-		m_relevanceMap[tag] = log( tag.m_weight );
-
-	bool update = false;
-	if( m_relevanceMap[tag] < m_minRelevance )
-	{
-		m_minRelevance = m_relevanceMap[tag];
-		update = true;
-	}
-
-	if( m_relevanceMap[tag] > m_maxRelevance )
-	{
-		m_maxRelevance = m_relevanceMap[tag];
-		update = true;
-	}
-
-	if( update )
-	{
-        // min/max change so all the relevant tags have changed
-		foreach( BoffinTagItem t, m_relevanceMap.keys() )
-		{
-			int tagIndex = m_tagList.indexOf( t );
-			emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
-		}
-    } 
-    else 
-    {
-        // just one change
-	    int tagIndex = m_tagList.indexOf( tag );
-	    emit dataChanged( createIndex( tagIndex, 0 ), createIndex( tagIndex, 0 ));
-    }
 }
 
 void
@@ -202,21 +153,6 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
             QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
             i += index.row();
             return QVariant::fromValue<int>( i->m_count );
-        }
-
-        case PlaydarTagCloudModel::RelevanceRole:
-        {
-        	QMap<BoffinTagItem, float>::const_iterator i
-        		 = m_relevanceMap.find( m_tagList[index.row()] );
-        	if( i == m_relevanceMap.end() )
-        		return 0;
-
-        	else
-        	{
-                float a = i.value();
-                float aa = (i.value() - m_minRelevance)/ (m_maxRelevance - m_minRelevance);
-        		return QVariant::fromValue<float>( (i.value() - m_minRelevance)/ (m_maxRelevance - m_minRelevance));
-        	}
         }
 
         default:
