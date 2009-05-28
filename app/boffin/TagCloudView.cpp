@@ -17,6 +17,7 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include <boost/timer.hpp>
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
 #include <QApplication>
@@ -93,6 +94,11 @@ TagCloudView::paintEvent( QPaintEvent* e )
 		return;
     }
 
+    if (m_dirty) {
+        updateGeometries();
+        m_dirty = false;
+    }
+
     if (m_rects.isEmpty()) {
         p.drawText( viewport()->rect(), Qt::AlignCenter,  "No tags have been found!" );
         return;
@@ -129,35 +135,32 @@ void
 TagCloudView::onFetchedTags()
 {
 	m_fetched = true;
+
 }
 
 void
 TagCloudView::setModel(QAbstractItemModel *model)
 {
     QAbstractItemView::setModel(model);
-    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
-    connect(model, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(onRowsRemoved(QModelIndex, int, int)));
+    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRows(QModelIndex, int, int)));
+    connect(model, SIGNAL(rowsRemoved(QModelIndex, int, int)), SLOT(onRows(QModelIndex, int, int)));
 //    connect(model, SIGNAL(modelReset()), SLOT(onModelReset()));
 }
 
 void
-TagCloudView::onRowsInserted(const QModelIndex & parent, int start, int end)
+TagCloudView::onRows(const QModelIndex & parent, int start, int end)
 {
+    qDebug() << ".";
 	Q_UNUSED(parent);
     Q_UNUSED(start);
     Q_UNUSED(end);
-//    updateGeometries();
+    // the model has changed (row inserted or deleted)
+    // which means our rects are now rubbish 
+    // (they will get refreshed in paintEvent()
+    //  ...which will happen eventually)
+    m_dirty = true;
+    viewport()->update();
 }
-
-void
-TagCloudView::onRowsRemoved(const QModelIndex & parent, int start, int end)
-{
-	Q_UNUSED(parent);
-    Q_UNUSED(start);
-    Q_UNUSED(end);
-//    updateGeometries();
-}
-
 
 int gBaseline, gLeftMargin; //filthy but easiest
 void
@@ -184,6 +187,8 @@ TagCloudView::rectcalc()
 void
 TagCloudView::updateGeometries()
 {
+    boost::timer bt;
+
     if (!model())
         return;
 
@@ -229,6 +234,8 @@ TagCloudView::updateGeometries()
 
     viewport()->update();
     QAbstractItemView::updateGeometries();
+
+    qDebug() << bt.elapsed();
 }
 
 

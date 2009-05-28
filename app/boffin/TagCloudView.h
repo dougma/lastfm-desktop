@@ -42,8 +42,7 @@ public slots:
 
 protected slots:
     virtual void updateGeometries();
-    void onRowsInserted(const QModelIndex & parent, int start, int end);
-    void onRowsRemoved(const QModelIndex & parent, int start, int end);
+    void onRows(const QModelIndex & parent, int start, int end);
     void onFetchedTags();
     void onTag( const BoffinTagItem& );
 
@@ -67,6 +66,7 @@ protected:
     typedef QHash<int, QRect>::const_iterator RectsConstIt;
     typedef QHash<int, QRect>::iterator RectsIt;
 
+    bool m_dirty;
     bool m_fetched;
     QString m_loadedTag;
 };
