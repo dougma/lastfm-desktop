@@ -34,6 +34,7 @@
 #include <lastfm/User>
 #include <lastfm/ws.h>
 #include <lastfm/XmlQuery>
+#include <QDir>
 #include <QDebug>
 #include <QLocale>
 #include <QTranslator>
