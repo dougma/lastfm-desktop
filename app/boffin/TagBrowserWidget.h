@@ -25,19 +25,40 @@ class RelevanceFilter : public QSortFilterProxyModel
 public:
     RelevanceFilter()
         :m_req(0)
+        ,m_showAll(true)
     {
     }
 
-    void setRqlFilter(PlaydarConnection* playdar, QString rql)
+    void resetFilter()
     {
+        m_map.clear();
+        m_showAll = true;
+        invalidateFilter();
+    }
+
+    void setRqlFilter(PlaydarConnection* playdar, QStringList tags)
+    {
+	    m_map.clear();
+
+        QString rql;
+        {
+	        QStringList t;
+            foreach(QString s, tags) {
+    	        t << "tag:\"" + s + '"';
+                m_map.insert(s, 1.0);
+            }
+	        rql = t.join(" and ");
+        }
+
         m_min = FLT_MAX;
 	    m_max = FLT_MIN;
-	    m_map.clear();
         if (m_req) {
             m_req->disconnect(this);
         }
 	    m_req = playdar->boffinTagcloud( rql );
 	    connect(m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
+
+        invalidateFilter();
     }
 
     void showRelevant(bool bShowRelevant)
@@ -125,7 +146,7 @@ class TagBrowserWidget : public QWidget
 public:
     TagBrowserWidget(PlaydarConnection*, QWidget* parent = 0);
 
-    QString rql() const;
+    static QString rql(const QStringList& in);
 
 signals:
     void selectionChanged();
@@ -136,6 +157,8 @@ private slots:
     void onFilterClicked();
 
 private:
+    QStringList selectedTags() const;
+
     HistoryWidget* m_history;
 
     TagCloudView* m_view;
