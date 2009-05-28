@@ -66,9 +66,6 @@ protected:
 
         QModelIndex i = sourceModel()->index(source_row, 0, source_parent);
         const QString tagname = i.data().toString();
-        if (tagname != "") {
-            int i = 0;
-        }
         return m_map.contains(tagname);
     }
 

@@ -32,7 +32,6 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 	m_view = new TagCloudView(w);
 	m_view->setModel(m_filter);
 
-//    connect(m_tagCloudModel, SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(onRowsInserted(QModelIndex, int, int)));
     connect(m_tagCloudModel, SIGNAL(tagItem(BoffinTagItem)), m_view, SLOT(onTag(BoffinTagItem)));
     connect(m_tagCloudModel, SIGNAL(fetchedTags()), m_view, SLOT(onFetchedTags()));
 
