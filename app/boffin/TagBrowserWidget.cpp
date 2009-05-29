@@ -42,10 +42,11 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 			SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
 	vlayout->addWidget(m_view);
 
-	m_playlistModel = new PlaylistModel(this);
-	m_playlistWidget = new PlaylistWidget(m_playdar, this);
-	m_playlistWidget->setModel(m_playlistModel);
-	vlayout->addWidget(m_playlistWidget);
+// not interested in the playlist widget right now:
+//	m_playlistModel = new PlaylistModel(this);
+//	m_playlistWidget = new PlaylistWidget(m_playdar, this);
+//	m_playlistWidget->setModel(m_playlistModel);
+//	vlayout->addWidget(m_playlistWidget);
 
 	m_tagCloudModel->startGetTags();
 
@@ -79,18 +80,16 @@ void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
     Q_UNUSED(selected);
     Q_UNUSED(deselected);
 
-    QStringList tags(selectedTags());
-    if (tags.size()) {
-        qDebug() << "filtering: " << rql;
-	    m_filter->setRqlFilter(m_playdar, tags);
+    QStringList tags = selectedTags();
+    QString rql = TagBrowserWidget::rql(tags);
 
-	    ((PlaylistModel*)m_playlistWidget->model())->clear();
-	    m_playlistWidget->loadFromRql(rql(tags));
+    qDebug() << "filtering: " << rql;
+    m_filter->setRqlFilter(m_playdar, rql, m_view->selectionModel()->selectedIndexes());
 
-	    emit selectionChanged();
-    } else {
-        m_filter->resetFilter();
-    }
+//    ((PlaylistModel*)m_playlistWidget->model())->clear();
+//    m_playlistWidget->loadFromRql(rql);
+
+    emit selectionChanged();
 }
 
 
