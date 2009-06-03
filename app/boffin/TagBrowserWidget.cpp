@@ -63,12 +63,11 @@ TagBrowserWidget::selectedTags() const
     return tags;
 }
 
-//static
 QString 
-TagBrowserWidget::rql(const QStringList& in) 
+TagBrowserWidget::rql() 
 {
-	QStringList tags;
-    foreach(QString s, in) {
+    QStringList tags;
+    foreach(const QString& s, selectedTags()) {
     	tags << "tag:\"" + s + '"';
     }
 	return tags.join(" and ");
@@ -80,9 +79,7 @@ void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
     Q_UNUSED(selected);
     Q_UNUSED(deselected);
 
-    QStringList tags = selectedTags();
-    QString rql = TagBrowserWidget::rql(tags);
-
+    QString rql = TagBrowserWidget::rql();
     qDebug() << "filtering: " << rql;
     m_filter->setRqlFilter(m_playdar, rql, m_view->selectionModel()->selectedIndexes());
 

@@ -23,11 +23,11 @@ static Track toTrack(const BoffinPlayableItem& item)
 {
     Track t;
     MutableTrack mt(t);
-    mt.setArtist(item.m_artist);
-    mt.setAlbum(item.m_album);
-    mt.setTitle(item.m_track);
-    mt.setDuration(item.m_duration);
-    mt.setUrl(QUrl(item.m_url));
+    mt.setArtist(item.artist());
+    mt.setAlbum(item.album());
+    mt.setTitle(item.track());
+    mt.setDuration(item.duration());
+    mt.setUrl(QUrl(item.url()));
     mt.setSource(Track::Player);
     //QString m_source;
     //QString m_mimetype;

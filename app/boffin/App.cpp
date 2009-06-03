@@ -37,6 +37,8 @@
 #include "TrackSource.h"
 #include "PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
+#include "Playlist.h"
+
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
 
@@ -157,11 +159,11 @@ App::onOutputDeviceActionTriggered( QAction* a )
 }
 
 #include "TagBrowserWidget.h"
-#include "TagCloudView.h"
-#include "TagDelegate.h"
-#include "PlaydarTagCloudModel.h"
-#include "PlaydarStatRequest.h"
-#include "PlaydarConnection.h"
+//#include "TagCloudView.h"
+//#include "TagDelegate.h"
+//#include "PlaydarTagCloudModel.h"
+//#include "PlaydarStatRequest.h"
+//#include "PlaydarConnection.h"
 
 
 void
@@ -194,6 +196,10 @@ App::onPlaydarConnected()
 void
 App::play()
 {
+    if (m_tagcloud) {
+        m_playlist = new Playlist;
+        m_playlist->startRequest(m_tagcloud->rql(), this->m_playdar);
+    }
     onPreparing();
 }
 
@@ -338,3 +344,5 @@ App::onWordle()
     }
     d.show();
 }
+
+

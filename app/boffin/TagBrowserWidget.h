@@ -159,7 +159,8 @@ class TagBrowserWidget : public QWidget
 public:
     TagBrowserWidget(PlaydarConnection*, QWidget* parent = 0);
 
-    static QString rql(const QStringList& in);
+    QString rql();
+    QStringList selectedTags() const;
 
 signals:
     void selectionChanged();
@@ -170,8 +171,6 @@ private slots:
     void onFilterClicked();
 
 private:
-    QStringList selectedTags() const;
-
     HistoryWidget* m_history;
 
     TagCloudView* m_view;

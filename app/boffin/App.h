@@ -75,6 +75,7 @@ private:
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;
     class PlaydarConnection* m_playdar;
+    class Playlist* m_playlist;
 
     Phonon::AudioOutput* m_audioOutput;
 
