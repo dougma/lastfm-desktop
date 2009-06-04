@@ -41,6 +41,8 @@
 
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
+#define PLAYDAR_AUTHTOKEN_KEY "PlaydarAuth"
+#define PLAYDAR_URLBASE_KEY "PlaydarUrlBase"
 
 App::App( int& argc, char** argv )
    : unicorn::Application( argc, argv )
@@ -50,10 +52,13 @@ App::App( int& argc, char** argv )
    , m_pipe( 0 )
    , m_audioOutput( 0 )
    , m_playing( false )
-   , m_api( "http://localhost:8888", "fd91e3fb-311d-4903-91d7-87af53281d3f" )
+   , m_api( 
+        unicorn::UserSettings().value(PLAYDAR_URLBASE_KEY, "http://localhost:8888").toString(), 
+        unicorn::UserSettings().value(PLAYDAR_AUTHTOKEN_KEY, "").toString() )
 {
     m_wam = new lastfm::NetworkAccessManager( this );
     m_playdar = new PlaydarConnection(m_wam, m_api);
+    connect(m_playdar, SIGNAL(authed(QString)), SLOT(onPlaydarAuth(QString)));
 }
 
 
@@ -345,4 +350,8 @@ App::onWordle()
     d.show();
 }
 
-
+void
+App::onPlaydarAuth(const QString& auth)
+{
+    unicorn::UserSettings().setValue(PLAYDAR_AUTHTOKEN_KEY, auth);
+}

@@ -57,6 +57,7 @@ private slots:
     void onPlaydarConnected();
     void onReadyToPlay();
     void onPlaydarTracksReady( QList<Track> );
+    void onPlaydarAuth(const QString&);
     void onPreparing();
     void onStarted( const Track& );
     void onResumed();
