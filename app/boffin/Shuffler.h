@@ -36,6 +36,7 @@ public:
     BoffinPlayableItem sampleOne();
     const ItemList& items();
     void setArtistHistorySize(unsigned size);
+    void clear();
 
 public slots:
     void receivePlayableItem(BoffinPlayableItem item);

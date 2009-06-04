@@ -25,12 +25,17 @@
 #include <lastfm/global.h>
 #include <QPointer>
 #include <lastfm/Track>
+#include "BoffinPlayableItem.h"
+
 
 namespace Phonon { class AudioOutput; }
 
 class TagCloudView;
 class QItemSelection;
 class PlaydarTagCloudModel;
+class Shuffler;
+class TrackSource;
+
 namespace lastfm{ class Track; }
 
 class App : public unicorn::Application
@@ -56,7 +61,7 @@ private slots:
     void tagsChanged();
     void onPlaydarConnected();
     void onReadyToPlay();
-    void onPlaydarTracksReady( QList<Track> );
+    void onPlaydarTracksReady( BoffinPlayableItem );
     void onPlaydarAuth(const QString&);
     void onPreparing();
     void onStarted( const Track& );
@@ -74,9 +79,12 @@ private:
     class MainWindow* m_mainwindow;
     class TagBrowserWidget* m_tagcloud;
     class ScrobSocket* m_scrobsocket;
-    class MediaPipeline* m_pipe;
+    class MediaPipeline* m_pipe;        // pipe pulls from tracksource
+    class TrackSource* m_tracksource;   // tracksource pulls from shuffler
+    class Shuffler* m_shuffler;         // shuffler is fed from 
     class PlaydarConnection* m_playdar;
     class Playlist* m_playlist;
+    class BoffinRqlRequest* m_req;      // current boffin rql request
 
     Phonon::AudioOutput* m_audioOutput;
 

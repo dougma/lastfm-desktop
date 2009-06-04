@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
 #ifndef TRACK_SOURCE_H
@@ -22,24 +22,36 @@
 
 #include <QList>
 #include <lastfm/Track>
-#include "BoffinRqlRequest.h"
+#include "BoffinPlayableItem.h"
 
+class Shuffler;
 
+// Tracksource samples BoffinPlayableItem objects from the Shuffler, 
+// maintains a small buffer of them (for upcoming-track feature).
+// MediaPipeline then takes Track objects from us.
 class TrackSource
     : public QObject
 {
     Q_OBJECT
 
 public:
+    TrackSource(Shuffler* shuffler, QObject *parent);
+
+    Track takeNextTrack();
+    BoffinPlayableItem peek(unsigned index);
+    int size();
+    void setSize(unsigned maxSize);
+    void clear();
 
 signals:
-    void ready( Track );
-
-private slots:
-    void onPlayableItem(BoffinPlayableItem item);
+    void changed();     // the buffer has changed somehow.
 
 private:
-    QList<BoffinPlayableItem> m_tracks;
+    void fillBuffer();
+
+    Shuffler* m_shuffler;
+    QList<BoffinPlayableItem> m_buffer;
+    int m_maxSize;
 };
 
 #endif

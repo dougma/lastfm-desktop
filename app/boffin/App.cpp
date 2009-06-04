@@ -20,9 +20,10 @@
 #include <boost/bind.hpp>
 #include <QFileDialog>
 #include <QMenu>
-#include <QComboBox>
 #include <QLabel>
+#include <QTimer>
 #include <QShortcut>
+#include <QComboBox>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
@@ -35,6 +36,7 @@
 #include "ScanProgressWidget.h"
 #include "ScrobSocket.h"
 #include "TrackSource.h"
+#include "Shuffler.h"
 #include "PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include "Playlist.h"
@@ -50,8 +52,10 @@ App::App( int& argc, char** argv )
    , m_tagcloud( 0 )
    , m_scrobsocket( 0 )
    , m_pipe( 0 )
+   , m_playlist( 0 )
    , m_audioOutput( 0 )
    , m_playing( false )
+   , m_req( 0 )
    , m_api( 
         unicorn::UserSettings().value(PLAYDAR_URLBASE_KEY, "http://localhost:8888").toString(), 
         unicorn::UserSettings().value(PLAYDAR_AUTHTOKEN_KEY, "").toString() )
@@ -59,6 +63,9 @@ App::App( int& argc, char** argv )
     m_wam = new lastfm::NetworkAccessManager( this );
     m_playdar = new PlaydarConnection(m_wam, m_api);
     connect(m_playdar, SIGNAL(authed(QString)), SLOT(onPlaydarAuth(QString)));
+
+    m_shuffler = new Shuffler(this);
+    m_tracksource = new TrackSource(m_shuffler, this);
 }
 
 
@@ -201,11 +208,17 @@ App::onPlaydarConnected()
 void
 App::play()
 {
+    delete m_req;
+
     if (m_tagcloud) {
-        m_playlist = new Playlist;
-        m_playlist->startRequest(m_tagcloud->rql(), this->m_playdar);
+        m_req = m_playdar->boffinRql(m_tagcloud->rql());
+        if (m_req) {
+            m_shuffler->clear();
+            connect(m_req, SIGNAL(playableItem(BoffinPlayableItem)), m_shuffler, SLOT(receivePlayableItem(BoffinPlayableItem)));
+            connect(m_req, SIGNAL(playableItem(BoffinPlayableItem)), SLOT(onPlaydarTracksReady(BoffinPlayableItem)));
+            onPreparing();
+        }
     }
-    onPreparing();
 }
 
 void
@@ -215,14 +228,19 @@ App::tagsChanged()
 
 
 void
-App::onPlaydarTracksReady( QList<Track> t )
+App::onPlaydarTracksReady( BoffinPlayableItem )
 {
+    // just interested in the first one
+    disconnect(m_req, SIGNAL(playableItem(BoffinPlayableItem)), this, SLOT(onPlaydarTracksReady(BoffinPlayableItem)));
+    // then delay for a little bit (to let a few more tracks dribble in) before playing
+    QTimer::singleShot(500, this, SLOT(onReadyToPlay()));
 }
 
 
 void
 App::onReadyToPlay()
 {
+    m_pipe->play(m_tracksource);
 }
 
 

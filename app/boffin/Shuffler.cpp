@@ -49,6 +49,11 @@ Shuffler::setArtistHistorySize(unsigned size)
     m_artistHistorySize = size;
 }
 
+void
+Shuffler::clear()
+{
+    m_items.clear();
+}
 
 bool orderByWorkingWeightDesc(const BoffinPlayableItem& a, const BoffinPlayableItem& b)
 {
