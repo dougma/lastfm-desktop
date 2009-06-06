@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Copyright 2009 Last.fm Ltd.                                           *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -16,42 +16,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
+#ifndef SHUFFLER_H
+#define SHUFFLER_H
 
-#ifndef TRACK_SOURCE_H
-#define TRACK_SOURCE_H
-
-#include <QList>
-#include <lastfm/Track>
+//#include <QObject>
+#include <QStringList>
 #include "BoffinPlayableItem.h"
+#include "sample/SampleFromDistribution.h"
 
-class Shuffler;
 
-// Tracksource samples BoffinPlayableItem objects from the Shuffler, 
-// maintains a small buffer of them (for upcoming-track feature).
-// MediaPipeline then takes Track objects from us.
-class TrackSource
-    : public QObject
+class Shuffler : public QObject
 {
     Q_OBJECT
 
 public:
-    TrackSource(Shuffler* shuffler, QObject *parent);
+    typedef QList<BoffinPlayableItem> ItemList;
 
-    Track takeNextTrack();
-    BoffinPlayableItem peek(unsigned index);
-    int size();
-    void setSize(unsigned maxSize);
+    Shuffler(QObject* parent = 0);
+    BoffinPlayableItem sampleOne();
+    const ItemList& items();
+    void setArtistHistorySize(unsigned size);
     void clear();
 
-signals:
-    void changed();     // the buffer has changed somehow.
+public slots:
+    void receivePlayableItem(BoffinPlayableItem item);
 
 private:
-    void fillBuffer();
+    BoffinPlayableItem sample();
+    void result(const BoffinPlayableItem& item);
+    float pushdown(const BoffinPlayableItem& item);
 
-    Shuffler* m_shuffler;
-    QList<BoffinPlayableItem> m_buffer;
-    int m_maxSize;
+    struct AccessPolicy
+    {
+        float operator()(const QList<BoffinPlayableItem>::const_iterator& el) const
+        { 
+            return el->workingweight(); 
+        }
+    };
+
+    struct CopyPolicy
+    {
+       template <typename IT>
+       typename BoffinPlayableItem operator()(IT& it) const
+       {
+          return *it;
+       }
+
+       template <typename IT>
+       const BoffinPlayableItem operator()(const IT& it) const
+       {
+          return *it;
+       }
+    };
+
+
+    fm::last::algo::ListBasedSampler<AccessPolicy, CopyPolicy> m_sampler;
+    ItemList m_items;               // items arrive here
+    QStringList m_artistHistory;
+    int m_artistHistorySize;
 };
 
 #endif

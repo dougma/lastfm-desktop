@@ -44,7 +44,7 @@ public:
 
 signals:
     void changed(QString newStatusMessage);
-//    void authed();
+    void authed(QString authtoken);
     void connected();
 
 private slots:

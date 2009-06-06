@@ -22,10 +22,6 @@ public:
 
 public slots:
 	void loadFromRql(QString rql) {
-		BoffinRqlRequest* req = m_playdar->boffinRql(rql);
-		TrackSource* source = new TrackSource();
-		connect(req, SIGNAL(playableItem(BoffinPlayableItem)), source, SLOT(onPlayableItem(BoffinPlayableItem)));
-		connect(source, SIGNAL(ready(Track)), model(), SLOT(addTrack(Track)));
 	}
 
 signals:

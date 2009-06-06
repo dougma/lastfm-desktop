@@ -16,27 +16,78 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
-#include "TrackSource.h"
 
+#include "TrackSource.h"
+#include "Shuffler.h"
 
 static Track toTrack(const BoffinPlayableItem& item)
 {
     Track t;
     MutableTrack mt(t);
-    mt.setArtist(item.m_artist);
-    mt.setAlbum(item.m_album);
-    mt.setTitle(item.m_track);
-    mt.setDuration(item.m_duration);
-    mt.setUrl(QUrl(item.m_url));
+    mt.setArtist(item.artist());
+    mt.setAlbum(item.album());
+    mt.setTitle(item.track());
+    mt.setDuration(item.duration());
+    mt.setUrl(QUrl(item.url()));
     mt.setSource(Track::Player);
-    //QString m_source;
-    //QString m_mimetype;
     return t;
 }
 
-void
-TrackSource::onPlayableItem(BoffinPlayableItem item)
+TrackSource::TrackSource(Shuffler* shuffler, QObject *parent)
+: QObject(parent)
+, m_shuffler(shuffler)
+, m_maxSize(1)
 {
-    emit ready(toTrack(item));
 }
 
+Track
+TrackSource::takeNextTrack()
+{
+    fillBuffer();
+    if (m_buffer.isEmpty()) 
+        return Track();
+
+    Track result = toTrack(m_buffer.takeFirst());
+    fillBuffer();
+    emit changed();
+    return result;
+}
+
+void
+TrackSource::fillBuffer()
+{
+    while (m_buffer.size() < m_maxSize) {
+        BoffinPlayableItem item = m_shuffler->sampleOne();
+        if (item.isValid())
+            m_buffer.append(item);
+        else
+            break;
+    }
+}
+
+BoffinPlayableItem
+TrackSource::peek(unsigned index)
+{
+    return (index >= 0 && index < (unsigned) m_buffer.size()) ? m_buffer[index] : BoffinPlayableItem();
+}
+
+int
+TrackSource::size()
+{
+    return m_buffer.size();
+}
+
+void
+TrackSource::setSize(unsigned maxSize)
+{
+    m_maxSize = maxSize;
+}
+
+void
+TrackSource::clear()
+{
+    if (!m_buffer.isEmpty()) {
+        m_buffer.clear();
+        emit changed();
+    }
+}

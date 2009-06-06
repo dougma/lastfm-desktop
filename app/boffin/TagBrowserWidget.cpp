@@ -1,6 +1,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QItemSelectionModel>
 #include "TagBrowserWidget.h"
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
@@ -41,61 +42,51 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 			SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
 	vlayout->addWidget(m_view);
 
-	m_playlistModel = new PlaylistModel(this);
-	m_playlistWidget = new PlaylistWidget(m_playdar, this);
-	m_playlistWidget->setModel(m_playlistModel);
-	vlayout->addWidget(m_playlistWidget);
+// not interested in the playlist widget right now:
+//	m_playlistModel = new PlaylistModel(this);
+//	m_playlistWidget = new PlaylistWidget(m_playdar, this);
+//	m_playlistWidget->setModel(m_playlistModel);
+//	vlayout->addWidget(m_playlistWidget);
 
 	m_tagCloudModel->startGetTags();
 
 	this->setLayout(vlayout);
 }
 
-QString TagBrowserWidget::rql() const {
+QStringList 
+TagBrowserWidget::selectedTags() const
+{
 	QStringList tags;
-	for (int i = 0; i < m_tags.count(); ++i)
-		tags << "tag:\"" + m_tags[i] + '"';
+    foreach(const QModelIndex& i, m_view->selectionModel()->selectedIndexes()) {
+    	tags << i.data().toString();
+    }
+    return tags;
+}
+
+QString 
+TagBrowserWidget::rql() 
+{
+    QStringList tags;
+    foreach(const QString& s, selectedTags()) {
+    	tags << "tag:\"" + s + '"';
+    }
 	return tags.join(" and ");
 }
 
 void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
 		const QItemSelection& deselected) 
 {
-    bool changed = false;
+    Q_UNUSED(selected);
+    Q_UNUSED(deselected);
 
-	if (selected.indexes().size()) {
-		foreach( const QModelIndex& i, selected.indexes() ) {
-			QString tag = i.data().toString();
-			if (m_tags.contains(tag))
-				continue;
+    QString rql = TagBrowserWidget::rql();
+    qDebug() << "filtering: " << rql;
+    m_filter->setRqlFilter(m_playdar, rql, m_view->selectionModel()->selectedIndexes());
 
-			m_tags << tag;
-            changed = true;
-    		m_history->newItem(tag);
-		}
-	}
+//    ((PlaylistModel*)m_playlistWidget->model())->clear();
+//    m_playlistWidget->loadFromRql(rql);
 
-    if (deselected.indexes().size()) {
-        qDebug() << "deselection";
-		foreach( const QModelIndex& i, selected.indexes() ) {
-			QString tag = i.data().toString();
-            if (m_tags.removeAll(tag)) {
-                changed = true;
-                // todo needs to remove tag from m_history
-            }
-        }
-    }
-
-    if (changed) {
-        QString rql(rql());
-        qDebug() << "filtering: " << rql;
-		m_filter->setRqlFilter(m_playdar, rql);
-
-		((PlaylistModel*)m_playlistWidget->model())->clear();
-		m_playlistWidget->loadFromRql(rql);
-    }
-
-	emit selectionChanged();
+    emit selectionChanged();
 }
 
 

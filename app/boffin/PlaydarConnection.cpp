@@ -56,10 +56,10 @@ PlaydarConnection::onStat(QString name, QString version, QString hostname, bool 
     if (!bAuthenticated) {
         PlaydarAuthRequest* auth = new PlaydarAuthRequest(m_wam, m_api);
         connect(auth, SIGNAL(authed(QString)), SLOT(onAuth(QString)));
+        connect(auth, SIGNAL(authed(QString)), SIGNAL(authed(QString)));
         connect(auth, SIGNAL(error()), SLOT(onError()));
         auth->start("Boffin");
     } else {
-//        makeRosterRequest();
         makeCometRequest();
     }
 
@@ -98,7 +98,6 @@ PlaydarConnection::onAuth(QString authToken)
     m_state = Connecting;
     updateText();
 
-    makeRosterRequest();
     makeCometRequest();
 }
 

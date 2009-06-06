@@ -25,19 +25,38 @@ class RelevanceFilter : public QSortFilterProxyModel
 public:
     RelevanceFilter()
         :m_req(0)
+        ,m_showAll(true)
     {
     }
 
-    void setRqlFilter(PlaydarConnection* playdar, QString rql)
+    void resetFilter()
     {
+        m_map.clear();
+        m_showAll = true;
+        invalidateFilter();
+    }
+
+    void setRqlFilter(PlaydarConnection* playdar, QString rql, QModelIndexList selected)
+    {
+        if (rql.length() == 0) {
+            resetFilter();
+            return;
+        }
+
+	    m_map.clear();
+        foreach(const QModelIndex i, selected) {
+            m_map.insert(i.data().toString(), i.data(PlaydarTagCloudModel::WeightRole).value<float>());
+        }
+
         m_min = FLT_MAX;
 	    m_max = FLT_MIN;
-	    m_map.clear();
         if (m_req) {
             m_req->disconnect(this);
         }
 	    m_req = playdar->boffinTagcloud( rql );
 	    connect(m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
+
+        //invalidateFilter();
     }
 
     void showRelevant(bool bShowRelevant)
@@ -95,19 +114,34 @@ private slots:
     {
         const QString& tag = tagitem.m_name;
         float lw = log(tagitem.m_weight);
-        if (m_map.contains(tag)) {
-            lw = (m_map[tag] += lw);
-        } else {
-            m_map[tag] = lw;
+        if (insertTag(tag, lw))
             invalidateFilter();
+
+        // potentially, all our data (ie: the RelevanceRole) has changed
+        emit dataChanged(
+            this->mapFromSource(sourceModel()->index(0, 0)),
+            this->mapFromSource(sourceModel()->index(sourceModel()->rowCount(), 0)));
+    }
+
+    // returns true if the tag is new, false if the tag already existed
+    bool insertTag(const QString& tag, float logweight)
+    {
+        bool result;
+        if (m_map.contains(tag)) {
+            logweight = (m_map[tag] += logweight);
+            result = false;
+        } else {
+            m_map[tag] = logweight;
+            result = true;
         }
 
-        if (lw < m_min) {
-		    m_min = lw;
+        if (logweight < m_min) {
+		    m_min = logweight;
 	    }
-	    if (lw > m_max) {
-		    m_max = lw;
+	    if (logweight > m_max) {
+		    m_max = logweight;
 	    }
+        return result;
     }
 
 private:
@@ -125,7 +159,8 @@ class TagBrowserWidget : public QWidget
 public:
     TagBrowserWidget(PlaydarConnection*, QWidget* parent = 0);
 
-    QString rql() const;
+    QString rql();
+    QStringList selectedTags() const;
 
 signals:
     void selectionChanged();
