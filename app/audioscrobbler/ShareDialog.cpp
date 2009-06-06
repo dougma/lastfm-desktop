@@ -18,10 +18,8 @@
  ***************************************************************************/
 
 #include "ShareDialog.h"
-#include "Settings.h"
-#include "widgets/FriendsPicker.h"
-#include "widgets/TrackWidget.h"
-#include "widgets/UnicornWidget.h"
+#include "lib/unicorn/widgets/FriendsPicker.h"
+#include "lib/unicorn/widgets/TrackWidget.h"
 #include <lastfm/User>
 #include <QLineEdit>
 #include <QPainter>
@@ -39,7 +37,6 @@ ShareDialog::ShareDialog( const Track& t, QWidget* parent )
 {
     setupUi();
     setWindowTitle( tr("Share") );    
-    UnicornWidget::paintItBlack( this );
     enableDisableOk();
     
     m_track = t;

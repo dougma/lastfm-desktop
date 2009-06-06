@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "PlayerConnection.h"
+#include <QtAlgorithms>
 #include <QDebug>
 
 
@@ -46,7 +47,7 @@ struct FatalError : public Error
 
 
 void
-PlayerConnection::handleCommand( PlayerCommand command, const Track& t )
+PlayerConnection::handleCommand( PlayerCommand command, Track t )
 {
     try
     {
@@ -56,9 +57,9 @@ PlayerConnection::handleCommand( PlayerCommand command, const Track& t )
                 if (t.isNull()) throw FatalError("Can't start a null track");
                 m_state = Playing;
                 if (t == m_track) throw NonFatalError("Already playing this track");
-                m_track = t;
+                qSwap(m_track, t);
                 m_elapsed = 0;
-                emit trackStarted( t );
+                emit trackStarted( m_track, t );
                 break;
                 
             case CommandPause:

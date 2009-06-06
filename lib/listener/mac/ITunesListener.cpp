@@ -19,9 +19,8 @@
 
 #include "ITunesListener.h"
 #include "../PlayerConnection.h"
-#include <lastfm/CoreProcess>
-#include <lastfm/AppleScript>
-#include <lastfm/CFStringToQString>
+#include <lastfm/misc.h>
+#include "lib/unicorn/mac/AppleScript.h"
 #include <QThread>
 
 
@@ -131,7 +130,7 @@ template <> QString
 ITunesDictionaryHelper::token<QString>( CFStringRef t )
 {
     CFStringRef s = token<CFStringRef>( t );
-    return CFStringToQString( s );
+    return lastfm::CFStringToQString( s );
 }   
 
 
@@ -152,16 +151,15 @@ ITunesDictionaryHelper::determineTrackInformation()
     artist = token<QString>( CFSTR("Artist") );
     album = token<QString>( CFSTR("Album") );
     name = token<QString>( CFSTR("Name") );
+    pid = token<QString>( CFSTR("PersistentID") );
     
     // Get path decoded - iTunes encodes the file location as URL
     CFStringRef location = token<CFStringRef>( CFSTR("Location") );
-    QUrl url = QUrl::fromEncoded( CFStringToUtf8( location ) );
+    QUrl url = QUrl::fromEncoded( lastfm::CFStringToUtf8( location ) );
     path = url.toString().remove( "file://localhost" );
     
-    static AppleScript script( "tell application \"iTunes\" to return persistent ID of current track & player position" );
-    QString const out = script.exec();
-    pid = out.left( 16 );
-    position = out.mid( 16 ).toInt();
+    static AppleScript script( "tell application \"iTunes\" to return player position" );
+    position = script.exec().toInt();
 }
 /******************************************************************************/
 
@@ -231,7 +229,7 @@ bool //static
 ITunesListener::isMusic()
 {
     const char* code = "with timeout of 1 seconds\n"
-                           "tell application \"iTunes\" to return video kind of current track\n"
+                           "tell application \"iTunes\" to if running then return video kind of current track\n"
                        "end timeout";
 
     static AppleScript script( code ); //compile once
@@ -244,7 +242,7 @@ ITunesListener::isMusic()
 bool //static
 ITunesListener::iTunesIsPlaying()
 {
-    const char* code = "tell application \"iTunes\" to return player state is playing";
+    const char* code = "tell application \"iTunes\" to if running then return player state is playing";
     return AppleScript( code ).exec() == "true";
 }
 
@@ -252,8 +250,12 @@ ITunesListener::iTunesIsPlaying()
 void
 ITunesListener::setupCurrentTrack()
 {
-    if (!CoreProcess::isRunning( "iTunes" ) || !iTunesIsPlaying() || !isMusic())
+    qDebug() << "hi";
+    
+    if (!iTunesIsPlaying() || !isMusic())
         return;
+    
+    qDebug() << "hi";
     
     #define ENDL " & \"\n\" & "
     const char* code =

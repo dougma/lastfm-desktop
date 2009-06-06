@@ -17,16 +17,13 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
+#include "TagBuckets.h"
 #include "TagDialog.h"
 #include "TagListWidget.h"
-#include "UnicornTabWidget.h"
-#include "UnicornWidget.h"
-#include "TrackWidget.h"
-#include "TagDialog/TagBuckets.h"
-#include "radio/buckets/DelegateDragHint.h"
-#include <lastfm/User>
 #include "lib/unicorn/widgets/SpinnerLabel.h"
-#include <lastfm/WsReply>
+#include "lib/unicorn/widgets/TrackWidget.h"
+#include "lib/unicorn/widgets/UnicornTabWidget.h"
+#include <lastfm/User>
 #include <QtCore>
 #include <QtGui>
 
@@ -39,7 +36,7 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     setupUi();
     
     {
-        WsReply* r;
+        QNetworkReply* r;
         follow( r = track.getTopTags() );
         ui.suggestedTags->setTagsRequest( r );
         follow( r = track.getTags() );
@@ -52,9 +49,8 @@ TagDialog::TagDialog( const Track& track, QWidget *parent )
     
     
     setWindowTitle( tr("Tag") );
-    UnicornWidget::paintItBlack( this );
     
-    WsReply* r = AuthenticatedUser().getTopTags();
+    QNetworkReply* r = AuthenticatedUser().getTopTags();
     ui.yourTags->setTagsRequest( r );
     follow( r );
 	
@@ -110,10 +106,10 @@ TagDialog::setupUi()
 
 
 void
-TagDialog::follow( WsReply* r )
+TagDialog::follow( QNetworkReply* r )
 {
     r->setParent( this );
-    connect( r, SIGNAL(finished( WsReply* )), SLOT(onWsFinished( WsReply* )) );
+    connect( r, SIGNAL(finished()), SLOT(onWsFinished()) );
     m_activeRequests += r;
     ui.spinner->show();
 }
@@ -135,7 +131,7 @@ TagDialog::accept()
 
 
 void
-TagDialog::onWsFinished( WsReply *r )
+TagDialog::onWsFinished( QNetworkReply *r )
 {
     m_activeRequests.removeAll( r );
     ui.spinner->setVisible( m_activeRequests.size() );
@@ -190,8 +186,8 @@ TagDialog::onTagListItemDoubleClicked( QTreeWidgetItem* item, int)
     options.state = QStyle::State_Selected;
     options.rect = w->visualItemRect( item );
     
-    DelegateDragHint* d = new DelegateDragHint( w->itemDelegate( i ), i, options, w );
-    d->setMimeData( PlayableMimeData::createFromTag( Tag( item->text(0)) ) );
+//TODO    DelegateDragHint* d = new DelegateDragHint( w->itemDelegate( i ), i, options, w );
+//TODO    d->setMimeData( PlayableMimeData::createFromTag( Tag( item->text(0)) ) );
     
-    d->dragTo( ui.appliedTags->currentBucket());
+//TODO    d->dragTo( ui.appliedTags->currentBucket());
 }

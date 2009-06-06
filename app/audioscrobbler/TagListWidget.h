@@ -17,60 +17,58 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef TAG_DIALOG_H
-#define TAG_DIALOG_H
+#ifndef TAGLISTWIDGET_H
+#define TAGLISTWIDGET_H
 
-#include <lastfm/Track>
-#include <QModelIndex>
-#include <QDialog>
-
-namespace Unicorn 
-{
-    class TabWidget;
-}
+#include <QTreeWidget>
+#include "PlayableMimeData.h"
 
 
-class TagDialog : public QDialog
+class TagListWidget : public QTreeWidget
 {
     Q_OBJECT
 
 public:
-    TagDialog( const Track&,QWidget *parent );
+    TagListWidget( QWidget* parent = 0 );
+    
+    using QTreeWidget::indexFromItem;
+    
+    /** we won't add the tag if we already have it, and in that case we 
+      * return false */
+    bool add( QString );
+    QStringList newTags() const { return m_newTags; }
 
-	Track track() const { return m_track; }
+public slots:
+    void setTagsRequest( QNetworkReply* );
+    
+protected:
+    virtual QMimeData* mimeData( const QList<QTreeWidgetItem *> items ) const;
+    
+private slots:
+    void onTagsRequestFinished();
+    
+private:
+    class QMenu* m_menu;
+    QStringList m_newTags;
+	QNetworkReply *m_currentReply;
+
+    QTreeWidgetItem* createNewItem( QString tag );
 
 private slots:
-    void onWsFinished( WsReply* );
-    void onTagActivated( class QTreeWidgetItem *item );
-    void onAddClicked();
-    void onTagListItemDoubleClicked( QTreeWidgetItem*, int);
-    void follow( WsReply* );
-    void removeCurrentTag();
-
-private:
-    struct Ui
-    {
-        class TrackWidget* track;
-        class SpinnerLabel* spinner;
-        class TagBuckets* appliedTags;
-        class TagListWidget* suggestedTags;
-        class TagListWidget* yourTags;
-        class QDialogButtonBox* buttons;
-        Unicorn::TabWidget* tabs;
-        
-        void setupUi( QWidget* parent );
-    } ui;
-
-    void setupUi();
+    void showMenu( const QPoint& );
     
-    virtual void accept();
-    
-    Track m_track;
-    QStringList m_originalTags;
-    QStringList m_publicTags;
-    QStringList m_userTags;
-
-    QList<WsReply*> m_activeRequests;
+    void sortByPopularity();
+    void sortAlphabetically();
+    void openTagPageForCurrentItem();
 };
 
-#endif
+
+class TagIconView : public TagListWidget
+{
+    virtual void paintEvent( QPaintEvent* );
+
+public:
+    TagIconView();
+};
+
+#endif // TAGLISTWIDGET_H

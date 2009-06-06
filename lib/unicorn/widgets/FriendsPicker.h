@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *    This program is distributed in the hope that it will be useful,      *
+ *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,44 +17,30 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <lastfm/global.h>
-#include "lib/unicorn/UnicornApplication.h"
-#include <QPointer>
-#include <QSystemTrayIcon>
-class PlayerMediator;
-class PlayerConnection;
-class MetadataWindow;
-class StopWatch;
+#ifndef FRIENDS_PICKER_H
+#define FRIENDS_PICKER_H
+
+#include <QDialog>
+#include <lastfm/User>
 
 
-namespace audioscrobbler
+class FriendsPicker : public QDialog
 {
-    class Application : public unicorn::Application
-    {
-        Q_OBJECT
-        
-        // we delete these so QPointers
-        QPointer<QSystemTrayIcon> tray;
-        QPointer<Audioscrobbler> as;
-        QPointer<PlayerMediator> mediator;
-        QPointer<PlayerConnection> connection;
-        QPointer<StopWatch> watch;
-        QPointer<MetadataWindow> mw;
-        
-        QAction* m_submit_scrobbles_toggle;
-        QAction* m_title_action;
-        
-    public:
-        Application(int& argc, char** argv);
+    Q_OBJECT
 
-    private slots:
-        void onTrayActivated(QSystemTrayIcon::ActivationReason);
-        void onStopWatchTimedOut();
-        void setConnection(PlayerConnection*);
-        
-        void onTrackStarted(const Track&, const Track&);
-        void onPaused();
-        void onResumed();
-        void onStopped();
-    };
-}
+    struct
+    {
+        class QDialogButtonBox* buttons;
+        class QListWidget* list;
+    } ui;
+    
+public:
+    FriendsPicker( const User& = AuthenticatedUser() );
+    
+    QList<User> selection() const;
+
+private slots:
+    void onGetFriendsReturn();
+};
+
+#endif

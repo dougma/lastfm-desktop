@@ -17,52 +17,60 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include "FriendsPicker.h"
-#include "widgets/HelpTextLineEdit.h"
-#include "widgets/UnicornWidget.h"
-#include <lastfm/User>
-#include <lastfm/WsReply.h"
-#include <QDebug>
-#include <QDialogButtonBox>
-#include <QListWidget>
-#include <QVBoxLayout>
+#ifndef TAG_DIALOG_H
+#define TAG_DIALOG_H
 
+#include <lastfm/Track>
+#include <QModelIndex>
+#include <QDialog>
 
-FriendsPicker::FriendsPicker( const User& user )
-{    
-    qDebug() << user;
-    
-    QVBoxLayout* v = new QVBoxLayout( this );
-    v->addWidget( new HelpTextLineEdit( tr("Sear>) ) );
-    v->addWidget( ui.list = new QListWidget );
-    v->addWidget( ui.buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel ) );
- 
-    UnicornWidget::paintItBlack( this );    
-    
-    setWindowTitle( tr("Browse Friends") );
-    
-    WsReply* r = user.getFriends();
-    connect( r, SIGNAL(finished( WsReply* )), SLOT(onGetFriendsReturn( WsReply* )) );
-    
-    connect( ui.buttons, SIGNAL(accepted()), SLOT(accept()) );
-    connect( ui.buttons, SIGNAL(rejected()), SLOT(reject()) );
+namespace Unicorn
+{
+    class TabWidget;
 }
 
 
-void
-FriendsPicker::onGetFriendsReturn( WsReply* r )
+class TagDialog : public QDialog
 {
-    qDebug() << r;
-    
-    foreach (User u, User::list( r ))
+    Q_OBJECT
+
+public:
+    TagDialog( const Track&, QWidget* parent );
+
+	Track track() const { return m_track; }
+
+private slots:
+    void onWsFinished( QNetworkReply* );
+    void onTagActivated( class QTreeWidgetItem *item );
+    void onAddClicked();
+    void onTagListItemDoubleClicked( QTreeWidgetItem*, int);
+    void follow( QNetworkReply* );
+    void removeCurrentTag();
+
+private:
+    struct Ui
     {
-        ui.list->addItem( u );
-    }
-}
+        class TrackWidget* track;
+        class SpinnerLabel* spinner;
+        class TagBuckets* appliedTags;
+        class TagListWidget* suggestedTags;
+        class TagListWidget* yourTags;
+        class QDialogButtonBox* buttons;
+        Unicorn::TabWidget* tabs;
+        
+        void setupUi( QWidget* parent );
+    } ui;
 
+    void setupUi();
+    
+    virtual void accept();
+    
+    Track m_track;
+    QStringList m_originalTags;
+    QStringList m_publicTags;
+    QStringList m_userTags;
 
-QList<User>
-FriendsPicker::selection() const
-{
-    return QList<User>();
-}
+    QList<QNetworkReply*> m_activeRequests;
+};
+
+#endif

@@ -17,44 +17,16 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <lastfm/global.h>
-#include "lib/unicorn/UnicornApplication.h"
-#include <QPointer>
-#include <QSystemTrayIcon>
-class PlayerMediator;
-class PlayerConnection;
-class MetadataWindow;
-class StopWatch;
+#include "DBusListener.h"
+#ifdef QT_DBUS_LIB
+#include <QDBusConnection>
+
+#define bus() QDBusConnection::sessionBus()
 
 
-namespace audioscrobbler
+DBusListener::DBusListener( QObject* parent )
 {
-    class Application : public unicorn::Application
-    {
-        Q_OBJECT
-        
-        // we delete these so QPointers
-        QPointer<QSystemTrayIcon> tray;
-        QPointer<Audioscrobbler> as;
-        QPointer<PlayerMediator> mediator;
-        QPointer<PlayerConnection> connection;
-        QPointer<StopWatch> watch;
-        QPointer<MetadataWindow> mw;
-        
-        QAction* m_submit_scrobbles_toggle;
-        QAction* m_title_action;
-        
-    public:
-        Application(int& argc, char** argv);
-
-    private slots:
-        void onTrayActivated(QSystemTrayIcon::ActivationReason);
-        void onStopWatchTimedOut();
-        void setConnection(PlayerConnection*);
-        
-        void onTrackStarted(const Track&, const Track&);
-        void onPaused();
-        void onResumed();
-        void onStopped();
-    };
+    bus().registerObject( "scrobsub", this, QDBusConnection::ExportAllSlots );
 }
+
+#endif

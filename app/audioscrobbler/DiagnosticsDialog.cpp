@@ -21,11 +21,11 @@
 //TODO #include "DiagnosticsDialog/SendLogsDialog.h"
 #include "app/twiddly.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
-#include <lastfm/CoreDir>
-#include <lastfm/Scrobbler>
-#include <lastfm/ScrobbleCache>
+#include "../../../liblastfm/src/scrobble/ScrobbleCache.h"
+#include <lastfm/Audioscrobbler>
+#include <lastfm/misc.h>
 #include <lastfm/Scrobble>
-#include <lastfm/WsKeys>
+#include <lastfm/ws.h>
 #include <QByteArray>
 #include <QHeaderView>
 #include <QProcess>
@@ -69,20 +69,22 @@ DiagnosticsDialog::DiagnosticsDialog( QWidget *parent )
 
 static QString scrobblerStatusText( int const i )
 {
+    using lastfm::Audioscrobbler;
+    
     #define tr QObject::tr
     switch (i)
     {
-        case Scrobbler::ErrorBadSession: return tr( "Your session expired, it is being renewed." );
-        case Scrobbler::ErrorBannedClientVersion: return tr( "Your client too old, you must upgrade." );
-        case Scrobbler::ErrorInvalidSessionKey: return tr( "Your username or password is incorrect" );
-        case Scrobbler::ErrorBadTime: return tr( "Your timezone or date are incorrect" );
-        case Scrobbler::ErrorThreeHardFailures: return tr( "The submissions server is down" );
+        case Audioscrobbler::ErrorBadSession: return tr( "Your session expired, it is being renewed." );
+        case Audioscrobbler::ErrorBannedClientVersion: return tr( "Your client too old, you must upgrade." );
+        case Audioscrobbler::ErrorInvalidSessionKey: return tr( "Your username or password is incorrect" );
+        case Audioscrobbler::ErrorBadTime: return tr( "Your timezone or date are incorrect" );
+        case Audioscrobbler::ErrorThreeHardFailures: return tr( "The submissions server is down" );
 
-        case Scrobbler::Connecting: return tr( "Connecting to Last.fm..." );
-        case Scrobbler::Scrobbling: return tr( "Scrobbling..." );
+        case Audioscrobbler::Connecting: return tr( "Connecting to Last.fm..." );
+        case Audioscrobbler::Scrobbling: return tr( "Scrobbling..." );
 
-        case Scrobbler::TracksScrobbled:
-        case Scrobbler::Handshaken:
+        case Audioscrobbler::TracksScrobbled:
+        case Audioscrobbler::Handshaken:
             return tr( "Ready" );
     }
     #undef tr
@@ -96,27 +98,27 @@ DiagnosticsDialog::scrobbleActivity( int msg )
 {
     m_delay->add( scrobblerStatusText( msg ) );
 
-    if (msg == Scrobbler::TracksScrobbled)
+    if (msg == Audioscrobbler::TracksScrobbled)
         QTimer::singleShot( 1000, this, SLOT(onScrobblePointReached()) );
 
     switch (msg)
     {
-        case Scrobbler::ErrorBadSession:
+        case Audioscrobbler::ErrorBadSession:
             //TODO flashing
-        case Scrobbler::Connecting:
+        case Audioscrobbler::Connecting:
             //NOTE we only get this on startup
             ui.subs_light->setColor( Qt::yellow );
             break;
-        case Scrobbler::Handshaken:
-        case Scrobbler::Scrobbling:
-        case Scrobbler::TracksScrobbled:
+        case Audioscrobbler::Handshaken:
+        case Audioscrobbler::Scrobbling:
+        case Audioscrobbler::TracksScrobbled:
             ui.subs_light->setColor( Qt::green );
             break;
         
-        case Scrobbler::ErrorBannedClientVersion:
-        case Scrobbler::ErrorInvalidSessionKey:
-        case Scrobbler::ErrorBadTime:
-        case Scrobbler::ErrorThreeHardFailures:
+        case Audioscrobbler::ErrorBannedClientVersion:
+        case Audioscrobbler::ErrorInvalidSessionKey:
+        case Audioscrobbler::ErrorBadTime:
+        case Audioscrobbler::ErrorThreeHardFailures:
             ui.subs_light->setColor( Qt::red );
             break;
     }
@@ -126,7 +128,7 @@ DiagnosticsDialog::scrobbleActivity( int msg )
 void
 DiagnosticsDialog::onScrobblePointReached()
 {    
-    ScrobbleCache cache( Ws::Username );
+    ScrobbleCache cache( lastfm::ws::Username );
 
     QList<QTreeWidgetItem *> items;
     foreach (Track t, cache.tracks())
