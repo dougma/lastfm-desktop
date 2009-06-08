@@ -131,8 +131,7 @@ MediaPipeline::stop()
         // the user did push the stop button. So tell the GUI that we stopped.
         emit stopped();
 
-    delete m_source;
-    m_source = 0;
+    m_source->clear();
 }
 
 
@@ -216,6 +215,11 @@ MediaPipeline::enqueue()
     {
         // consume next track from the track source. a null track 
         // response means wait until the trackAvailable signal
+        if( !m_source) {
+            qDebug() << "source is null";
+            break;
+        }
+
         Track t = m_source->takeNextTrack();
         if (t.isNull()) {
             qDebug() << "tracksource empty";
