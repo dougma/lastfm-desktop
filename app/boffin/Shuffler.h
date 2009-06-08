@@ -57,7 +57,7 @@ private:
     struct CopyPolicy
     {
        template <typename IT>
-       typename BoffinPlayableItem operator()(IT& it) const
+       BoffinPlayableItem operator()(IT& it) const
        {
           return *it;
        }
