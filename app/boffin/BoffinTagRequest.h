@@ -22,7 +22,6 @@
 
 #include <lastfm/global.h>
 #include "PlaydarApi.h"
-#include "PlaydarPollingRequest.h"
 #include "CometRequest.h"
 
 

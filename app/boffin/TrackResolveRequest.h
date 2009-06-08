@@ -17,44 +17,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "jsonGetMember.h"
+#ifndef TRACK_RESOLVE_REQUEST_H
+#define TRACK_RESOLVE_REQUEST_H
 
-bool jsonGetMember(const QVariantMap& o, const char* key, QString& out)
-{
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::String) {
-        out = it->toString();
-        return true;
-    }
-    return false;
-}
+#include <lastfm/global.h>
+#include "PlaydarApi.h"
+#include "CometRequest.h"
 
-bool jsonGetMember(const QVariantMap& o, const char* key, int& out)
+class TrackResolveRequest : public CometRequest
 {
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::LongLong) {
-        out = it->toLongLong();
-        return true;
-    }
-    return false;
-}
+    Q_OBJECT
 
-bool jsonGetMember(const QVariantMap& o, const char* key, double& out)
-{
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::Double) {
-        out = it->toDouble();
-        return true;
-    }
-    return false;
-}
+public:
+    void issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& artist, const QString& album, const QString& track, const QString& session);
+    virtual void receiveResult(const QVariantMap& o);
 
-bool jsonGetMember(const QVariantMap& o, const char* key, float& out)
-{
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::Double) {
-        out = (float) it->toDouble();
-        return true;
-    }
-    return false;
-}
+signals:
+    void error();
+    void result();
+    void requestMade( const QString );
+
+private slots:
+    void onFinished();
+
+private:
+    void fail(const char* message);
+};
+
+#endif

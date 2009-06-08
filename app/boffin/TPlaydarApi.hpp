@@ -19,7 +19,8 @@
 
 #ifndef TPLAYDAR_API_HPP
 #define TPLAYDAR_API_HPP
-// Policy needs to provide:
+
+// Policy provides:
 //
 // void paramsAdd(ParamsT& p, StringT name, StringT value)
 // UrlT createUrl(StringT base, StringT path, ParamsT p)
@@ -82,6 +83,26 @@ public:
     UrlT lanRoster()
     {
         return makeUrl("/lan/roster");
+    }
+
+    // cometsession optional
+    // qid optional
+    UrlT trackResolve(const StringT& artist, const StringT& album, const StringT& track, 
+        const StringT& cometSession = StringT(), const StringT& qid = StringT())
+    {
+        ParamsT params;
+        paramsAdd(params, "method", "resolve");
+        paramsAdd(params, "artist", artist);
+        paramsAdd(params, "album", album);
+        paramsAdd(params, "track", track);
+        paramsAdd(params, "auth", m_token);
+        if (cometSession != "") {
+            paramsAdd(params, "comet", cometSession);
+        }
+        if (qid != "") {
+            paramsAdd(params, "qid", qid);
+        }
+        return apiCall(params);
     }
 
     // qid optional

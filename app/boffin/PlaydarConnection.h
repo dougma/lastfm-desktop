@@ -26,6 +26,7 @@
 
 class PlaydarCometRequest;
 class CometRequest;
+class TrackResolveRequest;
 class BoffinTagRequest;
 class BoffinRqlRequest;
 
@@ -39,6 +40,7 @@ public:
     void start();
     QStringListModel* hostsModel();
 
+    TrackResolveRequest* trackResolve(const QString& artist, const QString& album, const QString& track);
     BoffinTagRequest* boffinTagcloud(const QString& rql);
     BoffinRqlRequest* boffinRql(const QString& rql);
 

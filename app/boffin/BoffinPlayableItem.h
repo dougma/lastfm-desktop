@@ -20,17 +20,25 @@
 #define BOFFIN_PLAYABLE_ITEM_H
 
 #include <QSharedData>
+#include <QVariant>
+#include <QString>
 
 struct BoffinPlayableItemData : QSharedData
 {
+    BoffinPlayableItemData();
+
     QString artist;
     QString album;
     QString track;
     QString source;
     QString mimetype;
     QString url;
-    int duration;
-    float weight;
+    int size;           // file size in bytes
+    int bitrate;        // nominal kb/sec of encoding
+    int duration;       // track length in seconds
+    float weight;       // boffin rql items have a weight
+    float score;        // resolved items have a score
+    int preference;     // plugin preference weighting (percentage?)
 
     float workingweight;
     int artistId;
@@ -39,32 +47,9 @@ struct BoffinPlayableItemData : QSharedData
 class BoffinPlayableItem
 {
 public:
-    BoffinPlayableItem()
-    {
-        d = new BoffinPlayableItemData;
-    }
+    BoffinPlayableItem();
 
-    BoffinPlayableItem(
-        QString artist,
-        QString album,
-        QString track,
-        QString source,
-        QString mimetype,
-        QString url,
-        int duration,
-        float weight)
-    {
-        d = new BoffinPlayableItemData;
-        d->artist = artist;
-        d->album = album;
-        d->track = track;
-        d->source = source;
-        d->mimetype = mimetype;
-        d->url = url;
-        d->duration = duration;
-        d->weight = weight;
-    }
-
+    // we set the bar low; if it has a url we can try to play it:
     bool isValid() const { return d->url.length() > 0; }
 
     QString artist() const { return d->artist; }
@@ -73,8 +58,11 @@ public:
     QString source() const { return d->source; }
     QString mimetype() const { return d->mimetype; }
     QString url() const { return d->url; }
+    int bitrate() const { return d->bitrate; }
     int duration() const { return d->duration; }
     float weight() const { return d->weight; }
+    float score() const { return d->score; }
+    int preference() const { return d->preference; }
 
     float workingweight() const { return d->workingweight; }
     int artistId() const { return d->artistId; }
@@ -82,6 +70,9 @@ public:
     // mutable:
     float& workingweight() { return d->workingweight; }
     int& artistId() { return d->artistId; }
+
+    static BoffinPlayableItem fromTrackResolveResult(const QVariantMap& map);
+    static BoffinPlayableItem fromBoffinRqlResult(const QVariantMap& map);
 
 protected:
     QExplicitlySharedDataPointer<BoffinPlayableItemData> d;

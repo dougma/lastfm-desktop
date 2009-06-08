@@ -23,6 +23,7 @@
 #include "PlaydarAuthRequest.h"
 #include "PlaydarRosterRequest.h"
 #include "PlaydarCometRequest.h"
+#include "TrackResolveRequest.h"
 #include "BoffinRqlRequest.h"
 #include "BoffinTagRequest.h"
 #include <lastfm/NetworkAccessManager>
@@ -159,6 +160,19 @@ QStringListModel*
 PlaydarConnection::hostsModel()
 {
     return &m_hostsModel;
+}
+
+TrackResolveRequest* 
+PlaydarConnection::trackResolve(const QString& artist, const QString& album, const QString& track)
+{
+    if (!m_cometSession.length()) {
+        return 0;
+    }
+    TrackResolveRequest* r = new TrackResolveRequest();
+    connect(r, SIGNAL(requestMade(QString)), SLOT(onRequestMade(QString)));
+    connect(r, SIGNAL(destroyed(QObject*)), SLOT(onRequestDestroyed(QObject*)));
+    r->issueRequest(m_wam, m_api, artist, album, track, m_cometSession);
+    return r;
 }
 
 BoffinRqlRequest*

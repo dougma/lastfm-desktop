@@ -1,6 +1,8 @@
 #ifndef TAG_BROWSER_WIDGET_H
 #define TAG_BROWSER_WIDGET_H
 
+#include <math.h>
+#include <float.h>
 #include <boost/function.hpp>
 #include <QStringList>
 #include <QWidget>

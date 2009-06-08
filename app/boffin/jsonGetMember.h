@@ -59,6 +59,7 @@ jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
 bool jsonGetMember(const QVariantMap& o, const char* key, QString& out);
 bool jsonGetMember(const QVariantMap& o, const char* key, int& out);
 bool jsonGetMember(const QVariantMap& o, const char* key, double& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, float& out);
 
 
 #endif

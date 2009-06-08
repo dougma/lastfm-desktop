@@ -17,44 +17,53 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#include "jsonGetMember.h"
+#include <QNetworkReply>
+#include <lastfm/NetworkAccessManager>
+#include "TrackResolveRequest.h"
+#include "BoffinPlayableItem.h"
 
-bool jsonGetMember(const QVariantMap& o, const char* key, QString& out)
+void 
+TrackResolveRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, 
+    const QString& artist, const QString& album, const QString& track, const QString& session)
 {
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::String) {
-        out = it->toString();
-        return true;
+    QNetworkReply* reply = wam->get(QNetworkRequest(api.trackResolve(artist, album, track, session, qid())));
+    if (reply) {
+        connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
+        emit requestMade( qid());
+    } else {
+        fail("couldn't issue boffin request");
     }
-    return false;
 }
 
-bool jsonGetMember(const QVariantMap& o, const char* key, int& out)
+//virtual 
+void 
+TrackResolveRequest::receiveResult(const QVariantMap& o)
 {
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::LongLong) {
-        out = it->toLongLong();
-        return true;
-    }
-    return false;
+    emit BoffinPlayableItem::fromTrackResolveResult(o);
 }
 
-bool jsonGetMember(const QVariantMap& o, const char* key, double& out)
+void 
+TrackResolveRequest::onFinished()
 {
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::Double) {
-        out = it->toDouble();
-        return true;
+    sender()->deleteLater();
+    QNetworkReply *reply = (QNetworkReply*) sender();
+    if (reply->error() == QNetworkReply::NoError) {
+        QString queryId;
+        if (getQueryId(reply->readAll(), queryId)) {
+            if (queryId == qid()) {
+                // all is good
+                return; 
+            }
+            fail("qid mismatch");            // we can't handle this
+        }
+        fail("bad response");
     }
-    return false;
+    fail("");
 }
 
-bool jsonGetMember(const QVariantMap& o, const char* key, float& out)
+void 
+TrackResolveRequest::fail(const char* message)
 {
-    QVariantMap::const_iterator it = o.find(key);
-    if (it != o.end() && it->type() == QVariant::Double) {
-        out = (float) it->toDouble();
-        return true;
-    }
-    return false;
+    qDebug() << message;
+	emit error();
 }
