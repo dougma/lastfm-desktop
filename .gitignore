@@ -11,3 +11,10 @@ Makefile*
 *.vcproj*
 *.sln
 *.suo
+.DS_Store
+/app/audioscrobbler/audioscrobbler.pro
+/app/boffin/boffin.pro
+/app/radio/radio.pro
+/lib/listener/listener.pro
+/lib/unicorn/unicorn.pro
+

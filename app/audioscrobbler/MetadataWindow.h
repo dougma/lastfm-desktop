@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,30 +17,33 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
+#include "lib/unicorn/UnicornMainWindow.h"
+#include <lastfm/Track>
 
-#include <QDialog>
-#include <lastfm/User>
-
-
-class FriendsPicker : public QDialog
+class MetadataWindow : public unicorn::MainWindow
 {
     Q_OBJECT
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
+    struct{
+        class QLabel* artist_image;
+        class QLabel* album_image;
+        class QLabel* title;
+        class QTextBrowser* bio;
+
+        class ImageButton* love;
+        class ImageButton* tag;
+        class ImageButton* share;
     } ui;
-    
+
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    MetadataWindow();
+
+public slots:
+    void onTrackStarted(const Track&, const Track&);
+    void onStopped();
 
 private slots:
-    void onGetFriendsReturn( WsReply* );
+    void onArtistGotInfo();
+//    void onAlbumGotInfo();
+    void onArtistImageDownloaded();
 };
-
-#endif

@@ -6,7 +6,7 @@
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
+ *    This program is distributed in the hope that it will be useful,      *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  *   GNU General Public License for more details.                          *
@@ -17,58 +17,34 @@
  *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
  ***************************************************************************/
 
-#include <lastfm/Track>
-#include <QTextEdit>
-#include <QLayout>
-#include <QWidget>
-class TagBucket;
+#include <QtGlobal>
+#ifdef QT_DBUS_LIB
+
+#include "lib/DllExportMacro.h"
+#include <QMap>
+#include <QObject>
+class PlayerConnection;
 
 
-class TagBuckets : public QWidget
+/** listens for dbus connections */
+class LISTENER_DLLEXPORT DBusListener : public QObject
 {
     Q_OBJECT
-    
-    Track m_track;
-    int m_current_index;
-    
-public:
-    TagBuckets( const Track& );
-    
-    struct {
-        TagBucket* track;
-        TagBucket* artist;
-        TagBucket* album;
-    } ui;
-    
-    TagBucket* currentBucket() { return (TagBucket*)layout()->itemAt( m_current_index )->widget(); }
 
+public:
+    DBusListener( QObject* parent );
+    
 signals:
-    void suggestedTagsRequest( class WsReply* );
+    void newConnection( class PlayerConnection* );
     
 private slots:
-    void onHeaderClicked();
+    void start( const QString& id );
+    void pause( const QString& id );
+    void resume( const QString& id );
+    void stop( const QString& id );
+
+private:
+    QMap<QString, PlayerConnection*> m_connections;
 };
 
-
-class TagBucket : public QTextEdit
-{
-    Q_OBJECT
-
-    QStringList m_existingTags;
-
-public:
-    TagBucket();
-       
-    QStringList tags() const;
-    QStringList newTags() const;
-    QStringList deletedTags() const;
-    
-public slots:
-    void onGotTags( class WsReply* );
-    
-protected:
-    virtual void paintEvent( QPaintEvent* );
-    virtual void dropEvent( QDropEvent* );
-    virtual void dragMoveEvent( QDragMoveEvent* );
-    virtual void dragEnterEvent( QDragEnterEvent* );
-};
+#endif

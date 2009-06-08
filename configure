@@ -89,12 +89,12 @@ echo 'Using '`which $QMAKE`
 header 'Generating Build System'
 
 middle "Running qpp..."
-for x in `admin/findsrc pro lib` `admin/findsrc pro app`
+for x in `admin/findsrc pro.in lib` `admin/findsrc pro.in app`
 do
-    cwd=`pwd`
-    pushd `dirname $x` &> /dev/null
-    $cwd/admin/qpp `basename $x` || die "Ruby not installed?"
-    popd &> /dev/null
+    pro=`dirname "$x"`/`basename "$x" .in`
+    cp "$x" "$pro"
+    echo "#### GENERATED FILE!!! Edit the pro.in file instead! ####" >> "$pro"
+    admin/qpp "$x" >> "$pro"
 done
 
 

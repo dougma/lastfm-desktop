@@ -6,7 +6,6 @@ CONFIG += lastfm
 LIBS += -lunicorn
 
 include( $$ROOT_DIR/admin/include.qmake )
-include( _files.qmake )
 
 DEFINES += LASTFM_COLLAPSE_NAMESPACE
 

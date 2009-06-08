@@ -30,7 +30,6 @@ namespace Unicorn
     class TabBar : public QTabBar
     {
         friend class UnicornMacStyle;
-
         
     public:
         TabBar();

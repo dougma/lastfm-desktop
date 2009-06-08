@@ -21,12 +21,14 @@
 #define LEGACY_TUNER_H
 
 #include <lastfm/Track>
-#include "RadioStation.h"
+#include <lastfm/RadioStation>
+#include <lastfm/ws.h>
+using lastfm::RadioStation;
 
 /** certain stuff can only be played with the legacy tuner */
 
 
-class LASTFM_RADIO_DLLEXPORT LegacyTuner
+class LegacyTuner : public QObject
 {
 	Q_OBJECT
 	
@@ -40,7 +42,7 @@ public:
 signals:
     void title( const QString& );
     void trackAvailable();
-    void error( Ws::Error );
+    void error( lastfm::ws::Error );
 
 private slots:
 	void onHandshakeReturn();

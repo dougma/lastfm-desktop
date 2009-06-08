@@ -19,9 +19,8 @@
 
 #include "TagBuckets.h"
 #include "common/qt/reverse.cpp"
-#include <lastfm/Tag.h"
-#include "PlayableMimeData>
-#include "radio/buckets/SeedTypes.h"
+#include "PlayableMimeData.h"
+#include <lastfm/Tag>
 #include <QtGui>
 
 static int gint = 0;
@@ -147,7 +146,7 @@ TagBucket::TagBucket()
 
 
 void
-TagBucket::onGotTags( WsReply* r )
+TagBucket::onGotTags( QNetworkReply* r )
 {
     setText( Qt::reverse( Tag::list( r ).values() ).join( ", " ) );
 }

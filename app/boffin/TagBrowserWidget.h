@@ -19,6 +19,8 @@ class PlaylistWidget;
 #include "PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include <QSortFilterProxyModel>
+#include <float.h>
+#include <math.h>
 
 class RelevanceFilter : public QSortFilterProxyModel
 {
