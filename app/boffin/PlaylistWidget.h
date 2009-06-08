@@ -3,8 +3,8 @@
 
 #include <QTreeView>
 #include "PlaylistModel.h"
-#include "PlaydarConnection.h"
-#include "BoffinTagRequest.h"
+#include "playdar/PlaydarConnection.h"
+#include "playdar/BoffinTagRequest.h"
 #include "TrackSource.h"
 
 class PlaylistWidget: public QTreeView {

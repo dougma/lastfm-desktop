@@ -20,7 +20,7 @@
 #include <float.h>
 #include <math.h>
 #include "PlaydarTagCloudModel.h"
-#include "PlaydarConnection.h"
+#include "playdar/PlaydarConnection.h"
 #include <QTimer>
 
 PlaydarTagCloudModel::PlaydarTagCloudModel(PlaydarConnection* playdar)

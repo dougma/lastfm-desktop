@@ -21,7 +21,7 @@
 #define TAG_CLOUD_VIEW_H
 
 #include <QAbstractItemView>
-#include "BoffinTagRequest.h"
+#include "playdar/BoffinTagRequest.h"
 
 class TagCloudView : public QAbstractItemView
 {

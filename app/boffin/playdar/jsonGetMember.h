@@ -16,42 +16,50 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
+ 
+#ifndef JSON_GET_MEMBER_H
+#define JSON_GET_MEMBER_H
 
-#ifndef TRACK_SOURCE_H
-#define TRACK_SOURCE_H
+// gets the named property from the json value
+//
+// returns true if it's got ok.
+//
+// todo: support nested objects,    eg: "playable.result.id"
+// todo: support arrays,            eg: "results[1].id"
 
-#include <QList>
-#include <lastfm/Track>
-#include "playdar/BoffinPlayableItem.h"
 
-class Shuffler;
+// for json_spirit:
+// ( T can be any type acceptable to json_spirit's get_value method )
+//
 
-// Tracksource samples BoffinPlayableItem objects from the Shuffler, 
-// maintains a small buffer of them (for upcoming-track feature).
-// MediaPipeline then takes Track objects from us.
-class TrackSource
-    : public QObject
+#include <boost/foreach.hpp>
+#include "../json_spirit/json_spirit.h"
+
+
+template <typename T>
+bool
+jsonGetMember(const json_spirit::Value& value, const char* name, T& out)
 {
-    Q_OBJECT
+    using namespace json_spirit;
 
-public:
-    TrackSource(Shuffler* shuffler, QObject *parent);
+    if (value.type() == obj_type) {
+        // yeah, only objects have values.
+        BOOST_FOREACH(const Pair& pair, value.get_obj()) {
+            if (pair.name_ == name) {
+                out = pair.value_.get_value<T>();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
-    Track takeNextTrack();
-    BoffinPlayableItem peek(unsigned index);
-    int size();
-    void setSize(unsigned maxSize);
-    void clear();
+// for QVariantMaps:
+#include <QVariant>
+bool jsonGetMember(const QVariantMap& o, const char* key, QString& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, int& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, double& out);
+bool jsonGetMember(const QVariantMap& o, const char* key, float& out);
 
-signals:
-    void changed();     // the buffer has changed somehow.
-
-private:
-    void fillBuffer();
-
-    Shuffler* m_shuffler;
-    QList<BoffinPlayableItem> m_buffer;
-    int m_maxSize;
-};
 
 #endif

@@ -20,8 +20,8 @@
 #ifndef PLAYDAR_TAG_CLOUD_MODEL_H
 #define PLAYDAR_TAG_CLOUD_MODEL_H
 
-#include "BoffinTagRequest.h"
-#include "PlaydarApi.h"
+#include "playdar/BoffinTagRequest.h"
+#include "playdar/PlaydarApi.h"
 #include <lastfm/global.h>
 #include <QAbstractItemModel>
 #include <QAbstractTableModel>

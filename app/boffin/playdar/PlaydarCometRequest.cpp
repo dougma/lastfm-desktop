@@ -21,7 +21,7 @@
 #include <QNetworkReply>
 #include "PlaydarCometRequest.h"
 #include <lastfm/NetworkAccessManager>
-#include "comet/CometParser.h"
+#include "../comet/CometParser.h"
 
 
 PlaydarCometRequest::PlaydarCometRequest()

@@ -16,7 +16,7 @@ class PlaydarConnection;
 class PlaylistModel;
 class PlaylistWidget;
 
-#include "PlaydarConnection.h"
+#include "playdar/PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include <QSortFilterProxyModel>
 #include <float.h>

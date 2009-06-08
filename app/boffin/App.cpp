@@ -37,7 +37,7 @@
 #include "ScrobSocket.h"
 #include "TrackSource.h"
 #include "Shuffler.h"
-#include "PlaydarConnection.h"
+#include "playdar/PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include "Playlist.h"
 

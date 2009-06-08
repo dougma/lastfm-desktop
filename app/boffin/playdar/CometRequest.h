@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2009 Last.fm Ltd.                                           *
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,47 +17,26 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
-#ifndef PLAYDAR_POLLING_REQUEST_H
-#define PLAYDAR_POLLING_REQUEST_H
+#ifndef COMET_REQUEST_H
+#define COMET_REQUEST_H
 
-#include <string>
-#include "json_spirit/json_spirit.h"
+#include <QString>
+#include <QVariant>
+#include <QByteArray>
 
-
-// abstract base class for polling kind of requests
-//
-class PlaydarPollingRequest
+class CometRequest : public QObject
 {
+    Q_OBJECT
+
 public:
-    PlaydarPollingRequest();
-    virtual ~PlaydarPollingRequest();
-
-    void start();
-
-    const std::string& qid();
-
-private:
-    virtual void issueRequest() = 0;
-    virtual void issuePoll(unsigned msDelay) = 0;
-
-    // return true if another poll should be made
-    virtual bool handleJsonPollResponse(
-        int poll, 
-        const json_spirit::Object& query, 
-        const json_spirit::Array& results) = 0;
-
-    virtual void fail(const char* message) = 0;
+    CometRequest();
+    const QString& qid() const;
+    virtual void receiveResult(const QVariantMap& o) = 0;
 
 protected:
-    // derived class calls this with the response of the initial request
-    void handleResponse(const char *data, unsigned size);
+    bool getQueryId(const QByteArray& data, QString& out);
 
-    // derived class calls this with the response from a poll
-    void handlePollResponse(const char *data, unsigned size);
-
-private:
-    std::string m_qid;
-    int m_pollCount;
+    QString m_qid;
 };
 
 #endif

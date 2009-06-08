@@ -20,12 +20,12 @@
 #ifndef APP_H
 #define APP_H
 
-#include "PlaydarApi.h"
+#include "playdar/PlaydarApi.h"
+#include "playdar/BoffinPlayableItem.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include <lastfm/global.h>
 #include <QPointer>
 #include <lastfm/Track>
-#include "BoffinPlayableItem.h"
 
 
 namespace Phonon { class AudioOutput; }

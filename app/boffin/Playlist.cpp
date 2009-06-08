@@ -1,6 +1,6 @@
 #include <QTimer>
 #include "Playlist.h"
-#include "PlaydarConnection.h"
+#include "playdar/PlaydarConnection.h"
 #include "sample/SampleFromDistribution.h"
 
 

@@ -4,7 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QObject>
-#include "BoffinRqlRequest.h"
+#include "playdar/BoffinRqlRequest.h"
 
 class PlaydarConnection;
 

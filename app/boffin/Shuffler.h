@@ -21,7 +21,7 @@
 
 //#include <QObject>
 #include <QStringList>
-#include "BoffinPlayableItem.h"
+#include "playdar/BoffinPlayableItem.h"
 #include "sample/SampleFromDistribution.h"
 
 

@@ -14,7 +14,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Steet, Fifth Floor, Boston, MA  02110-1301, USA.          *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
 
 #include "MainWindow.h"
@@ -26,7 +26,7 @@
 #include <QPushButton>
 #include <lastfm/Track>
 #include "PlaydarHostsModel.h"
-#include "PlaydarConnection.h"
+#include "playdar/PlaydarConnection.h"
 
 MainWindow::MainWindow()
 {   
