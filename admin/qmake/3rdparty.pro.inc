@@ -25,7 +25,7 @@ CONFIG( boost ) {
         LIBS += /opt/local/lib/libboost_thread.a
     }
     else:unix {
-        LIBS += -lboost_thread
+        LIBS += -lboost_thread-mt
     }
 }
 
