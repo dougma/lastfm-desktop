@@ -43,6 +43,7 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     m_maxWeight = 0;
     m_maxLogWeight = FLT_MIN;
     m_minLogWeight = FLT_MAX;
+    m_maxTrackCount = 0;
 
     BoffinTagRequest* req = m_playdar->boffinTagcloud(rql);
     connect(req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTag(BoffinTagItem)));
@@ -73,6 +74,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		{
 			m_tagListBuffer[ i ].m_weight += tag.m_weight;
 			m_tagListBuffer[ i ].m_logWeight = log( m_tagListBuffer[i].m_weight );
+            m_tagListBuffer[ i ].m_count += tag.m_count;
 			m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
 			m_maxLogWeight = qMax( m_tagListBuffer[i].m_logWeight, m_maxLogWeight);
 			emit dataChanged( createIndex( i, 0), createIndex( i, 0));
@@ -82,6 +84,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 	//	beginInsertRows( QModelIndex(), m_tagListBuffer.size(), m_tagListBuffer.size() + 1);
 			tag.m_logWeight = log( tag.m_weight );
 			m_tagListBuffer << tag;
+			m_maxTrackCount = qMax( tag.m_count, m_maxTrackCount );
 			m_maxWeight = qMax( tag.m_weight, m_maxWeight );
 			m_maxLogWeight = qMax( m_maxLogWeight, tag.m_logWeight );
 			m_minLogWeight = qMin( m_minLogWeight, tag.m_logWeight );
@@ -152,7 +155,7 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
         {
             QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
             i += index.row();
-            return QVariant::fromValue<int>( i->m_count );
+            return QVariant::fromValue<int>(i->m_count);
         }
 
         default:
@@ -223,4 +226,10 @@ PlaydarTagCloudModel::setTagMapping(QMap<QString, QString> tagMap)
 //    onTags(m_tags);
 }
 
+
+int
+PlaydarTagCloudModel::maxTrackCount() const
+{
+	return m_maxTrackCount;
+}
 

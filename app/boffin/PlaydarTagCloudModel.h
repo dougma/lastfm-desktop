@@ -48,6 +48,8 @@ public:
     void addToHostFilter(const QString& hostname);
     void setTagMapping(QMap<QString, QString> tagMap);  // map tagname -> preferred tagname
 
+    int maxTrackCount() const;
+
     virtual QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex()) const;
     QModelIndex indexOf( const BoffinTagItem& t );
     virtual QModelIndex parent( const QModelIndex& ) const;
@@ -75,6 +77,8 @@ private:
     QList< BoffinTagItem > m_tagList;
 
     BoffinTagItem m_tag;    // the last tag provided via onTags
+
+    int m_maxTrackCount;
 
     float m_maxWeight;
     float m_maxLogWeight;

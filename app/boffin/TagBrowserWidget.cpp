@@ -2,6 +2,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QItemSelectionModel>
+#include <QSlider>
 #include "TagBrowserWidget.h"
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
@@ -11,8 +12,8 @@
 #include "PlaylistModel.h"
 
 TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) :
-	QWidget(parent), 
-    m_playdar(playdar) 
+	QWidget(parent),
+    m_playdar(playdar)
 {
 	m_tagCloudModel = new PlaydarTagCloudModel(playdar);
     m_filter = new RelevanceFilter();
@@ -25,8 +26,22 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 			SLOT(onHistoryClicked(int, QString)));
     QPushButton* button = new QPushButton("filter irrelevant tags");
     connect(button, SIGNAL(clicked()), SLOT(onFilterClicked()));
+
+    m_trackCountSlider = new QSlider( this );
+    m_trackCountSlider->setMinimum( 0 );
+    m_trackCountSlider->setMaximum( 0 );
+    m_trackCountSlider->setOrientation( Qt::Horizontal );
+    m_trackCountSlider->setTickPosition( QSlider::TicksBelow );
+    connect( m_trackCountSlider, SIGNAL(sliderMoved(int)), SLOT(onSliderChanged( int )));
+
+    vlayout->addWidget(m_trackCountSlider);
     vlayout->addWidget(button);
 	vlayout->addWidget(m_history);
+
+	connect( m_tagCloudModel, SIGNAL( rowsInserted(QModelIndex,int,int)), SLOT( onModelChanged(QModelIndex,int,int)));
+	connect( m_tagCloudModel, SIGNAL( rowsRemoved(QModelIndex,int,int)), SLOT( onModelChanged(QModelIndex,int,int)));
+
+
 
 	QWidget* w = new QWidget(this);
 
@@ -53,7 +68,7 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 	this->setLayout(vlayout);
 }
 
-QStringList 
+QStringList
 TagBrowserWidget::selectedTags() const
 {
 	QStringList tags;
@@ -63,8 +78,8 @@ TagBrowserWidget::selectedTags() const
     return tags;
 }
 
-QString 
-TagBrowserWidget::rql() 
+QString
+TagBrowserWidget::rql()
 {
     QStringList tags;
     foreach(const QString& s, selectedTags()) {
@@ -74,7 +89,7 @@ TagBrowserWidget::rql()
 }
 
 void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
-		const QItemSelection& deselected) 
+		const QItemSelection& deselected)
 {
     Q_UNUSED(selected);
     Q_UNUSED(deselected);
@@ -90,7 +105,7 @@ void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
 }
 
 
-void 
+void
 TagBrowserWidget::onHistoryClicked(int position, const QString& text) {
 	Q_UNUSED(text);
 
@@ -111,4 +126,16 @@ TagBrowserWidget::onFilterClicked()
 {
     // toggle the filter:
     m_filter->showRelevant(m_filter->showingAll());
+}
+
+void
+TagBrowserWidget::onModelChanged(const QModelIndex&,int,int)
+{
+	m_trackCountSlider->setMaximum( m_tagCloudModel->maxTrackCount() );
+}
+
+void
+TagBrowserWidget::onSliderChanged( int val )
+{
+	m_filter->setMinimumTrackCountFilter( val );
 }
