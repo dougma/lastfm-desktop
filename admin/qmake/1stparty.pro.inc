@@ -18,4 +18,7 @@ CONFIG( lastfm ) {
         CONFIG += link_pkgconfig
         PKGCONFIG += lastfm
     }
+    mac{
+        LIBS += -framework Carbon -framework CoreFoundation # various
+    }
 }
