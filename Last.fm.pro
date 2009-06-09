@@ -9,8 +9,8 @@ SUBDIRS = lib/unicorn \
 
 debug:win32 {
     # make the client the default project in visual studio
-    SUBDIRS -= app/client
-    SUBDIRS = app/client $$SUBDIRS
+    SUBDIRS -= app/boffin
+    SUBDIRS = app/boffin $$SUBDIRS
 }
 
 linux*:SUBDIRS -= app/twiddly

@@ -1,9 +1,9 @@
 /***************************************************************************
- *   Copyright (C) 2008 by P. Sereno                                       *
- *   http://www.sereno-online.com                                          *
- *   http://www.qt4lab.org                                                 *
- *   http://www.qphoton.org                                                *
- *   Last.fm Ltd. <max@last.fm>                                            *
+ *   Copyright 2008 by P. Sereno                                           *
+ *       http://www.sereno-online.com                                      *
+ *       http://www.qt4lab.org                                             *
+ *       http://www.qphoton.org                                            *
+ *   Copyright 2009 Last.fm Ltd. <max@last.fm>                             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,7 +20,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-  
 #include "StatusLight.h"
 #include <QDebug>
 #include <QFontMetrics>

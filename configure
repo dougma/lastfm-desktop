@@ -127,7 +127,7 @@ else
                 EXTRA_QMAKE_FLAGS='NOOP=""'
             fi
 
-            qmake -config debug -recursive Last.fm.pro "CONFIG -= app_bundle" "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
+            qmake -config debug -recursive Last.fm.pro "CONFIG -= app_bundle release" "$EXTRA_QMAKE_FLAGS" || die "Configure failed."
             BUILD_CMD='make'        
         fi;;
             
@@ -152,9 +152,10 @@ fi
 
 
 middle "Generating _configure.h"
-touch _include/_configure.h
 case `uname` in
     Linux)
+        mkdir _include
+        touch _include/_configure.h
         lsb_release -d | grep 'Ubuntu 8.10$' && echo '#define UBUNTU_8_10' >> _include/_configure.h
         ;;
 esac
