@@ -40,6 +40,7 @@
 #include "playdar/PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include "Playlist.h"
+#include "XspfDialog.h"
 
 
 #define OUTPUT_DEVICE_KEY "OutputDevice"
@@ -260,7 +261,9 @@ App::xspf()
     QString path = QFileDialog::getOpenFileName( m_mainwindow, "Open XSPF File", "*.xspf" );
     if (path.size())
     {
-        m_mainwindow->QMainWindow::setWindowTitle( "Resolving XSPF..." );
+        XspfDialog *pDlg = new XspfDialog(path, m_playdar, m_mainwindow);
+        pDlg->show();
+ //       m_mainwindow->QMainWindow::setWindowTitle( "Resolving XSPF..." );
  //       m_pipe->playXspf( path );
     }
 }

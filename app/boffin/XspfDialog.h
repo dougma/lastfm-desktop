@@ -16,54 +16,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
+#ifndef XSPF_DIALOG_H
+#define XSPF_DIALOG_H
 
-#include <QNetworkReply>
-#include <lastfm/NetworkAccessManager>
-#include "TrackResolveRequest.h"
-#include "BoffinPlayableItem.h"
+#include <QDialog>
+#include <QMap>
+#include <lastfm/Xspf>
 
-void 
-TrackResolveRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, 
-    const QString& artist, const QString& album, const QString& track, const QString& session)
+class QTreeView;
+class XspfModel;
+class XspfReader;
+class PlaydarConnection;
+class BoffinPlayableItem;
+
+class XspfDialog : public QDialog
 {
-    QNetworkReply* reply = wam->get(QNetworkRequest(api.trackResolve(artist, album, track, session, qid())));
-    if (reply) {
-        connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
-        emit requestMade( qid());
-    } else {
-        fail("couldn't issue boffin request");
-    }
-}
+    Q_OBJECT
 
-//virtual 
-void 
-TrackResolveRequest::receiveResult(const QVariantMap& o)
-{
-    emit result(BoffinPlayableItem::fromTrackResolveResult(o));
-}
+public:
+    XspfDialog(QString url, PlaydarConnection* playdar, QWidget *parent = 0);
 
-void 
-TrackResolveRequest::onFinished()
-{
-    sender()->deleteLater();
-    QNetworkReply *reply = (QNetworkReply*) sender();
-    if (reply->error() == QNetworkReply::NoError) {
-        QString queryId;
-        if (getQueryId(reply->readAll(), queryId)) {
-            if (queryId == qid()) {
-                // all is good
-                return; 
-            }
-            fail("qid mismatch");            // we can't handle this
-        }
-        fail("bad response");
-    }
-    fail("");
-}
+private slots:
+    void onXspf(const lastfm::Xspf& xspf);
+    void onResolveResult(const BoffinPlayableItem& item);
 
-void 
-TrackResolveRequest::fail(const char* message)
-{
-    qDebug() << message;
-	emit error();
-}
+private:
+    QTreeView* m_treeview;
+    XspfModel* m_model;
+    XspfReader* m_reader;
+    PlaydarConnection* m_playdar;
+    QMap<QString, int> m_reqmap;    // map request qid to index
+};
+
+#endif

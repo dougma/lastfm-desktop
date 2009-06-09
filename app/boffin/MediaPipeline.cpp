@@ -126,12 +126,13 @@ MediaPipeline::stop()
             emit stopped(); //phonon is broken and shit
     }
     else if (m_source)
+    {
         // otherwise we have a source and it is doing something, but it could be
         // slow. Slow enough that the user wants to push the stop() button. So
         // the user did push the stop button. So tell the GUI that we stopped.
         emit stopped();
-
-    m_source->clear();
+        m_source->clear();
+    }
 }
 
 

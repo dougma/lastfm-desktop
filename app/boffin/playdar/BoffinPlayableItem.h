@@ -58,6 +58,7 @@ public:
     QString source() const { return d->source; }
     QString mimetype() const { return d->mimetype; }
     QString url() const { return d->url; }
+    int size() const { return d->size; }
     int bitrate() const { return d->bitrate; }
     int duration() const { return d->duration; }
     float weight() const { return d->weight; }
