@@ -1,4 +1,3 @@
-CONFIG -= app_bundle
 LIBS += -lunicorn -llastfm
 QT = core xml sql
 
@@ -7,7 +6,7 @@ include( $$ROOT_DIR/admin/include.qmake )
 DEFINES += LASTFM_COLLAPSE_NAMESPACE
 SOURCES = main.cpp PlayCountsDatabase.cpp IPod.cpp $$ROOT_DIR/common/c++/Logger.cpp
 
-macx*:SOURCES += ITunesLibrary_mac.cpp
+mac:SOURCES += ITunesLibrary_mac.cpp
 
 win32 {
     # Would prefer to refer to ITunesTrack.cpp and ITunesComWrapper.cpp in-situ
