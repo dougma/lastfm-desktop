@@ -40,7 +40,7 @@ TrackResolveRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi&
 void 
 TrackResolveRequest::receiveResult(const QVariantMap& o)
 {
-    emit BoffinPlayableItem::fromTrackResolveResult(o);
+    emit result(BoffinPlayableItem::fromTrackResolveResult(o));
 }
 
 void 

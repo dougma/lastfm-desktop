@@ -24,6 +24,7 @@
 #include <lastfm/global.h>
 #include "PlaydarApi.h"
 #include "CometRequest.h"
+#include "BoffinPlayableItem.h"
 
 class TrackResolveRequest : public CometRequest
 {
@@ -35,7 +36,7 @@ public:
 
 signals:
     void error();
-    void result();
+    void result( BoffinPlayableItem );
     void requestMade( const QString );
 
 private slots:
