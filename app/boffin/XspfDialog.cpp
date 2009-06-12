@@ -18,22 +18,27 @@
  ***************************************************************************/
 
 #include <QLayout>
-#include <QTreeView>
+#include <QTreeWidget>
 #include <QHBoxLayout>
 #include "XspfDialog.h"
-#include "XspfModel.h"
 #include "XspfReader.h"
 #include "playdar/PlaydarConnection.h"
 #include "playdar/TrackResolveRequest.h"
 #include "playdar/BoffinPlayableItem.h"
+
 
 XspfDialog::XspfDialog(QString path, PlaydarConnection* playdar, QWidget *parent)
 :QDialog(parent)
 ,m_playdar(playdar)
 {
     QLayout* layout = new QHBoxLayout();
-    m_treeview = new QTreeView();
-    layout->addWidget(m_treeview);
+    m_treewidget = new QTreeWidget();
+    m_treewidget->setColumnCount(12);
+    QStringList labels;
+    labels << "Position" << "Artist" << "Album" << "Title" << "Length" << "Url"
+        << "Score" << "Pref" << "Source" << "Bitrate" << "Size" << "Mimetype";
+    m_treewidget->setHeaderLabels(labels);
+    layout->addWidget(m_treewidget);
     setLayout(layout);
     setSizeGripEnabled(true);
 
@@ -44,18 +49,24 @@ XspfDialog::XspfDialog(QString path, PlaydarConnection* playdar, QWidget *parent
 void
 XspfDialog::onXspf(const lastfm::Xspf& xspf)
 {
-    m_model = new XspfModel();
     setWindowTitle(xspf.title());
     int i = 0;
     foreach(const lastfm::Track& t, xspf.tracks()) {
         TrackResolveRequest* req = m_playdar->trackResolve(t.artist(), t.album(), t.title());
-        m_reqmap[req->qid()] = i;
-        m_model->addTrack(t);
+
+        QTreeWidgetItem* item = new QTreeWidgetItem();
+        m_reqmap[req->qid()] = item;
+        item->setData(0, Qt::DisplayRole, QString::number(i));
+        item->setData(1, Qt::DisplayRole, (QString)t.artist());
+        item->setData(2, Qt::DisplayRole, (QString)t.album());
+        item->setData(3, Qt::DisplayRole, (QString)t.title());
+        item->setData(4, Qt::DisplayRole, t.duration());
+        item->setData(5, Qt::DisplayRole, t.url().toString());
+        m_treewidget->addTopLevelItem(item);
+
         connect(req, SIGNAL(result(BoffinPlayableItem)), SLOT(onResolveResult(BoffinPlayableItem)));
         i++;
     }
-
-    m_treeview->setModel(m_model);
 }
 
 void
@@ -63,9 +74,22 @@ XspfDialog::onResolveResult(const BoffinPlayableItem& item)
 {
     TrackResolveRequest* req = qobject_cast<TrackResolveRequest*>(sender());
     if (req) {
-        QMap<QString, int>::const_iterator it = m_reqmap.constFind(req->qid());
+        QMap<QString, QTreeWidgetItem*>::const_iterator it = m_reqmap.constFind(req->qid());
         if (it != m_reqmap.constEnd()) {
-            m_model->addResult(it.value(), item);
+            QTreeWidgetItem* child = new QTreeWidgetItem();
+            child->setFirstColumnSpanned(true);
+            child->setData(1, Qt::DisplayRole, item.artist());
+            child->setData(2, Qt::DisplayRole, item.album());
+            child->setData(3, Qt::DisplayRole, item.track());
+            child->setData(4, Qt::DisplayRole, item.duration());
+            child->setData(5, Qt::DisplayRole, item.url());
+            child->setData(6, Qt::DisplayRole, item.score());
+            child->setData(7, Qt::DisplayRole, item.preference());
+            child->setData(8, Qt::DisplayRole, item.source());
+            child->setData(9, Qt::DisplayRole, item.bitrate());
+            child->setData(10, Qt::DisplayRole, item.size());
+            child->setData(11, Qt::DisplayRole, item.mimetype());
+            it.value()->addChild(child);
         } else {
             qDebug() << "unknown qid " << req->qid();
         }

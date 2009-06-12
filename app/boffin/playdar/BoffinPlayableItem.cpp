@@ -51,8 +51,8 @@ BoffinPlayableItem::fromTrackResolveResult(const QVariantMap& map)
     jsonGetMember(map, "score", result.d->score);
     jsonGetMember(map, "source", result.d->source);
     jsonGetMember(map, "size", result.d->size);
-    jsonGetMember(map, "track", result.d->album);
-    jsonGetMember(map, "url", result.d->album);
+    jsonGetMember(map, "track", result.d->track);
+    jsonGetMember(map, "url", result.d->url);
     return result;
 }
 
@@ -69,8 +69,8 @@ BoffinPlayableItem::fromBoffinRqlResult(const QVariantMap& map)
     jsonGetMember(map, "preference", result.d->preference);
     jsonGetMember(map, "source", result.d->source);
     jsonGetMember(map, "size", result.d->size);
-    jsonGetMember(map, "track", result.d->album);
-    jsonGetMember(map, "url", result.d->album);
+    jsonGetMember(map, "track", result.d->track);
+    jsonGetMember(map, "url", result.d->url);
     jsonGetMember(map, "weight", result.d->weight);
     return result;
 }

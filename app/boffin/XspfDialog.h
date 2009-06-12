@@ -23,8 +23,8 @@
 #include <QMap>
 #include <lastfm/Xspf>
 
-class QTreeView;
-class XspfModel;
+class QTreeWidget;
+class QTreeWidgetItem;
 class XspfReader;
 class PlaydarConnection;
 class BoffinPlayableItem;
@@ -41,11 +41,10 @@ private slots:
     void onResolveResult(const BoffinPlayableItem& item);
 
 private:
-    QTreeView* m_treeview;
-    XspfModel* m_model;
     XspfReader* m_reader;
+    QTreeWidget* m_treewidget;
     PlaydarConnection* m_playdar;
-    QMap<QString, int> m_reqmap;    // map request qid to index
+    QMap<QString, QTreeWidgetItem*> m_reqmap;    // map request qid to index
 };
 
 #endif
