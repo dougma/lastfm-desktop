@@ -69,28 +69,28 @@ public:
             return;
         }
 
-	    m_map.clear();
-	    m_countmap.clear();
+        m_map.clear();
+        m_countmap.clear();
         foreach(const QModelIndex i, selected) {
             m_map.insert(i.data().toString(), i.data(PlaydarTagCloudModel::WeightRole).value<float>());
         }
 
         m_maxTrackCount = 0;
         m_min = FLT_MAX;
-	    m_max = FLT_MIN;
+        m_max = FLT_MIN;
         if (m_req) {
             m_req->disconnect(this);
         }
-	    m_req = playdar->boffinTagcloud( rql );
-	    connect(m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
+        m_req = playdar->boffinTagcloud( rql );
+        connect(m_req, SIGNAL(tagItem(BoffinTagItem)), SLOT(onTagItem(BoffinTagItem)));
 
         //invalidateFilter();
     }
 
     void setMinimumTrackCountFilter( int i = 0 )
     {
-    	m_minimumTrackCountFilter = i;
-    	invalidateFilter();
+        m_minimumTrackCountFilter = i;
+        invalidateFilter();
     }
 
     void showRelevant(bool bShowRelevant)
@@ -114,14 +114,14 @@ public:
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex & source_parent) const
     {
-    	if( m_countmap.isEmpty() && sourceModel()->index(source_row, 0, source_parent)
-								    .data( PlaydarTagCloudModel::CountRole ).toInt() < m_minimumTrackCountFilter )
-    		return false;
+        if( m_countmap.isEmpty() && sourceModel()->index(source_row, 0, source_parent)
+                                    .data( PlaydarTagCloudModel::CountRole ).toInt() < m_minimumTrackCountFilter )
+            return false;
 
-    	if( !m_countmap.isEmpty() &&
-    		m_countmap[sourceModel()->index(source_row, 0, source_parent)
-								    .data().toString()] < m_minimumTrackCountFilter )
-    		return false;
+        if( !m_countmap.isEmpty() &&
+            m_countmap[sourceModel()->index(source_row, 0, source_parent)
+                                    .data().toString()] < m_minimumTrackCountFilter )
+            return false;
 
 
         if (m_showAll)
@@ -136,36 +136,38 @@ protected:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
     {
         if (role == PlaydarTagCloudModel::RelevanceRole) {
+//          if( m_map.isEmpty()) return 0.0;
+
             const QString tagname = mapToSource(index).data().toString();
-        	QMap<QString, float>::const_iterator i = m_map.find(tagname);
+            QMap<QString, float>::const_iterator i = m_map.find(tagname);
             float result;
             if (i == m_map.end()) {
-        		result = 0;
+                result = 0;
             } else if (m_min == m_max) {
-                result = 1.0;
+                result = 0.8;
             } else {
                 const float lw = i.value();
-                result = (lw - m_min) / (m_max - m_min);
+                result = (lw - m_min) / (m_max - m_min) * 0.8;
             }
             return QVariant::fromValue<float>(result);
         } else if( role == Qt::ToolTipRole ) {
-        	int count = 0;
+            int count = 0;
 
-        	//if no tags are selected then display the total track count per tag
-        	if( m_countmap.isEmpty() )
-        	{
-        		count = mapToSource(index).data( PlaydarTagCloudModel::CountRole ).toInt();
-        	}
+            //if no tags are selected then display the total track count per tag
+            if( m_countmap.isEmpty() )
+            {
+                count = mapToSource(index).data( PlaydarTagCloudModel::CountRole ).toInt();
+            }
 
-        	//otherwise calculate the resultant track count based on currently selected tags
+            //otherwise calculate the resultant track count based on currently selected tags
             const QString tagname = mapToSource(index).data().toString();
-        	QMap<QString, int>::const_iterator i = m_countmap.find(tagname);
+            QMap<QString, int>::const_iterator i = m_countmap.find(tagname);
 
-        	if( i != m_countmap.end()) {
-        		count = i.value();
-        	}
-        	return count > 0 ? tr( "%1 tracks" ).arg( count )
-							 : tr( "no tracks" );
+            if( i != m_countmap.end()) {
+                count = i.value();
+            }
+            return count > 0 ? tr( "%L1 tracks" ).arg( count )
+                             : tr( "no tracks" );
         }
 
         return QSortFilterProxyModel::data(index, role);
@@ -177,10 +179,10 @@ private slots:
         const QString& tag = tagitem.m_name;
         float lw = log(tagitem.m_weight);
         if (insertTag(tag, lw)) {
-        	m_countmap[ tag ] = tagitem.m_count;
+            m_countmap[ tag ] = tagitem.m_count;
             invalidateFilter();
         } else {
-        	m_countmap[ tag ] += tagitem.m_count;
+            m_countmap[ tag ] += tagitem.m_count;
         }
         m_maxTrackCount = qMax( m_maxTrackCount, m_countmap[ tag ] );
         // potentially, all our data (ie: the RelevanceRole) has changed
@@ -202,11 +204,11 @@ private slots:
         }
 
         if (logweight < m_min) {
-		    m_min = logweight;
-	    }
-	    if (logweight > m_max) {
-		    m_max = logweight;
-	    }
+            m_min = logweight;
+        }
+        if (logweight > m_max) {
+            m_max = logweight;
+        }
         return result;
     }
 

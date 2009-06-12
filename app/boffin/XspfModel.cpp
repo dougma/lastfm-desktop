@@ -68,8 +68,8 @@ XspfModel::data(const QModelIndex &index, int role /* = Qt::DisplayRole */) cons
         } else {
             lastfm::Track t = m_tracks[index.row()].first;
             switch (index.column()) {
-                case 0: return t.artist();
-                case 1: return t.album();
+                case 0: return (QString)t.artist();
+                case 1: return (QString)t.album();
                 case 2: return t.title();
                 case 3: return t.duration();
                 case 4: return t.url();

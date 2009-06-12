@@ -59,7 +59,7 @@ BoffinRqlRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& ap
 void
 BoffinRqlRequest::receiveResult(const QVariantMap& o)
 {
-    emit BoffinPlayableItem::fromBoffinRqlResult(o);
+    emit playableItem( BoffinPlayableItem::fromBoffinRqlResult(o) );
 }
 
 void

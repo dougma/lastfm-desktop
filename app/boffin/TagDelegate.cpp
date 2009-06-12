@@ -48,11 +48,16 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
 {
     QPen p( Qt::NoPen );
     QBrush b( Qt::NoBrush );
+    int alpha = 255;
+    float tagRelevance = index.data( PlaydarTagCloudModel::RelevanceRole ).value<float>() * 0.8;
+    QColor bc(54,115,213);
+    QColor borderColor = bc;
 
-    float tagRelevance = index.data( PlaydarTagCloudModel::RelevanceRole ).value<float>();
-    QColor bc(255,0,0);
-    bc.setAlphaF( tagRelevance );
-    b = QBrush( bc );
+    	bc.setAlphaF( tagRelevance * 0.5 );
+		borderColor.setAlphaF( tagRelevance );
+	    b = QBrush( bc );
+	    p = QPen( borderColor );
+
 
     QColor const dark = option.palette.color( QPalette::Highlight ).darker();
 
@@ -60,7 +65,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     {
         b = option.state & QStyle::State_Enabled
                 ? option.palette.highlight()
-                : QColor(0x646464);
+                : QColor(0x64, 0x64, 0x64, alpha );
     }
     if( option.state & QStyle::State_MouseOver )
         p = option.palette.color( QPalette::Highlight );
@@ -79,9 +84,11 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     painter->setFont( font( option.font, weight ) );
 
     painter->setRenderHint( QPainter::Antialiasing, false );
-    painter->setPen( option.state & (QStyle::State_Selected|QStyle::State_Active)
-            ? option.palette.color( QPalette::HighlightedText )
-            : option.palette.color( QPalette::Text ) );
+    QColor textColor = option.state & (QStyle::State_Selected|QStyle::State_Active)
+ 					 ? option.palette.color( QPalette::HighlightedText )
+					 : option.palette.color( QPalette::Text );
+ 	textColor.setAlpha( alpha );
+    painter->setPen( textColor );
 
     QString const text = index.data().toString();
     QFontMetrics const metrics = painter->fontMetrics();
