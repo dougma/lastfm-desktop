@@ -67,12 +67,14 @@ BoffinTagRequest::receiveResult(const QVariantMap& o)
     QString tagName, hostName;
     int count;
     double weight;
+    int seconds;
     if (jsonGetMember(o, "name", tagName) &&
         jsonGetMember(o, "source", hostName) &&
         jsonGetMember(o, "count", count) &&
-        jsonGetMember(o, "weight", weight))
+        jsonGetMember(o, "weight", weight) && 
+        jsonGetMember(o, "seconds", seconds))
     {
-        emit tagItem(BoffinTagItem(tagName, hostName, count, static_cast<float>(weight)));
+        emit tagItem(BoffinTagItem(tagName, hostName, count, static_cast<float>(weight), seconds));
     }
 }
 

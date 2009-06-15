@@ -28,17 +28,17 @@
 
 struct BoffinTagItem
 {
-	BoffinTagItem()//: m_valid( false )
+	BoffinTagItem()
 	{}
 
-	BoffinTagItem( const QString& name ): m_name( name )/*, m_valid( false )*/ {};
+	BoffinTagItem( const QString& name ): m_name( name ) {};
 
-    BoffinTagItem(const QString& name, const QString& host, int count, float weight)
+    BoffinTagItem(const QString& name, const QString& host, int count, float weight, int seconds)
         : m_name(name)
         , m_host(host)
         , m_count(count)
         , m_weight(weight)
-//        , m_valid( true )
+        , m_seconds(seconds)
     {
     }
 
@@ -57,7 +57,7 @@ struct BoffinTagItem
     int m_count;
     float m_weight;
     float m_logWeight;
-    //bool m_valid;
+    int m_seconds;          // the total duration of tracks with this tag
 };
 
 class BoffinTagRequest : public CometRequest
