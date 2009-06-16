@@ -106,9 +106,10 @@ public:
         return apiCall(params);
     }
 
+    // boffinTags to obtain tags and weights for a query
     // qid optional
     // rql optional
-    UrlT boffinTagcloud(const StringT& cometSession, const StringT& qid = StringT(), const StringT& rql = StringT())
+    UrlT boffinTags(const StringT& cometSession, const StringT& qid = StringT(), const StringT& rql = StringT())
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
@@ -116,11 +117,12 @@ public:
         if (qid != "") {
             paramsAdd(params, "qid", qid);
         }
-        return makeUrl("/boffin/tagcloud/" + rql, params);
+        return makeUrl("/boffin/tags/" + rql, params);
     }
 
+    // boffinTracks to obtain playable items matching a query
     // qid optional
-    UrlT boffinRql(const StringT& cometSession, const StringT& qid, const StringT& rql)
+    UrlT boffinTracks(const StringT& cometSession, const StringT& qid, const StringT& rql)
     {
         ParamsT params;
         paramsAdd(params, "auth", m_token);
@@ -128,7 +130,20 @@ public:
         if (qid != "") {
             paramsAdd(params, "qid", qid);
         }
-        return makeUrl("/boffin/rql/" + rql, params);
+        return makeUrl("/boffin/tracks/" + rql, params);
+    }
+
+    // boffinSummary provides file count and total play time for a query
+    // qid optional
+    UrlT boffinSummary(const StringT& cometSession, const StringT& qid, const StringT& rql)
+    {
+        ParamsT params;
+        paramsAdd(params, "auth", m_token);
+        paramsAdd(params, "comet", cometSession);
+        if (qid != "") {
+            paramsAdd(params, "qid", qid);
+        }
+        return makeUrl("/boffin/summary/" + rql, params);
     }
 
     UrlT comet(const StringT& session)

@@ -30,7 +30,7 @@
 void 
 BoffinTagRequest::issueRequest(lastfm::NetworkAccessManager* wam, PlaydarApi& api, const QString& rql, const QString& session)
 {
-    QNetworkReply* reply = wam->get(QNetworkRequest(api.boffinTagcloud(session, qid(), rql)));
+    QNetworkReply* reply = wam->get(QNetworkRequest(api.boffinTags(session, qid(), rql)));
     if (reply) {
         connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
         emit requestMade( qid());
