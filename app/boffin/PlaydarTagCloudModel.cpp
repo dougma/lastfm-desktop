@@ -41,8 +41,8 @@ PlaydarTagCloudModel::startGetTags(const QString& rql)
     m_tagList.clear();
 
     m_maxWeight = 0;
-    m_maxLogWeight = FLT_MIN;
-    m_minLogWeight = FLT_MAX;
+    m_maxLogCount = FLT_MIN;
+    m_minLogCount = FLT_MAX;
     m_maxTrackCount = 0;
 
     BoffinTagRequest* req = m_playdar->boffinTagcloud(rql);
@@ -73,21 +73,21 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		if( int i = m_tagListBuffer.indexOf( tag ) >= 0 )
 		{
 			m_tagListBuffer[ i ].m_weight += tag.m_weight;
-			m_tagListBuffer[ i ].m_logWeight = log( m_tagListBuffer[i].m_weight );
             m_tagListBuffer[ i ].m_count += tag.m_count;
+			m_tagListBuffer[ i ].m_logCount = log( m_tagListBuffer[i].m_count );
 			m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
-			m_maxLogWeight = qMax( m_tagListBuffer[i].m_logWeight, m_maxLogWeight);
+			m_maxLogCount = qMax( m_tagListBuffer[i].m_logCount, m_maxLogCount);
 			emit dataChanged( createIndex( i, 0), createIndex( i, 0));
 			break;
 		}
 
 	//	beginInsertRows( QModelIndex(), m_tagListBuffer.size(), m_tagListBuffer.size() + 1);
-			tag.m_logWeight = log( tag.m_weight );
+			tag.m_logCount = log( tag.m_count );
 			m_tagListBuffer << tag;
 			m_maxTrackCount = qMax( tag.m_count, m_maxTrackCount );
 			m_maxWeight = qMax( tag.m_weight, m_maxWeight );
-			m_maxLogWeight = qMax( m_maxLogWeight, tag.m_logWeight );
-			m_minLogWeight = qMin( m_minLogWeight, tag.m_logWeight );
+			m_maxLogCount = qMax( m_maxLogCount, tag.m_logCount );
+			m_minLogCount = qMin( m_minLogCount, tag.m_logCount );
 	//	endInsertRows();
 	} while( false );
 
@@ -148,7 +148,7 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
             }
             QList< BoffinTagItem >::const_iterator i = m_tagList.constBegin();
             i += index.row();
-            return QVariant::fromValue<float>( ( i->m_logWeight - m_minLogWeight ) / (m_maxLogWeight - m_minLogWeight));
+            return QVariant::fromValue<float>( ( i->m_logCount - m_minLogCount ) / (m_maxLogCount - m_minLogCount));
         }
 
         case PlaydarTagCloudModel::CountRole:

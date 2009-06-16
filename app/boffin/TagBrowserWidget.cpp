@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QItemSelectionModel>
 #include <QSlider>
+#include <QLabel>
 #include "TagBrowserWidget.h"
 #include "TagCloudView.h"
 #include "PlaydarTagCloudModel.h"
@@ -39,31 +40,12 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
     m_filter->setSourceModel(m_tagCloudModel);
 
 	QVBoxLayout* vlayout = new QVBoxLayout(this);
-	m_history = new HistoryWidget();
-	m_history->newItem("all");
-	connect(m_history, SIGNAL(clicked(int, QString)),
-			SLOT(onHistoryClicked(int, QString)));
-    QPushButton* button = new QPushButton("filter irrelevant tags");
-    connect(button, SIGNAL(clicked()), SLOT(onFilterClicked()));
-
-    m_trackCountSlider = new QSlider( this );
-    m_trackCountSlider->setMinimum( 0 );
-    m_trackCountSlider->setMaximum( 0 );
-    m_trackCountSlider->setOrientation( Qt::Horizontal );
-    m_trackCountSlider->setTickPosition( QSlider::TicksBelow );
-    connect( m_trackCountSlider, SIGNAL(sliderMoved(int)), SLOT(onSliderChanged( int )));
-
-    vlayout->addWidget(m_trackCountSlider);
-    vlayout->addWidget(button);
-	vlayout->addWidget(m_history);
-
-	connect( m_tagCloudModel, SIGNAL( rowsInserted(QModelIndex,int,int)), SLOT( onModelChanged(QModelIndex,int,int)));
-	connect( m_tagCloudModel, SIGNAL( rowsRemoved(QModelIndex,int,int)), SLOT( onModelChanged(QModelIndex,int,int)));
-
-
 
 	QWidget* w = new QWidget(this);
 
+	m_rqlSentence = new QLabel( this );
+	vlayout->addWidget( m_rqlSentence );
+	
 	m_view = new TagCloudView(w);
 	m_view->setModel(m_filter);
 
@@ -75,12 +57,6 @@ TagBrowserWidget::TagBrowserWidget(PlaydarConnection* playdar, QWidget* parent) 
 			SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
 			SLOT(onSelectionChanged(QItemSelection, QItemSelection)));
 	vlayout->addWidget(m_view);
-
-// not interested in the playlist widget right now:
-//	m_playlistModel = new PlaylistModel(this);
-//	m_playlistWidget = new PlaylistWidget(m_playdar, this);
-//	m_playlistWidget->setModel(m_playlistModel);
-//	vlayout->addWidget(m_playlistWidget);
 
 	m_tagCloudModel->startGetTags();
 
@@ -115,29 +91,20 @@ void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
 
     QString rql = TagBrowserWidget::rql();
     qDebug() << "filtering: " << rql;
+    if( !selected.isEmpty() )
+    if( qFuzzyCompare( 0.0f, selected.last().topLeft().data( PlaydarTagCloudModel::RelevanceRole ).value<float>() ) )
+        qDebug() << "Need to OR!";
+    else
+        qDebug() << "No Need to OR: " << selected.last().topLeft().data( PlaydarTagCloudModel::RelevanceRole ).value<float>() << "!";
+    
     m_filter->setRqlFilter(m_playdar, rql, m_view->selectionModel()->selectedIndexes());
 
+    m_rqlSentence->setText( rql );
+    
 //    ((PlaylistModel*)m_playlistWidget->model())->clear();
 //    m_playlistWidget->loadFromRql(rql);
 
     emit selectionChanged();
-}
-
-
-void
-TagBrowserWidget::onHistoryClicked(int position, const QString& text) {
-	Q_UNUSED(text);
-
-	// move backward to the clicked-button
-	while (m_tags.size() > position) {
-		// the view is deleted after the animation finishes
-		QString t = m_tags.takeLast();
-		QModelIndex i = m_tagCloudModel->indexOf(BoffinTagItem(t));
-		m_view->selectionModel()->select(i, QItemSelectionModel::Deselect);
-		m_view->update(i);
-		m_history->pop();
-	}
-	emit selectionChanged();
 }
 
 void
@@ -145,12 +112,6 @@ TagBrowserWidget::onFilterClicked()
 {
     // toggle the filter:
     m_filter->showRelevant(m_filter->showingAll());
-}
-
-void
-TagBrowserWidget::onModelChanged(const QModelIndex&,int,int)
-{
-	m_trackCountSlider->setMaximum( m_tagCloudModel->maxTrackCount() );
 }
 
 void

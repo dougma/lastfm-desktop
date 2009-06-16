@@ -49,14 +49,14 @@ struct BoffinTagItem
 
     bool operator <( const BoffinTagItem& that ) const
     {
-    	return m_weight < that.m_weight;
+    	return m_count < that.m_count;
     }
 
     QString m_name;
     QString m_host;
     int m_count;
     float m_weight;
-    float m_logWeight;
+    float m_logCount;
     int m_seconds;          // the total duration of tracks with this tag
 };
 

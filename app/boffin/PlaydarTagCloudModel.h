@@ -81,8 +81,8 @@ private:
     int m_maxTrackCount;
 
     float m_maxWeight;
-    float m_maxLogWeight;
-    float m_minLogWeight;
+    float m_maxLogCount;
+    float m_minLogCount;
 
     class QTimer* m_loadingTimer;
 };

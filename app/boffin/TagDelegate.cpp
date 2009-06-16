@@ -53,10 +53,10 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     QColor bc(54,115,213);
     QColor borderColor = bc;
 
-    	bc.setAlphaF( tagRelevance * 0.5 );
-		borderColor.setAlphaF( tagRelevance );
-	    b = QBrush( bc );
-	    p = QPen( borderColor );
+    bc.setAlphaF( tagRelevance * 0.5 );
+    borderColor.setAlphaF( tagRelevance );
+    b = QBrush( bc );
+    p = QPen( borderColor );
 
 
     QColor const dark = option.palette.color( QPalette::Highlight ).darker();
@@ -67,6 +67,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
                 ? option.palette.highlight()
                 : QColor(0x64, 0x64, 0x64, alpha );
     }
+    
     if( option.state & QStyle::State_MouseOver )
         p = option.palette.color( QPalette::Highlight );
 
