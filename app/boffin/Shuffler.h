@@ -20,7 +20,6 @@
 #ifndef SHUFFLER_H
 #define SHUFFLER_H
 
-//#include <QObject>
 #include <QStringList>
 #include "playdar/BoffinPlayableItem.h"
 #include "sample/SampleFromDistribution.h"
@@ -37,7 +36,9 @@ public:
     BoffinPlayableItem sampleOne();
     const ItemList& items();
     void setArtistHistorySize(unsigned size);
+    void setSongHistorySize(unsigned size);
     void clear();
+    void clearHistory();
 
 public slots:
     void receivePlayableItem(BoffinPlayableItem item);
@@ -46,6 +47,7 @@ private:
     BoffinPlayableItem sample();
     void result(const BoffinPlayableItem& item);
     float pushdown(const BoffinPlayableItem& item);
+    float pushdownSong(const BoffinPlayableItem& item);
 
     struct AccessPolicy
     {
@@ -75,6 +77,8 @@ private:
     ItemList m_items;               // items arrive here
     QStringList m_artistHistory;
     int m_artistHistorySize;
+    QList<BoffinPlayableItem> m_songHistory;
+    int m_songHistorySize;
 };
 
 #endif
