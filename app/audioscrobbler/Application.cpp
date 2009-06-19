@@ -1,3 +1,4 @@
+
 /*
    Copyright 2005-2009 Last.fm Ltd. 
       - Primarily authored by Max Howell, Jono Cole and Doug Mansell
@@ -76,7 +77,6 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 /// mediator
     mediator = new PlayerMediator(this);
     connect(mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), SLOT(setConnection( PlayerConnection* )) );
-    connect(new LegacyPlayerListener(mediator), SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)) );
 
 /// listeners
     try{
@@ -85,6 +85,7 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
         connect(itunes, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
         itunes->start();
     #endif
+        
         QObject* o = new PlayerListener(mediator);
         connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
         o = new LegacyPlayerListener(mediator);
