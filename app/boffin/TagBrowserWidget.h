@@ -235,7 +235,8 @@ class TagBrowserWidget : public QWidget
 public:
     TagBrowserWidget(PlaydarConnection*, QWidget* parent = 0);
 
-    QString rql();
+    QString human() const;
+    QString rql() const;
     QStringList selectedTags() const;
 
 signals:
@@ -247,8 +248,7 @@ private slots:
     void onSliderChanged( int );
 
 private:
-    HistoryWidget* m_history;
-    
+    class QStringList m_rql;
     class QLabel* m_rqlSentence;
 
     TagCloudView* m_view;

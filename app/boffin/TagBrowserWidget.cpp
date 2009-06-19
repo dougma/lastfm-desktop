@@ -73,33 +73,70 @@ TagBrowserWidget::selectedTags() const
     return tags;
 }
 
-QString
-TagBrowserWidget::rql()
+QString 
+TagBrowserWidget::rql() const
 {
-    QStringList tags;
-    foreach(const QString& s, selectedTags()) {
-    	tags << "tag:\"" + s + '"';
+    QString r;
+    foreach( QString s, m_rql )
+    {
+        if( s == "and" || s == "or" ) {
+            r += " " + s + " ";
+            continue;
+        }
+        r += "tag:\"" + s + "\"";
     }
-	return tags.join(" and ");
+    return r;
+}
+
+QString
+TagBrowserWidget::human() const
+{
+    return m_rql.join( " " );
 }
 
 void TagBrowserWidget::onSelectionChanged(const QItemSelection& selected,
 		const QItemSelection& deselected)
 {
-    Q_UNUSED(selected);
-    Q_UNUSED(deselected);
 
-    QString rql = TagBrowserWidget::rql();
-    qDebug() << "filtering: " << rql;
     if( !selected.isEmpty() )
-    if( qFuzzyCompare( 0.0f, selected.last().topLeft().data( PlaydarTagCloudModel::RelevanceRole ).value<float>() ) )
-        qDebug() << "Need to OR!";
-    else
-        qDebug() << "No Need to OR: " << selected.last().topLeft().data( PlaydarTagCloudModel::RelevanceRole ).value<float>() << "!";
+    {
+        //New Tag Selected
+        
+        const QModelIndex selectedIndex = selected.last().topLeft();
+        
+        if( !m_rql.isEmpty() ) {
+            if( qFuzzyCompare( 0.0f, selectedIndex.data( PlaydarTagCloudModel::RelevanceRole ).value<float>() ) ) {
+                m_rql << "or";
+            } else {
+                m_rql << "and";
+            }
+        }
+        m_rql << selectedIndex.data().toString();
+    }
     
-    m_filter->setRqlFilter(m_playdar, rql, m_view->selectionModel()->selectedIndexes());
+    else if( !deselected.isEmpty() )
+    {
+        //Tag DeSelected
+        
+        const QModelIndex deSelectedIndex = deselected.last().topLeft();
+        
+        int i = m_rql.indexOf( deSelectedIndex.data().toString() );
+        if( i == 0 ) {
+            m_rql.removeAt( 0 );
+            m_rql.removeAt( 0 );
+        } else {
+            m_rql.removeAt( i );
+            m_rql.removeAt( i-1 );
+        }
+        
+        qDebug() << "Deselecting: " << deSelectedIndex.data().toString();
+    }
 
-    m_rqlSentence->setText( rql );
+    qDebug() << "filtering: " << rql();
+        
+    m_filter->setRqlFilter(m_playdar, rql(), m_view->selectionModel()->selectedIndexes());
+ 
+    m_rqlSentence->setText( human() );
     
 //    ((PlaylistModel*)m_playlistWidget->model())->clear();
 //    m_playlistWidget->loadFromRql(rql);
