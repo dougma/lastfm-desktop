@@ -37,7 +37,7 @@ class PlaydarTagCloudModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole, CountRole, RelevanceRole };
+    enum CustomRoles { WeightRole = Qt::UserRole, LinearWeightRole, CountRole, SecondsRole, RelevanceRole };
 
     PlaydarTagCloudModel(PlaydarConnection *playdar);
     ~PlaydarTagCloudModel(void);
@@ -79,6 +79,8 @@ private:
     BoffinTagItem m_tag;    // the last tag provided via onTags
 
     int m_maxTrackCount;
+    int m_totalTracks;
+    int m_totalDuration;
 
     float m_maxWeight;
     float m_maxLogCount;

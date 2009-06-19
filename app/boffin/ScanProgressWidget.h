@@ -81,6 +81,9 @@ public:
     virtual void paintEvent( QPaintEvent* );
     virtual void timerEvent( QTimerEvent* );
 
+signals:
+    void statusMessage( QString );
+
 public slots:
     void onNewDirectory( const QString& );
     void onNewTrack( const Track& );
@@ -88,4 +91,7 @@ public slots:
 
 private slots:
     void onImageFucked();
+
+private:
+    void updateStatusMessage();
 };
