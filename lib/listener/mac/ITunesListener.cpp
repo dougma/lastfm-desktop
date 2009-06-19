@@ -151,7 +151,8 @@ ITunesDictionaryHelper::determineTrackInformation()
     artist = token<QString>( CFSTR("Artist") );
     album = token<QString>( CFSTR("Album") );
     name = token<QString>( CFSTR("Name") );
-    pid = token<QString>( CFSTR("PersistentID") );
+    pid = QString::number( token<int>( CFSTR("PersistentID") ) );
+
     
     // Get path decoded - iTunes encodes the file location as URL
     CFStringRef location = token<CFStringRef>( CFSTR("Location") );
