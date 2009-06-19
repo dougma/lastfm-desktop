@@ -25,6 +25,8 @@
 
 /** all quite messy, apologies --mxcl */
 
+#define MAX_IMAGE_COUNT 15
+
 
 ScanProgressWidget::ScanProgressWidget()
 {
@@ -46,38 +48,41 @@ ScanProgressWidget::onNewDirectory( const QString& directory )
 {
     paths += directory;
     if (paths.size() > 60) paths.pop_front();
+    update();
 }
 
 
 void
 ScanProgressWidget::onNewTrack( const Track& t )
 {
-    
     int& i = count( t.artist() );
     i++;
-    paths += t.url().path();
 
     m_artist_count = track_counts.size();
     m_track_count++;
 
-    // so this is a time saving way to keep the list the size of the screen
-    // it goes over a bit almost certainly, but it's ok
-    if (paths.size() > 60)
-        paths.pop_front();
+    updateStatusMessage();
+
+    if (t.url().isValid()) {
+        paths += t.url().path();
+        // so this is a time saving way to keep the list the size of the screen
+        // it goes over a bit almost certainly, but it's ok
+        if (paths.size() > 60)
+            paths.pop_front();
+    }
     
-    if (i == 1)
-    {
+    if (i == 1 && images.size() < MAX_IMAGE_COUNT) {
         QObject* o = new ImageFucker( t.artist() );
         connect( o, SIGNAL(fucked()), SLOT(onImageFucked()) );
         o->setParent( this );
     }
 }
 
-
 void
 ScanProgressWidget::onFinished()
 {
     m_done = true;
+    updateStatusMessage();
     repaint();
 }
 
@@ -87,17 +92,7 @@ ScanProgressWidget::paintEvent( QPaintEvent* )
 {
     QPainter p( this );    
     int y = height() - 6;
-    QString text;
 
-    if (m_artist_count != 0 && m_track_count != 0)
-    {
-        text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
-        if (m_done) text.prepend( tr("Preparation complete. ") );
-    }
-    else
-        text = tr("Scanning...");
-
-    p.drawText( 6, height() - 6, text );
     p.setPen( Qt::lightGray );
     foreach (QString const path, paths)
     {
@@ -150,14 +145,17 @@ ScanProgressWidget::timerEvent( QTimerEvent* )
 #endif
 
         images[i]->steps++;
-        
+
         if (steps == 200) remove.prepend( i );
     }
     
+    bool needUpdate = images.count();
+
     foreach (int i, remove)
         images.takeAt( i )->deleteLater();
 
-    update();
+    if (needUpdate)
+        update();
 }
 
 
@@ -167,6 +165,23 @@ ScanProgressWidget::onImageFucked()
     ImageFucker* fucker = (ImageFucker*)sender();
     fucker->x = rand() % width();
     images += fucker;
+}
+
+void
+ScanProgressWidget::updateStatusMessage()
+{
+    QString text;
+
+    if (m_artist_count != 0 && m_track_count != 0)
+    {
+        text = tr("Found %L1 artists and %L2 tracks").arg( m_artist_count ).arg( m_track_count );
+        if (m_done) text.prepend( tr("Scanning complete. ") );
+    }
+    else
+        text = tr("Scanning...");
+
+    emit statusMessage(text);
+    //p.drawText( 6, height() - 6, text );
 }
 
 
@@ -225,3 +240,4 @@ ImageFucker::onImageDownloaded()
 
     emit fucked();
 }
+

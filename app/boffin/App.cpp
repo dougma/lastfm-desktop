@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QShortcut>
 #include <QComboBox>
+#include <QStatusBar>
 #include <QVBoxLayout>
 #include <phonon/audiooutput.h>
 #include <phonon/backendcapabilities.h>
@@ -37,6 +38,7 @@
 #include "ScrobSocket.h"
 #include "TrackSource.h"
 #include "Shuffler.h"
+#include "LocalCollectionScanner.h"
 #include "playdar/PlaydarConnection.h"
 #include "PlaydarTagCloudModel.h"
 #include "Playlist.h"
@@ -140,7 +142,7 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( window->ui.play, SIGNAL(triggered()), SLOT(play()) );
     connect( window->ui.pause, SIGNAL(toggled( bool )), m_pipe, SLOT(setPaused( bool )) );
     connect( window->ui.skip, SIGNAL(triggered()), m_pipe, SLOT(skip()) );
-    connect( window->ui.rescan, SIGNAL(triggered()), SLOT(startAgain()) );
+    connect( window->ui.rescan, SIGNAL(triggered()), SLOT(onRescan()) );
     connect( window->ui.xspf, SIGNAL(triggered()), SLOT(xspf()) );
     connect( m_mainwindow->ui.wordle, SIGNAL( triggered()), SLOT( onWordle()));
 
@@ -148,11 +150,16 @@ App::init( MainWindow* window ) throw( int /*exitcode*/ )
     connect( cut, SIGNAL(activated()), SLOT(playPause()) );
     cut->setContext( Qt::ApplicationShortcut );
 
-    onScanningFinished();
-
-/// go!
-    //if (!scan( false ))
-    //    throw 1; //abort app
+    m_mainwindow->ui.play->setEnabled( true );
+    m_mainwindow->ui.pause->setEnabled( false );
+    m_mainwindow->ui.skip->setEnabled( false );
+    m_mainwindow->ui.rescan->setEnabled( true );
+    m_mainwindow->ui.wordle->setEnabled( true );
+    
+    connect(m_playdar->hostsModel(), SIGNAL(modelReset()), m_mainwindow, SLOT(onSourcesReset()));
+    connect(m_playdar, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
+    connect(m_playdar, SIGNAL(connected()), SLOT(newTagcloud()));
+    m_playdar->start();
 }
 
 
@@ -185,24 +192,14 @@ App::onScanningFinished()
     if (sender())
         disconnect( sender(), 0, this, 0 ); //only once pls
 
-    m_mainwindow->ui.play->setEnabled( true );
-    m_mainwindow->ui.pause->setEnabled( false );
-    m_mainwindow->ui.skip->setEnabled( false );
-    m_mainwindow->ui.rescan->setEnabled( true );
-    m_mainwindow->ui.wordle->setEnabled( true );
-    
-    connect(m_playdar->hostsModel(), SIGNAL(modelReset()), m_mainwindow, SLOT(onSourcesReset()));
-    connect(m_playdar, SIGNAL(changed(QString)), m_mainwindow->ui.playdarStatus, SLOT(setText(QString)));
-    connect(m_playdar, SIGNAL(connected()), SLOT(onPlaydarConnected()));
-    m_playdar->start();
 }
 
 void
-App::onPlaydarConnected()
+App::newTagcloud()
 {
+    delete m_tagcloud;
     m_tagcloud = new TagBrowserWidget( m_playdar );
     connect( m_tagcloud, SIGNAL( selectionChanged()), SLOT( tagsChanged() ));
-//    m_tagcloud->setFrameStyle( QFrame::NoFrame );
     m_mainwindow->setCentralWidget( m_tagcloud );
 }
 
@@ -375,4 +372,30 @@ void
 App::onPlaydarAuth(const QString& auth)
 {
     unicorn::UserSettings().setValue(PLAYDAR_AUTHTOKEN_KEY, auth);
+}
+
+void 
+App::onRescan()
+{
+    PickDirsDialog* dlg = new PickDirsDialog(m_mainwindow);
+    if (QDialog::Accepted == dlg->exec()) {
+        QStringList directories = dlg->dirs();
+        if (directories.size()) {
+            LocalCollectionScanner *scanner = new LocalCollectionScanner(this);
+            m_scanWidget = new ScanProgressWidget();
+            connect(scanner, SIGNAL(track(Track)), m_scanWidget, SLOT(onNewTrack(Track)));
+            connect(scanner, SIGNAL(directory(QString)), m_scanWidget, SLOT(onNewDirectory(QString)));
+            connect(scanner, SIGNAL(finished()), m_scanWidget, SLOT(onFinished()));
+            connect(scanner, SIGNAL(finished()), SLOT(newTagcloud()));
+            connect(m_scanWidget, SIGNAL(statusMessage(QString)), m_mainwindow->statusBar(), SLOT(showMessage(QString)));
+
+            // TODO: fix hard coded paths here!
+            scanner->run(
+                QDir("c:\\cygwin\\home\\doug\\src\\playdar\\win32\\debug\\bin\\"), 
+                "c:\\cygwin\\home\\doug\\src\\playdar\\win32\\collection.db", 
+                directories);
+
+            m_mainwindow->setCentralWidget(m_scanWidget);
+        }
+    }
 }

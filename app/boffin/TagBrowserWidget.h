@@ -152,25 +152,47 @@ protected:
             return QVariant::fromValue<float>(result);
         } else if( role == Qt::ToolTipRole ) {
             int count = 0;
+            int duration = 0;
+
+            QModelIndex srcindex( mapToSource(index) );
 
             //if no tags are selected then display the total track count per tag
             if( m_countmap.isEmpty() )
             {
-                count = mapToSource(index).data( PlaydarTagCloudModel::CountRole ).toInt();
+                count = srcindex.data( PlaydarTagCloudModel::CountRole ).toInt();
+                duration = srcindex.data( PlaydarTagCloudModel::SecondsRole ).toInt();
             }
 
             //otherwise calculate the resultant track count based on currently selected tags
-            const QString tagname = mapToSource(index).data().toString();
+            const QString tagname = srcindex.data().toString();
             QMap<QString, int>::const_iterator i = m_countmap.find(tagname);
 
             if( i != m_countmap.end()) {
                 count = i.value();
             }
-            return count > 0 ? tr( "%L1 tracks" ).arg( count )
+            return count > 0 ? tr( "%L1 tracks" ).arg( count ) + formatDuration(duration)
                              : tr( "no tracks" );
         }
 
         return QSortFilterProxyModel::data(index, role);
+    }
+
+    static QString formatDuration(int seconds)
+    {
+        if (seconds == 0)
+            return QString();
+
+        int mins = seconds / mins;
+        int hours = mins / 60;
+        if (hours)
+            return QString(" %1:%2:%3")
+                .arg(hours)
+                .arg(mins, 2, 10, QChar('0'))
+                .arg(seconds % 60, 2, 10, QChar('0'));
+
+        return QString(" %1:%2")
+            .arg(mins)
+            .arg(seconds % 60, 2, 10, QChar('0'));
     }
 
 private slots:

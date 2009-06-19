@@ -35,6 +35,7 @@ class QItemSelection;
 class PlaydarTagCloudModel;
 class Shuffler;
 class TrackSource;
+class ScanProgressWidget;
 
 namespace lastfm{ class Track; }
 
@@ -59,7 +60,6 @@ private slots:
     void onOutputDeviceActionTriggered( class QAction* );
 
     void tagsChanged();
-    void onPlaydarConnected();
     void onReadyToPlay();
     void onPlaydarTracksReady( BoffinPlayableItem );
     void onPlaydarAuth(const QString&);
@@ -68,6 +68,8 @@ private slots:
     void onResumed();
     void onPaused();
     void onStopped();
+    void onRescan();
+    void newTagcloud();
 
     void onScanningFinished();
     void onPlaybackError( const QString& );
@@ -78,6 +80,7 @@ private:
 
     class MainWindow* m_mainwindow;
     class TagBrowserWidget* m_tagcloud;
+    class ScanProgressWidget* m_scanWidget;
     class ScrobSocket* m_scrobsocket;
     class MediaPipeline* m_pipe;        // pipe pulls from tracksource
     class TrackSource* m_tracksource;   // tracksource pulls from shuffler
