@@ -26,9 +26,19 @@
 
 namespace moose
 {
+#ifdef WIN32
+    struct HklmSettings : QSettings
+    {
+        HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
+        {}
+    };
+#endif
+
+
     static inline const char* id() { return "Lastfm-F396D8C8-9595-4f48-A319-48DCB827AD8F"; }
     /** passed to QCoreApplication::setApplicationName() */
     static inline const char* applicationName() { return "Last.fm"; }
+
 
     static inline QString path()
     {
@@ -46,11 +56,13 @@ namespace moose
             return lastfm::dir::programFiles().filePath( "Last.fm/Last.fm.exe" );
         #endif
     }
-    
+
     static inline QDir dir()
     {
         return QFileInfo( path() ).absoluteDir();
     }
+
+
 
     enum ItemDataRole
     {

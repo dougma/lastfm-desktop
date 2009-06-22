@@ -56,6 +56,7 @@ struct BoffinTagItem
     QString m_host;
     int m_count;
     float m_weight;
+    float m_logWeight;
     float m_logCount;
     int m_seconds;          // the total duration of tracks with this tag
 };

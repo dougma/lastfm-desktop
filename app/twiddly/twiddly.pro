@@ -1,5 +1,6 @@
 LIBS += -lunicorn -llastfm
 QT = core xml sql
+CONFIG += lastfm
 
 include( $$ROOT_DIR/admin/include.qmake )
 
