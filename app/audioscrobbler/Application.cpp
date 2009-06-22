@@ -1,3 +1,4 @@
+
 /*
    Copyright 2005-2009 Last.fm Ltd. 
       - Primarily authored by Max Howell, Jono Cole and Doug Mansell
@@ -30,6 +31,8 @@
 #endif
 #include <lastfm/Audioscrobbler>
 #include <QMenu>
+#include "TagDialog.h"
+#include "ShareDialog.h"
 
 using audioscrobbler::Application;
 
@@ -52,9 +55,12 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 /// tray menu
     QMenu* menu = new QMenu;
     m_title_action = menu->addAction(tr("Ready"));
-    menu->addAction(tr("Love"));
-    menu->addAction(tr("Tag")+ELLIPSIS);
-    menu->addAction(tr("Share")+ELLIPSIS);
+    m_love_action = menu->addAction(tr("Love"));
+    connect( m_love_action, SIGNAL(triggered()), SLOT(onLoveTriggered()));
+    m_tag_action = menu->addAction(tr("Tag")+ELLIPSIS);
+    connect( m_tag_action, SIGNAL(triggered()), SLOT(onTagTriggered()));
+    m_share_action = menu->addAction(tr("Share")+ELLIPSIS);
+    connect( m_share_action, SIGNAL(triggered()), SLOT(onShareTriggered()));
     menu->addSeparator();
     m_submit_scrobbles_toggle = menu->addAction(tr("Submit Scrobbles"));
 #ifdef Q_WS_MAC
@@ -81,7 +87,6 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 /// mediator
     mediator = new PlayerMediator(this);
     connect(mediator, SIGNAL(activeConnectionChanged( PlayerConnection* )), SLOT(setConnection( PlayerConnection* )) );
-    connect(new LegacyPlayerListener(mediator), SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)) );
 
 /// listeners
     try{
@@ -90,6 +95,7 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
         connect(itunes, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
         itunes->start();
     #endif
+        
         QObject* o = new PlayerListener(mediator);
         connect(o, SIGNAL(newConnection(PlayerConnection*)), mediator, SLOT(follow(PlayerConnection*)));
         o = new LegacyPlayerListener(mediator);
@@ -159,6 +165,7 @@ Application::onTrackStarted(const Track& t, const Track& oldtrack)
     
     ScrobblePoint timeout(t.duration()/2);
     watch = new StopWatch(timeout, connection->elapsed());
+    watch->resume();
     connect(watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()));
 }
 
@@ -195,4 +202,25 @@ Application::onStopped()
         
     delete watch;
     as->submit();
+}
+
+void 
+Application::onTagTriggered()
+{
+    TagDialog* td = new TagDialog( mw->currentTrack(), mw );
+    td->show();
+}
+
+void 
+Application::onShareTriggered()
+{
+    ShareDialog* sd = new ShareDialog( mw->currentTrack(), mw );
+    sd->show();
+}
+
+void 
+Application::onLoveTriggered()
+{
+    MutableTrack t( mw->currentTrack());
+    t.love();
 }

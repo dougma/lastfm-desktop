@@ -43,14 +43,25 @@ namespace audioscrobbler
         
         QAction* m_submit_scrobbles_toggle;
         QAction* m_title_action;
+        QAction* m_love_action;
+        QAction* m_tag_action;
+        QAction* m_share_action;
         
     public:
         Application(int& argc, char** argv);
-
+        
+        QAction* loveAction() const{ return m_love_action; }
+        QAction* tagAction() const{ return m_tag_action; }
+        QAction* shareAction() const{ return m_share_action; }
+        
     private slots:
         void onTrayActivated(QSystemTrayIcon::ActivationReason);
         void onStopWatchTimedOut();
         void setConnection(PlayerConnection*);
+        
+        void onLoveTriggered();
+        void onTagTriggered();
+        void onShareTriggered();
         
         void onTrackStarted(const Track&, const Track&);
         void onPaused();
