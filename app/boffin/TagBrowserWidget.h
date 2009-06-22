@@ -226,10 +226,10 @@ private slots:
         if (m_logCountMap.contains(tag)) {
             m_countMap[tag] += count;
             //log is not a distributive function so need to log total count
-            m_logCountMap[tag] = log( m_countMap[tag] );
+            m_logCountMap[tag] = log( (float) m_countMap[tag] );
             result = false;
         } else {
-            m_logCountMap[tag] = log( count );
+            m_logCountMap[tag] = log( (float) count );
             m_countMap[ tag ] = count;
             result = true;
         }

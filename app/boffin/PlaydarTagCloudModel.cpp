@@ -76,7 +76,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		{
 			m_tagListBuffer[ i ].m_weight += tag.m_weight;
             m_tagListBuffer[ i ].m_count += tag.m_count;
-			m_tagListBuffer[ i ].m_logCount = log( m_tagListBuffer[i].m_count );
+			m_tagListBuffer[ i ].m_logCount = log( (float) m_tagListBuffer[i].m_count );
 			m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
 			m_maxLogCount = qMax( m_tagListBuffer[i].m_logCount, m_maxLogCount);
 			emit dataChanged( createIndex( i, 0), createIndex( i, 0));
@@ -84,7 +84,7 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 		}
 
 	//	beginInsertRows( QModelIndex(), m_tagListBuffer.size(), m_tagListBuffer.size() + 1);
-			tag.m_logCount = log( tag.m_count );
+			tag.m_logCount = log( (float) tag.m_count );
 			m_tagListBuffer << tag;
 			m_maxTrackCount = qMax( tag.m_count, m_maxTrackCount );
 			m_maxWeight = qMax( tag.m_weight, m_maxWeight );
