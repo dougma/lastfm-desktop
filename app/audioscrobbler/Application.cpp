@@ -25,11 +25,16 @@
 #include "lib/listener/PlayerListener.h"
 #include "lib/listener/PlayerMediator.h"
 #include "lib/listener/legacy/LegacyPlayerListener.h"
+#ifdef Q_WS_MAC
 #include "lib/listener/mac/ITunesListener.h"
+#endif
 #include <lastfm/Audioscrobbler>
 #include <QMenu>
+
 using audioscrobbler::Application;
+
 #define ELLIPSIS QString::fromUtf8("…")
+
 #ifdef Q_WS_X11
     #define AS_TRAY_ICON ":16x16.png"
 #else

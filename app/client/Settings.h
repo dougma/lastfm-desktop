@@ -22,6 +22,7 @@
 
 #include <lastfm/ScrobblePoint>
 #include "lib/unicorn/UnicornSettings.h"
+#include "app/moose.h"
 
 
 namespace moose
@@ -49,14 +50,6 @@ namespace moose
         void setFingerprintingEnabled( bool b ) { UserSettings().setValue( "FingerprintingEnabled", b ); }
         void setAudioOutputDeviceName( QString s ) { QSettings().setValue( "OutputDevice", s ); }
     };
-
-#ifdef WIN32
-    struct HklmSettings : QSettings
-    {
-        HklmSettings() : QSettings( "HKEY_LOCAL_MACHINE\\Software\\Last.fm\\Client", QSettings::NativeFormat )
-        {}
-    };
-#endif
 }
 
 

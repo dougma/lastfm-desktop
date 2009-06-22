@@ -21,10 +21,10 @@
 //TODO #include "DiagnosticsDialog/SendLogsDialog.h"
 #include "app/twiddly.h"
 #include "lib/unicorn/UnicornCoreApplication.h"
-#include "../../../liblastfm/src/scrobble/ScrobbleCache.h"
 #include <lastfm/Audioscrobbler>
 #include <lastfm/misc.h>
 #include <lastfm/Scrobble>
+#include <lastfm/ScrobbleCache>
 #include <lastfm/ws.h>
 #include <QByteArray>
 #include <QHeaderView>
@@ -128,7 +128,7 @@ DiagnosticsDialog::scrobbleActivity( int msg )
 void
 DiagnosticsDialog::onScrobblePointReached()
 {    
-    ScrobbleCache cache( lastfm::ws::Username );
+    lastfm::ScrobbleCache cache( lastfm::ws::Username );
 
     QList<QTreeWidgetItem *> items;
     foreach (Track t, cache.tracks())
