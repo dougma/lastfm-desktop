@@ -23,6 +23,7 @@
 
 #ifdef WIN32
 
+#include <lastfm/Track>
 #include "plugins/iTunes/ITunesTrack.h"
 #include <QSharedData>
 #include <QSharedDataPointer>
@@ -108,7 +109,7 @@ struct IPodLibraryTrackData : public ITunesLibraryTrackData
           *
           * @defined ITunesLibrary.cpp
           */
-        Track lastfmTrack() const;
+        lastfm::Track lastfmTrack() const;
     };
 
 
