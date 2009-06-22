@@ -22,9 +22,9 @@
 
 #include <QDialog>
 #include <lastfm/User>
+#include "lib/DllExportMacro.h"
 
-
-class FriendsPicker : public QDialog
+class UNICORN_DLLEXPORT FriendsPicker : public QDialog
 {
     Q_OBJECT
 
