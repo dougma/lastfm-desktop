@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = audioscrobbler
 VERSION = 2.0.0
 QT = core gui xml network
-CONFIG += lastfm
-LIBS += -lunicorn -llistener
+CONFIG += lastfm unicorn
+LIBS += -llistener
 DEFINES += LASTFM_COLLAPSE_NAMESPACE
 include( $$ROOT_DIR/admin/include.qmake )
