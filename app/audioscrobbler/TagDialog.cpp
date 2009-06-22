@@ -122,7 +122,6 @@ TagDialog::accept()
     m_track.artist().addTags( ui.appliedTags->ui.artist->newTags() );
     m_track.album().addTags( ui.appliedTags->ui.album->newTags() );
 
-    // don't ask me, ask anil why there is no setTags or removeTags
     foreach (QString tag, ui.appliedTags->ui.track->deletedTags())
         m_track.removeTag( tag );
     

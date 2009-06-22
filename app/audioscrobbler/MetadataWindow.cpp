@@ -29,6 +29,7 @@
 #include <QTextFrame>
 #include <QTextFrameFormat>
 #include <QVBoxLayout>
+#include "Application.h"
 
 static inline ImageButton* ib(const char* s)
 {
@@ -43,9 +44,16 @@ MetadataWindow::MetadataWindow()
 
     QHBoxLayout* h = new QHBoxLayout;
     h->addStretch();
-    h->addWidget(ib(":love.png"));
-    h->addWidget(ib(":tag.png"));
-    h->addWidget(ib(":share.png"));
+    
+    h->addWidget(ui.love = ib(":love.png"));
+    ui.love->setAction( ((audioscrobbler::Application*)qApp)->loveAction() );
+    
+    h->addWidget(ui.tag = ib(":tag.png"));
+    ui.tag->setAction( ((audioscrobbler::Application*)qApp)->tagAction() );
+    
+    h->addWidget(ui.share = ib(":share.png"));
+    ui.share->setAction( ((audioscrobbler::Application*)qApp)->shareAction() );
+    
     h->addStretch();
 
     QVBoxLayout* v = new QVBoxLayout(centralWidget());
@@ -92,7 +100,7 @@ MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
 
     ui.bio->clear();
     ui.artist_image->clear();
-
+    m_currentTrack = t;
     connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
 //    connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
 }
@@ -140,4 +148,5 @@ MetadataWindow::onStopped()
     ui.bio->clear();
     ui.artist_image->clear();
     ui.title->clear();
+    m_currentTrack = Track();
 }

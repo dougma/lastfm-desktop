@@ -29,6 +29,9 @@
 #include "lib/listener/mac/ITunesListener.h"
 #include <lastfm/Audioscrobbler>
 #include <QMenu>
+#include "TagDialog.h"
+#include "ShareDialog.h"
+
 using audioscrobbler::Application;
 #define ELLIPSIS QString::fromUtf8("…")
 #ifdef Q_WS_X11
@@ -48,9 +51,12 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 /// tray menu
     QMenu* menu = new QMenu;
     m_title_action = menu->addAction(tr("Ready"));
-    menu->addAction(tr("Love"));
-    menu->addAction(tr("Tag")+ELLIPSIS);
-    menu->addAction(tr("Share")+ELLIPSIS);
+    m_love_action = menu->addAction(tr("Love"));
+    connect( m_love_action, SIGNAL(triggered()), SLOT(onLoveTriggered()));
+    m_tag_action = menu->addAction(tr("Tag")+ELLIPSIS);
+    connect( m_tag_action, SIGNAL(triggered()), SLOT(onTagTriggered()));
+    m_share_action = menu->addAction(tr("Share")+ELLIPSIS);
+    connect( m_share_action, SIGNAL(triggered()), SLOT(onShareTriggered()));
     menu->addSeparator();
     m_submit_scrobbles_toggle = menu->addAction(tr("Submit Scrobbles"));
 #ifdef Q_WS_MAC
@@ -155,6 +161,7 @@ Application::onTrackStarted(const Track& t, const Track& oldtrack)
     
     ScrobblePoint timeout(t.duration()/2);
     watch = new StopWatch(timeout, connection->elapsed());
+    watch->resume();
     connect(watch, SIGNAL(timeout()), SLOT(onStopWatchTimedOut()));
 }
 
@@ -191,4 +198,25 @@ Application::onStopped()
         
     delete watch;
     as->submit();
+}
+
+void 
+Application::onTagTriggered()
+{
+    TagDialog* td = new TagDialog( mw->currentTrack(), mw );
+    td->show();
+}
+
+void 
+Application::onShareTriggered()
+{
+    ShareDialog* sd = new ShareDialog( mw->currentTrack(), mw );
+    sd->show();
+}
+
+void 
+Application::onLoveTriggered()
+{
+    MutableTrack t( mw->currentTrack());
+    t.love();
 }

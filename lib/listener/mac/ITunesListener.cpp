@@ -287,7 +287,7 @@ ITunesListener::setupCurrentTrack()
 
     m_previousPid = s.readLine();
         
-    if (!path.isEmpty())
+    if (!artist.isEmpty())
     {
         MutableTrack t;
         t.setArtist( artist );

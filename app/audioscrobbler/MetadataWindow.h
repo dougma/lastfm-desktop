@@ -37,6 +37,7 @@ class MetadataWindow : public unicorn::MainWindow
 
 public:
     MetadataWindow();
+    const Track& currentTrack() const{ return m_currentTrack; }
 
 public slots:
     void onTrackStarted(const Track&, const Track&);
@@ -46,4 +47,7 @@ private slots:
     void onArtistGotInfo();
 //    void onAlbumGotInfo();
     void onArtistImageDownloaded();
+    
+private:
+    Track m_currentTrack;
 };
