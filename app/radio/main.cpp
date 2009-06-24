@@ -29,6 +29,7 @@
 #include "_version.h"
 #include "Application.h"
 #include "MainWidget.h"
+#include "widgets/MultiStarterWidget.h"
 #include "Radio.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
@@ -99,7 +100,8 @@ int main( int argc, char** argv )
       #endif
         
         unicorn::MainWindow window;
-	    window.setCentralWidget(new MainWidget);
+//	    window.setCentralWidget(new MainWidget);
+        window.setCentralWidget( new MultiStarterWidget(3) );
         window.setWindowTitle( app.applicationName() );
 		window.finishUi();
 		window.show();
