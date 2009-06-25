@@ -21,33 +21,18 @@
 #include <lastfm.h>
 #include <QtGui>
 #include <stdarg.h>
-
+#include "widgets/QuickStartWidget.h"
+#include "widgets/RecentStationsWidget.h"
+#include "widgets/YourStationsWidget.h"
 
 MainWidget::MainWidget()
 {
-    QGridLayout* g = new QGridLayout(this);
-    g->addWidget(ui.friends = new FriendsList, 0, 0);
-    g->addWidget(ui.neighbours = new NeighboursList, 0, 1);
-    g->addWidget(ui.me = new Me, 0, 2);
-    g->addWidget(ui.friends_count = new QLabel, 1, 0);
-    g->addWidget(ui.neighbour_tags = new QLabel, 1, 1);
-    g->addWidget(ui.scrobbles = new QLabel, 1, 2);
-    g->setSpacing(0);
-    g->setMargin(0);
-    g->setColumnStretch(0, 1);
-    g->setColumnStretch(1, 1);
-    g->setColumnStretch(2, 1);
-
-    #define MACRO(x) x->setAlignment(Qt::AlignCenter); x->setFixedHeight(fontMetrics().height()+4);
-    MACRO(ui.scrobbles)
-    MACRO(ui.friends_count)
-    MACRO(ui.neighbour_tags)
-    connect(qApp, SIGNAL(userGotInfo( QNetworkReply* )), SLOT(onUserGotInfo( QNetworkReply* )));
-    
-    lastfm::AuthenticatedUser you;
-    connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
-    connect(you.getNeighbours(), SIGNAL(finished()), SLOT(onUserGotNeighbours()));
-    connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(new QuickStartWidget());
+    layout->addWidget(new RecentStationsWidget());
+    layout->addWidget(new YourStationsWidget());
+//    layout->addWidget(new StationGridWidget());
+//    layout->addWidget(new StationGridWidget());
 }
 
 

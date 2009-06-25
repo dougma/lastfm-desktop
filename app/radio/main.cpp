@@ -100,8 +100,8 @@ int main( int argc, char** argv )
       #endif
         
         unicorn::MainWindow window;
-//	    window.setCentralWidget(new MainWidget);
-        window.setCentralWidget( new MultiStarterWidget(3) );
+	    window.setCentralWidget(new MainWidget);
+//        window.setCentralWidget( new MultiStarterWidget(3) );
         window.setWindowTitle( app.applicationName() );
 		window.finishUi();
 		window.show();
