@@ -38,8 +38,6 @@ namespace lastfm
     class RadioStation;
     class RadioTuner;
 }
-using lastfm::RadioStation;
-using lastfm::RadioTuner;
 
 
 /** @author <max@last.fm>
@@ -73,8 +71,8 @@ signals:
     /** emitted up to twice, as first time may not have a title for the station
       * but the second time will */
     void tuningIn( const RadioStation& );
-    void trackSpooled( const lastfm::Track& );
-    void trackStarted( const lastfm::Track& );
+    void trackSpooled( const Track& );
+    void trackStarted( const Track& );
     void buffering( int );
     void stopped();
 	
@@ -87,7 +85,7 @@ private slots:
     void enqueue();
     void onPhononStateChanged( Phonon::State, Phonon::State );
 	void onPhononCurrentSourceChanged( const Phonon::MediaSource &);
-	void onTunerError( lastfm::ws::Error );
+    void onTunerError( lastfm::ws::Error );
     void phononEnqueue();
     void onBuffering( int );
 
@@ -101,11 +99,11 @@ private:
 	/** emits signals if appropriate */
 	void changeState( State );
 	
-	QPointer<RadioTuner> m_tuner;
+    QPointer<lastfm::RadioTuner> m_tuner;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
 	Radio::State m_state;
-	lastfm::Track m_track;
+	Track m_track;
 	RadioStation m_station;
     bool m_bErrorRecover;
 };

@@ -42,22 +42,24 @@ RecentStationsWidget::update()
     layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, 0, 1, 2, Qt::AlignCenter);
 
     PlayableItemWidget* item;
-    item = new PlayableItemWidget(tr("Radiohead Radio"), lastfm::RadioStation::similar(lastfm::Artist("Radiohead")));
+    item = new PlayableItemWidget(tr("Radiohead Radio"), RadioStation::similar(Artist("Radiohead")));
     layout->addWidget(item, 1, 0);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("mxcl's Loved Tracks"), lastfm::RadioStation::lovedTracks(lastfm::User("mxcl")));
+    item = new PlayableItemWidget(tr("mxcl's Loved Tracks"), RadioStation::lovedTracks(User("mxcl")));
     layout->addWidget(item, 1, 1);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("Jazz Tag Radio"), lastfm::RadioStation::globalTag(lastfm::Tag("Jazz")));
+    item = new PlayableItemWidget(tr("Jazz Tag Radio"), RadioStation::globalTag(Tag("Jazz")));
     layout->addWidget(item, 2, 0);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("megadeth radio"), lastfm::RadioStation::similar(lastfm::Artist("megadeth")));
+    item = new PlayableItemWidget(tr("megadeth radio"), RadioStation::similar(Artist("megadeth")));
     layout->addWidget(item, 2, 1);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     
+    layout->addWidget(new QLabel(tr("see more")), 3, 0, 1, 2, Qt::AlignRight);
+
     setLayout(layout);
     // } ends
 }
@@ -68,6 +70,6 @@ RecentStationsWidget::gotRecentStations()
     // todo: stop any spinner
     sender()->deleteLater();
     QNetworkReply* r = (QNetworkReply*)sender();
-    lastfm::XmlQuery lfm = r->readAll();
+    XmlQuery lfm = r->readAll();
     // todo: handle response
 }

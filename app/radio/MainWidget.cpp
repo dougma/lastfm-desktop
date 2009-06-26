@@ -21,22 +21,33 @@
 #include <lastfm.h>
 #include <QtGui>
 #include <stdarg.h>
-#include "widgets/QuickStartWidget.h"
-#include "widgets/RecentStationsWidget.h"
-#include "widgets/YourStationsWidget.h"
+#include "layouts/SideBySideLayout.h"
+#include "widgets/MainStarterWidget.h"
+#include "widgets/NowPlayingWidget.h"
 
 MainWidget::MainWidget()
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QuickStartWidget());
-    layout->addWidget(new RecentStationsWidget());
-    layout->addWidget(new YourStationsWidget());
-//    layout->addWidget(new StationGridWidget());
-//    layout->addWidget(new StationGridWidget());
+    SideBySideLayout* layout = new SideBySideLayout;
+
+    MainStarterWidget* w = new MainStarterWidget();
+    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+
+    layout->addWidget(w);
+
+    NowPlayingWidget* n = new NowPlayingWidget();
+
+
+    setLayout(layout);
 }
 
+void 
+MainWidget::onStartRadio(RadioStation rs)
+{
+    // todo: move forward to now playing screen
+}
 
-QString magic(lastfm::XmlQuery e, ...)
+QString magic(XmlQuery e, ...)
 {
     qDebug() << "sup";
     QString out;
@@ -58,7 +69,7 @@ QString magic(lastfm::XmlQuery e, ...)
 void
 MainWidget::onUserGotInfo(QNetworkReply* r)
 {
-    lastfm::XmlQuery e = lastfm::XmlQuery(r->readAll())["user"];
+    XmlQuery e = XmlQuery(r->readAll())["user"];
     uint count = e["playcount"].text().toUInt();
     ui.scrobbles->setText(tr("%L1 scrobbles").arg(count));
 #if 0
@@ -76,10 +87,10 @@ void
 MainWidget::onUserGotFriends()
 {
     QNetworkReply* r = (QNetworkReply*)sender();
-    lastfm::XmlQuery lfm = r->readAll();
+    XmlQuery lfm = r->readAll();
     
     uint count = 0; //TODO count is wrong as webservice is paginated
-    foreach (lastfm::XmlQuery e, lfm["friends"].children("user"))
+    foreach (XmlQuery e, lfm["friends"].children("user"))
     {
         count++;
         ui.friends->addItem(e["name"].text());
@@ -92,9 +103,9 @@ void
 MainWidget::onUserGotNeighbours()
 {
     QNetworkReply* r = (QNetworkReply*)sender();
-    lastfm::XmlQuery lfm = r->readAll();
+    XmlQuery lfm = r->readAll();
 
-    foreach (lastfm::XmlQuery e, lfm["neighbours"].children("user"))
+    foreach (XmlQuery e, lfm["neighbours"].children("user"))
     {
         ui.neighbours->addItem(e["name"].text());
     }
@@ -104,11 +115,11 @@ void
 MainWidget::onUserGotTopTags()
 {
     QNetworkReply* r = (QNetworkReply*)sender();
-    lastfm::XmlQuery lfm = r->readAll();
+    XmlQuery lfm = r->readAll();
 
     QStringList tags;
     uint x = 0;
-    foreach (lastfm::XmlQuery e, lfm["toptags"].children("tag"))
+    foreach (XmlQuery e, lfm["toptags"].children("tag"))
     {
         if(++x == 3) break;
         tags += e["name"].text();

@@ -45,10 +45,10 @@ QuickStartWidget::play()
 {
     switch (m_combo->currentIndex()) {
         case 0: // artist
-            emit startRadio(lastfm::RadioStation::similar(lastfm::Artist(m_edit->text())));
+            emit startRadio(RadioStation::similar(Artist(m_edit->text())));
             break;
         case 1: // tag
-            emit startRadio(lastfm::RadioStation::globalTag(lastfm::Tag(m_edit->text())));
+            emit startRadio(RadioStation::globalTag(Tag(m_edit->text())));
             break;
         default:
             qDebug() << "?";

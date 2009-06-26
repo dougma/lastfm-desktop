@@ -1,5 +1,6 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
+      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,34 +18,32 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MULTI_STARTER_WIDGET_H
-#define MULTI_STARTER_WIDGET_H
+#ifndef NOW_PLAYING_WIDGET_H
+#define NOW_PLAYING_WIDGET_H
 
 #include <QWidget>
 
-class SourceListWidget;
-class SourceSelectorWidget;
+class TrackWidget;
+class RadioStation;
+class Track;
 
-class MultiStarterWidget : public QWidget
+class NowPlayingWidget : public QWidget
 {
     Q_OBJECT;
 
 public:
-    MultiStarterWidget(int maxSources, QWidget *parent = 0);
+    NowPlayingWidget();
 
 private slots:
-    void onAdd(const QString& item);
-    void onUserGotTopTags();
-    void onUserGotTopArtists();
-    void onUserGotFriends();
+    // all from the radio:
+    void onTuningIn( const RadioStation& );
+    void onTrackSpooled( const Track& );
+    void onTrackStarted( const Track& );
+    void onBuffering( int );
+    void onStopped();
 
 private:
-    SourceListWidget* m_sourceList;
-    SourceSelectorWidget* m_tags;
-    SourceSelectorWidget* m_artists;
-    SourceSelectorWidget* m_users;
-    const int m_minTagCount;
-    const int m_minArtistCount;
+    TrackWidget* m_trackWidget;
 };
 
 #endif

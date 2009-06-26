@@ -1,5 +1,6 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
+      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -16,35 +17,30 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef MULTI_STARTER_WIDGET_H
-#define MULTI_STARTER_WIDGET_H
-
+#include <lastfm/global.h>
 #include <QWidget>
 
-class SourceListWidget;
-class SourceSelectorWidget;
 
-class MultiStarterWidget : public QWidget
+class RadioProgressBar : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    MultiStarterWidget(int maxSources, QWidget *parent = 0);
-
+    RadioProgressBar( QWidget* parent = 0 );
+    
+    virtual void paintEvent( QPaintEvent* e );
+    virtual QSize sizeHint() const;
+    
 private slots:
-    void onAdd(const QString& item);
-    void onUserGotTopTags();
-    void onUserGotTopArtists();
-    void onUserGotFriends();
+    void onRadioTick( qint64 tick );
+    void onTrackSpooled( const Track& track, class StopWatch* );
 
 private:
-    SourceListWidget* m_sourceList;
-    SourceSelectorWidget* m_tags;
-    SourceSelectorWidget* m_artists;
-    SourceSelectorWidget* m_users;
-    const int m_minTagCount;
-    const int m_minArtistCount;
+    int m_scrobbleProgressTick;
+    int m_currentTrackDuration;
+    
+    struct {
+        class QLabel* time;
+        class QLabel* timeToGo;
+    } ui;
 };
-
-#endif

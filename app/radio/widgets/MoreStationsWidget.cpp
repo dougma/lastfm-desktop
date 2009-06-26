@@ -17,34 +17,26 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MULTI_STARTER_WIDGET_H
-#define MULTI_STARTER_WIDGET_H
+#include "MoreStationsWidget.h"
 
-#include <QWidget>
+#include <QGridLayout>
+#include <QLabel>
 
-class SourceListWidget;
-class SourceSelectorWidget;
-
-class MultiStarterWidget : public QWidget
+MoreStationsWidget::MoreStationsWidget()
 {
-    Q_OBJECT;
+    QGridLayout* layout = new QGridLayout();
 
-public:
-    MultiStarterWidget(int maxSources, QWidget *parent = 0);
+    layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
-private slots:
-    void onAdd(const QString& item);
-    void onUserGotTopTags();
-    void onUserGotTopArtists();
-    void onUserGotFriends();
+    QLabel* item;
+    item = new QLabel(tr("Combo Station"));
+    layout->addWidget(item, 1, 0);
+//    connect(item, SIGNAL(), SLOT(onCombo()));
 
-private:
-    SourceListWidget* m_sourceList;
-    SourceSelectorWidget* m_tags;
-    SourceSelectorWidget* m_artists;
-    SourceSelectorWidget* m_users;
-    const int m_minTagCount;
-    const int m_minArtistCount;
-};
+    item = new QLabel(tr("Your Tags"));
+    layout->addWidget(item, 1, 1);
+//    connect(item, SIGNAL(), SIGNAL(onYourTags()));
 
-#endif
+    setLayout(layout);
+}
+

@@ -22,14 +22,14 @@
 #include <QLabel>
 
 
-PlayableItemWidget::PlayableItemWidget(QString stationTitle, lastfm::RadioStation& rs)
+PlayableItemWidget::PlayableItemWidget(QString stationTitle, RadioStation& rs)
     : m_rs(rs)
 {
     m_rs.setTitle(stationTitle);
     init();
 }
 
-PlayableItemWidget::PlayableItemWidget(lastfm::RadioStation& rs)
+PlayableItemWidget::PlayableItemWidget(RadioStation& rs)
     : m_rs(rs)
 {
     init();
@@ -40,11 +40,11 @@ PlayableItemWidget::init()
 {
     // todo: play icon
     setText(m_rs.title());
-    connect(this, SIGNAL(clicked()), SLOT(onClick()));
 }
 
-void
-PlayableItemWidget::onClick()
+//virtual 
+void 
+PlayableItemWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     emit startRadio(m_rs);
 }

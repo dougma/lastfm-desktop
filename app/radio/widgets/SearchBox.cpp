@@ -1,3 +1,22 @@
+/*
+   Copyright 2005-2009 Last.fm Ltd. 
+
+   This file is part of the Last.fm Desktop Application Suite.
+
+   lastfm-desktop is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   lastfm-desktop is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "SearchBox.h"
 #include <QNetworkReply>
 #include <QPushButton>
@@ -47,7 +66,7 @@ SearchBox::onSearchFinished()
     QString searchTerm;
     try {
         QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
-        lastfm::XmlQuery lfm(reply->readAll());
+        XmlQuery lfm(reply->readAll());
         searchTerm = ((QDomElement)lfm["results"]).attribute("for");
         m_completer->setModel(
             new QStringListModel(
@@ -76,14 +95,14 @@ ArtistSearch::ArtistSearch(QWidget* parent)
 QNetworkReply*
 ArtistSearch::startSearch(const QString& term)
 {
-    return lastfm::Artist(term).search();
+    return Artist(term).search();
 }
 
 QStringList
-ArtistSearch::handleSearchResponse(lastfm::XmlQuery& lfm)
+ArtistSearch::handleSearchResponse(XmlQuery& lfm)
 {
     QStringList list;
-    foreach(lastfm::XmlQuery i, lfm["results"]["artistmatches"].children("artist")) {
+    foreach(XmlQuery i, lfm["results"]["artistmatches"].children("artist")) {
         list << i["name"].text();
     }
     return list;
@@ -99,14 +118,14 @@ TagSearch::TagSearch(QWidget* parent)
 QNetworkReply*
 TagSearch::startSearch(const QString& term)
 {
-    return lastfm::Tag(term).search();
+    return Tag(term).search();
 }
 
 QStringList
-TagSearch::handleSearchResponse(lastfm::XmlQuery& lfm)
+TagSearch::handleSearchResponse(XmlQuery& lfm)
 {
     QStringList list;
-    foreach(lastfm::XmlQuery i, lfm["results"]["tagmatches"].children("tag")) {
+    foreach(XmlQuery i, lfm["results"]["tagmatches"].children("tag")) {
         list << i["name"].text().toLower();
     }
     return list;
@@ -122,14 +141,14 @@ UserSearch::UserSearch(QWidget* parent)
 QNetworkReply*
 UserSearch::startSearch(const QString& term)
 {
-    return lastfm::Tag(term).search();
+    return Tag(term).search();
 }
 
 QStringList
-UserSearch::handleSearchResponse(lastfm::XmlQuery& lfm)
+UserSearch::handleSearchResponse(XmlQuery& lfm)
 {
     QStringList list;
-    foreach(lastfm::XmlQuery i, lfm["results"]["tagmatches"].children("tag")) {
+    foreach(XmlQuery i, lfm["results"]["tagmatches"].children("tag")) {
         list << i["name"].text().toLower();
     }
     return list;

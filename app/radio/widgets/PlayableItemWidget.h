@@ -23,24 +23,26 @@
 #include <QLabel>
 #include <lastfm/RadioStation>
 
+class QMouseEvent;
+
 class PlayableItemWidget : public QLabel
 {
     Q_OBJECT;
 
 public:
-    PlayableItemWidget(QString stationTitle, lastfm::RadioStation& rs);
-    PlayableItemWidget(lastfm::RadioStation& rs);
+    PlayableItemWidget(QString stationTitle, RadioStation& rs);
+    PlayableItemWidget(RadioStation& rs);
 
 signals:
-    void startRadio(lastfm::RadioStation);
-
-private slots:
-    void onClick();
+    void startRadio(RadioStation);
 
 private:
+//    virtual void mousePressEvent(QMouseEvent* event);
+    virtual void mouseReleaseEvent(QMouseEvent* event);
+
     void init();
 
-    lastfm::RadioStation m_rs;
+    RadioStation m_rs;
 };
 
 #endif

@@ -17,57 +17,53 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <lastfm/global.h>
-#include <lastfm/RadioStation>
-#include <QListWidget>
-#include <QTextEdit>
-class QLabel;
- 
 
-class MainWidget : public QWidget
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <lastfm/Track>
+#include "lib/unicorn/widgets/TrackWidget.h"
+#include "NowPlayingWidget.h"
+#include "RadioProgressBar.h"
+
+
+NowPlayingWidget::NowPlayingWidget()
 {
-    Q_OBJECT
-    
-    struct{
-        QListWidget* friends;
-        QLabel* friends_count;
-        QListWidget* neighbours;
-        QLabel* neighbour_tags;
-        QTextEdit* me;
-        QLabel* scrobbles;
-    } ui;
+    QVBoxLayout* layout = new QVBoxLayout();
 
-public:
-    MainWidget();
-    
-signals:
-    void startRadio(RadioStation);
+    QPushButton* button = new QPushButton(tr("back"));
+    layout->addWidget(button);
 
-private slots:
-    void onStartRadio(RadioStation rs);
-    void onUserGotInfo( QNetworkReply* );
-    void onUserGotFriends();
-    void onUserGotNeighbours();
-    void onUserGotTopTags();
-};
+    m_trackWidget = new TrackWidget();
+    layout->addWidget(m_trackWidget);
 
+    RadioProgressBar* bar = new RadioProgressBar();
+    layout->addWidget(bar);
 
-class FriendsList : public QListWidget
+    setLayout(layout);
+}
+
+void
+NowPlayingWidget::onTuningIn( const RadioStation& )
 {
-public:
-    FriendsList();
-};
+}
 
-
-class NeighboursList : public QListWidget
+void
+NowPlayingWidget::onTrackSpooled( const Track& )
 {
-public:
-    NeighboursList();
-};
+}
 
-
-class Me : public QTextEdit
+void
+NowPlayingWidget::onTrackStarted( const Track& t )
 {
-public:
-    Me();
-};
+    m_trackWidget->setTrack(t);
+}
+
+void
+NowPlayingWidget::onBuffering( int )
+{
+}
+
+void
+NowPlayingWidget::onStopped()
+{
+}

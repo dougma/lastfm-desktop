@@ -33,21 +33,21 @@ YourStationsWidget::YourStationsWidget()
     PlayableItemWidget* item;
     layout->addWidget(new QLabel(tr("Your Stations")), 0, 0, 1, 2, Qt::AlignCenter);
 
-    item = new PlayableItemWidget(tr("Your Library"), lastfm::RadioStation::library(lastfm::ws::Username));
+    item = new PlayableItemWidget(tr("Your Library"), RadioStation::library(lastfm::ws::Username));
     layout->addWidget(item, 1, 0);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("Your Loved Tracks"), lastfm::RadioStation::lovedTracks(lastfm::ws::Username));
+    item = new PlayableItemWidget(tr("Your Loved Tracks"), RadioStation::lovedTracks(lastfm::ws::Username));
     layout->addWidget(item, 1, 1);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("Your Recommended Radio"), lastfm::RadioStation::recommendations(lastfm::ws::Username));
+    item = new PlayableItemWidget(tr("Your Recommended Radio"), RadioStation::recommendations(lastfm::ws::Username));
     layout->addWidget(item, 2, 0);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
-    item = new PlayableItemWidget(tr("Your Neighbourhood"), lastfm::RadioStation::neighbourhood(lastfm::ws::Username));
+    item = new PlayableItemWidget(tr("Your Neighbourhood"), RadioStation::neighbourhood(lastfm::ws::Username));
     layout->addWidget(item, 2, 1);
-    connect(item, SIGNAL(startRadio(lastfm::RadioStation)), SIGNAL(startRadio(lastfm::RadioStation)));
+    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     
     setLayout(layout);
 }

@@ -34,7 +34,7 @@ public:
     QuickStartWidget();
 
 signals:
-    void startRadio(lastfm::RadioStation);
+    void startRadio(RadioStation);
 
 private slots:
     void play();

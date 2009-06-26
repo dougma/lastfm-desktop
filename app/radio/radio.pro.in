@@ -7,7 +7,7 @@ LIBS += -lunicorn
 
 include( $$ROOT_DIR/admin/include.qmake )
 
-#DEFINES += LASTFM_COLLAPSE_NAMESPACE
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 SOURCES -= LegacyTuner.cpp
 HEADERS -= LegacyTuner.h
