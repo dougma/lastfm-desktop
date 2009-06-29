@@ -17,12 +17,19 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef MAIN_WIDGET_H
+#define MAIN_WIDGET_H
+
 #include <lastfm/global.h>
 #include <lastfm/RadioStation>
 #include <QListWidget>
 #include <QTextEdit>
+
+#include <QVBoxLayout>
+#include <QPushButton>
+
 class QLabel;
- 
+class SideBySideLayout;
 
 class MainWidget : public QWidget
 {
@@ -45,10 +52,17 @@ signals:
 
 private slots:
     void onStartRadio(RadioStation rs);
+    void onCombo();
+    void onYourTags();
+    void onBack();
+
     void onUserGotInfo( QNetworkReply* );
     void onUserGotFriends();
     void onUserGotNeighbours();
     void onUserGotTopTags();
+
+private:
+    SideBySideLayout* m_layout;
 };
 
 
@@ -71,3 +85,25 @@ class Me : public QTextEdit
 public:
     Me();
 };
+
+class BackWrapper : public QWidget
+{
+    Q_OBJECT;
+
+public:
+    BackWrapper(const QString& backButtonLabel, QWidget* child)
+    {
+        QVBoxLayout* layout = new QVBoxLayout();
+        QPushButton* button = new QPushButton(backButtonLabel);
+        layout->addWidget(button, 0, Qt::AlignLeft);
+        layout->addWidget(child);
+        setLayout(layout);
+        connect(button, SIGNAL(clicked()), SIGNAL(back()));
+    }
+
+signals:
+    void back();
+
+};
+
+#endif

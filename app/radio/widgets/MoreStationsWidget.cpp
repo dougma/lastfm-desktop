@@ -20,7 +20,9 @@
 #include "MoreStationsWidget.h"
 
 #include <QGridLayout>
+#include <QPushButton>
 #include <QLabel>
+
 
 MoreStationsWidget::MoreStationsWidget()
 {
@@ -28,15 +30,14 @@ MoreStationsWidget::MoreStationsWidget()
 
     layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
-    QLabel* item;
-    item = new QLabel(tr("Combo Station"));
-    layout->addWidget(item, 1, 0);
-//    connect(item, SIGNAL(), SLOT(onCombo()));
+    QWidget* w;
+    w = new QPushButton(tr("Combo Station"));
+    connect(w, SIGNAL(clicked()), SIGNAL(combo()));
+    layout->addWidget(w, 1, 0);
 
-    item = new QLabel(tr("Your Tags"));
-    layout->addWidget(item, 1, 1);
-//    connect(item, SIGNAL(), SIGNAL(onYourTags()));
+    w = new QPushButton(tr("Your Tags"));
+    connect(w, SIGNAL(clicked()), SIGNAL(yourTags()));
+    layout->addWidget(w, 1, 1);
 
     setLayout(layout);
 }
-

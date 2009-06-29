@@ -24,27 +24,56 @@
 #include "layouts/SideBySideLayout.h"
 #include "widgets/MainStarterWidget.h"
 #include "widgets/NowPlayingWidget.h"
+#include "widgets/MultiStarterWidget.h"
 
 MainWidget::MainWidget()
 {
-    SideBySideLayout* layout = new SideBySideLayout;
+    m_layout = new SideBySideLayout;
 
-    MainStarterWidget* w = new MainStarterWidget();
+    MainStarterWidget* w = new MainStarterWidget;
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+    connect(w, SIGNAL(combo()), SLOT(onCombo()));
+    connect(w, SIGNAL(yourTags()), SLOT(onYourTags()));
 
-    layout->addWidget(w);
+    m_layout->addWidget(w);
 
-    NowPlayingWidget* n = new NowPlayingWidget();
-
-
-    setLayout(layout);
+    setLayout(m_layout);
 }
 
 void 
 MainWidget::onStartRadio(RadioStation rs)
 {
-    // todo: move forward to now playing screen
+    NowPlayingWidget* n = new NowPlayingWidget;
+    m_layout->addWidget(n);
+    m_layout->moveForward();
+}
+
+void
+MainWidget::onCombo()
+{
+    MultiStarterWidget* multi = new MultiStarterWidget(3);
+    connect(multi, SIGNAL(startRadio()), SIGNAL(startRadio()));
+    connect(multi, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+    BackWrapper* back = new BackWrapper(tr("Back"), multi);
+    connect(back, SIGNAL(back()), SLOT(onBack()));
+    m_layout->addWidget(back);
+    m_layout->moveForward();
+}
+
+void
+MainWidget::onBack()
+{
+    QWidget* w = m_layout->currentWidget();
+    m_layout->moveBackward();
+    m_layout->removeWidget(w);
+    w->deleteLater();
+}
+
+void
+MainWidget::onYourTags()
+{
+    qDebug() << "todo";
 }
 
 QString magic(XmlQuery e, ...)

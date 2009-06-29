@@ -30,9 +30,9 @@ class MoreStationsWidget : public QWidget
 public:
     MoreStationsWidget();
 
-private slots:
-    
-private:
+signals:
+    void combo();
+    void yourTags();
 };
 
 #endif

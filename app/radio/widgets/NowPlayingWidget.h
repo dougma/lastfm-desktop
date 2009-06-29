@@ -22,10 +22,10 @@
 #define NOW_PLAYING_WIDGET_H
 
 #include <QWidget>
+#include <lastfm/Track>
+#include <lastfm/RadioStation>
 
 class TrackWidget;
-class RadioStation;
-class Track;
 
 class NowPlayingWidget : public QWidget
 {

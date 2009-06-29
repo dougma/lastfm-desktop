@@ -41,6 +41,8 @@ MainStarterWidget::MainStarterWidget()
     layout->addWidget(w);
 
     w = new MoreStationsWidget();
+    connect(w, SIGNAL(combo()), SIGNAL(combo()));
+    connect(w, SIGNAL(yourTags()), SIGNAL(yourTags()));
     layout->addWidget(w);
 
     setLayout(layout);

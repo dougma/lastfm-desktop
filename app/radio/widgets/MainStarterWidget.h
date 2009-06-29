@@ -32,6 +32,8 @@ public:
 
 signals:
     void startRadio(RadioStation);
+    void combo();
+    void yourTags();
 };
 
 #endif
