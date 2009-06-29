@@ -88,7 +88,7 @@ SourceListWidget::setOp(int sourceIdx)
     if (sourceIdx > 0) {
         QComboBox* combo = qobject_cast<QComboBox*>(m_layout->itemAt(sourceIdx * 2 - 1)->widget());
         combo->setEnabled(true);
-        combo->addItems(QStringList() << "and" << "or" << "and not");
+        combo->addItems(QStringList() << "and" << "or" << "not");
         Operator op = defaultOp(m_sources[sourceIdx-1].first, m_sources[sourceIdx].first);
         switch (op) {
             case And: combo->setCurrentIndex(0); break;
@@ -115,4 +115,53 @@ SourceListWidget::Operator
 SourceListWidget::defaultOp(SourceListWidget::SourceType first, SourceListWidget::SourceType second)
 {
     return (first == Tag && second == Tag) ? And : Or;
+}
+
+QString
+SourceListWidget::rql()
+{
+    int count = 0;
+    QString result;
+    foreach (const Source& src, m_sources) {
+        QString rqlSource;
+        switch(src.first) {
+            case Artist: rqlSource = "simart:"; break;
+            case Tag: rqlSource = "tag:"; break;
+            case User: rqlSource = "library:"; break;
+        }
+
+        if (count) {
+            // get operator
+            QComboBox* combo = qobject_cast<QComboBox*>(m_layout->itemAt(count * 2 - 1)->widget());
+            switch (combo->currentIndex()) {
+                case 0: result += " and "; break;
+                case 1: result += " or "; break;
+                case 2: result += " not "; break;
+            }
+        }
+        result += rqlSource + "\"" + src.second + "\"";
+        count++;
+    }
+    return result;
+}
+
+QString
+SourceListWidget::stationDescription()
+{
+    int count = 0;
+    QString result;
+    foreach (const Source& src, m_sources) {
+        if (count) {
+            // get operator
+            QComboBox* combo = qobject_cast<QComboBox*>(m_layout->itemAt(count * 2 - 1)->widget());
+            switch (combo->currentIndex()) {
+                case 0: result += " and "; break;
+                case 1: result += " or "; break;
+                case 2: result += " not "; break;
+            }
+        }
+        result += src.second;
+        count++;
+    }
+    return result;
 }

@@ -21,9 +21,11 @@
 #define MULTI_STARTER_WIDGET_H
 
 #include <QWidget>
+#include <lastfm/RadioStation>
 
 class SourceListWidget;
 class SourceSelectorWidget;
+class QPushButton;
 
 class MultiStarterWidget : public QWidget
 {
@@ -32,8 +34,12 @@ class MultiStarterWidget : public QWidget
 public:
     MultiStarterWidget(int maxSources, QWidget *parent = 0);
 
+signals:
+    void startRadio(RadioStation);
+
 private slots:
     void onAdd(const QString& item);
+    void onPlayClicked();
     void onUserGotTopTags();
     void onUserGotTopArtists();
     void onUserGotFriends();
@@ -43,6 +49,7 @@ private:
     SourceSelectorWidget* m_tags;
     SourceSelectorWidget* m_artists;
     SourceSelectorWidget* m_users;
+    QPushButton* m_playButton;
     const int m_minTagCount;
     const int m_minArtistCount;
 };

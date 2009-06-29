@@ -44,8 +44,11 @@ MainWidget::MainWidget()
 void 
 MainWidget::onStartRadio(RadioStation rs)
 {
+    qDebug() << rs.title() << " -> " << rs.url();
     NowPlayingWidget* n = new NowPlayingWidget;
-    m_layout->addWidget(n);
+    BackWrapper* back = new BackWrapper(tr("Back"), n);
+    connect(back, SIGNAL(back()), SLOT(onBack()));
+    m_layout->addWidget(back);
     m_layout->moveForward();
 }
 
@@ -53,7 +56,7 @@ void
 MainWidget::onCombo()
 {
     MultiStarterWidget* multi = new MultiStarterWidget(3);
-    connect(multi, SIGNAL(startRadio()), SIGNAL(startRadio()));
+    connect(multi, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(multi, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
     BackWrapper* back = new BackWrapper(tr("Back"), multi);
     connect(back, SIGNAL(back()), SLOT(onBack()));

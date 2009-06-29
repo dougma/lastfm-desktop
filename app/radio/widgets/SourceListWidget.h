@@ -35,6 +35,7 @@ public:
     SourceListWidget(int maxSources, QWidget* parent = 0);
 
     QString rql();
+    QString stationDescription();
     bool addSource(SourceType type, const QString& name);
 
 private slots:

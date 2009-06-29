@@ -18,8 +18,9 @@
 */
 
 #include <QTabWidget>
-#include <QListWidget>
 #include <QGridLayout>
+#include <QListWidget>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <lastfm/User>
 #include <lastfm/XmlQuery>
@@ -54,10 +55,15 @@ MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
 
     m_sourceList = new SourceListWidget(maxSources);
 
-    grid->addWidget(tabwidget, 0, 0);
-    grid->addWidget(m_sourceList, 0, 1);
+    m_playButton = new QPushButton(tr("Play"));
+
+    grid->addWidget(tabwidget, 0, 0, 2, 1);
+    grid->addWidget(m_sourceList, 0, 1, 1, 1);
+    grid->addWidget(m_playButton, 1, 1);
     grid->setColumnStretch(0, 1);
     grid->setColumnStretch(1, 1);
+
+    connect(m_playButton, SIGNAL(clicked()), SLOT(onPlayClicked()));
 
     ///
     lastfm::AuthenticatedUser you;
@@ -135,4 +141,12 @@ MultiStarterWidget::onUserGotFriends()
     if (friends.size() < m_minArtistCount) {
         // no friends. so?
     }
+}
+
+void
+MultiStarterWidget::onPlayClicked()
+{
+    RadioStation r = RadioStation::rql(m_sourceList->rql());
+    r.setTitle(m_sourceList->stationDescription());
+    emit startRadio(r);
 }

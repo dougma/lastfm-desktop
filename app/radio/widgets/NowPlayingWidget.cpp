@@ -30,9 +30,6 @@ NowPlayingWidget::NowPlayingWidget()
 {
     QVBoxLayout* layout = new QVBoxLayout();
 
-    QPushButton* button = new QPushButton(tr("back"));
-    layout->addWidget(button);
-
     m_trackWidget = new TrackWidget();
     layout->addWidget(m_trackWidget);
 
