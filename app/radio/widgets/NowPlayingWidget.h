@@ -24,8 +24,8 @@
 #include <QWidget>
 
 class TrackWidget;
-class RadioStation;
-class Track;
+#include <lastfm/RadioStation>
+#include <lastfm/Track>
 
 class NowPlayingWidget : public QWidget
 {
