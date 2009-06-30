@@ -25,6 +25,8 @@
 #include "widgets/MainStarterWidget.h"
 #include "widgets/NowPlayingWidget.h"
 #include "widgets/MultiStarterWidget.h"
+#include "Radio.h"
+
 
 MainWidget::MainWidget()
 {
@@ -45,8 +47,15 @@ void
 MainWidget::onStartRadio(RadioStation rs)
 {
     qDebug() << rs.title() << " -> " << rs.url();
-    NowPlayingWidget* n = new NowPlayingWidget;
-    BackWrapper* back = new BackWrapper(tr("Back"), n);
+
+    NowPlayingWidget* nowPlaying = new NowPlayingWidget;
+    connect(radio, SIGNAL(tuningIn( RadioStation )), nowPlaying, SLOT(tuningIn( RadioStation )));
+    connect(radio, SIGNAL(trackSpooled( Track )), nowPlaying, SLOT(trackSpooled( Track )));
+    connect(radio, SIGNAL(trackStarted( Track )), nowPlaying, SLOT(trackStarted( Track )));
+    connect(radio, SIGNAL(buffering( int )), nowPlaying, SLOT(buffering( int )));
+    connect(radio, SIGNAL(stopped()), nowPlaying, SLOT(stopped()));
+
+    BackWrapper* back = new BackWrapper(tr("Back"), nowPlaying);
     connect(back, SIGNAL(back()), SLOT(onBack()));
     m_layout->addWidget(back);
     m_layout->moveForward();

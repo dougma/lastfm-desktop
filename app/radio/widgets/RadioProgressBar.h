@@ -31,7 +31,7 @@ public:
     virtual void paintEvent( QPaintEvent* e );
     virtual QSize sizeHint() const;
     
-private slots:
+public slots:
     void onRadioTick( qint64 tick );
     void onTrackSpooled( const Track& track, class StopWatch* );
 

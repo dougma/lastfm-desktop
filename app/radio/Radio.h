@@ -17,6 +17,9 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef RADIO_H
+#define RADIO_H
+
 #include <lastfm/Track>
 #include <lastfm/RadioStation>
 #include <lastfm/ws.h>
@@ -135,3 +138,5 @@ Q_DECLARE_METATYPE( Radio::State );
 
 
 extern Radio* radio;
+
+#endif

@@ -26,6 +26,7 @@
 #include <lastfm/RadioStation>
 
 class TrackWidget;
+class RadioProgressBar;
 
 class NowPlayingWidget : public QWidget
 {
@@ -34,7 +35,7 @@ class NowPlayingWidget : public QWidget
 public:
     NowPlayingWidget();
 
-private slots:
+public slots:
     // all from the radio:
     void onTuningIn( const RadioStation& );
     void onTrackSpooled( const Track& );
@@ -44,6 +45,7 @@ private slots:
 
 private:
     TrackWidget* m_trackWidget;
+    RadioProgressBar* m_bar;
 };
 
 #endif

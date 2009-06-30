@@ -25,7 +25,6 @@
 #include "NowPlayingWidget.h"
 #include "RadioProgressBar.h"
 
-
 NowPlayingWidget::NowPlayingWidget()
 {
     QVBoxLayout* layout = new QVBoxLayout();
@@ -33,8 +32,8 @@ NowPlayingWidget::NowPlayingWidget()
     m_trackWidget = new TrackWidget();
     layout->addWidget(m_trackWidget);
 
-    RadioProgressBar* bar = new RadioProgressBar();
-    layout->addWidget(bar);
+    m_bar = new RadioProgressBar();
+    layout->addWidget(m_bar);
 
     setLayout(layout);
 }
@@ -45,8 +44,9 @@ NowPlayingWidget::onTuningIn( const RadioStation& )
 }
 
 void
-NowPlayingWidget::onTrackSpooled( const Track& )
+NowPlayingWidget::onTrackSpooled( const Track& t )
 {
+    m_bar->onTrackSpooled(t, 0);
 }
 
 void

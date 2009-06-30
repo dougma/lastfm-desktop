@@ -167,9 +167,18 @@ void setupRadio()
 	radio = new Radio( audioOutput );
 }
 
+void connectRadio(QObject* receiver)
+{
+    if (radio && receiver) {
+    }
+}
+
+
+
 void cleanup()
 {
 	QSettings().value( "Volume", radio->audioOutput()->volume() );
 }
+
 
 #include "main.moc"
