@@ -22,9 +22,9 @@
 
 
 #include <QAbstractButton>
+#include "lib/DllExportMacro.h"
 
-
-class ActionButton : public QAbstractButton
+class UNICORN_DLLEXPORT ActionButton : public QAbstractButton
 {
     Q_OBJECT
     

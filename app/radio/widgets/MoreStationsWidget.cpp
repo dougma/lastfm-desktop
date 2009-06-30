@@ -1,6 +1,5 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
-      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,30 +16,27 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
+#include "MoreStationsWidget.h"
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+#include <QGridLayout>
+#include <QLabel>
+
+MoreStationsWidget::MoreStationsWidget()
 {
-    Q_OBJECT
+    QGridLayout* layout = new QGridLayout();
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
-public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
-private slots:
-    void onGetFriendsReturn();
-};
+    QLabel* item;
+    item = new QLabel(tr("Combo Station"));
+    layout->addWidget(item, 1, 0);
+//    connect(item, SIGNAL(), SLOT(onCombo()));
 
-#endif
+    item = new QLabel(tr("Your Tags"));
+    layout->addWidget(item, 1, 1);
+//    connect(item, SIGNAL(), SIGNAL(onYourTags()));
+
+    setLayout(layout);
+}
+

@@ -23,9 +23,9 @@
 #include "ActionButton.h"
 #include <QIcon>
 #include <QMap>
+#include "lib/DllExportMacro.h"
 
-
-class ImageButton : public ActionButton
+class UNICORN_DLLEXPORT ImageButton : public ActionButton
 {
     void init( const QPixmap& );
 	

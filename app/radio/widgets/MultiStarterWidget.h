@@ -1,6 +1,5 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
-      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,30 +16,35 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
+#ifndef MULTI_STARTER_WIDGET_H
+#define MULTI_STARTER_WIDGET_H
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+#include <QWidget>
+
+class SourceListWidget;
+class SourceSelectorWidget;
+
+class MultiStarterWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    MultiStarterWidget(int maxSources, QWidget *parent = 0);
 
 private slots:
-    void onGetFriendsReturn();
+    void onAdd(const QString& item);
+    void onUserGotTopTags();
+    void onUserGotTopArtists();
+    void onUserGotFriends();
+
+private:
+    SourceListWidget* m_sourceList;
+    SourceSelectorWidget* m_tags;
+    SourceSelectorWidget* m_artists;
+    SourceSelectorWidget* m_users;
+    const int m_minTagCount;
+    const int m_minArtistCount;
 };
 
 #endif

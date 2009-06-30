@@ -29,6 +29,7 @@
 #include "_version.h"
 #include "Application.h"
 #include "MainWidget.h"
+#include "widgets/MultiStarterWidget.h"
 #include "Radio.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
@@ -43,10 +44,9 @@ class QMainObject : public QObject
 	Q_OBJECT
 	
 public slots:
-	void onReturnPressed()
+    void onStartRadio(RadioStation rs)
 	{
-		QUrl url = static_cast<QLineEdit*>(sender())->text();
-		radio->play( RadioStation(url) );
+		radio->play( rs );
 	}
 };
 
@@ -99,7 +99,10 @@ int main( int argc, char** argv )
       #endif
         
         unicorn::MainWindow window;
-	    window.setCentralWidget(new MainWidget);
+
+        MainWidget* mainWidget = new MainWidget;
+        q->connect(mainWidget, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+	    window.setCentralWidget( mainWidget );
         window.setWindowTitle( app.applicationName() );
 		window.finishUi();
 		window.show();

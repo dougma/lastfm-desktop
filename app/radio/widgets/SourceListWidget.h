@@ -1,6 +1,5 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
-      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,30 +16,42 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
+#ifndef SOURCE_LIST_WIDGET_H
+#define SOURCE_LIST_WIDGET_H
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+#include <QWidget>
+
+class QVBoxLayout;
+
+class SourceListWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    enum SourceType { Tag, Artist, User };
+    enum Operator { And, Or, AndNot };
+
+    SourceListWidget(int maxSources, QWidget* parent = 0);
+
+    QString rql();
+    bool addSource(SourceType type, const QString& name);
 
 private slots:
-    void onGetFriendsReturn();
+
+private:
+    typedef QPair<SourceType, QString> Source;
+
+    void setOp(int sourceIdx);
+    void setSource(int sourceIdx, QWidget* widget);
+    void addPlaceholder();
+
+    static Operator defaultOp(SourceType first, SourceType second);
+    static QWidget* createWidget(SourceType type, const QString& name);
+
+    QVBoxLayout* m_layout;
+    int m_maxSources;
+    QList<Source> m_sources;
 };
 
 #endif

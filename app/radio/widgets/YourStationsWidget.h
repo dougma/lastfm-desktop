@@ -1,6 +1,5 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
-      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,30 +16,29 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
+#ifndef YOUR_STATIONS_WIDGET_H
+#define YOUR_STATIONS_WIDGET_H
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+#include <QListWidget>
+#include <lastfm/RadioStation>
+
+class QComboBox;
+class QLineEdit;
+
+class YourStationsWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    YourStationsWidget();
+
+signals:
+    void startRadio(RadioStation);
 
 private slots:
-    void onGetFriendsReturn();
+    
+private:
 };
 
 #endif

@@ -17,30 +17,30 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
+#include <lastfm/global.h>
+#include <QWidget>
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+class RadioProgressBar : public QWidget
 {
     Q_OBJECT
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
+    RadioProgressBar( QWidget* parent = 0 );
     
-    QList<User> selection() const;
-
+    virtual void paintEvent( QPaintEvent* e );
+    virtual QSize sizeHint() const;
+    
 private slots:
-    void onGetFriendsReturn();
-};
+    void onRadioTick( qint64 tick );
+    void onTrackSpooled( const Track& track, class StopWatch* );
 
-#endif
+private:
+    int m_scrobbleProgressTick;
+    int m_currentTrackDuration;
+    
+    struct {
+        class QLabel* time;
+        class QLabel* timeToGo;
+    } ui;
+};

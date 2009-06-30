@@ -37,7 +37,7 @@ public:
 	  * automatically fetches the first 5 tracks for the station */
     LegacyTuner( const RadioStation&, const QString& password_md5 );
 
-    Track takeNextTrack();
+    lastfm::Track takeNextTrack();
 
 signals:
     void title( const QString& );

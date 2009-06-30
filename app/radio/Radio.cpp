@@ -25,9 +25,6 @@
 #include <QTimer>
 #include <cmath>
 
-using lastfm::Track;
-using lastfm::MutableTrack;
-
 
 Radio::Radio( Phonon::AudioOutput* output )
      : m_audioOutput( output ),
@@ -84,7 +81,7 @@ Radio::play( const RadioStation& station )
 
 	m_station = station;
 	delete m_tuner;
-    m_tuner = new RadioTuner(station);
+    m_tuner = new lastfm::RadioTuner(station);
 
 	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(trackAvailable()), SLOT(enqueue()) );

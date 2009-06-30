@@ -17,30 +17,33 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef FRIENDS_PICKER_H
-#define FRIENDS_PICKER_H
 
-#include <QDialog>
-#include <lastfm/User>
-#include "lib/DllExportMacro.h"
+#ifndef NOW_PLAYING_WIDGET_H
+#define NOW_PLAYING_WIDGET_H
 
-class UNICORN_DLLEXPORT FriendsPicker : public QDialog
+#include <QWidget>
+
+class TrackWidget;
+class RadioStation;
+class Track;
+
+class NowPlayingWidget : public QWidget
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    struct
-    {
-        class QDialogButtonBox* buttons;
-        class QListWidget* list;
-    } ui;
-    
 public:
-    FriendsPicker( const User& = AuthenticatedUser() );
-    
-    QList<User> selection() const;
+    NowPlayingWidget();
 
 private slots:
-    void onGetFriendsReturn();
+    // all from the radio:
+    void onTuningIn( const RadioStation& );
+    void onTrackSpooled( const Track& );
+    void onTrackStarted( const Track& );
+    void onBuffering( int );
+    void onStopped();
+
+private:
+    TrackWidget* m_trackWidget;
 };
 
 #endif

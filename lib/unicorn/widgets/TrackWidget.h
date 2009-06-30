@@ -22,9 +22,9 @@
 
 #include <lastfm/global.h>
 #include <QWidget>
+#include "lib/DllExportMacro.h"
 
-
-class TrackWidget : public QWidget
+class UNICORN_DLLEXPORT TrackWidget : public QWidget
 {
     Q_OBJECT
     

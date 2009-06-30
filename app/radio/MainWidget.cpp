@@ -21,35 +21,31 @@
 #include <lastfm.h>
 #include <QtGui>
 #include <stdarg.h>
-
+#include "layouts/SideBySideLayout.h"
+#include "widgets/MainStarterWidget.h"
+#include "widgets/NowPlayingWidget.h"
 
 MainWidget::MainWidget()
 {
-    QGridLayout* g = new QGridLayout(this);
-    g->addWidget(ui.friends = new FriendsList, 0, 0);
-    g->addWidget(ui.neighbours = new NeighboursList, 0, 1);
-    g->addWidget(ui.me = new Me, 0, 2);
-    g->addWidget(ui.friends_count = new QLabel, 1, 0);
-    g->addWidget(ui.neighbour_tags = new QLabel, 1, 1);
-    g->addWidget(ui.scrobbles = new QLabel, 1, 2);
-    g->setSpacing(0);
-    g->setMargin(0);
-    g->setColumnStretch(0, 1);
-    g->setColumnStretch(1, 1);
-    g->setColumnStretch(2, 1);
+    SideBySideLayout* layout = new SideBySideLayout;
 
-    #define MACRO(x) x->setAlignment(Qt::AlignCenter); x->setFixedHeight(fontMetrics().height()+4);
-    MACRO(ui.scrobbles)
-    MACRO(ui.friends_count)
-    MACRO(ui.neighbour_tags)
-    connect(qApp, SIGNAL(userGotInfo( QNetworkReply* )), SLOT(onUserGotInfo( QNetworkReply* )));
-    
-    AuthenticatedUser you;
-    connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
-    connect(you.getNeighbours(), SIGNAL(finished()), SLOT(onUserGotNeighbours()));
-    connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
+    MainStarterWidget* w = new MainStarterWidget();
+    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+
+    layout->addWidget(w);
+
+    NowPlayingWidget* n = new NowPlayingWidget();
+
+
+    setLayout(layout);
 }
 
+void 
+MainWidget::onStartRadio(RadioStation rs)
+{
+    // todo: move forward to now playing screen
+}
 
 QString magic(XmlQuery e, ...)
 {
