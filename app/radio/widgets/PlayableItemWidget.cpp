@@ -22,14 +22,14 @@
 #include <QLabel>
 
 
-PlayableItemWidget::PlayableItemWidget(QString stationTitle, RadioStation& rs)
+PlayableItemWidget::PlayableItemWidget(QString stationTitle, const RadioStation& rs)
     : m_rs(rs)
 {
     m_rs.setTitle(stationTitle);
     init();
 }
 
-PlayableItemWidget::PlayableItemWidget(RadioStation& rs)
+PlayableItemWidget::PlayableItemWidget(const RadioStation& rs)
     : m_rs(rs)
 {
     init();

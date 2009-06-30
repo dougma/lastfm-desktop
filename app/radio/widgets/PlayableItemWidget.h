@@ -30,8 +30,8 @@ class PlayableItemWidget : public QLabel
     Q_OBJECT;
 
 public:
-    PlayableItemWidget(QString stationTitle, RadioStation& rs);
-    PlayableItemWidget(RadioStation& rs);
+    PlayableItemWidget(QString stationTitle, const RadioStation& rs);
+    PlayableItemWidget(const RadioStation& rs);
 
 signals:
     void startRadio(RadioStation);
