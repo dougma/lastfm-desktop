@@ -155,7 +155,7 @@ public:
             rowLayout->addWidget(button, 0, Qt::AlignLeft);
         }
         if (nowPlaying) {
-            QPushButton* button = new QPushButton("Now Playing");
+            QPushButton* button = new QPushButton(tr("Now Playing"));
             button->setObjectName("NowPlayingButton");
             if (!nowPlaying->isPlaying()) {
                 button->hide();
