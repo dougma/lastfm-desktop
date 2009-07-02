@@ -23,6 +23,8 @@
 #include <QWidget>
 #include <lastfm/RadioStation>
 
+class QPushButton;
+
 class MainStarterWidget : public QWidget
 {
     Q_OBJECT;

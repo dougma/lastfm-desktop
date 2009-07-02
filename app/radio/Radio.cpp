@@ -239,18 +239,18 @@ Radio::phononEnqueue()
         // state changes, so we must filter them.
         if (!t.url().isValid()) continue;
         
-        qDebug() << t.url();
-
         m_track = t;
         Phonon::MediaSource ms( t.url() );
 
         // if we are playing a track now, enqueue, otherwise start now!
         if (m_mediaObject->currentSource().url().isValid()) {
+            qDebug() << "enqueuing " << t;
             m_mediaObject->enqueue( ms );
         } else {
+            qDebug() << "starting " << t;
             m_mediaObject->setCurrentSource( ms );
+            m_mediaObject->play();
         }
-        m_mediaObject->play();
         break;
     }
 }

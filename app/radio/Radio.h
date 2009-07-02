@@ -48,7 +48,8 @@ namespace lastfm
 class Radio : public QObject
 {
     Q_OBJECT
-    
+    Q_ENUMS(State)
+
 public:
     Radio( Phonon::AudioOutput* );
     ~Radio();

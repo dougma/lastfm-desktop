@@ -16,6 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <QPushButton>
 #include <QVBoxLayout>
 #include "MainStarterWidget.h"
 #include "QuickStartWidget.h"
@@ -25,9 +26,9 @@
 
 MainStarterWidget::MainStarterWidget()
 {
-    QWidget* w;
-    QVBoxLayout* layout = new QVBoxLayout();
+    QVBoxLayout* layout = new QVBoxLayout(this);
 
+    QWidget* w;
     w = new QuickStartWidget();
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     layout->addWidget(w);
@@ -44,6 +45,4 @@ MainStarterWidget::MainStarterWidget()
     connect(w, SIGNAL(combo()), SIGNAL(combo()));
     connect(w, SIGNAL(yourTags()), SIGNAL(yourTags()));
     layout->addWidget(w);
-
-    setLayout(layout);
 }

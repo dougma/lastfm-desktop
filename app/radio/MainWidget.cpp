@@ -30,7 +30,11 @@
 
 MainWidget::MainWidget()
 {
-    m_layout = new SideBySideLayout;
+    m_nowPlaying = new NowPlayingState();
+    connect(radio, SIGNAL(tuningIn(RadioStation)), m_nowPlaying, SLOT(onTuningIn(RadioStation)));
+    connect(radio, SIGNAL(stopped()), m_nowPlaying, SLOT(onStopped()));
+
+    m_layout = new SideBySideLayout();
 
     MainStarterWidget* w = new MainStarterWidget;
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
@@ -38,7 +42,9 @@ MainWidget::MainWidget()
     connect(w, SIGNAL(combo()), SLOT(onCombo()));
     connect(w, SIGNAL(yourTags()), SLOT(onYourTags()));
 
-    m_layout->addWidget(w);
+    BackForwardControls* ctrl = new BackForwardControls(QString(), m_nowPlaying, w);
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    m_layout->addWidget(ctrl);
 
     setLayout(m_layout);
 }
@@ -48,28 +54,30 @@ MainWidget::onStartRadio(RadioStation rs)
 {
     qDebug() << rs.title() << " -> " << rs.url();
 
-    NowPlayingWidget* nowPlaying = new NowPlayingWidget;
-    connect(radio, SIGNAL(tuningIn( RadioStation )), nowPlaying, SLOT(onTuningIn( RadioStation )));
-    connect(radio, SIGNAL(trackSpooled( Track )), nowPlaying, SLOT(onTrackSpooled( Track )));
-    connect(radio, SIGNAL(trackStarted( Track )), nowPlaying, SLOT(onTrackStarted( Track )));
-    connect(radio, SIGNAL(buffering( int )), nowPlaying, SLOT(onBuffering( int )));
-    connect(radio, SIGNAL(stopped()), nowPlaying, SLOT(onStopped()));
+    NowPlayingWidget* w = new NowPlayingWidget;
+    connect(radio, SIGNAL(tuningIn( RadioStation )), w, SLOT(onTuningIn( RadioStation )));
+    connect(radio, SIGNAL(trackSpooled( Track )), w, SLOT(onTrackSpooled( Track )));
+    connect(radio, SIGNAL(trackStarted( Track )), w, SLOT(onTrackStarted( Track )));
+    connect(radio, SIGNAL(buffering( int )), w, SLOT(onBuffering( int )));
+    connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
 
-    BackWrapper* back = new BackWrapper(tr("Back"), nowPlaying);
-    connect(back, SIGNAL(back()), SLOT(onBack()));
-    m_layout->addWidget(back);
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
+    connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    m_layout->addWidget(ctrl);
     m_layout->moveForward();
 }
 
 void
 MainWidget::onCombo()
 {
-    MultiStarterWidget* multi = new MultiStarterWidget(3);
-    connect(multi, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-    connect(multi, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
-    BackWrapper* back = new BackWrapper(tr("Back"), multi);
-    connect(back, SIGNAL(back()), SLOT(onBack()));
-    m_layout->addWidget(back);
+    MultiStarterWidget* w = new MultiStarterWidget(3);
+    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), m_nowPlaying, w);
+    connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    m_layout->addWidget(ctrl);
     m_layout->moveForward();
 }
 
@@ -80,6 +88,12 @@ MainWidget::onBack()
     m_layout->moveBackward();
     m_layout->removeWidget(w);
     w->deleteLater();
+}
+
+void
+MainWidget::onForward()
+{
+    qDebug() << "todo";
 }
 
 void
