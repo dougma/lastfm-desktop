@@ -28,11 +28,11 @@
 RecentStationsWidget::RecentStationsWidget()
 {
     // todo: start a spinner
-    update();
+    refresh();
 }
 
 void
-RecentStationsWidget::update()
+RecentStationsWidget::refresh()
 {
     // todo: implement AuthenticatedUser::getRecentStations()
     //connect(AuthenticatedUser::getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));

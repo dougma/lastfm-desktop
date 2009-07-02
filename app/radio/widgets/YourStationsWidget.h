@@ -20,13 +20,13 @@
 #ifndef YOUR_STATIONS_WIDGET_H
 #define YOUR_STATIONS_WIDGET_H
 
-#include <QListWidget>
+#include "widgets/StylableWidget.h"
 #include <lastfm/RadioStation>
 
 class QComboBox;
 class QLineEdit;
 
-class YourStationsWidget : public QWidget
+class YourStationsWidget : public StylableWidget
 {
     Q_OBJECT;
 

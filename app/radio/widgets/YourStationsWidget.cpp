@@ -28,7 +28,8 @@
 
 YourStationsWidget::YourStationsWidget()
 {
-    QGridLayout* layout = new QGridLayout();
+    
+    QGridLayout* layout = new QGridLayout( this );
 
     PlayableItemWidget* item;
     layout->addWidget(new QLabel(tr("Your Stations")), 0, 0, 1, 2, Qt::AlignCenter);
@@ -49,5 +50,4 @@ YourStationsWidget::YourStationsWidget()
     layout->addWidget(item, 2, 1);
     connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     
-    setLayout(layout);
 }

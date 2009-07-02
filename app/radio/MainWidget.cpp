@@ -34,7 +34,7 @@ MainWidget::MainWidget()
     connect(radio, SIGNAL(tuningIn(RadioStation)), m_nowPlaying, SLOT(onTuningIn(RadioStation)));
     connect(radio, SIGNAL(stopped()), m_nowPlaying, SLOT(onStopped()));
 
-    m_layout = new SideBySideLayout();
+    m_layout = new SideBySideLayout( this );
 
     MainStarterWidget* w = new MainStarterWidget;
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
@@ -46,7 +46,6 @@ MainWidget::MainWidget()
     connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
     m_layout->addWidget(ctrl);
 
-    setLayout(m_layout);
 }
 
 void 

@@ -20,10 +20,10 @@
 #ifndef RECENT_STATIONS_WIDGET_H
 #define RECENT_STATIONS_WIDGET_H
 
-#include <QWidget>
+#include "widgets/StylableWidget.h"
 #include <lastfm/RadioStation>
 
-class RecentStationsWidget : public QWidget
+class RecentStationsWidget : public StylableWidget
 {
     Q_OBJECT;
 
@@ -37,7 +37,7 @@ private slots:
     void gotRecentStations();
 
 private:
-    void update();
+    void refresh();
 };
 
 #endif

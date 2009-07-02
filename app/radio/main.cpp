@@ -58,7 +58,6 @@ namespace lastfm
     extern LASTFM_DLLEXPORT QByteArray UserAgent;
 }
 
-
 int main( int argc, char** argv )
 {
     QCoreApplication::setApplicationName( "Moralist Fad" );

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource>
+        <file alias="play-onhover.png">play_ondark_23x22_onhover.png</file>
+        <file alias="play-onpress.png">play_ondark_23x22_onpress.png</file>
+        <file alias="play-rest.png">play_ondark_23x22_rest.png</file>
+    </qresource>
+</RCC>
+

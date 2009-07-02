@@ -20,12 +20,12 @@
 #ifndef PLAYABLE_ITEM_WIDGET_H
 #define PLAYABLE_ITEM_WIDGET_H
 
-#include <QLabel>
+#include <QPushButton>
 #include <lastfm/RadioStation>
 
 class QMouseEvent;
 
-class PlayableItemWidget : public QLabel
+class PlayableItemWidget : public QPushButton
 {
     Q_OBJECT;
 

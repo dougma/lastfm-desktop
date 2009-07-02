@@ -36,6 +36,8 @@ QuickStartWidget::QuickStartWidget()
     layout->addWidget(button);
     setLayout(layout);
 
+    m_edit->setAttribute( Qt::WA_MacShowFocusRect, false );
+    
     connect(m_edit, SIGNAL(returnPressed()), SLOT(play()));
     connect(button, SIGNAL(clicked()), SLOT(play()));
 }
