@@ -23,6 +23,8 @@
 #include <QWidget>
 #include <lastfm/RadioStation>
 
+class QGridLayout;
+
 class RecentStationsWidget : public QWidget
 {
     Q_OBJECT;
@@ -38,6 +40,8 @@ private slots:
 
 private:
     void update();
+
+    QGridLayout* m_layout;
 };
 
 #endif

@@ -34,34 +34,11 @@ RecentStationsWidget::RecentStationsWidget()
 void
 RecentStationsWidget::update()
 {
-    // todo: implement AuthenticatedUser::getRecentStations()
-    //connect(AuthenticatedUser::getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));
+    AuthenticatedUser you;
+    connect(you.getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));
 
-    // dummy code begins {
-    QGridLayout* layout = new QGridLayout();
-    layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, 0, 1, 2, Qt::AlignCenter);
-
-    PlayableItemWidget* item;
-    item = new PlayableItemWidget(tr("Radiohead Radio"), RadioStation::similar(Artist("Radiohead")));
-    layout->addWidget(item, 1, 0);
-    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-
-    item = new PlayableItemWidget(tr("mxcl's Loved Tracks"), RadioStation::lovedTracks(User("mxcl")));
-    layout->addWidget(item, 1, 1);
-    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-
-    item = new PlayableItemWidget(tr("Jazz Tag Radio"), RadioStation::globalTag(Tag("Jazz")));
-    layout->addWidget(item, 2, 0);
-    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-
-    item = new PlayableItemWidget(tr("megadeth radio"), RadioStation::similar(Artist("megadeth")));
-    layout->addWidget(item, 2, 1);
-    connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-    
-    layout->addWidget(new QLabel(tr("see more")), 3, 0, 1, 2, Qt::AlignRight);
-
-    setLayout(layout);
-    // } ends
+    m_layout = new QGridLayout(this);
+    m_layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, 0, 1, 2, Qt::AlignCenter);
 }
 
 void
@@ -69,7 +46,14 @@ RecentStationsWidget::gotRecentStations()
 {
     // todo: stop any spinner
     sender()->deleteLater();
-    QNetworkReply* r = (QNetworkReply*)sender();
-    XmlQuery lfm = r->readAll();
-    // todo: handle response
+    QList<RadioStation> recent = RadioStation::list((QNetworkReply*)sender());
+
+    int p = 0;
+    foreach(const RadioStation& rs, recent) {
+        PlayableItemWidget* item = new PlayableItemWidget(rs.title(), rs);
+        m_layout->addWidget(item, 1 + p / 2, p % 2);
+        connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+        p++;
+    }
+    
 }
