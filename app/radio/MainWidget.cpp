@@ -49,11 +49,11 @@ MainWidget::onStartRadio(RadioStation rs)
     qDebug() << rs.title() << " -> " << rs.url();
 
     NowPlayingWidget* nowPlaying = new NowPlayingWidget;
-    connect(radio, SIGNAL(tuningIn( RadioStation )), nowPlaying, SLOT(tuningIn( RadioStation )));
-    connect(radio, SIGNAL(trackSpooled( Track )), nowPlaying, SLOT(trackSpooled( Track )));
-    connect(radio, SIGNAL(trackStarted( Track )), nowPlaying, SLOT(trackStarted( Track )));
-    connect(radio, SIGNAL(buffering( int )), nowPlaying, SLOT(buffering( int )));
-    connect(radio, SIGNAL(stopped()), nowPlaying, SLOT(stopped()));
+    connect(radio, SIGNAL(tuningIn( RadioStation )), nowPlaying, SLOT(onTuningIn( RadioStation )));
+    connect(radio, SIGNAL(trackSpooled( Track )), nowPlaying, SLOT(onTrackSpooled( Track )));
+    connect(radio, SIGNAL(trackStarted( Track )), nowPlaying, SLOT(onTrackStarted( Track )));
+    connect(radio, SIGNAL(buffering( int )), nowPlaying, SLOT(onBuffering( int )));
+    connect(radio, SIGNAL(stopped()), nowPlaying, SLOT(onStopped()));
 
     BackWrapper* back = new BackWrapper(tr("Back"), nowPlaying);
     connect(back, SIGNAL(back()), SLOT(onBack()));
