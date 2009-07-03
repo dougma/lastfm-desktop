@@ -25,7 +25,7 @@
 PlayableItemWidget::PlayableItemWidget(QString stationTitle, const RadioStation& rs)
     : m_rs(rs)
 {
-    m_rs.setTitle(stationTitle);
+    m_rs.setTitle( stationTitle);
     init();
 }
 
@@ -38,8 +38,10 @@ PlayableItemWidget::PlayableItemWidget(const RadioStation& rs)
 void
 PlayableItemWidget::init()
 {
-    // todo: play icon
-    setText(m_rs.title());
+    QString title = fontMetrics().elidedText( m_rs.title(), Qt::ElideRight, 200 );
+    if( title != m_rs.title() )
+        setToolTip( m_rs.title());
+    setText(title);
 }
 
 //virtual 

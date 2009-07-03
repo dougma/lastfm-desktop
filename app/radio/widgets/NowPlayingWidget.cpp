@@ -20,22 +20,40 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QLabel>
+#include <QImage>
+#include <QPixmap>
+
 #include <lastfm/Track>
-#include "lib/unicorn/widgets/TrackWidget.h"
+#include <lastfm/RadioStation>
+
+#include "lib/unicorn/TrackImageFetcher.h"
+
 #include "NowPlayingWidget.h"
 #include "RadioProgressBar.h"
 
 NowPlayingWidget::NowPlayingWidget()
 {
-    QVBoxLayout* layout = new QVBoxLayout();
+    new QVBoxLayout( this );
 
-    m_trackWidget = new TrackWidget();
-    layout->addWidget(m_trackWidget);
-
-    m_bar = new RadioProgressBar();
-    layout->addWidget(m_bar);
-
-    setLayout(layout);
+  //  m_trackWidget = new TrackWidget();
+  //  layout()->addWidget(m_trackWidget);
+    
+    ui.cover = new QLabel();
+    ui.cover->setAlignment( Qt::AlignCenter );
+    layout()->addWidget( ui.cover );
+    
+    ((QBoxLayout*)layout())->addStretch();
+    
+    ui.track = new QLabel();
+    layout()->addWidget( ui.track );
+    
+    ui.artist = new QLabel();
+    layout()->addWidget( ui.artist );
+    
+    ui.bar = new RadioProgressBar();
+    layout()->addWidget(ui.bar);
+    connect( this, SIGNAL( tick( qint64 )), ui.bar, SLOT( onRadioTick( qint64 )));
 }
 
 void
@@ -46,13 +64,27 @@ NowPlayingWidget::onTuningIn( const RadioStation& )
 void
 NowPlayingWidget::onTrackSpooled( const Track& t )
 {
-    m_bar->onTrackSpooled(t, 0);
+    ui.bar->onTrackSpooled(t, 0);
 }
 
 void
 NowPlayingWidget::onTrackStarted( const Track& t )
 {
-    m_trackWidget->setTrack(t);
+    TrackImageFetcher* imageFetcher = new TrackImageFetcher( t );
+    connect( imageFetcher, SIGNAL( finished( QImage )),
+                                         SLOT( onImageFinished( QImage )));
+    imageFetcher->start();
+    
+    ui.artist->setText( t.artist() );
+    ui.track->setText( t.title() );
+//    m_trackWidget->setTrack(t);
+}
+
+void 
+NowPlayingWidget::onImageFinished( const QImage& image )
+{
+    ui.cover->setPixmap( QPixmap::fromImage( image ) );
+    sender()->deleteLater();
 }
 
 void
