@@ -26,7 +26,7 @@
 
 class StylableWidget: public QWidget {
 protected:
-    void paintEvent(QPaintEvent* e)
+    void paintEvent(QPaintEvent*)
     {
         QStyleOption opt;
         opt.init(this);

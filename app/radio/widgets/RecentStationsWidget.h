@@ -20,7 +20,7 @@
 #ifndef RECENT_STATIONS_WIDGET_H
 #define RECENT_STATIONS_WIDGET_H
 
-#include "widgets/StylableWidget.h"
+#include "StylableWidget.h"
 #include <lastfm/RadioStation>
 
 class QGridLayout;

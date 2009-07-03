@@ -20,7 +20,7 @@
 #ifndef YOUR_STATIONS_WIDGET_H
 #define YOUR_STATIONS_WIDGET_H
 
-#include "widgets/StylableWidget.h"
+#include "StylableWidget.h"
 #include <lastfm/RadioStation>
 
 class QComboBox;
