@@ -49,3 +49,7 @@ PlayableItemWidget:hover {
 PlayableItemWidget:pressed {
     background-image: url(:/play-onpress.png);
 }
+
+NowPlayingWidget QLabel {
+    color: white;
+}

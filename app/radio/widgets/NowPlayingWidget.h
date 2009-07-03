@@ -27,6 +27,8 @@
 
 class TrackWidget;
 class RadioProgressBar;
+class QLabel;
+class QImage;
 
 class NowPlayingWidget : public QWidget
 {
@@ -35,6 +37,8 @@ class NowPlayingWidget : public QWidget
 public:
     NowPlayingWidget();
 
+signals:
+    void tick( qint64 );
 public slots:
     // all from the radio:
     void onTuningIn( const RadioStation& );
@@ -42,10 +46,17 @@ public slots:
     void onTrackStarted( const Track& );
     void onBuffering( int );
     void onStopped();
+    
+private slots:
+    void onImageFinished( const QImage& );
 
 private:
-    TrackWidget* m_trackWidget;
-    RadioProgressBar* m_bar;
+    struct {
+        RadioProgressBar* bar;
+        QLabel* cover;
+        QLabel* artist;
+        QLabel* track;
+    } ui;
 };
 
 #endif

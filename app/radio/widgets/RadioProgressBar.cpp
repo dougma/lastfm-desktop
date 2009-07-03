@@ -33,6 +33,8 @@ RadioProgressBar::RadioProgressBar( QWidget* parent )
                 : QWidget( parent )
                 , m_scrobbleProgressTick( 0 )
 {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    
     QHBoxLayout* h = new QHBoxLayout( this );
     h->addWidget( ui.time = new QLabel );
     h->addStretch();
@@ -52,7 +54,6 @@ RadioProgressBar::RadioProgressBar( QWidget* parent )
     ui.time->setFont( f );
     ui.timeToGo->setFont( f );
 #endif
-    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     
 }
         
@@ -91,8 +92,10 @@ RadioProgressBar::paintEvent( QPaintEvent* e )
 QSize
 RadioProgressBar::sizeHint() const
 {
-    return QSize( ui.time->sizeHint().width() + 114 + ui.timeToGo->sizeHint().width(),
+    QSize s( ui.time->sizeHint().width() + 15 + ui.timeToGo->sizeHint().width(),
                  ui.time->sizeHint().height());
+    qDebug() << "Size Hint: " << s.width();
+    return s;
 }
 
 
