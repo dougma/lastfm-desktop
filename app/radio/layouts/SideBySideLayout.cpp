@@ -26,7 +26,8 @@ SideBySideLayout::SideBySideLayout( QWidget* parent )
            : QLayout( parent ), m_currentItem( 0 ), m_timeLine( new QTimeLine( 500, this ) )
 {
     m_timeLine->setUpdateInterval( 25 );
-    connect( m_timeLine, SIGNAL( frameChanged( int )), SLOT( onFrameChanged( int )));
+    connect( m_timeLine, SIGNAL(frameChanged( int )), SLOT(onFrameChanged( int )));
+    connect( m_timeLine, SIGNAL(finished()), SIGNAL(moveFinished()));
 }
 
 
@@ -145,7 +146,9 @@ SideBySideLayout::moveForward()
     
     if( m_timeLine->state() == QTimeLine::Running && 
         m_timeLine->direction() == QTimeLine::Backward )
+    {
         m_timeLine->setDirection( QTimeLine::Forward );
+    }
     else
     {
         m_timeLine->setDirection( QTimeLine::Forward );
@@ -167,8 +170,10 @@ SideBySideLayout::moveBackward()
     m_currentItem = m_itemList.at( nextIndex );
 
     if( m_timeLine->state() == QTimeLine::Running && 
-       m_timeLine->direction() == QTimeLine::Forward )
+        m_timeLine->direction() == QTimeLine::Forward )
+    {
         m_timeLine->setDirection( QTimeLine::Backward );
+    }
     else
     {
         m_timeLine->setDirection( QTimeLine::Backward );
@@ -190,4 +195,19 @@ QWidget*
 SideBySideLayout::currentWidget()
 {
     return m_currentItem->widget();
+}
+
+QWidget* 
+SideBySideLayout::nextWidget()
+{
+    int nextIndex = m_itemList.indexOf( m_currentItem ) + 1;
+    return nextIndex < m_itemList.count() ? m_itemList[nextIndex]->widget() : 0;
+}
+
+void
+SideBySideLayout::insertWidget(int index, QWidget* widget)
+{
+    addChildWidget(widget);
+    m_itemList.insert(index, new QWidgetItem(widget));
+    doLayout(geometry(), 0);
 }

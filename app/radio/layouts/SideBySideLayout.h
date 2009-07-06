@@ -34,6 +34,7 @@
 class SideBySideLayout : public QLayout
 {
     Q_OBJECT
+
 public:
     SideBySideLayout( class QWidget* parent = 0 );
     ~SideBySideLayout();
@@ -48,11 +49,16 @@ public:
     QSize sizeHint() const;
     QLayoutItem *takeAt(int index);
     QWidget* currentWidget();
+    QWidget* nextWidget();
+    void insertWidget(int index, QWidget* widget);
+
+signals:
+    void moveFinished();
     
 public slots:
     void moveForward();
     void moveBackward();
-    
+
 private slots:
     void onFrameChanged( int frame );
 
@@ -62,8 +68,6 @@ private:
     QList<QLayoutItem *> m_itemList;
     QLayoutItem* m_currentItem;
     class QTimeLine* m_timeLine;
-    
-
 
 };
 
