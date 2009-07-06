@@ -139,7 +139,7 @@ PlaydarTagCloudModel::data( const QModelIndex& index, int role ) const
             return QVariant::fromValue<float>((i->m_weight / m_maxWeight));
 
         case PlaydarTagCloudModel::LinearWeightRole:
-            if (m_tagList.count() == 1) {
+            if (m_maxLogWeight == m_minLogWeight) {
                 return 1;
             }
             return QVariant::fromValue<float>( ( i->m_logWeight - m_minLogWeight ) / (m_maxLogWeight - m_minLogWeight));
