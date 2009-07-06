@@ -29,11 +29,14 @@
 #include <QThread>
 #include <QVariant>
 
+#include <Phonon>
+
 namespace Phonon
 {
 	class MediaObject;
 	class AudioOutput;
 	class MediaSource;
+    class Path;
 }
 
 namespace lastfm 
@@ -92,6 +95,11 @@ private slots:
     void onTunerError( lastfm::ws::Error );
     void phononEnqueue();
     void onBuffering( int );
+    void onFinished();
+
+    void onMutedChanged(bool);
+    void onOutputDeviceChanged(const Phonon::AudioOutputDevice&);
+    void onVolumeChanged(qreal);
 
 	/** we get a "proper" station name from the tune webservice */
 	void setStationNameIfCurrentlyBlank( const QString& );
@@ -106,6 +114,7 @@ private:
     QPointer<lastfm::RadioTuner> m_tuner;
 	Phonon::AudioOutput* m_audioOutput;
 	Phonon::MediaObject* m_mediaObject;
+    Phonon::Path m_path;
 	Radio::State m_state;
 	Track m_track;
 	RadioStation m_station;

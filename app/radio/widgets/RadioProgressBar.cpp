@@ -94,7 +94,7 @@ RadioProgressBar::sizeHint() const
 {
     QSize s( ui.time->sizeHint().width() + 15 + ui.timeToGo->sizeHint().width(),
                  ui.time->sizeHint().height());
-    qDebug() << "Size Hint: " << s.width();
+//    qDebug() << "Size Hint: " << s.width();
     return s;
 }
 

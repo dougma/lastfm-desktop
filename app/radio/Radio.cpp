@@ -19,6 +19,7 @@
 */
 #include "Radio.h"
 #include <lastfm/RadioTuner>
+#include <Phonon>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <QThread>
@@ -35,10 +36,19 @@ Radio::Radio( Phonon::AudioOutput* output )
     m_mediaObject = new Phonon::MediaObject;
     m_mediaObject->setTickInterval( 1000 );
     connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-	connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononCurrentSourceChanged( Phonon::MediaSource )) );
+    connect( m_mediaObject, SIGNAL(bufferStatus(int)), SLOT(onBuffering(int)));
+    connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononCurrentSourceChanged( Phonon::MediaSource )) );
     connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
+    connect( m_mediaObject, SIGNAL(finished()), SLOT(onFinished()));
     connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
-    Phonon::createPath( m_mediaObject, m_audioOutput );    
+    m_path = Phonon::createPath( m_mediaObject, m_audioOutput );
+    if (!m_path.isValid()) {
+        qDebug() << "Phonon::createPath failed";
+    }
+
+    connect(output, SIGNAL(mutedChanged(bool)), SLOT(onMutedChanged(bool)));
+    connect(output, SIGNAL(outputDeviceChanged(Phonon::AudioOutputDevice)), SLOT(onOutputDeviceChanged(Phonon::AudioOutputDevice)));
+    connect(output, SIGNAL(volumeChanged(qreal)), SLOT(onVolumeChanged(qreal)));
 }
 
 
@@ -177,7 +187,7 @@ Radio::clear()
 void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
-    qDebug() << "new:" << newstate << " old:" << oldstate;
+    qDebug() << oldstate << " -> " << newstate;
     switch (newstate)
     {
         case Phonon::ErrorState:
@@ -224,7 +234,8 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 void
 Radio::phononEnqueue()
 {
-    if (m_mediaObject->queue().size() || !m_tuner) return;
+    if (m_mediaObject->queue().size() || !m_tuner)
+        return;
 
     // keep only one track in the phononQueue
     // Loop until we get a null url or a valid url.
@@ -262,8 +273,13 @@ void
 Radio::onPhononCurrentSourceChanged( const Phonon::MediaSource& )
 {
     MutableTrack( m_track ).stamp();
-    changeState( Buffering );
-    emit trackSpooled( m_track );
+    if (m_mediaObject->state() == Phonon::PlayingState) {
+        emit trackSpooled( m_track );
+        emit trackStarted( m_track );
+    } else {
+        changeState( Buffering );
+        emit trackSpooled( m_track );
+    }
 }
 
 
@@ -311,9 +327,33 @@ Radio::setStationNameIfCurrentlyBlank( const QString& s )
     }
 }
 
-
 void
 Radio::onBuffering( int percent_filled )
 {
-    qDebug() << percent_filled;
+    Q_UNUSED(percent_filled);
+}
+
+void
+Radio::onMutedChanged(bool muted)
+{
+    Q_UNUSED(muted);
+}
+
+void
+Radio::onOutputDeviceChanged(const Phonon::AudioOutputDevice& newDevice)
+{
+    qDebug() << "name: " << newDevice.name() << " description: " << newDevice.description();
+}
+
+void
+Radio::onVolumeChanged(qreal vol)
+{
+    Q_UNUSED(vol)
+}
+
+void
+Radio::onFinished()
+{
+    // the play queue has come to a natural end
+    qDebug() << ".";
 }

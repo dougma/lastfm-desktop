@@ -36,6 +36,7 @@
 #include "lib/unicorn/UnicornMainWindow.h"
 #include <lastfm/RadioStation>
 #include <QLineEdit>
+
 void setupRadio();
 void cleanup();
 
@@ -105,7 +106,7 @@ int main( int argc, char** argv )
         window.setWindowTitle( app.applicationName() );
 		window.finishUi();
 		window.show();
-		
+
         app.parseArguments( app.arguments() );
         return app.exec();
     }
@@ -151,7 +152,18 @@ static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
 void setupRadio()
 {
 	Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, qApp );
-	audioOutput->setVolume( QSettings().value( "Volume", 80 ).toUInt() );
+//	audioOutput->setVolume( QSettings().value( "Volume", 80 ).toUInt() );
+
+    qDebug() << audioOutput->name();
+    qDebug() << audioOutput->outputDevice().description();
+    qDebug() << audioOutput->outputDevice().name();
+    qDebug() << (audioOutput->isMuted() ? "muted,": "not-muted,") <<
+                (audioOutput->isValid() ? "valid,": "not-valid,") <<
+                audioOutput->volumeDecibel() << "db " <<
+                audioOutput->volume();
+    foreach (QByteArray a, audioOutput->outputDevice().propertyNames()) {
+        qDebug() << a << ":" << audioOutput->outputDevice().property(a);
+    }
 
     QString audioOutputDeviceName = "";//TODO moose::Settings().audioOutputDeviceName();
     if (audioOutputDeviceName.size())
@@ -162,14 +174,7 @@ void setupRadio()
                 break;
             }
     }
-
 	radio = new Radio( audioOutput );
-}
-
-void connectRadio(QObject* receiver)
-{
-    if (radio && receiver) {
-    }
 }
 
 
