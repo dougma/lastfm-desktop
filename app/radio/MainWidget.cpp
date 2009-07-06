@@ -75,25 +75,40 @@ MainWidget::onCombo()
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
     BackForwardControls* ctrl = new BackForwardControls(tr("Back"), m_nowPlaying, w);
-    connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
     connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
-    m_layout->addWidget(ctrl);
+    m_layout->insertWidget(1, ctrl);
     m_layout->moveForward();
 }
 
 void
 MainWidget::onBack()
 {
-    QWidget* w = m_layout->currentWidget();
     m_layout->moveBackward();
-    m_layout->removeWidget(w);
-    w->deleteLater();
+}
+
+void
+MainWidget::onBackDelete()
+{
+    connect(m_layout, SIGNAL(moveFinished()), SLOT(onMoveFinished()));
+    m_layout->moveBackward();
+}
+
+void
+MainWidget::onMoveFinished()
+{
+    disconnect(m_layout, SIGNAL(moveFinished()), this, SLOT(onMoveFinished()));
+    QWidget* w = m_layout->nextWidget();
+    if (w) {
+        m_layout->removeWidget(w);
+        w->deleteLater();
+    }
 }
 
 void
 MainWidget::onForward()
 {
-    qDebug() << "todo";
+    m_layout->moveForward();
 }
 
 void

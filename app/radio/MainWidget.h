@@ -56,6 +56,8 @@ private slots:
     void onCombo();
     void onYourTags();
     void onBack();
+    void onBackDelete();
+    void onMoveFinished();
     void onForward();
 
     void onUserGotInfo( QNetworkReply* );
