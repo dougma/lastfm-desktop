@@ -22,19 +22,19 @@
 
 #include <lastfm/global.h>
 #include <lastfm/Track>
-#include <QTcpSocket>
+#include <QLocalSocket>
 #include <QQueue>
 
 /** @author Christian Muehlhaeuser <chris@last.fm>
   * @contributor Erik Jaelevik <erik@last.fm>
   * @rewrite Max Howell <max@last.fm>
   */
-class ScrobSocket : public QTcpSocket
+class ScrobSocket : public QLocalSocket
 {
     Q_OBJECT
 
 public:
-    ScrobSocket( QObject* parent );
+    ScrobSocket( const QString& clientId, QObject* parent = 0);
     ~ScrobSocket();
 
 public slots:
@@ -45,12 +45,14 @@ public slots:
 
 private slots:
     void transmit( const QString& data );
-    void onError( QAbstractSocket::SocketError );
+    void onError( QLocalSocket::LocalSocketError );
     void onReadyRead();
     void onConnected();
     void onDisconnected();
 
-private:    
+private:
+    void doConnect();
+
     Track m_track;
     QQueue<QString> m_msgQueue;
 };

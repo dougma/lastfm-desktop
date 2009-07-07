@@ -23,16 +23,19 @@
 #include <QUrl>
 #include <QTextStream>
 
-static int const kDefaultPort = 33367;
- 
+#ifdef WIN32
+    #include "common/c++/win/scrobSubPipeName.cpp"
+#endif
 
-ScrobSocket::ScrobSocket( QObject* parent ) : QTcpSocket( parent )
+
+ScrobSocket::ScrobSocket( const QString& clientId, QObject* parent ) 
+: QLocalSocket( parent )
 {
     connect( this, SIGNAL(readyRead()), SLOT(onReadyRead()) );    
-    connect( this, SIGNAL(error( QAbstractSocket::SocketError )), SLOT(onError( QAbstractSocket::SocketError )) );
+    connect( this, SIGNAL(error( QLocalSocket::LocalSocketError )), SLOT(onError( QLocalSocket::LocalSocketError )) );
     connect( this, SIGNAL(connected()), SLOT(onConnected()) );
     connect( this, SIGNAL(disconnected()), SLOT(onDisconnected()) );
-    transmit( "INIT c=bof\n" );
+    transmit( "INIT c=" + clientId + "\n" );
 }
 
 
@@ -47,8 +50,9 @@ ScrobSocket::transmit( const QString& data )
 {
     m_msgQueue.enqueue( data );
     qDebug() << "Connection state == " << state();
-    if( state() == QAbstractSocket::UnconnectedState )
-        connectToHost( QHostAddress::LocalHost, kDefaultPort );
+    if( state() == QAbstractSocket::UnconnectedState ) {
+        doConnect();
+    }
 }
 
 
@@ -62,17 +66,30 @@ ScrobSocket::onConnected()
     }
 }
 
+void
+ScrobSocket::doConnect()
+{
+    #ifdef WIN32
+        std::string s;
+        DWORD r = scrobSubPipeName( &s );
+        if (r != 0) throw std::runtime_error( formatWin32Error( r ) );
+        QString const name = QString::fromStdString( s );
+    #else
+        QString const name = "lastfm_scrobsub";
+    #endif
+    connectToServer( name );
+}
 
 void 
 ScrobSocket::onDisconnected()
 {
     if( !m_msgQueue.empty())
-        connectToHost( QHostAddress::LocalHost, kDefaultPort );
+        doConnect();
 }
 
 
 void
-ScrobSocket::onError( SocketError error )
+ScrobSocket::onError( QLocalSocket::LocalSocketError error )
 {
     switch (error)
     {
@@ -83,14 +100,15 @@ ScrobSocket::onError( SocketError error )
             m_msgQueue.clear();
             break;
         
-        case RemoteHostClosedError:
+        case PeerClosedError:
             // expected
             break;
         
-        default: // may as well
-            qDebug() << lastfm::qMetaEnumString<QAbstractSocket>( error, "SocketError" );
         case ConnectionRefusedError: // happens if client isn't running
             break;
+
+        default: // may as well
+            qDebug() << lastfm::qMetaEnumString<QAbstractSocket>( error, "SocketError" );
     }
 }
 
@@ -139,6 +157,7 @@ void
 ScrobSocket::onReadyRead()
 {
     QByteArray bytes = readAll();
-    if (bytes != "OK\n") qWarning() << bytes.trimmed();
-    disconnectFromHost();
+    if (bytes != "OK\n") 
+        qWarning() << bytes.trimmed();
+    disconnectFromServer();
 }

@@ -94,7 +94,7 @@ int main( int argc, char** argv )
 		qAddPostRoutine(cleanup);
 		app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
-        ScrobSocket* scrobsock = new ScrobSocket(&app);
+        ScrobSocket* scrobsock = new ScrobSocket("ass");
         scrobsock->connect(radio, SIGNAL(trackStarted(Track)), SLOT(start(Track)));
         scrobsock->connect(radio, SIGNAL(stopped()), SLOT(stop()));
 
