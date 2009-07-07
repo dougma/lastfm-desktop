@@ -20,13 +20,13 @@
 #ifndef QUICK_START_WIDGET_H
 #define QUICK_START_WIDGET_H
 
-#include <QWidget>
+#include "StylableWidget.h"
 #include <lastfm/RadioStation>
 
 class QComboBox;
 class QLineEdit;
 
-class QuickStartWidget : public QWidget
+class QuickStartWidget : public StylableWidget
 {
     Q_OBJECT;
 

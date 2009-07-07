@@ -128,7 +128,7 @@ DiagnosticsDialog::scrobbleActivity( int msg )
 void
 DiagnosticsDialog::onScrobblePointReached()
 {    
-    lastfm::ScrobbleCache cache( lastfm::ws::Username );
+    ScrobbleCache cache( lastfm::ws::Username );
 
     QList<QTreeWidgetItem *> items;
     foreach (Track t, cache.tracks())

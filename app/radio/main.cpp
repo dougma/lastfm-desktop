@@ -30,6 +30,7 @@
 #include "Application.h"
 #include "MainWidget.h"
 #include "widgets/MultiStarterWidget.h"
+#include "widgets/PlaybackControlsWidget.h"
 #include "Radio.h"
 #include "ScrobSocket.h"
 #include "lib/unicorn/UniqueApplication.h"
@@ -37,6 +38,7 @@
 #include "lib/unicorn/UnicornMainWindow.h"
 #include <lastfm/RadioStation>
 #include <QLineEdit>
+#include <QStatusBar>
 
 void setupRadio();
 void cleanup();
@@ -105,11 +107,27 @@ int main( int argc, char** argv )
         
         unicorn::MainWindow window;
 
-        MainWidget* mainWidget = new MainWidget;
-        q->connect(mainWidget, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
-	    window.setCentralWidget( mainWidget );
+        MainWidget mainWidget;
+        q->connect(&mainWidget, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+	    window.setCentralWidget( &mainWidget );
         window.setWindowTitle( app.applicationName() );
 		window.finishUi();
+		QStatusBar status;
+		PlaybackControlsWidget* pcw = new PlaybackControlsWidget();
+
+		//In order to compensate for the sizer grip on the bottom right
+		//of the window, an empty QWidget is added as a spacer.
+		QWidget* w = new QWidget( &status );
+		w->setFixedWidth( 13 );
+		status.addWidget( w );
+		
+		//Seemingly the only way to get a central widget in a QStatusBar
+		//is to add an empty widget either side with a stretch value.
+		status.addWidget( new QWidget( &status), 1 );
+		status.addWidget( pcw );
+		status.addWidget( new QWidget( &status), 1 );
+		window.setUnifiedTitleAndToolBarOnMac( true );
+		window.setStatusBar( &status );
 		window.show();
 
         app.parseArguments( app.arguments() );
