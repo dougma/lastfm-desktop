@@ -70,6 +70,7 @@ NowPlayingWidget::onTrackSpooled( const Track& t )
 void
 NowPlayingWidget::onTrackStarted( const Track& t )
 {
+    ui.cover->clear();
     TrackImageFetcher* imageFetcher = new TrackImageFetcher( t );
     connect( imageFetcher, SIGNAL( finished( QImage )),
                                          SLOT( onImageFinished( QImage )));

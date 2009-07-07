@@ -1,8 +1,30 @@
 <RCC>
     <qresource>
-        <file alias="play-onhover.png">play_ondark_23x22_onhover.png</file>
-        <file alias="play-onpress.png">play_ondark_23x22_onpress.png</file>
-        <file alias="play-rest.png">play_ondark_23x22_rest.png</file>
+        <file alias="station-start-onhover.png">station_start_23x22_onhover.png</file>
+        <file alias="station-start-onpress.png">station_start_23x22_onpress.png</file>
+        <file alias="station-start-rest.png">station_start_23x22_rest.png</file>
+        
+        <file alias="ban-onhover.png">ban_hover_29x29.png</file>
+        <file alias="ban-onpress.png">ban_pressed_29x29.png</file>
+        <file alias="ban-rest.png">ban_rest_29x29.png</file>
+        
+        <file alias="love-isloved.png">love_isloved_31x29.png</file>
+        <file alias="love-onhover.png">love_hover_31x29.png</file>
+        <file alias="love-onpress.png">love_pressed_31x29.png</file>
+        <file alias="love-rest.png">love_rest_31x29.png</file>
+        
+        <file alias="play-onhover.png">play_hover_29x29.png</file>
+        <file alias="play-onpress.png">play_pressed_29x29.png</file>
+        <file alias="play-rest.png">play_rest_29x29.png</file>
+        
+        <file alias="stop-onhover.png">stop_hover_29x29.png</file>
+        <file alias="stop-onpress.png">stop_pressed_29x29.png</file>
+        <file alias="stop-rest.png">stop_rest_29x29.png</file>
+                
+        <file alias="skip-onhover.png">skip_hover_45x29.png</file>
+        <file alias="skip-onpress.png">skip_pressed_45x29.png</file>
+        <file alias="skip-rest.png">skip_rest_45x29.png</file>
+        
     </qresource>
 </RCC>
 

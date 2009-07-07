@@ -36,9 +36,9 @@ RadioProgressBar::RadioProgressBar( QWidget* parent )
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     
     QHBoxLayout* h = new QHBoxLayout( this );
-    h->addWidget( ui.time = new QLabel );
+    h->addWidget( ui.time = new QLabel( "00:00") );
     h->addStretch();
-    h->addWidget( ui.timeToGo = new QLabel );
+    h->addWidget( ui.timeToGo = new QLabel( "00:00"));
     h->setMargin( 0 );
     h->setSpacing( 0 );
     

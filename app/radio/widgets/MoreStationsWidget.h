@@ -20,10 +20,10 @@
 #ifndef MORE_STATIONS_WIDGET_H
 #define MORE_STATIONS_WIDGET_H
 
-#include <QListWidget>
+#include "StylableWidget.h"
 #include <lastfm/RadioStation>
 
-class MoreStationsWidget : public QWidget
+class MoreStationsWidget : public StylableWidget
 {
     Q_OBJECT;
 

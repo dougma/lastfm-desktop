@@ -3,13 +3,18 @@ unicorn--MainWindow {
                                  stop:0 #211f20, stop:1 #383840 );
 }
 
-YourStationsWidget, RecentStationsWidget {
+YourStationsWidget, RecentStationsWidget,
+QuickStartWidget, MoreStationsWidget {
     background: #211f20;
     border-radius: 10px;
+    padding: 5px;
 }
 
-YourStationsWidget .QLabel,
-RecentStationsWidget .QLabel {
+YourStationsWidget > .QLabel,
+RecentStationsWidget > .QLabel,
+QuickStartWidget > .QLabel,
+MoreStationsWidget > .QLabel 
+{
     font-weight: bold;
     color: white;
 }
@@ -23,7 +28,8 @@ QuickStartWidget > QPushButton {
     border: none;
     background-color: #8b8b8b;
     color: #ededed;
-    padding: 2px 10px 2px 10px;
+    padding: 2px 10px;
+    margin: 5px;
     bottom: 10px;
 }
 
@@ -31,25 +37,101 @@ PlayableItemWidget {
     color: #7e7e7c;
     border: none;
     text-align: left;
-    background-image: url(:/play-rest.png);
+    background-image: url(:/station-start-rest.png);
     background-repeat: no-repeat;
     background-position: left;
     background-origin:border;
-    padding-left:30px;
-    padding-top:5px;
-    padding-bottom:5px;
-    margin-left:5px;
-    margin-right:5px;
+    padding:5px 0px 5x 30px;
+    margin: 0px 5px;
 }
 
 PlayableItemWidget:hover {
-    background-image: url(:/play-onhover.png);
+    background-image: url(:/station-start-onhover.png);
 }
 
 PlayableItemWidget:pressed {
-    background-image: url(:/play-onpress.png);
+    background-image: url(:/station-start-onpress.png);
 }
 
 NowPlayingWidget QLabel {
     color: white;
+}
+
+PlaybackControlsWidget QPushButton {
+    color: transparent;
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    margin: 5px 15px;
+    height: 29px;
+    width: 40;
+}
+
+PlaybackControlsWidget QPushButton#love {
+    background-image: url(:/love-rest.png);
+}
+
+PlaybackControlsWidget QPushButton#love:hover {
+    background-image: url(:/love-onhover.png);
+}
+
+PlaybackControlsWidget QPushButton#love:pressed {
+    background-image: url(:/love-onpress.png);
+}
+
+PlaybackControlsWidget QPushButton#love:checked {
+    background-image: url(:/love-isloved.png);
+}
+
+PlaybackControlsWidget QPushButton#ban {
+    background-image: url(:/ban-rest.png);
+}
+
+PlaybackControlsWidget QPushButton#ban:hover {
+    background-image: url(:/ban-onhover.png);
+}
+
+PlaybackControlsWidget QPushButton#ban:pressed {
+    background-image: url(:/ban-onpress.png);
+}
+
+PlaybackControlsWidget QPushButton#play {
+    background-image: url(:/play-rest.png);
+}
+
+PlaybackControlsWidget QPushButton#play:hover {
+    background-image: url(:/play-onhover.png);
+}
+
+PlaybackControlsWidget QPushButton#play:pressed {
+    background-image: url(:/play-onpress.png);
+}
+
+PlaybackControlsWidget QPushButton#play:checked {
+    background-image: url(:/stop-rest.png);
+}
+
+PlaybackControlsWidget QPushButton#play:hover:checked {
+    background-image: url(:/stop-onhover.png);
+}
+
+PlaybackControlsWidget QPushButton#play:pressed:checked {
+    background-image: url(:/stop-onpress.png);
+}
+
+PlaybackControlsWidget QPushButton#skip {
+    background-image: url(:/skip-rest.png);
+}
+
+PlaybackControlsWidget QPushButton#skip:hover {
+    background-image: url(:/skip-onhover.png);
+}
+
+PlaybackControlsWidget QPushButton#skip:pressed {
+    background-image: url(:/skip-onpress.png);
+}
+
+QStatusBar::item {
+    border: none;
 }
