@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = moralistfad
+TARGET = radio
 VERSION = 2.0.0
 QT = core gui xml network phonon
 CONFIG += lastfm

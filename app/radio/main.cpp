@@ -62,7 +62,7 @@ namespace lastfm
 
 int main( int argc, char** argv )
 {
-    QCoreApplication::setApplicationName( "Moralist Fad" );
+    QCoreApplication::setApplicationName( "Last.fm Radio" );
     QCoreApplication::setApplicationVersion( VERSION );
 
     // ATTENTION! Under no circumstance change these strings! --mxcl
