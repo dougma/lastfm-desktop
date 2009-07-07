@@ -31,6 +31,7 @@
 #include "MainWidget.h"
 #include "widgets/MultiStarterWidget.h"
 #include "Radio.h"
+#include "ScrobSocket.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "lib/unicorn/UnicornMainWindow.h"
@@ -93,6 +94,10 @@ int main( int argc, char** argv )
 		qAddPostRoutine(cleanup);
 		app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
+        ScrobSocket* scrobsock = new ScrobSocket(&app);
+        scrobsock->connect(radio, SIGNAL(trackStarted(Track)), SLOT(start(Track)));
+        scrobsock->connect(radio, SIGNAL(stopped()), SLOT(stop()));
+
       #ifdef Q_WS_MAC
         AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
         AEInstallEventHandler( 'GURL', 'GURL', h, 0, false );
@@ -108,7 +113,9 @@ int main( int argc, char** argv )
 		window.show();
 
         app.parseArguments( app.arguments() );
-        return app.exec();
+        int result = app.exec();
+        scrobsock->stop();
+        return result;
     }
     catch (unicorn::Application::StubbornUserException&)
     {

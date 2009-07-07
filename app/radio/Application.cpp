@@ -20,11 +20,15 @@
 #include "Application.h"
 #include "lib/unicorn/QMessageBoxBuilder.h"
 #include "Radio.h"
+#include "ScrobSocket.h"
+
 using moralistfad::Application;
 
 
-Application::Application( int& argc, char** argv ) : unicorn::Application( argc, argv )
-{}
+Application::Application( int& argc, char** argv ) 
+    : unicorn::Application( argc, argv )
+{
+}
 
 void
 Application::onWsError( lastfm::ws::Error e )

@@ -17,30 +17,42 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "lib/unicorn/UnicornApplication.h"
-#include <lastfm/ws.h>
+#ifndef SCROB_SOCKET_H
+#define SCROB_SOCKET_H
 
-namespace moralistfad
+#include <lastfm/global.h>
+#include <lastfm/Track>
+#include <QTcpSocket>
+#include <QQueue>
+
+/** @author Christian Muehlhaeuser <chris@last.fm>
+  * @contributor Erik Jaelevik <erik@last.fm>
+  * @rewrite Max Howell <max@last.fm>
+  */
+class ScrobSocket : public QTcpSocket
 {
-	class Application : public unicorn::Application
-	{
-	    Q_OBJECT
-   
-	public:
-	    Application( int&, char** );
+    Q_OBJECT
 
-	signals:    
-	    /** something should show it. Currently MainWindow does */
-	    void error( const QString& message );
-	    void status( const QString& message, const QString& id );
+public:
+    ScrobSocket( QObject* parent );
+    ~ScrobSocket();
 
-	public slots:
-		void parseArguments( const QStringList& args );
+public slots:
+    void start( const Track& );
+    void pause();
+    void resume();
+    void stop();
 
-	private slots:    
-	    /** all webservices connect to this and emit in the case of bad errors that
-	     * need to be handled at a higher level */
-	    void onWsError( lastfm::ws::Error );
-	    void onRadioError( int, const class QVariant& );
-	};
-}
+private slots:
+    void transmit( const QString& data );
+    void onError( QAbstractSocket::SocketError );
+    void onReadyRead();
+    void onConnected();
+    void onDisconnected();
+
+private:    
+    Track m_track;
+    QQueue<QString> m_msgQueue;
+};
+
+#endif
