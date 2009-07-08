@@ -29,7 +29,7 @@
 #include <QThread>
 #include <QVariant>
 
-#include <Phonon>
+#include <phonon>
 
 namespace Phonon
 {

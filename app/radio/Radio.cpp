@@ -19,7 +19,7 @@
 */
 #include "Radio.h"
 #include <lastfm/RadioTuner>
-#include <Phonon>
+#include <phonon>
 #include <phonon/mediaobject.h>
 #include <phonon/audiooutput.h>
 #include <QThread>
