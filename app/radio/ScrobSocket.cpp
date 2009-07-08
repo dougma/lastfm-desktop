@@ -30,6 +30,7 @@
 
 ScrobSocket::ScrobSocket( const QString& clientId, QObject* parent ) 
 : QLocalSocket( parent )
+, m_bInConnect( false )
 {
     connect( this, SIGNAL(readyRead()), SLOT(onReadyRead()) );    
     connect( this, SIGNAL(error( QLocalSocket::LocalSocketError )), SLOT(onError( QLocalSocket::LocalSocketError )) );
@@ -69,15 +70,21 @@ ScrobSocket::onConnected()
 void
 ScrobSocket::doConnect()
 {
-    #ifdef WIN32
-        std::string s;
-        DWORD r = scrobSubPipeName( &s );
-        if (r != 0) throw std::runtime_error( formatWin32Error( r ) );
-        QString const name = QString::fromStdString( s );
-    #else
-        QString const name = "lastfm_scrobsub";
-    #endif
-    connectToServer( name );
+    if (!m_bInConnect) {
+        #ifdef WIN32
+            std::string s;
+            DWORD r = scrobSubPipeName( &s );
+            if (r != 0) throw std::runtime_error( formatWin32Error( r ) );
+            QString const name = QString::fromStdString( s );
+        #else
+            QString const name = "lastfm_scrobsub";
+        #endif
+
+        // avoid stack-overflow connect/disconnect loop with m_bInConnect
+        m_bInConnect = true;
+        connectToServer( name );
+        m_bInConnect = false;
+    }
 }
 
 void 
