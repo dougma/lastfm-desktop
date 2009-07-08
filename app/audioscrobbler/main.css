@@ -1,0 +1,43 @@
+unicorn--MainWindow {
+    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #211f20, stop:1 #383840 );
+}
+
+MetadataWindow QPushButton {
+    color: transparent;
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    margin: 5px 15px;
+    height: 29px;
+    width: 40;
+}
+
+QPushButton#love {
+    background-image: url(:/love-rest.png);
+}
+
+QPushButton#love:hover {
+    background-image: url(:/love-onhover.png);
+}
+
+QPushButton#love:pressed {
+    background-image: url(:/love-onpress.png);
+}
+
+QPushButton#love:checked {
+    background-image: url(:/love-isloved.png);
+}
+
+QPushButton#tag {
+    background-image: url(:/tag.png);
+}
+
+QPushButton#share {
+    background-image: url(:/share.png);
+}
+
+QStatusBar::item {
+    border: none;
+}

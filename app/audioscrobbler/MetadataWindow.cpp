@@ -18,12 +18,12 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "MetadataWindow.h"
-#include "lib/unicorn/widgets/ImageButton.h"
 #include <lastfm/Artist>
 #include <lastfm/XmlQuery>
 #include <lastfm/ws.h>
 #include <QLabel>
 #include <QPainter>
+#include <QPushButton>
 #include <QTextBrowser>
 #include <QNetworkReply>
 #include <QTextFrame>
@@ -31,12 +31,6 @@
 #include <QVBoxLayout>
 #include "Application.h"
 
-static inline ImageButton* ib(const char* s)
-{
-    ImageButton* b = new ImageButton(s);
-    b->setFixedSize(36, 36);
-    return b;
-}
 
 MetadataWindow::MetadataWindow()
 {
@@ -45,14 +39,17 @@ MetadataWindow::MetadataWindow()
     QHBoxLayout* h = new QHBoxLayout;
     h->addStretch();
     
-    h->addWidget(ui.love = ib(":love.png"));
-    ui.love->setAction( ((audioscrobbler::Application*)qApp)->loveAction() );
+    h->addWidget(ui.love = new QPushButton(tr("love")));
+    ui.love->setObjectName("love");
+    ui.love->addAction( ((audioscrobbler::Application*)qApp)->loveAction() );
     
-    h->addWidget(ui.tag = ib(":tag.png"));
-    ui.tag->setAction( ((audioscrobbler::Application*)qApp)->tagAction() );
+    h->addWidget(ui.tag = new QPushButton(tr("tag")));
+    ui.tag->setObjectName("tag");
+    ui.tag->addAction( ((audioscrobbler::Application*)qApp)->tagAction() );
     
-    h->addWidget(ui.share = ib(":share.png"));
-    ui.share->setAction( ((audioscrobbler::Application*)qApp)->shareAction() );
+    h->addWidget(ui.share = new QPushButton(tr("share")));
+    ui.share->setObjectName("share");
+    ui.share->addAction( ((audioscrobbler::Application*)qApp)->shareAction() );
     
     h->addStretch();
 

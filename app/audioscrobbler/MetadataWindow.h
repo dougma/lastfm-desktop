@@ -30,9 +30,9 @@ class MetadataWindow : public unicorn::MainWindow
         class QLabel* title;
         class QTextBrowser* bio;
 
-        class ImageButton* love;
-        class ImageButton* tag;
-        class ImageButton* share;
+        class QPushButton* love;
+        class QPushButton* tag;
+        class QPushButton* share;
     } ui;
 
 public:

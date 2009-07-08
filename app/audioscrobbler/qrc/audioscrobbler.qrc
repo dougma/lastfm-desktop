@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>16x16.png</file>
+        <file>22x22.png</file>
+        <file>love.png</file>
+        <file>tag.png</file>
+        <file>share.png</file>
+        <file alias="love-onhover.png">love_hover_31x29.png</file>
+        <file alias="love-isloved.png">love_isloved_31x29.png</file>
+        <file alias="love-onpress.png">love_pressed_31x29.png</file>
+        <file alias="love-rest.png">love_rest_31x29.png</file>
+    </qresource>
+</RCC>

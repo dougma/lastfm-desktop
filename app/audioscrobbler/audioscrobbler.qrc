@@ -1,9 +1,0 @@
-<RCC>
-  <qresource>
-    <file>16x16.png</file>
-	<file>22x22.png</file>
-	<file>love.png</file>
-	<file>tag.png</file>
-	<file>share.png</file>
-  </qresource>
-</RCC>
