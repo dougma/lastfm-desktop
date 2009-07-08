@@ -19,7 +19,7 @@
 
 #include "PlaybackControlsWidget.h"
 
-#include "radio.h"
+#include "../Radio.h"
 #include <lastfm/RadioStation>
 
 #include <QPushButton>
