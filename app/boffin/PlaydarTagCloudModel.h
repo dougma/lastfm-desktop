@@ -85,7 +85,7 @@ private:
     float m_maxWeight;
     float m_maxLogCount;
     float m_minLogCount;
-    float m_minLogWeight, m_maxLogWeight;
+//    float m_minLogWeight, m_maxLogWeight;
 
     class QTimer* m_loadingTimer;
 };
