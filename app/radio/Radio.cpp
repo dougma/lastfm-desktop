@@ -95,7 +95,7 @@ Radio::play( const RadioStation& station )
 
 	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
 	connect( m_tuner, SIGNAL(trackAvailable()), SLOT(enqueue()) );
-	connect( m_tuner, SIGNAL(error( Ws::Error )), SLOT(onTunerError( Ws::Error )) );
+    connect( m_tuner, SIGNAL(error( lastfm::ws::Error )), SLOT(onTunerError( lastfm::ws::Error )) );
 
     changeState( TuningIn );
 }

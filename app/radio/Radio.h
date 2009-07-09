@@ -22,6 +22,7 @@
 
 #include <lastfm/Track>
 #include <lastfm/RadioStation>
+#include <lastfm/RadioTuner>
 #include <lastfm/ws.h>
 #include <phonon/phononnamespace.h>
 #include <QList>
@@ -38,13 +39,6 @@ namespace Phonon
 	class MediaSource;
     class Path;
 }
-
-namespace lastfm 
-{
-    class RadioStation;
-    class RadioTuner;
-}
-
 
 /** @author <max@last.fm>
  */
