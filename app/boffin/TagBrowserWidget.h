@@ -191,13 +191,25 @@ protected:
 
         int mins = seconds / 60;
         int hours = mins / 60;
-        if (hours)
-            return QString(" %1:%2:%3")
-                .arg(hours)
-                .arg(mins, 2, 10, QChar('0'))
+        if (hours >= 48) {
+            return QString(" : %1 days %2:%3:%4")
+                .arg(hours / 24)
+                .arg(hours % 24)
+                .arg(mins % 60, 2, 10, QChar('0'))
                 .arg(seconds % 60, 2, 10, QChar('0'));
+        } else if (hours >= 24) {
+            return QString(" : 1 day %1:%2:%3")
+                .arg(hours % 24)
+                .arg(mins % 60, 2, 10, QChar('0'))
+                .arg(seconds % 60, 2, 10, QChar('0'));
+        } else if (hours >= 1) {
+            return QString(" : %1:%2:%3")
+                .arg(hours)
+                .arg(mins % 60, 2, 10, QChar('0'))
+                .arg(seconds % 60, 2, 10, QChar('0'));
+        }
 
-        return QString(" %1:%2")
+        return QString(" : %1:%2")
             .arg(mins)
             .arg(seconds % 60, 2, 10, QChar('0'));
     }
