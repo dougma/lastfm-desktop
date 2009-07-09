@@ -142,8 +142,8 @@ protected:
             
             // A relevance weight will be returned with a value of min < result < max 
             // or 0.0 if there is absolutely no relevance.
-            const float min = 0.2;
-            const float max = 0.8;
+            const float min = 0.2f;
+            const float max = 0.8f;
             
             //TODO: relevance = 0 where trackCount >= current selected trackCount
             if (i == m_logCountMap.end()) {
@@ -189,7 +189,7 @@ protected:
         if (seconds == 0)
             return QString();
 
-        int mins = seconds / mins;
+        int mins = seconds / 60;
         int hours = mins / 60;
         if (hours)
             return QString(" %1:%2:%3")
