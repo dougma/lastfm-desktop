@@ -26,7 +26,7 @@
 
 MoreStationsWidget::MoreStationsWidget()
 {
-    QGridLayout* layout = new QGridLayout();
+    QGridLayout* layout = new QGridLayout( this );
 
     layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
@@ -39,5 +39,4 @@ MoreStationsWidget::MoreStationsWidget()
     connect(w, SIGNAL(clicked()), SIGNAL(yourTags()));
     layout->addWidget(w, 1, 1);
 
-    setLayout(layout);
 }

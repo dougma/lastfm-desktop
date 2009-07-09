@@ -23,7 +23,7 @@
 #include <QTimeLine>
 
 SideBySideLayout::SideBySideLayout( QWidget* parent )
-           : QLayout( parent ), m_currentItem( 0 ), m_timeLine( new QTimeLine( 500, this ) )
+           : QLayout( parent ), m_currentItem( 0 ), m_timeLine( new QTimeLine( 300, this ) )
 {
     m_timeLine->setUpdateInterval( 25 );
     connect( m_timeLine, SIGNAL(frameChanged( int )), SLOT(onFrameChanged( int )));
