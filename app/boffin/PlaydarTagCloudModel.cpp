@@ -64,35 +64,33 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
 {
 	if( m_loadingTimer )
 		m_loadingTimer->stop();
-	do {
-		// check if the host is being filtered.
-		if (m_hostFilter.contains(tag.m_host))
-			break;
 
+    // check if the host is being filtered.
+    if (!m_hostFilter.contains(tag.m_host)) {
         m_hosts.insert(tag.m_host);
 
-		//Merge any existing tags
 		if( int i = m_tagListBuffer.indexOf( tag ) >= 0 )
 		{
+    		// merge into existing tag
 			m_tagListBuffer[ i ].m_weight += tag.m_weight;
             m_tagListBuffer[ i ].m_count += tag.m_count;
 			m_tagListBuffer[ i ].m_logCount = log( (float) m_tagListBuffer[i].m_count );
 			m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
 			m_maxLogCount = qMax( m_tagListBuffer[i].m_logCount, m_maxLogCount);
-			emit dataChanged( createIndex( i, 0), createIndex( i, 0));
-			break;
-		}
+        }
+        else
+        {
+            // new tag
+		    tag.m_logCount = log( (float) tag.m_count );
+		    m_tagListBuffer << tag;
+		    m_maxTrackCount = qMax( tag.m_count, m_maxTrackCount );
+		    m_maxWeight = qMax( tag.m_weight, m_maxWeight );
+		    m_maxLogCount = qMax( m_maxLogCount, tag.m_logCount );
+		    m_minLogCount = qMin( m_minLogCount, tag.m_logCount );
+        }
+	}
 
-	//	beginInsertRows( QModelIndex(), m_tagListBuffer.size(), m_tagListBuffer.size() + 1);
-			tag.m_logCount = log( (float) tag.m_count );
-			m_tagListBuffer << tag;
-			m_maxTrackCount = qMax( tag.m_count, m_maxTrackCount );
-			m_maxWeight = qMax( tag.m_weight, m_maxWeight );
-			m_maxLogCount = qMax( m_maxLogCount, tag.m_logCount );
-			m_minLogCount = qMin( m_minLogCount, tag.m_logCount );
-	//	endInsertRows();
-	} while( false );
-
+    // fire onFetchedTags after 1 second of idle-ness
 	if( !m_loadingTimer )
 	{
 		m_loadingTimer = new QTimer();
@@ -108,10 +106,11 @@ PlaydarTagCloudModel::onFetchedTags()
 {
 	m_loadingTimer->deleteLater();
 	m_loadingTimer = 0;
-	beginInsertRows( QModelIndex(), m_tagList.size(), m_tagListBuffer.size() );
+//	beginInsertRows( QModelIndex(), m_tagList.size(), m_tagListBuffer.size() );
 		m_tagList = m_tagListBuffer;
 		qSort( m_tagList.begin(), m_tagList.end(), qGreater<BoffinTagItem >() );
-	endInsertRows();
+//	endInsertRows();
+    reset();
 	emit fetchedTags();
 }
 
