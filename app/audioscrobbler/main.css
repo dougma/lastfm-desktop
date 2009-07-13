@@ -14,6 +14,16 @@ MetadataWindow QPushButton {
     width: 40;
 }
 
+MetadataWindow QLabel[alternate="true"] {
+    background-color: rgb(31,31,31);
+}
+
+MetadataWindow QLabel#name  { color: rgb(186,186,186); }
+MetadataWindow QLabel#value { color: rgb(147,147,147); }
+
+MetadataWindow #artist_image { border: 1px solid white; margin:12; }
+
+
 QPushButton#love {
     background-image: url(:/love-rest.png);
 }
@@ -40,4 +50,33 @@ QPushButton#share {
 
 QStatusBar::item {
     border: none;
+}
+
+QTextBrowser, QLabel#title1, QLabel#title2 {
+    color: rgb(220,220,220);
+}
+
+QLabel#title1 
+{
+    font-size: 13px;
+    font-weight:bold;
+    padding-top:12;
+    padding-right:12;
+}
+
+QLabel#title2
+{
+    padding-right:12;
+}
+
+QTextBrowser {
+    border:none;
+    padding:12;
+}
+
+#now_playing 
+{
+    padding: 4 6 4 6;
+    color: rgb(186,186,186);
+    background-color: rgb(31,31,31);
 }

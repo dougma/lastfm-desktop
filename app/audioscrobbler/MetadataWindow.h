@@ -25,9 +25,14 @@ class MetadataWindow : public unicorn::MainWindow
     Q_OBJECT
 
     struct{
+        class QLabel* now_playing_source;
         class QLabel* artist_image;
         class QLabel* album_image;
         class QLabel* title;
+        class QLabel* album;
+        class QLabel* listeners;
+        class QLabel* scrobbles;
+        class QLabel* tags;
         class QTextBrowser* bio;
 
         class QPushButton* love;
