@@ -44,14 +44,17 @@ MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
     tabwidget->addTab(m_artists, tr("Artists"));
     connect(m_artists, SIGNAL(add(QString)), SLOT(onAdd(QString)));
+    connect(m_artists, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
     m_tags = new SourceSelectorWidget(new TagSearch());
     tabwidget->addTab(m_tags, tr("Tags"));
     connect(m_tags, SIGNAL(add(QString)), SLOT(onAdd(QString)));
+    connect(m_tags, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
     m_users = new SourceSelectorWidget(new TagSearch());
     tabwidget->addTab(m_users, tr("Friends"));
     connect(m_users, SIGNAL(add(QString)), SLOT(onAdd(QString)));
+    connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
     m_sourceList = new SourceListWidget(maxSources);
 
@@ -91,6 +94,24 @@ MultiStarterWidget::onAdd(const QString& item)
     }
 }
 
+void 
+MultiStarterWidget::onAddItem(QListWidgetItem* item)
+{
+    SourceListWidget::SourceType itemType;
+    if (m_artists == sender()) {
+        itemType = SourceListWidget::Artist;
+    } else if (m_tags == sender()) {
+        itemType = SourceListWidget::Tag;
+    } else if (m_users == sender()) {
+        itemType = SourceListWidget::User;
+    } else {
+        return;
+    }
+
+    if (m_sourceList->addSource(itemType, item)) {
+        // todo: grey it out if it's in the list?  or grey it some other way?
+    }
+}
 
 void
 MultiStarterWidget::onUserGotTopTags()
@@ -116,12 +137,12 @@ MultiStarterWidget::onUserGotTopArtists()
     QNetworkReply* r = (QNetworkReply*)sender();
     lastfm::XmlQuery lfm(r->readAll());
 
-    QStringList artists;
     foreach (lastfm::XmlQuery e, lfm["topartists"].children("artist")) {
-        artists += e["name"].text();
+        QListWidgetItem* item = new QListWidgetItem(m_artists->list());
+        item->setData(Qt::DisplayRole, e["name"].text());
+        item->setData(Qt::DecorationRole, e["image size=medium"].text());
     }
-    m_artists->list()->insertItems(0, artists);
-    if (artists.size() < m_minArtistCount) {
+    if (m_artists->list()->count() < m_minArtistCount) {
         // get global top artists
     }
 }
@@ -133,12 +154,13 @@ MultiStarterWidget::onUserGotFriends()
     QNetworkReply* r = (QNetworkReply*)sender();
     lastfm::XmlQuery lfm(r->readAll());
 
-    QStringList friends;
     foreach (lastfm::XmlQuery e, lfm["friends"].children("user")) {
-        friends += e["name"].text();
+        QListWidgetItem* item = new QListWidgetItem(m_users->list());
+        item->setData(Qt::DisplayRole, e["name"].text());
+        item->setData(Qt::ToolTipRole, e["realname"].text());
+        item->setData(Qt::DecorationRole, e["image size=medium"].text());
     }
-    m_users->list()->insertItems(0, friends);
-    if (friends.size() < m_minArtistCount) {
+    if (m_users->list()->count() < m_minArtistCount) {
         // no friends. so?
     }
 }

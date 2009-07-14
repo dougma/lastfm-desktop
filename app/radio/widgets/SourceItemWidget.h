@@ -17,35 +17,24 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SOURCE_SELECTOR_WIDGET_H
-#define SOURCE_SELECTOR_WIDGET_H
+#ifndef SOURCE_ITEM_WIDGET_H
+#define SOURCE_ITEM_WIDGET_H
 
 #include <QWidget>
-#include <QListWidgetItem>
 
-class QLineEdit;
-class QListWidget;
-class QPushButton;
-
-class SourceSelectorWidget : public QWidget
+class SourceItemWidget : public QWidget
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    SourceSelectorWidget(QLineEdit* edit, QWidget* parent = 0);
-    QListWidget* list();
+    SourceItemWidget(const QString& labelText, QLayout* layout);
 
-signals:
-    void itemActivated(QListWidgetItem* item);      // item chosen from the list
-    void add(const QString& item);                  // item typed in
+public slots:
+    void onGotImage();
 
-protected:
-    QLineEdit* m_edit;
-    QPushButton* m_button;
-    QListWidget* m_list;
-
-private slots:
-    void emitAdd();
+private:
+    class QLabel* m_label;
+    class QLabel* m_image;
 };
 
 #endif

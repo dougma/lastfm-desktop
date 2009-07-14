@@ -23,6 +23,7 @@
 #include <QWidget>
 
 class QVBoxLayout;
+class SourceItemWidget;
 
 class SourceListWidget : public QWidget
 {
@@ -37,6 +38,7 @@ public:
     QString rql();
     QString stationDescription();
     bool addSource(SourceType type, const QString& name);
+    bool addSource(SourceType type, class QListWidgetItem* item);
 
 private slots:
 
@@ -44,11 +46,10 @@ private:
     typedef QPair<SourceType, QString> Source;
 
     void setOp(int sourceIdx);
-    void setSource(int sourceIdx, QWidget* widget);
     void addPlaceholder();
 
     static Operator defaultOp(SourceType first, SourceType second);
-    static QWidget* createWidget(SourceType type, const QString& name);
+    static SourceItemWidget* createWidget(SourceType type, const QString& name, QLayout* layout);
 
     QVBoxLayout* m_layout;
     int m_maxSources;

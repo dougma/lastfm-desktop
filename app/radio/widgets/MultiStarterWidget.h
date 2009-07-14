@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <lastfm/RadioStation>
+#include <QListWidgetItem>
 
 class SourceListWidget;
 class SourceSelectorWidget;
@@ -39,6 +40,7 @@ signals:
 
 private slots:
     void onAdd(const QString& item);
+    void onAddItem(QListWidgetItem* item);
     void onPlayClicked();
     void onUserGotTopTags();
     void onUserGotTopArtists();
