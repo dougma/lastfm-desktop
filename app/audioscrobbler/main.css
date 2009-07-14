@@ -1,6 +1,5 @@
 unicorn--MainWindow {
-    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
-                                 stop:0 #211f20, stop:1 #383840 );
+    background-color: rgb(20,20,20);
 }
 
 MetadataWindow QPushButton {
@@ -14,12 +13,9 @@ MetadataWindow QPushButton {
     width: 40;
 }
 
-MetadataWindow QLabel[alternate="true"] {
-    background-color: rgb(31,31,31);
-}
-
-MetadataWindow QLabel#name  { color: rgb(186,186,186); }
-MetadataWindow QLabel#value { color: rgb(147,147,147); }
+MetadataWindow QLabel[alternate="true"] { background-color: rgb(31,31,31); }
+MetadataWindow QLabel#name  { color: rgb(186,186,186); padding:3; margin-left:6px; }
+MetadataWindow QLabel#value { color: rgb(147,147,147); padding:3; margin-right:6px; }
 
 MetadataWindow #artist_image { border: 1px solid white; margin:12; }
 
@@ -71,7 +67,7 @@ QLabel#title2
 
 QTextBrowser {
     border:none;
-    padding:12;
+    background-color: rgb(20,20,20);
 }
 
 #now_playing 
