@@ -60,6 +60,7 @@ MainWindow::MainWindow()
     ui.playdarStatus = new QLabel();
     status->addPermanentWidget(ui.playdarStatus);
     status->addPermanentWidget(ui.sourcesButton);
+    status->setStyleSheet( "QStatusBar::item{ border: none; }" );
     setStatusBar(status);
 
     finishUi();

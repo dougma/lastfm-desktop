@@ -234,8 +234,6 @@ TagCloudView::updateGeometries()
 
     viewport()->update();
     QAbstractItemView::updateGeometries();
-
-    qDebug() << bt.elapsed();
 }
 
 

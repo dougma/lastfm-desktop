@@ -153,6 +153,7 @@ public:
         QHBoxLayout* rowLayout = new QHBoxLayout();
         if (!backLabel.isNull()) {
             QPushButton* button = new QPushButton(backLabel);
+            button->setObjectName("back");
             connect(button, SIGNAL(clicked()), SIGNAL(back()));
             rowLayout->addWidget(button, 0, Qt::AlignLeft);
         }

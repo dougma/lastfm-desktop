@@ -1,13 +1,13 @@
 unicorn--MainWindow {
-    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
-                                 stop:0 #211f20, stop:1 #383840 );
+    background: #1a1a1a; /*qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #211f20, stop:1 #383840 );*/
 }
 
 YourStationsWidget, RecentStationsWidget,
 QuickStartWidget, MoreStationsWidget {
-    background: #211f20;
-    border-radius: 10px;
-    padding: 5px;
+    background: #242424;
+    border-radius: 5px;
+    padding-bottom: 20px;
 }
 
 YourStationsWidget > .QLabel,
@@ -24,13 +24,33 @@ QuickStartWidget > QLineEdit {
     position: relative;
 }
 
-QuickStartWidget > QPushButton {
-    border: none;
-    background-color: #8b8b8b;
-    color: #ededed;
-    padding: 2px 10px;
-    margin: 5px;
-    bottom: 10px;
+QuickStartWidget > QPushButton,
+BackForwardControls > QPushButton {
+    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #7e7e7e, stop:1 #373737 );
+    border-radius: 3px;
+    color: white;
+    border-width: 2px;
+    padding:3px 5px;
+    margin-bottom: 2px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+BackForwardControls > #NowPlayingButton {
+    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #cc3333, stop:1 #660000 );
+}
+
+QuickStartWidget > QPushButton:pressed,
+BackForwardControls > QPushButton:pressed {
+    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #3d3d3d, stop:1 #242424 );
+}
+
+BackForwardControls > #NowPlayingButton:pressed {
+    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
+                                 stop:0 #781313, stop:1 #3c0404 );
 }
 
 PlayableItemWidget {
