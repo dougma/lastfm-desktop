@@ -35,52 +35,89 @@
 MetadataWindow::MetadataWindow()
 {
     setCentralWidget(new QWidget);
-
-    QHBoxLayout* h = new QHBoxLayout;
-    h->addStretch();
-    
-    h->addWidget(ui.love = new QPushButton(tr("love")));
-    ui.love->setObjectName("love");
-    ui.love->addAction( ((audioscrobbler::Application*)qApp)->loveAction() );
-    
-    h->addWidget(ui.tag = new QPushButton(tr("tag")));
-    ui.tag->setObjectName("tag");
-    ui.tag->addAction( ((audioscrobbler::Application*)qApp)->tagAction() );
-    
-    h->addWidget(ui.share = new QPushButton(tr("share")));
-    ui.share->setObjectName("share");
-    ui.share->addAction( ((audioscrobbler::Application*)qApp)->shareAction() );
-    
-    h->addStretch();
-
     QVBoxLayout* v = new QVBoxLayout(centralWidget());
-    v->addWidget(ui.artist_image = new QLabel);
+
+    v->addWidget(ui.now_playing_source = new QLabel("Now Playing: Last.fm Radio"));
+    ui.now_playing_source->setObjectName("now_playing");
+
+    {
+        QHBoxLayout* h = new QHBoxLayout();
+        QVBoxLayout* v2 = new QVBoxLayout();
+        h->addWidget(ui.artist_image = new QLabel);
+        ui.artist_image->setObjectName("artist_image");
+        h->setStretchFactor(ui.artist_image, 1);
+        v2->addWidget(ui.title = new QLabel);
+        v2->addWidget(ui.album = new QLabel);
+        v2->addStretch();
+        ui.title->setObjectName("title1");
+        ui.title->setWordWrap(true);
+        ui.album->setObjectName("title2");
+        h->addLayout(v2);
+        h->setStretchFactor(v2, 3);
+        v->addLayout(h);
+    }
+
+    // listeners, scrobbles, tags:
+    {
+        QLabel* label;
+        QGridLayout* grid = new QGridLayout();
+        label = new QLabel(tr("Listeners"));
+        label->setObjectName("name");
+        label->setProperty("alternate", QVariant(true));
+        grid->addWidget(label, 0, 0);
+        ui.listeners = new QLabel;
+        ui.listeners->setObjectName("value");
+        ui.listeners->setProperty("alternate", QVariant(true));
+        grid->addWidget(ui.listeners, 0, 1);
+
+        label = new QLabel(tr("Scrobbles"));
+        label->setObjectName("name");
+        grid->addWidget(label, 1, 0);
+        ui.scrobbles = new QLabel;
+        ui.scrobbles->setObjectName("value");
+        grid->addWidget(ui.scrobbles, 1, 1);
+
+        label = new QLabel(tr("Tagged as"));
+        label->setObjectName("name");
+        label->setProperty("alternate", QVariant(true));
+        grid->addWidget(label, 2, 0);
+        ui.tags = new QLabel;
+        ui.tags->setObjectName("value");
+        ui.tags->setProperty("alternate", QVariant(true));
+        ui.tags->setWordWrap(true);
+        grid->addWidget(ui.tags, 2, 1);
+        v->addLayout(grid);
+    }
+
+    // bio:
     v->addWidget(ui.bio = new QTextBrowser);
-    v->addLayout(h);
     v->setStretchFactor(ui.bio, 1);
+
+    // love, tag, share buttons
+    {
+        QHBoxLayout* h = new QHBoxLayout;
+        h->addStretch();
+       
+        h->addWidget(ui.love = new QPushButton(tr("love")));
+        ui.love->setObjectName("love");
+        ui.love->addAction( ((audioscrobbler::Application*)qApp)->loveAction() );
+        
+        h->addWidget(ui.tag = new QPushButton(tr("tag")));
+        ui.tag->setObjectName("tag");
+        ui.tag->addAction( ((audioscrobbler::Application*)qApp)->tagAction() );
+        
+        h->addWidget(ui.share = new QPushButton(tr("share")));
+        ui.share->setObjectName("share");
+        ui.share->addAction( ((audioscrobbler::Application*)qApp)->shareAction() );
+       
+        h->addStretch();
+
+        v->addLayout(h);
+    }
+
     v->setSpacing(0);
     v->setMargin(0);
 
-    v = new QVBoxLayout(ui.artist_image);
-    v->addStretch();
-    v->addWidget(ui.title = new QLabel);
-
-    QFont f = ui.title->font();
-    f.setBold(true);
-    ui.title->setFont(f);
-
-    QPalette p;
-    QColor gray(28, 28, 28);
-    p.setColor(QPalette::Text, Qt::white);
-    p.setColor(QPalette::Base, gray);
-    p.setColor(QPalette::WindowText, Qt::white);
-    p.setColor(QPalette::Window, gray);
-
-    ui.title->setPalette(p);
-    ui.bio->setPalette(p);
-
-    ui.bio->setFrameStyle(QFrame::NoFrame);
-    ui.bio->viewport()->setContentsMargins(12, 12, 12, 12);
 
     setFixedWidth(252);
     setWindowTitle(tr("Last.fm Audioscrobbler"));
@@ -90,10 +127,12 @@ MetadataWindow::MetadataWindow()
 void
 MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
 {
-    QString title="%1\n%2 (%3)";
-    ui.title->setText(title.arg(t.artist()).arg(t.title()).arg(t.durationString()));
+    const unsigned short em_dash = 0x2014;
+    QString title = QString("%1 ") + QChar(em_dash) + " %2";
+    ui.title->setText(title.arg(t.artist()).arg(t.title()));
+    ui.album->setText("from " + t.album().title());
 
-    if (t.artist() == previous.artist())return;
+    if (t.artist() == previous.artist()) return;
 
     ui.bio->clear();
     ui.artist_image->clear();
@@ -107,6 +146,20 @@ MetadataWindow::onArtistGotInfo()
 {
     XmlQuery lfm = static_cast<QNetworkReply*>(sender())->readAll();
 
+    QString scrobbles = lfm["artist"]["stats"]["playcount"].text();
+    QString listeners = lfm["artist"]["stats"]["listeners"].text();
+    QString tags;
+    foreach(const XmlQuery& e, lfm["artist"]["tags"].children("tag")) {
+        if (tags.length()) {
+            tags += ", ";
+        }
+        tags += e["name"].text();
+    }
+
+    ui.scrobbles->setText(scrobbles);
+    ui.listeners->setText(listeners);
+    ui.tags->setText(tags);
+
     //TODO if empty suggest they edit it
     ui.bio->setHtml(lfm["artist"]["bio"]["content"].text());
 
@@ -115,8 +168,7 @@ MetadataWindow::onArtistGotInfo()
     f.setMargin(12);
     root->setFrameFormat(f);
 
-
-    QUrl url = lfm["artist"]["image size=large"].text().replace("/126/", "/252/");
+    QUrl url = lfm["artist"]["image size=medium"].text();
     QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), SLOT(onArtistImageDownloaded()));
 }

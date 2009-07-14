@@ -1,6 +1,5 @@
 unicorn--MainWindow {
-    background: qlineargradient( x1:0, y1:0, x2: 0, y2:1, 
-                                 stop:0 #211f20, stop:1 #383840 );
+    background-color: rgb(20,20,20);
 }
 
 MetadataWindow QPushButton {
@@ -13,6 +12,13 @@ MetadataWindow QPushButton {
     height: 29px;
     width: 40;
 }
+
+MetadataWindow QLabel[alternate="true"] { background-color: rgb(31,31,31); }
+MetadataWindow QLabel#name  { color: rgb(186,186,186); padding:3; margin-left:6px; }
+MetadataWindow QLabel#value { color: rgb(147,147,147); padding:3; margin-right:6px; }
+
+MetadataWindow #artist_image { border: 1px solid white; margin:12; }
+
 
 QPushButton#love {
     background-image: url(:/love-rest.png);
@@ -40,4 +46,33 @@ QPushButton#share {
 
 QStatusBar::item {
     border: none;
+}
+
+QTextBrowser, QLabel#title1, QLabel#title2 {
+    color: rgb(220,220,220);
+}
+
+QLabel#title1 
+{
+    font-size: 13px;
+    font-weight:bold;
+    padding-top:12;
+    padding-right:12;
+}
+
+QLabel#title2
+{
+    padding-right:12;
+}
+
+QTextBrowser {
+    border:none;
+    background-color: rgb(20,20,20);
+}
+
+#now_playing 
+{
+    padding: 4 6 4 6;
+    color: rgb(186,186,186);
+    background-color: rgb(31,31,31);
 }
