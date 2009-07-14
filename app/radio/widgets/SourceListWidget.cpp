@@ -28,9 +28,11 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QSpacerItem>
+#include <QListWidgetItem>
 #include "SourceListWidget.h"
+#include "SourceItemWidget.h"
 #include "lib/unicorn/widgets/ImageButton.h"
-
+#include "lastfm/ws.h"
 
 
 SourceListWidget::SourceListWidget(int maxSources, QWidget* parent)
@@ -52,6 +54,7 @@ SourceListWidget::addPlaceholder()
         m_layout->addWidget(combo);
     }
     QGroupBox* box = new QGroupBox("");
+    box->setLayout(new QHBoxLayout());
     m_layout->addWidget(box);
 }
 
@@ -63,24 +66,36 @@ SourceListWidget::addSource(SourceType type, const QString& name)
 
     m_sources.append(Source(type, name));
     int idx = m_sources.size() - 1;
-    setSource(idx, createWidget(type, name));
+    QLayoutItem* li = m_layout->itemAt(idx * 2);
+    QLayout* layout = ((QGroupBox *)li->widget())->layout();
+    createWidget(type, name, layout);
     setOp(idx);
     return true;
 }
 
-void
-SourceListWidget::setSource(int sourceIdx, QWidget* widget)
+bool 
+SourceListWidget::addSource(SourceType type, QListWidgetItem* item)
 {
-    QGroupBox* box = qobject_cast<QGroupBox*>(m_layout->itemAt(sourceIdx * 2)->widget());
-    widget->setParent(box);
-    widget->show();
+    if (m_sources.size() < m_maxSources) {
+        QString name = item->data(Qt::DisplayRole).toString();
+        if (name.length() > 0) {
+            m_sources.append(Source(type, name));
+            int idx = m_sources.size() - 1;
+            QLayoutItem* li = m_layout->itemAt(idx * 2);
+            QLayout* layout = ((QGroupBox *)li->widget())->layout();
+            SourceItemWidget* sourceItemWidget = createWidget(type, name, layout);
+            setOp(idx);
 
-    // todo: how would i float this in the center of the right edge of the box?
-//    ImageButton* button = new ImageButton("C:\\dev\\lastfm-desktop\\app\\radio\\widgets\\delete.png");
-//    button->setParent(box);
-//    button->show();
+            QString imageUrl = item->data(Qt::DecorationRole).toString();
+            if (imageUrl.length()) {
+                QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(imageUrl));
+                connect(reply, SIGNAL(finished()), sourceItemWidget, SLOT(onGotImage()));
+            }
+            return true;
+        }
+    }
+    return false;
 }
-
 
 void
 SourceListWidget::setOp(int sourceIdx)
@@ -99,13 +114,13 @@ SourceListWidget::setOp(int sourceIdx)
 }
 
 //static
-QWidget*
-SourceListWidget::createWidget(SourceType type, const QString& name)
+SourceItemWidget*
+SourceListWidget::createWidget(SourceType type, const QString& name, QLayout* layout)
 {
     switch (type) {
-        case Artist: return new QLabel("Artist: " + name);
-        case Tag: return new QLabel("Tag: " + name);
-        case User: return new QLabel("User: " + name);
+        case Artist: return new SourceItemWidget("Artist: " + name, layout);
+        case Tag: return new SourceItemWidget("Tag: " + name, layout);
+        case User: return new SourceItemWidget("User: " + name, layout);
     }
     return 0;
 }

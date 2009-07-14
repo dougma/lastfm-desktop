@@ -17,35 +17,29 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SOURCE_SELECTOR_WIDGET_H
-#define SOURCE_SELECTOR_WIDGET_H
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QNetworkReply>
+#include "SourceItemWidget.h"
 
-#include <QWidget>
-#include <QListWidgetItem>
-
-class QLineEdit;
-class QListWidget;
-class QPushButton;
-
-class SourceSelectorWidget : public QWidget
+SourceItemWidget::SourceItemWidget(const QString& labelText, QLayout* layout)
 {
-    Q_OBJECT;
+    layout->addWidget( m_image = new QLabel );
+    layout->addWidget( m_label = new QLabel );
+    m_image->setScaledContents( true );
+    m_label->setText(labelText);
+}
 
-public:
-    SourceSelectorWidget(QLineEdit* edit, QWidget* parent = 0);
-    QListWidget* list();
-
-signals:
-    void itemActivated(QListWidgetItem* item);      // item chosen from the list
-    void add(const QString& item);                  // item typed in
-
-protected:
-    QLineEdit* m_edit;
-    QPushButton* m_button;
-    QListWidget* m_list;
-
-private slots:
-    void emitAdd();
-};
-
-#endif
+void
+SourceItemWidget::onGotImage()
+{
+    sender()->deleteLater();
+    QNetworkReply* reply = (QNetworkReply*) sender();
+    if (reply->error() == QNetworkReply::NoError) {
+        QPixmap p;
+        p.loadFromData(((QNetworkReply*)sender())->readAll());
+        if (!p.isNull()) {
+            m_image->setPixmap(p);
+        }
+    }
+}
