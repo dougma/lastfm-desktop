@@ -17,6 +17,7 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QLabel>
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QListWidget>
@@ -32,11 +33,11 @@
 #include <QGroupBox>
 
 
-MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
+MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *parent)
     : QWidget(parent)
+    , m_advanced(advanced)
     , m_minTagCount(10)
     , m_minArtistCount(10)
-    , m_bAdvanced(true)
 {
     QGridLayout* grid = new QGridLayout(this);
 
@@ -57,21 +58,23 @@ MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
     connect(m_users, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
-    m_sourceList = new SourceListWidget(maxSources);
+    m_sourceList = new SourceListWidget(advanced, maxSources);
 
     QHBoxLayout* hLayout = new QHBoxLayout;
-    QVBoxLayout* slidersLayout = new QVBoxLayout();
-    slidersLayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
-    slidersLayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
-    m_repSlider->setMinimum(0);
-    m_repSlider->setMaximum(100);
-    m_repSlider->setValue(50);
-    m_repSlider->setToolTip(tr("Repetition"));
-    m_mainstrSlider->setMinimum(0);
-    m_mainstrSlider->setMaximum(100);
-    m_mainstrSlider->setValue(50);
-    m_mainstrSlider->setToolTip(tr("Mainstream"));
-    hLayout->addLayout(slidersLayout);
+    if (advanced) {
+        QVBoxLayout* slidersLayout = new QVBoxLayout();
+        slidersLayout->addWidget(new QLabel(tr("Repetition")));
+        slidersLayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
+        slidersLayout->addWidget(new QLabel(tr("Mainstreamness")));
+        slidersLayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+        m_repSlider->setMinimum(0);
+        m_repSlider->setMaximum(8);
+        m_repSlider->setValue(4);
+        m_mainstrSlider->setMinimum(0);
+        m_mainstrSlider->setMaximum(8);
+        m_mainstrSlider->setValue(4);
+        hLayout->addLayout(slidersLayout);
+    }
     hLayout->addWidget(m_playButton = new QPushButton(tr("Play")));
 
     grid->addWidget(tabwidget, 0, 0, 2, 1);
@@ -183,7 +186,7 @@ void
 MultiStarterWidget::onPlayClicked()
 {
     QString rql = m_sourceList->rql();
-    if (m_bAdvanced) {
+    if (m_advanced) {
         float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
         float r = m_repSlider->value() / (float) m_repSlider->maximum();
         rql += QString(" opt:rep|%1 opt:mainstr|%2").arg(r).arg(m);
@@ -192,3 +195,17 @@ MultiStarterWidget::onPlayClicked()
     r.setTitle(m_sourceList->stationDescription());
     emit startRadio(r);
 }
+
+
+//////
+
+AdvancedComboWidget::AdvancedComboWidget(int maxSource, QWidget* parent)
+: MultiStarterWidget(true, maxSource, parent)
+{
+}
+
+SimpleComboWidget::SimpleComboWidget(int maxSource, QWidget* parent)
+: MultiStarterWidget(false, maxSource, parent)
+{
+}
+

@@ -31,7 +31,8 @@ public:
     MoreStationsWidget();
 
 signals:
-    void combo();
+    void simpleCombo();
+    void advancedCombo();
     void yourTags();
 };
 

@@ -39,7 +39,8 @@ MainWidget::MainWidget()
     MainStarterWidget* w = new MainStarterWidget;
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
-    connect(w, SIGNAL(combo()), SLOT(onCombo()));
+    connect(w, SIGNAL(simpleCombo()), SLOT(onSimpleCombo()));
+    connect(w, SIGNAL(advancedCombo()), SLOT(onAdvancedCombo()));
     connect(w, SIGNAL(yourTags()), SLOT(onYourTags()));
 
     BackForwardControls* ctrl = new BackForwardControls(QString(), m_nowPlaying, w);
@@ -68,9 +69,9 @@ MainWidget::onStartRadio(RadioStation rs)
 }
 
 void
-MainWidget::onCombo()
+MainWidget::onSimpleCombo()
 {
-    MultiStarterWidget* w = new MultiStarterWidget(3);
+    MultiStarterWidget* w = new SimpleComboWidget(3);
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
@@ -80,6 +81,21 @@ MainWidget::onCombo()
     m_layout->insertWidget(1, ctrl);
     m_layout->moveForward();
 }
+
+void
+MainWidget::onAdvancedCombo()
+{
+    MultiStarterWidget* w = new AdvancedComboWidget(3);
+    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), m_nowPlaying, w);
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    m_layout->insertWidget(1, ctrl);
+    m_layout->moveForward();
+}
+
 
 void
 MainWidget::onBack()

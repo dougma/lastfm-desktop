@@ -34,7 +34,7 @@ class MultiStarterWidget : public QWidget
     Q_OBJECT;
 
 public:
-    MultiStarterWidget(int maxSources, QWidget *parent = 0);
+    MultiStarterWidget(bool advanced, int maxSources, QWidget *parent = 0);
 
 signals:
     void startRadio(RadioStation);
@@ -48,7 +48,7 @@ private slots:
     void onUserGotFriends();
 
 private:
-    bool m_bAdvanced;
+    bool m_advanced;
     SourceListWidget* m_sourceList;
     SourceSelectorWidget* m_tags;
     SourceSelectorWidget* m_artists;
@@ -58,6 +58,18 @@ private:
     QPushButton* m_playButton;
     const int m_minTagCount;
     const int m_minArtistCount;
+};
+
+class AdvancedComboWidget : public MultiStarterWidget
+{
+public:
+    AdvancedComboWidget(int maxSources, QWidget *parent = 0);
+};
+
+class SimpleComboWidget : public MultiStarterWidget
+{
+public:
+    SimpleComboWidget(int maxSources, QWidget *parent = 0);
 };
 
 #endif

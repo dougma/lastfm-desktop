@@ -31,12 +31,16 @@ MoreStationsWidget::MoreStationsWidget()
     layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
     QWidget* w;
-    w = new QPushButton(tr("Combo Station"));
-    connect(w, SIGNAL(clicked()), SIGNAL(combo()));
+    w = new QPushButton(tr("Simple Combo Station"));
+    connect(w, SIGNAL(clicked()), SIGNAL(simpleCombo()));
     layout->addWidget(w, 1, 0);
 
-    w = new QPushButton(tr("Your Tags"));
-    connect(w, SIGNAL(clicked()), SIGNAL(yourTags()));
+    w = new QPushButton(tr("Advanced Combo Station"));
+    connect(w, SIGNAL(clicked()), SIGNAL(advancedCombo()));
     layout->addWidget(w, 1, 1);
+
+    //w = new QPushButton(tr("Your Tags"));
+    //connect(w, SIGNAL(clicked()), SIGNAL(yourTags()));
+    //layout->addWidget(w, 1, 1);
 
 }

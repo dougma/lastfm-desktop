@@ -33,7 +33,7 @@ public:
     enum SourceType { Tag, Artist, User };
     enum Operator { And, Or, AndNot };
 
-    SourceListWidget(int maxSources, QWidget* parent = 0);
+    SourceListWidget(bool advanced, int maxSources, QWidget* parent = 0);
 
     QString rql();
     QString stationDescription();
@@ -57,6 +57,7 @@ private:
     QVBoxLayout* m_layout;
     int m_maxSources;
     QList<Source> m_sources;
+    bool m_advanced;
 };
 
 #endif
