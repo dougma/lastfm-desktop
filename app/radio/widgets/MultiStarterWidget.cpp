@@ -36,6 +36,7 @@ MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
     : QWidget(parent)
     , m_minTagCount(10)
     , m_minArtistCount(10)
+    , m_bAdvanced(true)
 {
     QGridLayout* grid = new QGridLayout(this);
 
@@ -58,11 +59,24 @@ MultiStarterWidget::MultiStarterWidget(int maxSources, QWidget *parent)
 
     m_sourceList = new SourceListWidget(maxSources);
 
-    m_playButton = new QPushButton(tr("Play"));
+    QHBoxLayout* hLayout = new QHBoxLayout;
+    QVBoxLayout* slidersLayout = new QVBoxLayout();
+    slidersLayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
+    slidersLayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+    m_repSlider->setMinimum(0);
+    m_repSlider->setMaximum(100);
+    m_repSlider->setValue(50);
+    m_repSlider->setToolTip(tr("Repetition"));
+    m_mainstrSlider->setMinimum(0);
+    m_mainstrSlider->setMaximum(100);
+    m_mainstrSlider->setValue(50);
+    m_mainstrSlider->setToolTip(tr("Mainstream"));
+    hLayout->addLayout(slidersLayout);
+    hLayout->addWidget(m_playButton = new QPushButton(tr("Play")));
 
     grid->addWidget(tabwidget, 0, 0, 2, 1);
     grid->addWidget(m_sourceList, 0, 1, 1, 1);
-    grid->addWidget(m_playButton, 1, 1);
+    grid->addLayout(hLayout, 1, 1);
     grid->setColumnStretch(0, 1);
     grid->setColumnStretch(1, 1);
 
@@ -168,7 +182,13 @@ MultiStarterWidget::onUserGotFriends()
 void
 MultiStarterWidget::onPlayClicked()
 {
-    RadioStation r = RadioStation::rql(m_sourceList->rql());
+    QString rql = m_sourceList->rql();
+    if (m_bAdvanced) {
+        float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
+        float r = m_repSlider->value() / (float) m_repSlider->maximum();
+        rql += QString(" opt:rep|%1 opt:mainstr|%2").arg(r).arg(m);
+    }
+    RadioStation r = RadioStation::rql(rql);
     r.setTitle(m_sourceList->stationDescription());
     emit startRadio(r);
 }
