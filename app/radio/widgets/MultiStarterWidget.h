@@ -24,9 +24,10 @@
 #include <lastfm/RadioStation>
 #include <QListWidgetItem>
 
+class QSlider;
+class QPushButton;
 class SourceListWidget;
 class SourceSelectorWidget;
-class QPushButton;
 
 class MultiStarterWidget : public QWidget
 {
@@ -47,10 +48,13 @@ private slots:
     void onUserGotFriends();
 
 private:
+    bool m_bAdvanced;
     SourceListWidget* m_sourceList;
     SourceSelectorWidget* m_tags;
     SourceSelectorWidget* m_artists;
     SourceSelectorWidget* m_users;
+    QSlider* m_repSlider;
+    QSlider* m_mainstrSlider;
     QPushButton* m_playButton;
     const int m_minTagCount;
     const int m_minArtistCount;
