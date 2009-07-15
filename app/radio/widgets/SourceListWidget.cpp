@@ -65,10 +65,16 @@ SourceListWidget::addPlaceholder()
     m_layout->addWidget(box);
 }
 
+bool
+SourceListWidget::sourceInList(SourceType type, const QString& name)
+{
+    return m_sources.contains(Source(type, name));
+}
+
 bool 
 SourceListWidget::addSource(SourceType type, const QString& name)
 {
-    if (m_sources.size() == m_maxSources)
+    if (m_sources.size() == m_maxSources || sourceInList(type, name))
         return false;
 
     m_sources.append(Source(type, name));
@@ -84,28 +90,26 @@ SourceListWidget::addSource(SourceType type, const QString& name)
 bool 
 SourceListWidget::addSource(SourceType type, QListWidgetItem* item)
 {
-    if (m_sources.size() < m_maxSources) {
-        QString name = item->data(Qt::DisplayRole).toString();
-        if (name.length() > 0) {
-            SourceItemWidget* sourceItemWidget = createWidget(type, name);
+    QString name = item->data(Qt::DisplayRole).toString();
+    if (m_sources.size() == m_maxSources || sourceInList(type, name))
+        return false;
 
-            m_sources.append(Source(type, name));
-            int idx = m_sources.size() - 1;
-            QWidget* old = m_layout->itemAt(idx * 2)->widget();
-            m_layout->removeWidget(old);
-            old->deleteLater();
-            m_layout->insertWidget(idx * 2, sourceItemWidget);
-            setOp(idx);
+    SourceItemWidget* sourceItemWidget = createWidget(type, name);
 
-            QString imageUrl = item->data(Qt::DecorationRole).toString();
-            if (imageUrl.length()) {
-                QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(imageUrl));
-                connect(reply, SIGNAL(finished()), sourceItemWidget, SLOT(onGotImage()));
-            }
-            return true;
-        }
+    m_sources.append(Source(type, name));
+    int idx = m_sources.size() - 1;
+    QWidget* old = m_layout->itemAt(idx * 2)->widget();
+    m_layout->removeWidget(old);
+    old->deleteLater();
+    m_layout->insertWidget(idx * 2, sourceItemWidget);
+    setOp(idx);
+
+    QString imageUrl = item->data(Qt::DecorationRole).toString();
+    if (imageUrl.length()) {
+        QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(imageUrl));
+        connect(reply, SIGNAL(finished()), sourceItemWidget, SLOT(onGotImage()));
     }
-    return false;
+    return true;
 }
 
 void
