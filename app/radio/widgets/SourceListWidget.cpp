@@ -35,9 +35,10 @@
 #include "lastfm/ws.h"
 
 
-SourceListWidget::SourceListWidget(int maxSources, QWidget* parent)
+SourceListWidget::SourceListWidget(bool advanced, int maxSources, QWidget* parent)
 : QWidget(parent)
 , m_maxSources(maxSources)
+, m_advanced(advanced)
 {
     m_layout = new QVBoxLayout(this);
     for (int i = 0; i < maxSources; i++) {
@@ -60,6 +61,9 @@ SourceListWidget::addPlaceholder()
         QComboBox* combo = new QComboBox();
         combo->setDisabled(true);
         m_layout->addWidget(combo);
+        if (!m_advanced) {
+            combo->hide();
+        }
     }
     QGroupBox* box = new QGroupBox("");
     m_layout->addWidget(box);

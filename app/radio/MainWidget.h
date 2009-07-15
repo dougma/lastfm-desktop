@@ -53,7 +53,8 @@ signals:
 
 private slots:
     void onStartRadio(RadioStation rs);
-    void onCombo();
+    void onSimpleCombo();
+    void onAdvancedCombo();
     void onYourTags();
     void onBack();
     void onBackDelete();
