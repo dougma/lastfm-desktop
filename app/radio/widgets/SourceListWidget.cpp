@@ -46,6 +46,14 @@ SourceListWidget::SourceListWidget(int maxSources, QWidget* parent)
 }
 
 void
+SourceListWidget::addPlaceholders()
+{
+    while (m_layout->count() < (m_maxSources * 2) - 1) {
+        addPlaceholder();
+    }
+}
+
+void
 SourceListWidget::addPlaceholder()
 {
     if (m_layout->itemAt(0)) {
@@ -54,7 +62,6 @@ SourceListWidget::addPlaceholder()
         m_layout->addWidget(combo);
     }
     QGroupBox* box = new QGroupBox("");
-    box->setLayout(new QHBoxLayout());
     m_layout->addWidget(box);
 }
 
@@ -66,9 +73,10 @@ SourceListWidget::addSource(SourceType type, const QString& name)
 
     m_sources.append(Source(type, name));
     int idx = m_sources.size() - 1;
-    QLayoutItem* li = m_layout->itemAt(idx * 2);
-    QLayout* layout = ((QGroupBox *)li->widget())->layout();
-    createWidget(type, name, layout);
+    QWidget* old = m_layout->itemAt(idx * 2)->widget();
+    m_layout->removeWidget(old);
+    old->deleteLater();
+    m_layout->insertWidget(idx * 2, createWidget(type, name));
     setOp(idx);
     return true;
 }
@@ -79,11 +87,14 @@ SourceListWidget::addSource(SourceType type, QListWidgetItem* item)
     if (m_sources.size() < m_maxSources) {
         QString name = item->data(Qt::DisplayRole).toString();
         if (name.length() > 0) {
+            SourceItemWidget* sourceItemWidget = createWidget(type, name);
+
             m_sources.append(Source(type, name));
             int idx = m_sources.size() - 1;
-            QLayoutItem* li = m_layout->itemAt(idx * 2);
-            QLayout* layout = ((QGroupBox *)li->widget())->layout();
-            SourceItemWidget* sourceItemWidget = createWidget(type, name, layout);
+            QWidget* old = m_layout->itemAt(idx * 2)->widget();
+            m_layout->removeWidget(old);
+            old->deleteLater();
+            m_layout->insertWidget(idx * 2, sourceItemWidget);
             setOp(idx);
 
             QString imageUrl = item->data(Qt::DecorationRole).toString();
@@ -113,16 +124,49 @@ SourceListWidget::setOp(int sourceIdx)
     }
 }
 
-//static
 SourceItemWidget*
-SourceListWidget::createWidget(SourceType type, const QString& name, QLayout* layout)
+SourceListWidget::createWidget(SourceType type, const QString& name)
 {
+    SourceItemWidget* result = 0;
     switch (type) {
-        case Artist: return new SourceItemWidget("Artist: " + name, layout);
-        case Tag: return new SourceItemWidget("Tag: " + name, layout);
-        case User: return new SourceItemWidget("User: " + name, layout);
+        case Artist: 
+            result = new SourceItemWidget("Artist: " + name);
+            break;
+        case Tag: 
+            result = new SourceItemWidget("Tag: " + name);
+            break;
+        case User: 
+            result = new SourceItemWidget("User: " + name);
+            break;
+        default:
+            return 0;
     }
-    return 0;
+    connect(result, SIGNAL(deleteClicked()), SLOT(onDeleteClicked()));
+    return result;
+}
+
+void
+SourceListWidget::onDeleteClicked()
+{
+    sender()->deleteLater();
+    SourceItemWidget* source = qobject_cast<SourceItemWidget*>(sender());
+    if (source) {
+        int idx = m_layout->indexOf(source);
+        if (idx != -1) {
+            m_sources.removeAt(idx / 2);
+            bool first = idx == 0;
+            if (!first) {
+                // remove any preceding operator control
+                idx--;
+                m_layout->takeAt(idx)->widget()->deleteLater();
+            }
+            m_layout->takeAt(idx)->widget()->deleteLater();
+            if (first) {
+                m_layout->takeAt(0)->widget()->deleteLater();
+            }
+            addPlaceholders();
+        }
+    }
 }
 
 //static

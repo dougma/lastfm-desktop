@@ -41,15 +41,17 @@ public:
     bool addSource(SourceType type, class QListWidgetItem* item);
 
 private slots:
+    void onDeleteClicked();
 
 private:
     typedef QPair<SourceType, QString> Source;
 
     void setOp(int sourceIdx);
     void addPlaceholder();
+    void addPlaceholders();
 
+    SourceItemWidget* createWidget(SourceType type, const QString& name);
     static Operator defaultOp(SourceType first, SourceType second);
-    static SourceItemWidget* createWidget(SourceType type, const QString& name, QLayout* layout);
 
     QVBoxLayout* m_layout;
     int m_maxSources;

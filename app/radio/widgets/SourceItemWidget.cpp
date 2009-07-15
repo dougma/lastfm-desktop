@@ -19,15 +19,20 @@
 
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QNetworkReply>
 #include "SourceItemWidget.h"
 
-SourceItemWidget::SourceItemWidget(const QString& labelText, QLayout* layout)
+SourceItemWidget::SourceItemWidget(const QString& labelText)
 {
+    QPushButton* del;
+    QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget( m_image = new QLabel );
     layout->addWidget( m_label = new QLabel );
+    layout->addWidget( del = new QPushButton("X") );
     m_image->setScaledContents( true );
     m_label->setText(labelText);
+    connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
 }
 
 void
