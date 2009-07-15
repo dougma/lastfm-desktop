@@ -27,10 +27,13 @@ class SourceItemWidget : public QWidget
     Q_OBJECT
 
 public:
-    SourceItemWidget(const QString& labelText, QLayout* layout);
+    SourceItemWidget(const QString& labelText);
 
 public slots:
     void onGotImage();
+
+signals:
+    void deleteClicked();
 
 private:
     class QLabel* m_label;
