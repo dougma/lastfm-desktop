@@ -46,6 +46,7 @@ private slots:
 private:
     typedef QPair<SourceType, QString> Source;
 
+    bool sourceInList(SourceType type, const QString& name);
     void setOp(int sourceIdx);
     void addPlaceholder();
     void addPlaceholders();
