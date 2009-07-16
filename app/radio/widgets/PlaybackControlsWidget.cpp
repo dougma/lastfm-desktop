@@ -32,7 +32,8 @@
 #include <QPaintEvent>
 
 
-PlaybackControlsWidget::PlaybackControlsWidget()
+PlaybackControlsWidget::PlaybackControlsWidget( QWidget* parent )
+                       :StylableWidget( parent )
 {
     QHBoxLayout* h = new QHBoxLayout( this );
     h->setContentsMargins( 12, 0, 12, 0 );

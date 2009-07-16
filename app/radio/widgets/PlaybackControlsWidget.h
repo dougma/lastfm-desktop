@@ -33,7 +33,7 @@ class PlaybackControlsWidget : public StylableWidget
 	Q_OBJECT
 
 public:
-    PlaybackControlsWidget();
+    PlaybackControlsWidget( QWidget* parent = 0 );
 
 	struct Ui
     {
