@@ -18,7 +18,7 @@ MainWindow::MainWindow()
     //of the window, an empty QWidget is added as a spacer.
     QSizeGrip* sg = status->findChild<QSizeGrip *>();
     if( sg ) {
-        int gripWidget = sg->sizeHint().width();
+        int gripWidth = sg->sizeHint().width();
         QWidget* w = new QWidget( status );
         w->setFixedWidth( gripWidth );
         status->addWidget( w );
