@@ -21,11 +21,12 @@
 #include "lib/unicorn/UnicornApplication.h"
 #include <QPointer>
 #include <QSystemTrayIcon>
+
 class PlayerMediator;
 class PlayerConnection;
 class MetadataWindow;
 class StopWatch;
-
+class QAction;
 
 namespace audioscrobbler
 {
