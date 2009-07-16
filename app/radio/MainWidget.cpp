@@ -28,7 +28,8 @@
 #include "Radio.h"
 
 
-MainWidget::MainWidget()
+MainWidget::MainWidget( QWidget* parent )
+           :QWidget( parent )
 {
     m_nowPlaying = new NowPlayingState();
     connect(radio, SIGNAL(tuningIn(RadioStation)), m_nowPlaying, SLOT(onTuningIn(RadioStation)));

@@ -30,8 +30,12 @@
 #include <QThread>
 #include <QVariant>
 
-#include <phonon>
-
+#ifdef Q_OS_UNIX
+    #include <phonon/audiooutput.h>
+    #include <phonon/mediasource.h>
+#else
+    #include <phonon>
+#endif
 namespace Phonon
 {
 	class MediaObject;
