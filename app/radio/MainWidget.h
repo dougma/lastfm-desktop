@@ -46,7 +46,7 @@ class MainWidget : public QWidget
     } ui;
 
 public:
-    MainWidget();
+    MainWidget( QWidget* parent = 0 );
     
 signals:
     void startRadio(RadioStation);
