@@ -45,7 +45,7 @@ MetadataWindow::MetadataWindow()
         QVBoxLayout* v2 = new QVBoxLayout();
         h->addWidget(ui.artist_image = new QLabel);
         ui.artist_image->setObjectName("artist_image");
-        h->setStretchFactor(ui.artist_image, 1);
+        h->addStretch( 1 );
         v2->addWidget(ui.title = new QLabel);
         v2->addWidget(ui.album = new QLabel);
         v2->addStretch();
@@ -53,7 +53,7 @@ MetadataWindow::MetadataWindow()
         ui.title->setWordWrap(true);
         ui.album->setObjectName("title2");
         h->addLayout(v2);
-        h->setStretchFactor(v2, 3);
+        h->addStretch( 1 );
         v->addLayout(h);
     }
 
@@ -68,24 +68,28 @@ MetadataWindow::MetadataWindow()
         ui.listeners = new QLabel;
         ui.listeners->setObjectName("value");
         ui.listeners->setProperty("alternate", QVariant(true));
-        grid->addWidget(ui.listeners, 0, 1);
+        grid->addWidget(ui.listeners, 0, 2);
 
         label = new QLabel(tr("Scrobbles"));
         label->setObjectName("name");
         grid->addWidget(label, 1, 0);
         ui.scrobbles = new QLabel;
         ui.scrobbles->setObjectName("value");
-        grid->addWidget(ui.scrobbles, 1, 1);
+        grid->addWidget(ui.scrobbles, 1, 2);
 
         label = new QLabel(tr("Tagged as"));
         label->setObjectName("name");
         label->setProperty("alternate", QVariant(true));
+        label->setAlignment( Qt::AlignTop );
         grid->addWidget(label, 2, 0);
         ui.tags = new QLabel;
         ui.tags->setObjectName("value");
         ui.tags->setProperty("alternate", QVariant(true));
         ui.tags->setWordWrap(true);
-        grid->addWidget(ui.tags, 2, 1);
+        grid->addWidget(ui.tags, 2, 2);
+        grid->addWidget( new QWidget( this ), 2, 3);
+        grid->setColumnStretch( 1, 1 );
+        grid->setColumnStretch( 1, 3 );
         v->addLayout(grid);
     }
 
@@ -119,9 +123,8 @@ MetadataWindow::MetadataWindow()
     v->setMargin(0);
 
 
-    setFixedWidth(252);
     setWindowTitle(tr("Last.fm Audioscrobbler"));
-    resize(20, 500);
+    resize(252, 500);
 }
 
 void

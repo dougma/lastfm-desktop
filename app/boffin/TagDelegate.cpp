@@ -69,14 +69,14 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
     }
     
     if( option.state & QStyle::State_MouseOver )
-        p = option.palette.color( QPalette::Highlight );
+        p = option.palette.color( QPalette::Active, QPalette::Window );
 
     if( option.state & QStyle::State_Active )
         p = dark;
 
 
     p.setWidth( 3 );
-    painter->setPen( p );
+//    painter->setPen( p );
     painter->setBrush( b );
     painter->setRenderHint( QPainter::Antialiasing, true );
     painter->drawRoundedRect( option.rect.adjusted( 2, 2, -2, -2 ), 5.0f, 5.0f );
@@ -89,7 +89,7 @@ TagDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option, const
  					 ? option.palette.color( QPalette::HighlightedText )
 					 : option.palette.color( QPalette::Text );
  	textColor.setAlpha( alpha );
-    painter->setPen( textColor );
+//    painter->setPen( textColor );
 
     QString const text = index.data().toString();
     QFontMetrics const metrics = painter->fontMetrics();
