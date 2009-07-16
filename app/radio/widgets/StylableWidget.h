@@ -25,6 +25,9 @@
 #include <QPainter>
 
 class StylableWidget: public QWidget {
+public:
+    StylableWidget( QWidget* parent = 0 ):QWidget( parent ){}
+
 protected:
     void paintEvent(QPaintEvent*)
     {

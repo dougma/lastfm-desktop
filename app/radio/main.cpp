@@ -28,17 +28,11 @@
 
 #include "_version.h"
 #include "Application.h"
-#include "MainWidget.h"
-#include "widgets/MultiStarterWidget.h"
-#include "widgets/PlaybackControlsWidget.h"
-#include "Radio.h"
 #include "ScrobSocket.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
-#include "lib/unicorn/UnicornMainWindow.h"
-#include <lastfm/RadioStation>
-#include <QLineEdit>
-#include <QStatusBar>
+#include "MainWindow.h"
+#include "Radio.h"
 
 void setupRadio();
 void cleanup();
@@ -92,9 +86,9 @@ int main( int argc, char** argv )
         q->connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
       #endif
 		
-		setupRadio();
-		qAddPostRoutine(cleanup);
-		app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
+        setupRadio();
+        qAddPostRoutine(cleanup);
+        app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
         ScrobSocket* scrobsock = new ScrobSocket("ass");
         scrobsock->connect(radio, SIGNAL(trackStarted(Track)), SLOT(start(Track)));
@@ -105,30 +99,13 @@ int main( int argc, char** argv )
         AEInstallEventHandler( 'GURL', 'GURL', h, 0, false );
       #endif
         
-        unicorn::MainWindow window;
+        MainWindow window;
 
-        MainWidget mainWidget;
-        q->connect(&mainWidget, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
-	    window.setCentralWidget( &mainWidget );
+        q->connect(&window, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+
         window.setWindowTitle( app.applicationName() );
-		window.finishUi();
-		QStatusBar status;
-		PlaybackControlsWidget* pcw = new PlaybackControlsWidget();
 
-		//In order to compensate for the sizer grip on the bottom right
-		//of the window, an empty QWidget is added as a spacer.
-		QWidget* w = new QWidget( &status );
-		w->setFixedWidth( 13 );
-		status.addWidget( w );
-		
-		//Seemingly the only way to get a central widget in a QStatusBar
-		//is to add an empty widget either side with a stretch value.
-		status.addWidget( new QWidget( &status), 1 );
-		status.addWidget( pcw );
-		status.addWidget( new QWidget( &status), 1 );
-		window.setUnifiedTitleAndToolBarOnMac( true );
-		window.setStatusBar( &status );
-		window.show();
+        window.show();
 
         app.parseArguments( app.arguments() );
         int result = app.exec();
