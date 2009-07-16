@@ -10,6 +10,12 @@ QuickStartWidget, MoreStationsWidget {
     padding-bottom: 20px;
 }
 
+RecentStationsWidget > QListWidget
+{
+    border:none;
+    background: #242424;
+}
+
 YourStationsWidget > .QLabel,
 RecentStationsWidget > .QLabel,
 QuickStartWidget > .QLabel,

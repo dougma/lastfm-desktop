@@ -187,9 +187,14 @@ MultiStarterWidget::onPlayClicked()
 {
     QString rql = m_sourceList->rql();
     if (m_advanced) {
-        float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
         float r = m_repSlider->value() / (float) m_repSlider->maximum();
-        rql += QString(" opt:rep|%1 opt:mainstr|%2").arg(r).arg(m);
+        if (r != 0.5) {
+            rql += QString(" opt:rep|%1").arg(r);
+        }
+        float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
+        if (m != 0.5) {
+            rql += QString(" opt:mainstr|%1").arg(m);
+        }
     }
     RadioStation r = RadioStation::rql(rql);
     r.setTitle(m_sourceList->stationDescription());

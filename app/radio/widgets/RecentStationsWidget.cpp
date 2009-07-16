@@ -18,12 +18,27 @@
 */
 
 #include <QNetworkReply>
-#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QListWidget>
+#include <QResizeEvent>
+#include <QListWidgetItem>
 #include <QLabel>
 #include <lastfm/AuthenticatedUser>
 #include <lastfm/XmlQuery>
 #include "RecentStationsWidget.h"
 #include "PlayableItemWidget.h"
+
+class OurListWidget : public QListWidget
+{
+protected:
+    virtual void resizeEvent(QResizeEvent* e)
+    {
+        if (e->size().width() < 350) 
+            setGridSize(QSize(e->size().width(), 30));
+        else
+            setGridSize(QSize(e->size().width() / 2, 30));
+    }
+};
 
 RecentStationsWidget::RecentStationsWidget()
 {
@@ -37,8 +52,14 @@ RecentStationsWidget::refresh()
     AuthenticatedUser you;
     connect(you.getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));
 
-    m_layout = new QGridLayout(this);
-    m_layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, 0, 1, 2, Qt::AlignCenter);
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(new QLabel(tr("Your Recent Stations")));
+    layout->addWidget(m_list = new OurListWidget());
+//    m_list->setFlow(QListView::LeftToRight);
+    m_list->setWrapping(true);
+    m_list->setResizeMode(QListView::Adjust);
+    m_list->setUniformItemSizes(false);
+    m_list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 void
@@ -48,12 +69,13 @@ RecentStationsWidget::gotRecentStations()
     sender()->deleteLater();
     QList<RadioStation> recent = RadioStation::list((QNetworkReply*)sender());
 
-    int p = 0;
     foreach(const RadioStation& rs, recent) {
-        PlayableItemWidget* item = new PlayableItemWidget(rs.title(), rs);
-        m_layout->addWidget(item, 1 + p / 2, p % 2);
-        connect(item, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-        p++;
+        QListWidgetItem* item = new QListWidgetItem(m_list);
+        PlayableItemWidget* widget = new PlayableItemWidget(rs.title(), rs);
+//        widget->setMinimumHeight(60);
+//        widget->setMinimumWidth(100);
+        m_list->setItemWidget(item, widget);
+        connect(widget, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     }
     
 }
