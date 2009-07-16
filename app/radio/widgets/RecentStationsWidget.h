@@ -23,7 +23,7 @@
 #include "StylableWidget.h"
 #include <lastfm/RadioStation>
 
-class QGridLayout;
+class QListWidget;
 
 class RecentStationsWidget : public StylableWidget
 {
@@ -40,7 +40,8 @@ private slots:
 
 private:
     void refresh();
-    QGridLayout* m_layout;
+
+    QListWidget* m_list;
 };
 
 #endif
