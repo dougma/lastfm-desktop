@@ -25,6 +25,7 @@ class PlayerMediator;
 class PlayerConnection;
 class MetadataWindow;
 class StopWatch;
+class QAction;
 
 
 namespace audioscrobbler
