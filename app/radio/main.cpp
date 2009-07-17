@@ -33,6 +33,7 @@
 #include "lib/unicorn/UnicornApplication.h"
 #include "MainWindow.h"
 #include "Radio.h"
+#include "app/moose.h"
 
 void setupRadio();
 void cleanup();
