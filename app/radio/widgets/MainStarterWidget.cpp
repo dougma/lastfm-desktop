@@ -35,6 +35,7 @@ MainStarterWidget::MainStarterWidget()
 
     w = new RecentStationsWidget();
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(showMoreRecentStations()), SIGNAL(showMoreRecentStations()));
     layout->addWidget(w);
 
     w = new YourStationsWidget();

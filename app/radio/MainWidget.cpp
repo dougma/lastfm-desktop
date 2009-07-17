@@ -25,6 +25,7 @@
 #include "widgets/MainStarterWidget.h"
 #include "widgets/NowPlayingWidget.h"
 #include "widgets/MultiStarterWidget.h"
+#include "widgets/FullHistoryWidget.h"
 #include "Radio.h"
 
 
@@ -40,6 +41,7 @@ MainWidget::MainWidget( QWidget* parent )
     MainStarterWidget* w = new MainStarterWidget;
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+    connect(w, SIGNAL(showMoreRecentStations()), SLOT(onShowMoreRecentStations()));
     connect(w, SIGNAL(simpleCombo()), SLOT(onSimpleCombo()));
     connect(w, SIGNAL(advancedCombo()), SLOT(onAdvancedCombo()));
     connect(w, SIGNAL(yourTags()), SLOT(onYourTags()));
@@ -62,6 +64,19 @@ MainWidget::onStartRadio(RadioStation rs)
     connect(radio, SIGNAL(tick( qint64 )), w, SIGNAL( tick( qint64 )));
     connect(radio, SIGNAL(buffering( int )), w, SLOT(onBuffering( int )));
     connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
+    connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    m_layout->addWidget(ctrl);
+    m_layout->moveForward();
+}
+
+void
+MainWidget::onShowMoreRecentStations()
+{
+    FullHistoryWidget* w = new FullHistoryWidget();
+    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
     BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
     connect(ctrl, SIGNAL(back()), SLOT(onBack()));

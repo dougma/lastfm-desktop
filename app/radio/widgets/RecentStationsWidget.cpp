@@ -20,31 +20,40 @@
 #include <QNetworkReply>
 #include <QVBoxLayout>
 #include <QListWidget>
+#include <QPushButton>
 #include <QResizeEvent>
 #include <QListWidgetItem>
 #include <QLabel>
+#include <QScrollBar>
 #include <lastfm/AuthenticatedUser>
 #include <lastfm/XmlQuery>
 #include "RecentStationsWidget.h"
 #include "PlayableItemWidget.h"
 
+#define GRID_HEIGHT_PX 30
+
+
 class OurListWidget : public QListWidget
 {
 protected:
+
+    // switches between 1 and 2 column mode by changing the item grid size
     virtual void resizeEvent(QResizeEvent* e)
     {
         if (e->size().width() < 350) 
-            setGridSize(QSize(e->size().width(), 30));
+            setGridSize(QSize(e->size().width(), GRID_HEIGHT_PX));
         else
-            setGridSize(QSize(e->size().width() / 2, 30));
+            setGridSize(QSize(e->size().width() / 2, GRID_HEIGHT_PX));
     }
 };
 
+
 RecentStationsWidget::RecentStationsWidget()
 {
-    // todo: start a spinner
+    // todo: start a spinner?
     refresh();
 }
+
 
 void
 RecentStationsWidget::refresh()
@@ -53,13 +62,17 @@ RecentStationsWidget::refresh()
     connect(you.getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(tr("Your Recent Stations")));
+    layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, Qt::AlignCenter);
     layout->addWidget(m_list = new OurListWidget());
-//    m_list->setFlow(QListView::LeftToRight);
     m_list->setWrapping(true);
     m_list->setResizeMode(QListView::Adjust);
     m_list->setUniformItemSizes(false);
     m_list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_list->setMaximumHeight(GRID_HEIGHT_PX * 3 + 1);
+    layout->addWidget(m_moreButton = new QPushButton(tr("more")), 0, Qt::AlignRight);
+    m_moreButton->setObjectName("more");
+    connect(m_moreButton, SIGNAL(clicked()), SIGNAL(showMoreRecentStations()));
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
 void
@@ -72,10 +85,10 @@ RecentStationsWidget::gotRecentStations()
     foreach(const RadioStation& rs, recent) {
         QListWidgetItem* item = new QListWidgetItem(m_list);
         PlayableItemWidget* widget = new PlayableItemWidget(rs.title(), rs);
-//        widget->setMinimumHeight(60);
-//        widget->setMinimumWidth(100);
         m_list->setItemWidget(item, widget);
         connect(widget, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     }
-    
+    if (m_list->count() > 6) {
+        m_moreButton->setChecked(true);
+    }
 }
