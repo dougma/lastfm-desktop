@@ -74,7 +74,6 @@ PlaydarTagCloudModel::onTag(BoffinTagItem tag)
     		// merge into existing tag
 			m_tagListBuffer[ i ].m_weight += tag.m_weight;
             m_tagListBuffer[ i ].m_count += tag.m_count;
-            m_tagListBuffer[ i ].m_seconds += tag.m_seconds;
 			m_tagListBuffer[ i ].m_logCount = log( (float) m_tagListBuffer[i].m_count );
 			m_maxWeight = qMax( m_tagListBuffer[i].m_weight, m_maxWeight);
 			m_maxLogCount = qMax( m_tagListBuffer[i].m_logCount, m_maxLogCount);
