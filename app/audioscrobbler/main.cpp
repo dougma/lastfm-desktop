@@ -20,6 +20,7 @@
 #include "_version.h"
 #include "lib/unicorn/UniqueApplication.h"
 #include "Application.h"
+#include "app/moose.h"
 
 
 int main( int argc, char** argv )

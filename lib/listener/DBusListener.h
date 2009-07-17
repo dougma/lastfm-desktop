@@ -38,10 +38,10 @@ signals:
     void newConnection( class PlayerConnection* );
     
 private slots:
-    void start( const QString& id ){};
-    void pause( const QString& id ){};
-    void resume( const QString& id ){};
-    void stop( const QString& id ){};
+    void start( const QString& id ) {}
+    void pause( const QString& id ) {}
+    void resume( const QString& id ) {}
+    void stop( const QString& id ) {}
 
 private:
     QMap<QString, PlayerConnection*> m_connections;
