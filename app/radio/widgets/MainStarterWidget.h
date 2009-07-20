@@ -34,6 +34,7 @@ public:
 
 signals:
     void startRadio(RadioStation);
+    void showMoreRecentStations();
     void simpleCombo();
     void advancedCombo();
     void yourTags();

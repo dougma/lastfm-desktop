@@ -17,34 +17,4 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef RECENT_STATIONS_WIDGET_H
-#define RECENT_STATIONS_WIDGET_H
-
-#include "StylableWidget.h"
-#include <lastfm/RadioStation>
-
-class QListWidget;
-class QPushButton;
-
-class RecentStationsWidget : public StylableWidget
-{
-    Q_OBJECT;
-
-public:
-    RecentStationsWidget();
-
-signals:
-    void startRadio(RadioStation);
-    void showMoreRecentStations();
-
-private slots:
-    void gotRecentStations();
-
-private:
-    void refresh();
-
-    QListWidget* m_list;
-    QPushButton* m_moreButton;
-};
-
-#endif
+// todo!
