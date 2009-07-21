@@ -29,6 +29,7 @@
 #include <QTextFrame>
 #include <QTextFrameFormat>
 #include <QVBoxLayout>
+#include <QFile>
 #include "Application.h"
 
 
@@ -161,7 +162,16 @@ MetadataWindow::onArtistGotInfo()
     ui.tags->setText(tags);
 
     //TODO if empty suggest they edit it
-    ui.bio->setHtml(lfm["artist"]["bio"]["content"].text());
+    QString style = "<style>" + ((audioscrobbler::Application*)qApp)->loadedStyleSheet() + styleSheet() + "</style>";
+    
+    QString bio;
+    {
+        QStringList bioList = lfm["artist"]["bio"]["content"].text().split( "\r" );
+        foreach( const QString& p, bioList )
+            bio += "<p>" + p + "</p>";
+    }
+
+    ui.bio->setHtml( style + bio );
 
     QTextFrame* root = ui.bio->document()->rootFrame();
     QTextFrameFormat f = root->frameFormat();

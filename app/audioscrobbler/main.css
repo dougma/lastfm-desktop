@@ -76,3 +76,46 @@ QTextBrowser {
     color: rgb(186,186,186);
     background-color: rgb(31,31,31);
 }
+
+QScrollBar {
+    background-color: #3b3b3b;
+    border-radius: 6px;
+    margin: 1px 0px 30px 0px;
+}
+
+QScrollBar::add-page, 
+QScrollBar::sub-page {
+    background-color: none;
+}
+
+QScrollBar::handle {
+    background-color: #737373;
+    min-height: 20px;
+    max-height: 100px;
+    border-radius: 6px;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line,
+QScrollBar::up-arrow,
+QScrollBar::down-arrow {
+    border-color: none;
+    background-color: none;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+    height: 15px;
+}
+
+QScrollBar::sub-line {
+    bottom: 16px;
+    color: red;
+}
+
+QScrollBar::add-line {
+    top: 16px;
+    color: red;
+}
+
+a {
+    color: #2eb5db;
+}

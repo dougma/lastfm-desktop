@@ -82,6 +82,15 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
     lastfm::ws::SessionKey = s.value( "SessionKey" ).toString();
     
     connect( AuthenticatedUser().getInfo(), SIGNAL(finished()), SLOT(onUserGotInfo()) );
+    
+    if( !styleSheet().isEmpty() ) {
+        QString cssPath = QUrl( styleSheet() ).toLocalFile();
+        cssPath = QDir::currentPath() + cssPath;
+        QFile cssFile( cssPath );
+        cssFile.open( QIODevice::ReadOnly );
+        m_styleSheet = cssFile.readAll();
+        cssFile.close();
+    }
 
 #ifdef __APPLE__
     setQuitOnLastWindowClosed( false );

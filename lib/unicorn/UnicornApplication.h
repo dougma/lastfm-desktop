@@ -44,6 +44,14 @@ namespace unicorn
         Application( int&, char** ) throw( StubbornUserException );
         ~Application();
 
+        /** Will return the actual stylesheet that is loaded if one is specified
+           (on the command-line with -stylesheet or with setStyleSheet(). )
+           Note. the QApplication styleSheet property will return the path 
+                 to the css file unlike this method. */
+        const QString& loadedStyleSheet() {
+            return m_styleSheet;
+        }
+
         struct Settings
         {
             bool logOutOnExit() { return GlobalSettings().value( "LogOutOnExit", false ).toBool(); }
@@ -59,6 +67,7 @@ namespace unicorn
 
     private:
         void translate();
+        QString m_styleSheet;
 
     private slots:
         void onUserGotInfo();
