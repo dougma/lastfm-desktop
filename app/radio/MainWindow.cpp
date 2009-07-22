@@ -14,6 +14,7 @@ MainWindow::MainWindow()
     QStatusBar* status = new QStatusBar( this );
     PlaybackControlsWidget* pcw = new PlaybackControlsWidget( status );
 
+    //FIXME: this code is duplicated in the audioscrobbler app too
     //In order to compensate for the sizer grip on the bottom right
     //of the window, an empty QWidget is added as a spacer.
     QSizeGrip* sg = status->findChild<QSizeGrip *>();

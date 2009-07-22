@@ -13,12 +13,21 @@ MetadataWindow QPushButton {
     width: 40;
 }
 
-MetadataWindow QLabel[alternate="true"] { background-color: rgb(31,31,31); }
-MetadataWindow QLabel#name  { color: rgb(186,186,186); padding:3; margin-left:6px; }
-MetadataWindow QLabel#value { color: rgb(147,147,147); padding:3; margin-right:6px; }
+QScrollArea,
+QScrollArea > QWidget,
+QScrollArea > QWidget > QWidget {
+    background-color: transparent;
+}
 
-MetadataWindow #artist_image { border: 1px solid white; margin:12; }
+QScrollArea {
+    border: none;
+}
 
+MetadataWindow QLabel[alternate="true"] { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:1 #171717, stop:0 #212222 ); }
+MetadataWindow QLabel#name  { color: rgb(186,186,186); padding:3; margin-left:12px; }
+MetadataWindow QLabel#value { color: rgb(147,147,147); padding:3; margin-right:10px; }
+
+MetadataWindow #artist_image { border: 1px solid #716f6f; margin:12; }
 
 QPushButton#love {
     background-image: url(:/love-rest.png);
@@ -52,6 +61,10 @@ QTextBrowser, QLabel#title1, QLabel#title2 {
     color: rgb(220,220,220);
 }
 
+QTextBrowser {
+    margin-right: -3px;
+}
+
 QLabel#title1 
 {
     font-size: 13px;
@@ -80,42 +93,27 @@ QTextBrowser {
 QScrollBar {
     background-color: #3b3b3b;
     border-radius: 6px;
-    margin: 1px 0px 30px 0px;
+    margin: 7px 0px 7px 0px;
+    width:14px;
+    padding: 0px;
 }
 
 QScrollBar::add-page, 
 QScrollBar::sub-page {
-    background-color: none;
+    background-color: transparent;
 }
 
 QScrollBar::handle {
     background-color: #737373;
     min-height: 20px;
-    max-height: 100px;
     border-radius: 6px;
 }
 
-QScrollBar::add-line,
 QScrollBar::sub-line,
-QScrollBar::up-arrow,
-QScrollBar::down-arrow {
-    border-color: none;
-    background-color: none;
-    subcontrol-position: bottom;
-    subcontrol-origin: margin;
-    height: 15px;
-}
-
-QScrollBar::sub-line {
-    bottom: 16px;
-    color: red;
-}
-
 QScrollBar::add-line {
-    top: 16px;
-    color: red;
+    height: 0px;
 }
 
 a {
-    color: #2eb5db;
+    color: #4c7699;
 }

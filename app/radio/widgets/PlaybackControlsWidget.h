@@ -20,7 +20,7 @@
 #ifndef PLAYBACK_CONTROLS_WIDGET_H_
 #define PLAYBACK_CONTROLS_WIDGET_H_
 
-#include "StylableWidget.h"
+#include "lib/unicorn/StylableWidget.h"
 
 class QPushButton;
 

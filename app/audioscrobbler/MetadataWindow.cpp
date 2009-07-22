@@ -18,9 +18,15 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "MetadataWindow.h"
+
+#include "ScrobbleControls.h"
+#include "Application.h"
+#include "lib/unicorn/StylableWidget.h"
+
 #include <lastfm/Artist>
 #include <lastfm/XmlQuery>
 #include <lastfm/ws.h>
+
 #include <QLabel>
 #include <QPainter>
 #include <QPushButton>
@@ -29,9 +35,9 @@
 #include <QTextFrame>
 #include <QTextFrameFormat>
 #include <QVBoxLayout>
-#include <QFile>
-#include "Application.h"
-
+#include <QScrollArea>
+#include <QStatusBar>
+#include <QSizeGrip>
 
 MetadataWindow::MetadataWindow()
 {
@@ -40,6 +46,17 @@ MetadataWindow::MetadataWindow()
 
     v->addWidget(ui.now_playing_source = new QLabel("Now Playing: Last.fm Radio"));
     ui.now_playing_source->setObjectName("now_playing");
+    ui.now_playing_source->setFixedHeight( 25 );
+   
+    QVBoxLayout* vs;
+    {
+        QWidget* scrollWidget;
+        QScrollArea* sa = new QScrollArea();
+        sa->setWidgetResizable( true );
+        sa->setWidget( scrollWidget = new StylableWidget(sa));
+        vs = new QVBoxLayout( scrollWidget );
+        v->addWidget( sa );
+    }
 
     {
         QHBoxLayout* h = new QHBoxLayout();
@@ -55,7 +72,7 @@ MetadataWindow::MetadataWindow()
         ui.album->setObjectName("title2");
         h->addLayout(v2);
         h->setStretchFactor(v2, 3);
-        v->addLayout(h);
+        vs->addLayout(h);
     }
 
     // listeners, scrobbles, tags:
@@ -65,7 +82,7 @@ MetadataWindow::MetadataWindow()
         label = new QLabel(tr("Listeners"));
         label->setObjectName("name");
         label->setProperty("alternate", QVariant(true));
-        grid->addWidget(label, 0, 0);
+        grid->addWidget(label, 0, 0, ( Qt::AlignTop | Qt::AlignLeft ));
         ui.listeners = new QLabel;
         ui.listeners->setObjectName("value");
         ui.listeners->setProperty("alternate", QVariant(true));
@@ -73,7 +90,7 @@ MetadataWindow::MetadataWindow()
 
         label = new QLabel(tr("Scrobbles"));
         label->setObjectName("name");
-        grid->addWidget(label, 1, 0);
+        grid->addWidget(label, 1, 0, ( Qt::AlignTop | Qt::AlignLeft ));
         ui.scrobbles = new QLabel;
         ui.scrobbles->setObjectName("value");
         grid->addWidget(ui.scrobbles, 1, 1);
@@ -81,48 +98,65 @@ MetadataWindow::MetadataWindow()
         label = new QLabel(tr("Tagged as"));
         label->setObjectName("name");
         label->setProperty("alternate", QVariant(true));
-        grid->addWidget(label, 2, 0);
+        grid->addWidget(label, 2, 0, ( Qt::AlignTop | Qt::AlignLeft ));
         ui.tags = new QLabel;
         ui.tags->setObjectName("value");
         ui.tags->setProperty("alternate", QVariant(true));
         ui.tags->setWordWrap(true);
         grid->addWidget(ui.tags, 2, 1);
-        v->addLayout(grid);
+
+        // bio:
+        label = new QLabel(tr("Biography"));
+        label->setObjectName("name");
+        grid->addWidget(label, 3, 0, ( Qt::AlignTop | Qt::AlignLeft ));
+        grid->addWidget(ui.bio = new QTextBrowser, 3, 1);
+        ui.bio->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    
+        vs->addLayout(grid);
+
     }
+    connect( ui.bio, SIGNAL( textChanged()), SLOT( onBioChanged()));
+    vs->setStretchFactor(ui.bio, 1);
 
-    // bio:
-    v->addWidget(ui.bio = new QTextBrowser);
-    v->setStretchFactor(ui.bio, 1);
-
-    // love, tag, share buttons
+    // status bar and scrobble controls
     {
-        QHBoxLayout* h = new QHBoxLayout;
-        h->addStretch();
-       
-        h->addWidget(ui.love = new QPushButton(tr("love")));
-        ui.love->setObjectName("love");
-        ui.love->addAction( ((audioscrobbler::Application*)qApp)->loveAction() );
+        QStatusBar* status = new QStatusBar( this );
         
-        h->addWidget(ui.tag = new QPushButton(tr("tag")));
-        ui.tag->setObjectName("tag");
-        ui.tag->addAction( ((audioscrobbler::Application*)qApp)->tagAction() );
-        
-        h->addWidget(ui.share = new QPushButton(tr("share")));
-        ui.share->setObjectName("share");
-        ui.share->addAction( ((audioscrobbler::Application*)qApp)->shareAction() );
-       
-        h->addStretch();
+        //FIXME: this code is duplicated in the radio too
+        //In order to compensate for the sizer grip on the bottom right
+        //of the window, an empty QWidget is added as a spacer.
+        QSizeGrip* sg = status->findChild<QSizeGrip *>();
+        if( sg ) {
+            int gripWidth = sg->sizeHint().width();
+            QWidget* w = new QWidget( status );
+            w->setFixedWidth( gripWidth );
+            status->addWidget( w );
+        }
 
-        v->addLayout(h);
+        //Seemingly the only way to get a central widget in a QStatusBar
+        //is to add an empty widget either side with a stretch value.
+        status->addWidget( new QWidget( status), 1 );
+        status->addWidget( new ScrobbleControls());
+        status->addWidget( new QWidget( status), 1 );
+        setStatusBar( status );
     }
 
     v->setSpacing(0);
     v->setMargin(0);
+    vs->setSpacing(0);
+    vs->setMargin(0);
 
 
-    setFixedWidth(252);
     setWindowTitle(tr("Last.fm Audioscrobbler"));
+    setUnifiedTitleAndToolBarOnMac( true );
+    setMinimumHeight( 80 );
     resize(20, 500);
+}
+
+void
+MetadataWindow::onBioChanged()
+{
+    ui.bio->setFixedHeight( ui.bio->document()->size().height() );
 }
 
 void
@@ -178,7 +212,7 @@ MetadataWindow::onArtistGotInfo()
     f.setMargin(12);
     root->setFrameFormat(f);
 
-    QUrl url = lfm["artist"]["image size=medium"].text();
+    QUrl url = lfm["artist"]["image size=large"].text();
     QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), SLOT(onArtistImageDownloaded()));
 }
@@ -198,6 +232,7 @@ MetadataWindow::onArtistImageDownloaded()
     p.fillRect(px.rect(), g);
     p.end();
 
+    ui.artist_image->setFixedSize( px.size());
     ui.artist_image->setPixmap(px);
 }
 

@@ -20,7 +20,7 @@
 #ifndef RECENT_STATIONS_WIDGET_H
 #define RECENT_STATIONS_WIDGET_H
 
-#include "StylableWidget.h"
+#include "lib/unicorn/StylableWidget.h"
 #include <lastfm/RadioStation>
 
 class QListWidget;

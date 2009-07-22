@@ -36,7 +36,8 @@ class LISTENER_DLLEXPORT PlayerListener : public QLocalServer
 
 public:
     PlayerListener( QObject* parent = 0 ) throw( std::runtime_error );
-    
+    ~PlayerListener(){ close(); }
+
 signals:
     void newConnection( class PlayerConnection* );
     void bootstrapCompleted( const QString& playerId );

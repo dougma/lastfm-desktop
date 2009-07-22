@@ -1,5 +1,6 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
+      - Primarily authored by Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -17,23 +18,17 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MORE_STATIONS_WIDGET_H
-#define MORE_STATIONS_WIDGET_H
+#ifndef SCROBBLE_CONTROLS_H
+#define SCROBBLE_CONTROLS_H
 
 #include "lib/unicorn/StylableWidget.h"
-#include <lastfm/RadioStation>
 
-class MoreStationsWidget : public StylableWidget
+class ScrobbleControls : public StylableWidget
 {
-    Q_OBJECT;
-
+    Q_OBJECT
 public:
-    MoreStationsWidget();
+    ScrobbleControls();
 
-signals:
-    void simpleCombo();
-    void advancedCombo();
-    void yourTags();
 };
 
-#endif
+#endif //SCROBBLE_CONTROLS_H

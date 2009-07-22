@@ -52,6 +52,7 @@ private slots:
     void onArtistGotInfo();
 //    void onAlbumGotInfo();
     void onArtistImageDownloaded();
+    void onBioChanged();
     
 private:
     Track m_currentTrack;
