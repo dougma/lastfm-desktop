@@ -18,6 +18,7 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "lib/unicorn/UnicornMainWindow.h"
+#include "lib/unicorn/StylableWidget.h"
 #include <lastfm/Track>
 
 class MetadataWindow : public unicorn::MainWindow
@@ -52,8 +53,9 @@ private slots:
     void onArtistGotInfo();
 //    void onAlbumGotInfo();
     void onArtistImageDownloaded();
-    void onBioChanged();
+    void onBioChanged( const QSizeF& );
     
 private:
     Track m_currentTrack;
 };
+

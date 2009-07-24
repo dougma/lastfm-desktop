@@ -17,17 +17,27 @@ QScrollArea,
 QScrollArea > QWidget,
 QScrollArea > QWidget > QWidget {
     background-color: transparent;
+    padding: 0px;
+    margin: 0px;
 }
 
 QScrollArea {
     border: none;
 }
 
-MetadataWindow QLabel[alternate="true"] { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:1 #171717, stop:0 #212222 ); }
-MetadataWindow QLabel#name  { color: rgb(186,186,186); padding:3; margin-left:12px; }
-MetadataWindow QLabel#value { color: rgb(147,147,147); padding:3; margin-right:10px; }
+MetadataWindow QLabel{ padding: 3px 0px 1px 5px; margin: 0px; font-size: 11px; font-weight: bold;}
+MetadataWindow QLabel[alternate="true"]{ background-origin: margin; background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:1 #171717, stop:0 #212222 ); }
+MetadataWindow QLabel#name { color: #afafaf; margin-left: 15px; }
+MetadataWindow QLabel#value { color: #cccccc; font-weight: bold; margin: 0px; margin-right:11px; }
 
-MetadataWindow #artist_image { border: 1px solid #716f6f; margin:12; }
+MetadataWindow #artist_image {
+    padding: 0px;  
+    border: 1px solid #716f6f; 
+    margin:15px; 
+    margin-right: 4px;
+    min-width: 85px; 
+    min-height: 85px; 
+}
 
 QPushButton#love {
     background-image: url(:/love-rest.png);
@@ -58,44 +68,45 @@ QStatusBar::item {
 }
 
 QTextBrowser, QLabel#title1, QLabel#title2 {
-    color: rgb(220,220,220);
+    color: #e6e6e6;
 }
 
 QTextBrowser {
-    margin-right: -3px;
-}
-
-QLabel#title1 
-{
-    font-size: 13px;
-    font-weight:bold;
-    padding-top:12;
-    padding-right:12;
-}
-
-QLabel#title2
-{
-    padding-right:12;
-}
-
-QTextBrowser {
+    font-size: 12px;
+    padding: 0px;
+    margin: -7px 0px 0px -5px;
     border:none;
     background-color: rgb(20,20,20);
 }
 
+QLabel#title1 
+{
+    margin-left: -2px;
+    font-size: 18px;
+    font-weight:bold;
+    padding-top:12px 12px 0px 0px;
+}
+
+QLabel#title2
+{
+    font-size: 12px;
+    font-weight: bold;
+    padding-top:12px 12px 0px 0px;
+}
+
 #now_playing 
 {
-    padding: 4 6 4 6;
-    color: rgb(186,186,186);
-    background-color: rgb(31,31,31);
+    padding: 3 5 5 5;
+    color: #262626;
+    font-size: 11px;
+    border-top: 1px solid #d9eaef;
+    background-color: qlineargradient( x1:0, y1:0, x2:0, y2:1, stop:0 #c2dfe7, stop:1 #8ba2a8 );
 }
 
 QScrollBar {
     background-color: #3b3b3b;
-    border-radius: 6px;
-    margin: 7px 0px 7px 0px;
-    width:14px;
-    padding: 0px;
+    border-radius: 5px;
+    margin-left: -5px;
 }
 
 QScrollBar::add-page, 
@@ -104,9 +115,10 @@ QScrollBar::sub-page {
 }
 
 QScrollBar::handle {
-    background-color: #737373;
+    background-color: qlineargradient( x1:0, y1:0, x2:1, y2:0, stop:0 #878787, stop:1 #636464 );
     min-height: 20px;
-    border-radius: 6px;
+    margin: 3px 3px 3px 0px;
+    border-radius: 5px;
 }
 
 QScrollBar::sub-line,
@@ -114,6 +126,13 @@ QScrollBar::add-line {
     height: 0px;
 }
 
+QSizeGrip {
+    margin-right: 2px;
+    margin-bottom: 2px;
+}
+
 a {
     color: #4c7699;
+    text-decoration: none;
 }
+

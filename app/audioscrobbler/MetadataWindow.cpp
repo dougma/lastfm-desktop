@@ -33,11 +33,11 @@
 #include <QTextBrowser>
 #include <QNetworkReply>
 #include <QTextFrame>
-#include <QTextFrameFormat>
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QStatusBar>
 #include <QSizeGrip>
+#include <QAbstractTextDocumentLayout>
 
 MetadataWindow::MetadataWindow()
 {
@@ -46,7 +46,7 @@ MetadataWindow::MetadataWindow()
 
     v->addWidget(ui.now_playing_source = new QLabel("Now Playing: Last.fm Radio"));
     ui.now_playing_source->setObjectName("now_playing");
-    ui.now_playing_source->setFixedHeight( 25 );
+    ui.now_playing_source->setFixedHeight( 22 );
    
     QVBoxLayout* vs;
     {
@@ -58,64 +58,72 @@ MetadataWindow::MetadataWindow()
         v->addWidget( sa );
     }
 
-    {
-        QHBoxLayout* h = new QHBoxLayout();
-        QVBoxLayout* v2 = new QVBoxLayout();
-        h->addWidget(ui.artist_image = new QLabel);
-        ui.artist_image->setObjectName("artist_image");
-        h->setStretchFactor(ui.artist_image, 1);
-        v2->addWidget(ui.title = new QLabel);
-        v2->addWidget(ui.album = new QLabel);
-        v2->addStretch();
-        ui.title->setObjectName("title1");
-        ui.title->setWordWrap(true);
-        ui.album->setObjectName("title2");
-        h->addLayout(v2);
-        h->setStretchFactor(v2, 3);
-        vs->addLayout(h);
-    }
+
 
     // listeners, scrobbles, tags:
     {
+       
         QLabel* label;
         QGridLayout* grid = new QGridLayout();
+        grid->setSpacing( 0 );
+
+        {
+            QVBoxLayout* v2 = new QVBoxLayout();
+            grid->addWidget(ui.artist_image = new QLabel, 0, 0, Qt::AlignTop | Qt::AlignLeft );
+            ui.artist_image->setObjectName("artist_image");
+            v2->addWidget(ui.title = new QLabel);
+            v2->addWidget(ui.album = new QLabel);
+            v2->addStretch();
+            ui.title->setObjectName("title1");
+            ui.title->setWordWrap(true);
+            ui.album->setObjectName("title2");
+            grid->addLayout(v2, 0, 1, Qt::AlignTop | Qt::AlignLeft );
+        }
+
         label = new QLabel(tr("Listeners"));
         label->setObjectName("name");
         label->setProperty("alternate", QVariant(true));
-        grid->addWidget(label, 0, 0, ( Qt::AlignTop | Qt::AlignLeft ));
+        label->setAlignment( Qt::AlignTop );
+        grid->addWidget( label, 1, 0 );
         ui.listeners = new QLabel;
         ui.listeners->setObjectName("value");
         ui.listeners->setProperty("alternate", QVariant(true));
-        grid->addWidget(ui.listeners, 0, 1);
+        grid->addWidget(ui.listeners, 1, 1);
 
         label = new QLabel(tr("Scrobbles"));
         label->setObjectName("name");
-        grid->addWidget(label, 1, 0, ( Qt::AlignTop | Qt::AlignLeft ));
+        label->setAlignment( Qt::AlignTop );
+        grid->addWidget( label, 2, 0 );
         ui.scrobbles = new QLabel;
         ui.scrobbles->setObjectName("value");
-        grid->addWidget(ui.scrobbles, 1, 1);
+        grid->addWidget(ui.scrobbles, 2, 1);
 
         label = new QLabel(tr("Tagged as"));
         label->setObjectName("name");
         label->setProperty("alternate", QVariant(true));
-        grid->addWidget(label, 2, 0, ( Qt::AlignTop | Qt::AlignLeft ));
+        label->setAlignment( Qt::AlignTop );
+        grid->addWidget( label, 3, 0 );
         ui.tags = new QLabel;
         ui.tags->setObjectName("value");
         ui.tags->setProperty("alternate", QVariant(true));
         ui.tags->setWordWrap(true);
-        grid->addWidget(ui.tags, 2, 1);
+        grid->addWidget(ui.tags, 3, 1);
 
         // bio:
         label = new QLabel(tr("Biography"));
         label->setObjectName("name");
-        grid->addWidget(label, 3, 0, ( Qt::AlignTop | Qt::AlignLeft ));
-        grid->addWidget(ui.bio = new QTextBrowser, 3, 1);
+        label->setAlignment( Qt::AlignTop );
+        grid->addWidget( label, 4, 0 );
+        grid->addWidget(ui.bio = new QTextBrowser, 4, 1);
         ui.bio->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    
-        vs->addLayout(grid);
+        
+        grid->setRowStretch( 4, 1 );
+
+        vs->addLayout(grid, 1);
+        vs->addStretch();
 
     }
-    connect( ui.bio, SIGNAL( textChanged()), SLOT( onBioChanged()));
+    connect( ui.bio->document()->documentLayout(), SIGNAL( documentSizeChanged(QSizeF)), SLOT( onBioChanged(QSizeF)));
     vs->setStretchFactor(ui.bio, 1);
 
     // status bar and scrobble controls
@@ -154,9 +162,9 @@ MetadataWindow::MetadataWindow()
 }
 
 void
-MetadataWindow::onBioChanged()
+MetadataWindow::onBioChanged( const QSizeF& size )
 {
-    ui.bio->setFixedHeight( ui.bio->document()->size().height() );
+    ui.bio->setMinimumHeight( size.toSize().height() );
 }
 
 void
