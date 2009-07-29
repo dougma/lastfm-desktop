@@ -19,6 +19,7 @@
 */
 #include "MetadataWindow.h"
 
+#include "ScrobbleStatus.h"
 #include "ScrobbleControls.h"
 #include "Application.h"
 #include "lib/unicorn/StylableWidget.h"
@@ -44,16 +45,19 @@ MetadataWindow::MetadataWindow()
     setCentralWidget(new QWidget);
     QVBoxLayout* v = new QVBoxLayout(centralWidget());
 
-    v->addWidget(ui.now_playing_source = new QLabel("Now Playing: Last.fm Radio"));
+    setMinimumWidth( 410 );
+
+    v->addWidget(ui.now_playing_source = new ScrobbleStatus());
     ui.now_playing_source->setObjectName("now_playing");
     ui.now_playing_source->setFixedHeight( 22 );
-   
+    connect(qApp, SIGNAL(trackStarted(Track, Track)), ui.now_playing_source, SLOT(onTrackStarted(Track, Track)));
     QVBoxLayout* vs;
     {
         QWidget* scrollWidget;
         QScrollArea* sa = new QScrollArea();
         sa->setWidgetResizable( true );
         sa->setWidget( scrollWidget = new StylableWidget(sa));
+        sa->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
         vs = new QVBoxLayout( scrollWidget );
         v->addWidget( sa );
     }
@@ -75,9 +79,10 @@ MetadataWindow::MetadataWindow()
             v2->addWidget(ui.album = new QLabel);
             v2->addStretch();
             ui.title->setObjectName("title1");
+            ui.title->setTextInteractionFlags( Qt::TextSelectableByMouse );
             ui.title->setWordWrap(true);
             ui.album->setObjectName("title2");
-            grid->addLayout(v2, 0, 1, Qt::AlignTop | Qt::AlignLeft );
+            grid->addLayout(v2, 0, 1, Qt::AlignTop );
         }
 
         label = new QLabel(tr("Listeners"));
@@ -116,7 +121,6 @@ MetadataWindow::MetadataWindow()
         grid->addWidget( label, 4, 0 );
         grid->addWidget(ui.bio = new QTextBrowser, 4, 1);
         ui.bio->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-        
         grid->setRowStretch( 4, 1 );
 
         vs->addLayout(grid, 1);
@@ -180,6 +184,8 @@ MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
     ui.bio->clear();
     ui.artist_image->clear();
     m_currentTrack = t;
+    
+
     connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
 //    connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
 }
@@ -208,7 +214,7 @@ MetadataWindow::onArtistGotInfo()
     
     QString bio;
     {
-        QStringList bioList = lfm["artist"]["bio"]["content"].text().split( "\r" );
+        QStringList bioList = lfm["artist"]["bio"]["content"].text().trimmed().split( "\r" );
         foreach( const QString& p, bioList )
             bio += "<p>" + p + "</p>";
     }
@@ -250,5 +256,8 @@ MetadataWindow::onStopped()
     ui.bio->clear();
     ui.artist_image->clear();
     ui.title->clear();
+    ui.album->clear();
+    ui.listeners->clear();
+    ui.scrobbles->clear();
     m_currentTrack = Track();
 }

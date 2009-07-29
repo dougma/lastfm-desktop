@@ -60,7 +60,7 @@ public:
     QString code() const { return m_code; }
 	
 private:    
-    void compile();
+    bool compile();
     void logError();
 
 private:

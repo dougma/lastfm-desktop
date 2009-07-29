@@ -54,7 +54,12 @@ namespace audioscrobbler
         QAction* loveAction() const{ return m_love_action; }
         QAction* tagAction() const{ return m_tag_action; }
         QAction* shareAction() const{ return m_share_action; }
+        StopWatch* stopWatch() const;
+        PlayerConnection* currentConnection() const;
         
+    signals:
+        void trackStarted( const Track&, const Track& );
+
     private slots:
         void onTrayActivated(QSystemTrayIcon::ActivationReason);
         void onStopWatchTimedOut();

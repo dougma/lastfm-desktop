@@ -21,6 +21,8 @@
 #include "PlayerCommandParser.h"
 #include "PlayerConnection.h"
 #include <QLocalSocket>
+#include <QDir>
+#include <QFile>
 
 #ifdef WIN32
     #include "common/c++/win/scrobSubPipeName.cpp"
@@ -41,6 +43,9 @@ PlayerListener::PlayerListener( QObject* parent ) throw( std::runtime_error )
     QString const name = "lastfm_scrobsub";
 #endif
     
+    if( QFile::exists( QDir::tempPath() + "/" + name ))
+        QFile::remove( QDir::tempPath() + "/" + name );
+
     if (!listen( name ))
         throw std::runtime_error( errorString().toStdString() );
 }
@@ -70,7 +75,6 @@ PlayerListener::onDataReady()
 		try
         {
             PlayerCommandParser parser( line );
-            
             QString const id = parser.playerId();
             PlayerConnection* connection = 0;
             

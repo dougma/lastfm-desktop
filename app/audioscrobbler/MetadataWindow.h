@@ -26,7 +26,7 @@ class MetadataWindow : public unicorn::MainWindow
     Q_OBJECT
 
     struct{
-        class QLabel* now_playing_source;
+        class ScrobbleStatus* now_playing_source;
         class QLabel* artist_image;
         class QLabel* album_image;
         class QLabel* title;

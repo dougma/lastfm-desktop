@@ -70,7 +70,7 @@ public:
     void resume();
     
     /** in milliseconds */
-    uint elapsed() const { return ((m_point*1000 - m_remaining) + m_elapsed.elapsed()); }
+    uint elapsed() const { return ((m_point*1000 - m_remaining) + ( m_timer->isActive() ? m_elapsed.elapsed() : 0)); }
 
     ScrobblePoint scrobblePoint() const { return m_point; }
     

@@ -5,6 +5,7 @@
         <file>love.png</file>
         <file>tag.png</file>
         <file>share.png</file>
+        <file>scrobbler_as.mng</file>
         <file alias="love-onhover.png">love_hover_31x29.png</file>
         <file alias="love-isloved.png">love_isloved_31x29.png</file>
         <file alias="love-onpress.png">love_pressed_31x29.png</file>

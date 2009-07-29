@@ -72,22 +72,31 @@ AppleScript::logError()
 }
 
 
-void
+bool
 AppleScript::compile()
 {
     QByteArray const utf8 = m_code.toUtf8();
     void const* text = utf8.data();
     long const textLength = utf8.length();
-    
+   
+    OSStatus err;
     AEDesc d;
-    AECreateDesc( typeUTF8Text, text, textLength, &d );
+    err = AECreateDesc( typeUTF8Text, text, textLength, &d );
+    
+    if( err != noErr ) {
+        logError();
+        return false;
+    }
 
-    OSStatus err = OSACompile( s_component, &d, kOSAModeNull, &m_compiled_script );
+    err = OSACompile( s_component, &d, kOSAModeNull, &m_compiled_script );
 
     qDebug() << "Compiled:" << m_compiled_script << '\n' << m_code.trimmed();
     
-    if (err != noErr)
+    if (err != noErr) {
         logError();
+        return false;
+    }
+    return true;
 }
 
 
@@ -106,8 +115,9 @@ AppleScript::compile()
 QString
 AppleScript::exec()
 {
-    if (m_compiled_script == kOSANullScript)
-        compile();
+    if (m_compiled_script == kOSANullScript) {
+        if( !compile() ) return "";
+    }
 
     OSAID id = kOSANullScript;
     OSStatus err = OSAExecute( s_component,

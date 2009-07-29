@@ -94,15 +94,6 @@ QLabel#title2
     padding-top:12px 12px 0px 0px;
 }
 
-#now_playing 
-{
-    padding: 3 5 5 5;
-    color: #262626;
-    font-size: 11px;
-    border-top: 1px solid #d9eaef;
-    background-color: qlineargradient( x1:0, y1:0, x2:0, y2:1, stop:0 #c2dfe7, stop:1 #8ba2a8 );
-}
-
 QScrollBar {
     background-color: #3b3b3b;
     border-radius: 5px;
@@ -129,6 +120,22 @@ QScrollBar::add-line {
 QSizeGrip {
     margin-right: 2px;
     margin-bottom: 2px;
+}
+
+ScrobbleStatus#now_playing {
+    margin: 0px;
+    padding: 0px;
+    color: #262626;
+    border-top: 1px solid #d9eaef;
+    background-color: qlineargradient( x1:0, y1:0, x2:0, y2:1, stop:0 #c2dfe7, stop:1 #8ba2a8 );
+}
+
+ScrobbleStatus QLabel {
+    padding: 3 5 5 5;
+    border: none;
+    font-size: 11px;
+    color: black;
+    background: none;
 }
 
 a {

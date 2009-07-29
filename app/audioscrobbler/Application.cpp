@@ -133,6 +133,7 @@ Application::setConnection(PlayerConnection*c)
     connect(c, SIGNAL(resumed()), SLOT(onResumed()));
     connect(c, SIGNAL(stopped()), SLOT(onStopped()));
     connect(c, SIGNAL(trackStarted(Track, Track)), mw, SLOT(onTrackStarted(Track, Track)));
+    connect(c, SIGNAL(trackStarted(Track, Track)), SIGNAL(trackStarted(Track, Track)));
     connect(c, SIGNAL(stopped()), mw, SLOT(onStopped()));
     connection = c;
 
@@ -189,7 +190,6 @@ Application::onResumed()
 {
     Q_ASSERT(watch);
     Q_ASSERT(connection);    
-    Q_ASSERT(connection->state() == Paused);
 
     if(watch)watch->resume();
 }
@@ -223,4 +223,16 @@ Application::onLoveTriggered()
 {
     MutableTrack t( mw->currentTrack());
     t.love();
+}
+
+PlayerConnection*
+Application::currentConnection() const
+{
+    return connection;
+}
+
+StopWatch* 
+Application::stopWatch() const
+{
+    return watch;
 }
