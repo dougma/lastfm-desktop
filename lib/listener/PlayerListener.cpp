@@ -34,6 +34,10 @@ PlayerListener::PlayerListener( QObject* parent ) throw( std::runtime_error )
 {
     connect( this, SIGNAL(newConnection()), SLOT(onNewConnection()) );
 
+    // Create a user-unique name to listen on.
+    // User-unique so that different logged-on users 
+    // can run their own scrobbler instances.
+
 #ifdef WIN32
     std::string s;
     DWORD r = scrobSubPipeName( &s );
@@ -41,11 +45,15 @@ PlayerListener::PlayerListener( QObject* parent ) throw( std::runtime_error )
     QString const name = QString::fromStdString( s );
 #else
     QString const name = "lastfm_scrobsub";
-#endif
-    
+
+    // on windows we use named pipes which auto-delete
+    // *nix platforms need more help:
+
+    // todo: need to make this user-unique
     if( QFile::exists( QDir::tempPath() + "/" + name ))
         QFile::remove( QDir::tempPath() + "/" + name );
-
+#endif
+    
     if (!listen( name ))
         throw std::runtime_error( errorString().toStdString() );
 }

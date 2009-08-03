@@ -1,4 +1,4 @@
-/* Copyright 205-2009, Last.fm Ltd. <client@last.fm>                       
+/* Copyright 2005-2009, Last.fm Ltd. <client@last.fm>                       
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,8 @@ formatWin32Error(DWORD error)
     return os.str();
 }
 
-
+// create a name (for the scrobsub pipe) based on the SID of the user running this process
+// return win32 error code (0 == success)
 DWORD
 scrobSubPipeName(string* pipeName)
 {
