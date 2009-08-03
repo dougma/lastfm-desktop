@@ -35,7 +35,6 @@
 #include "Radio.h"
 #include "app/moose.h"
 
-void setupRadio();
 void cleanup();
 
 class QMainObject : public QObject
@@ -87,7 +86,7 @@ int main( int argc, char** argv )
         q->connect( &uapp, SIGNAL(arguments( QStringList )), SLOT(parseArguments( QStringList )) );
       #endif
 		
-        setupRadio();
+        radio = new Radio();
         qAddPostRoutine(cleanup);
         app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
@@ -149,42 +148,11 @@ static pascal OSErr appleEventHandler( const AppleEvent* e, AppleEvent*, long )
 #endif
 
 
-#include <phonon/audiooutput.h>
-#include <phonon/backendcapabilities.h>
-
-void setupRadio()
-{
-	Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, qApp );
-//	audioOutput->setVolume( QSettings().value( "Volume", 80 ).toUInt() );
-
-    qDebug() << audioOutput->name();
-    qDebug() << audioOutput->outputDevice().description();
-    qDebug() << audioOutput->outputDevice().name();
-    qDebug() << (audioOutput->isMuted() ? "muted,": "not-muted,") <<
-                (audioOutput->isValid() ? "valid,": "not-valid,") <<
-                audioOutput->volumeDecibel() << "db " <<
-                audioOutput->volume();
-    foreach (QByteArray a, audioOutput->outputDevice().propertyNames()) {
-        qDebug() << a << ":" << audioOutput->outputDevice().property(a);
-    }
-
-    QString audioOutputDeviceName = "";//TODO moose::Settings().audioOutputDeviceName();
-    if (audioOutputDeviceName.size())
-    {
-        foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
-            if (d.name() == audioOutputDeviceName) {
-                audioOutput->setOutputDevice( d );
-                break;
-            }
-    }
-	radio = new Radio( audioOutput );
-}
-
-
-
 void cleanup()
 {
-	QSettings().value( "Volume", radio->audioOutput()->volume() );
+    if (radio && radio->audioOutput()) {
+	    QSettings().value( "Volume", radio->audioOutput()->volume() );
+    }
 }
 
 

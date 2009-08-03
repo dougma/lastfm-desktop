@@ -52,7 +52,7 @@ class Radio : public QObject
     Q_ENUMS(State)
 
 public:
-    Radio( Phonon::AudioOutput* );
+    Radio();
     ~Radio();
 	
 	enum State
@@ -105,6 +105,7 @@ private slots:
 private:
     /** resets internals to what Stopped means, used by changeState() */
     void clear();
+    bool initRadio();
     
 	/** emits signals if appropriate */
 	void changeState( State );

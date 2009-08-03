@@ -17,40 +17,21 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "Radio.h"
-#include <lastfm/RadioTuner>
-#ifndef Q_OS_UNIX
-    #include <phonon>
-#endif
-#include <phonon/mediaobject.h>
-#include <phonon/audiooutput.h>
+
+#include <Phonon>
 #include <QThread>
 #include <QTimer>
 #include <cmath>
+#include <lastfm/RadioTuner>
+#include "Radio.h"
 
 
-Radio::Radio( Phonon::AudioOutput* output )
-     : m_audioOutput( output ),
+Radio::Radio( )
+     : m_audioOutput( 0 ),
        m_mediaObject( 0 ),
        m_state( Radio::Stopped ),
        m_bErrorRecover( false )
 {
-    m_mediaObject = new Phonon::MediaObject;
-    m_mediaObject->setTickInterval( 1000 );
-    connect( m_mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
-    connect( m_mediaObject, SIGNAL(bufferStatus(int)), SLOT(onBuffering(int)));
-    connect( m_mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononCurrentSourceChanged( Phonon::MediaSource )) );
-    connect( m_mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
-    connect( m_mediaObject, SIGNAL(finished()), SLOT(onFinished()));
-    connect( m_mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
-    m_path = Phonon::createPath( m_mediaObject, m_audioOutput );
-    if (!m_path.isValid()) {
-        qDebug() << "Phonon::createPath failed";
-    }
-
-    connect(output, SIGNAL(mutedChanged(bool)), SLOT(onMutedChanged(bool)));
-    connect(output, SIGNAL(outputDeviceChanged(Phonon::AudioOutputDevice)), SLOT(onOutputDeviceChanged(Phonon::AudioOutputDevice)));
-    connect(output, SIGNAL(volumeChanged(qreal)), SLOT(onVolumeChanged(qreal)));
 }
 
 
@@ -91,8 +72,17 @@ Radio::play( const RadioStation& station )
         m_state = oldstate;
     }
 
-	m_station = station;
 	delete m_tuner;
+    m_tuner = 0;
+
+    if (0 == m_audioOutput)  {
+        if (!initRadio()) {
+            changeState( Stopped );
+            return;
+        }
+    }
+
+	m_station = station;
     m_tuner = new lastfm::RadioTuner(station);
 
 	connect( m_tuner, SIGNAL(title( QString )), SLOT(setStationNameIfCurrentlyBlank( QString )) );
@@ -358,4 +348,60 @@ Radio::onFinished()
 {
     // the play queue has come to a natural end
     qDebug() << ".";
+}
+
+
+// returns true on successful initialisation
+bool 
+Radio::initRadio()
+{
+	Phonon::AudioOutput* audioOutput = new Phonon::AudioOutput( Phonon::MusicCategory, this );
+//	audioOutput->setVolume( QSettings().value( "Volume", 80 ).toUInt() );
+
+    qDebug() << audioOutput->name();
+    qDebug() << audioOutput->outputDevice().description();
+    qDebug() << audioOutput->outputDevice().name();
+    qDebug() << (audioOutput->isMuted() ? "muted,": "not-muted,") <<
+                (audioOutput->isValid() ? "valid,": "not-valid,") <<
+                audioOutput->volumeDecibel() << "db " <<
+                audioOutput->volume();
+    foreach (QByteArray a, audioOutput->outputDevice().propertyNames()) {
+        qDebug() << a << ":" << audioOutput->outputDevice().property(a);
+    }
+
+    QString audioOutputDeviceName = "";//TODO moose::Settings().audioOutputDeviceName();
+    if (audioOutputDeviceName.size())
+    {
+        foreach (Phonon::AudioOutputDevice d, Phonon::BackendCapabilities::availableAudioOutputDevices())
+            if (d.name() == audioOutputDeviceName) {
+                audioOutput->setOutputDevice( d );
+                break;
+            }
+    }
+
+    Phonon::MediaObject* mediaObject = new Phonon::MediaObject;
+    m_path = Phonon::createPath( mediaObject, audioOutput );
+    if (!m_path.isValid()) {
+        qDebug() << "Phonon::createPath failed";
+// can't delete the mediaObject after a failed Phonon::createPath without a crash in phonon...  (Qt 4.4.3)
+// so, we leak it:
+//        mediaObject->deleteLater();
+        audioOutput->deleteLater();
+        return false;
+    } 
+
+    mediaObject->setTickInterval( 1000 );
+    connect( mediaObject, SIGNAL(stateChanged( Phonon::State, Phonon::State )), SLOT(onPhononStateChanged( Phonon::State, Phonon::State )) );
+    connect( mediaObject, SIGNAL(bufferStatus(int)), SLOT(onBuffering(int)));
+    connect( mediaObject, SIGNAL(currentSourceChanged( Phonon::MediaSource )), SLOT(onPhononCurrentSourceChanged( Phonon::MediaSource )) );
+    connect( mediaObject, SIGNAL(aboutToFinish()), SLOT(phononEnqueue()) ); // this fires when the whole queue is about to finish
+    connect( mediaObject, SIGNAL(finished()), SLOT(onFinished()));
+    connect( mediaObject, SIGNAL(tick(qint64)), SIGNAL(tick(qint64)));
+    connect( audioOutput, SIGNAL(mutedChanged(bool)), SLOT(onMutedChanged(bool)));
+    connect( audioOutput, SIGNAL(outputDeviceChanged(Phonon::AudioOutputDevice)), SLOT(onOutputDeviceChanged(Phonon::AudioOutputDevice)));
+    connect( audioOutput, SIGNAL(volumeChanged(qreal)), SLOT(onVolumeChanged(qreal)));
+
+    m_audioOutput = audioOutput;
+    m_mediaObject = mediaObject;
+    return true;
 }
