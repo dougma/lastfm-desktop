@@ -183,13 +183,16 @@ Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
     switch (newstate)
     {
         case Phonon::ErrorState:
-			if (m_mediaObject->errorType() == Phonon::FatalError)
-            {
+			if (m_mediaObject->errorType() == Phonon::FatalError) {
                 qWarning() << "Phonon fatal error:" << m_mediaObject->errorString();
+                emit error( lastfm::ws::UnknownError, QVariant( m_mediaObject->errorString() ));
+                deInitRadio();
+                changeState( Radio::Stopped );
+            } else {
+                // seems we need to clear the error state before trying to play again.
+                m_bErrorRecover = true;
+                m_mediaObject->stop();
             }
-            // seems we need to clear the error state before trying to play again.
-            m_bErrorRecover = true;
-            m_mediaObject->stop();
             break;
 			
 		case Phonon::PausedState:
@@ -404,4 +407,13 @@ Radio::initRadio()
     m_audioOutput = audioOutput;
     m_mediaObject = mediaObject;
     return true;
+}
+
+void
+Radio::deInitRadio()
+{
+    // try to deleteLater and phonon crashes. poo.
+    // leak em...  :(
+    m_audioOutput = 0;
+    m_mediaObject = 0;
 }

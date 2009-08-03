@@ -81,8 +81,8 @@ signals:
     void buffering( int );
     void stopped();
 	
-	/** the error is either one of Ws::Error, or if Ws::Unknown a fatal error
-      * from Phonon with error message set in data */
+	/** the error is one of lastfm::ws::Error, 
+      * if UnknownError, then data is a fatal error from Phonon */
 	void error( int, const QVariant& data = QVariant() );
     void tick( qint64 );
 
@@ -106,6 +106,7 @@ private:
     /** resets internals to what Stopped means, used by changeState() */
     void clear();
     bool initRadio();
+    void deInitRadio();
     
 	/** emits signals if appropriate */
 	void changeState( State );
