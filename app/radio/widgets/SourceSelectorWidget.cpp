@@ -36,12 +36,14 @@ SourceSelectorWidget::SourceSelectorWidget(QLineEdit* edit, QWidget* parent)
     m_button = new QPushButton(tr("Add"));
     grid->addWidget(m_button, 0, 1);
     grid->setColumnStretch(0, 3);
+    onTextChanged(m_edit->text());
 
     m_list = new QListWidget();
     m_list->setIconSize(QSize(0,0));
     grid->addWidget(m_list, 1, 0, 1, 2);
 
     connect(m_edit, SIGNAL(returnPressed()), SLOT(emitAdd())); 
+    connect(m_edit, SIGNAL(textChanged(QString)), SLOT(onTextChanged(QString)));
     connect(m_button, SIGNAL(clicked()), SLOT(emitAdd()));
     connect(m_list, SIGNAL(itemActivated(QListWidgetItem *)), SIGNAL(itemActivated(QListWidgetItem *)));
 }
@@ -50,6 +52,12 @@ QListWidget*
 SourceSelectorWidget::list()
 {
     return m_list;
+}
+
+void
+SourceSelectorWidget::onTextChanged(const QString& text)
+{
+    m_button->setEnabled( text.length() != 0 );
 }
 
 void

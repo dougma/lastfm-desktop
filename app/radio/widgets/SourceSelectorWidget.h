@@ -46,6 +46,7 @@ protected:
 
 private slots:
     void emitAdd();
+    void onTextChanged(const QString& text);
 };
 
 #endif
