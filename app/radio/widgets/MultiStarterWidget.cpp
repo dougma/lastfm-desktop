@@ -28,6 +28,7 @@
 #include "MultiStarterWidget.h"
 #include "SourceSelectorWidget.h"
 #include "SourceListWidget.h"
+#include "../SourceListModel.h"
 #include "SearchBox.h"
 
 #include <QGroupBox>
@@ -58,7 +59,9 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     connect(m_users, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
-    m_sourceList = new SourceListWidget(advanced, maxSources);
+    m_sourceModel = new SourceListModel(maxSources, this);
+    m_sourceList = new SourceListWidget(advanced, this);
+    m_sourceList->setModel(m_sourceModel);
 
     QHBoxLayout* hLayout = new QHBoxLayout;
     if (advanced) {
@@ -95,18 +98,18 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
 void
 MultiStarterWidget::onAdd(const QString& item)
 {
-    SourceListWidget::SourceType itemType;
+    RqlSource::Type type;
     if (m_artists == sender()) {
-        itemType = SourceListWidget::Artist;
+        type = RqlSource::SimArt;
     } else if (m_tags == sender()) {
-        itemType = SourceListWidget::Tag;
+        type = RqlSource::Tag;
     } else if (m_users == sender()) {
-        itemType = SourceListWidget::User;
+        type = RqlSource::User;
     } else {
         return;
     }
 
-    if (m_sourceList->addSource(itemType, item)) {
+    if (m_sourceModel->addSource(RqlSource(type, item, QString(), 1.0))) {
         // todo: grey it out if it's in the list?  or grey it some other way?
     }
 }
@@ -114,20 +117,7 @@ MultiStarterWidget::onAdd(const QString& item)
 void 
 MultiStarterWidget::onAddItem(QListWidgetItem* item)
 {
-    SourceListWidget::SourceType itemType;
-    if (m_artists == sender()) {
-        itemType = SourceListWidget::Artist;
-    } else if (m_tags == sender()) {
-        itemType = SourceListWidget::Tag;
-    } else if (m_users == sender()) {
-        itemType = SourceListWidget::User;
-    } else {
-        return;
-    }
-
-    if (m_sourceList->addSource(itemType, item)) {
-        // todo: grey it out if it's in the list?  or grey it some other way?
-    }
+    onAdd(item->data(Qt::DisplayRole).toString());
 }
 
 void

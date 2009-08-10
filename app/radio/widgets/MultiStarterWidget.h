@@ -26,6 +26,7 @@
 
 class QSlider;
 class QPushButton;
+class SourceListModel;
 class SourceListWidget;
 class SourceSelectorWidget;
 
@@ -49,6 +50,7 @@ private slots:
 
 private:
     bool m_advanced;
+    SourceListModel* m_sourceModel;
     SourceListWidget* m_sourceList;
     SourceSelectorWidget* m_tags;
     SourceSelectorWidget* m_artists;

@@ -21,6 +21,7 @@
 #define SOURCE_LIST_WIDGET_H
 
 #include <QWidget>
+#include "..\SourceListModel.h"
 
 class QVBoxLayout;
 class SourceItemWidget;
@@ -30,33 +31,30 @@ class SourceListWidget : public QWidget
     Q_OBJECT;
 
 public:
-    enum SourceType { Tag, Artist, User };
     enum Operator { And, Or, AndNot };
 
-    SourceListWidget(bool advanced, int maxSources, QWidget* parent = 0);
+    SourceListWidget(bool advanced, QWidget* parent = 0);
+    void setModel(SourceListModel* model);
 
     QString rql();
     QString stationDescription();
-    bool addSource(SourceType type, const QString& name);
-    bool addSource(SourceType type, class QListWidgetItem* item);
 
 private slots:
     void onDeleteClicked();
 
-private:
-    typedef QPair<SourceType, QString> Source;
+    void onRowsInserted(const QModelIndex&, int, int);
+    void onRowsAboutToBeRemoved(const QModelIndex&, int, int);
 
-    bool sourceInList(SourceType type, const QString& name);
+private:
     void setOp(int sourceIdx);
     void addPlaceholder();
     void addPlaceholders();
 
-    SourceItemWidget* createWidget(SourceType type, const QString& name);
-    static Operator defaultOp(SourceType first, SourceType second);
+    SourceItemWidget* createWidget(int index);
+    static Operator defaultOp(RqlSource::Type first, RqlSource::Type second);
 
     QVBoxLayout* m_layout;
-    int m_maxSources;
-    QList<Source> m_sources;
+    SourceListModel* m_model;
     bool m_advanced;
 };
 

@@ -27,6 +27,7 @@ class SourceItemWidget : public QWidget
     Q_OBJECT
 
 public:
+    SourceItemWidget();
     SourceItemWidget(const QString& labelText);
 
 public slots:
@@ -35,9 +36,23 @@ public slots:
 signals:
     void deleteClicked();
 
-private:
+protected:
     class QLabel* m_label;
     class QLabel* m_image;
+    QString m_rql;
+};
+
+
+class UserItemWidget : public SourceItemWidget
+{
+    Q_OBJECT
+
+public:
+    UserItemWidget(const QString& username);
+
+protected:
+    QString m_username;
+    class QComboBox* m_combo;
 };
 
 #endif

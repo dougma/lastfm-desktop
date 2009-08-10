@@ -18,10 +18,19 @@
 */
 
 #include <QLabel>
+#include <QComboBox>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QPushButton>
 #include <QNetworkReply>
 #include "SourceItemWidget.h"
+
+
+SourceItemWidget::SourceItemWidget()
+:m_image(0)
+,m_label(0)
+{
+}
 
 SourceItemWidget::SourceItemWidget(const QString& labelText)
 {
@@ -31,7 +40,7 @@ SourceItemWidget::SourceItemWidget(const QString& labelText)
     layout->addWidget( m_label = new QLabel );
     layout->addWidget( del = new QPushButton("X") );
     m_image->setScaledContents( true );
-    m_label->setText(labelText);
+    m_label->setText( labelText );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
 }
 
@@ -48,3 +57,29 @@ SourceItemWidget::onGotImage()
         }
     }
 }
+
+////
+
+UserItemWidget::UserItemWidget(const QString& username)
+: m_username(username)
+{
+    QPushButton* del;
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->addWidget( m_image = new QLabel );
+
+    QVBoxLayout* vlayout = new QVBoxLayout();
+    vlayout->addWidget( m_label = new QLabel );
+    vlayout->addWidget( m_combo = new QComboBox() );
+    m_combo->addItem( "Library", "user" );
+    m_combo->addItem( "Loved Tracks", "loved" );
+    m_combo->addItem( "Recommended", "recs" );
+    m_combo->addItem( "Neighbours", "neigh" );
+
+    layout->addLayout( vlayout );
+    layout->addWidget( del = new QPushButton("X") );
+    m_image->setScaledContents( true );
+    m_label->setText( username );
+    connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
+}
+
+//    QString op = m_combo->itemData(m_combo->currentIndex()).toString();
