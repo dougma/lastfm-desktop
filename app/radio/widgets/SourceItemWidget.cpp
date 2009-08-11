@@ -24,6 +24,7 @@
 #include <QPushButton>
 #include <QNetworkReply>
 #include "SourceItemWidget.h"
+#include "../SourceListModel.h"
 
 
 SourceItemWidget::SourceItemWidget()
@@ -63,6 +64,7 @@ SourceItemWidget::onGotImage()
 UserItemWidget::UserItemWidget(const QString& username)
 : m_username(username)
 {
+    // todo: no reason username can't come from the model...
     QPushButton* del;
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget( m_image = new QLabel );
@@ -70,10 +72,11 @@ UserItemWidget::UserItemWidget(const QString& username)
     QVBoxLayout* vlayout = new QVBoxLayout();
     vlayout->addWidget( m_label = new QLabel );
     vlayout->addWidget( m_combo = new QComboBox() );
-    m_combo->addItem( "Library", "user" );
-    m_combo->addItem( "Loved Tracks", "loved" );
-    m_combo->addItem( "Recommended", "recs" );
-    m_combo->addItem( "Neighbours", "neigh" );
+    m_combo->addItem( "Library", RqlSource::User );
+    m_combo->addItem( "Loved Tracks", RqlSource::Loved );
+    m_combo->addItem( "Recommended", RqlSource::Rec );
+    m_combo->addItem( "Neighbours", RqlSource::Neigh );
+    connect(m_combo, SIGNAL(currentIndexChanged(int)), SLOT(onComboChanged(int)));
 
     layout->addLayout( vlayout );
     layout->addWidget( del = new QPushButton("X") );
@@ -82,4 +85,18 @@ UserItemWidget::UserItemWidget(const QString& username)
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
 }
 
-//    QString op = m_combo->itemData(m_combo->currentIndex()).toString();
+void
+UserItemWidget::setModel(QAbstractItemModel* model, const QModelIndex& index)
+{
+    // todo: i'd like to do this right way, by setting the model on m_combo, 
+    // but I can't make it work... hence the signal/slot workaround
+    m_model = model;
+    m_index = index;
+}
+
+void
+UserItemWidget::onComboChanged(int comboItemIndex)
+{
+    QVariant test = m_combo->itemData(comboItemIndex);
+    m_model->setData(m_index, m_combo->itemData(comboItemIndex), SourceListModel::SourceType);
+}

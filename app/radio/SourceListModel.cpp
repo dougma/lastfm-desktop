@@ -108,6 +108,19 @@ SourceListModel::descriptions() const
     return result;
 }
 
+bool
+SourceListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() &&
+        index.row() < m_list.size() &&
+        role == SourceListModel::SourceType &&
+        value.type() == QVariant::Int)
+    {
+        m_list[index.row()].type = (RqlSource::Type) value.toInt();
+        return true;
+    }
+    return false;
+}
 
 ////
 

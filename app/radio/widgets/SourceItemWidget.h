@@ -21,6 +21,9 @@
 #define SOURCE_ITEM_WIDGET_H
 
 #include <QWidget>
+#include <QModelIndex>
+
+class QAbstractItemModel;
 
 class SourceItemWidget : public QWidget
 {
@@ -49,10 +52,18 @@ class UserItemWidget : public SourceItemWidget
 
 public:
     UserItemWidget(const QString& username);
+    void setModel(QAbstractItemModel* model, const QModelIndex& index);
 
 protected:
     QString m_username;
     class QComboBox* m_combo;
+
+private slots:
+    void onComboChanged(int newIdx);
+
+private:
+    QAbstractItemModel* m_model;
+    QModelIndex m_index;
 };
 
 #endif

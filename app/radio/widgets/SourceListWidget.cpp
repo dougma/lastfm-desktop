@@ -145,7 +145,11 @@ SourceListWidget::createWidget(int idx)
             result = new SourceItemWidget("Tag: " + arg1.toString());
             break;
         case RqlSource::User: 
-            result = new UserItemWidget(arg1.toString());
+            {
+                UserItemWidget* widget = new UserItemWidget(arg1.toString());
+                widget->setModel(m_model, m_model->index(idx, 0));
+                result = widget;
+            }
             break;
         default:
             return 0;

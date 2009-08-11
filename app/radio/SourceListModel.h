@@ -53,6 +53,7 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     int getMaxSize() const;
     int addSource(const RqlSource& s);
