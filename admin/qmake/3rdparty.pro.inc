@@ -22,7 +22,7 @@ CONFIG( mad ) {
 
 CONFIG( boost ) {
     mac:CONFIG(app_bundle){
-        LIBS += /opt/local/lib/libboost_thread.a
+        LIBS += /opt/local/lib/libboost_thread-mt.a
     }
     else:unix {
         LIBS += -lboost_thread-mt

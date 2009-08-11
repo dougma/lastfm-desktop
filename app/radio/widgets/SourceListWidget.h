@@ -21,7 +21,7 @@
 #define SOURCE_LIST_WIDGET_H
 
 #include <QWidget>
-#include "..\SourceListModel.h"
+#include "../SourceListModel.h"
 
 class QVBoxLayout;
 class SourceItemWidget;

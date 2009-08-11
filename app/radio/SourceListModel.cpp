@@ -19,6 +19,7 @@
 
 #include "SourceListModel.h"
 #include <QStringList>
+#include <stdexcept>
 
 
 SourceListModel::SourceListModel(int maxSize, QObject* parent)

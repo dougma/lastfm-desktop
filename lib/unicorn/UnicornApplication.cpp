@@ -31,6 +31,7 @@
 #include "UnicornCoreApplication.h"
 #include "widgets/LoginDialog.h"
 #include "UnicornSettings.h"
+#include <lastfm/misc.h>
 #include <lastfm/User>
 #include <lastfm/ws.h>
 #include <lastfm/XmlQuery>
