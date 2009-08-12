@@ -20,5 +20,6 @@
         <file alias="skip-onpress.png" >skip_pressed_45x29.png</file>
         <file alias="skip-rest.png" >skip_rest_45x29.png</file>
         <file>delete.png</file>
+        <file>default_user_small.png</file>
     </qresource>
 </RCC>

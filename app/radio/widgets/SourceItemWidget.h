@@ -32,6 +32,7 @@ class SourceItemWidget : public StylableWidget
 public:
     SourceItemWidget();
     SourceItemWidget(const QString& labelText);
+    void getImage(const QUrl& url);
 
 public slots:
     void onGotImage();

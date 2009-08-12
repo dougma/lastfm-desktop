@@ -78,6 +78,7 @@ SourceListModel::data(const QModelIndex &index, int role) const
         case Arg2: return src.arg2;
         case Weight: return src.weight;
         case Rql: return src.toRqlString();
+        case ImageUrl: return src.imgUrl;
     }
 
     return QVariant();    
@@ -125,11 +126,12 @@ SourceListModel::setData(const QModelIndex &index, const QVariant &value, int ro
 
 ////
 
-RqlSource::RqlSource(Type _type, const QString& _arg1, const QString& _arg2, float _weight)
+RqlSource::RqlSource(Type _type, const QString& _arg1, const QString& _arg2, float _weight, const QString& _imgUrl)
 : type(_type)
 , arg1(_arg1)
 , arg2(_arg2)
 , weight(_weight)
+, imgUrl(_imgUrl)
 {
 }
 

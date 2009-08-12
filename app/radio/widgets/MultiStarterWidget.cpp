@@ -96,7 +96,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
 }
 
 void
-MultiStarterWidget::onAdd(const QString& item)
+MultiStarterWidget::onAdd(const QString& item, const QString& imgUrl)
 {
     RqlSource::Type type;
     if (m_artists == sender()) {
@@ -109,7 +109,9 @@ MultiStarterWidget::onAdd(const QString& item)
         return;
     }
 
-    if (m_sourceModel->addSource(RqlSource(type, item, QString(), 1.0))) {
+
+    if (m_sourceModel->addSource(RqlSource(type, item, QString(), 1.0, imgUrl))) 
+    {
         // todo: grey it out if it's in the list?  or grey it some other way?
     }
 }
@@ -117,7 +119,9 @@ MultiStarterWidget::onAdd(const QString& item)
 void 
 MultiStarterWidget::onAddItem(QListWidgetItem* item)
 {
-    onAdd(item->data(Qt::DisplayRole).toString());
+    onAdd(
+        item->data(Qt::DisplayRole).toString(), 
+        item->data(Qt::DecorationRole).toString());
 }
 
 void
@@ -147,7 +151,7 @@ MultiStarterWidget::onUserGotTopArtists()
     foreach (lastfm::XmlQuery e, lfm["topartists"].children("artist")) {
         QListWidgetItem* item = new QListWidgetItem(m_artists->list());
         item->setData(Qt::DisplayRole, e["name"].text());
-        item->setData(Qt::DecorationRole, e["image size=medium"].text());
+        item->setData(Qt::DecorationRole, e["image size=small"].text());
     }
     if (m_artists->list()->count() < m_minArtistCount) {
         // get global top artists
@@ -165,7 +169,7 @@ MultiStarterWidget::onUserGotFriends()
         QListWidgetItem* item = new QListWidgetItem(m_users->list());
         item->setData(Qt::DisplayRole, e["name"].text());
         item->setData(Qt::ToolTipRole, e["realname"].text());
-        item->setData(Qt::DecorationRole, e["image size=medium"].text());
+        item->setData(Qt::DecorationRole, e["image size=small"].text());
     }
     if (m_users->list()->count() < m_minArtistCount) {
         // no friends. so?

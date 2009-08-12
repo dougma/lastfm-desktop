@@ -30,12 +30,18 @@ struct RqlSource
         SimArt, Tag, User, Group, Rec, Loved, Neigh, PersonalTag, Playlist, Art
     };
 
-    RqlSource(Type type, const QString& arg1, const QString& arg2, float weight);
+    RqlSource(Type type, const QString& arg1, const QString& arg2, float weight, const QString& imgUrl = QString());
     
+    // rql parameters:
     Type type;
     QString arg1;
     QString arg2;
     float weight;
+
+    // 
+    QString imgUrl;
+
+    //////////////
 
     QString sourceName() const;
     QString toDisplayString() const;
@@ -67,7 +73,8 @@ public:
         Arg1,
         Arg2,
         Weight,
-        Rql
+        Rql,
+        ImageUrl
     };
 
 private:

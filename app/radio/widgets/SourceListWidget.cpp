@@ -151,10 +151,14 @@ SourceListWidget::createWidget(int idx)
                 result = widget;
             }
             break;
-        default:
-            return 0;
     }
-    connect(result, SIGNAL(deleteClicked()), SLOT(onDeleteClicked()));
+    if (result) {
+        QString imgUrl = m_model->data(qidx, SourceListModel::ImageUrl).toString();
+        if (imgUrl.length()) {
+            result->getImage(QUrl(imgUrl));
+        }
+        connect(result, SIGNAL(deleteClicked()), SLOT(onDeleteClicked()));
+    }
     return result;
 }
 

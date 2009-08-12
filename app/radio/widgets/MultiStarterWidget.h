@@ -41,7 +41,7 @@ signals:
     void startRadio(RadioStation);
 
 private slots:
-    void onAdd(const QString& item);
+    void onAdd(const QString& item, const QString& imgUrl);
     void onAddItem(QListWidgetItem* item);
     void onPlayClicked();
     void onUserGotTopTags();

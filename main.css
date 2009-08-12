@@ -178,3 +178,18 @@ SourceItemWidget QPushButton
     width: 15px;
 	background-image: url(:/delete.png);
 }
+
+SourceItemWidget QLabel#image,
+SourceItemWidget QLabel#userImage
+{
+    min-height: 34px;
+    min-width: 34px;
+    max-height: 34px;
+    max-width: 34px;
+    border: solid 1px #808080;
+}
+
+SourceItemWidget QLabel#userImage[noImage="true"]
+{
+    background: transparent url(:/default_user_small.png) no-repeat center;
+}

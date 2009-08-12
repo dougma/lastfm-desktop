@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QNetworkReply>
+#include <lastfm/ws.h>
 #include "SourceItemWidget.h"
 #include "../SourceListModel.h"
 
@@ -37,12 +38,20 @@ SourceItemWidget::SourceItemWidget(const QString& labelText)
 {
     QPushButton* del;
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->addWidget( m_image = new QLabel );
-    layout->addWidget( m_label = new QLabel );
+    layout->addWidget( m_image = new QLabel, 0, Qt::AlignLeft );
+    layout->addWidget( m_label = new QLabel, 0, Qt::AlignLeft );
     layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
-    m_image->setScaledContents( true );
+    m_image->setObjectName( "image" );
+    m_image->setProperty( "noImage", true );
     m_label->setText( labelText );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
+}
+
+void
+SourceItemWidget::getImage(const QUrl& url)
+{
+    QNetworkReply* reply = lastfm::nam()->get(QNetworkRequest(url));
+    connect(reply, SIGNAL(finished()), SLOT(onGotImage()));
 }
 
 void
@@ -54,7 +63,17 @@ SourceItemWidget::onGotImage()
         QPixmap p;
         p.loadFromData(((QNetworkReply*)sender())->readAll());
         if (!p.isNull()) {
-            m_image->setPixmap(p);
+            // loose the default user image:
+            m_image->setProperty( "noImage", false );
+            // need to reapply stylesheet to pickup the property change :(  
+            // (but this doesn't actually work (on at least qt 4.4.3 on windows))
+            // fixme.
+            m_image->setStyleSheet( m_image->styleSheet() );    
+
+            // maximumSize() doesn't get the maximum size from the stylesheet :(
+            // so we hard-code to 34x34. fixme.
+            // QSize size = m_image->maximumSize();
+            m_image->setPixmap(p.scaled(34, 34, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     }
 }
@@ -70,7 +89,7 @@ UserItemWidget::UserItemWidget(const QString& username)
     layout->addWidget( m_image = new QLabel );
 
     QVBoxLayout* vlayout = new QVBoxLayout();
-    vlayout->addWidget( m_label = new QLabel() );
+    vlayout->addWidget( m_label = new QLabel );
     vlayout->addWidget( m_combo = new QComboBox() );
     m_combo->addItem( "Library", RqlSource::User );
     m_combo->addItem( "Loved Tracks", RqlSource::Loved );
@@ -80,7 +99,8 @@ UserItemWidget::UserItemWidget(const QString& username)
 
     layout->addLayout( vlayout );
     layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
-    m_image->setScaledContents( true );
+    m_image->setObjectName( "userImage" );
+    m_image->setProperty( "noImage", true );
     m_label->setText( username );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
 }
