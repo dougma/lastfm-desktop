@@ -63,7 +63,7 @@ SourceItemWidget::onGotImage()
         QPixmap p;
         p.loadFromData(((QNetworkReply*)sender())->readAll());
         if (!p.isNull()) {
-            // loose the default user image:
+            // lose the default user image:
             m_image->setProperty( "noImage", false );
             // need to reapply stylesheet to pickup the property change :(  
             // (but this doesn't actually work (on at least qt 4.4.3 on windows))
