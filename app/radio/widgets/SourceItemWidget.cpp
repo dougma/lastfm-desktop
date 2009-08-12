@@ -39,7 +39,7 @@ SourceItemWidget::SourceItemWidget(const QString& labelText)
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget( m_image = new QLabel );
     layout->addWidget( m_label = new QLabel );
-    layout->addWidget( del = new QPushButton("X") );
+    layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
     m_image->setScaledContents( true );
     m_label->setText( labelText );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
@@ -70,7 +70,7 @@ UserItemWidget::UserItemWidget(const QString& username)
     layout->addWidget( m_image = new QLabel );
 
     QVBoxLayout* vlayout = new QVBoxLayout();
-    vlayout->addWidget( m_label = new QLabel );
+    vlayout->addWidget( m_label = new QLabel() );
     vlayout->addWidget( m_combo = new QComboBox() );
     m_combo->addItem( "Library", RqlSource::User );
     m_combo->addItem( "Loved Tracks", RqlSource::Loved );
@@ -79,7 +79,7 @@ UserItemWidget::UserItemWidget(const QString& username)
     connect(m_combo, SIGNAL(currentIndexChanged(int)), SLOT(onComboChanged(int)));
 
     layout->addLayout( vlayout );
-    layout->addWidget( del = new QPushButton("X") );
+    layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
     m_image->setScaledContents( true );
     m_label->setText( username );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));

@@ -20,12 +20,12 @@
 #ifndef SOURCE_ITEM_WIDGET_H
 #define SOURCE_ITEM_WIDGET_H
 
-#include <QWidget>
+#include "lib/unicorn/StylableWidget.h"
 #include <QModelIndex>
 
 class QAbstractItemModel;
 
-class SourceItemWidget : public QWidget
+class SourceItemWidget : public StylableWidget
 {
     Q_OBJECT
 

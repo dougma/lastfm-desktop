@@ -139,10 +139,10 @@ SourceListWidget::createWidget(int idx)
     SourceItemWidget* result = 0;
     switch (type) {
         case RqlSource::SimArt: 
-            result = new SourceItemWidget("Artist: " + arg1.toString());
+            result = new SourceItemWidget(arg1.toString());
             break;
         case RqlSource::Tag: 
-            result = new SourceItemWidget("Tag: " + arg1.toString());
+            result = new SourceItemWidget(arg1.toString());
             break;
         case RqlSource::User: 
             {
