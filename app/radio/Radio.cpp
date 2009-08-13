@@ -180,6 +180,11 @@ void
 Radio::onPhononStateChanged( Phonon::State newstate, Phonon::State oldstate )
 {
     qDebug() << oldstate << " -> " << newstate;
+    if (m_mediaObject == 0) {
+        qDebug() << "m_mediaObject is null!";
+        return;
+    }
+
     switch (newstate)
     {
         case Phonon::ErrorState:
