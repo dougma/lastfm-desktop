@@ -18,13 +18,18 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Phonon>
 #include <QThread>
 #include <QTimer>
 #include <cmath>
 #include <lastfm/RadioTuner>
 #include "Radio.h"
 
+#ifdef Q_OS_UNIX
+    #include <phonon/mediaobject.h>
+    #include <phonon/backendcapabilities.h>
+#else
+    #include <phonon>
+#endif
 
 Radio::Radio( )
      : m_audioOutput( 0 ),
