@@ -17,30 +17,24 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QUICK_START_WIDGET_H
-#define QUICK_START_WIDGET_H
+#ifndef STATION_SEARCH_H
+#define STATION_SEARCH_H
 
-#include "lib/unicorn/StylableWidget.h"
+#include <QObject>
 #include <lastfm/RadioStation>
 
-class QComboBox;
-class QLineEdit;
-
-class QuickStartWidget : public StylableWidget
+class StationSearch : public QObject
 {
     Q_OBJECT;
 
 public:
-    QuickStartWidget();
+    void startSearch(const QString& name);
 
 signals:
-    void startRadio(RadioStation);
+    void searchResult(RadioStation);
 
 private slots:
-    void search();
-
-private:
-    QLineEdit* m_edit;
+    void onFinished();
 };
 
 #endif

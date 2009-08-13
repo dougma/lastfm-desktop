@@ -17,30 +17,33 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QUICK_START_WIDGET_H
-#define QUICK_START_WIDGET_H
+#include "StationSearch.h"
+#include <lastfm/ws.h>
+#include <lastfm/XmlQuery>
 
-#include "lib/unicorn/StylableWidget.h"
-#include <lastfm/RadioStation>
+using namespace lastfm;
 
-class QComboBox;
-class QLineEdit;
-
-class QuickStartWidget : public StylableWidget
+void
+StationSearch::startSearch(const QString& name)
 {
-    Q_OBJECT;
+    QMap<QString, QString> params;
+    params["method"] = "radio.search";
+    params["name"] = name;
+    connect(ws::get(params), SIGNAL(finished()), SLOT(onFinished()));
+}
 
-public:
-    QuickStartWidget();
-
-signals:
-    void startRadio(RadioStation);
-
-private slots:
-    void search();
-
-private:
-    QLineEdit* m_edit;
-};
-
-#endif
+void
+StationSearch::onFinished()
+{
+    try {
+        sender()->deleteLater();
+        lastfm::XmlQuery x(ws::parse(qobject_cast<QNetworkReply*>(sender())));
+        lastfm::XmlQuery station = x["stations"]["station"];
+        RadioStation rs(station["url"].text());
+        rs.setTitle(station["name"].text());
+        emit searchResult(rs);
+    } catch (...) {
+        qDebug() << "exception";
+    }
+}
+    
