@@ -26,10 +26,13 @@ using namespace lastfm;
 void
 StationSearch::startSearch(const QString& name)
 {
-    QMap<QString, QString> params;
-    params["method"] = "radio.search";
-    params["name"] = name;
-    connect(ws::get(params), SIGNAL(finished()), SLOT(onFinished()));
+    if (name.length()) {
+        m_name = name.toLower();
+        QMap<QString, QString> params;
+        params["method"] = "radio.search";
+        params["name"] = name;
+        connect(ws::get(params), SIGNAL(finished()), SLOT(onFinished()));
+    }
 }
 
 void
@@ -40,10 +43,35 @@ StationSearch::onFinished()
         lastfm::XmlQuery x(ws::parse(qobject_cast<QNetworkReply*>(sender())));
         lastfm::XmlQuery station = x["stations"]["station"];
         RadioStation rs(station["url"].text());
-        rs.setTitle(station["name"].text());
-        emit searchResult(rs);
+        if (rs.url().length()) {
+            rs.setTitle(station["name"].text());
+            emit searchResult(rs);
+            return;
+        }
     } catch (...) {
         qDebug() << "exception";
+    }
+
+    // no artist or tag result
+    // maybe the user wanted to hear a friend's library?
+    lastfm::AuthenticatedUser you;
+    connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
+}
+
+void
+StationSearch::onUserGotFriends()
+{
+    sender()->deleteLater();
+    QNetworkReply* r = (QNetworkReply*)sender();
+    lastfm::XmlQuery lfm(r->readAll());
+
+    foreach (lastfm::XmlQuery e, lfm["friends"].children("user")) {
+        if (m_name == e["name"].text().toLower()) {
+            // friend!
+            RadioStation rs = RadioStation::library(User(m_name));
+            emit searchResult(rs);
+            return;
+        }
     }
 }
     

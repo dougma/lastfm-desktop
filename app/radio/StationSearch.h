@@ -23,6 +23,9 @@
 #include <QObject>
 #include <lastfm/RadioStation>
 
+// Use radio.search to find the most likely station (tag or similar artist).
+// Fallback to searching friends list for library radio if radio.search 
+// returns no result.
 class StationSearch : public QObject
 {
     Q_OBJECT;
@@ -35,6 +38,10 @@ signals:
 
 private slots:
     void onFinished();
+    void onUserGotFriends();
+
+private:
+    QString m_name;
 };
 
 #endif
