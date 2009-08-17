@@ -31,7 +31,7 @@ StationSearch::startSearch(const QString& name)
         QMap<QString, QString> params;
         params["method"] = "radio.search";
         params["name"] = name;
-        connect(ws::get(params), SIGNAL(finished()), SLOT(onFinished()));
+        connect(lastfm::ws::get(params), SIGNAL(finished()), SLOT(onFinished()));
     }
 }
 
@@ -40,7 +40,7 @@ StationSearch::onFinished()
 {
     try {
         sender()->deleteLater();
-        lastfm::XmlQuery x(ws::parse(qobject_cast<QNetworkReply*>(sender())));
+        lastfm::XmlQuery x(lastfm::ws::parse(qobject_cast<QNetworkReply*>(sender())));
         lastfm::XmlQuery station = x["stations"]["station"];
         RadioStation rs(station["url"].text());
         if (rs.url().length()) {
