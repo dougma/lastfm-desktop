@@ -152,9 +152,17 @@ UserItemWidget::onComboChanged(int comboItemIndex)
     if (RqlSource::PersonalTag == i) {
         m_tagCombo->setVisible(true);
         m_playlistCombo->setVisible(false);
+
+        QVariant v = m_tagCombo->itemData(m_tagCombo->currentIndex(), Qt::DisplayRole);     // tag name
+        m_model->setData(m_index, v, SourceListModel::Arg1);
+        m_model->setData(m_index, m_username, SourceListModel::Arg2);
     } else if (RqlSource::Playlist == i) {
         m_playlistCombo->setVisible(true);
         m_tagCombo->setVisible(false);
+
+        QVariant v = m_playlistCombo->itemData(m_playlistCombo->currentIndex());            // playlist id
+        m_model->setData(m_index, v, SourceListModel::Arg1);
+        m_model->setData(m_index, QVariant(), SourceListModel::Arg2);
     } else {
         m_playlistCombo->setVisible(false);
         m_tagCombo->setVisible(false);
@@ -166,11 +174,12 @@ UserItemWidget::onCombo2Changed(int comboItemIndex)
 {
     if (sender() == m_tagCombo) {
         QVariant v = m_tagCombo->itemData(comboItemIndex, Qt::DisplayRole);      // tag name
+        m_model->setData(m_index, RqlSource::PersonalTag, SourceListModel::SourceType);
         m_model->setData(m_index, v, SourceListModel::Arg1);
         m_model->setData(m_index, m_username, SourceListModel::Arg2);           
     } else if (sender() == m_playlistCombo) {
         QVariant v = m_playlistCombo->itemData(comboItemIndex);                 // playlist id
-        QString test = v.toString();
+        m_model->setData(m_index, RqlSource::Playlist, SourceListModel::SourceType);
         m_model->setData(m_index, v, SourceListModel::Arg1);
         m_model->setData(m_index, QVariant(), SourceListModel::Arg2);
     } 
