@@ -22,39 +22,27 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include "QuickStartWidget.h"
+#include "../StationSearch.h"
 
 QuickStartWidget::QuickStartWidget()
 {
-    m_combo = new QComboBox();
-    m_combo->addItem(tr("Artist"));
-    m_combo->addItem(tr("Tag"));
-    m_edit = new QLineEdit();
+    QHBoxLayout* layout = new QHBoxLayout(this);
     QPushButton* button = new QPushButton(tr("Play"));
-    QHBoxLayout* layout = new QHBoxLayout();
-    layout->addWidget(m_combo);
-    layout->addWidget(m_edit);
+    layout->addWidget(m_edit = new QLineEdit());
     layout->addWidget(button);
-    setLayout(layout);
 
     m_edit->setAttribute( Qt::WA_MacShowFocusRect, false );
     
-    connect(m_edit, SIGNAL(returnPressed()), SLOT(play()));
-    connect(button, SIGNAL(clicked()), SLOT(play()));
+    connect(m_edit, SIGNAL(returnPressed()), SLOT(search()));
+    connect(button, SIGNAL(clicked()), SLOT(search()));
 }
 
 void
-QuickStartWidget::play()
+QuickStartWidget::search()
 {
-    switch (m_combo->currentIndex()) {
-        case 0: // artist
-            emit startRadio(RadioStation::similar(Artist(m_edit->text())));
-            break;
-        case 1: // tag
-            emit startRadio(RadioStation::globalTag(Tag(m_edit->text())));
-            break;
-        default:
-            qDebug() << "?";
+    if (m_edit->text().length()) {
+        StationSearch* s = new StationSearch();
+        connect(s, SIGNAL(searchResult(RadioStation)), SIGNAL(startRadio(RadioStation)));
+        s->startSearch(m_edit->text());
     }
-    
 }
-
