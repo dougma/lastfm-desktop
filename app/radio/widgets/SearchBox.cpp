@@ -141,15 +141,14 @@ UserSearch::UserSearch(QWidget* parent)
 QNetworkReply*
 UserSearch::startSearch(const QString& term)
 {
-    return Tag(term).search();
+    // alas, there is no user.search yet
+    Q_UNUSED(term);
+    return 0;
 }
 
 QStringList
 UserSearch::handleSearchResponse(XmlQuery& lfm)
 {
-    QStringList list;
-    foreach(XmlQuery i, lfm["results"]["tagmatches"].children("tag")) {
-        list << i["name"].text().toLower();
-    }
-    return list;
+    Q_UNUSED(lfm);
+    return QStringList();
 }

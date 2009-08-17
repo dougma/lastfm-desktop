@@ -54,7 +54,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     connect(m_tags, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_tags, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
-    m_users = new SourceSelectorWidget(new TagSearch());
+    m_users = new SourceSelectorWidget(new UserSearch());
     tabwidget->addTab(m_users, tr("Friends"));
     connect(m_users, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
