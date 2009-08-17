@@ -109,7 +109,6 @@ MultiStarterWidget::onAdd(const QString& item, const QString& imgUrl)
         return;
     }
 
-
     if (m_sourceModel->addSource(RqlSource(type, item, QString(), 1.0, imgUrl))) 
     {
         // todo: grey it out if it's in the list?  or grey it some other way?
@@ -180,6 +179,7 @@ void
 MultiStarterWidget::onPlayClicked()
 {
     QString rql = m_sourceList->rql();
+    qDebug() << rql;
     if (m_advanced) {
         float r = m_repSlider->value() / (float) m_repSlider->maximum();
         if (r != 0.5) {

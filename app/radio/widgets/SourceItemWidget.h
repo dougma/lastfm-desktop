@@ -60,9 +60,11 @@ public:
 protected:
     QString m_username;
     class QComboBox* m_combo;
+    class QComboBox* m_combo2;
 
 private slots:
     void onComboChanged(int newIdx);
+    void onCombo2Changed(int newIdx);
     void onGotPlaylists();
     void onGotTags();
 

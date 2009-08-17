@@ -113,13 +113,18 @@ SourceListModel::descriptions() const
 bool
 SourceListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (index.isValid() &&
-        index.row() < m_list.size() &&
-        role == SourceListModel::SourceType &&
-        value.type() == QVariant::Int)
-    {
-        m_list[index.row()].type = (RqlSource::Type) value.toInt();
-        return true;
+    if (index.isValid() && index.row() < m_list.size()) {
+        switch (role) {
+            case SourceListModel::SourceType:
+                m_list[index.row()].type = (RqlSource::Type) value.toInt();
+                return true;
+            case SourceListModel::Arg1:
+                m_list[index.row()].arg1 = value.toString();
+                return true;
+            case SourceListModel::Arg2:
+                m_list[index.row()].arg2 = value.toString();
+                return true;
+        }
     }
     return false;
 }
@@ -164,8 +169,8 @@ RqlSource::toDisplayString() const
         case Rec: return arg1 + "'s Recommendations";
         case Loved: return arg1 + "'s Loved Tracks";
         case Neigh: return arg1 + "'s Neighbourhood";
-        case PersonalTag: return arg1 + "'s " + arg2 + " Tag";
-        case Playlist: return "Playlist";  // todo: make this one more descriptive
+        case PersonalTag: return arg2 + "'s " + arg1 + " Tag";
+        case Playlist: return "Playlist " + arg1;  // todo: make this one more descriptive?
         case Art: return arg1 + " Artist";
     } 
     throw std::runtime_error("unknown type in RqlSource");
@@ -176,7 +181,7 @@ RqlSource::toRqlString() const
 {
     QString r = sourceName() + ":" + quote(arg1);
     if (arg2.length()) {
-        r += "|" + arg2;
+        r += "|" + quote(arg2);
     }
     if (weight != 1.0) {
         r += "^" + QString::number(weight, 'f');

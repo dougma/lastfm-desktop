@@ -106,6 +106,8 @@ UserItemWidget::UserItemWidget(const QString& username)
     QVBoxLayout* vlayout = new QVBoxLayout();
     vlayout->addWidget( m_label = new QLabel );
     vlayout->addWidget( m_combo = new QComboBox() );
+    vlayout->addWidget( m_combo2 = new QComboBox() );
+    m_combo2->setVisible(false);
     m_combo->addItem( "Library", RqlSource::User );
     if (subscriber) {
         m_combo->addItem( "Loved Tracks", RqlSource::Loved );
@@ -117,6 +119,7 @@ UserItemWidget::UserItemWidget(const QString& username)
     m_combo->addItem( "Recommended", RqlSource::Rec );
     m_combo->addItem( "Neighbours", RqlSource::Neigh );
     connect(m_combo, SIGNAL(currentIndexChanged(int)), SLOT(onComboChanged(int)));
+    connect(m_combo2, SIGNAL(currentIndexChanged(int)), SLOT(onCombo2Changed(int)));
 
     layout->addLayout( vlayout );
     layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
@@ -143,11 +146,31 @@ UserItemWidget::setModel(QAbstractItemModel* model, const QModelIndex& index)
 void
 UserItemWidget::onComboChanged(int comboItemIndex)
 {
-    QVariant sourceType = m_combo->itemData(comboItemIndex);
-    m_model->setData(m_index, sourceType, SourceListModel::SourceType);
-    if (RqlSource::PersonalTag == sourceType.toInt()) {
-        int i = 0;
+    QVariant v = m_combo->itemData(comboItemIndex);
+    int i = v.toInt();
+    m_model->setData(m_index, v, SourceListModel::SourceType);
+    if (RqlSource::PersonalTag == i) {
+        m_combo2->setModel(m_personalTagsModel);
+        m_combo2->setVisible(true);
+    } else if (RqlSource::Playlist == i) {
+        m_combo2->setModel(m_playlistModel);
+        m_combo2->setVisible(true);
+    } else {
+        m_combo2->setVisible(false);
     }
+}
+
+void
+UserItemWidget::onCombo2Changed(int comboItemIndex)
+{
+    if (m_combo2->model() == m_personalTagsModel) {
+        QVariant v = m_combo2->itemData(comboItemIndex, Qt::DisplayRole);       // tag name
+        m_model->setData(m_index, v, SourceListModel::Arg1);
+        m_model->setData(m_index, m_username, SourceListModel::Arg2);           
+    } else if (m_combo2->model() == m_playlistModel) {
+        QVariant v = m_combo2->itemData(comboItemIndex, Qt::UserRole);          // playlist id
+        m_model->setData(m_index, v, SourceListModel::Arg1);
+    } 
 }
 
 void
@@ -182,7 +205,7 @@ UserItemWidget::onGotTags()
         if (tags.count()) {
             m_personalTagsModel = new QStringListModel(this);
             m_personalTagsModel->setStringList(tags);
-            m_combo->addItem("Personal tag", RqlSource::PersonalTag);
+            m_combo->addItem( "Personal tag", RqlSource::PersonalTag );
         }
     }
 }

@@ -112,6 +112,10 @@ int main( int argc, char** argv )
         scrobsock->stop();
         return result;
     }
+    catch (std::exception& e)
+    {
+        qDebug() << "unhandled exception " << e.what();
+    }
     catch (unicorn::Application::StubbornUserException&)
     {
         // user wouldn't log in
