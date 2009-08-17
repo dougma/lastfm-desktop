@@ -24,6 +24,8 @@
 #include <QModelIndex>
 
 class QAbstractItemModel;
+class QNetworkReply;
+class QStringListModel;
 
 class SourceItemWidget : public StylableWidget
 {
@@ -61,10 +63,14 @@ protected:
 
 private slots:
     void onComboChanged(int newIdx);
+    void onGotPlaylists();
+    void onGotTags();
 
 private:
     QAbstractItemModel* m_model;
     QModelIndex m_index;
+    QStringListModel* m_personalTagsModel;
+    QStringListModel* m_playlistModel;
 };
 
 #endif

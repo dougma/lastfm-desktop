@@ -23,7 +23,12 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QNetworkReply>
+#include <QStringListModel>
 #include <lastfm/ws.h>
+#include <lastfm/Tag>
+#include <lastfm/User>
+#include <lastfm/XmlQuery>
+#include "lib/unicorn/UnicornSettings.h"
 #include "SourceItemWidget.h"
 #include "../SourceListModel.h"
 
@@ -82,7 +87,17 @@ SourceItemWidget::onGotImage()
 
 UserItemWidget::UserItemWidget(const QString& username)
 : m_username(username)
+, m_personalTagsModel(0)
+, m_playlistModel(0)
 {
+    // subscribers can listen to loved tracks and personal tags.
+    bool subscriber = false;
+    {
+        unicorn::UserSettings us;
+        QVariant v = us.value(unicorn::UserSettings::subscriptionKey(), false);
+        subscriber = v.toBool();
+    }
+
     // todo: no reason username can't come from the model...
     QPushButton* del;
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -92,7 +107,13 @@ UserItemWidget::UserItemWidget(const QString& username)
     vlayout->addWidget( m_label = new QLabel );
     vlayout->addWidget( m_combo = new QComboBox() );
     m_combo->addItem( "Library", RqlSource::User );
-    m_combo->addItem( "Loved Tracks", RqlSource::Loved );
+    if (subscriber) {
+        m_combo->addItem( "Loved Tracks", RqlSource::Loved );
+    } else {
+        // would be nice to show the option in a disabled state.
+        // how?
+        // fixme.
+    }
     m_combo->addItem( "Recommended", RqlSource::Rec );
     m_combo->addItem( "Neighbours", RqlSource::Neigh );
     connect(m_combo, SIGNAL(currentIndexChanged(int)), SLOT(onComboChanged(int)));
@@ -103,6 +124,11 @@ UserItemWidget::UserItemWidget(const QString& username)
     m_image->setProperty( "noImage", true );
     m_label->setText( username );
     connect(del, SIGNAL(clicked()), SIGNAL(deleteClicked()));
+
+    if (subscriber) {
+        connect(User(username).getPlaylists(), SIGNAL(finished()), SLOT(onGotPlaylists()));
+        connect(User(username).getTopTags(), SIGNAL(finished()), SLOT(onGotTags()));
+    }
 }
 
 void
@@ -117,6 +143,46 @@ UserItemWidget::setModel(QAbstractItemModel* model, const QModelIndex& index)
 void
 UserItemWidget::onComboChanged(int comboItemIndex)
 {
-    QVariant test = m_combo->itemData(comboItemIndex);
-    m_model->setData(m_index, m_combo->itemData(comboItemIndex), SourceListModel::SourceType);
+    QVariant sourceType = m_combo->itemData(comboItemIndex);
+    m_model->setData(m_index, sourceType, SourceListModel::SourceType);
+    if (RqlSource::PersonalTag == sourceType.toInt()) {
+        int i = 0;
+    }
+}
+
+void
+UserItemWidget::onGotPlaylists()
+{
+    QNetworkReply* r = qobject_cast<QNetworkReply*>(sender());
+    if (r) {
+        r->deleteLater();
+        QList<lastfm::XmlQuery> playlists = lastfm::XmlQuery(r->readAll()).children("playlist");
+        if (playlists.count()) {
+            m_playlistModel = new QStringListModel(this);
+            m_playlistModel->insertRows(0, playlists.count());
+            int row = 0;
+            foreach(const XmlQuery& playlist, playlists) {
+                QModelIndex idx = m_playlistModel->index(row);
+                m_playlistModel->setData(idx, playlist["title"].text(), Qt::DisplayRole);
+                m_playlistModel->setData(idx, playlist["id"].text().toInt(), Qt::UserRole);
+                row++;
+            }
+            m_combo->addItem( "Playlist", RqlSource::Playlist );
+        }
+    }
+}
+
+void
+UserItemWidget::onGotTags()
+{
+    QNetworkReply* r = qobject_cast<QNetworkReply*>(sender());
+    if (r) {
+        r->deleteLater();
+        QStringList tags = Tag::list(r).values();
+        if (tags.count()) {
+            m_personalTagsModel = new QStringListModel(this);
+            m_personalTagsModel->setStringList(tags);
+            m_combo->addItem("Personal tag", RqlSource::PersonalTag);
+        }
+    }
 }
