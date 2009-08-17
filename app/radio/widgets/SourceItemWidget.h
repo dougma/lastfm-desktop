@@ -25,7 +25,6 @@
 
 class QAbstractItemModel;
 class QNetworkReply;
-class QStringListModel;
 
 class SourceItemWidget : public StylableWidget
 {
@@ -60,7 +59,8 @@ public:
 protected:
     QString m_username;
     class QComboBox* m_combo;
-    class QComboBox* m_combo2;
+    class QComboBox* m_playlistCombo;
+    class QComboBox* m_tagCombo;
 
 private slots:
     void onComboChanged(int newIdx);
@@ -71,8 +71,6 @@ private slots:
 private:
     QAbstractItemModel* m_model;
     QModelIndex m_index;
-    QStringListModel* m_personalTagsModel;
-    QStringListModel* m_playlistModel;
 };
 
 #endif

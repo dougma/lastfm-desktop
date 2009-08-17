@@ -23,7 +23,6 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QNetworkReply>
-#include <QStringListModel>
 #include <lastfm/ws.h>
 #include <lastfm/Tag>
 #include <lastfm/User>
@@ -87,8 +86,6 @@ SourceItemWidget::onGotImage()
 
 UserItemWidget::UserItemWidget(const QString& username)
 : m_username(username)
-, m_personalTagsModel(0)
-, m_playlistModel(0)
 {
     // subscribers can listen to loved tracks and personal tags.
     bool subscriber = false;
@@ -106,8 +103,10 @@ UserItemWidget::UserItemWidget(const QString& username)
     QVBoxLayout* vlayout = new QVBoxLayout();
     vlayout->addWidget( m_label = new QLabel );
     vlayout->addWidget( m_combo = new QComboBox() );
-    vlayout->addWidget( m_combo2 = new QComboBox() );
-    m_combo2->setVisible(false);
+    vlayout->addWidget( m_playlistCombo = new QComboBox() );
+    vlayout->addWidget( m_tagCombo = new QComboBox() );
+    m_playlistCombo->setVisible(false);
+    m_tagCombo->setVisible(false);
     m_combo->addItem( "Library", RqlSource::User );
     if (subscriber) {
         m_combo->addItem( "Loved Tracks", RqlSource::Loved );
@@ -119,7 +118,8 @@ UserItemWidget::UserItemWidget(const QString& username)
     m_combo->addItem( "Recommended", RqlSource::Rec );
     m_combo->addItem( "Neighbours", RqlSource::Neigh );
     connect(m_combo, SIGNAL(currentIndexChanged(int)), SLOT(onComboChanged(int)));
-    connect(m_combo2, SIGNAL(currentIndexChanged(int)), SLOT(onCombo2Changed(int)));
+    connect(m_playlistCombo, SIGNAL(currentIndexChanged(int)), SLOT(onCombo2Changed(int)));
+    connect(m_tagCombo, SIGNAL(currentIndexChanged(int)), SLOT(onCombo2Changed(int)));
 
     layout->addLayout( vlayout );
     layout->addWidget( del = new QPushButton("X"), 0, Qt::AlignRight );
@@ -150,26 +150,29 @@ UserItemWidget::onComboChanged(int comboItemIndex)
     int i = v.toInt();
     m_model->setData(m_index, v, SourceListModel::SourceType);
     if (RqlSource::PersonalTag == i) {
-        m_combo2->setModel(m_personalTagsModel);
-        m_combo2->setVisible(true);
+        m_tagCombo->setVisible(true);
+        m_playlistCombo->setVisible(false);
     } else if (RqlSource::Playlist == i) {
-        m_combo2->setModel(m_playlistModel);
-        m_combo2->setVisible(true);
+        m_playlistCombo->setVisible(true);
+        m_tagCombo->setVisible(false);
     } else {
-        m_combo2->setVisible(false);
+        m_playlistCombo->setVisible(false);
+        m_tagCombo->setVisible(false);
     }
 }
 
 void
 UserItemWidget::onCombo2Changed(int comboItemIndex)
 {
-    if (m_combo2->model() == m_personalTagsModel) {
-        QVariant v = m_combo2->itemData(comboItemIndex, Qt::DisplayRole);       // tag name
+    if (sender() == m_tagCombo) {
+        QVariant v = m_tagCombo->itemData(comboItemIndex, Qt::DisplayRole);      // tag name
         m_model->setData(m_index, v, SourceListModel::Arg1);
         m_model->setData(m_index, m_username, SourceListModel::Arg2);           
-    } else if (m_combo2->model() == m_playlistModel) {
-        QVariant v = m_combo2->itemData(comboItemIndex, Qt::UserRole);          // playlist id
+    } else if (sender() == m_playlistCombo) {
+        QVariant v = m_playlistCombo->itemData(comboItemIndex);                 // playlist id
+        QString test = v.toString();
         m_model->setData(m_index, v, SourceListModel::Arg1);
+        m_model->setData(m_index, QVariant(), SourceListModel::Arg2);
     } 
 }
 
@@ -181,14 +184,8 @@ UserItemWidget::onGotPlaylists()
         r->deleteLater();
         QList<lastfm::XmlQuery> playlists = lastfm::XmlQuery(r->readAll()).children("playlist");
         if (playlists.count()) {
-            m_playlistModel = new QStringListModel(this);
-            m_playlistModel->insertRows(0, playlists.count());
-            int row = 0;
             foreach(const XmlQuery& playlist, playlists) {
-                QModelIndex idx = m_playlistModel->index(row);
-                m_playlistModel->setData(idx, playlist["title"].text(), Qt::DisplayRole);
-                m_playlistModel->setData(idx, playlist["id"].text().toInt(), Qt::UserRole);
-                row++;
+                m_playlistCombo->addItem(playlist["title"].text(), playlist["id"].text());
             }
             m_combo->addItem( "Playlist", RqlSource::Playlist );
         }
@@ -203,8 +200,7 @@ UserItemWidget::onGotTags()
         r->deleteLater();
         QStringList tags = Tag::list(r).values();
         if (tags.count()) {
-            m_personalTagsModel = new QStringListModel(this);
-            m_personalTagsModel->setStringList(tags);
+            m_tagCombo->addItems(tags);
             m_combo->addItem( "Personal tag", RqlSource::PersonalTag );
         }
     }
