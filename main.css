@@ -10,10 +10,14 @@ QuickStartWidget, MoreStationsWidget {
     padding-bottom: 20px;
 }
 
-RecentStationsWidget > QListWidget
-{
+RecentStationsWidget > QListView {
     border:none;
-    background: #242424;
+    background: transparent;
+}
+
+RecentStationsWidget > QListView::item {
+    height: 25px;
+    padding: 0px;
 }
 
 YourStationsWidget > .QLabel,
@@ -67,7 +71,7 @@ PlayableItemWidget {
     background-repeat: no-repeat;
     background-position: left;
     background-origin:border;
-    padding:5px 0px 5x 30px;
+    padding:5px 0px 5px 30px; 
     margin: 0px 5px;
 }
 
