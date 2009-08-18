@@ -166,6 +166,9 @@ UserItemWidget::onComboChanged(int comboItemIndex)
     } else {
         m_playlistCombo->setVisible(false);
         m_tagCombo->setVisible(false);
+
+        m_model->setData(m_index, m_username, SourceListModel::Arg1);
+        m_model->setData(m_index, QVariant(), SourceListModel::Arg2);
     }
 }
 
