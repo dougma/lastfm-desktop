@@ -27,20 +27,23 @@
 MoreStationsWidget::MoreStationsWidget()
 {
     QGridLayout* layout = new QGridLayout( this );
-
     layout->addWidget(new QLabel(tr("More")), 0, 0, 1, 2, Qt::AlignCenter);
 
     QWidget* w;
-    w = new QPushButton(tr("Simple Combo Station"));
-    connect(w, SIGNAL(clicked()), SIGNAL(simpleCombo()));
+
+    w = new QPushButton(tr("Your Friends"));
+    connect(w, SIGNAL(clicked()), SIGNAL(friends()));
     layout->addWidget(w, 1, 0);
 
-    w = new QPushButton(tr("Advanced Combo Station"));
-    connect(w, SIGNAL(clicked()), SIGNAL(advancedCombo()));
+    w = new QPushButton(tr("Your Tags"));
+    connect(w, SIGNAL(clicked()), SIGNAL(tags()));
     layout->addWidget(w, 1, 1);
 
-    //w = new QPushButton(tr("Your Tags"));
-    //connect(w, SIGNAL(clicked()), SIGNAL(yourTags()));
-    //layout->addWidget(w, 1, 1);
+    w = new QPushButton(tr("Your Playlists"));
+    connect(w, SIGNAL(clicked()), SIGNAL(playlists()));
+    layout->addWidget(w, 2, 0);
 
+    w = new QPushButton(tr("Start a combo station"));
+    connect(w, SIGNAL(clicked()), SIGNAL(combo()));
+    layout->addWidget(w, 2, 1);
 }

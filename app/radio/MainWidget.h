@@ -54,9 +54,10 @@ signals:
 private slots:
     void onStartRadio(RadioStation rs);
     void onShowMoreRecentStations();
-    void onSimpleCombo();
-    void onAdvancedCombo();
+    void onCombo();
     void onYourTags();
+    void onYourFriends();
+    void onYourPlaylists();
     void onBack();
     void onBackDelete();
     void onMoveFinished();

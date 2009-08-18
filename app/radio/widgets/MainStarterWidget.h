@@ -35,9 +35,10 @@ public:
 signals:
     void startRadio(RadioStation);
     void showMoreRecentStations();
-    void simpleCombo();
-    void advancedCombo();
+    void combo();
     void yourTags();
+    void yourFriends();
+    void yourPlaylists();
 };
 
 #endif

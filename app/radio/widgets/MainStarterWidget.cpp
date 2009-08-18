@@ -43,8 +43,9 @@ MainStarterWidget::MainStarterWidget()
     layout->addWidget(w);
 
     w = new MoreStationsWidget();
-    connect(w, SIGNAL(simpleCombo()), SIGNAL(simpleCombo()));
-    connect(w, SIGNAL(advancedCombo()), SIGNAL(advancedCombo()));
-    connect(w, SIGNAL(yourTags()), SIGNAL(yourTags()));
+    connect(w, SIGNAL(combo()), SIGNAL(combo()));
+    connect(w, SIGNAL(tags()), SIGNAL(yourTags()));
+    connect(w, SIGNAL(friends()), SIGNAL(yourFriends()));
+    connect(w, SIGNAL(playlists()), SIGNAL(yourPlaylists()));
     layout->addWidget(w);
 }

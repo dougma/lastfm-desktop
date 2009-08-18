@@ -31,9 +31,10 @@ public:
     MoreStationsWidget();
 
 signals:
-    void simpleCombo();
-    void advancedCombo();
-    void yourTags();
+    void combo();
+    void tags();
+    void playlists();
+    void friends();
 };
 
 #endif

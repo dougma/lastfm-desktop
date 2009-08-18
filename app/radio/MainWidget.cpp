@@ -42,9 +42,10 @@ MainWidget::MainWidget( QWidget* parent )
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
     connect(w, SIGNAL(showMoreRecentStations()), SLOT(onShowMoreRecentStations()));
-    connect(w, SIGNAL(simpleCombo()), SLOT(onSimpleCombo()));
-    connect(w, SIGNAL(advancedCombo()), SLOT(onAdvancedCombo()));
+    connect(w, SIGNAL(combo()), SLOT(onCombo()));
     connect(w, SIGNAL(yourTags()), SLOT(onYourTags()));
+    connect(w, SIGNAL(yourFriends()), SLOT(onYourFriends()));
+    connect(w, SIGNAL(yourPlaylists()), SLOT(onYourPlaylists()));
 
     BackForwardControls* ctrl = new BackForwardControls(QString(), m_nowPlaying, w);
     connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
@@ -63,10 +64,11 @@ MainWidget::onStartRadio(RadioStation rs)
     connect(radio, SIGNAL(trackStarted( Track )), w, SLOT(onTrackStarted( Track )));
     connect(radio, SIGNAL(tick( qint64 )), w, SIGNAL( tick( qint64 )));
     connect(radio, SIGNAL(buffering( int )), w, SLOT(onBuffering( int )));
-    connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
+//    connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
 
     BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
     connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    connect(radio, SIGNAL(stopped()), ctrl, SLOT(onBack()));
     m_layout->addWidget(ctrl);
     m_layout->moveForward();
 }
@@ -85,7 +87,7 @@ MainWidget::onShowMoreRecentStations()
 }
 
 void
-MainWidget::onSimpleCombo()
+MainWidget::onCombo()
 {
     MultiStarterWidget* w = new SimpleComboWidget(3);
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
@@ -99,17 +101,21 @@ MainWidget::onSimpleCombo()
 }
 
 void
-MainWidget::onAdvancedCombo()
+MainWidget::onYourTags()
 {
-    MultiStarterWidget* w = new AdvancedComboWidget(3);
-    connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
-    connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+    qDebug() << "todo";
+}
 
-    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), m_nowPlaying, w);
-    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
-    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
-    m_layout->insertWidget(1, ctrl);
-    m_layout->moveForward();
+void
+MainWidget::onYourFriends()
+{
+    qDebug() << "todo";
+}
+
+void
+MainWidget::onYourPlaylists()
+{
+    qDebug() << "todo";
 }
 
 
@@ -141,12 +147,6 @@ void
 MainWidget::onForward()
 {
     m_layout->moveForward();
-}
-
-void
-MainWidget::onYourTags()
-{
-    qDebug() << "todo";
 }
 
 QString magic(XmlQuery e, ...)
