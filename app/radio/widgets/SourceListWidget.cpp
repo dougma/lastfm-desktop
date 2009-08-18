@@ -133,32 +133,13 @@ SourceItemWidget*
 SourceListWidget::createWidget(int idx)
 {
     QModelIndex qidx = m_model->index(idx);
-    RqlSource::Type type = (RqlSource::Type) m_model->data(qidx, SourceListModel::SourceType).toInt();
-    QVariant arg1 = m_model->data(qidx, SourceListModel::Arg1);
-//    QVariant arg2 = m_model->data(qidx, SourceListModel::Arg2);
-    SourceItemWidget* result = 0;
-    switch (type) {
-        case RqlSource::SimArt: 
-            result = new SourceItemWidget(arg1.toString());
-            break;
-        case RqlSource::Tag: 
-            result = new SourceItemWidget(arg1.toString());
-            break;
-        case RqlSource::User: 
-            {
-                UserItemWidget* widget = new UserItemWidget(arg1.toString());
-                widget->setModel(m_model, m_model->index(idx, 0));
-                result = widget;
-            }
-            break;
+    QString label = m_model->data(qidx, Qt::DisplayRole).toString();
+    QString imgUrl = m_model->data(qidx, SourceListModel::ImageUrl).toString();
+    SourceItemWidget* result = new SourceItemWidget(label);
+    if (imgUrl.length()) {
+        result->getImage(QUrl(imgUrl));
     }
-    if (result) {
-        QString imgUrl = m_model->data(qidx, SourceListModel::ImageUrl).toString();
-        if (imgUrl.length()) {
-            result->getImage(QUrl(imgUrl));
-        }
-        connect(result, SIGNAL(deleteClicked()), SLOT(onDeleteClicked()));
-    }
+    connect(result, SIGNAL(deleteClicked()), SLOT(onDeleteClicked()));
     return result;
 }
 
