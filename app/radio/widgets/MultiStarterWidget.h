@@ -62,16 +62,4 @@ private:
     const int m_minArtistCount;
 };
 
-class AdvancedComboWidget : public MultiStarterWidget
-{
-public:
-    AdvancedComboWidget(int maxSources, QWidget *parent = 0);
-};
-
-class SimpleComboWidget : public MultiStarterWidget
-{
-public:
-    SimpleComboWidget(int maxSources, QWidget *parent = 0);
-};
-
 #endif

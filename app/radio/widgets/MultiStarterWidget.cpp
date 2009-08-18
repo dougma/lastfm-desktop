@@ -194,17 +194,3 @@ MultiStarterWidget::onPlayClicked()
     r.setTitle(m_sourceList->stationDescription());
     emit startRadio(r);
 }
-
-
-//////
-
-AdvancedComboWidget::AdvancedComboWidget(int maxSource, QWidget* parent)
-: MultiStarterWidget(true, maxSource, parent)
-{
-}
-
-SimpleComboWidget::SimpleComboWidget(int maxSource, QWidget* parent)
-: MultiStarterWidget(false, maxSource, parent)
-{
-}
-
