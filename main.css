@@ -83,7 +83,9 @@ PlayableItemWidget:pressed {
     background-image: url(:/station-start-onpress.png);
 }
 
-NowPlayingWidget QLabel {
+NowPlayingWidget QLabel,
+MultiStarterWidget QLabel,
+MultiStarterWidget QCheckBox {
     color: white;
 }
 

@@ -18,6 +18,7 @@
 */
 
 #include <QLabel>
+#include <QCheckBox>
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QListWidget>
@@ -42,6 +43,11 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
 {
     QGridLayout* grid = new QGridLayout(this);
 
+    QHBoxLayout* titleLayout = new QHBoxLayout();
+    QCheckBox* checkbox;
+    titleLayout->addWidget(new QLabel("Choose up to " + QString::number(maxSources) + " items and press play."), 0, Qt::AlignCenter);
+    titleLayout->addWidget(checkbox = new QCheckBox("Show options"), 0, Qt::AlignRight);
+    
     QTabWidget* tabwidget = new QTabWidget();
 
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
@@ -80,9 +86,10 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     }
     hLayout->addWidget(m_playButton = new QPushButton(tr("Play")));
 
-    grid->addWidget(tabwidget, 0, 0, 2, 1);
-    grid->addWidget(m_sourceList, 0, 1, 1, 1);
-    grid->addLayout(hLayout, 1, 1);
+    grid->addLayout(titleLayout, 0, 0, 1, 2);
+    grid->addWidget(tabwidget, 1, 0, 2, 1);
+    grid->addWidget(m_sourceList, 1, 1, 1, 1);
+    grid->addLayout(hLayout, 2, 1);
     grid->setColumnStretch(0, 1);
     grid->setColumnStretch(1, 1);
 
