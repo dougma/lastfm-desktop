@@ -37,7 +37,6 @@
 
 MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *parent)
     : QWidget(parent)
-    , m_advanced(advanced)
     , m_minTagCount(10)
     , m_minArtistCount(10)
 {
@@ -47,6 +46,8 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     QCheckBox* checkbox;
     titleLayout->addWidget(new QLabel("Choose up to " + QString::number(maxSources) + " items and press play."), 0, Qt::AlignCenter);
     titleLayout->addWidget(checkbox = new QCheckBox("Show options"), 0, Qt::AlignRight);
+    connect(checkbox, SIGNAL(stateChanged(int)), SLOT(onCheckBox(int)));
+    checkbox->setChecked(advanced);
     
     QTabWidget* tabwidget = new QTabWidget();
 
@@ -66,30 +67,28 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
     m_sourceModel = new SourceListModel(maxSources, this);
-    m_sourceList = new SourceListWidget(advanced, this);
+    m_sourceList = new SourceListWidget(this);
     m_sourceList->setModel(m_sourceModel);
 
-    QHBoxLayout* hLayout = new QHBoxLayout;
-    if (advanced) {
-        QVBoxLayout* slidersLayout = new QVBoxLayout();
-        slidersLayout->addWidget(new QLabel(tr("Repetition")));
-        slidersLayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
-        slidersLayout->addWidget(new QLabel(tr("Mainstreamness")));
-        slidersLayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
-        m_repSlider->setMinimum(0);
-        m_repSlider->setMaximum(8);
-        m_repSlider->setValue(4);
-        m_mainstrSlider->setMinimum(0);
-        m_mainstrSlider->setMaximum(8);
-        m_mainstrSlider->setValue(4);
-        hLayout->addLayout(slidersLayout);
-    }
-    hLayout->addWidget(m_playButton = new QPushButton(tr("Play")));
+    QVBoxLayout* rightside = new QVBoxLayout();
+
+    //todo: make sliders into single widgets..?
+    rightside->addWidget(m_sourceList);
+    rightside->addWidget(new QLabel(tr("Repetition")));
+    rightside->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
+    rightside->addWidget(new QLabel(tr("Mainstreamness")));
+    rightside->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+    m_repSlider->setMinimum(0);
+    m_repSlider->setMaximum(8);
+    m_repSlider->setValue(4);
+    m_mainstrSlider->setMinimum(0);
+    m_mainstrSlider->setMaximum(8);
+    m_mainstrSlider->setValue(4);
+    rightside->addWidget(m_playButton = new QPushButton(tr("Play")));
 
     grid->addLayout(titleLayout, 0, 0, 1, 2);
-    grid->addWidget(tabwidget, 1, 0, 2, 1);
-    grid->addWidget(m_sourceList, 1, 1, 1, 1);
-    grid->addLayout(hLayout, 2, 1);
+    grid->addWidget(tabwidget, 1, 0);
+    grid->addLayout(rightside, 1, 1);
     grid->setColumnStretch(0, 1);
     grid->setColumnStretch(1, 1);
 
@@ -100,6 +99,16 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
     connect(you.getTopArtists(), SIGNAL(finished()), SLOT(onUserGotTopArtists()));
     connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
+
+    onCheckBox(checkbox->checkState());
+}
+
+void
+MultiStarterWidget::onCheckBox(int checkState)
+{
+    m_repSlider->setVisible(checkState == Qt::Checked);
+    m_mainstrSlider->setVisible(checkState == Qt::Checked);
+    m_sourceList->updateAdvanced(checkState);
 }
 
 void
@@ -186,18 +195,16 @@ void
 MultiStarterWidget::onPlayClicked()
 {
     QString rql = m_sourceList->rql();
-    qDebug() << rql;
-    if (m_advanced) {
-        float r = m_repSlider->value() / (float) m_repSlider->maximum();
-        if (r != 0.5) {
-            rql += QString(" opt:rep|%1").arg(r);
-        }
-        float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
-        if (m != 0.5) {
-            rql += QString(" opt:mainstr|%1").arg(m);
-        }
+    float r = m_repSlider->value() / (float) m_repSlider->maximum();
+    if (r != 0.5) {
+        rql += QString(" opt:rep|%1").arg(r);
     }
-    RadioStation r = RadioStation::rql(rql);
-    r.setTitle(m_sourceList->stationDescription());
-    emit startRadio(r);
+    float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
+    if (m != 0.5) {
+        rql += QString(" opt:mainstr|%1").arg(m);
+    }
+    qDebug() << rql;
+    RadioStation rs = RadioStation::rql(rql);
+    rs.setTitle(m_sourceList->stationDescription());
+    emit startRadio(rs);
 }

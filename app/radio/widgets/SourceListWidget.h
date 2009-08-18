@@ -39,6 +39,8 @@ public:
     QString rql();
     QString stationDescription();
 
+    void updateAdvanced(int checkState);
+
 private slots:
     void onDeleteClicked();
 

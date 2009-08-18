@@ -47,9 +47,9 @@ private slots:
     void onUserGotTopTags();
     void onUserGotTopArtists();
     void onUserGotFriends();
+    void onCheckBox(int checkState);
 
 private:
-    bool m_advanced;
     SourceListModel* m_sourceModel;
     SourceListWidget* m_sourceList;
     SourceSelectorWidget* m_tags;

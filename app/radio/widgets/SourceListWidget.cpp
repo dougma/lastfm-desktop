@@ -203,3 +203,13 @@ SourceListWidget::stationDescription()
     }
     return result;
 }
+
+void
+SourceListWidget::updateAdvanced(int checkState)
+{
+    m_advanced = (checkState == Qt::Checked);
+    for (int i = 1; i < m_layout->count(); i += 2) {
+        QComboBox* combo = qobject_cast<QComboBox*>(m_layout->itemAt(i)->widget());
+        combo->setVisible(m_advanced);
+    }
+}
