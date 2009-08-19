@@ -47,7 +47,7 @@ MainWidget::MainWidget( QWidget* parent )
     connect(w, SIGNAL(yourFriends()), SLOT(onYourFriends()));
     connect(w, SIGNAL(yourPlaylists()), SLOT(onYourPlaylists()));
 
-    BackForwardControls* ctrl = new BackForwardControls(QString(), m_nowPlaying, w);
+    BackForwardControls* ctrl = new BackForwardControls(QString(), QString(), m_nowPlaying, w);
     connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
     m_layout->addWidget(ctrl);
 
@@ -66,7 +66,7 @@ MainWidget::onStartRadio(RadioStation rs)
     connect(radio, SIGNAL(buffering( int )), w, SLOT(onBuffering( int )));
 //    connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
 
-    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), rs.title(), NULL, w);
     connect(ctrl, SIGNAL(back()), SLOT(onBack()));
     connect(radio, SIGNAL(stopped()), ctrl, SLOT(onBack()));
     m_layout->addWidget(ctrl);
@@ -80,8 +80,8 @@ MainWidget::onShowMoreRecentStations()
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
-    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), NULL, w);
-    connect(ctrl, SIGNAL(back()), SLOT(onBack()));
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), "Recent Stations", NULL, w);
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
     m_layout->addWidget(ctrl);
     m_layout->moveForward();
 }
@@ -93,7 +93,7 @@ MainWidget::onCombo()
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
-    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), m_nowPlaying, w);
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), "Start a combo station", m_nowPlaying, w);
     connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
     connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
     m_layout->insertWidget(1, ctrl);

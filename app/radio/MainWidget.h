@@ -27,8 +27,8 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QLabel>
 
-class QLabel;
 class SideBySideLayout;
 class NowPlayingState;
 
@@ -150,7 +150,7 @@ public:
     // if backLabel is an empty string, there is no back button.
     // if nowPlaying is null, there is no now-playing button.
 
-    BackForwardControls(const QString& backLabel, NowPlayingState* nowPlaying, QWidget* child)
+    BackForwardControls(const QString& backLabel, const QString& mainLabel, NowPlayingState* nowPlaying, QWidget* child)
     {
         QVBoxLayout* layout = new QVBoxLayout(this);
         QHBoxLayout* rowLayout = new QHBoxLayout();
@@ -159,6 +159,9 @@ public:
             button->setObjectName("back");
             connect(button, SIGNAL(clicked()), SIGNAL(back()));
             rowLayout->addWidget(button, 0, Qt::AlignLeft);
+        }
+        if (!mainLabel.isNull()) {
+            rowLayout->addWidget(new QLabel(mainLabel), Qt::AlignCenter);
         }
         if (nowPlaying) {
             QPushButton* button = new QPushButton(tr("Now Playing"));

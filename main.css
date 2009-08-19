@@ -63,6 +63,11 @@ BackForwardControls > #NowPlayingButton:pressed {
                                  stop:0 #781313, stop:1 #3c0404 );
 }
 
+BackForwardControls QLabel 
+{
+    color: white;
+}
+
 PlayableItemWidget {
     color: #7e7e7c;
     border: none;
