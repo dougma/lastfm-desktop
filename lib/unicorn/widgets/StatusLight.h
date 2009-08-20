@@ -27,7 +27,6 @@
 #include <QColor>
 #include <QWidget>
 
-
 class UNICORN_DLLEXPORT StatusLight : public QWidget
 {
     QColor m_color;

@@ -20,7 +20,7 @@
 #ifndef MULTI_STARTER_WIDGET_H
 #define MULTI_STARTER_WIDGET_H
 
-#include <QWidget>
+#include "lib/unicorn/StylableWidget.h"
 #include <lastfm/RadioStation>
 #include <QListWidgetItem>
 
@@ -30,7 +30,7 @@ class SourceListModel;
 class SourceListWidget;
 class SourceSelectorWidget;
 
-class MultiStarterWidget : public QWidget
+class MultiStarterWidget : public StylableWidget
 {
     Q_OBJECT;
 

@@ -23,6 +23,7 @@
 
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QAction>
 
 ScrobbleControls::ScrobbleControls()
 {
@@ -30,14 +31,14 @@ ScrobbleControls::ScrobbleControls()
     QPushButton* b;
     layout()->addWidget(b = new QPushButton(tr("love")));
     b->setObjectName("love");
-    b->addAction( ((audioscrobbler::Application*)qApp)->loveAction() );
+    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->loveAction(), SLOT(trigger()));
     b->setAutoFillBackground( true );
     
     layout()->addWidget(b = new QPushButton(tr("tag")));
     b->setObjectName("tag");
-    b->addAction( ((audioscrobbler::Application*)qApp)->tagAction() );
+    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->tagAction(), SLOT(trigger()));
     
     layout()->addWidget(b = new QPushButton(tr("share")));
     b->setObjectName("share");
-    b->addAction( ((audioscrobbler::Application*)qApp)->shareAction() );
+    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->shareAction(), SLOT(trigger()));
 }
