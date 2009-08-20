@@ -17,4 +17,19 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// todo!
+#ifndef RADIO_LIST_WIDGET_H
+#define RADIO_LIST_WIDGET_H
+
+#include <QListWidget>
+
+class RadioListWidget : public QListWidget
+{
+    Q_OBJECT
+
+public:
+    RadioListWidget(QWidget* parent = 0);
+
+
+};
+
+#endif

@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
+#include "PlaylistMeta.h"
 
 class SideBySideLayout;
 class NowPlayingState;
@@ -37,8 +38,6 @@ class MainWidget : public QWidget
     Q_OBJECT
     
     struct{
-        QListWidget* friends;
-        QLabel* friends_count;
         QListWidget* neighbours;
         QLabel* neighbour_tags;
         QTextEdit* me;
@@ -65,26 +64,19 @@ private slots:
 
     void onUserGotInfo( QNetworkReply* );
     void onUserGotFriends();
-    void onUserGotNeighbours();
     void onUserGotTopTags();
+    void onUserGotPlaylists();
+
+    void onTagActivated(const QModelIndex& idx);
+    void onFriendActivated(const QModelIndex& idx);
+    void onPlaylistActivated(const QModelIndex& idx);
 
 private:
     SideBySideLayout* m_layout;
     NowPlayingState* m_nowPlaying;
-};
-
-
-class FriendsList : public QListWidget
-{
-public:
-    FriendsList();
-};
-
-
-class NeighboursList : public QListWidget
-{
-public:
-    NeighboursList();
+    QStringList m_friends;
+    QStringList m_tags;
+    QList<PlaylistMeta> m_playlists;
 };
 
 

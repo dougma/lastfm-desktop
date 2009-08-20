@@ -25,8 +25,9 @@
 #include "widgets/MainStarterWidget.h"
 #include "widgets/NowPlayingWidget.h"
 #include "widgets/MultiStarterWidget.h"
-#include "widgets/FullHistoryWidget.h"
+#include "widgets/RadioListWidget.h"
 #include "Radio.h"
+#include "../PlaylistModel.h"
 
 
 MainWidget::MainWidget( QWidget* parent )
@@ -76,7 +77,7 @@ MainWidget::onStartRadio(RadioStation rs)
 void
 MainWidget::onShowMoreRecentStations()
 {
-    FullHistoryWidget* w = new FullHistoryWidget();
+    RadioListWidget* w = new RadioListWidget();
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
 
@@ -100,24 +101,91 @@ MainWidget::onCombo()
     m_layout->moveForward();
 }
 
+// user clicks "Your Tags" button
 void
 MainWidget::onYourTags()
 {
-    qDebug() << "todo";
+    QListView* lv = new QListView();
+    lv->setModel(new QStringListModel(m_tags));
+    lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), "Your Tags", m_nowPlaying, lv);
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    connect(lv, SIGNAL(activated(QModelIndex)), SLOT(onTagActivated(QModelIndex)));
+    m_layout->insertWidget(1, ctrl);
+    m_layout->moveForward();
 }
 
+// user clicks a tag from the Your Tags list:
+// start user's personal tag radio
+void
+MainWidget::onTagActivated(const QModelIndex& idx)
+{
+    QString t = idx.data().toString();
+    RadioStation rs = RadioStation::userTag(lastfm::ws::Username, t);
+    rs.setTitle(lastfm::ws::Username + "'s " + t + " Tag Radio");
+    emit startRadio(rs);
+    onStartRadio(rs);
+}
+
+// user clicks "Your Friends" button
 void
 MainWidget::onYourFriends()
 {
-    qDebug() << "todo";
+    QListView* lv = new QListView();
+    lv->setModel(new QStringListModel(m_friends));
+    lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), "Your Friends", m_nowPlaying, lv);
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    connect(lv, SIGNAL(activated(QModelIndex)), SLOT(onFriendActivated(QModelIndex)));
+    m_layout->insertWidget(1, ctrl);
+    m_layout->moveForward();
 }
 
+// user clicks a friend from the Your Friends list:
+// start friend's library radio
+void
+MainWidget::onFriendActivated(const QModelIndex& idx)
+{
+    QString f = idx.data().toString();
+    RadioStation rs = RadioStation::library(User(f));
+    rs.setTitle(f + "'s Library");
+    emit startRadio(rs);
+    onStartRadio(rs);
+}
+
+// user clicks "Your Playlists"
 void
 MainWidget::onYourPlaylists()
 {
-    qDebug() << "todo";
+    QListView* lv = new QListView();
+    PlaylistModel* model = new PlaylistModel();
+    model->setList(m_playlists);
+    lv->setModel(model);
+    lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    BackForwardControls* ctrl = new BackForwardControls(tr("Back"), "Your Playlists", m_nowPlaying, lv);
+    connect(ctrl, SIGNAL(back()), SLOT(onBackDelete()));
+    connect(ctrl, SIGNAL(forward()), SLOT(onForward()));
+    connect(lv, SIGNAL(activated(QModelIndex)), SLOT(onPlaylistActivated(QModelIndex)));
+    m_layout->insertWidget(1, ctrl);
+    m_layout->moveForward();
 }
 
+// user clicks a playlist from the Your Playlists list:
+void
+MainWidget::onPlaylistActivated(const QModelIndex& idx)
+{
+    int playlistId = idx.data(PlaylistModel::PlaylistIdRole).toInt();
+    QString title = idx.data().toString();
+    RadioStation rs = RadioStation::playlist(playlistId);
+    rs.setTitle(title);
+    emit startRadio(rs);
+    onStartRadio(rs);
+}
 
 void
 MainWidget::onBack()
@@ -188,55 +256,38 @@ MainWidget::onUserGotInfo(QNetworkReply* r)
 void
 MainWidget::onUserGotFriends()
 {
+    sender()->deleteLater();
     QNetworkReply* r = (QNetworkReply*)sender();
     XmlQuery lfm = r->readAll();
-    
-    uint count = 0; //TODO count is wrong as webservice is paginated
-    foreach (XmlQuery e, lfm["friends"].children("user"))
-    {
-        count++;
-        ui.friends->addItem(e["name"].text());
-    }
-    ui.friends_count->setText(tr("%L1 friends").arg(count));
-}
-
-
-void
-MainWidget::onUserGotNeighbours()
-{
-    QNetworkReply* r = (QNetworkReply*)sender();
-    XmlQuery lfm = r->readAll();
-
-    foreach (XmlQuery e, lfm["neighbours"].children("user"))
-    {
-        ui.neighbours->addItem(e["name"].text());
+    m_friends.clear();
+    foreach (const XmlQuery& e, lfm["friends"].children("user")) {
+        m_friends << e["name"].text();
     }
 }
 
 void
 MainWidget::onUserGotTopTags()
 {
+    sender()->deleteLater();
     QNetworkReply* r = (QNetworkReply*)sender();
     XmlQuery lfm = r->readAll();
-
-    QStringList tags;
-    uint x = 0;
-    foreach (XmlQuery e, lfm["toptags"].children("tag"))
-    {
-        if(++x == 3) break;
-        tags += e["name"].text();
+    m_tags.clear();
+    foreach (const XmlQuery& e, lfm["toptags"].children("tag")) {
+        m_tags << e["name"].text();
     }
-    ui.neighbour_tags->setText(tags.join(", "));
 }
 
-
-FriendsList::FriendsList()
-{}
-
-
-NeighboursList::NeighboursList()
-{}
-
+void 
+MainWidget::onUserGotPlaylists()
+{
+    sender()->deleteLater();
+    QNetworkReply* r = (QNetworkReply*)sender();
+    XmlQuery lfm = r->readAll();
+    m_playlists.clear();
+    foreach (const XmlQuery& e, lfm["playlists"].children("playlist")) {
+        m_playlists << PlaylistMeta(e);
+    }
+}
 
 Me::Me()
 {}

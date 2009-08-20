@@ -17,11 +17,11 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FULL_HISTORY_WIDGET_H
-#define FULL_HISTORY_WIDGET_H
+#include "RadioListWidget.h"
 
-class FullHistoryWidget : public QListWidget
+RadioListWidget::RadioListWidget(QWidget* parent)
+: QListWidget(parent)
 {
-};
 
-#endif
+}
+
