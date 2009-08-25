@@ -23,6 +23,9 @@
 #include <QListView>
 class QResizeEvent;
 
+// a listview which switches between displayed 1 or 2 columns
+// switches to single column when resized width is less than singleColumnWidth
+//
 class ColumnListWidget : public QListView
 {
     Q_OBJECT
