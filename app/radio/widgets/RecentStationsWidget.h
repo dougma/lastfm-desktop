@@ -23,8 +23,9 @@
 #include "lib/unicorn/StylableWidget.h"
 #include <lastfm/RadioStation>
 
-class QListWidget;
 class QPushButton;
+class QAbstractItemModel;
+class ColumnListWidget;
 
 class RecentStationsWidget : public StylableWidget
 {
@@ -32,18 +33,18 @@ class RecentStationsWidget : public StylableWidget
 
 public:
     RecentStationsWidget();
+    void setModel(QAbstractItemModel* model);
 
 signals:
     void startRadio(RadioStation);
     void showMoreRecentStations();
 
 private slots:
-    void gotRecentStations();
+    void onActivate(const QModelIndex&);
+    void recalcMoreButton();
 
 private:
-    void refresh();
-
-    QListWidget* m_list;
+    ColumnListWidget* m_list;
     QPushButton* m_moreButton;
 };
 

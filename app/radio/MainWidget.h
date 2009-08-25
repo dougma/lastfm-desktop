@@ -29,6 +29,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include "PlaylistMeta.h"
+#include "RadioStationListModel.h"
 
 class SideBySideLayout;
 class NowPlayingState;
@@ -37,13 +38,6 @@ class MainWidget : public QWidget
 {
     Q_OBJECT
     
-    struct{
-        QListWidget* neighbours;
-        QLabel* neighbour_tags;
-        QTextEdit* me;
-        QLabel* scrobbles;
-    } ui;
-
 public:
     MainWidget( QWidget* parent = 0 );
     
@@ -62,10 +56,10 @@ private slots:
     void onMoveFinished();
     void onForward();
 
-    void onUserGotInfo( QNetworkReply* );
     void onUserGotFriends();
     void onUserGotTopTags();
     void onUserGotPlaylists();
+    void onUserGotRecentStations();
 
     void onTagActivated(const QModelIndex& idx);
     void onFriendActivated(const QModelIndex& idx);
@@ -77,13 +71,7 @@ private:
     QStringList m_friends;
     QStringList m_tags;
     QList<PlaylistMeta> m_playlists;
-};
-
-
-class Me : public QTextEdit
-{
-public:
-    Me();
+    RadioStationListModel m_recentModel;
 };
 
 

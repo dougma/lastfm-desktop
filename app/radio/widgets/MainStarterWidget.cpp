@@ -33,7 +33,7 @@ MainStarterWidget::MainStarterWidget()
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     layout->addWidget(w);
 
-    w = new RecentStationsWidget();
+    w = m_recentStationsWidget = new RecentStationsWidget();
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(showMoreRecentStations()), SIGNAL(showMoreRecentStations()));
     layout->addWidget(w);
@@ -48,4 +48,10 @@ MainStarterWidget::MainStarterWidget()
     connect(w, SIGNAL(friends()), SIGNAL(yourFriends()));
     connect(w, SIGNAL(playlists()), SIGNAL(yourPlaylists()));
     layout->addWidget(w);
+}
+
+void
+MainStarterWidget::setRecentStationsModel(QAbstractItemModel* m)
+{
+    m_recentStationsWidget->setModel(m);
 }

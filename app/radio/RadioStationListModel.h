@@ -17,33 +17,30 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAIN_STARTER_WIDGET_H
-#define MAIN_STARTER_WIDGET_H
+#ifndef RADIO_STATION_LIST_MODEL_H
+#define RADIO_STATION_LIST_MODEL_H
 
-#include <QWidget>
+#include <QAbstractListModel>
+#include <QModelIndex>
 #include <lastfm/RadioStation>
 
-class QAbstractItemModel;
-class RecentStationsWidget;
-
-class MainStarterWidget : public QWidget
+class RadioStationListModel : public QAbstractListModel
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    MainStarterWidget();
-    void setRecentStationsModel(QAbstractItemModel*);
+    enum RadioStationListModelRole { UrlRole = Qt::UserRole };
 
-signals:
-    void startRadio(RadioStation);
-    void showMoreRecentStations();
-    void combo();
-    void yourTags();
-    void yourFriends();
-    void yourPlaylists();
+    RadioStationListModel(QObject* parent = 0);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
+    void setList(QList<RadioStation> list);
 
 private:
-    RecentStationsWidget* m_recentStationsWidget;
+    QList<RadioStation> m_list;
 };
 
 #endif

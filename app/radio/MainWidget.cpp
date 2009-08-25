@@ -40,6 +40,7 @@ MainWidget::MainWidget( QWidget* parent )
     m_layout = new SideBySideLayout( this );
 
     MainStarterWidget* w = new MainStarterWidget;
+    w->setRecentStationsModel(&m_recentModel);
     connect(w, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
     connect(w, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
     connect(w, SIGNAL(showMoreRecentStations()), SLOT(onShowMoreRecentStations()));
@@ -217,42 +218,6 @@ MainWidget::onForward()
     m_layout->moveForward();
 }
 
-QString magic(XmlQuery e, ...)
-{
-    qDebug() << "sup";
-    QString out;
-    va_list ap;
-    va_start(ap, e);
-    while(const char* args = va_arg(ap, const char*)){
-        qDebug() << args;
-        QString const arg = e[args].text();
-
-        if(arg.size()){
-            out += QString(va_arg(ap, const char*)).arg(arg);
-            out += "\n";
-    }}
-    va_end(ap);
-    return out;
-}
-
-
-void
-MainWidget::onUserGotInfo(QNetworkReply* r)
-{
-    XmlQuery e = XmlQuery(r->readAll())["user"];
-    uint count = e["playcount"].text().toUInt();
-    ui.scrobbles->setText(tr("%L1 scrobbles").arg(count));
-#if 0
-    QString s = magic(e,
-                      "name", "<h1>%1</h1>",
-                      "image", "<img src='%1'>",
-                      "age", "%L1 years old",
-                      "country", "From %1",
-                      0);
-    ui.me->setText(s);
-#endif
-}
-
 void
 MainWidget::onUserGotFriends()
 {
@@ -289,5 +254,13 @@ MainWidget::onUserGotPlaylists()
     }
 }
 
-Me::Me()
-{}
+
+void
+MainWidget::onUserGotRecentStations()
+{
+    sender()->deleteLater();
+    m_recentModel.setList(
+        RadioStation::list(
+            qobject_cast<QNetworkReply*>(sender())));
+}
+

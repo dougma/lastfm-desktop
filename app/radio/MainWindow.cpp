@@ -33,13 +33,15 @@ MainWindow::MainWindow()
 
     setStatusBar( status );
 
-    AuthenticatedUser user;
-
     MainWidget* mw = new MainWidget( this );
     connect(mw, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+
+    AuthenticatedUser user;
     connect(user.getFriends(), SIGNAL(finished()), mw, SLOT(onUserGotFriends()));
     connect(user.getTopTags(), SIGNAL(finished()), mw, SLOT(onUserGotTopTags()));
     connect(user.getPlaylists(), SIGNAL(finished()), mw, SLOT(onUserGotPlaylists()));
+    connect(user.getRecentStations(), SIGNAL(finished()), mw, SLOT(onUserGotRecentStations()));
+
     setCentralWidget( mw );
 
     finishUi();

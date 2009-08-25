@@ -19,78 +19,73 @@
 
 #include <QNetworkReply>
 #include <QVBoxLayout>
-#include <QListWidget>
 #include <QPushButton>
-#include <QResizeEvent>
-#include <QListWidgetItem>
 #include <QLabel>
 #include <QScrollBar>
 #include <lastfm/AuthenticatedUser>
 #include <lastfm/XmlQuery>
 #include "RecentStationsWidget.h"
-#include "PlayableItemWidget.h"
+#include "ColumnListWidget.h"
+#include "../RadioStationListModel.h"
 
 #define GRID_HEIGHT_PX 30
-
-
-class OurListWidget : public QListWidget
-{
-protected:
-
-    // switches between 1 and 2 column mode by changing the item grid size
-    virtual void resizeEvent(QResizeEvent* e)
-    {
-        if (e->size().width() < 350) 
-            setGridSize(QSize(e->size().width(), GRID_HEIGHT_PX));
-        else
-            setGridSize(QSize(e->size().width() / 2, GRID_HEIGHT_PX));
-    }
-};
+#define ROW_COUNT 3
 
 
 RecentStationsWidget::RecentStationsWidget()
 {
-    // todo: start a spinner?
-    refresh();
-}
-
-
-void
-RecentStationsWidget::refresh()
-{
-    AuthenticatedUser you;
-    connect(you.getRecentStations(), SIGNAL(finished()), SLOT(gotRecentStations()));
-
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, Qt::AlignCenter);
-    layout->addWidget(m_list = new OurListWidget());
+    m_list = new ColumnListWidget(350, GRID_HEIGHT_PX);
+    m_list->setSelectionMode(QAbstractItemView::NoSelection);
     m_list->setWrapping(true);
     m_list->setResizeMode(QListView::Adjust);
     m_list->setUniformItemSizes(false);
     m_list->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_list->setMaximumHeight(GRID_HEIGHT_PX * 3 + 1);
-    layout->addWidget(m_moreButton = new QPushButton(tr("more")), 0, Qt::AlignRight);
+    m_list->setMaximumHeight(GRID_HEIGHT_PX * ROW_COUNT + 1);
+    connect(m_list, SIGNAL(clicked(QModelIndex)), SLOT(onActivate(QModelIndex)));
+    connect(m_list, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivate(QModelIndex)));
+    connect(m_list, SIGNAL(columnsChanged()), SLOT(recalcMoreButton()));
+
+    m_moreButton = new QPushButton(tr("more"));
     m_moreButton->setObjectName("more");
+    m_moreButton->setVisible(false);
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(new QLabel(tr("Your Recent Stations")), 0, Qt::AlignCenter);
+    layout->addWidget(m_list);
+    layout->addWidget(m_moreButton, 0, Qt::AlignRight);
+
     connect(m_moreButton, SIGNAL(clicked()), SIGNAL(showMoreRecentStations()));
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
 void
-RecentStationsWidget::gotRecentStations()
+RecentStationsWidget::onActivate(const QModelIndex& i)
 {
-    // todo: stop any spinner
-    sender()->deleteLater();
-    QList<RadioStation> recent = RadioStation::list((QNetworkReply*)sender());
+    QString title = i.data().toString();
+    QString url = i.data(RadioStationListModel::UrlRole).toString();
+    RadioStation rs(url);
+    rs.setTitle(title);
+    emit startRadio(rs);
+}
 
-    foreach(const RadioStation& rs, recent) {
-        QListWidgetItem* item = new QListWidgetItem(m_list);
-        PlayableItemWidget* widget = new PlayableItemWidget(rs.title(), rs);
-//        widget->setMinimumHeight(60);
-//        widget->setMinimumWidth(100);
-        m_list->setItemWidget(item, widget);
-        connect(widget, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
+
+void
+RecentStationsWidget::setModel(QAbstractItemModel* model)
+{
+    if (m_list->model()) {
+        disconnect(m_list->model(), 0, this, 0);
     }
-    if (m_list->count() > 6) {
-        m_moreButton->setChecked(true);
-    }
+    m_list->setModel(model);
+    connect(model, SIGNAL(modelReset()), SLOT(recalcMoreButton()));
+    connect(model, SIGNAL(rowsRemoved()), SLOT(recalcMoreButton()));
+    connect(model, SIGNAL(rowsInserted()), SLOT(recalcMoreButton()));
+}
+
+// re-evaluate the visibility of the "more" button
+void
+RecentStationsWidget::recalcMoreButton()
+{
+    bool more = m_list->model() && 
+        (m_list->model()->rowCount() > m_list->getDisplayedColumns() * ROW_COUNT);
+    m_moreButton->setVisible(more);
 }

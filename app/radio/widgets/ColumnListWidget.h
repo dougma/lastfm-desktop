@@ -17,33 +17,30 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAIN_STARTER_WIDGET_H
-#define MAIN_STARTER_WIDGET_H
+#ifndef COLUMN_LIST_WIDGET_H
+#define COLUMN_LIST_WIDGET_H
 
-#include <QWidget>
-#include <lastfm/RadioStation>
+#include <QListView>
+class QResizeEvent;
 
-class QAbstractItemModel;
-class RecentStationsWidget;
-
-class MainStarterWidget : public QWidget
+class ColumnListWidget : public QListView
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    MainStarterWidget();
-    void setRecentStationsModel(QAbstractItemModel*);
+    ColumnListWidget(int singleColumnWidth, int gridHeightPx);
+    int getDisplayedColumns();
 
 signals:
-    void startRadio(RadioStation);
-    void showMoreRecentStations();
-    void combo();
-    void yourTags();
-    void yourFriends();
-    void yourPlaylists();
+    void columnsChanged();
+
+protected:
+    virtual void resizeEvent(QResizeEvent* e);
 
 private:
-    RecentStationsWidget* m_recentStationsWidget;
+    int m_displayColumns;   // current display columns
+    int m_singleColumnWidth;
+    int m_gridHeightPx;
 };
 
 #endif

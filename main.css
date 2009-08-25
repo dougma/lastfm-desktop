@@ -68,7 +68,8 @@ BackForwardControls QLabel
     color: white;
 }
 
-PlayableItemWidget {
+PlayableItemWidget, 
+RecentStationsWidget QListView::item {
     color: #7e7e7c;
     border: none;
     text-align: left;
@@ -80,11 +81,13 @@ PlayableItemWidget {
     margin: 0px 5px;
 }
 
-PlayableItemWidget:hover {
+PlayableItemWidget:hover, 
+RecentStationsWidget QListView::item:hover {
     background-image: url(:/station-start-onhover.png);
 }
 
-PlayableItemWidget:pressed {
+PlayableItemWidget:pressed, 
+RecentStationsWidget QListView::item:pressed {
     background-image: url(:/station-start-onpress.png);
 }
 
