@@ -25,7 +25,7 @@
 #include <lastfm/AuthenticatedUser>
 #include <lastfm/XmlQuery>
 #include "RecentStationsWidget.h"
-#include "ColumnListWidget.h"
+#include "ColumnListView.h"
 #include "../RadioStationListModel.h"
 
 #define GRID_HEIGHT_PX 30
@@ -34,7 +34,7 @@
 
 RecentStationsWidget::RecentStationsWidget()
 {
-    m_list = new ColumnListWidget(350, GRID_HEIGHT_PX);
+    m_list = new ColumnListView(350, GRID_HEIGHT_PX);
     m_list->setSelectionMode(QAbstractItemView::NoSelection);
     m_list->setWrapping(true);
     m_list->setResizeMode(QListView::Adjust);

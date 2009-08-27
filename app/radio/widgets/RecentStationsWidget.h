@@ -25,7 +25,7 @@
 
 class QPushButton;
 class QAbstractItemModel;
-class ColumnListWidget;
+class ColumnListView;
 
 class RecentStationsWidget : public StylableWidget
 {
@@ -44,7 +44,7 @@ private slots:
     void recalcMoreButton();
 
 private:
-    ColumnListWidget* m_list;
+    ColumnListView* m_list;
     QPushButton* m_moreButton;
 };
 

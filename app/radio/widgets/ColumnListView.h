@@ -17,8 +17,8 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COLUMN_LIST_WIDGET_H
-#define COLUMN_LIST_WIDGET_H
+#ifndef COLUMN_LIST_VIEW_H
+#define COLUMN_LIST_VIEW_H
 
 #include <QListView>
 class QResizeEvent;
@@ -26,12 +26,12 @@ class QResizeEvent;
 // a listview which switches between displayed 1 or 2 columns
 // switches to single column when resized width is less than singleColumnWidth
 //
-class ColumnListWidget : public QListView
+class ColumnListView : public QListView
 {
     Q_OBJECT
 
 public:
-    ColumnListWidget(int singleColumnWidth, int gridHeightPx);
+    ColumnListView(int singleColumnWidth, int gridHeightPx);
     int getDisplayedColumns();
 
 signals:

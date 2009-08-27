@@ -17,11 +17,11 @@
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ColumnListWidget.h"
+#include "ColumnListView.h"
 #include <QResizeEvent>
 
 
-ColumnListWidget::ColumnListWidget(int singleColumnWidth, int gridHeightPx)
+ColumnListView::ColumnListView(int singleColumnWidth, int gridHeightPx)
     : m_displayColumns(-1)
     , m_singleColumnWidth(singleColumnWidth)
     , m_gridHeightPx(gridHeightPx)
@@ -29,7 +29,7 @@ ColumnListWidget::ColumnListWidget(int singleColumnWidth, int gridHeightPx)
 }
 
 int
-ColumnListWidget::getDisplayedColumns()
+ColumnListView::getDisplayedColumns()
 {
     if (m_displayColumns == -1) {
         m_displayColumns = size().width() < m_singleColumnWidth ? 1 : 2;
@@ -39,7 +39,7 @@ ColumnListWidget::getDisplayedColumns()
 
 //virtual
 void
-ColumnListWidget::resizeEvent(QResizeEvent* e)
+ColumnListView::resizeEvent(QResizeEvent* e)
 {
     if (e->size().width() < m_singleColumnWidth) {
         setGridSize(QSize(e->size().width(), m_gridHeightPx));
