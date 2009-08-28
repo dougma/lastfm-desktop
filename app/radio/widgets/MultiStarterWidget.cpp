@@ -31,12 +31,13 @@
 #include "SourceListWidget.h"
 #include "../SourceListModel.h"
 #include "SearchBox.h"
+#include "YouListWidget.h"
 
 #include <QGroupBox>
 
 
 MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *parent)
-    : QWidget(parent)
+    : StylableWidget(parent)
     , m_minTagCount(10)
     , m_minArtistCount(10)
 {
@@ -51,6 +52,8 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     
     QTabWidget* tabwidget = new QTabWidget();
 
+    tabwidget->addTab(new YouListWidget(this), tr("You"));
+    
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
     tabwidget->addTab(m_artists, tr("Artists"));
     connect(m_artists, SIGNAL(add(QString)), SLOT(onAdd(QString)));

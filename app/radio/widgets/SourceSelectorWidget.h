@@ -20,14 +20,14 @@
 #ifndef SOURCE_SELECTOR_WIDGET_H
 #define SOURCE_SELECTOR_WIDGET_H
 
-#include <QWidget>
+#include "lib/unicorn/StylableWidget.h"
 #include <QListWidgetItem>
 
 class QLineEdit;
 class QListWidget;
 class QPushButton;
 
-class SourceSelectorWidget : public QWidget
+class SourceSelectorWidget : public StylableWidget
 {
     Q_OBJECT;
 

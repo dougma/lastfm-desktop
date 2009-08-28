@@ -25,12 +25,14 @@
 #include "SourceSelectorWidget.h"
 
 SourceSelectorWidget::SourceSelectorWidget(QLineEdit* edit, QWidget* parent)
-    :QWidget(parent)
+    :StylableWidget(parent)
 {
     QGridLayout* grid = new QGridLayout(this);
 
     m_edit = edit;
     m_edit->setParent(this);
+
+    grid->setContentsMargins( 0, 0, 0, 0 );
     grid->addWidget(m_edit, 0, 0);
 
     m_button = new QPushButton(tr("Add"));

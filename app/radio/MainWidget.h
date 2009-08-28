@@ -138,7 +138,7 @@ public:
             QPushButton* button = new QPushButton(backLabel);
             button->setObjectName("back");
             connect(button, SIGNAL(clicked()), SIGNAL(back()));
-            rowLayout->addWidget(button, 0, Qt::AlignLeft);
+            rowLayout->addWidget(button, 1, Qt::AlignLeft);
         }
         if (!mainLabel.isNull()) {
             rowLayout->addWidget(new QLabel(mainLabel), Qt::AlignCenter);
