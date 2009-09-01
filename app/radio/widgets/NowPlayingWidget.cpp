@@ -48,8 +48,8 @@ NowPlayingWidget::NowPlayingWidget()
     ui.track = new QLabel();
     layout()->addWidget( ui.track );
     
-    ui.artist = new QLabel();
-    layout()->addWidget( ui.artist );
+    ui.album = new QLabel();
+    layout()->addWidget( ui.album );
     
     ui.bar = new RadioProgressBar();
     layout()->addWidget(ui.bar);
@@ -72,13 +72,17 @@ NowPlayingWidget::onTrackStarted( const Track& t )
 {
     ui.cover->clear();
     TrackImageFetcher* imageFetcher = new TrackImageFetcher( t );
-    connect( imageFetcher, SIGNAL( finished( QImage )),
-                                         SLOT( onImageFinished( QImage )));
+    connect( imageFetcher, SIGNAL( finished( QImage )), SLOT( onImageFinished( QImage )));
     imageFetcher->start();
     
-    ui.artist->setText( t.artist() );
-    ui.track->setText( t.title() );
-//    m_trackWidget->setTrack(t);
+    ui.track->setText( t.artist() + " - " + t.title() );
+    QString albumTitle = t.album();
+    if (albumTitle.length()) {
+        ui.album->setText( "from " + albumTitle );
+        ui.album->show();
+    } else {
+        ui.album->hide();
+    }
 }
 
 void 

@@ -54,8 +54,8 @@ private:
     struct {
         RadioProgressBar* bar;
         QLabel* cover;
-        QLabel* artist;
         QLabel* track;
+        QLabel* album;
     } ui;
 };
 
