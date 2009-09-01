@@ -43,7 +43,6 @@ public slots:
     // all from the radio:
     void onTuningIn( const RadioStation& );
     void onTrackSpooled( const Track& );
-    void onTrackStarted( const Track& );
     void onBuffering( int );
     void onStopped();
     

@@ -117,17 +117,13 @@ RadioProgressBar::onTrackSpooled( const Track& track, class StopWatch* )
 {
     if( !track.isNull() && track.source() == Track::LastFmRadio )
     {
-        ui.time->setVisible( true );
-        ui.timeToGo->setVisible( true );
-        
         m_currentTrackDuration = track.duration();
         QTime t( 0, 0 );
+        ui.time->setText( t.toString( "mm:ss" ));
         t = t.addSecs( m_currentTrackDuration );
-        if( ui.timeToGo->text() != t.toString( "mm:ss" ))
-        {
-            ui.timeToGo->setText( t.toString( "mm:ss" ));
-            update();
-        }
+        ui.timeToGo->setText( t.toString( "mm:ss" ));
+        ui.time->setVisible( true );
+        ui.timeToGo->setVisible( true );
     }
     else
     {

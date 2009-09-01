@@ -36,9 +36,6 @@ NowPlayingWidget::NowPlayingWidget()
 {
     new QVBoxLayout( this );
 
-  //  m_trackWidget = new TrackWidget();
-  //  layout()->addWidget(m_trackWidget);
-    
     ui.cover = new QLabel();
     ui.cover->setAlignment( Qt::AlignCenter );
     layout()->addWidget( ui.cover );
@@ -64,25 +61,20 @@ NowPlayingWidget::onTuningIn( const RadioStation& )
 void
 NowPlayingWidget::onTrackSpooled( const Track& t )
 {
-    ui.bar->onTrackSpooled(t, 0);
-}
-
-void
-NowPlayingWidget::onTrackStarted( const Track& t )
-{
     ui.cover->clear();
     TrackImageFetcher* imageFetcher = new TrackImageFetcher( t );
     connect( imageFetcher, SIGNAL( finished( QImage )), SLOT( onImageFinished( QImage )));
     imageFetcher->start();
     
     ui.track->setText( t.artist() + " - " + t.title() );
-    QString albumTitle = t.album();
-    if (albumTitle.length()) {
-        ui.album->setText( "from " + albumTitle );
+    if (!t.album().isNull()) {
+        ui.album->setText( "from " + t.album().title() );
         ui.album->show();
     } else {
         ui.album->hide();
     }
+    ui.bar->onTrackSpooled(t, 0);
+    qDebug() << t;
 }
 
 void 

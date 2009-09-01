@@ -116,6 +116,9 @@ Radio::enqueue()
 void
 Radio::skip()
 {
+    if (!m_mediaObject)
+        return;
+
     if (m_track.extra( "rating" ).isEmpty())
         MutableTrack( m_track ).setExtra( "rating", "S" );
     
@@ -280,7 +283,6 @@ Radio::onPhononCurrentSourceChanged( const Phonon::MediaSource& )
     MutableTrack( m_track ).stamp();
     if (m_mediaObject->state() == Phonon::PlayingState) {
         emit trackSpooled( m_track );
-        emit trackStarted( m_track );
     } else {
         changeState( Buffering );
         emit trackSpooled( m_track );
@@ -310,9 +312,7 @@ Radio::changeState( Radio::State const newstate )
             
         case Buffering:
             break;
-            
 		case Playing:
-            emit trackStarted( m_track );
             break;
 
 		case Stopped:

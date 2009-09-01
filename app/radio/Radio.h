@@ -77,7 +77,6 @@ signals:
       * but the second time will */
     void tuningIn( const RadioStation& );
     void trackSpooled( const Track& );
-    void trackStarted( const Track& );
     void buffering( int );
     void stopped();
 	

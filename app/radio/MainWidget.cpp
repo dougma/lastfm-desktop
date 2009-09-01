@@ -63,7 +63,6 @@ MainWidget::onStartRadio(RadioStation rs)
     NowPlayingWidget* w = new NowPlayingWidget;
     connect(radio, SIGNAL(tuningIn( RadioStation )), w, SLOT(onTuningIn( RadioStation )));
     connect(radio, SIGNAL(trackSpooled( Track )), w, SLOT(onTrackSpooled( Track )));
-    connect(radio, SIGNAL(trackStarted( Track )), w, SLOT(onTrackStarted( Track )));
     connect(radio, SIGNAL(tick( qint64 )), w, SIGNAL( tick( qint64 )));
     connect(radio, SIGNAL(buffering( int )), w, SLOT(onBuffering( int )));
 //    connect(radio, SIGNAL(stopped()), w, SLOT(onStopped()));
