@@ -32,18 +32,22 @@ MoreStationsWidget::MoreStationsWidget()
     QWidget* w;
 
     w = new QPushButton(tr("Your Friends"));
+    w->setObjectName("friends");
     connect(w, SIGNAL(clicked()), SIGNAL(friends()));
     layout->addWidget(w, 1, 0);
 
     w = new QPushButton(tr("Your Tags"));
+    w->setObjectName("tags");
     connect(w, SIGNAL(clicked()), SIGNAL(tags()));
     layout->addWidget(w, 1, 1);
 
     w = new QPushButton(tr("Your Playlists"));
+    w->setObjectName("playlists");
     connect(w, SIGNAL(clicked()), SIGNAL(playlists()));
     layout->addWidget(w, 2, 0);
 
     w = new QPushButton(tr("Start a combo station"));
+    w->setObjectName("combos");
     connect(w, SIGNAL(clicked()), SIGNAL(combo()));
     layout->addWidget(w, 2, 1);
 }

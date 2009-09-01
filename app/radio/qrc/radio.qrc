@@ -21,5 +21,17 @@
         <file alias="skip-rest.png" >skip_rest_45x29.png</file>
         <file>delete.png</file>
         <file>default_user_small.png</file>
+        <file>combo_pressed_26x27.png</file>
+        <file>combo_rest_26x27.png</file>
+        <file>friends_hover_26x27.png</file>
+        <file>friends_pressed_26x27.png</file>
+        <file>friends_rest_26x27.png</file>
+        <file>playlists_hover_26x27.png</file>
+        <file>playlists_pressed_26x27.png</file>
+        <file>playlists_rest_26x27.png</file>
+        <file>tags_hover_26x27.png</file>
+        <file>tags_pressed_26x27.png</file>
+        <file>tags_rest_26x27.png</file>
+        <file>combo_hover_26x27.png</file>
     </qresource>
 </RCC>

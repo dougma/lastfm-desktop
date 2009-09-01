@@ -97,6 +97,35 @@ MultiStarterWidget QCheckBox {
     color: white;
 }
 
+MoreStationsWidget QPushButton 
+{
+    color: #7e7e7c;
+    border: none;
+    text-align: left;
+    background-repeat: no-repeat;
+    background-position: left;
+    background-origin:border;
+    padding:5px 0px 5px 30px; 
+    margin: 0px 5px;
+}
+
+MoreStationsWidget QPushButton#friends { background-image: url(:/friends_rest_26x27.png); }
+MoreStationsWidget QPushButton#friends:hover { background-image: url(:/friends_hover_26x27.png); }
+MoreStationsWidget QPushButton#friends:pressed { background-image: url(:/friends_pressed_26x27.png); }
+
+MoreStationsWidget QPushButton#playlists { background-image: url(:/playlists_rest_26x27.png); }
+MoreStationsWidget QPushButton#playlists:hover { background-image: url(:/playlists_hover_26x27.png); }
+MoreStationsWidget QPushButton#playlists:pressed { background-image: url(:/playlists_pressed_26x27.png); }
+
+MoreStationsWidget QPushButton#tags { background-image: url(:/tags_rest_26x27.png); }
+MoreStationsWidget QPushButton#tags:hover { background-image: url(:/tags_hover_26x27.png); }
+MoreStationsWidget QPushButton#tags:pressed { background-image: url(:/tags_pressed_26x27.png); }
+
+MoreStationsWidget QPushButton#combos { background-image: url(:/combo_rest_26x27.png); }
+MoreStationsWidget QPushButton#combos:hover { background-image: url(:/combo_hover_26x27.png); }
+MoreStationsWidget QPushButton#combos:pressed { background-image: url(:/combo_pressed_26x27.png); }
+
+
 PlaybackControlsWidget QPushButton {
     color: transparent;
     background-color: transparent;
@@ -176,7 +205,9 @@ QStatusBar::item {
     border: none;
 }
 
-SourceItemWidget {
+SourceItemWidget 
+{
+    color: #000000;
 	background-color: #ffffff;
 }
 
