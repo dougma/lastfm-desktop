@@ -91,7 +91,7 @@ int main( int argc, char** argv )
         app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
         ScrobSocket* scrobsock = new ScrobSocket("ass");
-        scrobsock->connect(radio, SIGNAL(trackStarted(Track)), SLOT(start(Track)));
+        scrobsock->connect(radio, SIGNAL(trackSpooled(Track)), SLOT(start(Track)));
         scrobsock->connect(radio, SIGNAL(stopped()), SLOT(stop()));
 
       #ifdef Q_WS_MAC
