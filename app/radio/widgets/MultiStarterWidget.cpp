@@ -83,6 +83,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     sliderslayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
     m_sliders = new QWidget();
     m_sliders->setLayout(sliderslayout);
+    m_sliders->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
 
     m_repSlider->setMinimum(0);
     m_repSlider->setMaximum(8);
