@@ -187,16 +187,15 @@ MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
     ui.title->setText(title.arg(t.artist()).arg(t.title()));
     ui.album->setText("from " + t.album().title());
 
-    if (t.artist() == previous.artist()) return;
-
-    ui.bio->clear();
-    ui.artist_image->clear();
-    ui.now_playing_source->onTrackStarted(t, previous);
-
     m_currentTrack = t;
+    ui.now_playing_source->onTrackStarted(t, previous);
     
-    connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
-//    connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
+    if (t.artist() != previous.artist()) {
+        ui.bio->clear();
+        ui.artist_image->clear();
+        connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
+        //connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
+    }
 }
 
 void
