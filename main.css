@@ -205,11 +205,7 @@ QStatusBar::item {
     border: none;
 }
 
-SourceItemWidget 
-{
-    color: #000000;
-	background-color: #ffffff;
-}
+SourceItemWidget { background-color: #ffffff; }
 
 SourceItemWidget QPushButton
 {
@@ -224,6 +220,7 @@ SourceItemWidget QPushButton
 	background-image: url(:/delete.png);
 }
 
+SourceItemWidget QLabel { color: #000000; }
 SourceItemWidget QLabel#image,
 SourceItemWidget QLabel#userImage
 {
