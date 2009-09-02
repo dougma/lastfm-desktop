@@ -34,10 +34,9 @@ ScrobbleStatus::ScrobbleStatus( QWidget* parent )
     ui.playerStatus = new QLabel();
     layout()->addWidget( ui.playerStatus );
 
-    m_timer = new QTimer( this );
-    
-    connect( m_timer, SIGNAL(timeout()), SLOT( update()));
-    m_timer->start();
+    //m_timer = new QTimer( this );
+    //connect( m_timer, SIGNAL(timeout()), SLOT( update()));
+    //m_timer->start();
 }
 
 void
