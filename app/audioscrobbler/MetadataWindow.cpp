@@ -51,7 +51,6 @@ MetadataWindow::MetadataWindow()
     v->addWidget(ui.now_playing_source = new ScrobbleStatus());
     ui.now_playing_source->setObjectName("now_playing");
     ui.now_playing_source->setFixedHeight( 22 );
-    connect(qApp, SIGNAL(trackStarted(Track, Track)), ui.now_playing_source, SLOT(onTrackStarted(Track, Track)));
     QVBoxLayout* vs;
     {
         QWidget* scrollWidget;
@@ -192,9 +191,10 @@ MetadataWindow::onTrackStarted(const Track& t, const Track& previous)
 
     ui.bio->clear();
     ui.artist_image->clear();
+    ui.now_playing_source->onTrackStarted(t, previous);
+
     m_currentTrack = t;
     
-
     connect(t.artist().getInfo(), SIGNAL(finished()), SLOT(onArtistGotInfo()));
 //    connect(t.album().getInfo(), SIGNAL(finished()), SLOT(onAlbumGotInfo()));
 }
@@ -265,8 +265,10 @@ MetadataWindow::onStopped()
     ui.bio->clear();
     ui.artist_image->clear();
     ui.title->clear();
+    ui.tags->clear();
     ui.album->clear();
     ui.listeners->clear();
     ui.scrobbles->clear();
     m_currentTrack = Track();
+    ui.now_playing_source->onTrackStopped();
 }
