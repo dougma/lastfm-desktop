@@ -204,8 +204,8 @@ MetadataWindow::onArtistGotInfo()
 {
     XmlQuery lfm = static_cast<QNetworkReply*>(sender())->readAll();
 
-    QString scrobbles = lfm["artist"]["stats"]["playcount"].text();
-    QString listeners = lfm["artist"]["stats"]["listeners"].text();
+    int scrobbles = lfm["artist"]["stats"]["playcount"].text().toInt();
+    int listeners = lfm["artist"]["stats"]["listeners"].text().toInt();
     QString tags;
     foreach(const XmlQuery& e, lfm["artist"]["tags"].children("tag")) {
         if (tags.length()) {
@@ -214,8 +214,8 @@ MetadataWindow::onArtistGotInfo()
         tags += e["name"].text();
     }
 
-    ui.scrobbles->setText(scrobbles);
-    ui.listeners->setText(listeners);
+    ui.scrobbles->setText(QString("%L1").arg(scrobbles));
+    ui.listeners->setText(QString("%L1").arg(listeners));
     ui.tags->setText(tags);
 
     //TODO if empty suggest they edit it
