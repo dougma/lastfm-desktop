@@ -137,7 +137,7 @@ else
             middle "Configured to produce a _debug_ build.";;
 
         *)
-            svn co svn+ssh://gimli.last.fm/svn/clientside/bin/win _bin
+            #svn co svn+ssh://gimli.last.fm/svn/clientside/bin/win _bin
             qmake -recursive -tp vc Last.fm.pro "CONFIG -= flat" || die "Configure failed."
             fix_sln
             BUILD_CMD='devenv /useenv Last.sln';;
