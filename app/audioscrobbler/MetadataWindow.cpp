@@ -38,6 +38,7 @@
 #include <QScrollArea>
 #include <QStatusBar>
 #include <QSizeGrip>
+#include <QDesktopServices>
 #include <QAbstractTextDocumentLayout>
 
 MetadataWindow::MetadataWindow()
@@ -121,13 +122,15 @@ MetadataWindow::MetadataWindow()
         grid->addWidget( label, 4, 0 );
         grid->addWidget(ui.bio = new QTextBrowser, 4, 1);
         ui.bio->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+        ui.bio->setOpenLinks( false );
         grid->setRowStretch( 4, 1 );
 
         vs->addLayout(grid, 1);
         vs->addStretch();
 
     }
-    connect( ui.bio->document()->documentLayout(), SIGNAL( documentSizeChanged(QSizeF)), SLOT( onBioChanged(QSizeF)));
+    connect(ui.bio->document()->documentLayout(), SIGNAL( documentSizeChanged(QSizeF)), SLOT( onBioChanged(QSizeF)));
+    connect(ui.bio, SIGNAL(anchorClicked(QUrl)), SLOT(onAnchorClicked(QUrl)));
     vs->setStretchFactor(ui.bio, 1);
 
     // status bar and scrobble controls
@@ -163,6 +166,12 @@ MetadataWindow::MetadataWindow()
     setUnifiedTitleAndToolBarOnMac( true );
     setMinimumHeight( 80 );
     resize(20, 500);
+}
+
+void
+MetadataWindow::onAnchorClicked( const QUrl& link )
+{
+    QDesktopServices::openUrl( link );
 }
 
 void

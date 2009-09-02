@@ -52,6 +52,7 @@ public slots:
 private slots:
     void onArtistGotInfo();
 //    void onAlbumGotInfo();
+    void onAnchorClicked( const QUrl& link );
     void onArtistImageDownloaded();
     void onBioChanged( const QSizeF& );
     
