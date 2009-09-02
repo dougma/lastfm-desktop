@@ -56,6 +56,7 @@ private:
     Track m_track;
     QQueue<QString> m_msgQueue;
     bool m_bInConnect;
+    QString m_clientId;
 };
 
 #endif

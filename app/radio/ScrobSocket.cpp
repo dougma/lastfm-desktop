@@ -31,6 +31,7 @@
 ScrobSocket::ScrobSocket( const QString& clientId, QObject* parent ) 
 : QLocalSocket( parent )
 , m_bInConnect( false )
+, m_clientId( clientId )
 {
     connect( this, SIGNAL(readyRead()), SLOT(onReadyRead()) );    
     connect( this, SIGNAL(error( QLocalSocket::LocalSocketError )), SLOT(onError( QLocalSocket::LocalSocketError )) );
@@ -130,10 +131,10 @@ void
 ScrobSocket::start( const Track& t )
 {
     m_track = t;
-    transmit( "START c=bof" "&"
+    transmit( "START c=" + m_clientId + "&"
                     "a=" + encodeAmp( t.artist() ) + "&"
                     "t=" + encodeAmp( t.title() ) + "&"
-                    "b=" + encodeAmp( t.album() ) + "&"
+                    "b=" + encodeAmp( t.album() ) + "&"     // todo: and when album.isNull?
                     "l=" + QString::number( t.duration() ) + "&"
                     "p=" + encodeAmp( t.url().path() ) + '\n' );
 }
@@ -142,21 +143,21 @@ ScrobSocket::start( const Track& t )
 void
 ScrobSocket::pause()
 {
-    transmit( "PAUSE c=bof\n" );
+    transmit( "PAUSE c=" + m_clientId + "\n" );
 }
 
 
 void
 ScrobSocket::resume()
 {
-    transmit( "RESUME c=bof\n" );
+    transmit( "RESUME c=" + m_clientId + "\n" );
 }
 
 
 void
 ScrobSocket::stop()
 {
-    transmit( "STOP c=bof\n" );
+    transmit( "STOP c=" + m_clientId + "\n" );
 }
 
 
