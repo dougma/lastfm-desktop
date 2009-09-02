@@ -55,6 +55,7 @@ private:
     SourceSelectorWidget* m_tags;
     SourceSelectorWidget* m_artists;
     SourceSelectorWidget* m_users;
+    QWidget* m_sliders;
     QSlider* m_repSlider;
     QSlider* m_mainstrSlider;
     QPushButton* m_playButton;

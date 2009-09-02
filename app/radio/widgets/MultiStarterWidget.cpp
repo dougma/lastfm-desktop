@@ -74,19 +74,23 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     m_sourceList->setModel(m_sourceModel);
 
     QVBoxLayout* rightside = new QVBoxLayout();
-
-    //todo: make sliders into single widgets..?
     rightside->addWidget(m_sourceList);
-    rightside->addWidget(new QLabel(tr("Repetition")));
-    rightside->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
-    rightside->addWidget(new QLabel(tr("Mainstreamness")));
-    rightside->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+
+    QVBoxLayout* sliderslayout = new QVBoxLayout();
+    sliderslayout->addWidget(new QLabel(tr("Repetition")));
+    sliderslayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
+    sliderslayout->addWidget(new QLabel(tr("Mainstreamness")));
+    sliderslayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+    m_sliders = new QWidget();
+    m_sliders->setLayout(sliderslayout);
+
     m_repSlider->setMinimum(0);
     m_repSlider->setMaximum(8);
     m_repSlider->setValue(4);
     m_mainstrSlider->setMinimum(0);
     m_mainstrSlider->setMaximum(8);
     m_mainstrSlider->setValue(4);
+    rightside->addWidget(m_sliders);
     rightside->addWidget(m_playButton = new QPushButton(tr("Play")));
 
     grid->addLayout(titleLayout, 0, 0, 1, 2);
@@ -109,8 +113,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
 void
 MultiStarterWidget::onCheckBox(int checkState)
 {
-    m_repSlider->setVisible(checkState == Qt::Checked);
-    m_mainstrSlider->setVisible(checkState == Qt::Checked);
+    m_sliders->setVisible(checkState == Qt::Checked);
     m_sourceList->updateAdvanced(checkState);
 }
 
