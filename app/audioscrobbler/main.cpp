@@ -29,7 +29,7 @@ int main( int argc, char** argv )
     QCoreApplication::setApplicationVersion( VERSION );
 
 #ifdef NDEBUG
-    UniqueApplication uapp( moose::id() );
+    UniqueApplication uapp( "Audioscrobbler-A4BF10D5-6F58-4c1b-9D5B-7D8CE7ECB674" );
     if (uapp.isAlreadyRunning())
 		return uapp.forward( argc, argv ) ? 0 : 1;
     uapp.init1();
