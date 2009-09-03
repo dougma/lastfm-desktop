@@ -153,7 +153,6 @@ public:
             button->setEnabled(nowPlaying->isPlaying());
             connect(button, SIGNAL(clicked()), SIGNAL(forward()));
             connect(nowPlaying, SIGNAL(playingStateChange(bool)), button, SLOT(setEnabled(bool)));
-            connect(nowPlaying, SIGNAL(playingStateChange(bool)), button, SLOT(setEnabled(bool)));
             rowLayout->addWidget(button, 1, Qt::AlignRight);
         } else {
             rowLayout->addStretch(1);            // need this to get the label centered
