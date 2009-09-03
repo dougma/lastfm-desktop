@@ -69,7 +69,7 @@ MainWidget::onStartRadio(RadioStation rs)
 
     BackForwardControls* ctrl = new BackForwardControls(tr("Back"), rs.title(), NULL, w);
     connect(ctrl, SIGNAL(back()), SLOT(onBack()));
-    connect(radio, SIGNAL(stopped()), ctrl, SLOT(onBack()));
+    connect(radio, SIGNAL(stopped()), SLOT(onBackDelete()));
     m_layout->addWidget(ctrl);
     m_layout->moveForward();
 }
