@@ -97,6 +97,7 @@ public slots:
         if (!m_playing) {
             m_playing = true;
             emit playingStarted();
+            emit playingStateChange(m_playing);
         }
     }
 
@@ -105,12 +106,14 @@ public slots:
         if (m_playing) {
             m_playing = false;
             emit playingStopped();
+            emit playingStateChange(m_playing);
         }
     }
 
 signals:
     void playingStarted();
     void playingStopped();
+    void playingStateChange(bool);
 
 private:
     bool m_playing;
@@ -141,18 +144,19 @@ public:
             rowLayout->addWidget(button, 1, Qt::AlignLeft);
         }
         if (!mainLabel.isNull()) {
-            rowLayout->addWidget(new QLabel(mainLabel), Qt::AlignCenter);
+            rowLayout->addWidget(new QLabel(mainLabel), 1, Qt::AlignCenter);
         }
         if (nowPlaying) {
+            // a button which toggles enable/disabled state (use css to make it visible/invisible)
             QPushButton* button = new QPushButton(tr("Now Playing"));
             button->setObjectName("NowPlayingButton");
-            if (!nowPlaying->isPlaying()) {
-                button->hide();
-            }
+            button->setEnabled(nowPlaying->isPlaying());
             connect(button, SIGNAL(clicked()), SIGNAL(forward()));
-            connect(nowPlaying, SIGNAL(playingStarted()), button, SLOT(show()));
-            connect(nowPlaying, SIGNAL(playingStopped()), button, SLOT(hide()));
+            connect(nowPlaying, SIGNAL(playingStateChange(bool)), button, SLOT(setEnabled(bool)));
+            connect(nowPlaying, SIGNAL(playingStateChange(bool)), button, SLOT(setEnabled(bool)));
             rowLayout->addWidget(button, 1, Qt::AlignRight);
+        } else {
+            rowLayout->addStretch(1);            // need this to get the label centered
         }
         if (!backLabel.isNull() || nowPlaying) 
             layout->addLayout(rowLayout);
