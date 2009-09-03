@@ -32,6 +32,7 @@
 #include "lib/unicorn/UniqueApplication.h"
 #include "lib/unicorn/UnicornApplication.h"
 #include "MainWindow.h"
+#include "widgets/MessageBar.h"
 #include "Radio.h"
 #include "app/moose.h"
 
@@ -88,7 +89,6 @@ int main( int argc, char** argv )
 		
         radio = new Radio();
         qAddPostRoutine(cleanup);
-        app.connect( radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
         ScrobSocket* scrobsock = new ScrobSocket("ass");
         scrobsock->connect(radio, SIGNAL(trackSpooled(Track)), SLOT(start(Track)));
@@ -102,6 +102,7 @@ int main( int argc, char** argv )
         MainWindow window;
 
         q->connect(&window, SIGNAL(startRadio(RadioStation)), SLOT(onStartRadio(RadioStation)));
+        window.connect(radio, SIGNAL(error(int, QVariant)), SLOT(onRadioError(int, QVariant)) );
 
         window.setWindowTitle( app.applicationName() );
 

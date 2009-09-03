@@ -1,5 +1,6 @@
 /*
    Copyright 2005-2009 Last.fm Ltd. 
+      - Primarily authored by Max Howell, Jono Cole and Doug Mansell
 
    This file is part of the Last.fm Desktop Application Suite.
 
@@ -16,30 +17,37 @@
    You should have received a copy of the GNU General Public License
    along with lastfm-desktop.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef MESSAGE_BAR_H
+#define MESSAGE_BAR_H
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include <QWidget>
 
-#include "lib/unicorn/UnicornMainWindow.h"
-#include <lastfm/RadioStation>
 
-class MessageBar;
+/** @author <max@last.fm> */
 
-class MainWindow : public unicorn::MainWindow
+class MessageBar : public QWidget
 {
     Q_OBJECT
+    
+    class QTimeLine* m_timeline;
 
+    struct Ui {
+        QWidget* papyrus;
+    } ui;
+    
+    virtual void resizeEvent( QResizeEvent* );
+    void doLayout();
+    
 public:
-    MainWindow();
-
-signals:
-    void startRadio(const RadioStation&);
-
+    MessageBar();
+    
 public slots:
-    void onRadioError(int code, const QVariant& data);
-
-private:
-    MessageBar* m_messageBar;
+    void show( const QString&, const QString& id = QString() );
+    void remove( const QString& id );
+    
+private slots:
+    void animate( int );
+    void onLabelDestroyed();
 };
 
-#endif // MAINWINDOW_H
+#endif

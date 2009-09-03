@@ -41,6 +41,5 @@ namespace moralistfad
 	    /** all webservices connect to this and emit in the case of bad errors that
 	     * need to be handled at a higher level */
 	    void onWsError( lastfm::ws::Error );
-	    void onRadioError( int, const class QVariant& );
 	};
 }

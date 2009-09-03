@@ -30,56 +30,17 @@ Application::Application( int& argc, char** argv )
 {
 }
 
+// lastfmlib invokes this directly, for some errors:
 void
 Application::onWsError( lastfm::ws::Error e )
 {
     switch (e)
     {
-        case lastfm::ws::OperationFailed:
-            //TODOCOPY
-            //TODO use the non intrusive status messages
-            QMessageBoxBuilder( 0 ) //TODO window pointer
-                    .setTitle( "Oops" )
-                    .setText( "Last.fm is b0rked" )
-                    .exec();
-            break;
-
         case lastfm::ws::InvalidSessionKey:
             logout();
             break;
-			
 		default:
 			break;
-    }
-}
-
-void
-Application::onRadioError( int code, const QVariant& data )
-{
-    switch (code)
-    {
-        case lastfm::ws::NotEnoughContent:
-            emit error( tr("Sorry, there is no more content available for this radio station.") );
-            break;
-            
-        case lastfm::ws::MalformedResponse:
-        case lastfm::ws::TryAgainLater:
-            emit error( tr("Sorry, there was a radio error at Last.fm. Please try again later.") );
-            break;
-            
-        case lastfm::ws::SubscribersOnly:
-            emit error( tr("Sorry, this station is only available to Last.fm subscribers. "
-                           "<A href='http://www.last.fm/subscribe'>Sign up</a>.") );
-            break;
-
-        case lastfm::ws::UnknownError:
-            // string contains Phonon generated user readable error message
-            emit error( data.toString() );
-            break;
-
-        default:
-            emit error( tr("Sorry, an unexpected error occurred.") );
-            break;
     }
 }
 
