@@ -24,8 +24,9 @@
 #include "widgets/PlaybackControlsWidget.h"
 #include <lastfm/RadioStation>
 #include <QLineEdit>
-#include <QStatusBar>
 #include <QSizeGrip>
+#include <QStatusBar>
+#include <QStackedLayout>
 
 MainWindow::MainWindow()
 {
@@ -56,9 +57,12 @@ MainWindow::MainWindow()
     MainWidget* mw;
 
     QWidget* w = new QWidget();
-    QVBoxLayout* v = new QVBoxLayout(w);
-    v->addWidget(m_messageBar = new MessageBar());
-    v->addWidget(mw = new MainWidget());
+    // a stacked layout so the messagebar can intrude over the top
+    QStackedLayout* sl = new QStackedLayout(w);
+    sl->setStackingMode(QStackedLayout::StackAll);
+    sl->addWidget(m_messageBar = new MessageBar());
+    sl->addWidget(mw = new MainWidget());
+    sl->setCurrentWidget(m_messageBar);     // make sure it's on top.
     connect(mw, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
     AuthenticatedUser user;
