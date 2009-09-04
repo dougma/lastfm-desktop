@@ -39,7 +39,7 @@ class UniqueApplicationWidget : public QWidget
         
         Q_ASSERT(msg->hwnd == winId());
         COPYDATASTRUCT *data = (COPYDATASTRUCT*)msg->lParam;
-        QString message = QString::fromLatin1( (char*)data->lpData, data->cbData / 2 );
+        QString message = QString::fromLatin1( (const char*)data->lpData, data->cbData );
 
         emit app->arguments( message.split( QChar('\0') ) );
         
@@ -193,7 +193,7 @@ UniqueApplication::forward( const QStringList& args )
     
     COPYDATASTRUCT data;
     data.dwData = 0;
-    data.cbData = message.length()+1;
+    data.cbData = message.length();
     data.lpData = message.data();
     DWORD result;
     LRESULT res = SendMessageTimeoutA( m_hwnd, 
