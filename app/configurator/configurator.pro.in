@@ -1,0 +1,12 @@
+TEMPLATE = app
+TARGET = configurator
+VERSION = 2.0.0
+QT = core gui xml network phonon
+CONFIG += lastfm
+LIBS += -lunicorn
+
+include( $$ROOT_DIR/admin/include.qmake )
+
+DEFINES += LASTFM_COLLAPSE_NAMESPACE
+
+

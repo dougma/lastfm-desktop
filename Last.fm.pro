@@ -2,15 +2,16 @@ TEMPLATE = subdirs
 CONFIG += ordered
 SUBDIRS = lib/unicorn \
           lib/listener \
+          app/configurator \
           app/audioscrobbler \
           app/radio \
           app/twiddly \
           app/boffin
 
 debug:win32 {
-    # make the client the default project in visual studio
-    SUBDIRS -= app/boffin
-    SUBDIRS = app/boffin $$SUBDIRS
+    # reorder things to set the default project in visual studio
+    SUBDIRS -= app/configurator
+    SUBDIRS = app/configurator $$SUBDIRS
 }
 
 linux*:SUBDIRS -= app/twiddly

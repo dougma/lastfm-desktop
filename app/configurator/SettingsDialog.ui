@@ -1,0 +1,544 @@
+<ui version="4.0" >
+ <class>SettingsDialog</class>
+ <widget class="QDialog" name="SettingsDialog" >
+  <property name="windowModality" >
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>486</width>
+    <height>446</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Last.fm Settings</string>
+  </property>
+  <property name="modal" >
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>0</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QListWidget" name="pageSelector" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Maximum" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize" >
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
+     <property name="focusPolicy" >
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="layoutDirection" >
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth" >
+      <number>0</number>
+     </property>
+     <property name="horizontalScrollBarPolicy" >
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="autoScroll" >
+      <bool>false</bool>
+     </property>
+     <property name="editTriggers" >
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors" >
+      <bool>false</bool>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior" >
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="iconSize" >
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="textElideMode" >
+      <enum>Qt::ElideNone</enum>
+     </property>
+     <property name="movement" >
+      <enum>QListView::Static</enum>
+     </property>
+     <property name="flow" >
+      <enum>QListView::LeftToRight</enum>
+     </property>
+     <property name="isWrapping" stdset="0" >
+      <bool>true</bool>
+     </property>
+     <property name="resizeMode" >
+      <enum>QListView::Adjust</enum>
+     </property>
+     <property name="layoutMode" >
+      <enum>QListView::SinglePass</enum>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <property name="viewMode" >
+      <enum>QListView::IconMode</enum>
+     </property>
+     <property name="uniformItemSizes" >
+      <bool>false</bool>
+     </property>
+     <property name="selectionRectVisible" >
+      <bool>true</bool>
+     </property>
+     <property name="currentRow" >
+      <number>-1</number>
+     </property>
+     <item>
+      <property name="text" >
+       <string>General</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="widgets.qrc" >
+        <normaloff>:/SettingsDialog/account.png</normaloff>:/SettingsDialog/account.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Radio</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="widgets.qrc" >
+        <normaloff>:/SettingsDialog/radio.png</normaloff>:/SettingsDialog/radio.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Scrobbling</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="widgets.qrc" >
+        <normaloff>:/SettingsDialog/scrobbling.png</normaloff>:/SettingsDialog/scrobbling.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>iPod</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="widgets.qrc" >
+        <normaloff>:/SettingsDialog/ipod.png</normaloff>:/SettingsDialog/ipod.png</iconset>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="pageStack" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex" >
+      <number>2</number>
+     </property>
+     <widget class="QWidget" name="accountPage" >
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QCheckBox" name="logOutOnExit" >
+         <property name="text" >
+          <string>Log out on exit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="sendCrashReportsToLastFm" >
+         <property name="text" >
+          <string>Send crash reports to Last.fm</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QLabel" name="languageLabel" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Language:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="languages" >
+           <property name="minimumSize" >
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="modelColumn" >
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>181</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="radioPage" >
+      <layout class="QVBoxLayout" name="verticalLayout" >
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout" >
+         <item>
+          <widget class="QLabel" name="label_2" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Output device:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="outputDevice" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer" >
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="scrobblingPage" >
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QLabel" name="label_13" >
+         <property name="text" >
+          <string>By default the track scrobbles halfway, you can increase this if you like:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="leftMargin" >
+          <number>9</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_12" >
+           <property name="text" >
+            <string>Scrobble at</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="scrobblePointPercentage" >
+           <property name="suffix" >
+            <string>%</string>
+           </property>
+           <property name="minimum" >
+            <number>50</number>
+           </property>
+           <property name="maximum" >
+            <number>100</number>
+           </property>
+           <property name="singleStep" >
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="label" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Ignored" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Please note that the maximum scrobble point is 4 minutes</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>12</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="launchWithMediaPlayers" >
+         <property name="text" >
+          <string>Launch with media players</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="fingerprintingEnabled" >
+         <property name="text" >
+          <string>Enable fingerprinting</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>12</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Don't scrobble files under these paths:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPlainTextEdit" name="forbiddenPaths" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="iPodPage" >
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="QCheckBox" name="iPodScrobblingEnabled" >
+         <property name="text" >
+          <string>Enable iPod Scrobbling</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="alwaysConfirmIPodScrobbles" >
+         <property name="text" >
+          <string>Always confirm iPod scrobbles</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer" >
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <zorder>pageSelector</zorder>
+  <zorder>line</zorder>
+  <zorder>buttonBox</zorder>
+  <zorder>pageStack</zorder>
+ </widget>
+ <resources>
+  <include location="widgets.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>311</x>
+     <y>370</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>83</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>224</x>
+     <y>370</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>368</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pageSelector</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>pageStack</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>354</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>361</x>
+     <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
