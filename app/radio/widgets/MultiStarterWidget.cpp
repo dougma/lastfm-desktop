@@ -52,7 +52,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     
     QTabWidget* tabwidget = new QTabWidget();
 
-    tabwidget->addTab(new YouListWidget(this), tr("You"));
+    tabwidget->addTab(new YouListWidget(lastfm::ws::Username, this), tr("You"));
     
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
     tabwidget->addTab(m_artists, tr("Artists"));
