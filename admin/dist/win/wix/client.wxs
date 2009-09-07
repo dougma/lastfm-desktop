@@ -1,85 +1,161 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="d81df4a9-959c-4583-be16-0b004104246b" Name="Last.fm" Language="1033" Version="1.0.0.0" Manufacturer="Last.fm" UpgradeCode="2b30baf0-ec7d-48fd-b5e6-cedf588c53fd">
+	<Product 
+    Id="AC9C3551-7256-45e3-BDAB-D2BA00A9FB45" 
+    Name="Last.fm" 
+    Language="1033" 
+    Manufacturer="Last.fm" 
+    Version="2.0.0" 
+    UpgradeCode="2b30baf0-ec7d-48fd-b5e6-cedf588c53fd">
+    
 		<Package 
         Description="Last.fm" 
         Manufacturer="Last.fm Ltd." 
-        InstallerVersion="200"
+        InstallerVersion="300"
         Compressed="yes" />
+        
+        <Upgrade Id="2b30baf0-ec7d-48fd-b5e6-cedf588c53fd">
+            <UpgradeVersion 
+            Minimum="1.0.0"
+            IncludeMinimum="yes"
+            Maximum="2.0.0"
+            Property="THISMUSTBEALLCAPS" />
+        </Upgrade>
+        
+        <Upgrade Id="2b30baf0-ec7d-48fd-b5e6-cedf588c53fd">
+            <UpgradeVersion 
+            Minimum="1.0.0"
+            OnlyDetect="yes"
+            Property="NEWERVERSIONDETECTED" />
+        </Upgrade>
+        
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallInitialize"/>
+        </InstallExecuteSequence>
+        
+        <Condition Message="A later version of [ProductName] is already installed. Kthxbai.">
+            NOT NEWERVERSIONDETECTED OR Installed
+        </Condition>
 
-    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <UIRef Id="WixUI_InstallDir" />
-    <UIRef Id="WixUI_ErrorProgressText" />
-
-    <Directory Id="TARGETDIR" Name="SourceDir">
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <UIRef Id="WixUI_InstallDir" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+        <WixVariable Id="WixUILicenseRtf" Value="eula.rtf" />        
+        
+        <Directory Id="TARGETDIR" Name="SourceDir">
+        
+            <!-- start menu items -->
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="lastfmMenuFolder" Name="Last.fm v2">
+                    <Component Id="lastfmShortcutComponent" Guid="*">
+                        <RegistryKey Root="HKCU" Key="Software\Last.fm\Last.fm\shortcut">
+                            <RegistryValue Value="" Type="string" KeyPath="yes"/>
+                        </RegistryKey>
+                        <Shortcut Id="launchLastfmRadio"
+                                  Name="Last.fm Radio"
+                                  Target="[INSTALLDIR]radio.exe"
+                                  Arguments="-stylesheet=[INSTALLDIR]radio.css"
+                                  Directory="lastfmMenuFolder" />
+                        <Shortcut Id="launchAudioscrobbler"
+                                  Name="Audioscrobbler"
+                                  Target="[INSTALLDIR]audioscrobbler.exe"
+                                  Arguments="-stylesheet=[INSTALLDIR]audioscrobbler.css"
+                                  Directory="lastfmMenuFolder" />
+                        <Shortcut Id="uninstallBoffin"
+                                  Name="Uninstall Last.fm"
+                                  Target="[System64Folder]msiexec.exe"
+                                  Arguments="/x {AC9C3551-7256-45e3-BDAB-D2BA00A9FB45}"
+                                  Directory="lastfmMenuFolder"
+                                  Description="Uninstalls Last.fm" />
+                        <RemoveFolder Id="removeShortcutFolder" On="uninstall" />
+                    </Component>
+                </Directory>
+            </Directory>
+        
+        
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLDIR" Name="Last.fm v2">
 					<Component Id="MainBit" Guid="d8f98724-51fe-4398-96df-2e156b19fc21">
-            <File Id="lastfmexe" Name="Last.fm.exe" Source="Last.fm.exe" />
-            <File Id="twiddlyexe" Name="twiddly.exe" Source="twiddly.exe" DefaultLanguage="0" />
-            <File Id="coredll" Name="core.dll" Source="core.dll" />
-            <File Id="fingerprintdll" Name="fingerprint.dll" Source="fingerprint.dll" />
-            <File Id="libfftw3f3dll" Name="libfftw3f-3.dll" Source="libfftw3f-3.dll" />
-            <File Id="listenerdll" Name="listener.dll" Source="listener.dll" />
-            <File Id="radiodll" Name="radio.dll" Source="radio.dll" />
-            <File Id="scrobbledll" Name="scrobble.dll" Source="scrobble.dll" />
-            <File Id="sqlite3dll" Name="sqlite3.dll" Source="sqlite3.dll" />
-            <File Id="tagdll" Name="tag.dll" Source="tag.dll" />
-            <File Id="typesdll" Name="types.dll" Source="types.dll" />
-            <File Id="unicorndll" Name="unicorn.dll" Source="unicorn.dll" />
-            <File Id="wsdll" Name="ws.dll" Source="ws.dll" />
-            <RegistryKey Root="HKLM" Key="Software">
-              <RegistryKey Key="Last.fm" Action="create">
-                <RegistryValue Key="Client" Name="Path" Action="write" Type="string" Value="[INSTALLDIR]Last.fm.exe" />
-              </RegistryKey>
-            </RegistryKey>
-            
-            <!-- register association and icon for .xspf -->
-            <ProgId Id="Last.fm.xspf" Description="XML Shareable Playlist Format">
-              <Extension Id="xspf" ContentType="application/xspf+xml">
-                <Verb Id='open' Command='Open' TargetFile='lastfmexe' Argument='"%1"' />
-              </Extension>
-            </ProgId>
-            <RegistryValue Id='icon' Root="HKCR" Key='Last.fm.xspf\DefaultIcon' Action='write' Type='string' Value='[INSTALLDIR]Last.fm.exe,1' />
+                        <File Id="qtconf" Name="qt.conf" Source="qt.conf" /> 
+                        <File Id="radioexe" Name="radio.exe" Source="radio.exe" />
+                        <File Id="audioscrobblerexe" Name="audioscrobbler.exe" Source="audioscrobbler.exe" />
+                        <File Id="twiddlyexe" Name="twiddly.exe" Source="twiddly.exe" DefaultLanguage="0" />
+                        <File Id="lastfmdll" Name="lastfm.dll" Source="lastfm.dll" />
+                        <File Id="lastfm_fingerprintdll" Name="lastfm_fingerprint.dll" Source="lastfm_fingerprint.dll" />
+                        <File Id="libfftw3f3dll" Name="libfftw3f-3.dll" Source="libfftw3f-3.dll" />
+                        <File Id="listenerdll" Name="listener.dll" Source="listener.dll" />
+                        <File Id="unicorndll" Name="unicorn.dll" Source="unicorn.dll" />
+                        
+                        <File Id="radiocss" Name="radio.css" Source="app\radio\main.css" />
+                        <File Id="audioscrobblercss" Name="audioscrobbler.css" Source="app\audioscrobbler\main.css" />
+                        
+                        <RegistryKey Root="HKLM" Key="Software">
+                            <RegistryKey Key="Last.fm" Action="create">
+                                <RegistryValue Key="Client" Name="Path" Action="write" Type="string" Value="[INSTALLDIR]radio.exe" />
+                            </RegistryKey>
+                        </RegistryKey>
 
-          </Component>
+                    </Component>
 
-          <Component Id="Qt4" Guid="A78D4DC2-2523-438b-B5F5-EF441911124F">
-            <File Id="qtwebkit4dll" Name="qtwebkit4.dll" Source="qtwebkit4.dll" DefaultLanguage="0" />
-            <File Id="phonon4dll" Name="phonon4.dll" Source="phonon4.dll" DefaultLanguage="0" />
-            <File Id="qtsvg4dll" Name="qtsvg4.dll" Source="qtsvg4.dll" DefaultLanguage="0" />
-            <File Id="qtxml4dll" Name="qtxml4.dll" Source="qtxml4.dll" DefaultLanguage="0" />
-            <File Id="qtgui4dll" Name="qtgui4.dll" Source="qtgui4.dll" DefaultLanguage="0" />
-            <File Id="qtnetwork4dll" Name="qtnetwork4.dll" Source="qtnetwork4.dll" DefaultLanguage="0" />
-            <File Id="qtcore4dll" Name="qtcore4.dll" Source="qtcore4.dll" DefaultLanguage="0" />
-          </Component>
+                    <Component Id="Qt4" Guid="0A0987A0-8CB1-491d-A074-2A8005DA326A">
+                        <!-- <File Id="qtwebkit4dll" Name="qtwebkit4.dll" Source="qtwebkit4.dll" /> -->
+                        <!-- <File Id="qtsvg4dll" Name="qtsvg4.dll" Source="qtsvg4.dll" /> -->
+                        <File Id="phonon4dll" Name="phonon4.dll" Source="phonon4.dll" />
+                        <!-- <File Id="qtsql4dll" Name="qtsql4.dll" Source="qtsql4.dll" /> -->
+                        <File Id="qtxml4dll" Name="qtxml4.dll" Source="qtxml4.dll" />
+                        <File Id="qtgui4dll" Name="qtgui4.dll" Source="qtgui4.dll" />
+                        <File Id="qtnetwork4dll" Name="qtnetwork4.dll" Source="qtnetwork4.dll" />
+                        <File Id="qtcore4dll" Name="qtcore4.dll" Source="qtcore4.dll" />
+                        <File Id="qtopengl4dll" Name="qtopengl4.dll" Source="qtopengl4.dll" />
+                    </Component>
 
-          <Directory Id="PluginsFolder" Name="plugins">
-            <Component Id="ResolverPlugin" Guid="86552379-CE2B-411d-BDF6-588FC95658BD">
-              <File Id="resolverdll" Name="resolver.dll" Source="resolver.dll" />
-            </Component>
-          </Directory>
+                    <Directory Id="imageformatsDir" Name="imageformats">
+                        <Component Id="imageformatsComponent" Guid="52944572-8766-4a99-8207-5F110EA00705">
+                        <File Id="qjpeg4dll" Name="qjpeg4.dll" Source="imageformats\qjpeg4.dll" />
+                        <File Id="qgif4dll" Name="qgif4.dll" Source="imageformats\qgif4.dll" />
+                        <File Id="qmng4dll" Name="qmng4.dll" Source="imageformats\qmng4.dll" />
+                        </Component>
+                    </Directory>
+
+                    <!-- <Directory Id="sqldriversDir" Name="sqldrivers">
+                        <Component Id="sqldriversComponent" Guid="97429E06-A2EC-489d-8672-79385F85E804">
+                            <File Id="qsqlite4dll" Name="qsqlite4.dll" Source="sqldrivers\qsqlite4.dll" />
+                        </Component>
+                    </Directory> -->
+
+                    <Directory Id="phononBackendDir" Name="phonon_backend">
+                        <Component Id="phononBackendComponent" Guid="9E1C98AB-52E8-4ca6-86A8-FDF6B3C23DE0">
+                            <File Id="phonon_ds94dll" Name="phonon_ds94.dll" Source="phonon_backend\phonon_ds94.dll" />
+                        </Component>
+                    </Directory>
+
+                    <Merge Id="crt1" Language="0" SourceFile="Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+                    <Merge Id="crt2" Language="0" SourceFile="policy_8_0_Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+                    
+                </Directory>
+            </Directory>
         </Directory>
-      </Directory>
-    </Directory>
 
-
-
-    <!-- clean up: 
+<!-- clean up: 
     ideally we'd remove ..\AppData\Local\Last.fm for each user,
-    but we msi doesn't provide any mechanism to help us with that -->
+    but thee msi doesn't provide any mechanism to help us with that -->
 <!--    
     <Directory Id="" Name="AppData">
-     
     </Directory>
 -->
 
-    <Feature Id="Complete" Title="feature" Level="1">
-			<ComponentRef Id="MainBit" />
-      <ComponentRef Id="Qt4" />
-      <ComponentRef Id="ResolverPlugin" />
-    </Feature>
+        <Feature Id="Complete" Title="feature" Level="1">
+            <ComponentRef Id="MainBit" />
+            <ComponentRef Id="Qt4" />
+            <ComponentRef Id="imageformatsComponent" />
+            <!-- <ComponentRef Id="sqldriversComponent" /> -->
+            <ComponentRef Id="phononBackendComponent" />
+            <ComponentRef Id="lastfmShortcutComponent" />
+            <MergeRef Id="crt1" />
+            <MergeRef Id="crt2" />
+        </Feature>
+        
 	</Product>
 </Wix>
