@@ -43,6 +43,8 @@
         <UIRef Id="WixUI_InstallDir" />
         <UIRef Id="WixUI_ErrorProgressText" />
         <WixVariable Id="WixUILicenseRtf" Value="eula.rtf" />        
+        <WixVariable Id="WixUIDialogBmp" Value="..\installer1_icon.bmp" />
+        <WixVariable Id="WixUIBannerBmp" Value="..\installer2_icon.bmp" />
         
         <Directory Id="TARGETDIR" Name="SourceDir">
         
