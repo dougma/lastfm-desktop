@@ -31,6 +31,7 @@
 #include "SourceSelectorWidget.h"
 #include "SourceListWidget.h"
 #include "../SourceListModel.h"
+#include "../layouts/SideBySideLayout.h"
 #include "SearchBox.h"
 #include "YouListWidget.h"
 
@@ -53,9 +54,14 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     
     QTabWidget* tabwidget = new QTabWidget();
 
-    YouListWidget* youWidget = new YouListWidget(lastfm::ws::Username, this);
-    tabwidget->addTab(youWidget, tr("You"));
-    connect(youWidget, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+    {
+        m_youWidget = new QWidget(this);
+        SideBySideLayout* layout = new SideBySideLayout(m_youWidget);
+        YouListWidget* you = new YouListWidget(lastfm::ws::Username, this);
+        connect(you, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+        layout->addWidget(you);
+        tabwidget->addTab(m_youWidget, tr("You"));
+    }
 
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
     tabwidget->addTab(m_artists, tr("Artists"));
@@ -163,7 +169,11 @@ MultiStarterWidget::onYouItemActivated(QTreeWidgetItem* i, int)
         QString activatedUsername = i->data(0, SourceListModel::Arg1).toString();
         YouListWidget* you = (YouListWidget*) sender();
         if (activatedUsername != you->username()) {
-            // slide forward...
+            // slide forward
+            YouListWidget* w = new YouListWidget(activatedUsername, this);
+            connect(w, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+            m_youWidget->layout()->addWidget(w);
+            ((SideBySideLayout*)m_youWidget->layout())->moveForward();
             return;
         }
     }
