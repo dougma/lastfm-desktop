@@ -28,6 +28,22 @@ class YouListWidget : public QTreeWidget
 
 public:
     YouListWidget(const QString& username, QWidget* parent = 0);
+
+    QString username() const { return m_username; }
+
+private slots:
+    void gotFriends();
+    void gotTopArtists();
+    void gotTopTags();
+    void gotPlaylists();
+
+private:
+    QTreeWidgetItem* m_friendsItem;
+    QTreeWidgetItem* m_artistsItem;
+    QTreeWidgetItem* m_tagsItem;
+    QTreeWidgetItem* m_playlistsItem;
+
+    QString m_username;
 };
 
 #endif // YOU_LIST_WIDGET_H_

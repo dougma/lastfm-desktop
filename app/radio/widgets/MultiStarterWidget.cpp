@@ -24,6 +24,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QTreeWidgetItem>
 #include <lastfm/User>
 #include <lastfm/XmlQuery>
 #include "MultiStarterWidget.h"
@@ -52,8 +53,10 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     
     QTabWidget* tabwidget = new QTabWidget();
 
-    tabwidget->addTab(new YouListWidget(lastfm::ws::Username, this), tr("You"));
-    
+    YouListWidget* youWidget = new YouListWidget(lastfm::ws::Username, this);
+    tabwidget->addTab(youWidget, tr("You"));
+    connect(youWidget, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
     tabwidget->addTab(m_artists, tr("Artists"));
     connect(m_artists, SIGNAL(add(QString)), SLOT(onAdd(QString)));
@@ -144,6 +147,33 @@ MultiStarterWidget::onAddItem(QListWidgetItem* item)
     onAdd(
         item->data(Qt::DisplayRole).toString(), 
         item->data(Qt::DecorationRole).toString());
+}
+
+void
+MultiStarterWidget::onYouItemActivated(QTreeWidgetItem* i, int)
+{
+    QVariant vType = i->data(0, SourceListModel::SourceType);
+    if (vType.isNull())
+        return;
+
+    RqlSource::Type sourceType = (RqlSource::Type) vType.toInt();
+    if (sourceType == RqlSource::User) {
+        // may be the "current" user, or a friend... a friend
+        // user slides forward to the friend's profile
+        QString activatedUsername = i->data(0, SourceListModel::Arg1).toString();
+        YouListWidget* you = (YouListWidget*) sender();
+        if (activatedUsername != you->username()) {
+            // slide forward...
+            return;
+        }
+    }
+
+    m_sourceModel->addSource(RqlSource(
+        sourceType,
+        i->data(0, SourceListModel::Arg1).toString(),
+        i->data(0, SourceListModel::Arg2).toString(),
+        1.0,
+        i->data(0, SourceListModel::ImageUrl).toString()));     
 }
 
 void
