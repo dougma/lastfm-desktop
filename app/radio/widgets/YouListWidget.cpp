@@ -110,8 +110,9 @@ YouListWidget::gotTopTags()
     foreach (lastfm::XmlQuery e, lfm["toptags"].children("tag")) {
         QString tag = e["name"].text();
         QTreeWidgetItem* item = new QTreeWidgetItem(m_tagsItem, QStringList(tag));
-        item->setData(0, SourceListModel::SourceType, RqlSource::Tag);
+        item->setData(0, SourceListModel::SourceType, RqlSource::PersonalTag);
         item->setData(0, SourceListModel::Arg1, tag);
+        item->setData(0, SourceListModel::Arg2, m_username);
     }
 }
 
