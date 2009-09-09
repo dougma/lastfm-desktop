@@ -47,7 +47,7 @@ SourceSelectorWidget::SourceSelectorWidget(QLineEdit* edit, QWidget* parent)
     connect(m_edit, SIGNAL(returnPressed()), SLOT(emitAdd())); 
     connect(m_edit, SIGNAL(textChanged(QString)), SLOT(onTextChanged(QString)));
     connect(m_button, SIGNAL(clicked()), SLOT(emitAdd()));
-    connect(m_list, SIGNAL(itemClicked(QListWidgetItem *)), SIGNAL(itemActivated(QListWidgetItem *)));
+    connect(m_list, SIGNAL(itemActivated(QListWidgetItem *)), SIGNAL(itemActivated(QListWidgetItem *)));
 }
 
 QListWidget* 
