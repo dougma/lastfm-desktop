@@ -25,6 +25,7 @@
 #include <QListWidgetItem>
 
 class QSlider;
+class QCheckBox;
 class QPushButton;
 class QTreeWidgetItem;
 class SourceListModel;
@@ -62,6 +63,7 @@ private:
     QWidget* m_sliders;
     QSlider* m_repSlider;
     QSlider* m_mainstrSlider;
+    QCheckBox* m_disco;
     QPushButton* m_playButton;
     const int m_minTagCount;
     const int m_minArtistCount;

@@ -133,6 +133,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     m_mainstrSlider->setMaximum(8);
     m_mainstrSlider->setValue(4);
     rightside->addWidget(m_sliders);
+    rightside->addWidget(m_disco = new QCheckBox(tr("Discovery mode")));
     rightside->addWidget(m_playButton = new QPushButton(tr("Play combo")));
 
     grid->addLayout(titleLayout, 0, 0, 1, 2);
@@ -152,11 +153,13 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     onCheckBox(checkbox->checkState());
 }
 
+// "show options" checkbox:
 void
 MultiStarterWidget::onCheckBox(int checkState)
 {
     m_sliders->setVisible(checkState == Qt::Checked);
     m_sourceList->updateAdvanced(checkState);
+    m_disco->setVisible(checkState == Qt::Checked);
 }
 
 void
@@ -289,16 +292,21 @@ void
 MultiStarterWidget::onPlayClicked()
 {
     QString rql = m_sourceList->rql();
-    float r = m_repSlider->value() / (float) m_repSlider->maximum();
-    if (r != 0.5) {
-        rql += QString(" opt:rep|%1").arg(r);
+    if (rql.length()) {
+        float r = m_repSlider->value() / (float) m_repSlider->maximum();
+        if (r != 0.5) {
+            rql += QString(" opt:rep|%1").arg(r);
+        }
+        float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
+        if (m != 0.5) {
+            rql += QString(" opt:mainstr|%1").arg(m);
+        }
+        if (m_disco->isChecked()) {
+            rql += QString(" opt:discovery|true");
+        }
+        qDebug() << rql;
+        RadioStation rs = RadioStation::rql(rql);
+        rs.setTitle(m_sourceList->stationDescription());
+        emit startRadio(rs);
     }
-    float m = m_mainstrSlider->value() / (float) m_mainstrSlider->maximum();
-    if (m != 0.5) {
-        rql += QString(" opt:mainstr|%1").arg(m);
-    }
-    qDebug() << rql;
-    RadioStation rs = RadioStation::rql(rql);
-    rs.setTitle(m_sourceList->stationDescription());
-    emit startRadio(rs);
 }
