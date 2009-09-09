@@ -18,7 +18,7 @@
 */
 
 #include "YouListWidget.h"
-#include "..\SourceListModel.h"
+#include "../SourceListModel.h"
 #include <lastfm.h>
 
 
