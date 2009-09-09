@@ -90,8 +90,8 @@
                         <File Id="listenerdll" Name="listener.dll" Source="listener.dll" />
                         <File Id="unicorndll" Name="unicorn.dll" Source="unicorn.dll" />
                         
-                        <File Id="radiocss" Name="radio.css" Source="app\radio\main.css" />
-                        <File Id="audioscrobblercss" Name="audioscrobbler.css" Source="app\audioscrobbler\main.css" />
+                        <File Id="radiocss" Name="radio.css" Source="app\radio\radio.css" />
+                        <File Id="audioscrobblercss" Name="audioscrobbler.css" Source="app\audioscrobbler\audioscrobbler.css" />
                         
                         <RegistryKey Root="HKLM" Key="Software">
                             <RegistryKey Key="Last.fm" Action="create">
