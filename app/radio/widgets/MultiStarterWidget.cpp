@@ -37,6 +37,19 @@
 
 #include <QGroupBox>
 
+class LabelledSlider : public QSlider
+{
+public:
+    LabelledSlider(const QString& leftText, const QString& rightText)
+        : QSlider(Qt::Horizontal)
+    {
+        QLayout* layout = new QHBoxLayout(this);
+        layout->addWidget(new QLabel(leftText));
+//        layout->addWidget(this);
+        layout->addWidget(new QLabel(rightText));
+    }
+};
+
 
 MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *parent)
     : StylableWidget(parent)
@@ -64,19 +77,21 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     }
 
     m_artists = new SourceSelectorWidget(new ArtistSearch());    
-    tabwidget->addTab(m_artists, tr("Artists"));
+    tabwidget->addTab(m_artists, tr("Top Artists"));
     connect(m_artists, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_artists, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
     m_tags = new SourceSelectorWidget(new TagSearch());
-    tabwidget->addTab(m_tags, tr("Tags"));
+    tabwidget->addTab(m_tags, tr("Top Tags"));
     connect(m_tags, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_tags, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
 
+/*
     m_users = new SourceSelectorWidget(new UserSearch());
     tabwidget->addTab(m_users, tr("Friends"));
     connect(m_users, SIGNAL(add(QString)), SLOT(onAdd(QString)));
     connect(m_users, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(onAddItem(QListWidgetItem*)));
+*/
 
     m_sourceModel = new SourceListModel(maxSources, this);
     m_sourceList = new SourceListWidget(this);
@@ -86,10 +101,27 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     rightside->addWidget(m_sourceList);
 
     QVBoxLayout* sliderslayout = new QVBoxLayout();
-    sliderslayout->addWidget(new QLabel(tr("Repetition")));
-    sliderslayout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
-    sliderslayout->addWidget(new QLabel(tr("Mainstreamness")));
-    sliderslayout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+    {
+        QLabel* label = new QLabel(tr("Type of tracks played"));
+        label->setObjectName("sliderDescription");
+        sliderslayout->addWidget(label, Qt::AlignCenter);       // although it doesn't seem to center :(
+        QLayout* layout = new QHBoxLayout(this);
+        layout->addWidget(new QLabel(tr("Popular")));
+        layout->addWidget(m_mainstrSlider = new QSlider(Qt::Horizontal));
+        layout->addWidget(new QLabel(tr("Obscure")));
+        sliderslayout->addLayout(layout);
+    }
+    {
+        QLabel* label = new QLabel(tr("Tracks from the same artist"));
+        label->setObjectName("sliderDescription");
+        sliderslayout->addWidget(label, Qt::AlignCenter);
+        QLayout* layout = new QHBoxLayout(this);
+        layout->addWidget(new QLabel(tr("More")));
+        layout->addWidget(m_repSlider = new QSlider(Qt::Horizontal));
+        layout->addWidget(new QLabel(tr("Less")));
+        sliderslayout->addLayout(layout);
+    }
+    
     m_sliders = new QWidget();
     m_sliders->setLayout(sliderslayout);
     m_sliders->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed));
@@ -101,7 +133,7 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
     m_mainstrSlider->setMaximum(8);
     m_mainstrSlider->setValue(4);
     rightside->addWidget(m_sliders);
-    rightside->addWidget(m_playButton = new QPushButton(tr("Play")));
+    rightside->addWidget(m_playButton = new QPushButton(tr("Play combo")));
 
     grid->addLayout(titleLayout, 0, 0, 1, 2);
     grid->addWidget(tabwidget, 1, 0);
@@ -111,11 +143,11 @@ MultiStarterWidget::MultiStarterWidget(bool advanced, int maxSources, QWidget *p
 
     connect(m_playButton, SIGNAL(clicked()), SLOT(onPlayClicked()));
 
-    ///
-    lastfm::AuthenticatedUser you;
-    connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
-    connect(you.getTopArtists(), SIGNAL(finished()), SLOT(onUserGotTopArtists()));
-    connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
+    //lastfm::AuthenticatedUser you;
+    //connect(you.getTopTags(), SIGNAL(finished()), SLOT(onUserGotTopTags()));
+    //connect(you.getTopArtists(), SIGNAL(finished()), SLOT(onUserGotTopArtists()));
+    //connect(you.getFriends(), SIGNAL(finished()), SLOT(onUserGotFriends()));
+    connect(Tag::getTopTags(), SIGNAL(finished()), SLOT(onGotTopTags()));
 
     onCheckBox(checkbox->checkState());
 }
@@ -205,7 +237,7 @@ MultiStarterWidget::onYouBack()
 }
 
 void
-MultiStarterWidget::onUserGotTopTags()
+MultiStarterWidget::onGotTopTags()
 {
     sender()->deleteLater();
     QNetworkReply* r = (QNetworkReply*)sender();
@@ -216,9 +248,6 @@ MultiStarterWidget::onUserGotTopTags()
         tags += e["name"].text();
     }
     m_tags->list()->insertItems(0, tags);
-    if (tags.size() < m_minTagCount) {
-        // get global top tags
-    }
 }
 
 void

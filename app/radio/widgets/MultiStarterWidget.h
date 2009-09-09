@@ -45,7 +45,7 @@ private slots:
     void onAdd(const QString& item, const QString& imgUrl = QString());
     void onAddItem(QListWidgetItem* item);
     void onPlayClicked();
-    void onUserGotTopTags();
+    void onGotTopTags();
     void onUserGotTopArtists();
     void onUserGotFriends();
     void onCheckBox(int checkState);

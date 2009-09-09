@@ -313,6 +313,10 @@ MultiStarterWidget SourceListWidget SourceItemWidget {
     spacing: 0px;
 }
 
+MultiStarterWidget QLabel#sliderDescription {
+    color: #808080;
+}
+
 YouListWidget {
     border: none;
     background-color: white;
