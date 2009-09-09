@@ -19,14 +19,23 @@
 
 #include "YouListWidget.h"
 #include "../SourceListModel.h"
+#include "lib/unicorn/UnicornSettings.h"
 #include <lastfm.h>
 
 
 YouListWidget::YouListWidget(const QString& username, QWidget* parent)
     : QTreeWidget(parent) 
     , m_username(username)
+    , m_subscriber(false)
 {
     QString displayName = (username == lastfm::ws::Username) ? "Your " : username + "'s ";
+
+    // subscribers can listen to loved tracks and personal tags.
+    {
+        unicorn::UserSettings us;
+        QVariant v = us.value(unicorn::UserSettings::subscriptionKey(), false);
+        m_subscriber = v.toBool();
+    }
 
     setAlternatingRowColors( true );
     setHeaderHidden( true );
@@ -44,6 +53,10 @@ YouListWidget::YouListWidget(const QString& username, QWidget* parent)
     item = new QTreeWidgetItem(h, QStringList(displayName + "Loved Tracks"));
     item->setData(0, SourceListModel::SourceType, RqlSource::Loved);
     item->setData(0, SourceListModel::Arg1, username);
+    if (!m_subscriber) {
+        item->setDisabled(true);
+        item->setToolTip(0, tr("Loved tracks are playable by subscribers"));
+    }
     item = new QTreeWidgetItem(h, QStringList(displayName + "Recommendations"));
     item->setData(0, SourceListModel::SourceType, RqlSource::Rec);
     item->setData(0, SourceListModel::Arg1, username);
@@ -113,6 +126,10 @@ YouListWidget::gotTopTags()
         item->setData(0, SourceListModel::SourceType, RqlSource::PersonalTag);
         item->setData(0, SourceListModel::Arg1, tag);
         item->setData(0, SourceListModel::Arg2, m_username);
+        if (!m_subscriber) {
+            item->setDisabled(true);
+            item->setToolTip(0, tr("Personal tags are playable by subscribers"));
+        }
     }
 }
 

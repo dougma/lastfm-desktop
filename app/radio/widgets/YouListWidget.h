@@ -44,6 +44,7 @@ private:
     QTreeWidgetItem* m_playlistsItem;
 
     QString m_username;
+    bool m_subscriber;
 };
 
 #endif // YOU_LIST_WIDGET_H_

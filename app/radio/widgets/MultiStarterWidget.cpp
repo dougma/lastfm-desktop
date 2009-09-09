@@ -193,6 +193,9 @@ MultiStarterWidget::onAddItem(QListWidgetItem* item)
 void
 MultiStarterWidget::onYouItemActivated(QTreeWidgetItem* i, int)
 {
+    if (i->isDisabled())
+        return;             // don't know how it gets activated, but it does...
+
     QVariant vType = i->data(0, SourceListModel::SourceType);
     if (vType.isNull())
         return;
