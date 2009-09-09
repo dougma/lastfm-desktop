@@ -263,3 +263,24 @@ MainWidget::onUserGotRecentStations()
             qobject_cast<QNetworkReply*>(sender())));
 }
 
+
+
+void
+MainWidget::rawrql()
+{
+    bool ok;
+    QString rql = QInputDialog::getItem(this, 
+        "Direct RQL tuning",
+        "RQL", 
+        m_rawrqlItems,
+        0,
+        true, //editable
+        &ok);
+    if (ok && !rql.isEmpty()) {
+        m_rawrqlItems.prepend(rql);
+        RadioStation rs = RadioStation::rql(rql);
+        onStartRadio(rs);
+        emit startRadio(rs);
+    }
+}
+

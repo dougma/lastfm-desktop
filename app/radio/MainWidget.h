@@ -65,6 +65,8 @@ private slots:
     void onFriendActivated(const QModelIndex& idx);
     void onPlaylistActivated(const QModelIndex& idx);
 
+    void rawrql();
+
 private:
     SideBySideLayout* m_layout;
     NowPlayingState* m_nowPlaying;
@@ -72,6 +74,8 @@ private:
     QStringList m_tags;
     QList<PlaylistMeta> m_playlists;
     RadioStationListModel m_recentModel;
+
+    QStringList m_rawrqlItems;
 };
 
 

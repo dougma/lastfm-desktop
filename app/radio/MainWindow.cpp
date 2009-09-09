@@ -27,6 +27,7 @@
 #include <QSizeGrip>
 #include <QStatusBar>
 #include <QStackedLayout>
+#include <QMenuBar>
 
 MainWindow::MainWindow()
 {
@@ -74,6 +75,9 @@ MainWindow::MainWindow()
     setCentralWidget( w );
 
     finishUi();
+
+    //todo: bury this:
+    menuBar()->addMenu("Normania")->addAction( tr("RQL"), mw, SLOT(rawrql()), QKeySequence(tr("Ctrl+r")) );
 }
 
 void
@@ -105,4 +109,3 @@ MainWindow::onRadioError(int code, const QVariant& data)
             break;
     }
 }
-
