@@ -11,3 +11,5 @@ DEFINES += LASTFM_COLLAPSE_NAMESPACE
 
 SOURCES -= LegacyTuner.cpp
 HEADERS -= LegacyTuner.h
+
+#RC_FILE = radio.rc
