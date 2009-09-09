@@ -50,6 +50,7 @@ private slots:
     void onUserGotFriends();
     void onCheckBox(int checkState);
     void onYouItemActivated(QTreeWidgetItem*, int);
+    void onYouBack();
 
 private:
     SourceListModel* m_sourceModel;

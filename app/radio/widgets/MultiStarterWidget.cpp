@@ -169,9 +169,17 @@ MultiStarterWidget::onYouItemActivated(QTreeWidgetItem* i, int)
         QString activatedUsername = i->data(0, SourceListModel::Arg1).toString();
         YouListWidget* you = (YouListWidget*) sender();
         if (activatedUsername != you->username()) {
-            // slide forward
-            YouListWidget* w = new YouListWidget(activatedUsername, this);
-            connect(w, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+            // make a profile widget with a back button
+            QWidget* w = new QWidget(this);
+            QLayout* l = new QVBoxLayout(w);
+            QPushButton* b = new QPushButton("back");
+            connect(b, SIGNAL(clicked()), SLOT(onYouBack()));
+            l->addWidget(b);
+            YouListWidget* ylw = new YouListWidget(activatedUsername, this);
+            connect(ylw, SIGNAL(itemActivated(QTreeWidgetItem*, int)), SLOT(onYouItemActivated(QTreeWidgetItem*, int)));
+            l->addWidget(ylw);
+
+            // slide m_youWidget forward to show the new profile
             m_youWidget->layout()->addWidget(w);
             ((SideBySideLayout*)m_youWidget->layout())->moveForward();
             return;
@@ -184,6 +192,16 @@ MultiStarterWidget::onYouItemActivated(QTreeWidgetItem* i, int)
         i->data(0, SourceListModel::Arg2).toString(),
         1.0,
         i->data(0, SourceListModel::ImageUrl).toString()));     
+}
+
+void
+MultiStarterWidget::onYouBack()
+{
+    SideBySideLayout* layout = (SideBySideLayout*) m_youWidget->layout();
+    QWidget* top = layout->currentWidget();
+    layout->moveBackward();
+    layout->removeWidget(top);
+    top->deleteLater();
 }
 
 void
