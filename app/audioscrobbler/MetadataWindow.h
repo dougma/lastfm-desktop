@@ -39,11 +39,13 @@ class MetadataWindow : public unicorn::MainWindow
         class QPushButton* love;
         class QPushButton* tag;
         class QPushButton* share;
+        class ScrobbleControls* sc;
     } ui;
 
 public:
     MetadataWindow();
     const Track& currentTrack() const{ return m_currentTrack; }
+    class ScrobbleControls* scrobbleControls() const{ return ui.sc; }
 
 public slots:
     void onTrackStarted(const Track&, const Track&);

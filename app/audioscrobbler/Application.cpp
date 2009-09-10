@@ -20,6 +20,7 @@
 */
 #include "Application.h"
 #include "MetadataWindow.h"
+#include "ScrobbleControls.h"
 #include "StopWatch.h"
 #include "lib/listener/DBusListener.h"
 #include "lib/listener/PlayerConnection.h"
@@ -33,15 +34,16 @@
 #include <QMenu>
 #include "TagDialog.h"
 #include "ShareDialog.h"
-
 using audioscrobbler::Application;
 
 #define ELLIPSIS QString::fromUtf8("…")
 
 #ifdef Q_WS_X11
     #define AS_TRAY_ICON ":16x16.png"
-#else
+#elif defined( Q_WS_WIN )
     #define AS_TRAY_ICON ":22x22.png"
+#elif defined( Q_WS_MAC )
+    #define AS_TRAY_ICON ":19x15.png"
 #endif
 
 Application::Application(int& argc, char** argv) : unicorn::Application(argc, argv)
@@ -49,7 +51,8 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 /// tray
     tray = new QSystemTrayIcon(this);
     connect(tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onTrayActivated(QSystemTrayIcon::ActivationReason)));
-    tray->setIcon(QIcon(AS_TRAY_ICON));
+    QIcon trayIcon( AS_TRAY_ICON );
+    tray->setIcon(trayIcon);
     tray->show();
 
 /// tray menu
@@ -80,6 +83,10 @@ Application::Application(int& argc, char** argv) : unicorn::Application(argc, ar
 
 /// MetadataWindow
     mw = new MetadataWindow;
+    ScrobbleControls* sc = mw->scrobbleControls();
+    sc->setLoveAction( m_love_action );
+    sc->setTagAction( m_tag_action );
+    sc->setShareAction( m_share_action );
 
 /// scrobbler
     as = new Audioscrobbler("ass");
