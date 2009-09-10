@@ -58,12 +58,12 @@
                         <Shortcut Id="launchLastfmRadio"
                                   Name="Last.fm Radio"
                                   Target="[INSTALLDIR]radio.exe"
-                                  Arguments="-stylesheet=[INSTALLDIR]radio.css"
+                                  Arguments="&quot;-stylesheet=[INSTALLDIR]radio.css&quot;"
                                   Directory="lastfmMenuFolder" />
                         <Shortcut Id="launchAudioscrobbler"
                                   Name="Audioscrobbler"
                                   Target="[INSTALLDIR]audioscrobbler.exe"
-                                  Arguments="-stylesheet=[INSTALLDIR]audioscrobbler.css"
+                                  Arguments="&quot;-stylesheet=[INSTALLDIR]audioscrobbler.css&quot;"
                                   Directory="lastfmMenuFolder" />
                         <Shortcut Id="uninstallBoffin"
                                   Name="Uninstall Last.fm"
@@ -135,6 +135,8 @@
 
                     <Merge Id="crt1" Language="0" SourceFile="Microsoft_VC80_CRT_x86.msm" DiskId="1" />
                     <Merge Id="crt2" Language="0" SourceFile="policy_8_0_Microsoft_VC80_CRT_x86.msm" DiskId="1" />
+                    <Merge Id="atl1" Language="0" SourceFile="Microsoft_VC80_ATL_x86.msm" DiskId="1" />
+                    <Merge Id="atl2" Language="0" SourceFile="policy_8_0_Microsoft_VC80_ATL_x86.msm" DiskId="1" />
                     
                 </Directory>
             </Directory>
@@ -157,6 +159,8 @@
             <ComponentRef Id="lastfmShortcutComponent" />
             <MergeRef Id="crt1" />
             <MergeRef Id="crt2" />
+            <MergeRef Id="atl1" />
+            <MergeRef Id="atl2" />
         </Feature>
         
 	</Product>
