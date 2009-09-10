@@ -26,7 +26,6 @@
 #include <QLineEdit>
 #include <QSizeGrip>
 #include <QStatusBar>
-#include <QStackedLayout>
 
 MainWindow::MainWindow()
 {
@@ -57,12 +56,12 @@ MainWindow::MainWindow()
     MainWidget* mw;
 
     QWidget* w = new QWidget();
-    // a stacked layout so the messagebar can intrude over the top
-    QStackedLayout* sl = new QStackedLayout(w);
-    sl->setStackingMode(QStackedLayout::StackAll);
-    sl->addWidget(m_messageBar = new MessageBar());
-    sl->addWidget(mw = new MainWidget());
-    sl->setCurrentWidget(m_messageBar);     // make sure it's on top.
+    
+    new QVBoxLayout( w );
+    w->layout()->addWidget(mw = new MainWidget());
+
+    m_messageBar = new MessageBar( this );
+
     connect(mw, SIGNAL(startRadio(RadioStation)), SIGNAL(startRadio(RadioStation)));
 
     AuthenticatedUser user;
@@ -74,6 +73,7 @@ MainWindow::MainWindow()
     setCentralWidget( w );
 
     finishUi();
+    m_messageBar->raise();
 }
 
 void
@@ -105,4 +105,9 @@ MainWindow::onRadioError(int code, const QVariant& data)
             break;
     }
 }
-
+#include <QResizeEvent>
+void 
+MainWindow::resizeEvent(QResizeEvent* event)
+{
+    m_messageBar->resize( event->size().width(), m_messageBar->height());
+}
