@@ -38,6 +38,9 @@ signals:
 public slots:
     void onRadioError(int code, const QVariant& data);
 
+protected:
+    virtual void resizeEvent(QResizeEvent* event);
+    
 private:
     MessageBar* m_messageBar;
 };

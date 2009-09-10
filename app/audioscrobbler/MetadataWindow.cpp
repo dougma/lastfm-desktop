@@ -150,7 +150,7 @@ MetadataWindow::MetadataWindow()
         //Seemingly the only way to get a central widget in a QStatusBar
         //is to add an empty widget either side with a stretch value.
         status->addWidget( new QWidget( status), 1 );
-        status->addWidget( new ScrobbleControls());
+        status->addWidget( ui.sc = new ScrobbleControls());
         status->addWidget( new QWidget( status), 1 );
         setStatusBar( status );
     }
@@ -166,6 +166,12 @@ MetadataWindow::MetadataWindow()
     setMinimumHeight( 80 );
     resize(20, 500);
 }
+
+//ScrobbleControls* 
+//MetadataWindow::scrobbleControls() const
+//{
+//    return ui.sc;
+//}
 
 void
 MetadataWindow::onAnchorClicked( const QUrl& link )
@@ -217,9 +223,10 @@ MetadataWindow::onArtistGotInfo()
     ui.listeners->setText(QString("%L1").arg(listeners));
     ui.tags->setText(tags);
 
-    //TODO if empty suggest they edit it
-    QString style = "<style>" + ((audioscrobbler::Application*)qApp)->loadedStyleSheet() + styleSheet() + "</style>";
+    QString stylesheet = ((audioscrobbler::Application*)qApp)->loadedStyleSheet() + styleSheet();
+    QString style = "<style>" + stylesheet + "</style>";
     
+    //TODO if empty suggest they edit it
     QString bio;
     {
         QStringList bioList = lfm["artist"]["bio"]["content"].text().trimmed().split( "\r" );

@@ -23,12 +23,23 @@
 
 #include "lib/unicorn/StylableWidget.h"
 
+class QPushButton;
 class ScrobbleControls : public StylableWidget
 {
     Q_OBJECT
 public:
     ScrobbleControls();
+    
+    void setLoveAction( const QAction* a );
+    void setTagAction( const QAction* a );
+    void setShareAction( const QAction* a );
 
+protected:
+    struct {
+        QPushButton* love;
+        QPushButton* tag;
+        QPushButton* share;
+    } ui;
 };
 
 #endif //SCROBBLE_CONTROLS_H

@@ -22,12 +22,14 @@
 #include <QtGui>
 
 
-MessageBar::MessageBar()
+MessageBar::MessageBar( QWidget* parent )
+           :QWidget( parent )
 {
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+    updateGeometry();
     setFixedHeight( 0 );
-    
     ui.papyrus = new QWidget( this );
-
+    
     QPalette p = palette();
     p.setColor( QPalette::Text, Qt::black );
     p.setColor( QPalette::Window, QColor( 0xfa, 0xfa, 0xc7 ) );
@@ -130,7 +132,7 @@ MessageBar::onLabelDestroyed()
 
 
 void
-MessageBar::resizeEvent( QResizeEvent* )
+MessageBar::resizeEvent( QResizeEvent* e )
 {
     ui.papyrus->setFixedWidth( width() );
     foreach (QLabel* l, findChildren<QLabel*>())

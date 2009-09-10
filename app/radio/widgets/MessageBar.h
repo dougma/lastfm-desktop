@@ -39,7 +39,7 @@ class MessageBar : public QWidget
     void doLayout();
     
 public:
-    MessageBar();
+    MessageBar( QWidget* parent = 0 );
     
 public slots:
     void show( const QString&, const QString& id = QString() );

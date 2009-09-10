@@ -28,17 +28,30 @@
 ScrobbleControls::ScrobbleControls()
 {
     new QHBoxLayout( this );
-    QPushButton* b;
-    layout()->addWidget(b = new QPushButton(tr("love")));
-    b->setObjectName("love");
-    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->loveAction(), SLOT(trigger()));
-    b->setAutoFillBackground( true );
+    layout()->addWidget(ui.love = new QPushButton(tr("love")));
+    ui.love->setObjectName("love");
     
-    layout()->addWidget(b = new QPushButton(tr("tag")));
-    b->setObjectName("tag");
-    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->tagAction(), SLOT(trigger()));
+    layout()->addWidget(ui.tag = new QPushButton(tr("tag")));
+    ui.tag->setObjectName("tag");
     
-    layout()->addWidget(b = new QPushButton(tr("share")));
-    b->setObjectName("share");
-    connect( b, SIGNAL(clicked()), ((audioscrobbler::Application*)qApp)->shareAction(), SLOT(trigger()));
+    layout()->addWidget(ui.share = new QPushButton(tr("share")));
+    ui.share->setObjectName("share");
+}
+
+void
+ScrobbleControls::setLoveAction( const QAction* a )
+{
+    connect( ui.love, SIGNAL(clicked()), a, SLOT(trigger()));
+}
+
+void
+ScrobbleControls::setTagAction( const QAction* a )
+{
+    connect( ui.tag, SIGNAL(clicked()), a, SLOT(trigger()));
+}
+
+void
+ScrobbleControls::setShareAction( const QAction* a )
+{
+    connect( ui.share, SIGNAL(clicked()), a, SLOT(trigger()));
 }
