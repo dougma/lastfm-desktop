@@ -39,6 +39,8 @@
 #include <QDebug>
 #include <QLocale>
 #include <QTranslator>
+#include <QFile>
+#include <QFileInfo>
 
 
 unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserException )
@@ -55,6 +57,19 @@ unicorn::Application::Application( int& argc, char** argv ) throw( StubbornUserE
     AEEventHandlerUPP h = NewAEEventHandlerUPP( appleEventHandler );
     AEInstallEventHandler( kCoreEventClass, kAEReopenApplication, h, 0, false );
 #endif
+
+    #ifdef Q_WS_MAC
+        #define CSS_PATH "/../Resources/"
+    #else
+        #define CSS_PATH "/"
+    #endif
+    if( styleSheet().isEmpty()) {
+        QString cssFileName = QFileInfo(applicationFilePath()).baseName() + ".css";
+        QFile stylesheetFile( applicationDirPath() + CSS_PATH + cssFileName );
+        stylesheetFile.open( QIODevice::ReadOnly );
+        QString stylesheet( stylesheetFile.readAll() );
+        setStyleSheet( stylesheet );
+    }
 
     translate();
 
