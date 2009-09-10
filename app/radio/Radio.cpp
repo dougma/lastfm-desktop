@@ -63,7 +63,11 @@ Radio::~Radio()
 #endif
 }
 
-
+// fixme:
+// todo:
+// note:
+// if the station is the same as current station (ie: the user hit stop then start)
+// then we *don't* retune.  norman is quite emphatic about this.  :)
 void
 Radio::play( const RadioStation& station )
 {
